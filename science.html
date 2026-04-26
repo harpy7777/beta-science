@@ -4,133 +4,140 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>베타과학학원 | 통합과학 수행평가</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Serif+Display:ital@0;1&display=swap');
+
 :root {
-  --purple: #7B5EA7;
+  --purple:       #7B5EA7;
   --purple-light: #9B7EC8;
-  --purple-dark: #4A3470;
-  --accent: #F0C040;
-  --accent2: #60C8A0;
-  --bg: #0D0B14;
+  --purple-dark:  #4A3470;
+  --accent:       #F0C040;
+  --accent2:      #60C8A0;
+  --bg:  #0D0B14;
   --bg2: #13101E;
   --bg3: #1A1628;
-  --text: #F0EEF8;
-  --text2: #A098C0;
+  --text:   #F0EEF8;
+  --text2:  #A098C0;
   --border: rgba(123,94,167,0.25);
+  --font-body:    'Noto Sans KR', sans-serif;
+  --font-display: 'DM Serif Display', serif;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
-/* 배경 노이즈 텍스처 */
-body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-/* 배경 오브 */
-.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
-.orb1{width:600px;height:600px;background:radial-gradient(circle,rgba(123,94,167,0.15),transparent 70%);top:-200px;right:-100px}
-.orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(96,200,160,0.08),transparent 70%);bottom:200px;left:-100px}
+.orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
+.orb1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(123,94,167,0.15), transparent 70%); top: -200px; right: -100px; }
+.orb2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(96,200,160,0.08), transparent 70%); bottom: 200px; left: -100px; }
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;background:rgba(13,11,20,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.nav-logo{display:flex;align-items:center;gap:10px}
-.nav-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--purple),var(--purple-light));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
-.nav-logo-text{font-size:14px;font-weight:700;color:var(--text)}
-.nav-logo-sub{font-size:11px;color:var(--text2);margin-top:1px}
-.nav-links{display:flex;gap:2rem;align-items:center}
-.nav-link{font-size:13px;color:var(--text2);text-decoration:none;transition:color 0.2s;cursor:pointer}
-.nav-link:hover{color:var(--text)}
-.nav-cta{background:var(--purple);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;text-decoration:none;transition:background 0.2s;cursor:pointer;border:none;font-family:inherit}
-.nav-cta:hover{background:var(--purple-light)}
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(13,11,20,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; }
+.nav-logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, var(--purple), var(--purple-light)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.nav-logo-text { font-size: 14px; font-weight: 700; color: var(--text); }
+.nav-logo-sub  { font-size: 11px; color: var(--text2); margin-top: 1px; }
+.nav-links { display: flex; gap: 2rem; align-items: center; }
+.nav-link  { font-size: 13px; color: var(--text2); text-decoration: none; transition: color 0.2s; cursor: pointer; }
+.nav-link:hover { color: var(--text); }
 
-/* HERO */
-.hero{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;padding:6rem 2rem 4rem;max-width:1100px;margin:0 auto}
-.hero-content{max-width:700px}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(123,94,167,0.15);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:12px;color:var(--purple-light);margin-bottom:2rem;letter-spacing:0.05em}
-.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--accent2);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-.hero-title{font-family:'DM Serif Display',serif;font-size:clamp(2.5rem,6vw,4.5rem);line-height:1.1;margin-bottom:1.5rem;color:var(--text)}
-.hero-title em{font-style:italic;color:var(--purple-light)}
-.hero-title span{color:var(--accent)}
-.hero-desc{font-size:16px;color:var(--text2);line-height:1.8;margin-bottom:2.5rem;max-width:560px;font-weight:300}
-.hero-stats{display:flex;gap:2.5rem;margin-bottom:3rem}
-.hero-stat-num{font-size:2rem;font-weight:900;color:var(--text);line-height:1}
-.hero-stat-label{font-size:12px;color:var(--text2);margin-top:4px}
-.hero-btn-row{display:flex;gap:12px;flex-wrap:wrap}
-.btn-primary{background:linear-gradient(135deg,var(--purple),var(--purple-light));color:#fff;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:600;text-decoration:none;transition:all 0.2s;border:none;cursor:pointer;font-family:inherit}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(123,94,167,0.4)}
-.btn-secondary{background:transparent;color:var(--text);padding:14px 28px;border-radius:12px;font-size:14px;font-weight:500;border:1px solid var(--border);cursor:pointer;font-family:inherit;transition:all 0.2s}
-.btn-secondary:hover{border-color:var(--purple);background:rgba(123,94,167,0.1)}
-.hero-visual{position:absolute;right:0;top:50%;transform:translateY(-50%);width:380px;opacity:0.6;display:none}
-@media(min-width:1000px){.hero-visual{display:block}}
+.hero { position: relative; z-index: 1; min-height: 100vh; display: flex; align-items: center; padding: 6rem 2rem 4rem; max-width: 1100px; margin: 0 auto; }
+.hero-content { text-align: center; max-width: 700px; margin: 0 auto; }
+.hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(123,94,167,0.15); border: 1px solid var(--border); border-radius: 100px; padding: 6px 16px; font-size: 12px; color: var(--purple-light); margin-bottom: 2rem; letter-spacing: 0.05em; }
+.hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-/* 태그 칩 */
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:3rem}
-.chip{padding:6px 14px;border-radius:100px;font-size:12px;font-weight:500;letter-spacing:0.03em}
-.chip-explore{background:rgba(240,192,64,0.12);color:var(--accent);border:1px solid rgba(240,192,64,0.2)}
-.chip-perf{background:rgba(123,94,167,0.15);color:var(--purple-light);border:1px solid var(--border)}
-.chip-special{background:rgba(96,200,160,0.1);color:var(--accent2);border:1px solid rgba(96,200,160,0.2)}
+.hero-title { font-family: var(--font-body); font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.1; margin-bottom: 1.5rem; color: var(--text); }
+.hero-title em   { font-style: normal; color: var(--purple-light); }
+.hero-title span { color: var(--accent); }
+.hero-desc { font-size: 16px; color: var(--text2); line-height: 1.8; margin-bottom: 2.5rem; max-width: 100%; text-align: center; font-weight: 300; }
+.hero-stats { display: flex; gap: 2.5rem; margin-bottom: 3rem; justify-content: center; }
+.hero-stat-num   { font-size: 2rem; font-weight: 900; color: var(--text); line-height: 1; }
+.hero-stat-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
 
-/* SECTION */
-section{position:relative;z-index:1;padding:5rem 2rem;max-width:1100px;margin:0 auto}
-.section-eyebrow{font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--purple-light);margin-bottom:12px}
-.section-title{font-family:'DM Serif Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);color:var(--text);margin-bottom:1rem;line-height:1.2}
-.section-title em{font-style:italic;color:var(--purple-light)}
-.section-desc{font-size:15px;color:var(--text2);line-height:1.8;max-width:560px;font-weight:300}
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 3rem; justify-content: center; }
+.chip { padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 500; letter-spacing: 0.03em; }
+.chip-explore { background: rgba(240,192,64,0.12); color: var(--accent);       border: 1px solid rgba(240,192,64,0.2); }
+.chip-perf    { background: rgba(123,94,167,0.15);  color: var(--purple-light); border: 1px solid var(--border); }
+.chip-special { background: rgba(96,200,160,0.10);  color: var(--accent2);      border: 1px solid rgba(96,200,160,0.2); }
 
-/* 단원 헤더 */
-.unit-header{display:flex;align-items:center;gap:16px;padding:1.5rem 2rem;background:var(--bg2);border:1px solid var(--border);border-radius:16px;margin-bottom:1.5rem;margin-top:4rem}
-.unit-icon{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
-.unit-num{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text2);margin-bottom:4px}
-.unit-title{font-size:18px;font-weight:700;color:var(--text)}
-.unit-sub{font-size:13px;color:var(--text2);margin-top:3px}
-.unit-count{margin-left:auto;background:rgba(123,94,167,0.15);border:1px solid var(--border);color:var(--purple-light);font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;white-space:nowrap}
+.hero-btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.btn-primary { background: linear-gradient(135deg, var(--purple), var(--purple-light)); color: #fff; padding: 14px 28px; border-radius: 12px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; font-family: var(--font-body); transition: all 0.2s; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(123,94,167,0.4); }
 
-/* 카드 그리드 */
-.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.5rem;transition:all 0.25s;cursor:pointer;position:relative;overflow:hidden}
-.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(123,94,167,0.05),transparent);opacity:0;transition:opacity 0.25s}
-.card:hover{border-color:rgba(123,94,167,0.5);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.3)}
-.card:hover::before{opacity:1}
-.card-icon-wrap{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:1rem;background:var(--bg3)}
-.card-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.4}
-.card-desc{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:1rem;font-weight:300}
-.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem}
-.card-tag{font-size:10px;font-weight:500;padding:3px 8px;border-radius:6px;letter-spacing:0.03em}
-.tag-explore{background:rgba(240,192,64,0.1);color:var(--accent)}
-.tag-perf{background:rgba(123,94,167,0.15);color:var(--purple-light)}
-.tag-special{background:rgba(96,200,160,0.1);color:var(--accent2)}
-.tag-csat{background:rgba(255,255,255,0.06);color:var(--text2)}
-.card-link{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--purple-light);margin-top:auto;transition:gap 0.2s}
-.card:hover .card-link{gap:10px}
+.feature-bar { display: flex; justify-content: center; gap: 12px; padding: 0 2rem 4rem; max-width: 1100px; margin: 0 auto; flex-wrap: wrap; position: relative; z-index: 1; }
+.feature-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem 1.25rem; text-align: center; flex: 1; min-width: 160px; transition: all 0.2s; }
+.feature-item:hover { border-color: rgba(123,94,167,0.5); transform: translateY(-3px); }
+.feature-icon  { font-size: 2rem; margin-bottom: 0.75rem; }
+.feature-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.feature-sub   { font-size: 12px; color: var(--text2); }
 
-/* DIVIDER */
-.unit-divider{display:flex;align-items:center;gap:12px;margin:3rem 0 0;opacity:0.5}
-.unit-divider-line{flex:1;height:1px;background:var(--border)}
-.unit-divider-label{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text2);white-space:nowrap}
+.why-section { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 2rem 5rem; }
+.why-header { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 2rem 2.5rem; margin-bottom: 1.5rem; }
+.why-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+.why-title span { color: var(--accent); }
+.why-desc { font-size: 14px; color: var(--text2); line-height: 1.8; font-weight: 300; }
+.why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.why-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; transition: all 0.2s; }
+.why-card:hover { border-color: rgba(123,94,167,0.5); transform: translateY(-3px); }
+.why-icon { font-size: 2rem; margin-bottom: 1rem; }
+.why-card-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.why-card-desc  { font-size: 13px; color: var(--text2); line-height: 1.7; font-weight: 300; }
 
-/* FOOTER */
-footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:3rem 2rem;text-align:center}
-.footer-logo{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--text);margin-bottom:8px}
-.footer-logo em{font-style:italic;color:var(--purple-light)}
-.footer-sub{font-size:13px;color:var(--text2);margin-bottom:1rem}
-.footer-tags{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:1.5rem}
-.footer-copy{font-size:12px;color:rgba(160,152,192,0.5)}
+section { position: relative; z-index: 1; padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+.unit-divider { display: flex; align-items: center; gap: 12px; margin: 3rem 0 0; opacity: 1; }
+.unit-divider-line  { flex: 1; height: 1px; background: var(--border); }
+.unit-divider-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #ffffff; white-space: nowrap; }
+.unit-header { display: flex; align-items: center; gap: 16px; padding: 1.5rem 2rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 1.5rem; margin-top: 1.5rem; }
+.unit-icon  { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.unit-num   { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text2); margin-bottom: 4px; }
+.unit-title { font-size: 18px; font-weight: 700; color: var(--text); }
+.unit-sub   { font-size: 13px; color: var(--text2); margin-top: 3px; }
+.unit-count { margin-left: auto; background: rgba(123,94,167,0.15); border: 1px solid var(--border); color: var(--purple-light); font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 20px; white-space: nowrap; }
 
-/* 애니메이션 */
-.fade-in{opacity:0;transform:translateY(20px);transition:opacity 0.6s ease,transform 0.6s ease}
-.fade-in.visible{opacity:1;transform:translateY(0)}
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; transition: all 0.25s; cursor: pointer; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+.card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(123,94,167,0.05), transparent); opacity: 0; transition: opacity 0.25s; }
+.card:hover { border-color: rgba(123,94,167,0.5); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+.card:hover::before { opacity: 1; }
+.card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; }
+.card-icon-wrap { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: var(--bg3); flex-shrink: 0; }
+.card-top .card-icon-wrap { margin-bottom: 0; }
+.card-title { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.4; }
+.card-desc  { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 1rem; font-weight: 300; flex: 1; }
+.card-tags  { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+.card-tag   { font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.03em; }
+.tag-explore{ background: rgba(240,192,64,0.1);  color: var(--accent); }
+.tag-perf   { background: rgba(123,94,167,0.15); color: var(--purple-light); }
+.tag-special{ background: rgba(96,200,160,0.1);  color: var(--accent2); }
+.tag-csat   { background: rgba(255,255,255,0.06);color: var(--text2); }
+.card-link  { display: flex; align-items: center; justify-content: flex-end; gap: 6px; font-size: 13px; font-weight: 500; color: var(--purple-light); transition: gap 0.2s; }
+.card:hover .card-link { gap: 10px; }
 
-/* 모바일 */
+footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 3rem 2rem; text-align: center; }
+.footer-logo { font-family: var(--font-body); font-size: 1.5rem; color: var(--text); margin-bottom: 8px; }
+.footer-sub  { font-size: 13px; color: var(--text2); margin-bottom: 1rem; }
+.footer-tags { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 1.5rem; }
+.footer-copy { font-size: 12px; color: rgba(160,152,192,0.5); }
+
+.fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
 @media(max-width:768px){
-  nav{padding:1rem}
-  .nav-links{display:none}
-  .hero{padding:5rem 1rem 3rem}
-  .hero-stats{gap:1.5rem}
-  section{padding:3rem 1rem}
-  .unit-header{padding:1rem}
-  .card-grid{grid-template-columns:1fr}
+  nav { padding: 1rem; }
+  .nav-links { display: none; }
+  .hero { padding: 5rem 1rem 3rem; }
+  .hero-stats { gap: 1.5rem; }
+  section { padding: 3rem 1rem; }
+  .unit-header { padding: 1rem; }
+  .card-grid { grid-template-columns: 1fr; }
+  .why-grid { grid-template-columns: 1fr 1fr; }
 }
 </style>
 </head>
@@ -139,7 +146,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:3r
 <div class="orb orb1"></div>
 <div class="orb orb2"></div>
 
-<!-- NAV -->
 <nav>
   <div class="nav-logo">
     <div class="nav-logo-icon">🔬</div>
@@ -154,25 +160,23 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:3r
     <a class="nav-link" href="#unit3">Ⅲ단원</a>
     <a class="nav-link" href="#unit4">Ⅳ단원</a>
   </div>
-  <button class="nav-cta" onclick="window.location.href='/'">온라인 테스트 →</button>
 </nav>
 
-<!-- HERO -->
 <div class="hero">
   <div class="hero-content fade-in">
     <div class="hero-badge">
       <span class="hero-badge-dot"></span>
       고등학교 1학년 통합과학
-    </div>
+    </div><br>
     <h1 class="hero-title">
       수행평가 · 탐구 · 세특<br>
       <em>완벽하게</em> 준비하는<br>
       <span>베타</span>의 방법
-    </h1>
-    <p class="hero-desc">단순 암기를 넘어 탐구 역량과 과학적 사고력을 키우는 체험형 학습 시스템. 수행평가부터 세특 서술까지 모든 과학 준비를 베타에서 완성하세요.</p>
+    </h1><br><br>
+    <p class="hero-desc"><strong>단순 암기를 넘어 탐구 역량과 과학적 사고력을 키우는 체험형 학습 시스템.<br>수행평가부터 세특 서술까지 모든 과학 준비를 베타에서 완성하세요.</strong></p><br>
     <div class="hero-stats">
-      <div><div class="hero-stat-num">4</div><div class="hero-stat-label">대단원</div></div>
-      <div><div class="hero-stat-num">20+</div><div class="hero-stat-label">학습 자료</div></div>
+      <div><div class="hero-stat-num">4</div><div class="hero-stat-label">대단원</div></div>&emsp;
+      <div><div class="hero-stat-num">20+</div><div class="hero-stat-label">학습 자료</div></div>&emsp;
       <div><div class="hero-stat-num">100%</div><div class="hero-stat-label">수행·탐구·세특 대응</div></div>
     </div>
     <div class="chips">
@@ -182,200 +186,94 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:3r
       <span class="chip chip-perf">내신대비</span>
       <span class="chip chip-perf">수능대비</span>
     </div>
-    <div class="hero-btn-row">
-      <button class="btn-primary" onclick="document.getElementById('unit1').scrollIntoView({behavior:'smooth'})">자료 보러가기 ↓</button>
-      <button class="btn-secondary" onclick="window.location.href='/'">온라인 테스트</button>
-    </div>
   </div>
 </div>
 
-<!-- UNIT 1 -->
+<div class="feature-bar">
+  <div class="feature-item"><div class="feature-icon">📚</div><div class="feature-title">내신 완벽 대비</div><div class="feature-sub">학교별 맞춤 분석</div></div>
+  <div class="feature-item"><div class="feature-icon">🎯</div><div class="feature-title">수능 집중 대비</div><div class="feature-sub">고난도 문제 마스터</div></div>
+  <div class="feature-item"><div class="feature-icon">✏️</div><div class="feature-title">수행평가 완성</div><div class="feature-sub">모든 유형 커버</div></div>
+  <div class="feature-item"><div class="feature-icon">🔬</div><div class="feature-title">탐구 보고서</div><div class="feature-sub">과정·결과 완벽 정리</div></div>
+  <div class="feature-item"><div class="feature-icon">📝</div><div class="feature-title">세특 서술 코칭</div><div class="feature-sub">입시 직결 서술 완성</div></div>
+</div>
+
+<div class="why-section">
+  <div class="why-header">
+    <div class="why-title">왜 베타과학학원이어야 할까요? <span>4가지 이유</span></div>
+    <div class="why-desc">단순히 문제 푸는 학원이 아닙니다. 목동 20년 이상의 경력으로 수행평가·세특·수능 모두를 관통하는 진짜 실력을 만들고, 최상위권 대학 합격을 이끌어 드립니다.</div>
+  </div>
+  <div class="why-grid">
+    <div class="why-card"><div class="why-icon">🧬</div><div class="why-card-title">탐구 실험 중심 수업</div><div class="why-card-desc">교과서 탐구 활동을 직접 체험하고, 결과를 논술로 완성하는 보고서 작성 훈련까지 한 수업에 담습니다.</div></div>
+    <div class="why-card"><div class="why-icon">📊</div><div class="why-card-title">수행평가 100% 대비</div><div class="why-card-desc">학교별 수행평가 출제 패턴을 분석하고, O/X·선택형·서술형·포트폴리오까지 모든 유형을 체계적으로 준비합니다.</div></div>
+    <div class="why-card"><div class="why-icon">✍️</div><div class="why-card-title">세특 서술 전문 코칭</div><div class="why-card-desc">단순 수업 참여에 그치지 않고, 탐구 활동 경험을 입시에 유리한 세특 서술로 연결하는 코칭을 제공합니다.</div></div>
+    <div class="why-card"><div class="why-icon">🏆</div><div class="why-card-title">내신 + 수능 + 최상위권 합격</div><div class="why-card-desc">목동 20년+ 경력의 노하우로 내신·수능·수행평가·세특을 하나로 통합해 최상위권 대학의 합격을 실현합니다.</div></div>
+  </div>
+</div>
+
 <section id="unit1">
   <div class="unit-divider"><div class="unit-divider-line"></div><span class="unit-divider-label">대단원 Ⅰ</span><div class="unit-divider-line"></div></div>
   <div class="unit-header fade-in">
     <div class="unit-icon" style="background:rgba(240,192,64,0.1)">⚗️</div>
-    <div>
-      <div class="unit-num">Unit 01</div>
-      <div class="unit-title">물질과 규칙성</div>
-      <div class="unit-sub">원소 · 주기율 · 스펙트럼 · 화학결합</div>
-    </div>
+    <div><div class="unit-num">Unit 01</div><div class="unit-title">물질과 규칙성</div><div class="unit-sub">원소 · 주기율 · 스펙트럼 · 화학결합</div></div>
     <div class="unit-count">5개 자료</div>
   </div>
   <div class="card-grid">
-    <div class="card fade-in">
-      <div class="card-icon-wrap">🔭</div>
-      <div class="card-title">원소의 스펙트럼 관찰 탐구</div>
-      <div class="card-desc">다양한 원소의 불꽃 반응과 방전관 스펙트럼을 비교 분석하고 원소 고유의 선 스펙트럼 원리를 탐구합니다.</div>
-      <div class="card-tags"><span class="card-tag tag-explore">탐구활동</span><span class="card-tag tag-perf">수행평가</span><span class="card-tag tag-special">세특</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
-    <div class="card fade-in">
-      <div class="card-icon-wrap">🧪</div>
-      <div class="card-title">주기율표 완성하기 — 규칙으로 원소 세계 탐구</div>
-      <div class="card-desc">원소의 물리·화학적 성질 규칙성을 찾아 주기율표를 직접 구성해 보는 탐구 활동입니다.</div>
-      <div class="card-tags"><span class="card-tag tag-explore">탐구활동</span><span class="card-tag tag-perf">수행평가</span><span class="card-tag tag-special">세특</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
-    <div class="card fade-in">
-      <div class="card-icon-wrap">⚡</div>
-      <div class="card-title">이온 결합 vs 공유 결합 완벽대비</div>
-      <div class="card-desc">이온·공유 결합의 형성 원리와 옥텟 규칙, 결합 모형을 비교하고 수능·내신 문제에 완벽 대비합니다.</div>
-      <div class="card-tags"><span class="card-tag tag-perf">내신대비</span><span class="card-tag tag-csat">수능대비</span><span class="card-tag tag-special">세특</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
-    <div class="card fade-in">
-      <div class="card-icon-wrap">🌍</div>
-      <div class="card-title">지구와 생명체 구성 성분 비교 탐구</div>
-      <div class="card-desc">Fe·O·Si·Mg vs O·C·H·N 비교 분석과 우주적 원소 기원 서술까지 완벽 정리된 학습 자료입니다.</div>
-      <div class="card-tags"><span class="card-tag tag-perf">내신대비</span><span class="card-tag tag-csat">수능대비</span><span class="card-tag tag-special">세특</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
-    <div class="card fade-in">
-      <div class="card-icon-wrap">🌈</div>
-      <div class="card-title">분광기로 천체 스펙트럼 비교 완벽대비</div>
-      <div class="card-desc">천체의 흡수·방출 스펙트럼과 원소 비교를 통해 별의 대기 성분을 분석하는 방법을 완전 정리합니다.</div>
-      <div class="card-tags"><span class="card-tag tag-perf">내신대비</span><span class="card-tag tag-csat">수능대비</span><span class="card-tag tag-special">세특</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">🔭</div><div class="card-title">원소의 스펙트럼 관찰 탐구</div></div><div class="card-desc">다양한 원소의 불꽃 반응과 방전관 스펙트럼을 비교 분석하고 원소 고유의 선 스펙트럼 원리를 탐구합니다.</div><div class="card-tags"><span class="card-tag tag-explore">탐구활동</span><span class="card-tag tag-perf">수행평가</span><span class="card-tag tag-special">세특</span></div><div class="card-link">바로 보기 →</div></div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">🧪</div><div class="card-title">주기율표 완성하기 — 규칙으로 원소 세계 탐구</div></div><div class="card-desc">원소의 물리·화학적 성질 규칙성을 찾아 주기율표를 직접 구성해 보는 탐구 활동입니다.</div><div class="card-tags"><span class="card-tag tag-explore">탐구활동</span><span class="card-tag tag-perf">수행평가</span><span class="card-tag tag-special">세특</span></div><div class="card-link">바로 보기 →</div></div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">⚡</div><div class="card-title">이온 결합 vs 공유 결합 완벽대비</div></div><div class="card-desc">이온·공유 결합의 형성 원리와 옥텟 규칙, 결합 모형을 비교하고 수능·내신 문제에 완벽 대비합니다.</div><div class="card-tags"><span class="card-tag tag-perf">내신대비</span><span class="card-tag tag-csat">수능대비</span><span class="card-tag tag-special">세특</span></div><div class="card-link">바로 보기 →</div></div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">🌍</div><div class="card-title">지구와 생명체 구성 성분 비교 탐구</div></div><div class="card-desc">Fe·O·Si·Mg vs O·C·H·N 비교 분석과 우주적 원소 기원 서술까지 완벽 정리된 학습 자료입니다.</div><div class="card-tags"><span class="card-tag tag-perf">내신대비</span><span class="card-tag tag-csat">수능대비</span><span class="card-tag tag-special">세특</span></div><div class="card-link">바로 보기 →</div></div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">🌈</div><div class="card-title">분광기로 천체 스펙트럼 비교 완벽 대비</div></div><div class="card-desc">천체의 흡수·방출 스펙트럼과 원소 비교를 통해 별의 대기 성분을 분석하는 방법을 완전 정리합니다.</div><div class="card-tags"><span class="card-tag tag-perf">내신대비</span><span class="card-tag tag-csat">수능대비</span><span class="card-tag tag-special">세특</span></div><div class="card-link">바로 보기 →</div></div>
   </div>
 </section>
 
-<!-- UNIT 2 -->
 <section id="unit2">
   <div class="unit-divider"><div class="unit-divider-line"></div><span class="unit-divider-label">대단원 Ⅱ</span><div class="unit-divider-line"></div></div>
   <div class="unit-header fade-in">
     <div class="unit-icon" style="background:rgba(96,200,160,0.1)">🧬</div>
-    <div>
-      <div class="unit-num">Unit 02</div>
-      <div class="unit-title">자연의 구성 물질</div>
-      <div class="unit-sub">지각·생명체 구성 물질 · 신소재</div>
-    </div>
+    <div><div class="unit-num">Unit 02</div><div class="unit-title">자연의 구성 물질</div><div class="unit-sub">지각·생명체 구성 물질 · 신소재</div></div>
     <div class="unit-count">4개 자료</div>
   </div>
   <div class="card-grid">
-    <div class="card fade-in">
-      <div class="card-icon-wrap">💎</div>
-      <div class="card-title">물질의 전기적 성질 — 소재 조사 탐구</div>
-      <div class="card-desc">도체·부도체·반도체의 전기적 성질과 첨단 소재 활용 사례를 조사하고 탐구 보고서로 완성합니다.</div>
-      <div class="card-tags"><span class="card-tag tag-explore">소재탐구</span><span class="card-tag tag-perf">수행평가</span><span class="card-tag tag-special">세특</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
-    <div class="card fade-in">
-      <div class="card-icon-wrap">🦴</div>
-      <div class="card-title">생명체 구성 물질 완벽대비</div>
-      <div class="card-desc">단백질·핵산·탄수화물·지질의 구조와 기능을 체계적으로 정리하고 수행평가와 세특에 활용합니다.</div>
-      <div class="card-tags"><span class="card-tag tag-perf">내신대비</span><span class="card-tag tag-csat">수능대비</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
-    <div class="card fade-in">
-      <div class="card-icon-wrap">🪨</div>
-      <div class="card-title">지각 구성 물질 — 광물과 암석 탐구</div>
-      <div class="card-desc">규산염 광물의 구조적 특성과 암석의 순환을 탐구하고 지각 물질의 실생활 활용을 조사합니다.</div>
-      <div class="card-tags"><span class="card-tag tag-explore">탐구활동</span><span class="card-tag tag-perf">수행평가</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
-    <div class="card fade-in">
-      <div class="card-icon-wrap">🔋</div>
-      <div class="card-title">신소재 개발과 첨단 기술 세특 서술</div>
-      <div class="card-desc">그래핀·탄소나노튜브·초전도체 등 신소재의 원리와 활용을 세특 서술로 완성하는 종합 자료입니다.</div>
-      <div class="card-tags"><span class="card-tag tag-special">세특</span><span class="card-tag tag-perf">수행평가</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">💎</div><div class="card-title">물질의 전기적 성질 — 소재 조사 탐구</div></div><div class="card-desc">도체·부도체·반도체의 전기적 성질과 첨단 소재 활용 사례를 조사하고 탐구 보고서로 완성합니다.</div><div class="card-tags"><span class="card-tag tag-explore">소재탐구</span><span class="card-tag tag-perf">수행평가</span><span class="card-tag tag-special">세특</span></div><div class="card-link">바로 보기 →</div></div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">🦴</div><div class="card-title">생명체 구성 물질 완벽대비</div></div><div class="card-desc">단백질·핵산·탄수화물·지질의 구조와 기능을 체계적으로 정리하고 수행평가와 세특에 활용합니다.</div><div class="card-tags"><span class="card-tag tag-perf">내신대비</span><span class="card-tag tag-csat">수능대비</span></div><div class="card-link">바로 보기 →</div></div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">🪨</div><div class="card-title">지각 구성 물질 — 광물과 암석 탐구</div></div><div class="card-desc">규산염 광물의 구조적 특성과 암석의 순환을 탐구하고 지각 물질의 실생활 활용을 조사합니다.</div><div class="card-tags"><span class="card-tag tag-explore">탐구활동</span><span class="card-tag tag-perf">수행평가</span></div><div class="card-link">바로 보기 →</div></div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">🔋</div><div class="card-title">신소재 개발과 첨단 기술 세특 서술</div></div><div class="card-desc">그래핀·탄소나노튜브·초전도체 등 신소재의 원리와 활용을 세특 서술로 완성하는 종합 자료입니다.</div><div class="card-tags"><span class="card-tag tag-special">세특</span><span class="card-tag tag-perf">수행평가</span></div><div class="card-link">바로 보기 →</div></div>
   </div>
 </section>
 
-<!-- UNIT 3 -->
 <section id="unit3">
   <div class="unit-divider"><div class="unit-divider-line"></div><span class="unit-divider-label">대단원 Ⅲ</span><div class="unit-divider-line"></div></div>
   <div class="unit-header fade-in">
     <div class="unit-icon" style="background:rgba(123,94,167,0.15)">🚀</div>
-    <div>
-      <div class="unit-num">Unit 03</div>
-      <div class="unit-title">역학적 시스템</div>
-      <div class="unit-sub">힘과 운동 · 지구 시스템 · 생명 시스템</div>
-    </div>
+    <div><div class="unit-num">Unit 03</div><div class="unit-title">역학적 시스템</div><div class="unit-sub">힘과 운동 · 지구 시스템 · 생명 시스템</div></div>
     <div class="unit-count">4개 자료</div>
   </div>
   <div class="card-grid">
-    <div class="card fade-in">
-      <div class="card-icon-wrap">🎯</div>
-      <div class="card-title">역학 시스템 수행평가 완벽대비</div>
-      <div class="card-desc">뉴턴 법칙·운동량·충격량 등 역학의 핵심을 정리하고, 수행평가·서술형 문제를 완벽하게 대비합니다.</div>
-      <div class="card-tags"><span class="card-tag tag-perf">수행평가</span><span class="card-tag tag-perf">내신대비</span><span class="card-tag tag-csat">수능대비</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
-    <div class="card fade-in">
-      <div class="card-icon-wrap">🌏</div>
-      <div class="card-title">지구 시스템 수행평가 완벽대비</div>
-      <div class="card-desc">지권·수권·기권·생물권·외권의 상호작용과 지구 시스템 전반을 체계적으로 정리합니다.</div>
-      <div class="card-tags"><span class="card-tag tag-perf">수행평가</span><span class="card-tag tag-perf">내신대비</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
-    <div class="card fade-in">
-      <div class="card-icon-wrap">🧫</div>
-      <div class="card-title">생명 시스템 수행평가 완벽대비</div>
-      <div class="card-desc">세포부터 개체까지 생명 시스템의 구성과 물질대사, 유전정보 흐름까지 수행평가 전 범위를 완성합니다.</div>
-      <div class="card-tags"><span class="card-tag tag-perf">수행평가</span><span class="card-tag tag-perf">내신대비</span><span class="card-tag tag-special">세특</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
-    <div class="card fade-in">
-      <div class="card-icon-wrap">⚖️</div>
-      <div class="card-title">힘의 평형과 안전 — 실생활 탐구</div>
-      <div class="card-desc">교량·건축물에서 힘의 평형 원리를 탐구하고 안전 설계에 어떻게 적용되는지 조사 보고서로 완성합니다.</div>
-      <div class="card-tags"><span class="card-tag tag-explore">탐구활동</span><span class="card-tag tag-special">세특</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">🎯</div><div class="card-title">역학 시스템 수행평가 완벽대비</div></div><div class="card-desc">뉴턴 법칙·운동량·충격량 등 역학의 핵심을 정리하고, 수행평가·서술형 문제를 완벽하게 대비합니다.</div><div class="card-tags"><span class="card-tag tag-perf">수행평가</span><span class="card-tag tag-perf">내신대비</span><span class="card-tag tag-csat">수능대비</span></div><div class="card-link">바로 보기 →</div></div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">🌏</div><div class="card-title">지구 시스템 수행평가 완벽대비</div></div><div class="card-desc">지권·수권·기권·생물권·외권의 상호작용과 지구 시스템 전반을 체계적으로 정리합니다.</div><div class="card-tags"><span class="card-tag tag-perf">수행평가</span><span class="card-tag tag-perf">내신대비</span></div><div class="card-link">바로 보기 →</div></div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">🧫</div><div class="card-title">생명 시스템 수행평가 완벽대비</div></div><div class="card-desc">세포부터 개체까지 생명 시스템의 구성과 물질대사, 유전정보 흐름까지 수행평가 전 범위를 완성합니다.</div><div class="card-tags"><span class="card-tag tag-perf">수행평가</span><span class="card-tag tag-perf">내신대비</span><span class="card-tag tag-special">세특</span></div><div class="card-link">바로 보기 →</div></div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">⚖️</div><div class="card-title">힘의 평형과 안전 — 실생활 탐구</div></div><div class="card-desc">교량·건축물에서 힘의 평형 원리를 탐구하고 안전 설계에 어떻게 적용되는지 조사 보고서로 완성합니다.</div><div class="card-tags"><span class="card-tag tag-explore">탐구활동</span><span class="card-tag tag-special">세특</span></div><div class="card-link">바로 보기 →</div></div>
   </div>
 </section>
 
-<!-- UNIT 4 -->
 <section id="unit4">
   <div class="unit-divider"><div class="unit-divider-line"></div><span class="unit-divider-label">대단원 Ⅳ</span><div class="unit-divider-line"></div></div>
   <div class="unit-header fade-in">
     <div class="unit-icon" style="background:rgba(96,200,160,0.12)">🌿</div>
-    <div>
-      <div class="unit-num">Unit 04</div>
-      <div class="unit-title">환경과 에너지</div>
-      <div class="unit-sub">생태계 · 발전과 에너지 · 미래 에너지</div>
-    </div>
+    <div><div class="unit-num">Unit 04</div><div class="unit-title">환경과 에너지</div><div class="unit-sub">생태계 · 발전과 에너지 · 미래 에너지</div></div>
     <div class="unit-count">4개 자료</div>
   </div>
   <div class="card-grid">
-    <div class="card fade-in">
-      <div class="card-icon-wrap">♻️</div>
-      <div class="card-title">에너지 전환과 보존 탐구</div>
-      <div class="card-desc">열·전기·운동 에너지의 전환 과정을 실험으로 탐구하고 에너지 보존 법칙을 수행평가에 적용합니다.</div>
-      <div class="card-tags"><span class="card-tag tag-explore">탐구활동</span><span class="card-tag tag-perf">수행평가</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
-    <div class="card fade-in">
-      <div class="card-icon-wrap">☀️</div>
-      <div class="card-title">신재생에너지 조사 — 세특 서술 완성</div>
-      <div class="card-desc">태양광·풍력·수소 에너지의 원리와 한계를 분석하고 미래 에너지 정책까지 세특 서술로 완성합니다.</div>
-      <div class="card-tags"><span class="card-tag tag-special">세특</span><span class="card-tag tag-perf">수행평가</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
-    <div class="card fade-in">
-      <div class="card-icon-wrap">🌡️</div>
-      <div class="card-title">기후변화와 탄소 중립 탐구 보고서</div>
-      <div class="card-desc">온실효과 메커니즘부터 탄소 중립 실천 방안까지 과학적 근거를 바탕으로 탐구 보고서를 완성합니다.</div>
-      <div class="card-tags"><span class="card-tag tag-explore">탐구활동</span><span class="card-tag tag-special">세특</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
-    <div class="card fade-in">
-      <div class="card-icon-wrap">🏭</div>
-      <div class="card-title">발전 방식 비교 — 효율과 환경 분석</div>
-      <div class="card-desc">화력·원자력·재생에너지 발전 방식을 효율과 환경 영향 측면에서 비교 분석하는 종합 자료입니다.</div>
-      <div class="card-tags"><span class="card-tag tag-perf">내신대비</span><span class="card-tag tag-csat">수능대비</span><span class="card-tag tag-special">세특</span></div>
-      <div class="card-link">자료 보기 →</div>
-    </div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">♻️</div><div class="card-title">에너지 전환과 보존 탐구</div></div><div class="card-desc">열·전기·운동 에너지의 전환 과정을 실험으로 탐구하고 에너지 보존 법칙을 수행평가에 적용합니다.</div><div class="card-tags"><span class="card-tag tag-explore">탐구활동</span><span class="card-tag tag-perf">수행평가</span></div><div class="card-link">바로 보기 →</div></div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">☀️</div><div class="card-title">신재생에너지 조사 — 세특 서술 완성</div></div><div class="card-desc">태양광·풍력·수소 에너지의 원리와 한계를 분석하고 미래 에너지 정책까지 세특 서술로 완성합니다.</div><div class="card-tags"><span class="card-tag tag-special">세특</span><span class="card-tag tag-perf">수행평가</span></div><div class="card-link">바로 보기 →</div></div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">🌡️</div><div class="card-title">기후변화와 탄소 중립 탐구 보고서</div></div><div class="card-desc">온실효과 메커니즘부터 탄소 중립 실천 방안까지 과학적 근거를 바탕으로 탐구 보고서를 완성합니다.</div><div class="card-tags"><span class="card-tag tag-explore">탐구활동</span><span class="card-tag tag-special">세특</span></div><div class="card-link">바로 보기 →</div></div>
+    <div class="card fade-in"><div class="card-top"><div class="card-icon-wrap">🏭</div><div class="card-title">발전 방식 비교 — 효율과 환경 분석</div></div><div class="card-desc">화력·원자력·재생에너지 발전 방식을 효율과 환경 영향 측면에서 비교 분석하는 종합 자료입니다.</div><div class="card-tags"><span class="card-tag tag-perf">내신대비</span><span class="card-tag tag-csat">수능대비</span><span class="card-tag tag-special">세특</span></div><div class="card-link">바로 보기 →</div></div>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
-  <div class="footer-logo">베타과학학원 | <em>Beta Science</em></div>
-  <div class="footer-sub">서울 목동 · 고1 통합과학 전문</div>
+  <div class="footer-logo">베타과학학원 | <span style="color:var(--purple-light)">Beta Science</span></div>
+  <div class="footer-sub">목동 경력 20년 이상으로 통합과학, 화학, 생물 전문 학원</div>
   <div class="footer-tags">
     <span class="chip chip-perf">수행평가 100% 대비</span>
     <span class="chip chip-explore">탐구 실험 중심</span>
@@ -385,7 +283,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:3r
 </footer>
 
 <script>
-// 스크롤 fade-in
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry, i) => {
     if (entry.isIntersecting) {
@@ -396,7 +293,6 @@ const observer = new IntersectionObserver((entries) => {
     }
   });
 }, { threshold: 0.1 });
-
 document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 </script>
 </body>
