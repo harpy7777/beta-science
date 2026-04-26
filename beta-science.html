@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>베타과학학원</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;background:#f0f2f5;min-height:100vh}
+
+/* ===== TOP NAV ===== */
+.top-nav{background:#0a1020;display:flex;gap:0;padding:0 1rem;position:sticky;top:0;z-index:100}
+.app-tab{padding:10px 18px;color:#6b7db3;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s}
+.app-tab.active{color:#fff;border-bottom-color:#5b8af5}
+
+/* ===== MASTER BOARD ===== */
+#master-board{display:block}
+.mb-bg{background:#0f1729;min-height:100vh;padding:0}
+.mb-sidebar{width:220px;background:#0a1020;height:100vh;position:fixed;left:0;top:41px;padding:1rem;overflow-y:auto}
+.mb-logo{display:flex;align-items:center;gap:10px;padding:0.5rem;margin-bottom:1.5rem}
+.mb-logo-icon{width:36px;height:36px;background:#1a2a50;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.mb-logo-title{color:#fff;font-size:14px;font-weight:500;line-height:1.3}
+.mb-logo-sub{color:#6b7db3;font-size:11px}
+.mb-section{font-size:10px;color:#4a5a80;text-transform:uppercase;letter-spacing:0.08em;padding:0.5rem;margin:1rem 0 0.25rem}
+.mb-nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;color:#8899cc;font-size:13px;margin-bottom:2px;transition:background 0.15s}
+.mb-nav-item:hover,.mb-nav-item.active{background:#1a2a50;color:#fff}
+.mb-nav-item .nav-icon{font-size:14px;width:20px;text-align:center}
+.mb-nav-badge{margin-left:auto;background:#1e3060;color:#8899cc;font-size:10px;padding:1px 6px;border-radius:10px}
+.mb-main{margin-left:220px;padding:2rem}
+.mb-cat-tag{color:#8899cc;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.mb-cat-tag::before{content:'○';font-size:10px}
+.mb-cat-title{color:#fff;font-size:28px;font-weight:600;margin-bottom:4px}
+.mb-cat-sub{color:#6b7db3;font-size:13px}
+.mb-tool-count{background:#1e2a45;border:1px solid #2a3a60;color:#8899cc;font-size:12px;padding:4px 12px;border-radius:20px;float:right;margin-top:-40px}
+.mb-tool-list{display:flex;flex-direction:column;gap:10px;clear:both;padding-top:10px}
+.mb-tool-item{background:#1a2540;border:1px solid #2a3a60;border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:background 0.15s;text-decoration:none}
+.mb-tool-item:hover{background:#1e2d50}
+.mb-tool-item.highlight{background:#1e2d50;border-color:#3a4a80}
+.mb-tool-icon{width:48px;height:48px;background:#1e3060;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.mb-tool-name{color:#e0e8ff;font-size:15px;font-weight:500}
+.mb-tool-desc{color:#6b7db3;font-size:12px;margin-top:2px}
+.mb-tool-new{background:#c8960c;color:#fff;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;margin-left:6px}
+.mb-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ===== TEST APP ===== */
+#test-app{display:none}
+.ta-bg{background:linear-gradient(160deg,#e8f0fe 0%,#f5f0ff 50%,#e8f0fe 100%);min-height:100vh}
+.ta-header{background:linear-gradient(90deg,#4a7cf7,#6c63ff);padding:1rem;text-align:center;color:#fff;display:flex;align-items:center;justify-content:center;gap:12px}
+.ta-header-icon{width:44px;height:44px;background:rgba(255,255,255,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.ta-header-title{font-size:18px;font-weight:600}
+.ta-header-sub{font-size:12px;opacity:0.85}
+.ta-body{max-width:640px;margin:0 auto;padding:1.5rem 1rem}
+
+.ta-login-card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(100,100,200,0.12)}
+.ta-login-hero{background:linear-gradient(135deg,#5b8af5,#7c6fff);padding:2.5rem 2rem;text-align:center;position:relative;overflow:hidden}
+.ta-login-hero::before{content:'';position:absolute;width:200px;height:200px;background:rgba(255,255,255,0.06);border-radius:50%;top:-60px;right:-40px}
+.ta-login-hero::after{content:'';position:absolute;width:150px;height:150px;background:rgba(255,255,255,0.06);border-radius:50%;bottom:-50px;left:-30px}
+.ta-hero-icon{width:72px;height:72px;background:rgba(255,255,255,0.18);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 1rem;position:relative;z-index:1}
+.ta-hero-title{color:#fff;font-size:26px;font-weight:700;margin-bottom:8px;position:relative;z-index:1}
+.ta-hero-badge{display:inline-block;background:rgba(255,255,255,0.2);color:#fff;font-size:13px;padding:4px 14px;border-radius:20px;position:relative;z-index:1}
+.ta-form{padding:2rem}
+.ta-form label{font-size:13px;font-weight:500;color:#333;display:block;margin-bottom:6px}
+.ta-form select,.ta-form input{width:100%;padding:12px 14px;border:1.5px solid #e0e4f0;border-radius:10px;font-size:14px;background:#f8f9ff;color:#222;margin-bottom:1.25rem;outline:none;font-family:inherit;-webkit-appearance:none;appearance:none}
+.ta-form select:focus,.ta-form input:focus{border-color:#6c63ff;background:#fff}
+.ta-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ta-btn{padding:14px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:inherit}
+.ta-btn-dark{background:#1a1a2e;color:#fff}
+.ta-btn-primary{background:linear-gradient(90deg,#5b8af5,#7c6fff);color:#fff}
+
+.ta-test-card{background:#fff;border-radius:16px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 2px 12px rgba(100,100,200,0.08)}
+.ta-progress{background:#f0f0f8;border-radius:4px;height:6px;margin-bottom:1.5rem;overflow:hidden}
+.ta-progress-bar{background:linear-gradient(90deg,#5b8af5,#7c6fff);height:100%;border-radius:4px;transition:width 0.3s}
+.ta-q-num{font-size:12px;color:#888;margin-bottom:8px}
+.ta-q-text{font-size:16px;font-weight:500;color:#1a1a2e;margin-bottom:1.25rem;line-height:1.6}
+.ta-option{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid #e0e4f0;border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all 0.15s;background:#fff}
+.ta-option:hover{border-color:#6c63ff;background:#f5f0ff}
+.ta-option.selected{border-color:#6c63ff;background:#ede9ff}
+.ta-option.correct{border-color:#22c55e;background:#f0fff4}
+.ta-option.wrong{border-color:#ef4444;background:#fff0f0}
+.ta-option-num{width:28px;height:28px;border-radius:50%;background:#f0f0f8;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#666;flex-shrink:0}
+.ta-option.selected .ta-option-num{background:#6c63ff;color:#fff}
+.ta-ox-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.ta-ox-btn{padding:20px;border-radius:12px;font-size:24px;font-weight:700;cursor:pointer;border:2px solid #e0e4f0;background:#fff;transition:all 0.15s;font-family:inherit}
+.ta-ox-btn:hover{border-color:#6c63ff}
+.ta-ox-btn.selected{border-color:#6c63ff;background:#ede9ff}
+.ta-ox-btn.correct{border-color:#22c55e;background:#f0fff4}
+.ta-ox-btn.wrong{border-color:#ef4444;background:#fff0f0}
+.ta-next-btn{width:100%;padding:14px;background:linear-gradient(90deg,#5b8af5,#7c6fff);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-top:1rem;font-family:inherit}
+.ta-next-btn:disabled{opacity:0.4;cursor:not-allowed}
+
+.ta-result-card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(100,100,200,0.12);text-align:center}
+.ta-result-hero{background:linear-gradient(135deg,#5b8af5,#7c6fff);padding:2.5rem 2rem}
+.ta-result-score{font-size:56px;font-weight:700;color:#fff}
+.ta-result-label{color:rgba(255,255,255,0.8);font-size:14px;margin-top:4px}
+.ta-result-body{padding:1.5rem}
+.ta-result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1.5rem}
+.ta-result-stat{background:#f8f9ff;border-radius:10px;padding:12px}
+.ta-result-stat-num{font-size:22px;font-weight:600;color:#1a1a2e}
+.ta-result-stat-label{font-size:11px;color:#888;margin-top:2px}
+.ta-grade{display:inline-block;font-size:32px;font-weight:700;padding:8px 28px;border-radius:40px;margin-bottom:1.5rem}
+.grade-a{background:#f0fff4;color:#16a34a}
+.grade-b{background:#ede9ff;color:#6c63ff}
+.grade-c{background:#fffbeb;color:#d97706}
+.grade-f{background:#fff0f0;color:#ef4444}
+
+/* ===== ADMIN ===== */
+#admin-app{display:none}
+.ad-bg{background:#f8f9ff;min-height:100vh;padding:1.5rem}
+.ad-body{max-width:800px;margin:0 auto}
+.ad-title{font-size:22px;font-weight:600;color:#1a1a2e;margin-bottom:1.5rem}
+.ad-card{background:#fff;border-radius:16px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 2px 8px rgba(100,100,200,0.08)}
+.ad-card h3{font-size:15px;font-weight:600;color:#1a1a2e;margin-bottom:1rem}
+.ad-form label{font-size:13px;font-weight:500;color:#333;display:block;margin-bottom:5px}
+.ad-form select,.ad-form input,.ad-form textarea{width:100%;padding:10px 12px;border:1.5px solid #e0e4f0;border-radius:8px;font-size:14px;background:#f8f9ff;color:#222;margin-bottom:1rem;outline:none;font-family:inherit}
+.ad-form textarea{min-height:80px;resize:vertical}
+.ad-form select:focus,.ad-form input:focus,.ad-form textarea:focus{border-color:#6c63ff;background:#fff}
+.ad-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ad-btn{padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit}
+.ad-btn-primary{background:#6c63ff;color:#fff}
+.ad-btn-danger{background:#fff0f0;color:#ef4444;border:1px solid #fca5a5}
+.ad-q-item{background:#f8f9ff;border-radius:10px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.ad-q-text{font-size:13px;color:#1a1a2e;line-height:1.5;flex:1}
+.ad-q-meta{font-size:11px;color:#888;margin-top:3px}
+.ad-badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500;margin-right:4px}
+.ad-badge-ox{background:#ede9ff;color:#6c63ff}
+.ad-badge-mc{background:#e0f2fe;color:#0369a1}
+.radio-row{display:flex;gap:16px;margin-bottom:1rem}
+.radio-label{display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="top-nav">
+  <div class="app-tab active" onclick="showTab('master')">📋 마스터보드</div>
+  <div class="app-tab" onclick="showTab('test')">📝 온라인 테스트</div>
+  <div class="app-tab" onclick="showTab('admin')">⚙️ 문제 관리</div>
+</div>
+
+<!-- ===== MASTER BOARD ===== -->
+<div id="master-board">
+<div class="mb-bg">
+  <div class="mb-sidebar">
+    <div class="mb-logo">
+      <div class="mb-logo-icon">🔬</div>
+      <div>
+        <div class="mb-logo-title">베타과학학원</div>
+        <div class="mb-logo-sub">Master Workspace</div>
+      </div>
+    </div>
+    <div class="mb-section">Tools</div>
+    <div class="mb-nav-item"><span class="nav-icon">⊞</span>Productivity<span class="mb-nav-badge">5</span></div>
+    <div class="mb-nav-item"><span class="nav-icon">✦</span>AI Partners<span class="mb-nav-badge">6</span></div>
+    <div class="mb-nav-item"><span class="nav-icon">&lt;/&gt;</span>Dev & Tools<span class="mb-nav-badge">5</span></div>
+    <div class="mb-nav-item"><span class="nav-icon">◈</span>Design Tools<span class="mb-nav-badge">5</span></div>
+    <div class="mb-section">Academy</div>
+    <div class="mb-nav-item active" onclick="showMbCat('academy')"><span class="nav-icon">○</span>Academy & Biz<span class="mb-nav-badge">6</span></div>
+    <div class="mb-nav-item" onclick="showMbCat('marketing')"><span class="nav-icon">◆</span>Marketing<span class="mb-nav-badge">5</span></div>
+    <div class="mb-nav-item" onclick="showMbCat('admission')"><span class="nav-icon">◎</span>입시정보<span class="mb-nav-badge">2</span></div>
+    <div class="mb-nav-item" onclick="showMbCat('media')"><span class="nav-icon">▶</span>Media & Content<span class="mb-nav-badge">5</span></div>
+  </div>
+  <div class="mb-main" id="mb-main-content">
+    <!-- Academy & Biz (default) -->
+    <div id="mb-cat-academy">
+      <div class="mb-cat-tag">BIZ</div>
+      <div class="mb-cat-title">Academy & Biz</div>
+      <div class="mb-cat-sub">학원 운영 · 교육 콘텐츠</div>
+      <div class="mb-tool-count">6개 도구</div>
+      <div class="mb-tool-list">
+        <div class="mb-tool-item" onclick="showTab('test')">
+          <div class="mb-tool-icon">🏆</div>
+          <div><div class="mb-tool-name">베타 프로그램</div><div class="mb-tool-desc">학원 프로그램 안내</div></div>
+        </div>
+        <div class="mb-tool-item highlight" onclick="showTab('test')">
+          <div class="mb-tool-icon">📝</div>
+          <div><div class="mb-tool-name">베타 온라인테스트</div><div class="mb-tool-desc">온라인 시험 시스템</div></div>
+        </div>
+        <div class="mb-2col">
+          <div class="mb-tool-item" onclick="showTab('test')">
+            <div class="mb-tool-icon">🎬</div>
+            <div><div class="mb-tool-name">베타 강의동영상</div><div class="mb-tool-desc">강의 영상 라이브러리</div></div>
+          </div>
+          <div class="mb-tool-item" onclick="showTab('test')">
+            <div class="mb-tool-icon">✏️</div>
+            <div><div class="mb-tool-name">통합과학 수행평가</div><div class="mb-tool-desc">수행평가 가이드</div></div>
+          </div>
+          <div class="mb-tool-item" onclick="showTab('test')">
+            <div class="mb-tool-icon">🔭</div>
+            <div><div class="mb-tool-name">탐구활동 보고서</div><div class="mb-tool-desc">탐구 보고서 템플릿</div></div>
+          </div>
+          <div class="mb-tool-item" onclick="showTab('admin')">
+            <div class="mb-tool-icon">📋</div>
+            <div><div class="mb-tool-name">학원 운영매뉴얼 <span class="mb-tool-new">NEW</span></div><div class="mb-tool-desc">베타과학학원 운영 매뉴얼</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="mb-cat-marketing" style="display:none">
+      <div class="mb-cat-tag">MARKETING</div>
+      <div class="mb-cat-title">Marketing</div>
+      <div class="mb-cat-sub">마케팅 · 홍보</div>
+      <div class="mb-tool-count">5개 도구</div>
+      <div class="mb-tool-list">
+        <div class="mb-tool-item"><div class="mb-tool-icon">☕</div><div><div class="mb-tool-name">베타 카페</div><div class="mb-tool-desc">학원 커뮤니티</div></div></div>
+        <div class="mb-tool-item"><div class="mb-tool-icon">📰</div><div><div class="mb-tool-name">학원 블로그</div><div class="mb-tool-desc">학원 소식 & 정보</div></div></div>
+        <div class="mb-tool-item"><div class="mb-tool-icon">💬</div><div><div class="mb-tool-name">카카오 채널</div><div class="mb-tool-desc">학부모 소통 채널</div></div></div>
+      </div>
+    </div>
+    <div id="mb-cat-admission" style="display:none">
+      <div class="mb-cat-tag">입시</div>
+      <div class="mb-cat-title">입시정보</div>
+      <div class="mb-cat-sub">입시 · 진학 정보</div>
+      <div class="mb-tool-count">2개 도구</div>
+      <div class="mb-tool-list">
+        <div class="mb-tool-item"><div class="mb-tool-icon">🎯</div><div><div class="mb-tool-name">입시정보 대시보드</div><div class="mb-tool-desc">입시 일정 & 정보</div></div></div>
+        <div class="mb-tool-item"><div class="mb-tool-icon">💰</div><div><div class="mb-tool-name">국가지원금</div><div class="mb-tool-desc">지원금 안내</div></div></div>
+      </div>
+    </div>
+    <div id="mb-cat-media" style="display:none">
+      <div class="mb-cat-tag">MEDIA</div>
+      <div class="mb-cat-title">Media & Content</div>
+      <div class="mb-cat-sub">미디어 · 콘텐츠 제작</div>
+      <div class="mb-tool-count">5개 도구</div>
+      <div class="mb-tool-list">
+        <div class="mb-tool-item"><div class="mb-tool-icon">▶️</div><div><div class="mb-tool-name">YouTube</div><div class="mb-tool-desc">학원 유튜브 채널</div></div></div>
+        <div class="mb-tool-item"><div class="mb-tool-icon">✍️</div><div><div class="mb-tool-name">블로그 생성기</div><div class="mb-tool-desc">AI 블로그 작성</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===== TEST APP ===== -->
+<div id="test-app">
+<div class="ta-bg">
+  <div class="ta-header">
+    <div class="ta-header-icon">📖</div>
+    <div>
+      <div class="ta-header-title">베타과학학원</div>
+      <div class="ta-header-sub">BETA SCIENCE ACADEMY</div>
+    </div>
+  </div>
+  <div class="ta-body">
+    <div id="ta-login">
+      <div class="ta-login-card">
+        <div class="ta-login-hero">
+          <div class="ta-hero-icon">📋</div>
+          <div class="ta-hero-title">온라인 테스트</div>
+          <div style="height:8px"></div>
+          <div id="ta-subject-badge" class="ta-hero-badge">과목을 선택하세요</div>
+        </div>
+        <div class="ta-form">
+          <label>과목</label>
+          <select id="ta-subject" onchange="updateSubjectBadge()">
+            <option value="">과목을 선택하세요</option>
+            <option value="통합과학">통합과학</option>
+            <option value="지학">지학</option>
+            <option value="물리">물리</option>
+            <option value="생명">생명</option>
+            <option value="중등3">중등3 과학</option>
+            <option value="중등2">중등2 과학</option>
+          </select>
+          <label>단원</label>
+          <select id="ta-unit">
+            <option value="">단원을 선택하세요</option>
+            <option>1단원: 물질의 구성</option>
+            <option>2단원: 빛과 파동</option>
+            <option>3단원: 생명시스템</option>
+            <option>4단원: 지구시스템</option>
+          </select>
+          <label>학년</label>
+          <select id="ta-grade">
+            <option value="">학년을 선택하세요</option>
+            <option>중1</option><option>중2</option><option>중3</option>
+            <option>고1</option><option>고2</option><option>고3</option>
+          </select>
+          <label>학생 ID</label>
+          <input type="text" id="ta-id" placeholder="학원에서 부여받은 ID를 입력하세요">
+          <label>학생 이름</label>
+          <input type="text" id="ta-name" placeholder="이름을 입력하세요">
+          <div class="ta-btn-row">
+            <button class="ta-btn ta-btn-dark" onclick="showRecords()">📁 기록 보기</button>
+            <button class="ta-btn ta-btn-primary" onclick="startTest()">▶ 테스트 시작</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="ta-test" style="display:none">
+      <div class="ta-test-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <span style="font-size:13px;color:#666" id="ta-student-info"></span>
+          <span style="font-size:13px;color:#6c63ff;font-weight:500" id="ta-q-counter"></span>
+        </div>
+        <div class="ta-progress"><div class="ta-progress-bar" id="ta-prog"></div></div>
+        <div class="ta-q-num" id="ta-q-num"></div>
+        <div class="ta-q-text" id="ta-q-text"></div>
+        <div id="ta-options"></div>
+        <button class="ta-next-btn" id="ta-next-btn" disabled onclick="nextQuestion()">다음 문제 →</button>
+      </div>
+    </div>
+
+    <div id="ta-result" style="display:none">
+      <div class="ta-result-card">
+        <div class="ta-result-hero">
+          <div class="ta-result-score" id="res-score">0점</div>
+          <div class="ta-result-label" id="res-name-label"></div>
+        </div>
+        <div class="ta-result-body">
+          <div class="ta-result-grid">
+            <div class="ta-result-stat"><div class="ta-result-stat-num" id="res-correct">0</div><div class="ta-result-stat-label">정답</div></div>
+            <div class="ta-result-stat"><div class="ta-result-stat-num" id="res-wrong">0</div><div class="ta-result-stat-label">오답</div></div>
+            <div class="ta-result-stat"><div class="ta-result-stat-num" id="res-total">0</div><div class="ta-result-stat-label">전체</div></div>
+          </div>
+          <div id="res-grade" class="ta-grade grade-b">B</div>
+          <br>
+          <button class="ta-btn ta-btn-primary" style="width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit" onclick="resetTest()">다시 풀기</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="ta-records" style="display:none">
+      <div class="ta-test-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+          <div style="font-size:16px;font-weight:600;color:#1a1a2e">내 성적 기록</div>
+          <button onclick="document.getElementById('ta-records').style.display='none';document.getElementById('ta-login').style.display='block'" style="background:none;border:none;color:#6c63ff;font-size:13px;cursor:pointer">← 돌아가기</button>
+        </div>
+        <div id="records-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===== ADMIN (문제 관리) ===== -->
+<div id="admin-app">
+<div class="ad-bg">
+  <div class="ad-body">
+    <div class="ad-title">⚙️ 문제 관리</div>
+    <div class="ad-card">
+      <h3>➕ 문제 추가</h3>
+      <div class="ad-form">
+        <div class="ad-grid2">
+          <div>
+            <label>과목</label>
+            <select id="ad-subject">
+              <option value="통합과학">통합과학</option>
+              <option value="지학">지학</option>
+              <option value="물리">물리</option>
+              <option value="생명">생명</option>
+              <option value="중등3">중등3 과학</option>
+              <option value="중등2">중등2 과학</option>
+            </select>
+          </div>
+          <div>
+            <label>문제 유형</label>
+            <select id="ad-type" onchange="toggleAdForm()">
+              <option value="ox">OX 문제</option>
+              <option value="mc">4지선다</option>
+            </select>
+          </div>
+        </div>
+        <label>문제</label>
+        <textarea id="ad-q" placeholder="문제를 입력하세요"></textarea>
+
+        <!-- OX -->
+        <div id="ad-ox-section">
+          <label>정답</label>
+          <div class="radio-row">
+            <label class="radio-label"><input type="radio" name="ad-ans-ox" value="O" checked> O (참)</label>
+            <label class="radio-label"><input type="radio" name="ad-ans-ox" value="X"> X (거짓)</label>
+          </div>
+        </div>
+
+        <!-- 4지선다 -->
+        <div id="ad-mc-section" style="display:none">
+          <div class="ad-grid2">
+            <div><label>보기 ①</label><input type="text" id="ad-opt0" placeholder="보기 1"></div>
+            <div><label>보기 ②</label><input type="text" id="ad-opt1" placeholder="보기 2"></div>
+            <div><label>보기 ③</label><input type="text" id="ad-opt2" placeholder="보기 3"></div>
+            <div><label>보기 ④</label><input type="text" id="ad-opt3" placeholder="보기 4"></div>
+          </div>
+          <label>정답 번호</label>
+          <div class="radio-row">
+            <label class="radio-label"><input type="radio" name="ad-ans-mc" value="0" checked> ①</label>
+            <label class="radio-label"><input type="radio" name="ad-ans-mc" value="1"> ②</label>
+            <label class="radio-label"><input type="radio" name="ad-ans-mc" value="2"> ③</label>
+            <label class="radio-label"><input type="radio" name="ad-ans-mc" value="3"> ④</label>
+          </div>
+        </div>
+
+        <button class="ad-btn ad-btn-primary" onclick="addQuestion()">문제 추가</button>
+      </div>
+    </div>
+
+    <div class="ad-card">
+      <h3>📋 등록된 문제 목록 <span id="ad-q-count" style="font-size:13px;color:#888;font-weight:400"></span></h3>
+      <div style="margin-bottom:1rem">
+        <select id="ad-filter" onchange="renderAdminList()" style="padding:8px 12px;border:1.5px solid #e0e4f0;border-radius:8px;font-size:13px;background:#f8f9ff;color:#333;font-family:inherit">
+          <option value="">전체 과목</option>
+          <option value="통합과학">통합과학</option>
+          <option value="지학">지학</option>
+          <option value="물리">물리</option>
+          <option value="생명">생명</option>
+          <option value="중등3">중등3</option>
+          <option value="중등2">중등2</option>
+        </select>
+      </div>
+      <div id="ad-q-list"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+// ===== 기본 문제 데이터 =====
+const DEFAULT_QUESTIONS = {
+  "통합과학": [
+    {type:"mc",q:"물질의 기본 단위로, 더 이상 나눌 수 없는 가장 작은 입자를 무엇이라 하는가?",opts:["분자","원자","이온","전자"],ans:1},
+    {type:"mc",q:"다음 중 화학 결합의 종류가 아닌 것은?",opts:["이온 결합","공유 결합","금속 결합","핵 결합"],ans:3},
+    {type:"ox",q:"빛은 진공 속에서도 전파될 수 있다.",ans:"O"},
+    {type:"ox",q:"전자기파의 파장이 짧을수록 에너지가 작다.",ans:"X"},
+    {type:"mc",q:"세포에서 단백질을 합성하는 세포 소기관은?",opts:["미토콘드리아","리보솜","골지체","엽록체"],ans:1},
+    {type:"ox",q:"DNA는 이중 나선 구조를 이루고 있다.",ans:"O"},
+    {type:"mc",q:"지구 내부 구조 중 가장 바깥층은?",opts:["내핵","외핵","맨틀","지각"],ans:3},
+    {type:"ox",q:"판 구조론에 따르면 대륙은 현재도 이동하고 있다.",ans:"O"}
+  ],
+  "지학": [
+    {type:"mc",q:"대기 중 가장 많은 비율을 차지하는 기체는?",opts:["산소","이산화탄소","질소","아르곤"],ans:2},
+    {type:"ox",q:"해류는 해양 생태계에 영향을 미치지 않는다.",ans:"X"},
+    {type:"mc",q:"지층의 나이를 결정하는 데 사용되는 것은?",opts:["화석","광물","암석 색깔","지층 두께"],ans:0},
+    {type:"ox",q:"온난화로 인해 해수면이 상승할 수 있다.",ans:"O"}
+  ],
+  "물리": [
+    {type:"mc",q:"뉴턴의 운동 제2법칙 F = ma 에서 a는 무엇인가?",opts:["힘","질량","가속도","속도"],ans:2},
+    {type:"ox",q:"마찰력은 항상 운동 방향과 반대로 작용한다.",ans:"O"},
+    {type:"mc",q:"전기 저항의 단위는?",opts:["볼트(V)","암페어(A)","옴(Ω)","와트(W)"],ans:2},
+    {type:"ox",q:"도체는 전류가 흐르지 않는 물질이다.",ans:"X"}
+  ],
+  "생명": [
+    {type:"mc",q:"광합성이 일어나는 세포 소기관은?",opts:["미토콘드리아","리보솜","엽록체","액포"],ans:2},
+    {type:"ox",q:"동물 세포에는 세포벽이 없다.",ans:"O"},
+    {type:"mc",q:"유전 정보를 담고 있는 물질은?",opts:["단백질","지질","DNA","탄수화물"],ans:2},
+    {type:"ox",q:"멘델의 법칙에서 우성 형질은 항상 표현된다.",ans:"O"}
+  ],
+  "중등3": [
+    {type:"mc",q:"감각 기관 중 빛을 감지하는 기관은?",opts:["코","귀","눈","피부"],ans:2},
+    {type:"ox",q:"뇌는 중추 신경계에 속한다.",ans:"O"},
+    {type:"mc",q:"대기 중의 수분이 응결되어 지표에 내리는 것은?",opts:["증발","강수","증산","대류"],ans:1},
+    {type:"ox",q:"공기 중의 이산화탄소 농도는 점점 줄어들고 있다.",ans:"X"}
+  ],
+  "중등2": [
+    {type:"mc",q:"암석의 종류 중 마그마가 굳어서 생성된 암석은?",opts:["퇴적암","변성암","화성암","석회암"],ans:2},
+    {type:"ox",q:"다이아몬드와 흑연은 같은 원소로 이루어져 있다.",ans:"O"},
+    {type:"mc",q:"산과 염기가 반응하면 생성되는 것은?",opts:["산화물","염과 물","기체","금속"],ans:1},
+    {type:"ox",q:"pH 7은 중성이다.",ans:"O"}
+  ]
+};
+
+// localStorage에서 문제 로드 (없으면 기본값)
+function loadQuestions(){
+  try{
+    const saved = localStorage.getItem('beta_questions');
+    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
+  }catch(e){ return JSON.parse(JSON.stringify(DEFAULT_QUESTIONS)); }
+}
+function saveQuestions(q){
+  try{ localStorage.setItem('beta_questions', JSON.stringify(q)); }catch(e){}
+}
+
+let QUESTIONS = loadQuestions();
+let records = [];
+try{ records = JSON.parse(localStorage.getItem('beta_records')||'[]'); }catch(e){}
+
+let currentQ=0, answers=[], currentQuestions=[];
+let taSubject='', taUnit='', taGrade='', taName='', taId='';
+
+// ===== TAB =====
+function showTab(tab){
+  ['master-board','test-app','admin-app'].forEach(id=>{
+    document.getElementById(id).style.display='none';
+  });
+  document.getElementById(
+    tab==='master'?'master-board':tab==='test'?'test-app':'admin-app'
+  ).style.display='block';
+  document.querySelectorAll('.app-tab').forEach((t,i)=>{
+    t.classList.toggle('active',
+      (i===0&&tab==='master')||(i===1&&tab==='test')||(i===2&&tab==='admin')
+    );
+  });
+  if(tab==='admin') renderAdminList();
+}
+
+// ===== MASTER BOARD =====
+function showMbCat(cat){
+  ['academy','marketing','admission','media'].forEach(c=>{
+    const el=document.getElementById('mb-cat-'+c);
+    if(el) el.style.display=c===cat?'block':'none';
+  });
+  document.querySelectorAll('.mb-nav-item').forEach(el=>el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+// ===== TEST APP =====
+function updateSubjectBadge(){
+  const v=document.getElementById('ta-subject').value;
+  document.getElementById('ta-subject-badge').textContent=v||'과목을 선택하세요';
+}
+
+function startTest(){
+  taSubject=document.getElementById('ta-subject').value;
+  taUnit=document.getElementById('ta-unit').value;
+  taGrade=document.getElementById('ta-grade').value;
+  taId=document.getElementById('ta-id').value.trim();
+  taName=document.getElementById('ta-name').value.trim();
+  if(!taSubject||!taGrade||!taName){alert('과목, 학년, 이름을 입력해주세요');return;}
+  currentQuestions=QUESTIONS[taSubject]||[];
+  if(currentQuestions.length===0){alert('등록된 문제가 없습니다. 문제 관리 탭에서 문제를 추가해주세요.');return;}
+  currentQ=0; answers=[];
+  document.getElementById('ta-login').style.display='none';
+  document.getElementById('ta-test').style.display='block';
+  document.getElementById('ta-student-info').textContent=taGrade+' '+taName+(taUnit?' | '+taUnit:'');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q=currentQuestions[currentQ];
+  const total=currentQuestions.length;
+  document.getElementById('ta-q-counter').textContent=(currentQ+1)+' / '+total;
+  document.getElementById('ta-q-num').textContent=(currentQ+1)+'번 문제 '+(q.type==='ox'?'(OX)':'(4지선다)');
+  document.getElementById('ta-q-text').textContent=q.q;
+  document.getElementById('ta-prog').style.width=Math.round((currentQ/total)*100)+'%';
+  document.getElementById('ta-next-btn').disabled=true;
+  document.getElementById('ta-next-btn').textContent=currentQ===total-1?'결과 보기 →':'다음 문제 →';
+  const opts=document.getElementById('ta-options');
+  if(q.type==='ox'){
+    opts.innerHTML=`<div class="ta-ox-row">
+      <button class="ta-ox-btn" onclick="selectOX(this,'O')">O</button>
+      <button class="ta-ox-btn" onclick="selectOX(this,'X')">X</button>
+    </div>`;
+  } else {
+    opts.innerHTML=q.opts.map((o,i)=>`<div class="ta-option" onclick="selectMC(this,${i})">
+      <div class="ta-option-num">${['①','②','③','④'][i]}</div>
+      <div style="font-size:14px;color:#333">${o}</div>
+    </div>`).join('');
+  }
+}
+
+function selectOX(el,val){
+  document.querySelectorAll('.ta-ox-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[currentQ]=val;
+  document.getElementById('ta-next-btn').disabled=false;
+}
+function selectMC(el,idx){
+  document.querySelectorAll('.ta-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[currentQ]=idx;
+  document.getElementById('ta-next-btn').disabled=false;
+}
+
+function nextQuestion(){
+  const q=currentQuestions[currentQ];
+  const ans=answers[currentQ];
+  if(q.type==='ox'){
+    document.querySelectorAll('.ta-ox-btn').forEach(b=>{
+      if(b.textContent===q.ans) b.classList.add('correct');
+      else if(b.classList.contains('selected')) b.classList.add('wrong');
+    });
+  } else {
+    document.querySelectorAll('.ta-option').forEach((o,i)=>{
+      if(i===q.ans) o.classList.add('correct');
+      else if(i===ans&&i!==q.ans) o.classList.add('wrong');
+    });
+  }
+  document.getElementById('ta-next-btn').disabled=true;
+  setTimeout(()=>{
+    if(currentQ<currentQuestions.length-1){currentQ++;renderQuestion();}
+    else showResult();
+  },700);
+}
+
+function showResult(){
+  let correct=0;
+  currentQuestions.forEach((q,i)=>{
+    if(answers[i]===q.ans) correct++;
+  });
+  const total=currentQuestions.length;
+  const score=Math.round((correct/total)*100);
+  const gr=score>=90?'A':score>=80?'B':score>=70?'C':score>=60?'D':'F';
+  const rec={name:taName,id:taId,subject:taSubject,unit:taUnit,grade:taGrade,score,correct,total,letterGrade:gr,date:new Date().toLocaleDateString('ko-KR')};
+  records.unshift(rec);
+  try{localStorage.setItem('beta_records',JSON.stringify(records.slice(0,100)));}catch(e){}
+  document.getElementById('ta-test').style.display='none';
+  document.getElementById('ta-result').style.display='block';
+  document.getElementById('res-score').textContent=score+'점';
+  document.getElementById('res-name-label').textContent=taGrade+' '+taName+' | '+taSubject;
+  document.getElementById('res-correct').textContent=correct;
+  document.getElementById('res-wrong').textContent=total-correct;
+  document.getElementById('res-total').textContent=total;
+  const gradeEl=document.getElementById('res-grade');
+  gradeEl.textContent=gr;
+  gradeEl.className='ta-grade grade-'+(gr==='A'?'a':gr==='B'?'b':gr==='C'||gr==='D'?'c':'f');
+}
+
+function resetTest(){
+  document.getElementById('ta-result').style.display='none';
+  document.getElementById('ta-login').style.display='block';
+}
+
+function showRecords(){
+  const id=document.getElementById('ta-id').value.trim();
+  const name=document.getElementById('ta-name').value.trim();
+  if(!id&&!name){alert('ID 또는 이름을 입력하면 본인 기록을 볼 수 있어요');return;}
+  const filtered=records.filter(r=>(!id||r.id===id)&&(!name||r.name===name));
+  document.getElementById('ta-login').style.display='none';
+  document.getElementById('ta-records').style.display='block';
+  const el=document.getElementById('records-list');
+  if(filtered.length===0){el.innerHTML='<div style="text-align:center;color:#888;padding:2rem">기록이 없습니다</div>';return;}
+  el.innerHTML=filtered.map(r=>`<div style="padding:12px 0;border-bottom:1px solid #f0f0f8;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <div style="font-size:14px;font-weight:500;color:#1a1a2e">${r.subject}${r.unit?' · '+r.unit:''}</div>
+      <div style="font-size:12px;color:#888;margin-top:2px">${r.date} · ${r.grade}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:20px;font-weight:700;color:#6c63ff">${r.score}점</div>
+      <div style="font-size:11px;color:#888">${r.correct}/${r.total} 정답</div>
+    </div>
+  </div>`).join('');
+}
+
+// ===== ADMIN =====
+function toggleAdForm(){
+  const type=document.getElementById('ad-type').value;
+  document.getElementById('ad-ox-section').style.display=type==='ox'?'block':'none';
+  document.getElementById('ad-mc-section').style.display=type==='mc'?'block':'none';
+}
+
+function addQuestion(){
+  const subject=document.getElementById('ad-subject').value;
+  const type=document.getElementById('ad-type').value;
+  const q=document.getElementById('ad-q').value.trim();
+  if(!q){alert('문제를 입력해주세요');return;}
+  if(!QUESTIONS[subject]) QUESTIONS[subject]=[];
+  if(type==='ox'){
+    const ans=document.querySelector('input[name="ad-ans-ox"]:checked').value;
+    QUESTIONS[subject].push({type:'ox',q,ans});
+  } else {
+    const opts=[0,1,2,3].map(i=>document.getElementById('ad-opt'+i).value.trim());
+    if(opts.some(o=>!o)){alert('보기를 모두 입력해주세요');return;}
+    const ans=parseInt(document.querySelector('input[name="ad-ans-mc"]:checked').value);
+    QUESTIONS[subject].push({type:'mc',q,opts,ans});
+  }
+  saveQuestions(QUESTIONS);
+  document.getElementById('ad-q').value='';
+  [0,1,2,3].forEach(i=>{const el=document.getElementById('ad-opt'+i);if(el)el.value='';});
+  renderAdminList();
+  alert('문제가 추가됐어요!');
+}
+
+function deleteQuestion(subject,idx){
+  if(!confirm('이 문제를 삭제할까요?')) return;
+  QUESTIONS[subject].splice(idx,1);
+  saveQuestions(QUESTIONS);
+  renderAdminList();
+}
+
+function renderAdminList(){
+  const filter=document.getElementById('ad-filter').value;
+  const subjects=filter?[filter]:Object.keys(QUESTIONS);
+  let html='', total=0;
+  subjects.forEach(sub=>{
+    const qs=QUESTIONS[sub]||[];
+    if(qs.length===0) return;
+    total+=qs.length;
+    html+=`<div style="font-size:12px;font-weight:600;color:#6c63ff;margin:12px 0 6px;text-transform:uppercase;letter-spacing:0.05em">${sub} (${qs.length}문항)</div>`;
+    qs.forEach((q,i)=>{
+      html+=`<div class="ad-q-item">
+        <div style="flex:1">
+          <span class="ad-badge ${q.type==='ox'?'ad-badge-ox':'ad-badge-mc'}">${q.type==='ox'?'OX':'4지선다'}</span>
+          <span class="ad-q-text">${q.q}</span>
+          <div class="ad-q-meta">정답: ${q.type==='ox'?q.ans:['①','②','③','④'][q.ans]+' '+q.opts[q.ans]}</div>
+        </div>
+        <button class="ad-btn ad-btn-danger" onclick="deleteQuestion('${sub}',${i})" style="flex-shrink:0;padding:6px 10px;font-size:12px">삭제</button>
+      </div>`;
+    });
+  });
+  if(!html) html='<div style="text-align:center;color:#888;padding:2rem">등록된 문제가 없습니다</div>';
+  document.getElementById('ad-q-list').innerHTML=html;
+  document.getElementById('ad-q-count').textContent='총 '+total+'문항';
+}
+</script>
+</body>
+</html>
