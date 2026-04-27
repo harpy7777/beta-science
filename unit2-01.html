@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>규칙으로 완성되는 원소의 세계 멘델레예프 주기율표 만들기 | 베타과학학원</title>
+<title>멘델레예프 주기율표 만들기 | 베타과학학원</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -27,7 +27,9 @@
   --amber:     #F59E0B;
   --amber-pale:#FFFBEB;
   --amber-b:   #FDE68A;
-  --rose:      #F43F5E;
+  --red:       #EF4444;
+  --red-pale:  #FEF2F2;
+  --red-b:     #FECACA;
   --beige:     #FAF7F2;
   --beige-b:   #E8DDD0;
   --beige-acc: #C4A882;
@@ -36,6 +38,7 @@
   --radius:    14px;
   --font:      'Noto Sans KR', sans-serif;
 }
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body { font-family: var(--font); background: var(--bg); color: var(--text); overflow-x: hidden; line-height: 1.7; }
@@ -46,13 +49,21 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); over
   background: rgba(255,255,255,0.97); backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 2rem; height: 48px;
+  padding: 0.7rem 2rem;
   box-shadow: 0 1px 8px rgba(27,43,94,0.07);
 }
-.topbar-left  { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text2); }
-.topbar-brand { font-weight: 800; color: var(--n1); text-decoration: none; }
-.topbar-sep   { color: var(--text3); }
-.topbar-right { display: flex; gap: 8px; }
+.topbar-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+.topbar-logo-icon {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--n1), var(--n2));
+  border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.topbar-logo-text { font-size: 13px; font-weight: 800; color: var(--n1); }
+.topbar-logo-sub  { font-size: 10px; color: var(--text3); }
+.topbar-center { font-size: 13px; color: var(--text2); font-weight: 500; }
+.topbar-center strong { color: var(--n1); font-weight: 700; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.topbar-right span { font-size: 12px; color: var(--text3); }
 .btn-print {
   display: flex; align-items: center; gap: 6px;
   background: linear-gradient(135deg, var(--n1), var(--n2));
@@ -65,42 +76,39 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); over
 
 /* ── HERO ── */
 .hero {
-  background: linear-gradient(135deg, #2A3F8F 0%, #3D5BBF 40%, #5B7FE0 100%);
-  padding: 4rem 2rem 3.5rem; text-align: center;
+  background: linear-gradient(135deg, var(--n1) 0%, var(--n2) 55%, var(--n3) 100%);
+  padding: 3.5rem 2rem 3rem; text-align: center;
   position: relative; overflow: hidden;
 }
-.hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 70% 50%, rgba(255,255,255,0.06) 0%, transparent 60%);
+.hero::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 4px; background: linear-gradient(90deg, var(--n3), var(--n-mid), var(--n3));
 }
-.hero-breadcrumb {
-  font-size: 13px; color: rgba(255,255,255,0.6);
-  margin-bottom: 1.6rem; letter-spacing: 0.02em;
+.hero-badge-top {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 18px; border-radius: 100px;
+  font-size: 13px; font-weight: 600;
+  background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.9); margin-bottom: 1.2rem; cursor: default;
 }
-.hero-title {
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  font-weight: 900; color: #fff; line-height: 1.2; margin-bottom: 2rem;
-  letter-spacing: -0.01em;
-}
-.hero-title em { color: #FCD34D; font-style: normal; }
-.hero-badge-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.hero-title  { font-size: clamp(1.9rem, 4.5vw, 2.8rem); font-weight: 900; color: #fff; line-height: 1.15; margin-bottom: 0.5rem; }
+.hero-subtitle { font-size: clamp(1.4rem, 3.5vw, 2rem); font-weight: 800; color: #FBBF24; margin-bottom: 0.5rem; }
+.hero-tagline { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 1.75rem; }
+.hero-badge-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
 .hbadge {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 7px 18px; border-radius: 100px;
+  padding: 6px 16px; border-radius: 100px;
   font-size: 13px; font-weight: 600;
   border: 1.5px solid transparent; cursor: default;
-  transition: background .2s;
 }
 .hb-blue   { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.35); color: rgba(255,255,255,0.95); }
-.hb-red    { background: rgba(239,68,68,0.22);   border-color: rgba(239,68,68,0.5);   color: #FCA5A5; }
-.hb-green  { background: rgba(16,185,129,0.22);  border-color: rgba(16,185,129,0.5);  color: #6EE7B7; }
-.hb-amber  { background: rgba(245,158,11,0.22);  border-color: rgba(245,158,11,0.5);  color: #FCD34D; }
-.hb-purple { background: rgba(167,139,250,0.22); border-color: rgba(167,139,250,0.5); color: #DDD6FE; }
-  
+.hb-amber  { background: rgba(245,158,11,0.22);  border-color: rgba(245,158,11,0.4);  color: #FCD34D; }
+.hb-purple { background: rgba(139,92,246,0.2);   border-color: rgba(139,92,246,0.4);  color: #C4B5FD; }
+.hero-footer-text { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 0.5rem; }
+
 /* ── TABS ── */
 .tabs-wrap {
-  position: sticky; top: 48px; z-index: 90;
+  position: sticky; top: 49px; z-index: 90;
   background: #fff; border-bottom: 2px solid var(--border);
   box-shadow: 0 2px 8px rgba(27,43,94,0.05);
 }
@@ -150,93 +158,123 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); over
 }
 .section-body { background: #fff; padding: 1.5rem; }
 
-/* ── SCORE CARDS (원소카드/과학자/차이점) ── */
-.score-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 1.25rem; }
-.score-card {
-  border-radius: 10px; padding: 1.25rem 1rem;
-  text-align: center; border: 1px solid var(--border);
-  transition: box-shadow .2s, transform .2s;
-}
-.score-card:hover { box-shadow: var(--shadow-m); transform: translateY(-2px); }
-.score-card.yellow { background: var(--amber-pale); border-color: var(--amber-b); }
-.score-card.blue   { background: var(--n-pale);     border-color: var(--n-soft); }
-.score-card.green  { background: var(--green-pale);  border-color: var(--green-b); }
-.score-card-icon   { font-size: 2rem; margin-bottom: 8px; }
-.score-card-title  { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
-.score-card-desc   { font-size: 12px; color: var(--text2); line-height: 1.6; }
-
-/* ── RUBRIC TABLE ── */
-.rubric-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 1rem; }
-.rubric-table thead th {
-  background: linear-gradient(90deg, var(--n1), var(--n2));
-  color: #fff; padding: 0.7rem 1rem; font-weight: 700; text-align: left;
-}
-.rubric-table td {
-  padding: 0.75rem 1rem; border-bottom: 1px solid var(--border);
-  color: var(--text2); vertical-align: top; line-height: 1.65;
-}
-.rubric-table td:first-child { color: var(--n1); font-weight: 700; white-space: nowrap; }
-.rubric-table td:last-child  { color: var(--text3); font-size: 12px; }
-.rubric-table tbody tr:nth-child(even) td { background: var(--bg2); }
-
-/* ── TIP BOX ── */
-.tip-box {
-  background: var(--amber-pale); border: 1px solid var(--amber-b);
-  border-left: 4px solid var(--amber);
-  border-radius: 8px; padding: 0.9rem 1.1rem; margin-top: 1rem;
-  font-size: 13px; color: #78350F; line-height: 1.8;
-}
-.tip-box strong { color: #92400E; font-weight: 800; }
-
-/* ── ACHIEVEMENT TABLE ── */
-.ach-header {
-  background: var(--n-pale); border: 1px solid var(--n-soft);
+/* ── INFO BOX ── */
+.info-box {
+  background: var(--bg2); border: 1px solid var(--border);
   border-left: 4px solid var(--n2);
-  border-radius: 8px; padding: 0.85rem 1.1rem; margin-bottom: 1rem;
-  font-size: 13px; color: var(--n1); font-weight: 600; line-height: 1.7;
+  border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1rem;
+  font-size: 13px; color: var(--text2); line-height: 1.8;
 }
-.grade-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 1rem; }
-.grade-table thead th {
+.info-box strong { color: var(--n1); font-weight: 700; }
+
+/* ── CARD GRID ── */
+.card-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 1.25rem; }
+.card-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.25rem; }
+.card {
+  border-radius: 10px; padding: 1.2rem 1.25rem;
+  background: var(--bg2); border: 1px solid var(--border);
+  text-align: center; transition: box-shadow .2s, transform .2s;
+}
+.card:hover { box-shadow: var(--shadow-m); transform: translateY(-2px); }
+.card-emoji { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
+.card-title { font-size: 14px; font-weight: 800; color: var(--n1); margin-bottom: 6px; }
+.card-desc  { font-size: 13px; color: var(--text2); line-height: 1.75; }
+.card-desc strong { color: var(--text); font-weight: 700; }
+
+/* ── SCORING TABLE ── */
+.scoring-box {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden; margin-bottom: 1.25rem;
+}
+.scoring-box-header {
+  background: var(--n-pale); border-bottom: 1px solid var(--n-soft);
+  padding: 0.75rem 1.25rem; font-size: 13px; font-weight: 800; color: var(--n1);
+  display: flex; align-items: center; gap: 8px;
+}
+
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table thead th {
   background: linear-gradient(90deg, var(--n1), var(--n2));
-  color: #fff; padding: 0.7rem 1rem; font-weight: 700; text-align: left;
+  color: #fff; padding: 0.7rem 1rem; font-weight: 700; text-align: center;
 }
-.grade-table td {
-  padding: 0.85rem 1rem; border-bottom: 1px solid var(--border);
-  color: var(--text2); line-height: 1.7; vertical-align: top;
+.data-table td {
+  padding: 0.7rem 1rem; border-bottom: 1px solid var(--border);
+  color: var(--text2); text-align: center; font-size: 13px; vertical-align: middle;
 }
-.grade-table td:first-child { width: 60px; }
-.grade-icon { font-size: 1.3rem; display: block; text-align: center; }
-.grade-table tbody tr:nth-child(1) td { background: #FFFBEB; }
-.grade-table tbody tr:nth-child(2) td { background: #F5F7FD; }
-.grade-table tbody tr:nth-child(3) td { background: #FFF1F2; }
-.grade-table td strong { font-weight: 700; color: var(--text); }
-.grade-table td u { text-decoration: underline; text-decoration-color: var(--n3); }
+.data-table td:first-child { font-weight: 700; color: var(--n1); text-align: left; }
+.data-table td:nth-child(2) { text-align: left; }
+.data-table tbody tr:nth-child(even) td { background: var(--bg2); }
+.data-table tbody tr:hover td { background: var(--n-pale); }
+.data-table .row-merge { background: var(--bg2); }
+
+/* ── ALERT ── */
+.alert {
+  border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0;
+  font-size: 13px; line-height: 1.8;
+}
+.alert-amber { background: var(--amber-pale); border: 1px solid var(--amber-b); border-left: 4px solid var(--amber); color: #78350F; }
+.alert-blue  { background: var(--n-pale); border: 1px solid var(--n-soft); border-left: 4px solid var(--n2); color: var(--n1); }
+.alert-green { background: var(--green-pale); border: 1px solid var(--green-b); border-left: 4px solid var(--green); color: #065F46; }
+.alert strong { font-weight: 700; }
+
+/* ── GRADE TABLE ── */
+.grade-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+.grade-table th, .grade-table td {
+  padding: 0.75rem 1rem; border-bottom: 1px solid var(--border);
+  font-size: 13px; vertical-align: top;
+}
+.grade-table th {
+  background: linear-gradient(90deg, var(--n1), var(--n2));
+  color: #fff; font-weight: 700;
+}
+.grade-label-상 { font-weight: 800; color: var(--n1); display: flex; align-items: center; gap: 6px; flex-direction: column; }
+.grade-label-중 { font-weight: 800; color: #2563EB; display: flex; align-items: center; gap: 6px; flex-direction: column; }
+.grade-label-하 { font-weight: 800; color: #6B7280; display: flex; align-items: center; gap: 6px; flex-direction: column; }
+.grade-table td { color: var(--text2); line-height: 1.75; }
+.grade-table td strong { color: var(--text); font-weight: 700; }
+.grade-table tbody tr:nth-child(even) td { background: var(--bg2); }
 
 /* ── MODEL ANSWER ── */
-.model-box {
+.model-answer {
   background: var(--green-pale); border: 1px solid var(--green-b);
   border-left: 4px solid var(--green);
-  border-radius: 10px; padding: 1.25rem 1.5rem; margin-top: 1rem;
+  border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0;
 }
-.model-box-header { font-size: 12px; font-weight: 800; color: #059669; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-.model-box-title  { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
-.model-box-text   { font-size: 13px; color: var(--text2); line-height: 1.95; }
-.model-box-text strong { color: #065F46; font-weight: 700; }
-.model-box-text u { text-decoration: underline; text-decoration-color: #059669; }
+.model-answer-header {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; font-weight: 800; color: #059669; margin-bottom: 8px;
+}
+.model-answer-header span { color: var(--text3); font-weight: 500; }
+.model-answer-text { font-size: 13px; color: var(--text2); line-height: 1.9; }
+.model-answer-text strong { color: #065F46; font-weight: 700; }
 
-/* ── CONCEPT GRID (2×2) ── */
-.concept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.25rem; }
-.concept-card {
-  border-radius: 10px; padding: 1.1rem 1.2rem;
-  background: var(--n-pale); border: 1px solid var(--n-soft); border-left: 4px solid var(--n2);
-  transition: box-shadow .2s, transform .2s;
+/* ── CONCEPT PILLS ── */
+.concept-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1.25rem; }
+.concept-pill {
+  border-radius: 10px; padding: 1rem 1.25rem; flex: 1; min-width: 200px;
+  background: var(--bg2); border: 1px solid var(--border); border-top: 3px solid var(--n2);
 }
-.concept-card:hover { box-shadow: var(--shadow-m); transform: translateY(-2px); }
-.concept-card-title { font-size: 14px; font-weight: 800; color: var(--n1); margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
-.concept-card-desc  { font-size: 13px; color: var(--text2); line-height: 1.75; }
-.concept-card-desc strong { color: var(--text); font-weight: 700; }
-.concept-card.amber { background: var(--amber-pale); border-color: var(--amber-b); border-left-color: var(--amber); }
-.concept-card.amber .concept-card-title { color: #78350F; }
+.concept-pill.amber { border-top-color: var(--amber); }
+.concept-pill.green { border-top-color: var(--green); }
+.concept-pill-title { font-size: 14px; font-weight: 800; color: var(--n1); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.concept-pill-desc { font-size: 13px; color: var(--text2); line-height: 1.75; }
+
+/* ── TIMELINE ── */
+.timeline { list-style: none; padding: 0; margin: 1rem 0; }
+.timeline-item {
+  display: flex; gap: 14px; padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.timeline-item:last-child { border-bottom: none; }
+.timeline-dot {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; margin-top: 2px;
+  background: var(--n2); display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: #fff; font-weight: 800;
+}
+.timeline-content { flex: 1; }
+.timeline-year { font-size: 13px; font-weight: 800; color: var(--n2); margin-bottom: 4px; }
+.timeline-desc { font-size: 13px; color: var(--text2); line-height: 1.75; }
+.timeline-desc strong { color: var(--text); font-weight: 700; }
 
 /* ── SUB TITLE ── */
 .sub-title {
@@ -246,138 +284,20 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); over
   padding-bottom: 6px; border-bottom: 2px solid var(--n-pale);
 }
 
-/* ── GROUP TABLE ── */
-.group-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 1rem; }
-.group-table thead th {
-  background: linear-gradient(90deg, var(--n1), var(--n2));
-  color: #fff; padding: 0.65rem 1rem; font-weight: 700; text-align: left;
-}
-.group-table td {
-  padding: 0.65rem 1rem; border-bottom: 1px solid var(--border);
-  color: var(--text2); vertical-align: middle;
-}
-.group-table td:first-child { font-weight: 800; color: var(--n1); text-align: center; width: 60px; }
-.group-table tbody tr:nth-child(even) td { background: var(--bg2); }
-.group-table tbody tr:hover td { background: var(--n-pale); }
-
-/* ── ATOM TABLE ── */
-.atom-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 1rem; }
-.atom-table thead th {
-  background: linear-gradient(90deg, var(--n1), var(--n2));
-  color: #fff; padding: 0.65rem 1rem; font-weight: 700; text-align: left;
-}
-.atom-table td {
-  padding: 0.65rem 1rem; border-bottom: 1px solid var(--border);
-  color: var(--text2);
-}
-.atom-table td:first-child { font-weight: 700; color: var(--text); }
-.atom-table tbody tr:nth-child(even) td { background: var(--bg2); }
-.atom-table tbody tr:hover td { background: var(--n-pale); }
-
-/* ── STRATEGY BOX ── */
-.strategy-box {
+/* ── PROCESS STEPS ── */
+.process-box {
   background: var(--bg2); border: 1px solid var(--border);
   border-left: 4px solid var(--n2);
-  border-radius: 10px; padding: 1.1rem 1.25rem; margin-bottom: 1rem;
+  border-radius: 10px; padding: 1.1rem 1.25rem; margin-bottom: 1.25rem;
 }
-.strategy-title { font-size: 13px; font-weight: 800; color: var(--n1); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-.strategy-steps { list-style: none; }
-.strategy-steps li {
-  font-size: 13px; color: var(--text2); padding: 5px 0;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: baseline; gap: 8px; line-height: 1.65;
-}
-.strategy-steps li:last-child { border-bottom: none; }
-.step-badge {
-  background: linear-gradient(135deg, var(--n1), var(--n2));
-  color: #fff; font-size: 10px; font-weight: 800;
-  padding: 2px 7px; border-radius: 4px; flex-shrink: 0; white-space: nowrap;
-}
-.strategy-steps li strong { color: var(--text); font-weight: 700; }
-.strategy-steps li u { text-decoration: underline; text-decoration-color: var(--n3); color: var(--n1); font-weight: 700; }
-
-.warn-box {
-  background: #FFF1F2; border: 1px solid #FECDD3; border-left: 4px solid var(--rose);
-  border-radius: 8px; padding: 0.9rem 1.1rem; margin-top: 1rem;
-  font-size: 13px; color: #9F1239; line-height: 1.8;
-}
-.warn-box strong { color: #881337; font-weight: 800; }
-
-/* ── TIMELINE ── */
-.timeline { list-style: none; position: relative; padding-left: 2rem; }
-.timeline::before {
-  content: ''; position: absolute; left: 10px; top: 0; bottom: 0;
-  width: 2px; background: var(--n-soft);
-}
-.timeline-item { position: relative; margin-bottom: 1.25rem; }
-.timeline-item:last-child { margin-bottom: 0; }
-.timeline-dot {
-  position: absolute; left: -1.65rem; top: 4px;
-  width: 14px; height: 14px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--n2), var(--n3));
-  border: 2px solid #fff; box-shadow: 0 0 0 2px var(--n-soft);
-}
-.timeline-year  { font-size: 13px; font-weight: 800; color: var(--n2); margin-bottom: 3px; }
-.timeline-body  { font-size: 13px; color: var(--text2); line-height: 1.75; }
-.timeline-body strong { color: var(--text); font-weight: 700; }
-
-/* ── COMPARE TABLE ── */
-.compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.compare-table thead th {
-  background: linear-gradient(90deg, var(--n1), var(--n2));
-  color: #fff; padding: 0.7rem 1rem; font-weight: 700; text-align: left;
-}
-.compare-table td {
-  padding: 0.7rem 1rem; border-bottom: 1px solid var(--border);
-  color: var(--text2); vertical-align: middle;
-}
-.compare-table td:first-child { color: var(--n1); font-weight: 700; white-space: nowrap; }
-.compare-table tbody tr:nth-child(even) td { background: var(--bg2); }
-
-/* ── ELECTRON TABLE ── */
-.electron-section { margin-bottom: 1.25rem; }
-.electron-sub-title {
-  font-size: 13px; font-weight: 800; color: var(--n1);
-  margin: 0 0 0.75rem;
-  display: flex; align-items: center; gap: 7px;
-  padding: 0.5rem 0; border-bottom: 2px solid var(--n-pale);
-}
-.bullet-list { list-style: none; margin-bottom: 1rem; }
-.bullet-list li {
+.process-box-title { font-size: 13px; font-weight: 800; color: var(--n1); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.process-steps { list-style: none; }
+.process-steps li {
   font-size: 13px; color: var(--text2); padding: 4px 0;
-  display: flex; gap: 8px; line-height: 1.65;
+  display: flex; gap: 8px; line-height: 1.65; align-items: flex-start;
 }
-.bullet-list li::before { content: '▶'; color: var(--n3); font-size: 9px; flex-shrink: 0; margin-top: 5px; }
-.bullet-list li strong { color: var(--text); font-weight: 700; }
-
-.bond-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 1rem; }
-.bond-table thead th {
-  background: linear-gradient(90deg, var(--n1), var(--n2));
-  color: #fff; padding: 0.65rem 1rem; font-weight: 700; text-align: left;
-}
-.bond-table td { padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); color: var(--text2); }
-.bond-table td:first-child { font-weight: 700; color: var(--text); }
-.bond-table tbody tr:nth-child(even) td { background: var(--bg2); }
-.bond-table tbody tr:hover td { background: var(--n-pale); }
-
-/* ── BLANK REASON ── */
-.blank-box {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 10px; padding: 1.1rem 1.25rem; margin-bottom: 1rem;
-}
-.blank-box-title {
-  font-size: 13px; font-weight: 800; color: var(--n2);
-  margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
-}
-.blank-model {
-  background: var(--beige); border: 1px solid var(--beige-b);
-  border-left: 4px solid var(--beige-acc);
-  border-radius: 8px; padding: 0.9rem 1.1rem; margin-top: 0.75rem;
-}
-.blank-model-title { font-size: 12px; font-weight: 700; color: #8B6A3A; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
-.blank-model-text  { font-size: 13px; color: #5C4A2A; line-height: 1.9; }
-.blank-model-text strong { color: #3D2B10; font-weight: 700; }
-.blank-model-text u { text-decoration: underline; text-decoration-color: var(--beige-acc); }
+.process-steps li .step-arrow { color: var(--n2); font-size: 11px; flex-shrink: 0; margin-top: 4px; }
+.process-steps li strong { color: var(--n1); font-weight: 700; }
 
 /* ── CHECKLIST ── */
 .check-progress {
@@ -409,33 +329,25 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); over
 .check-item.checked .check-box::after { content: '✓'; color: #fff; font-size: 11px; font-weight: 800; }
 .check-label { font-size: 13px; color: var(--text2); line-height: 1.6; }
 .check-item.checked .check-label { color: var(--text3); text-decoration: line-through; }
-.check-intro {
-  background: var(--amber-pale); border: 1px solid var(--amber-b);
-  border-left: 4px solid var(--amber);
-  border-radius: 8px; padding: 0.85rem 1.1rem; margin-bottom: 1rem;
-  font-size: 13px; color: #78350F; line-height: 1.7;
-}
-.check-intro strong { color: #92400E; font-weight: 800; }
-
-/* ── FOOTER ── */
-footer {
-  background: linear-gradient(135deg, var(--n1), var(--n2));
-  padding: 2rem; text-align: center;
-}
-.footer-logo { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 4px; }
-.footer-sub  { font-size: 12px; color: rgba(255,255,255,0.5); }
 
 /* ── FADE-IN ── */
 .fade-in { opacity: 0; transform: translateY(14px); transition: opacity .5s ease, transform .5s ease; }
 .fade-in.visible { opacity: 1; transform: none; }
 
+/* ── FOOTER ── */
+footer { background: linear-gradient(135deg, var(--n1), var(--n2)); padding: 2rem; text-align: center; }
+.footer-logo { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+.footer-sub  { font-size: 12px; color: rgba(255,255,255,0.5); }
+
 /* ── RESPONSIVE ── */
-@media(max-width:680px) {
-  .topbar  { padding: 0 1rem; }
-  .hero    { padding: 2.5rem 1rem 2rem; }
-  .main    { padding: 1.5rem 1rem 4rem; }
-  .concept-grid, .score-grid { grid-template-columns: 1fr; }
-  .tabs    { justify-content: flex-start; }
+@media(max-width: 760px) {
+  .topbar { padding: .65rem 1rem; }
+  .topbar-center { display: none; }
+  .hero   { padding: 2.5rem 1rem 2rem; }
+  .main   { padding: 1.5rem 1rem 4rem; }
+  .card-grid { grid-template-columns: 1fr; }
+  .card-grid-2 { grid-template-columns: 1fr; }
+  .tabs   { justify-content: flex-start; }
   .section-body { padding: 1rem; }
 }
 @media print {
@@ -451,12 +363,15 @@ footer {
 
 <!-- ── TOPBAR ── -->
 <div class="topbar">
-  <div class="topbar-left">
-    <a class="topbar-brand" href="science.html">베타과학학원</a>
-    <span class="topbar-sep">—</span>
-    <span>수행평가 완벽대비 자료</span>
-    <span class="topbar-sep">｜</span>
-    <span>A4 인쇄 최적화</span>
+  <a class="topbar-logo" href="#">
+    <div class="topbar-logo-icon">🔬</div>
+    <div>
+      <div class="topbar-logo-text">베타과학학원</div>
+      <div class="topbar-logo-sub">Beta Science Academy</div>
+    </div>
+  </a>
+  <div class="topbar-center">
+    <strong>베타과학학원</strong> — 수행평가 완벽대비 자료 &nbsp;|&nbsp; A4 인쇄 최적화
   </div>
   <div class="topbar-right">
     <button class="btn-print" onclick="window.print()">🖨️ PDF / 인쇄 (A4)</button>
@@ -465,29 +380,28 @@ footer {
 
 <!-- ── HERO ── -->
 <div class="hero">
-  <div class="hero-breadcrumb">
-    베타과학학원 | Beta Science Academy | 과학 전문<br>
-    <span>통합과학 Ⅰ. 과학의 기초 ｜ 2. 과학의 측정과 우리 사회 ｜ 01. 과학적 측정 표준의 유용성</span>
-  </div> <br>
-  <h1 class="hero-title">일상생활에서 측정 표준이 활용되는 사례 탐색</h1>
- <br> <br>
-  <div class="hero-badge-row">
-    <span class="hbadge hb-w">📚 내신 대비</span>
-    <span class="hbadge hb-w">🎯 수능 대비</span>
-    <span class="hbadge hb-w">✏️ 수행평가</span>
-    <span class="hbadge hb-w">🔬 탐구 활동</span>
-    <span class="hbadge hb-w">✍️ 세특 대비</span>
+  <div style="margin-bottom:1rem;">
+    <span class="hbadge hb-blue" style="font-size:14px; padding: 8px 22px;">A1&nbsp;&nbsp;베타과학학원 수행평가 완벽대비</span>
   </div>
-</div>
+  <h1 class="hero-title">규칙으로 완성되는 원소의 세계</h1>
+  <div class="hero-subtitle">멘델레예프 주기율표 만들기</div>
+  
+  <div class="hero-badge-row">
+    <span class="hbadge hb-blue">📋 반영비율 20%</span>
+    <span class="hbadge hb-amber">✍️ 서·논술형</span>
+    <span class="hbadge hb-purple">🔬 통합과학</span>
+  </div>
+
 
 <!-- ── TABS ── -->
 <div class="tabs-wrap">
   <div class="tabs">
-    <button class="tab active" onclick="goTo('s-rubric')">채점 기준</button>
-    <button class="tab" onclick="goTo('s-grade')">성취기준</button>
+    <button class="tab active" onclick="goTo('s-scoring')">채점 기준 분석</button>
+    <button class="tab" onclick="goTo('s-grade')">등급 기준</button>
     <button class="tab" onclick="goTo('s-concept')">핵심 개념</button>
+    <button class="tab" onclick="goTo('s-strategy')">원소카드 전략</button>
     <button class="tab" onclick="goTo('s-scientist')">공헌 과학자</button>
-    <button class="tab" onclick="goTo('s-electron')">전자각 & 결합</button>
+    <button class="tab" onclick="goTo('s-electron')">전자각 모델</button>
     <button class="tab" onclick="goTo('s-blank')">빈칸 원소</button>
     <button class="tab" onclick="goTo('s-checklist')">최종 체크</button>
   </div>
@@ -496,60 +410,65 @@ footer {
 <div class="main">
 
   <!-- ① 채점 기준 완전 분석 -->
-  <div class="section fade-in" id="s-rubric">
+  <div class="section fade-in" id="s-scoring">
     <div class="section-header">
       <div class="section-header-left">
         <div class="section-num">①</div>
-        <div class="section-title">📋 채점 기준 완전 분석</div>
+        <div class="section-title">채점 기준 완전 분석</div>
       </div>
       <span class="section-badge">Beta Science</span>
     </div>
     <div class="section-body">
-      <div class="score-grid">
-        <div class="score-card yellow">
-          <div class="score-card-icon">🃏</div>
-          <div class="score-card-title">원소카드 배치</div>
-          <div class="score-card-desc">비워져 있는 원소카드 개수로 채점 — 정확도가 곧 점수!</div>
+
+      <div class="card-grid">
+        <div class="card">
+          <span class="card-emoji">🃏</span>
+          <div class="card-title">원소카드 배치</div>
+          <div class="card-desc">비워져 있는 원소카드 개수로 채점 — 정확도가 곧 점수!</div>
         </div>
-        <div class="score-card blue">
-          <div class="score-card-icon">🧑‍🔬</div>
-          <div class="score-card-title">과학자 업적 조사</div>
-          <div class="score-card-desc">조사한 항목 개수로 채점 — 과학자 3~4명 조사 필수!</div>
+        <div class="card">
+          <span class="card-emoji">🧑‍🔬</span>
+          <div class="card-title">과학자 업적 조사</div>
+          <div class="card-desc">조사한 항목 개수로 채점 — 과학자 3~4명 조사 필수!</div>
         </div>
-        <div class="score-card green">
-          <div class="score-card-icon">🔍</div>
-          <div class="score-card-title">차이점 + 빈칸 이유</div>
-          <div class="score-card-desc">관찰 항목 수 + 이유 서술 — 많이 쓸수록 유리!</div>
+        <div class="card">
+          <span class="card-emoji">🔍</span>
+          <div class="card-title">차이점 + 빈칸 이유</div>
+          <div class="card-desc">관찰 항목 수 + 이유 서술 — 많이 쓸수록 유리!</div>
         </div>
       </div>
 
-      <table class="rubric-table">
+      <table class="data-table" style="margin-bottom:0">
         <thead>
-          <tr><th>평가 영역</th><th>평가 기준</th><th>채점 척도</th></tr>
+          <tr>
+            <th style="text-align:left; width:120px">평가 영역</th>
+            <th style="text-align:left">평가 기준</th>
+            <th style="width:160px">채점 척도</th>
+          </tr>
         </thead>
         <tbody>
           <tr>
-            <td rowspan="2">주기율표</td>
-            <td>주기율표의 구성 원리에 따라 원소카드를 배치하여 멘델레예프 주기율표를 만들 수 있다</td>
+            <td rowspan="2" style="border-right:1px solid var(--border)">주기율표</td>
+            <td style="text-align:left">주기율표의 구성 원리에 따라 원소카드를 배치하여 멘델레예프 주기율표를 만들 수 있다</td>
             <td>비워져 있는 원소카드의 개수</td>
           </tr>
           <tr>
-            <td>주기율표 완성에 공헌한 과학자들의 업적을 조사하고 설명할 수 있다</td>
+            <td style="text-align:left">주기율표 완성에 공헌한 과학자들의 업적을 조사하고 설명할 수 있다</td>
             <td>조사한 항목의 개수</td>
           </tr>
           <tr>
-            <td rowspan="2">주기율표의<br>경향성</td>
-            <td>멘델레예프 주기율표와 현재 주기율표의 차이점을 조사하고 설명할 수 있다</td>
+            <td rowspan="2" style="border-right:1px solid var(--border)">주기율표의 경향성</td>
+            <td style="text-align:left">멘델레예프 주기율표와 현재 주기율표의 차이점을 조사하고 설명할 수 있다</td>
             <td>제대로 관찰한 항목의 개수</td>
           </tr>
           <tr>
-            <td>같은 족 원소들이 공통되는 성질을 갖는 이유를 설명할 수 있다</td>
+            <td style="text-align:left">같은 족 원소들이 공통되는 성질을 갖는 이유를 설명할 수 있다</td>
             <td>빈칸 원소 배치 이유 서술</td>
           </tr>
         </tbody>
       </table>
 
-      <div class="tip-box">
+      <div class="alert alert-amber" style="margin-top:1rem;">
         🎯 <strong>베타과학학원 핵심 전략:</strong> 원소카드 배치가 승부처입니다! 원자량 순서 + 같은 족 성질 두 조건을 동시에 만족해야 감점이 없습니다. 빈칸 원소 이유도 절대 놓치지 마세요!
       </div>
     </div>
@@ -560,41 +479,56 @@ footer {
     <div class="section-header">
       <div class="section-header-left">
         <div class="section-num">②</div>
-        <div class="section-title">🎯 성취기준별 상·중·하 등급 기준</div>
+        <div class="section-title">성취기준별 상·중·하 등급 기준</div>
       </div>
       <span class="section-badge">Beta Science</span>
     </div>
     <div class="section-body">
 
-      <div class="ach-header">
-        📌 <strong>성취기준 [10통과1-02-03]</strong><br>
+      <div class="alert alert-blue" style="margin-bottom:1.25rem;">
+        🚩 <strong>성취기준 [10통과1-02-03]</strong><br>
         세상을 구성하는 원소들의 성질이 주기성을 나타내는 현상을 통해 자연의 규칙성을 도출하고, 지구와 생명계를 구성하는 주요 원소들이 결합을 형성하는 이유를 해석할 수 있다
       </div>
 
       <table class="grade-table">
-        <thead><tr><th>등급</th><th colspan="2">베타과학 분석 — 등급별 평가기준</th></tr></thead>
+        <thead>
+          <tr>
+            <th style="width:60px; text-align:center">등급</th>
+            <th>베타과학학원 분석 — 등급별 평가기준</th>
+          </tr>
+        </thead>
         <tbody>
           <tr>
-            <td><span class="grade-icon">⭐</span><strong style="color:#D97706;font-size:14px;">상</strong></td>
-            <td colspan="2">세상을 구성하는 원소들의 성질이 주기성을 나타내는 현상을 통해 자연의 규칙성을 도출하고, 지구와 생명계를 구성하는 주요 원소들이 결합을 형성하는 이유를 <strong><u>전자각의 모델을 이용하여 직접 설명</u></strong>할 수 있다</td>
+            <td style="text-align:center">
+              <div class="grade-label-상">상<br>⭐</div>
+            </td>
+            <td>세상을 구성하는 원소들의 성질이 주기성을 나타내는 현상을 통해 자연의 규칙성을 도출하고, 지구와 생명계를 구성하는 주요 원소들이 결합을 형성하는 이유를 <strong>전자각의 모델을 이용하여 직접 설명</strong>할 수 있다</td>
           </tr>
           <tr>
-            <td><span class="grade-icon">👍</span><strong style="color:var(--n2);font-size:14px;">중</strong></td>
-            <td colspan="2">세상을 구성하는 원소들의 성질이 주기성을 나타내는 현상을 통해 자연의 규칙성을 도출하고, 지구와 생명계를 구성하는 주요 원소들이 결합을 형성하는 이유를 <strong><u>전자각 모델을 이용한 전제를 제시</u></strong>하여 설명할 수 있다</td>
+            <td style="text-align:center">
+              <div class="grade-label-중">중<br>👍</div>
+            </td>
+            <td>세상을 구성하는 원소들의 성질이 주기성을 나타내는 현상을 통해 자연의 규칙성을 도출하고, 지구와 생명계를 구성하는 주요 원소들이 결합을 형성하는 이유를 <strong>전자각 모델을 이용한 전제를 제시</strong>하여 설명할 수 있다</td>
           </tr>
           <tr>
-            <td><span class="grade-icon">📖</span><strong style="color:#E11D48;font-size:14px;">하</strong></td>
-            <td colspan="2">주기율표에서 <strong><u>유사한 성질의 원소들을 묶어</u></strong>, 지구와 생명계를 구성하는 주요 원소들이 화합물을 형성하는 현상을 말할 수 있다</td>
+            <td style="text-align:center">
+              <div class="grade-label-하">하<br>📖</div>
+            </td>
+            <td>주기율표에서 <strong>유사한 성질의 원소들을 묶어</strong>, 지구와 생명계를 구성하는 주요 원소들이 화합물을 형성하는 현상을 말할 수 있다</td>
           </tr>
         </tbody>
       </table>
 
-      <div class="model-box">
-        <div class="model-box-header">✏️ 베타과학학원 제공 — '상' 등급 모범 답안</div>
-        <div class="model-box-text">
-          같은 족 원소들은 <u>최외각 전자 수가 동일</u>하기 때문에 유사한 화학적 성질을 나타냅니다. 예를 들어, 알칼리 금속(1족)은 최외각 전자가 1개이므로 물과 격렬히 반응하여 수소 기체를 발생시키는 공통 성질을 가집니다. 전자각 모델에서 원소들은 <u>비활성 기체의 안정한 전자 배치</u>를 얻으려 하므로, 최외각 전자 수가 같은 원소들은 같은 방식으로 전자를 잃거나 얻어 결합을 형성합니다. 이것이 주기율표에서 같은 족 원소들이 공통 성질을 나타내는 이유입니다.
+      <div class="model-answer">
+        <div class="model-answer-header">
+          ✏️ 베타과학학원 제공 — '상' 등급 모범 답안
+          <span>Beta Science Academy</span>
+        </div>
+        <div class="model-answer-text">
+          같은 족 원소들은 <strong>최외각 전자 수가 동일</strong>하기 때문에 유사한 화학적 성질을 나타냅니다. 예를 들어, 알칼리 금속(1족)은 최외각 전자가 1개이므로 물과 격렬히 반응하여 수소 기체를 발생시키는 공통 성질을 가집니다. 전자각 모델에서 원소들은 <strong>비활성 기체의 안정한 전자 배치</strong>를 얻으려 하므로, 최외각 전자 수가 같은 원소들은 같은 방식으로 전자를 잃거나 얻어 결합을 형성합니다. 이것이 주기율표에서 같은 족 원소들이 공통 성질을 나타내는 이유입니다.
         </div>
       </div>
+
     </div>
   </div>
 
@@ -603,46 +537,61 @@ footer {
     <div class="section-header">
       <div class="section-header-left">
         <div class="section-num">③</div>
-        <div class="section-title">🧪 핵심 개념 완전 정리</div>
+        <div class="section-title">핵심 개념 완전 정리</div>
       </div>
       <span class="section-badge">Beta Science</span>
     </div>
     <div class="section-body">
 
-      <div class="concept-grid">
-        <div class="concept-card">
-          <div class="concept-card-title">📌 주기 (Period) — 가로줄</div>
-          <div class="concept-card-desc">전자껍질 수가 같은 원소들의 묶음. 같은 주기이면 전자껍질 수가 동일하다.</div>
+      <div class="card-grid-2" style="margin-bottom:1rem;">
+        <div class="concept-pill">
+          <div class="concept-pill-title">🚩 주기 (Period) — 가로줄</div>
+          <div class="concept-pill-desc">전자껍질 수가 같은 원소들의 묶음. 같은 주기이면 전자껍질 수가 동일하다.</div>
         </div>
-        <div class="concept-card">
-          <div class="concept-card-title">📌 족 (Group) — 세로줄</div>
-          <div class="concept-card-desc">최외각 전자 수가 같은 원소들의 묶음. 화학적 성질이 유사하다. ← 핵심!</div>
+        <div class="concept-pill">
+          <div class="concept-pill-title">🚩 족 (Group) — 세로줄</div>
+          <div class="concept-pill-desc">최외각 전자 수가 같은 원소들의 묶음. 화학적 성질이 유사하다. ← 핵심!</div>
         </div>
-        <div class="concept-card amber">
-          <div class="concept-card-title">📌 원자량 vs 원자번호</div>
-          <div class="concept-card-desc">멘델레예프 → 원자량 순서. 현대 주기율표 → 원자번호(양성자 수) 순서.</div>
+        <div class="concept-pill amber">
+          <div class="concept-pill-title">🚩 원자량 vs 원자번호</div>
+          <div class="concept-pill-desc">멘델레예프 → 원자량 순서. 현대 주기율표 → 원자번호(양성자 수) 순서.</div>
         </div>
-        <div class="concept-card amber">
-          <div class="concept-card-title">📌 주기성 (Periodicity)</div>
-          <div class="concept-card-desc">원소들의 성질이 일정 간격으로 반복되는 현상 — 자연의 규칙성!</div>
+        <div class="concept-pill green">
+          <div class="concept-pill-title">🚩 주기성 (Periodicity)</div>
+          <div class="concept-pill-desc">원소들의 성질이 일정 간격으로 반복되는 현상 — 자연의 규칙성!</div>
         </div>
       </div>
 
       <div class="sub-title">✏️ 족별 원소 특성 — 베타과학학원 필수 암기표</div>
-      <table class="group-table">
-        <thead><tr><th>족</th><th>이름</th><th>최외각 전자</th><th>특성</th><th>대표 원소</th></tr></thead>
+      <table class="data-table" style="margin-bottom:1.25rem;">
+        <thead>
+          <tr>
+            <th>족</th>
+            <th>이름</th>
+            <th>최외각 전자</th>
+            <th>특성</th>
+            <th>대표 원소</th>
+          </tr>
+        </thead>
         <tbody>
-          <tr><td>1족</td><td>알칼리 금속</td><td>1개</td><td>물과 격렬 반응, +1가 이온</td><td>Li, Na, K</td></tr>
-          <tr><td>2족</td><td>알칼리 토금속</td><td>2개</td><td>1족보다 반응성↓, +2가 이온</td><td>Mg, Ca, Ba</td></tr>
-          <tr><td>14족</td><td>탄소족</td><td>4개</td><td>공유결합 4개, 유기물 핵심</td><td>C, Si</td></tr>
-          <tr><td>17족</td><td>할로겐</td><td>7개</td><td>비금속, 이원자 분자, -1가 이온</td><td>F, Cl, Br, I</td></tr>
-          <tr><td>18족</td><td>비활성 기체</td><td>8개 (He:2)</td><td>반응 거의 안 함, 가장 안정</td><td>He, Ne, Ar</td></tr>
+          <tr><td>1족</td><td style="text-align:left">알칼리 금속</td><td>1개</td><td style="text-align:left">물과 격렬 반응, +1가 이온</td><td>Li, Na, K</td></tr>
+          <tr><td>2족</td><td style="text-align:left">알칼리 토금속</td><td>2개</td><td style="text-align:left">1족보다 반응성↓, +2가 이온</td><td>Mg, Ca, Ba</td></tr>
+          <tr><td>14족</td><td style="text-align:left">탄소족</td><td>4개</td><td style="text-align:left">공유결합 4개, 유기물 핵심</td><td>C, Si</td></tr>
+          <tr><td>17족</td><td style="text-align:left">할로젠</td><td>7개</td><td style="text-align:left">비금속, 이원자 분자, -1가 이온</td><td>F, Cl, Br, I</td></tr>
+          <tr><td>18족</td><td style="text-align:left">비활성 기체</td><td>8개 (He:2)</td><td style="text-align:left">반응 거의 안 함, 가장 안정</td><td>He, Ne, Ar</td></tr>
         </tbody>
       </table>
 
-      <div class="sub-title">📊 주요 원소 원자량 순서 — 원소카드 배치 핵심!</div>
-      <table class="atom-table">
-        <thead><tr><th>원소</th><th>기호</th><th>원자량(약)</th><th>주기·족</th></tr></thead>
+      <div class="sub-title">📋 주요 원소 원자량 순서 — 원소카드 배치 핵심!</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>원소</th>
+            <th>기호</th>
+            <th>원자량(약)</th>
+            <th>주기·족</th>
+          </tr>
+        </thead>
         <tbody>
           <tr><td>수소</td><td>H</td><td>1</td><td>1주기 1족</td></tr>
           <tr><td>헬륨</td><td>He</td><td>4</td><td>1주기 18족</td></tr>
@@ -658,65 +607,93 @@ footer {
         </tbody>
       </table>
 
-      <div class="strategy-box">
-        <div class="strategy-title">🃏 베타과학학원 — 원소카드 배치 5단계 전략</div>
-        <ul class="strategy-steps">
-          <li><span class="step-badge">STEP 1</span> 원소카드를 <u>원자량 순서</u>로 나열한다</li>
-          <li><span class="step-badge">STEP 2</span> 1주기 — H(수소), He(헬륨) 배치</li>
-          <li><span class="step-badge">STEP 3</span> 2~3주기 — 성질이 반복될 때마다 줄 바꿈</li>
-          <li><span class="step-badge">STEP 4</span> 같은 족(세로줄)끼리 성질이 비슷한지 반드시 검토</li>
-          <li><span class="step-badge">STEP 5</span> 성질이 맞지 않는 자리는 <u>빈칸으로 남겨</u> 미발견 원소 표시</li>
-        </ul>
-      </div>
-
-      <div class="warn-box">
-        ⚠️ <strong>주의!</strong> 원자량 순서만 맞추고 같은 족 성질 검토를 빠뜨리는 실수가 가장 많습니다. 배치 후 반드시 세로줄(족) 성질 일치 여부를 확인하세요!
-      </div>
-
     </div>
   </div>
 
-  <!-- ④ 공헌 과학자 업적 조사 완전 공략 -->
-  <div class="section fade-in" id="s-scientist">
+  <!-- ④ 원소카드 배치 5단계 전략 -->
+  <div class="section fade-in" id="s-strategy">
     <div class="section-header">
       <div class="section-header-left">
         <div class="section-num">④</div>
-        <div class="section-title">🧑‍🔬 공헌 과학자 업적 조사 완전 공략</div>
+        <div class="section-title">베타과학학원 — 원소카드 배치 5단계 전략</div>
       </div>
       <span class="section-badge">Beta Science</span>
     </div>
     <div class="section-body">
 
-      <div class="tip-box" style="margin-bottom:1.25rem;">
+      <div class="process-box">
+        <div class="process-box-title">🧠 베타과학학원 — 원소카드 배치 5단계 전략</div>
+        <ul class="process-steps">
+          <li><span class="step-arrow">▶</span><div><strong>STEP 1</strong>&nbsp; 원소카드를 <u>원자량 순서</u>로 나열한다</div></li>
+          <li><span class="step-arrow">▶</span><div><strong>STEP 2</strong>&nbsp; 1주기 — H(수소), He(헬륨) 배치</div></li>
+          <li><span class="step-arrow">▶</span><div><strong>STEP 3</strong>&nbsp; 2~3주기 — 성질이 반복될 때마다 줄 바꿈</div></li>
+          <li><span class="step-arrow">▶</span><div><strong>STEP 4</strong>&nbsp; 같은 족(세로줄)끼리 성질이 비슷한지 반드시 검토</div></li>
+          <li><span class="step-arrow">▶</span><div><strong>STEP 5</strong>&nbsp; 성질이 맞지 않는 자리는 <u>빈칸으로 남겨</u> 미발견 원소 표시</div></li>
+        </ul>
+      </div>
+
+      <div class="alert alert-amber">
+        ⚠️ <strong>에이원 주의!</strong> 원자량 순서만 맞추고 같은 족 성질 검토를 빠뜨리는 실수가 가장 많습니다. 배치 후 반드시 세로줄(족) 성질 일치 여부를 확인하세요!
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ⑤ 공헌 과학자 업적 조사 완전 공략 -->
+  <div class="section fade-in" id="s-scientist">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-num">⑤</div>
+        <div class="section-title">공헌 과학자 업적 조사 완전 공략</div>
+      </div>
+      <span class="section-badge">Beta Science</span>
+    </div>
+    <div class="section-body">
+
+      <div class="alert alert-green" style="margin-bottom:1.25rem;">
         ✅ <strong>베타과학학원 전략:</strong> 과학자 4명 × 각 1항목 이상 = 만점 확보! 아래 내용을 모두 조사지에 작성하세요.
       </div>
 
       <ul class="timeline">
         <li class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-year">1817년 — 되베라이너 (Döbereiner)</div>
-          <div class="timeline-body">성질이 유사한 원소 3개를 한 묶음(트리아드)으로 분류. 세 원소 중 가운데 원소의 원자량이 나머지 두 원소의 평균값에 가깝다는 사실 발견 → 원소 분류의 시초</div>
+          <div class="timeline-dot" style="background:#2563EB">●</div>
+          <div class="timeline-content">
+            <div class="timeline-year">1817년 — 되베라이너 (Döbereiner)</div>
+            <div class="timeline-desc">성질이 유사한 원소 3개를 한 묶음(트리아드)으로 분류. 세 원소 중 가운데 원소의 원자량이 나머지 두 원소의 평균값에 가깝다는 사실 발견 → 원소 분류의 시초</div>
+          </div>
         </li>
         <li class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-year">1864년 — 뉴랜즈 (Newlands)</div>
-          <div class="timeline-body">옥타브의 법칙 제안: 원소를 원자량 순으로 배열하면 8번째마다 성질이 비슷한 원소 반복. 당시 인정받지 못했으나 주기율 발견의 토대가 됨</div>
+          <div class="timeline-dot" style="background:#2563EB">●</div>
+          <div class="timeline-content">
+            <div class="timeline-year">1864년 — 뉴랜즈 (Newlands)</div>
+            <div class="timeline-desc">옥타브의 법칙 제안: 원소를 원자량 순으로 배열하면 8번째마다 성질이 비슷한 원소 반복. 당시 인정받지 못했으나 주기율 발견의 토대가 됨</div>
+          </div>
         </li>
         <li class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-year">1869년 — 멘델레예프 (Mendeleev) ⭐ 핵심!</div>
-          <div class="timeline-body">원자량 순서로 63개 원소를 배열하여 <strong>최초의 주기율표 발표.</strong> 에카붕소·에카알루미늄·에카규소 등 미발견 원소의 성질을 예측하고 빈칸 남김 → 이후 갈륨(Ga)·스칸듐(Sc)·저마늄(Ge) 발견으로 예측 확인</div>
+          <div class="timeline-dot" style="background:#F59E0B">●</div>
+          <div class="timeline-content">
+            <div class="timeline-year">1869년 — 멘델레예프 (Mendeleev) ⭐ 핵심!</div>
+            <div class="timeline-desc"><strong>원자량 순서로 63개 원소를 배열하여 최초의 주기율표 발표.</strong> 에카봉소·에카알루미늄·에카규소 등 미발견 원소의 성질을 예측하고 빈칸 남김 → 이후 갈륨(Ga)·스칸듐(Sc)·저마늄(Ge) 발견으로 예측 확인</div>
+          </div>
         </li>
         <li class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-year">1913년 — 모즐리 (Moseley)</div>
-          <div class="timeline-body">X선 실험으로 <strong>원자번호(양성자 수)</strong> 개념 확립. 원자번호 순서로 배열하는 현대 주기율표의 기초 마련 → 멘델레예프 표의 일부 불일치 해결</div>
+          <div class="timeline-dot" style="background:#2563EB">●</div>
+          <div class="timeline-content">
+            <div class="timeline-year">1913년 — 모즐리 (Moseley)</div>
+            <div class="timeline-desc">X선 실험으로 <strong>원자번호(양성자 수)</strong> 개념 확립. 원자번호 순서로 배열하는 현대 주기율표의 기초 마련 → 멘델레예프 표의 일부 불일치 해결</div>
+          </div>
         </li>
       </ul>
 
-      <div class="sub-title" style="margin-top:1.5rem;">📊 멘델레예프 vs 현대 주기율표 — 차이점 완전 공략</div>
-      <table class="compare-table">
-        <thead><tr><th>비교 항목</th><th>멘델레예프 주기율표</th><th>현대 주기율표</th></tr></thead>
+      <div class="sub-title">📊 멘델레예프 vs 현대 주기율표 — 차이점 완전 공략</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>비교 항목</th>
+            <th>멘델레예프 주기율표</th>
+            <th>현대 주기율표</th>
+          </tr>
+        </thead>
         <tbody>
           <tr><td>배열 기준</td><td>원자량 순서</td><td>원자번호(양성자 수) 순서</td></tr>
           <tr><td>원소 수</td><td>63개</td><td>118개</td></tr>
@@ -730,31 +707,38 @@ footer {
     </div>
   </div>
 
-  <!-- ⑤ 전자각 모델 & 화학 결합 — 상 등급 핵심 -->
+  <!-- ⑥ 전자각 모델 & 화학 결합 — 상 등급 핵심 -->
   <div class="section fade-in" id="s-electron">
     <div class="section-header">
       <div class="section-header-left">
-        <div class="section-num">⑤</div>
-        <div class="section-title">🔮 전자각 모델 &amp; 화학 결합 — 상 등급 핵심</div>
+        <div class="section-num">⑥</div>
+        <div class="section-title">전자각 모델 &amp; 화학 결합 — 상 등급 핵심</div>
       </div>
       <span class="section-badge">Beta Science</span>
     </div>
     <div class="section-body">
 
-      <div class="electron-section">
-        <div class="electron-sub-title">🔵 전자껍질 모델 이해</div>
-        <ul class="bullet-list">
-          <li>전자는 핵 주위를 에너지 준위에 따라 <strong>전자껍질(K, L, M, N...)</strong>에 배치</li>
-          <li>각 껍질 최대 전자 수: K=2, L=8, M=8(또는 18)</li>
-          <li><strong>최외각 전자</strong>: 가장 바깥 껍질의 전자 → 화학 반응에 참여하는 핵심!</li>
-          <li>비활성 기체(18족)는 최외각이 꽉 차 안정 → 반응 거의 안 함</li>
-          <li>원소들은 비활성 기체처럼 안정하려는 경향 = <strong>옥텟 규칙</strong></li>
+      <div class="process-box">
+        <div class="process-box-title">🔵 전자껍질 모델 이해</div>
+        <ul class="process-steps">
+          <li><span class="step-arrow">▶</span><div>전자는 핵 주위를 에너지 준위에 따라 <strong>전자껍질(K, L, M, N...)</strong>에 배치</div></li>
+          <li><span class="step-arrow">▶</span><div>각 껍질 최대 전자 수: K=2, L=8, M=8(또는 18)</div></li>
+          <li><span class="step-arrow">▶</span><div><strong>최외각 전자</strong>: 가장 바깥 껍질의 전자 → 화학 반응에 참여하는 핵심!</div></li>
+          <li><span class="step-arrow">▶</span><div>비활성 기체(18족)는 최외각이 꽉 차 안정 → 반응 거의 안 함</div></li>
+          <li><span class="step-arrow">▶</span><div>원소들은 비활성 기체처럼 안정하려는 경향 = <strong>옥텟 규칙</strong></div></li>
         </ul>
       </div>
 
-      <div class="electron-sub-title">🔗 지구·생명계 구성 원소와 결합 방식</div>
-      <table class="bond-table">
-        <thead><tr><th>원소</th><th>전자 배치</th><th>결합 방식</th><th>존재 예시</th></tr></thead>
+      <div class="sub-title">🔗 지구·생명계 구성 원소와 결합 방식</div>
+      <table class="data-table" style="margin-bottom:1.25rem;">
+        <thead>
+          <tr>
+            <th>원소</th>
+            <th>전자 배치</th>
+            <th>결합 방식</th>
+            <th>존재 예시</th>
+          </tr>
+        </thead>
         <tbody>
           <tr><td>수소(H)</td><td>K: 1</td><td>공유결합 1개</td><td>물(H₂O), 유기물</td></tr>
           <tr><td>산소(O)</td><td>K:2 L:6</td><td>공유결합 2개</td><td>물(H₂O), CO₂</td></tr>
@@ -765,9 +749,12 @@ footer {
         </tbody>
       </table>
 
-      <div class="model-box">
-        <div class="model-box-header">✏️ 베타과학학원 제공 — 결합 형성 이유 모범 답안 (상 등급)</div>
-        <div class="model-box-text">
+      <div class="model-answer">
+        <div class="model-answer-header">
+          ✏️ 베타과학학원 제공 — 결합 형성 이유 모범 답안 (상 등급)
+          <span>Beta Science Academy</span>
+        </div>
+        <div class="model-answer-text">
           원소들은 가장 바깥 전자껍질(최외각)을 비활성 기체처럼 안정하게 채우려는 경향이 있습니다(옥텟 규칙). 나트륨(Na)은 최외각 전자가 1개이므로 이를 잃어 Ne의 전자 배치를 가지려 하고, 염소(Cl)는 최외각 전자가 7개이므로 1개를 얻어 Ar의 전자 배치를 가지려 합니다. 이렇게 전자를 주고받아 Na⁺와 Cl⁻가 되고, 정전기적 인력으로 NaCl(소금)이 형성됩니다. 이것이 지구와 생명계를 구성하는 원소들이 결합을 형성하는 이유이며, 같은 족 원소들이 최외각 전자 수가 같아 유사한 화학적 성질을 갖는 원리와 같습니다.
         </div>
       </div>
@@ -775,27 +762,27 @@ footer {
     </div>
   </div>
 
-  <!-- ⑥ 빈칸 원소 이유 서술 — 절대 놓치지 말자! -->
+  <!-- ⑦ 빈칸 원소 이유 서술 — 절대 놓치지 말자! -->
   <div class="section fade-in" id="s-blank">
     <div class="section-header">
       <div class="section-header-left">
-        <div class="section-num">⑥</div>
-        <div class="section-title">💡 빈칸 원소 이유 서술 — 절대 놓치지 말자!</div>
+        <div class="section-num">⑦</div>
+        <div class="section-title">빈칸 원소 이유 서술 — 절대 놓치지 말자!</div>
       </div>
       <span class="section-badge">Beta Science</span>
     </div>
     <div class="section-body">
 
-      <div class="blank-box">
-        <div class="blank-box-title">⭐ 베타과학학원 공식 답안:</div>
-        <div style="font-size:13px;color:var(--text2);line-height:1.8;padding:0.5rem 0;">
-          멘델레예프는 원자량 순서로 원소를 배열할 때 성질이 맞지 않는 위치가 생기면, <strong>아직 발견되지 않은 원소가 존재할 것</strong>이라 예측하고 그 자리를 비워두었습니다. 에카알루미늄(훗날 갈륨 Ga), 에카규소(훗날 저마늄 Ge) 등 그 성질(원자량, 밀도, 화학적 특성)까지 구체적으로 예측하였고, 이후 실제 발견으로 예측이 올았음이 입증되었습니다.
-        </div>
+      <div class="alert alert-blue" style="margin-bottom:1rem;">
+        ⭐ <strong>베타과학학원 공식 답안:</strong>
       </div>
 
-      <div class="blank-model">
-        <div class="blank-model-title">✏️ 빈칸 원소 이유 모범 답안</div>
-        <div class="blank-model-text">
+      <div class="model-answer">
+        <div class="model-answer-header">
+          ✏️ 빈칸 원소 이유 모범 답안
+          <span>Beta Science Academy</span>
+        </div>
+        <div class="model-answer-text">
           멘델레예프는 원자량 순서로 원소를 배열할 때 성질이 맞지 않는 위치가 생기면, <u>아직 발견되지 않은 원소가 존재할 것</u>이라 예측하고 그 자리를 비워두었습니다. 에카알루미늄(훗날 갈륨 Ga), 에카규소(훗날 저마늄 Ge) 등 그 성질(원자량, 밀도, 화학적 특성)까지 구체적으로 예측하였고, 이후 실제 발견으로 예측이 올았음이 입증되었습니다.
         </div>
       </div>
@@ -803,25 +790,28 @@ footer {
     </div>
   </div>
 
-  <!-- ⑦ 수행평가 당일 최종 체크리스트 -->
+  <!-- ⑧ 수행평가 당일 최종 체크리스트 -->
   <div class="section fade-in" id="s-checklist">
     <div class="section-header">
       <div class="section-header-left">
-        <div class="section-num">⑦</div>
-        <div class="section-title">✅ 수행평가 당일 최종 체크리스트</div>
+        <div class="section-num">⑧</div>
+        <div class="section-title">수행평가 당일 최종 체크리스트</div>
       </div>
-      <span class="section-badge">Beta Science</span>
+      <span class="section-badge">Beta Science 완벽대비</span>
     </div>
     <div class="section-body">
-      <div class="check-intro">
-        📌 <strong>베타과학학원 완벽대비:</strong> 아래 항목 모두 체크되면 만점 도전 가능!
+
+      <div class="alert alert-amber" style="margin-bottom:1rem;">
+        🚩 <strong>베타과학학원 완벽대비:</strong> 아래 항목 모두 체크되면 만점 도전 가능!
       </div>
+
       <div class="check-progress">
         <div class="progress-bar-wrap">
           <div class="progress-bar" id="progressBar" style="width:0%"></div>
         </div>
         <div class="progress-text" id="progressText">0 / 8</div>
       </div>
+
       <ul class="checklist">
         <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">원소카드를 원자량 순서로 정확하게 배열했는가?</div></li>
         <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">같은 족(세로줄) 원소들이 유사한 성질을 가지는지 검토했는가?</div></li>
@@ -839,7 +829,7 @@ footer {
 
 <!-- ── FOOTER ── -->
 <footer>
-  <div class="footer-logo">🔬 베타과학학원 ｜ 과학 전문 학원</div>
+  <div class="footer-logo">🚀 베타과학학원 | Beta Science Academy | 과학 전문</div>
   <div class="footer-sub">내신 · 수능 · 수행 · 탐구 · 세특 — 과학에 대한 준비는 이제 완벽합니다!</div>
 </footer>
 
@@ -857,7 +847,7 @@ function goTo(id) {
   if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 110, behavior: 'smooth' });
 }
 const tabs = document.querySelectorAll('.tab');
-const secs = ['s-rubric','s-grade','s-concept','s-scientist','s-electron','s-blank','s-checklist'];
+const secs = ['s-scoring','s-grade','s-concept','s-strategy','s-scientist','s-electron','s-blank','s-checklist'];
 window.addEventListener('scroll', () => {
   let cur = 0;
   secs.forEach((id, i) => {
