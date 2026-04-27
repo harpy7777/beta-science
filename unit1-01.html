@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미시 세계와 거시 세계 | 베타과학학원</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
+
+:root {
+  /* 남색 3가지 메인 톤 */
+  --n1:        #1B2B5E;   /* 딥 네이비 */
+  --n2:        #2E4FA3;   /* 미디엄 블루 */
+  --n3:        #4F73D4;   /* 브라이트 블루 */
+
+  /* 연한 배경 파생 */
+  --n-pale:    #EEF2FB;
+  --n-soft:    #D6DFF5;
+  --n-mid:     #B0C0E8;
+
+  /* 기존 참조 유지 (하위 호환) */
+  --navy:      #1B2B5E;
+  --navy-m:    #2E4FA3;
+  --navy-l:    #4F73D4;
+  --navy-ll:   #7A96DC;
+  --navy-pale: #EEF2FB;
+  --navy-soft: #D6DFF5;
+
+  --bg:        #FFFFFF;
+  --bg2:       #F5F7FD;
+  --bg3:       #EEF2FB;
+
+  --text:      #1A1F36;
+  --text2:     #4A5070;
+  --text3:     #8A90AA;
+
+  --border:    #DDE2F0;
+  --green:     #10B981;
+  --amber:     #F59E0B;
+  --rose:      #F43F5E;
+
+  --shadow:    0 2px 12px rgba(27,43,94,0.08);
+  --shadow-m:  0 4px 20px rgba(27,43,94,0.13);
+  --radius:    14px;
+  --font:      'Noto Sans KR', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); overflow-x: hidden; line-height: 1.7; }
+
+/* ── topbar ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.97); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.7rem 2rem;
+  box-shadow: 0 1px 8px rgba(27,43,94,0.07);
+}
+.topbar-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+.topbar-logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--n1), var(--n2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.topbar-logo-text { font-size: 13px; font-weight: 800; color: var(--n1); }
+.topbar-logo-sub  { font-size: 10px; color: var(--text3); }
+.topbar-btns { display: flex; gap: 8px; }
+.btn-print {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg3); border: 1px solid var(--n-soft);
+  color: var(--n2); font-size: 12px; font-weight: 700;
+  padding: 7px 14px; border-radius: 8px; cursor: pointer;
+  font-family: var(--font); transition: all .2s;
+}
+.btn-print:hover { background: var(--n-soft); }
+.btn-test {
+  display: flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, var(--n1), var(--n2));
+  border: none; color: #fff;
+  font-size: 12px; font-weight: 700;
+  padding: 7px 16px; border-radius: 8px; cursor: pointer;
+  font-family: var(--font); transition: all .2s;
+  box-shadow: 0 2px 10px rgba(27,43,94,0.25);
+}
+.btn-test:hover { background: linear-gradient(135deg, var(--n2), var(--n3)); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(27,43,94,0.3); }
+
+/* ── hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--n1) 0%, var(--n2) 55%, var(--n3) 100%);
+  padding: 3.5rem 2rem 3rem;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--n3), var(--n-mid), var(--n3));
+}
+.hero-breadcrumb { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 1.2rem; line-height: 1.9; }
+.hero-breadcrumb span { color: var(--n-soft); font-weight: 600; }
+.hero-title    { font-size: clamp(1.9rem, 4.5vw, 3rem); font-weight: 900; color: #fff; line-height: 1.15; margin-bottom: 0.4rem; }
+.hero-subtitle { font-size: clamp(1.3rem, 3vw, 2rem); font-weight: 700; color: var(--n-soft); line-height: 1.2; margin-bottom: 1.5rem; }
+.hero-tagline  { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 1.75rem; }
+.hero-badge-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.hbadge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 13px; border-radius: 100px; font-size: 12px; font-weight: 600;
+}
+.hb-w { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.92); }
+.hb-a { background: rgba(245,158,11,0.22);  border: 1px solid rgba(245,158,11,0.4);  color: #FCD34D; }
+.hb-g { background: rgba(16,185,129,0.18);  border: 1px solid rgba(16,185,129,0.35); color: #6EE7B7; }
+
+/* ── tabs ── */
+.tabs-wrap {
+  position: sticky; top: 49px; z-index: 90;
+  background: #fff; border-bottom: 2px solid var(--border);
+  box-shadow: 0 2px 8px rgba(27,43,94,0.05);
+}
+.tabs { display: flex; justify-content: center; gap: 2px; padding: 0.4rem 1rem; max-width: 900px; margin: 0 auto; overflow-x: auto; }
+.tab {
+  padding: 7px 15px; border-radius: 8px 8px 0 0;
+  font-size: 13px; font-weight: 600; color: var(--text3);
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+  border: none; background: transparent; font-family: var(--font);
+}
+.tab:hover  { color: var(--n2); background: var(--bg3); }
+.tab.active { color: var(--n2); background: var(--n-pale); border-bottom: 2px solid var(--n2); }
+
+/* ── main ── */
+.main { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+
+/* ── section ── */
+.section { margin-bottom: 1.75rem; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border); }
+
+.section-header {
+  background: linear-gradient(135deg, var(--n1) 0%, var(--n2) 100%);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.9rem 1.5rem;
+}
+.section-header-left { display: flex; align-items: center; gap: 10px; }
+.section-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: #fff;
+}
+.section-title { font-size: 14px; font-weight: 800; color: #fff; }
+.section-badge {
+  font-size: 10px; font-weight: 700; padding: 3px 10px;
+  border-radius: 20px; background: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.95); border: 1px solid rgba(255,255,255,0.28);
+}
+.section-body { background: #fff; padding: 1.5rem; }
+
+/* ── info table ── */
+.info-table { width: 100%; border-collapse: collapse; }
+.info-table tr { border-bottom: 1px solid var(--border); }
+.info-table tr:last-child { border-bottom: none; }
+.info-table th {
+  width: 110px; padding: 0.85rem 1rem;
+  font-size: 13px; font-weight: 700; color: var(--n2);
+  background: var(--bg2); vertical-align: top; white-space: nowrap;
+}
+.info-table td { padding: 0.85rem 1rem; font-size: 13px; color: var(--text); line-height: 1.7; }
+
+/* ── question box ── */
+.question-box {
+  background: var(--n-pale);
+  border: 1px solid var(--n-soft);
+  border-left: 4px solid var(--n2);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  font-size: 13px; color: var(--n1); font-weight: 600;
+  margin-top: 1rem;
+}
+
+/* ── eval badges ── */
+.eval-badges { display: flex; flex-wrap: wrap; gap: 7px; }
+.eval-badge  { padding: 3px 11px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.ev-ob { background: var(--n-pale); color: var(--n2); border: 1px solid var(--n-soft); }
+.ev-pr { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+.ev-se { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+.ev-gr { background: #FFF1F2; color: #E11D48; border: 1px solid #FECDD3; }
+
+/* ── concept grid ── */
+.concept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.5rem; }
+.concept-card {
+  border-radius: 10px; padding: 1.1rem;
+  transition: box-shadow .2s, transform .2s;
+}
+.concept-card:hover { box-shadow: var(--shadow-m); transform: translateY(-2px); }
+.concept-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--n2);
+}
+.concept-card-title { font-size: 14px; font-weight: 700; color: var(--n1); margin-bottom: 6px; }
+.concept-card-desc  { font-size: 13px; color: var(--text2); line-height: 1.75; }
+.concept-card-desc strong { color: var(--text); font-weight: 700; }
+
+/* ── sub title ── */
+.sub-title {
+  font-size: 13px; font-weight: 800; color: var(--n1);
+  margin: 1.25rem 0 0.75rem;
+  display: flex; align-items: center; gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--n-pale);
+}
+
+/* ── data table ── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 1rem; }
+.data-table thead th { background: linear-gradient(90deg, var(--n1), var(--n2)); color: #fff; padding: 0.7rem 1rem; font-weight: 700; text-align: left; }
+.data-table td { padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); color: var(--text); font-size: 13px; }
+.data-table tbody tr:nth-child(even) td { background: var(--bg2); }
+.data-table tbody tr:hover td { background: var(--n-pale); }
+.tag-micro { background: var(--n-pale); color: var(--n2); padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+.tag-macro { background: #DCFCE7; color: #16A34A; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+.tag-mid   { background: #F3F4F6; color: #6B7280; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+
+/* ── compare grid ── */
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.compare-card { border-radius: 10px; padding: 1.1rem; }
+.compare-card.micro {
+  background: #FAF7F2;
+  border: 1px solid #E8DDD0;
+  border-top: 3px solid #C4A882;
+}
+.compare-card.macro { background: #F0FDF4; border: 1px solid #A7F3D0; border-top: 3px solid var(--green); }
+.compare-title { font-size: 14px; font-weight: 800; margin-bottom: 10px; }
+.compare-card.micro .compare-title { color: #5C4A2A; }
+.compare-card.macro .compare-title { color: #065F46; }
+.compare-list { list-style: none; }
+.compare-list li { font-size: 13px; padding: 5px 0; border-bottom: 1px solid rgba(0,0,0,0.06); display: flex; gap: 7px; color: var(--text2); }
+.compare-list li:last-child { border-bottom: none; }
+.compare-list li::before { content: '▶'; font-size: 9px; margin-top: 5px; flex-shrink: 0; }
+.compare-card.micro .compare-list li::before { color: #C4A882; }
+.compare-card.macro .compare-list li::before { color: var(--green); }
+.compare-card.micro .compare-list li strong { color: #3D2B10; font-weight: 700; }
+.compare-card.macro .compare-list li strong { color: var(--text); font-weight: 700; }
+
+/* ── formula box ── */
+.formula-box {
+  background: #FAF7F2;
+  border: 1px solid #E8DDD0;
+  border-left: 4px solid #C4A882;
+  border-radius: 10px; padding: 1.1rem 1.5rem 1.25rem;
+  margin-bottom: 1.25rem; line-height: 2.2;
+}
+.f-label { font-size: 12px; font-weight: 700; color: #8B6A3A; margin-bottom: 0.5rem; text-align: left; display: block; }
+.f-main { font-family: 'Courier New', monospace; font-size: 14px; font-weight: 700; color: var(--n1); letter-spacing: .04em; text-align: center; display: block; }
+.f-sub  { font-size: 12px; color: var(--text3); text-align: center; display: block; }
+
+/* ── steps ── */
+.step-list { list-style: none; }
+.step-item { display: flex; gap: 12px; margin-bottom: 1.2rem; }
+.step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--n2), var(--n3));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; flex-shrink: 0; margin-top: 2px;
+}
+.step-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.step-calc  {
+  font-family: 'Courier New', monospace; font-size: 13px;
+  color: var(--n1); background: var(--n-pale);
+  padding: 4px 10px; border-radius: 6px;
+  display: inline-block; margin-bottom: 3px; font-weight: 600;
+  border-left: 3px solid var(--n3);
+}
+.step-note  { font-size: 12px; color: var(--text3); }
+
+/* ── point box ── */
+.point-box {
+  background: var(--n-pale);
+  border: 1px solid var(--n-soft);
+  border-left: 4px solid var(--n3);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  font-size: 13px; color: var(--text2); line-height: 1.8;
+  margin-top: 1rem;
+}
+.point-box strong { color: var(--n1); font-weight: 700; }
+
+/* ── result QA ── */
+.qa-item { margin-bottom: 1.25rem; }
+.qa-q { font-size: 13px; font-weight: 700; color: var(--n2); margin-bottom: 6px; }
+.qa-q span { color: var(--text2); font-weight: 500; }
+.qa-a {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-left: 3px solid var(--n3);
+  border-radius: 8px; padding: 0.85rem 1rem;
+  font-size: 13px; color: var(--text2); line-height: 1.8;
+}
+
+/* ── model answer ── */
+.model-answer {
+  background: #F0FDF4; border: 1px solid #A7F3D0;
+  border-left: 4px solid var(--green);
+  border-radius: 10px; padding: 1.25rem 1.5rem; margin-top: 1rem;
+}
+.model-answer-header { font-size: 12px; font-weight: 700; color: #059669; margin-bottom: 0.6rem; }
+.model-answer-title  { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 0.6rem; }
+.model-answer p { font-size: 13px; color: var(--text2); line-height: 1.9; margin-bottom: 0.5rem; }
+.model-answer strong { color: #065F46; font-weight: 700; }
+
+/* ── OX ── */
+.ox-list { list-style: none; }
+.ox-item { display: flex; align-items: flex-start; gap: 10px; padding: 0.85rem 0; border-bottom: 1px solid var(--border); }
+.ox-item:last-child { border-bottom: none; }
+.ox-badge { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex-shrink: 0; margin-top: 1px; }
+.ox-o { background: #DCFCE7; color: #16A34A; border: 1.5px solid #86EFAC; }
+.ox-x { background: #FEE2E2; color: #DC2626; border: 1.5px solid #FCA5A5; }
+.ox-stmt    { font-size: 13px; color: var(--text); font-weight: 600; margin-bottom: 3px; }
+.ox-explain { font-size: 12px; color: var(--text3); line-height: 1.6; }
+.ox-explain::before { content: '▶ '; color: var(--n3); }
+
+/* ── csat ── */
+.csat-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+.csat-q   { font-size: 13px; color: var(--text); line-height: 1.8; margin-bottom: 0.9rem; font-weight: 500; }
+.csat-choices { list-style: none; }
+.csat-choices li { font-size: 13px; color: var(--text2); padding: 4px 0; }
+.answer-box { background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 8px; padding: 0.9rem 1rem; margin-top: 0.75rem; font-size: 13px; color: var(--text2); line-height: 1.8; }
+.answer-box strong { color: #059669; font-weight: 800; }
+
+/* ── rubric ── */
+.rubric-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.rubric-table thead th { background: linear-gradient(90deg, var(--n1), var(--n2)); color: #fff; padding: 0.7rem 1rem; font-weight: 700; text-align: left; }
+.rubric-table th:last-child { text-align: center; }
+.rubric-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--text2); }
+.rubric-table td:last-child { text-align: center; color: var(--n2); font-weight: 700; }
+.rubric-table tbody tr:nth-child(even) td { background: var(--bg2); }
+
+/* ── adv table ── */
+.adv-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.adv-table thead th { background: linear-gradient(90deg, var(--n1), var(--n2)); color: #fff; padding: 0.7rem 1rem; font-weight: 700; text-align: left; }
+.adv-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); color: var(--text2); line-height: 1.7; vertical-align: top; }
+.adv-table td:first-child { color: var(--n1); font-weight: 700; white-space: nowrap; }
+.adv-table td:last-child  { color: var(--n3); font-weight: 600; }
+.adv-table tbody tr:nth-child(even) td { background: var(--bg2); }
+
+/* ── setech ── */
+.setech-ex {
+  border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+}
+.setech-ex.beige {
+  background: #FAF7F2;
+  border: 1px solid #E8DDD0;
+  border-left: 4px solid #C4A882;
+}
+.setech-ex.beige .setech-lbl { color: #8B6A3A; }
+.setech-ex.beige .setech-ttl { color: #3D2B10; }
+.setech-ex.beige .setech-txt { color: #5C4A2A; }
+.setech-ex.beige .setech-txt strong { color: #3D2B10; font-weight: 700; }
+.setech-ex.green {
+  background: #F0FDF4;
+  border: 1px solid #A7F3D0;
+  border-left: 4px solid var(--green);
+}
+.setech-ex.green .setech-lbl { color: #059669; }
+.setech-ex.green .setech-ttl { color: var(--text); }
+.setech-ex.green .setech-txt { color: var(--text2); }
+.setech-ex.green .setech-txt strong { color: #065F46; font-weight: 700; }
+.setech-lbl { font-size: 11px; font-weight: 700; margin-bottom: 6px; }
+.setech-ttl { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.setech-txt { font-size: 13px; line-height: 1.9; }
+
+/* ── checklist ── */
+.check-progress { background: var(--n-pale); border-radius: 8px; padding: 0.8rem 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 12px; }
+.progress-bar-wrap { flex: 1; height: 6px; background: var(--n-soft); border-radius: 3px; overflow: hidden; }
+.progress-bar { height: 100%; background: linear-gradient(90deg, var(--n1), var(--n2), var(--n3)); border-radius: 3px; transition: width .4s; }
+.progress-text { font-size: 12px; color: var(--n1); font-weight: 700; white-space: nowrap; }
+.checklist { list-style: none; }
+.check-item { display: flex; align-items: flex-start; gap: 10px; padding: 0.7rem 0.5rem; border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 6px; transition: background .15s; }
+.check-item:hover { background: var(--bg2); }
+.check-item:last-child { border-bottom: none; }
+.check-box { width: 18px; height: 18px; border: 2px solid var(--n3); border-radius: 4px; flex-shrink: 0; margin-top: 2px; transition: all .2s; display: flex; align-items: center; justify-content: center; }
+.check-item.checked .check-box { background: linear-gradient(135deg, var(--n2), var(--n3)); border-color: var(--n2); }
+.check-item.checked .check-box::after { content: '✓'; color: #fff; font-size: 11px; font-weight: 800; }
+.check-label { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.check-item.checked .check-label { color: var(--text3); text-decoration: line-through; }
+
+/* ── tag pill ── */
+.tag-pill { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 700; margin-left: 6px; }
+.tp-green  { background: #DCFCE7; color: #16A34A; }
+.tp-navy   { background: var(--n-pale); color: var(--n2); }
+
+/* ── footer ── */
+footer { background: linear-gradient(135deg, var(--n1), var(--n2)); padding: 2rem; text-align: center; }
+.footer-logo { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+.footer-sub  { font-size: 12px; color: rgba(255,255,255,0.5); }
+
+/* ── fade-in ── */
+.fade-in { opacity: 0; transform: translateY(14px); transition: opacity .5s ease, transform .5s ease; }
+.fade-in.visible { opacity: 1; transform: none; }
+
+/* ── mobile ── */
+@media(max-width: 680px) {
+  .topbar { padding: .65rem 1rem; }
+  .hero { padding: 2.5rem 1rem 2rem; }
+  .main { padding: 1.5rem 1rem 4rem; }
+  .concept-grid, .compare-grid { grid-template-columns: 1fr; }
+  .tabs { justify-content: flex-start; }
+  .section-body { padding: 1rem; }
+  .info-table th { width: 80px; }
+  .btn-print span { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- topbar -->
+<div class="topbar">
+  <a class="topbar-logo" href="science.html">
+    <div class="topbar-logo-icon">🔬</div>
+    <div>
+      <div class="topbar-logo-text">베타과학학원</div>
+      <div class="topbar-logo-sub">Beta Science Academy</div>
+    </div>
+  </a>
+  <div class="topbar-btns">
+    <button class="btn-print" onclick="window.print()">🖨️ <span>학습자료 인쇄 (A4)</span></button>
+    <button class="btn-test">✏️ 테스트 출력하기</button>
+  </div>
+</div>
+
+<!-- hero -->
+<div class="hero">
+  <div class="hero-breadcrumb">
+    베타과학학원 | Beta Science Academy | 목동 과학 전문<br>
+    <span>통합과학 Ⅰ. 과학의 기초 > 1. 과학의 기본량 > 01. 자연 세계의 시간과 공간</span>
+  </div>
+  <h1 class="hero-title">미시 세계와 거시 세계</h1>
+  <div class="hero-subtitle">물체의 크기에 따른 차이점 분석</div>
+  <div class="hero-tagline">내신 · 수능 · 수행 · 탐구 · 세특 — 과학에 대한 준비는 이제 완벽합니다!</div>
+  <div class="hero-badge-row">
+    <span class="hbadge hb-w">📚 내신 대비</span>
+    <span class="hbadge hb-w">🎯 수능 대비</span>
+    <span class="hbadge hb-a">✏️ 수행평가</span>
+    <span class="hbadge hb-w">🔬 탐구 활동</span>
+    <span class="hbadge hb-g">✍️ 세특 대비</span>
+  </div>
+</div>
+
+<!-- tabs -->
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="goTo('s-overview')">탐구 개요</button>
+    <button class="tab" onclick="goTo('s-concept')">핵심 개념</button>
+    <button class="tab" onclick="goTo('s-process')">탐구 과정</button>
+    <button class="tab" onclick="goTo('s-result')">결과 정리</button>
+    <button class="tab" onclick="goTo('s-problems')">확인 문제</button>
+    <button class="tab" onclick="goTo('s-setech')">세특·수능 심화</button>
+    <button class="tab" onclick="goTo('s-checklist')">최종 체크</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ① 탐구 개요 -->
+  <div class="section fade-in" id="s-overview">
+    <div class="section-header">
+      <div class="section-header-left"><div class="section-num">①</div><div class="section-title">탐구 활동 개요</div></div>
+      <span class="section-badge">Beta Science</span>
+    </div>
+    <div class="section-body">
+      <table class="info-table">
+        <tr><th>단원</th><td>Ⅰ. 과학의 기초 > 1. 과학의 기본량 > 01. 자연 세계의 시간과 공간</td></tr>
+        <tr><th>탐구 목표</th><td>미시 세계 물체와 거시 세계 물체의 차이점을 분석할 수 있다.</td></tr>
+        <tr><th>학습 요소</th><td>미시 세계, 거시 세계, SI 단위, 과학적 표기법(지수 표기)</td></tr>
+        <tr><th>과정·기능</th><td>수학적 사고와 모형을 활용하여 통합 및 융합 과학 관련 현상 설명하기</td></tr>
+        <tr><th>가치·태도</th><td>자연과 과학에 대한 감수성, 미시·거시 세계에 대한 호기심</td></tr>
+        <tr><th>평가 유형</th><td>
+          <div class="eval-badges">
+            <span class="eval-badge ev-ob">관찰 평가</span>
+            <span class="eval-badge ev-pr">발표 평가</span>
+            <span class="eval-badge ev-se">자기 평가</span>
+            <span class="eval-badge ev-gr">모둠 평가</span>
+          </div>
+        </td></tr>
+      </table>
+      <div class="question-box">📌 <strong>탐구 핵심 질문:</strong> 미시 세계와 거시 세계에서 물체의 크기 표현의 차이점은 무엇일까?</div>
+    </div>
+  </div>
+
+  <!-- ② 핵심 개념 -->
+  <div class="section fade-in" id="s-concept">
+    <div class="section-header">
+      <div class="section-header-left"><div class="section-num">②</div><div class="section-title">핵심 개념 완전 정리</div></div>
+      <span class="section-badge">Beta Science</span>
+    </div>
+    <div class="section-body">
+      <div class="concept-grid">
+        <div class="concept-card"><div class="concept-card-title">🔬 미시 세계 (Micro World)</div><div class="concept-card-desc">원자, 분자, 소립자 등 <strong>매우 작은 규모</strong>의 물체를 다루는 세계. 나노미터(nm), 아토초(as) 등의 극소 단위를 사용한다.</div></div>
+        <div class="concept-card"><div class="concept-card-title">🌌 거시 세계 (Macro World)</div><div class="concept-card-desc">행성, 항성, 은하 등 <strong>매우 큰 규모</strong>의 물체를 다루는 세계. 천문단위(AU), 광년(ly) 등의 극대 단위를 사용한다.</div></div>
+        <div class="concept-card"><div class="concept-card-title">📐 SI 기본 단위</div><div class="concept-card-desc">국제 단위계(SI). 길이: 미터(m), 시간: 초(s), 질량: 킬로그램(kg). 접두사를 붙여 다양한 크기를 표현한다.</div></div>
+        <div class="concept-card"><div class="concept-card-title">✏️ 과학적 표기법</div><div class="concept-card-desc"><strong>a × 10ⁿ</strong> (1 ≤ a &lt; 10) 형태로 나타내는 방법. 미시·거시 세계의 수를 간결하게 표현할 수 있다.</div></div>
+      </div>
+
+      <div class="sub-title">⚡ SI 접두사 비교표</div>
+      <table class="data-table">
+        <thead><tr><th>접두사</th><th>기호</th><th>값</th><th>활용 예</th><th>분류</th></tr></thead>
+        <tbody>
+          <tr><td>아토(atto)</td><td>a</td><td>10⁻¹⁸</td><td>전자 공전 시간: ~150 as</td><td><span class="tag-micro">미시</span></td></tr>
+          <tr><td>펨토(femto)</td><td>f</td><td>10⁻¹⁵</td><td>원자핵 크기: ~1 fm</td><td><span class="tag-micro">미시</span></td></tr>
+          <tr><td>피코(pico)</td><td>p</td><td>10⁻¹²</td><td>X선 파장: ~100 pm</td><td><span class="tag-micro">미시</span></td></tr>
+          <tr><td>나노(nano)</td><td>n</td><td>10⁻⁹</td><td>수소 원자 지름: ~0.1 nm</td><td><span class="tag-micro">미시</span></td></tr>
+          <tr><td>마이크로(micro)</td><td>μ</td><td>10⁻⁶</td><td>세포 크기: ~10 μm</td><td><span class="tag-micro">미시</span></td></tr>
+          <tr><td>밀리(milli)</td><td>m</td><td>10⁻³</td><td>빗방울 지름: ~1 mm</td><td><span class="tag-mid">일반</span></td></tr>
+          <tr><td>킬로(kilo)</td><td>k</td><td>10³</td><td>지구 반지름: ~6400 km</td><td><span class="tag-macro">거시</span></td></tr>
+          <tr><td>메가(mega)</td><td>M</td><td>10⁶</td><td>태양 지름: ~1.4×10⁶ km</td><td><span class="tag-macro">거시</span></td></tr>
+          <tr><td>기가(giga)</td><td>G</td><td>10⁹</td><td>—</td><td><span class="tag-macro">거시</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="sub-title">🔍 미시 세계 vs 거시 세계 비교</div>
+      <div class="compare-grid">
+        <div class="compare-card micro">
+          <div class="compare-title">🔬 미시 세계 (수소 원자)</div>
+          <ul class="compare-list">
+            <li>수소 원자 지름: 약 0.1 nm = <strong>10⁻¹⁰ m</strong></li>
+            <li>전자 공전 시간: 약 150 as = <strong>1.5×10⁻¹⁶ s</strong></li>
+            <li>공간 단위: nm, pm, fm (매우 작음)</li>
+            <li>시간 단위: as, fs, ps (매우 짧음)</li>
+            <li>지배 원리: <strong>양자역학</strong></li>
+          </ul>
+        </div>
+        <div class="compare-card macro">
+          <div class="compare-title">🌌 거시 세계 (태양계)</div>
+          <ul class="compare-list">
+            <li>지구-태양 거리: 1 AU = <strong>1.5×10¹¹ m</strong></li>
+            <li>지구 공전 시간: 365일 = <strong>3.1536×10⁷ s</strong></li>
+            <li>공간 단위: AU, 광년(ly) (매우 큼)</li>
+            <li>시간 단위: 일, 년, 세기 (매우 김)</li>
+            <li>지배 원리: <strong>뉴턴 역학(상대성 이론)</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ 탐구 과정 -->
+  <div class="section fade-in" id="s-process">
+    <div class="section-header">
+      <div class="section-header-left"><div class="section-num">③</div><div class="section-title">탐구 과정 &amp; 단계별 계산 풀이</div></div>
+      <span class="section-badge">Beta Science</span>
+    </div>
+    <div class="section-body">
+      <div class="formula-box">
+        <span class="f-label">🔑 단위 환산 공식</span>
+        <div class="f-main">1 nm = 10⁻⁹ m &nbsp;&nbsp; 1 as = 10⁻¹⁸ s &nbsp;&nbsp; 1 AU ≈ 1.5×10¹¹ m</div>
+        <div class="f-sub">1 day = 86,400 s &nbsp;&nbsp; 1 year ≈ 3.15×10⁷ s</div>
+      </div>
+
+      <div class="sub-title">📐 [과정 1] 공간 단위를 m로 환산</div>
+      <ol class="step-list">
+        <li class="step-item">
+          <div class="step-num">1</div>
+          <div><div class="step-title">수소 원자 지름 환산 (nm → m)</div><div class="step-calc">0.1 nm = 0.1 × 10⁻⁹ m = 10⁻¹⁰ m</div><div class="step-note">소수점 이하 0이 9개 → 매우 작아 표현 불편</div></div>
+        </li>
+        <li class="step-item">
+          <div class="step-num">2</div>
+          <div><div class="step-title">지구-태양 거리 환산 (AU → m)</div><div class="step-calc">1 AU = 1.5×10⁸ × 10³ m = 1.5×10¹¹ m</div><div class="step-note">숫자가 매우 커서 m 단위로는 표현하기 불편</div></div>
+        </li>
+      </ol>
+
+      <div class="sub-title">⏱ [과정 2] 시간 단위를 s로 환산</div>
+      <ol class="step-list">
+        <li class="step-item">
+          <div class="step-num">3</div>
+          <div><div class="step-title">전자 공전 시간 환산 (as → s)</div><div class="step-calc">150 as = 150 × 10⁻¹⁸ s = 1.5×10⁻¹⁶ s</div><div class="step-note">소수점 아래 0이 15개 → 매우 작아 표현 불편</div></div>
+        </li>
+        <li class="step-item">
+          <div class="step-num">4</div>
+          <div><div class="step-title">지구 공전 시간 환산 (일 → s)</div><div class="step-calc">365 × 24 × 3600 = 31,536,000 s ≈ 3.15×10⁷ s</div><div class="step-note">숫자가 매우 커서 s 단위로는 표현하기 불편</div></div>
+        </li>
+      </ol>
+
+      <div class="point-box">💡 <strong>핵심 포인트:</strong> m와 s로 통일하면, 미시 세계는 값이 극도로 작아지고, 거시 세계는 극도로 커진다. 따라서 각 세계에 적합한 고유 단위(nm, as / AU, 년)를 사용하는 것이 과학적으로 합리적이다.</div>
+
+      <div class="sub-title">📊 단위 환산 결과 정리표</div>
+      <table class="data-table">
+        <thead><tr><th>대상</th><th>원래 단위</th><th>원래 값</th><th>m 또는 s 환산값</th><th>과학적 표기</th></tr></thead>
+        <tbody>
+          <tr><td>수소 원자 지름</td><td>nm</td><td>0.1 nm</td><td>0.0000000001 m</td><td>10⁻¹⁰ m</td></tr>
+          <tr><td>전자 공전 시간</td><td>as</td><td>150 as</td><td>0.00000000000000015 s</td><td>1.5×10⁻¹⁶ s</td></tr>
+          <tr><td>지구-태양 거리</td><td>AU</td><td>1 AU</td><td>150,000,000,000 m</td><td>1.5×10¹¹ m</td></tr>
+          <tr><td>지구 공전 시간</td><td>일</td><td>365 일</td><td>31,536,000 s</td><td>≈3.15×10⁷ s</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ④ 결과 정리 -->
+  <div class="section fade-in" id="s-result">
+    <div class="section-header">
+      <div class="section-header-left"><div class="section-num">④</div><div class="section-title">결과 정리 — 논술 모범 답안</div></div>
+      <span class="section-badge">Beta Science</span>
+    </div>
+    <div class="section-body">
+      <div class="qa-item"><div class="qa-q">Q1. <span>미시·거시 세계의 공간 단위를 미터(m)로 통일하면 어떤 문제가 생기는가?</span></div><div class="qa-a">미시 세계를 나타낼 때 숫자가 극히 작아져(예: 10⁻¹⁰ m) 표현 및 계산이 불편하고, 거시 세계를 나타낼 때 숫자가 극히 커져(예: 1.5×10¹¹ m) 직관적 이해가 어렵다.</div></div>
+      <div class="qa-item"><div class="qa-q">Q2. <span>미시·거시 세계의 시간 단위를 초(s)로 통일하면 어떤 문제가 생기는가?</span></div><div class="qa-a">미시 세계 시간은 1.5×10⁻¹⁶ s처럼 극히 작아지고, 거시 세계 시간은 3.15×10⁷ s처럼 극히 커져 직관적 파악이 어렵다.</div></div>
+      <div class="model-answer">
+        <div class="model-answer-header">✅ 베타과학학원 | 논술 모범 답안</div>
+        <div class="model-answer-title">[ 미시·거시 세계의 단위가 다른 이유 ]</div>
+        <p>미시 세계와 거시 세계를 표현하는 시간과 공간의 단위가 다른 이유는, <strong>두 세계에서 다루는 현상의 규모가 극적으로 다르기 때문</strong>이다.</p>
+        <p>미시 세계는 원자·분자 수준의 매우 작은 규모의 현상을 다루므로, 극히 작은 단위(nm, as 등)가 필요하다. 반면 거시 세계는 행성·항성 등 거대한 규모의 현상을 다루므로, 상대적으로 큰 단위(AU, 광년, 년 등)가 필요하다.</p>
+        <p>만약 단위를 m와 s로 통일하면 미시 세계는 수치가 극히 작아지고 거시 세계는 수치가 극히 커져, 수의 표현과 계산이 매우 불편해진다. 따라서 각 세계의 규모에 적합한 단위를 사용하여 <strong>편리하고 직관적인 과학적 표현이 가능하도록</strong> 서로 다른 단위 체계를 활용한다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ 확인 문제 -->
+  <div class="section fade-in" id="s-problems">
+    <div class="section-header">
+      <div class="section-header-left"><div class="section-num">⑤</div><div class="section-title">탐구 확인 문제 &amp; 정답 해설</div></div>
+      <span class="section-badge">Beta Science</span>
+    </div>
+    <div class="section-body">
+      <div class="sub-title">① O/X 확인 문제</div>
+      <ul class="ox-list">
+        <li class="ox-item"><div class="ox-badge ox-x">X</div><div><div class="ox-stmt">수소 원자의 지름을 나타낼 때 사용하는 단위는 밀리미터(mm)이다.</div><div class="ox-explain">수소 원자의 지름은 약 0.1 nm(나노미터)로 나타낸다. mm는 10⁻³ m으로 수소 원자에 비해 훨씬 크다.</div></div></li>
+        <li class="ox-item"><div class="ox-badge ox-o">O</div><div><div class="ox-stmt">1 천문단위(AU)는 약 1억 5천만 km이다.</div><div class="ox-explain">1 AU = 약 1.5×10⁸ km = 1.5×10¹¹ m으로, 지구와 태양 사이의 평균 거리이다.</div></div></li>
+        <li class="ox-item"><div class="ox-badge ox-x">X</div><div><div class="ox-stmt">전자가 원자핵 주위를 도는 시간 단위와 지구의 공전 시간 단위는 같다.</div><div class="ox-explain">전자 공전은 아토초(as = 10⁻¹⁸ s), 지구 공전은 '일' 또는 '년'으로 전혀 다른 단위를 사용한다.</div></div></li>
+      </ul>
+
+      <br>
+      <div class="sub-title">② 수능형 선택 문제 <span class="tag-pill tp-green">수능형</span></div>
+      <div class="csat-box">
+        <div class="csat-q">다음 보기에서 옳은 것만을 있는 대로 고르시오.</div>
+        <ul class="csat-choices">
+          <li>ㄱ. 수소 원자의 지름을 미터 단위로 나타내면 약 10⁻¹² m이다.</li>
+          <li>ㄴ. 지구가 태양 주위를 공전하는 데 걸리는 시간을 초 단위로 나타내면 약 3.1×10⁷ 초이다.</li>
+          <li>ㄷ. 미시 세계와 거시 세계를 표현하는 시간과 공간의 단위가 다른 이유는 두 세계의 규모가 매우 다르기 때문이다.</li>
+        </ul>
+        <div class="answer-box"><strong>정답: ㄴ, ㄷ</strong><br>ㄱ. 오답 — 수소 원자 지름은 약 0.1 nm = 10⁻¹⁰ m이다.<br>ㄴ. 정답 — 365일 × 86,400 s ≈ 3.15×10⁷ s<br>ㄷ. 정답 — 두 세계의 현상 규모 차이로 인해 서로 다른 단위 체계를 사용한다.</div>
+      </div>
+
+      <div class="sub-title">③ 채점 기준표 <span class="tag-pill tp-navy">서술형</span></div>
+      <table class="rubric-table">
+        <thead><tr><th>항목</th><th>채점 기준</th><th>배점</th></tr></thead>
+        <tbody>
+          <tr><td>①번</td><td>단위 통일 시 수치 불편 이유 언급 (크거나 작아짐)</td><td>상/중/하</td></tr>
+          <tr><td>②번</td><td>미시·거시 각각 적절한 공간 단위 제시 (nm, AU 등)</td><td>상/중/하</td></tr>
+          <tr><td>③번</td><td>규모 차이를 이유로 명확하게 서술, 예시 수치 포함</td><td>상/중/하</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ⑥ 세특·심화 -->
+  <div class="section fade-in" id="s-setech">
+    <div class="section-header">
+      <div class="section-header-left"><div class="section-num">⑥</div><div class="section-title">세특 · 수능 심화</div></div>
+      <span class="section-badge">Beta Science</span>
+    </div>
+    <div class="section-body">
+      <div class="sub-title">🚀 심화 지식</div>
+      <table class="adv-table">
+        <thead><tr><th>주제</th><th>핵심 내용</th><th>관련 탐구</th></tr></thead>
+        <tbody>
+          <tr><td>양자역학과 미시 세계</td><td>미시 세계에서는 입자의 위치와 운동량을 동시에 정확히 알 수 없다(하이젠베르크 불확정성 원리). 뉴턴 역학이 아닌 양자역학이 지배한다.</td><td>전자 이중슬릿 실험</td></tr>
+          <tr><td>상대성 이론과 거시 세계</td><td>매우 빠른 속도(빛의 속도에 근접)나 강한 중력 하에서는 특수·일반 상대성 이론이 필요하다. GPS 위성도 상대성 보정을 적용한다.</td><td>GPS 시간 보정</td></tr>
+          <tr><td>보어 모형</td><td>전자가 특정 궤도에서만 원운동. 수소 원자 기저 상태(n=1) 반지름 = 0.053 nm (보어 반지름)</td><td>원자 스펙트럼 분석</td></tr>
+          <tr><td>천문 거리 단위</td><td>AU(~1.5×10¹¹ m), 광년(ly, ~9.46×10¹⁵ m), 파섹(pc, ~3.09×10¹⁶ m). 거리에 따라 적절한 단위를 선택한다.</td><td>별까지의 거리 측정</td></tr>
+          <tr><td>나노기술</td><td>1~100 nm 스케일을 다루는 기술. 반도체 소자, 의약품 전달체(나노입자), 탄소 나노튜브 등에 활용. 미시 세계 이해가 핵심이다.</td><td>나노소재 탐구</td></tr>
+        </tbody>
+      </table>
+
+      <div class="sub-title">📝 세특 서술 예시</div>
+      <div class="setech-ex beige">
+        <div class="setech-lbl">✅ 베타과학학원 | 세특 서술 예시 1 (탐구 중심)</div>
+        <div class="setech-ttl">세특 서술 예시 1 (탐구 중심):</div>
+        <div class="setech-txt">"미시 세계와 거시 세계의 크기 차이를 분석하는 탐구 활동에서 수소 원자(~10⁻¹⁰ m)와 태양계(~10¹¹ m)의 크기 차이가 약 10²¹배임을 계산하였다. 이를 통해 자연 현상의 규모에 따라 적절한 단위와 이론 체계(양자역학/뉴턴역학)가 달라짐을 이해하고, <strong>나노기술의 원리와 천문학적 거리 측정 방법까지 연계하여 탐구하였다."</strong></div>
+      </div>
+      <div class="setech-ex green">
+        <div class="setech-lbl">✅ 베타과학학원 | 세특 서술 예시 2 (개념 연계 중심)</div>
+        <div class="setech-ttl">세특 서술 예시 2 (개념 연계 중심):</div>
+        <div class="setech-txt">"자연 세계의 시간과 공간 단위에서 SI 단위와 과학적 표기법의 필요성을 이해하고, 수소 원자와 태양계의 크기·시간을 SI 기본 단위로 환산하여 직접 비교하는 활동을 수행하였다. 이 과정에서 미시 세계는 양자역학, 거시 세계는 고전역학(상대성 이론)이라는 서로 다른 이론 체계가 적용됨을 <strong>자발적으로 탐구하여 심화 이해를 도모하였다."</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑦ 체크리스트 -->
+  <div class="section fade-in" id="s-checklist">
+    <div class="section-header">
+      <div class="section-header-left"><div class="section-num">⑦</div><div class="section-title">최종 점검 체크리스트</div></div>
+      <span class="section-badge">Beta Science</span>
+    </div>
+    <div class="section-body">
+      <div class="point-box" style="margin-bottom:1rem; margin-top:0;">✅ 아래 항목을 모두 체크하면 이번 탐구 활동 완벽 대비 완료!</div>
+      <div class="check-progress">
+        <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+        <div class="progress-text" id="progressText">0 / 11</div>
+      </div>
+      <ul class="checklist">
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">미시 세계와 거시 세계의 정의를 말할 수 있다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">1 nm = 10⁻⁹ m, 1 as = 10⁻¹⁸ s 환산식을 암기하였다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">수소 원자 지름(0.1 nm = 10⁻¹⁰ m)을 정확히 기억한다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">전자 공전 시간(150 as = 1.5×10⁻¹⁶ s) 환산을 스스로 할 수 있다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">1 AU ≈ 1.5×10¹¹ m 환산을 정확히 안다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">지구 공전 시간(365일 = 약 3.15×10⁷ s) 환산을 스스로 할 수 있다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">단위를 통일했을 때 발생하는 문제점을 서술할 수 있다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">미시·거시 세계의 단위가 다른 이유를 논리적으로 설명할 수 있다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">SI 접두사(나노, 아토, 킬로, 메가)의 크기 값을 안다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">과학적 표기법(a × 10ⁿ)으로 어떤 수든 변환할 수 있다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">세특 서술 예시를 참고하여 자신만의 세특 문장을 작성할 수 있다.</div></li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">베타과학학원 | Beta Science Academy </div>
+  <div class="footer-sub">내신 · 수능 · 수행 · 탐구 · 세특 — 과학에 대한 준비는 이제 완벽합니다!</div>
+</footer>
+
+<script>
+function goTo(id){const el=document.getElementById(id);if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.pageYOffset-110,behavior:'smooth'});}
+const tabs=document.querySelectorAll('.tab');
+const secs=['s-overview','s-concept','s-process','s-result','s-problems','s-setech','s-checklist'];
+window.addEventListener('scroll',()=>{let c=0;secs.forEach((id,i)=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<160)c=i;});tabs.forEach((t,i)=>t.classList.toggle('active',i===c));});
+function toggleCheck(item){item.classList.toggle('checked');const all=document.querySelectorAll('.check-item'),chk=document.querySelectorAll('.check-item.checked').length;document.getElementById('progressBar').style.width=Math.round(chk/all.length*100)+'%';document.getElementById('progressText').textContent=chk+' / '+all.length;}
+const obs=new IntersectionObserver((e)=>{e.forEach((en,i)=>{if(en.isIntersecting){setTimeout(()=>en.target.classList.add('visible'),i*100);obs.unobserve(en.target);}});},{threshold:.08});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
