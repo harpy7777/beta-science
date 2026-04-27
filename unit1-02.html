@@ -3,454 +3,1590 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>미시 세계와 거시 세계 | 베타과학학원</title>
+<title>미시 세계와 거시 세계 완벽대비 학습자료 | 베타과학학원</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
-
+/* ────────────────────────────────────────
+   CSS VARIABLES — 기존 unit1-01 디자인 시스템 유지
+──────────────────────────────────────── */
 :root {
-  /* 원장님이 주신 네이비 메인 톤 */
-  --n1:         #1B2B5E;   /* 딥 네이비 */
-  --n2:         #2E4FA3;   /* 미디엄 블루 */
-  --n3:         #4F73D4;   /* 브라이트 블루 */
-  --n-pale:     #EEF2FB;
-  --n-soft:     #D6DFF5;
-  --n-mid:      #B0C0E8;
-  --bg:         #FFFFFF;
-  --bg2:        #F5F7FD;
-  --bg3:        #EEF2FB;
-  --text:       #1A1F36;
-  --text2:      #4A5070;
-  --text3:      #8A90AA;
-  --border:     #DDE2F0;
-  --green:      #10B981;
-  --amber:      #F59E0B;
-  --rose:       #F43F5E;
-  --shadow:     0 2px 12px rgba(27,43,94,0.08);
-  --shadow-m:   0 4px 20px rgba(27,43,94,0.13);
-  --radius:     14px;
-  --font:       'Noto Sans KR', sans-serif;
+  --n1: #1B2B5E;
+  --n2: #2E4FA3;
+  --n3: #4F73D4;
+  --n-pale: #EEF2FB;
+  --n-soft: #D6DFF5;
+  --n-mid: #B0C0E8;
+  --beige: #FAF7F2;
+  --beige-border: #E8DDD0;
+  --beige-accent: #C4A882;
+  --beige-dark: #3D2B10;
+  --bg: #FFFFFF;
+  --bg2: #F5F7FD;
+  --bg3: #EEF2FB;
+  --text: #1A1F36;
+  --text2: #4A5070;
+  --text3: #8A90AA;
+  --border: #DDE2F0;
+  --green: #10B981;
+  --green-pale: #ECFDF5;
+  --green-border: #A7F3D0;
+  --amber: #F59E0B;
+  --rose: #F43F5E;
+  --shadow: 0 2px 12px rgba(27,43,94,0.08);
+  --shadow-m: 0 4px 20px rgba(27,43,94,0.13);
+  --shadow-l: 0 8px 32px rgba(27,43,94,0.18);
+  --radius: 14px;
+  --font: 'Noto Sans KR', sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-body { font-family: var(--font); background: var(--bg); color: var(--text); overflow-x: hidden; line-height: 1.7; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  line-height: 1.7;
+}
 
-/* ── topbar ── */
+/* ────────────────────────────────────────
+   TOPBAR
+──────────────────────────────────────── */
 .topbar {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(255,255,255,0.97); backdrop-filter: blur(16px);
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0.7rem 2rem;
   box-shadow: 0 1px 8px rgba(27,43,94,0.07);
 }
-.topbar-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
-.topbar-logo-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--n1), var(--n2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-.topbar-logo-text { font-size: 13px; font-weight: 800; color: var(--n1); }
-.topbar-logo-sub  { font-size: 10px; color: var(--text3); }
-.topbar-btns { display: flex; gap: 8px; }
-.btn-print {
+.topbar__logo {
+  display: flex; align-items: center; gap: 9px;
+  text-decoration: none;
+}
+.topbar__logo-icon {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--n1), var(--n2));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+.topbar__logo-text { font-size: 13px; font-weight: 800; color: var(--n1); }
+.topbar__logo-sub  { font-size: 10px; color: var(--text3); }
+.topbar__btns { display: flex; gap: 8px; }
+.btn--print {
   display: flex; align-items: center; gap: 6px;
   background: var(--bg3); border: 1px solid var(--n-soft);
   color: var(--n2); font-size: 12px; font-weight: 700;
   padding: 7px 14px; border-radius: 8px; cursor: pointer;
-  transition: all .2s;
+  font-family: var(--font); transition: all .2s;
 }
-.btn-print:hover { background: var(--n-soft); }
-.btn-test {
+.btn--print:hover { background: var(--n-soft); }
+.btn--back {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg3); border: 1px solid var(--n-soft);
+  color: var(--n2); font-size: 12px; font-weight: 700;
+  padding: 7px 14px; border-radius: 8px; cursor: pointer;
+  font-family: var(--font); transition: all .2s;
+  text-decoration: none;
+}
+.btn--back:hover { background: var(--n-soft); }
+.btn--primary {
   display: flex; align-items: center; gap: 6px;
   background: linear-gradient(135deg, var(--n1), var(--n2));
   border: none; color: #fff;
   font-size: 12px; font-weight: 700;
   padding: 7px 16px; border-radius: 8px; cursor: pointer;
-  transition: all .2s;
+  font-family: var(--font); transition: all .2s;
   box-shadow: 0 2px 10px rgba(27,43,94,0.25);
 }
+.btn--primary:hover {
+  background: linear-gradient(135deg, var(--n2), var(--n3));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(27,43,94,0.3);
+}
 
-/* ── hero ── */
+/* ────────────────────────────────────────
+   HERO
+──────────────────────────────────────── */
 .hero {
   background: linear-gradient(135deg, var(--n1) 0%, var(--n2) 55%, var(--n3) 100%);
-  padding: 4rem 2rem 3.5rem;
+  padding: 3.5rem 2rem 3rem;
   text-align: center;
   position: relative; overflow: hidden;
 }
-.hero::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--n3), var(--n-mid), var(--n3)); }
-.hero-brand { color: var(--amber); font-size: 24px; font-weight: 900; margin-bottom: 5px; }
-.hero-breadcrumb { font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 1.5rem; line-height: 1.6; }
-.hero-breadcrumb span { color: var(--n-soft); font-weight: 600; }
-.hero-title    { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900; color: #fff; line-height: 1.2; margin-bottom: 0.5rem; }
-.hero-subtitle { font-size: clamp(1.4rem, 3.5vw, 2.2rem); font-weight: 700; color: var(--n-soft); margin-bottom: 1.8rem; }
-.hero-badge-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-.hbadge { display: inline-flex; align-items: center; gap: 5px; padding: 6px 15px; border-radius: 100px; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; }
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(79,115,212,0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.05) 0%, transparent 40%);
+}
+.hero::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--n3), var(--n-mid), var(--n3));
+}
+.hero__inner { position: relative; }
+.hero__breadcrumb {
+  font-size: 12px; color: rgba(255,255,255,0.5);
+  margin-bottom: 1.2rem; line-height: 1.9;
+}
+.hero__breadcrumb span { color: var(--n-soft); font-weight: 600; }
+.hero__eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 100px;
+  padding: 5px 14px;
+  font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.85);
+  margin-bottom: 1rem;
+}
+.hero__title {
+  font-size: clamp(1.9rem, 4.5vw, 3rem);
+  font-weight: 900; color: #fff;
+  line-height: 1.15; margin-bottom: 0.4rem;
+}
+.hero__subtitle {
+  font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+  font-weight: 700; color: var(--n-soft);
+  line-height: 1.3; margin-bottom: 1.5rem;
+}
+.hero__tagline {
+  font-size: 13px; color: rgba(255,255,255,0.5);
+  margin-bottom: 1.75rem;
+}
+.hero__badges {
+  display: flex; justify-content: center;
+  gap: 8px; flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.hbadge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 13px; border-radius: 100px;
+  font-size: 12px; font-weight: 600;
+}
+.hbadge--white {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.92);
+}
+.hbadge--amber {
+  background: rgba(245,158,11,0.22);
+  border: 1px solid rgba(245,158,11,0.4);
+  color: #FCD34D;
+}
+.hbadge--green {
+  background: rgba(16,185,129,0.18);
+  border: 1px solid rgba(16,185,129,0.35);
+  color: #6EE7B7;
+}
+/* stats row */
+.hero__stats {
+  display: flex; justify-content: center;
+  gap: 2px; flex-wrap: wrap;
+}
+.hero__stat {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 10px;
+  padding: 0.8rem 1.5rem;
+  min-width: 110px;
+}
+.hero__stat-num {
+  font-size: 1.5rem; font-weight: 900; color: #fff;
+  line-height: 1.1; margin-bottom: 2px;
+}
+.hero__stat-label { font-size: 11px; color: rgba(255,255,255,0.6); }
 
-/* ── tabs ── */
-.tabs-wrap { position: sticky; top: 49px; z-index: 90; background: #fff; border-bottom: 2px solid var(--border); box-shadow: 0 2px 8px rgba(27,43,94,0.05); }
-.tabs { display: flex; justify-content: center; gap: 2px; padding: 0.4rem 1rem; max-width: 1000px; margin: 0 auto; overflow-x: auto; }
-.tab { padding: 10px 18px; border-radius: 8px 8px 0 0; font-size: 13.5px; font-weight: 600; color: var(--text3); cursor: pointer; transition: all .2s; white-space: nowrap; border: none; background: transparent; }
-.tab.active { color: var(--n2); background: var(--n-pale); border-bottom: 3px solid var(--n2); }
+/* ────────────────────────────────────────
+   TABS
+──────────────────────────────────────── */
+.tabs-wrap {
+  position: sticky; top: 49px; z-index: 90;
+  background: #fff; border-bottom: 2px solid var(--border);
+  box-shadow: 0 2px 8px rgba(27,43,94,0.05);
+}
+.tabs {
+  display: flex; justify-content: center;
+  gap: 2px; padding: 0.4rem 1rem;
+  max-width: 960px; margin: 0 auto;
+  overflow-x: auto;
+}
+.tab {
+  padding: 7px 15px; border-radius: 8px 8px 0 0;
+  font-size: 13px; font-weight: 600; color: var(--text3);
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+  border: none; background: transparent; font-family: var(--font);
+}
+.tab:hover  { color: var(--n2); background: var(--bg3); }
+.tab.active { color: var(--n2); background: var(--n-pale); border-bottom: 2px solid var(--n2); }
 
-/* ── main ── */
-.main { max-width: 1000px; margin: 0 auto; padding: 2.5rem 1.5rem 6rem; }
-.section { margin-bottom: 2.5rem; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border); }
-.section-header { background: linear-gradient(135deg, var(--n1) 0%, var(--n2) 100%); display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.8rem; }
-.section-num { width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; margin-right: 12px; }
-.section-title { font-size: 15px; font-weight: 800; color: #fff; flex: 1; }
-.section-badge { font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; background: rgba(255,255,255,0.18); color: #fff; border: 1px solid rgba(255,255,255,0.28); }
-.section-body { background: #fff; padding: 2rem; }
+/* ────────────────────────────────────────
+   PROGRESS BAR (페이지 스크롤)
+──────────────────────────────────────── */
+.read-progress {
+  position: fixed; top: 0; left: 0; z-index: 200;
+  height: 3px; width: 0%;
+  background: linear-gradient(90deg, var(--n3), var(--green));
+  transition: width .1s linear;
+}
 
-/* ── tables ── */
-.info-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; border: 1px solid var(--border); }
-.info-table th { width: 130px; padding: 1rem; font-size: 13.5px; font-weight: 700; color: var(--n2); background: var(--bg2); border: 1px solid var(--border); text-align: left; }
-.info-table td { padding: 1rem; font-size: 13.5px; color: var(--text); border: 1px solid var(--border); }
+/* ────────────────────────────────────────
+   MAIN LAYOUT
+──────────────────────────────────────── */
+.main {
+  max-width: 960px; margin: 0 auto;
+  padding: 2rem 1.5rem 5rem;
+}
 
-.data-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 1.5rem 0; border: 1px solid var(--border); }
-.data-table thead th { background: var(--n1); color: #fff; padding: 12px; font-weight: 700; text-align: center; border: 1px solid var(--n1); }
-.data-table td { padding: 12px; border: 1px solid var(--border); text-align: center; }
-.data-table tbody tr:nth-child(even) { background: #fcfdfe; }
-.tag-micro { background: #eef2fb; color: #2e4fa3; font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+/* ────────────────────────────────────────
+   SECTION WRAPPER
+──────────────────────────────────────── */
+.section {
+  margin-bottom: 1.75rem;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+.section__header {
+  background: linear-gradient(135deg, var(--n1) 0%, var(--n2) 100%);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.9rem 1.5rem;
+}
+.section__header-left { display: flex; align-items: center; gap: 10px; }
+.section__num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: #fff;
+}
+.section__title { font-size: 14px; font-weight: 800; color: #fff; }
+.section__badge {
+  font-size: 10px; font-weight: 700; padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.95);
+  border: 1px solid rgba(255,255,255,0.28);
+}
+.section__body { background: #fff; padding: 1.5rem; }
 
-/* ── cards ── */
-.concept-grid, .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 1.5rem 0; }
-.c-card { border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border); background: var(--bg2); transition: 0.2s; }
-.c-card.micro { border-top: 4px solid var(--n3); }
-.c-card.macro { border-top: 4px solid var(--amber); }
-.c-card-title { font-size: 15px; font-weight: 800; color: var(--n1); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-.c-card-desc { font-size: 13.5px; color: var(--text2); line-height: 1.8; }
-.c-list { list-style: none; }
-.c-list li { padding-left: 15px; position: relative; margin-bottom: 6px; font-size: 13.5px; }
-.c-list li::before { content: '•'; position: absolute; left: 0; color: var(--n3); font-weight: 900; }
+/* ────────────────────────────────────────
+   OVERVIEW TABLE
+──────────────────────────────────────── */
+.info-table { width: 100%; border-collapse: collapse; }
+.info-table tr { border-bottom: 1px solid var(--border); }
+.info-table tr:last-child { border-bottom: none; }
+.info-table th {
+  width: 110px; padding: 0.85rem 1rem;
+  font-size: 13px; font-weight: 700; color: var(--n2);
+  background: var(--bg2); vertical-align: top; white-space: nowrap;
+}
+.info-table td {
+  padding: 0.85rem 1rem;
+  font-size: 13px; color: var(--text); line-height: 1.7;
+}
+.eval-badges { display: flex; flex-wrap: wrap; gap: 7px; }
+.eval-badge {
+  padding: 3px 11px; border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+}
+.ev-ob { background: var(--n-pale); color: var(--n2); border: 1px solid var(--n-soft); }
+.ev-pr { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+.ev-se { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+.ev-gr { background: #FFF1F2; color: #E11D48; border: 1px solid #FECDD3; }
 
-/* ── q&a ── */
-.q-box { background: var(--bg2); border-left: 5px solid var(--n2); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; }
-.q-title { font-weight: 800; font-size: 15px; margin-bottom: 10px; color: var(--n1); }
-.ans-box { background: #f0fdf4; border: 1px solid #a7f3d0; padding: 1.5rem; border-radius: 8px; margin-top: 15px; }
-.ans-label { background: var(--green); color: #fff; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 4px; margin-bottom: 8px; display: inline-block; }
+/* ────────────────────────────────────────
+   LESSON FLOW
+──────────────────────────────────────── */
+.lesson-flow {
+  display: flex; gap: 0; margin: 1rem 0;
+  border-radius: 10px; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.lesson-step {
+  flex: 1; padding: 0.9rem 0.75rem;
+  text-align: center;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+.lesson-step:last-child { border-right: none; }
+.lesson-step--intro  { background: var(--n-pale); }
+.lesson-step--main   { background: #EEF6FF; }
+.lesson-step--wrap   { background: var(--beige); }
+.lesson-step__icon { font-size: 18px; margin-bottom: 4px; }
+.lesson-step__time {
+  font-size: 10px; font-weight: 700;
+  color: var(--n3); margin-bottom: 2px;
+}
+.lesson-step__label {
+  font-size: 11px; font-weight: 700; color: var(--text);
+  margin-bottom: 3px;
+}
+.lesson-step__desc { font-size: 10px; color: var(--text3); line-height: 1.5; }
+.arrow-sep {
+  display: flex; align-items: center;
+  font-size: 12px; color: var(--text3);
+  padding: 0 2px;
+  background: var(--bg2);
+}
 
-/* ── problems ── */
-.prob-card { border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem; }
-.prob-q { font-weight: 700; font-size: 15px; margin-bottom: 12px; }
-.ox-btn { background: var(--n-pale); color: var(--n1); border: 1px solid var(--n-soft); padding: 6px 15px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 10px; }
-.reveal-ans { display: none; margin-top: 15px; padding: 12px; background: #f9f9f9; border-radius: 6px; font-size: 13.5px; color: var(--rose); font-weight: 600; border-left: 3px solid var(--rose); }
+/* ────────────────────────────────────────
+   CONCEPT CARDS
+──────────────────────────────────────── */
+.concept-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin-bottom: 1.5rem;
+}
+.concept-card {
+  border-radius: 10px; padding: 1.1rem;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--n2);
+  transition: box-shadow .2s, transform .2s;
+}
+.concept-card:hover { box-shadow: var(--shadow-m); transform: translateY(-2px); }
+.concept-card__title {
+  font-size: 14px; font-weight: 700;
+  color: var(--n1); margin-bottom: 6px;
+}
+.concept-card__desc {
+  font-size: 13px; color: var(--text2); line-height: 1.75;
+}
+.concept-card__desc strong { color: var(--text); font-weight: 700; }
 
-/* ── checklist ── */
-.checklist-wrap { background: var(--bg2); border-radius: 12px; padding: 1.5rem; }
-.check-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
-.check-box { width: 20px; height: 20px; border: 2px solid var(--n-soft); border-radius: 4px; flex-shrink: 0; margin-top: 3px; }
-.check-item.checked .check-box { background: var(--n2); border-color: var(--n2); display: flex; align-items: center; justify-content: center; }
-.check-item.checked .check-box::after { content: '✓'; color: #fff; font-weight: 900; font-size: 14px; }
-.check-item.checked span { color: var(--text3); text-decoration: line-through; }
+/* ────────────────────────────────────────
+   SUB TITLE
+──────────────────────────────────────── */
+.sub-title {
+  font-size: 13px; font-weight: 800; color: var(--n1);
+  margin: 1.25rem 0 0.75rem;
+  display: flex; align-items: center; gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--n-pale);
+}
 
-/* ── footer ── */
-footer { background: var(--n1); color: #fff; padding: 3.5rem 2rem; text-align: center; }
-.footer-logo { font-size: 18px; font-weight: 800; color: var(--amber); margin-bottom: 8px; }
-.footer-sub { font-size: 13px; opacity: 0.7; }
+/* ────────────────────────────────────────
+   DATA TABLES
+──────────────────────────────────────── */
+.data-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px; margin-bottom: 1rem;
+}
+.data-table thead th {
+  background: linear-gradient(90deg, var(--n1), var(--n2));
+  color: #fff; padding: 0.7rem 1rem;
+  font-weight: 700; text-align: left;
+}
+.data-table td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text); font-size: 13px;
+}
+.data-table tbody tr:nth-child(even) td { background: var(--bg2); }
+.data-table tbody tr:hover td { background: var(--n-pale); }
 
-/* ── scroll fade ── */
-.fade-in { opacity: 0; transform: translateY(20px); transition: 0.6s ease-out; }
-.fade-in.visible { opacity: 1; transform: translateY(0); }
+.tag--micro { background: var(--n-pale); color: var(--n2); padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+.tag--macro { background: #DCFCE7; color: #16A34A; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+.tag--mid   { background: #F3F4F6; color: #6B7280; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+.tag--pill  { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 700; margin-left: 6px; }
+.tp--green  { background: #DCFCE7; color: #16A34A; }
+.tp--navy   { background: var(--n-pale); color: var(--n2); }
+.tp--amber  { background: #FFFBEB; color: #D97706; }
 
-@media(max-width: 768px) {
-  .concept-grid, .compare-grid { grid-template-columns: 1fr; }
-  .info-table th { width: 100px; }
+/* ────────────────────────────────────────
+   COMPARE GRID
+──────────────────────────────────────── */
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.compare-card { border-radius: 10px; padding: 1.1rem; }
+.compare-card--micro {
+  background: var(--beige);
+  border: 1px solid var(--beige-border);
+  border-top: 3px solid var(--beige-accent);
+}
+.compare-card--macro {
+  background: var(--green-pale);
+  border: 1px solid var(--green-border);
+  border-top: 3px solid var(--green);
+}
+.compare-card__title {
+  font-size: 14px; font-weight: 800; margin-bottom: 10px;
+}
+.compare-card--micro .compare-card__title { color: #5C4A2A; }
+.compare-card--macro .compare-card__title { color: #065F46; }
+.compare-list { list-style: none; }
+.compare-list li {
+  font-size: 13px; padding: 5px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  display: flex; gap: 7px; color: var(--text2);
+}
+.compare-list li:last-child { border-bottom: none; }
+.compare-list li::before { content: '▶'; font-size: 9px; margin-top: 5px; flex-shrink: 0; }
+.compare-card--micro .compare-list li::before { color: var(--beige-accent); }
+.compare-card--macro .compare-list li::before { color: var(--green); }
+.compare-card--micro .compare-list li strong { color: var(--beige-dark); font-weight: 700; }
+.compare-card--macro .compare-list li strong { color: var(--text); font-weight: 700; }
+
+/* ────────────────────────────────────────
+   SCALE VISUALIZER
+──────────────────────────────────────── */
+.scale-viz {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+}
+.scale-track {
+  display: flex; align-items: stretch;
+  gap: 0; margin: 0.5rem 0;
+  min-width: 600px;
+}
+.scale-item {
+  flex: 1; padding: 0.6rem 0.4rem;
+  text-align: center;
+  font-size: 10px; font-weight: 700;
+  border-right: 1px solid rgba(255,255,255,0.3);
+  cursor: pointer;
+  transition: filter .2s;
+}
+.scale-item:last-child { border-right: none; }
+.scale-item:hover { filter: brightness(1.1); }
+.scale-item__obj  { font-size: 15px; margin-bottom: 2px; }
+.scale-item__name { font-size: 9px; margin-bottom: 1px; }
+.scale-item__size { font-size: 9px; opacity: 0.8; }
+/* color bands */
+.si-1 { background: #1B2B5E; color: #fff; }
+.si-2 { background: #243970; color: #fff; }
+.si-3 { background: #2E4FA3; color: #fff; }
+.si-4 { background: #3A5DBB; color: #fff; }
+.si-5 { background: #4F73D4; color: #fff; }
+.si-6 { background: #7A96DC; color: #fff; }
+.si-7 { background: #A5B8E8; color: #1B2B5E; }
+.si-8 { background: #CBD8F0; color: #1B2B5E; }
+.si-9 { background: #E8DDD0; color: #3D2B10; }
+.si-10{ background: #C4A882; color: #fff; }
+.si-11{ background: #9B7A50; color: #fff; }
+.scale-legend {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: var(--text3); margin-top: 6px;
+}
+
+/* ────────────────────────────────────────
+   MEASUREMENT CARDS (측정 방법)
+──────────────────────────────────────── */
+.meas-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin-bottom: 1rem;
+}
+.meas-card {
+  border-radius: 10px; padding: 1rem;
+  border: 1px solid var(--border);
+}
+.meas-card--xray {
+  background: linear-gradient(135deg, #EEF2FB 0%, #F5F7FD 100%);
+  border-top: 3px solid var(--n2);
+}
+.meas-card--orbit {
+  background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);
+  border-top: 3px solid var(--green);
+}
+.meas-card__icon { font-size: 24px; margin-bottom: 8px; }
+.meas-card__title {
+  font-size: 13px; font-weight: 800; color: var(--text);
+  margin-bottom: 4px;
+}
+.meas-card__target {
+  font-size: 11px; font-weight: 700;
+  padding: 2px 8px; border-radius: 10px;
+  display: inline-block; margin-bottom: 8px;
+}
+.meas-card--xray  .meas-card__target { background: var(--n-pale); color: var(--n2); }
+.meas-card--orbit .meas-card__target { background: #DCFCE7; color: #16A34A; }
+.meas-card__steps { list-style: none; }
+.meas-card__steps li {
+  font-size: 12px; color: var(--text2); padding: 3px 0;
+  display: flex; gap: 6px; line-height: 1.5;
+}
+.meas-card__steps li::before {
+  content: counter(step);
+  counter-increment: step;
+  width: 16px; height: 16px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 800; flex-shrink: 0; margin-top: 2px;
+}
+.meas-card--xray  .meas-card__steps { counter-reset: step; }
+.meas-card--orbit .meas-card__steps { counter-reset: step; }
+.meas-card--xray  .meas-card__steps li::before { background: var(--n-pale); color: var(--n2); }
+.meas-card--orbit .meas-card__steps li::before { background: #DCFCE7; color: #16A34A; }
+
+/* ────────────────────────────────────────
+   FORMULA BOX
+──────────────────────────────────────── */
+.formula-box {
+  background: var(--beige);
+  border: 1px solid var(--beige-border);
+  border-left: 4px solid var(--beige-accent);
+  border-radius: 10px; padding: 1.1rem 1.5rem 1.25rem;
+  margin-bottom: 1.25rem; line-height: 2.2;
+}
+.formula-box__label {
+  font-size: 12px; font-weight: 700; color: #8B6A3A;
+  margin-bottom: 0.5rem; display: block;
+}
+.formula-box__main {
+  font-family: 'Courier New', monospace;
+  font-size: 14px; font-weight: 700; color: var(--n1);
+  letter-spacing: .04em; text-align: center; display: block;
+}
+.formula-box__sub {
+  font-size: 12px; color: var(--text3);
+  text-align: center; display: block;
+}
+
+/* ────────────────────────────────────────
+   SCALE PROPORTION (크기·시간 비례)
+──────────────────────────────────────── */
+.proportion-box {
+  background: var(--n-pale);
+  border: 1px solid var(--n-soft);
+  border-radius: 10px; padding: 1.1rem 1.5rem;
+  margin-bottom: 1rem;
+}
+.proportion-row {
+  display: flex; align-items: center;
+  gap: 12px; margin-bottom: 0.65rem;
+}
+.proportion-row:last-child { margin-bottom: 0; }
+.proportion-label {
+  font-size: 12px; font-weight: 700; color: var(--n2);
+  width: 80px; flex-shrink: 0;
+}
+.proportion-bar-wrap {
+  flex: 1; height: 8px; background: var(--n-soft);
+  border-radius: 4px; overflow: hidden; position: relative;
+}
+.proportion-bar {
+  height: 100%; border-radius: 4px;
+  background: linear-gradient(90deg, var(--n2), var(--n3));
+  transition: width 1.2s cubic-bezier(.22,1,.36,1);
+}
+.proportion-val {
+  font-size: 11px; font-weight: 700; color: var(--n1);
+  white-space: nowrap; min-width: 90px; text-align: right;
+}
+
+/* ────────────────────────────────────────
+   RESULT / QA
+──────────────────────────────────────── */
+.qa-item { margin-bottom: 1.25rem; }
+.qa-q {
+  font-size: 13px; font-weight: 700; color: var(--n2);
+  margin-bottom: 6px;
+}
+.qa-q span { color: var(--text2); font-weight: 500; }
+.qa-a {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-left: 3px solid var(--n3);
+  border-radius: 8px; padding: 0.85rem 1rem;
+  font-size: 13px; color: var(--text2); line-height: 1.8;
+}
+.model-answer {
+  background: var(--green-pale);
+  border: 1px solid var(--green-border);
+  border-left: 4px solid var(--green);
+  border-radius: 10px; padding: 1.25rem 1.5rem; margin-top: 1rem;
+}
+.model-answer__header {
+  font-size: 12px; font-weight: 700; color: #059669; margin-bottom: 0.6rem;
+}
+.model-answer__title {
+  font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 0.6rem;
+}
+.model-answer p {
+  font-size: 13px; color: var(--text2); line-height: 1.9; margin-bottom: 0.5rem;
+}
+.model-answer strong { color: #065F46; font-weight: 700; }
+
+/* ────────────────────────────────────────
+   POINT / WARN BOX
+──────────────────────────────────────── */
+.point-box {
+  background: var(--n-pale);
+  border: 1px solid var(--n-soft);
+  border-left: 4px solid var(--n3);
+  border-radius: 8px; padding: 0.9rem 1.1rem;
+  font-size: 13px; color: var(--text2); line-height: 1.8;
+  margin-top: 1rem;
+}
+.point-box strong { color: var(--n1); font-weight: 700; }
+.warn-box {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-left: 4px solid var(--amber);
+  border-radius: 8px; padding: 0.9rem 1.1rem;
+  font-size: 13px; color: #92400E; line-height: 1.8;
+  margin-top: 1rem;
+}
+.warn-box strong { color: #78350F; font-weight: 700; }
+
+/* ────────────────────────────────────────
+   O/X LIST
+──────────────────────────────────────── */
+.ox-list { list-style: none; }
+.ox-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 0.85rem 0; border-bottom: 1px solid var(--border);
+}
+.ox-item:last-child { border-bottom: none; }
+.ox-badge {
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; flex-shrink: 0; margin-top: 1px;
+}
+.ox--o { background: #DCFCE7; color: #16A34A; border: 1.5px solid #86EFAC; }
+.ox--x { background: #FEE2E2; color: #DC2626; border: 1.5px solid #FCA5A5; }
+.ox-stmt { font-size: 13px; color: var(--text); font-weight: 600; margin-bottom: 3px; }
+.ox-explain { font-size: 12px; color: var(--text3); line-height: 1.6; }
+.ox-explain::before { content: '▶ '; color: var(--n3); }
+
+/* ────────────────────────────────────────
+   CSAT BOX
+──────────────────────────────────────── */
+.csat-box {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+}
+.csat-label {
+  font-size: 11px; font-weight: 700; color: var(--n3);
+  margin-bottom: 6px;
+}
+.csat-q {
+  font-size: 13px; color: var(--text); line-height: 1.8;
+  margin-bottom: 0.9rem; font-weight: 500;
+}
+.csat-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px; margin-bottom: 0.9rem;
+}
+.csat-table th {
+  background: linear-gradient(90deg, var(--n1), var(--n2));
+  color: #fff; padding: 0.5rem 0.8rem;
+  font-weight: 700; text-align: left;
+  font-size: 12px;
+}
+.csat-table td {
+  padding: 0.5rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.csat-table tbody tr:nth-child(even) td { background: var(--bg2); }
+.csat-choices { list-style: none; }
+.csat-choices li {
+  font-size: 13px; color: var(--text2); padding: 4px 0;
+}
+.answer-box {
+  background: #ECFDF5; border: 1px solid #A7F3D0;
+  border-radius: 8px; padding: 0.9rem 1rem; margin-top: 0.75rem;
+  font-size: 13px; color: var(--text2); line-height: 1.8;
+}
+.answer-box strong { color: #059669; font-weight: 800; }
+
+/* ────────────────────────────────────────
+   RUBRIC TABLE
+──────────────────────────────────────── */
+.rubric-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.rubric-table thead th {
+  background: linear-gradient(90deg, var(--n1), var(--n2));
+  color: #fff; padding: 0.7rem 1rem; font-weight: 700; text-align: left;
+}
+.rubric-table th:last-child { text-align: center; }
+.rubric-table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+}
+.rubric-table td:last-child { text-align: center; color: var(--n2); font-weight: 700; }
+.rubric-table tbody tr:nth-child(even) td { background: var(--bg2); }
+
+/* ────────────────────────────────────────
+   ADVANCED TABLE
+──────────────────────────────────────── */
+.adv-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.adv-table thead th {
+  background: linear-gradient(90deg, var(--n1), var(--n2));
+  color: #fff; padding: 0.7rem 1rem; font-weight: 700; text-align: left;
+}
+.adv-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2); line-height: 1.7; vertical-align: top;
+}
+.adv-table td:first-child { color: var(--n1); font-weight: 700; white-space: nowrap; }
+.adv-table td:last-child  { color: var(--n3); font-weight: 600; }
+.adv-table tbody tr:nth-child(even) td { background: var(--bg2); }
+
+/* ────────────────────────────────────────
+   SETECH EXAMPLES
+──────────────────────────────────────── */
+.setech-ex {
+  border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+}
+.setech-ex--beige {
+  background: var(--beige);
+  border: 1px solid var(--beige-border);
+  border-left: 4px solid var(--beige-accent);
+}
+.setech-ex--beige .setech-ex__label { color: #8B6A3A; }
+.setech-ex--beige .setech-ex__title { color: var(--beige-dark); }
+.setech-ex--beige .setech-ex__text  { color: #5C4A2A; }
+.setech-ex--beige .setech-ex__text strong { color: var(--beige-dark); font-weight: 700; }
+.setech-ex--green {
+  background: var(--green-pale);
+  border: 1px solid var(--green-border);
+  border-left: 4px solid var(--green);
+}
+.setech-ex--green .setech-ex__label { color: #059669; }
+.setech-ex--green .setech-ex__title { color: var(--text); }
+.setech-ex--green .setech-ex__text  { color: var(--text2); }
+.setech-ex--green .setech-ex__text strong { color: #065F46; font-weight: 700; }
+.setech-ex--navy {
+  background: var(--n-pale);
+  border: 1px solid var(--n-soft);
+  border-left: 4px solid var(--n2);
+}
+.setech-ex--navy .setech-ex__label { color: var(--n2); }
+.setech-ex--navy .setech-ex__title { color: var(--n1); }
+.setech-ex--navy .setech-ex__text  { color: var(--text2); }
+.setech-ex--navy .setech-ex__text strong { color: var(--n1); font-weight: 700; }
+.setech-ex__label { font-size: 11px; font-weight: 700; margin-bottom: 6px; }
+.setech-ex__title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.setech-ex__text  { font-size: 13px; line-height: 1.9; }
+
+/* ────────────────────────────────────────
+   CHECKLIST
+──────────────────────────────────────── */
+.check-progress {
+  background: var(--n-pale); border-radius: 8px;
+  padding: 0.8rem 1rem; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.progress-bar-wrap {
+  flex: 1; height: 6px; background: var(--n-soft);
+  border-radius: 3px; overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--n1), var(--n2), var(--n3));
+  border-radius: 3px; transition: width .4s;
+}
+.progress-text {
+  font-size: 12px; color: var(--n1); font-weight: 700; white-space: nowrap;
+}
+.checklist { list-style: none; }
+.check-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 0.7rem 0.5rem; border-bottom: 1px solid var(--border);
+  cursor: pointer; border-radius: 6px; transition: background .15s;
+}
+.check-item:hover  { background: var(--bg2); }
+.check-item:last-child { border-bottom: none; }
+.check-box {
+  width: 18px; height: 18px; border: 2px solid var(--n3);
+  border-radius: 4px; flex-shrink: 0; margin-top: 2px;
+  transition: all .2s; display: flex; align-items: center; justify-content: center;
+}
+.check-item.checked .check-box {
+  background: linear-gradient(135deg, var(--n2), var(--n3));
+  border-color: var(--n2);
+}
+.check-item.checked .check-box::after { content: '✓'; color: #fff; font-size: 11px; font-weight: 800; }
+.check-label { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.check-item.checked .check-label { color: var(--text3); text-decoration: line-through; }
+
+/* ────────────────────────────────────────
+   QUESTION BOX
+──────────────────────────────────────── */
+.question-box {
+  background: var(--n-pale);
+  border: 1px solid var(--n-soft);
+  border-left: 4px solid var(--n2);
+  border-radius: 8px; padding: 0.9rem 1.1rem;
+  font-size: 13px; color: var(--n1); font-weight: 600;
+  margin-top: 1rem;
+}
+
+/* ────────────────────────────────────────
+   UNIT CARD (단위 특수 정리)
+──────────────────────────────────────── */
+.unit-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; margin-bottom: 1rem;
+}
+.unit-card {
+  border-radius: 10px; padding: 0.9rem;
+  text-align: center;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  transition: box-shadow .2s, transform .2s;
+}
+.unit-card:hover { box-shadow: var(--shadow-m); transform: translateY(-2px); }
+.unit-card__symbol {
+  font-family: 'Courier New', monospace;
+  font-size: 1.4rem; font-weight: 900; color: var(--n1);
+  margin-bottom: 4px;
+}
+.unit-card__name { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.unit-card__eq   { font-size: 11px; color: var(--n2); font-weight: 700; margin-bottom: 4px; }
+.unit-card__use  { font-size: 10px; color: var(--text3); line-height: 1.4; }
+
+/* ────────────────────────────────────────
+   CSAT WIDE (2028 수능형)
+──────────────────────────────────────── */
+.csat-wide {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+}
+.csat-wide__num {
+  font-size: 11px; font-weight: 700; color: var(--n3); margin-bottom: 6px;
+}
+.csat-wide__q {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  line-height: 1.8; margin-bottom: 0.9rem;
+}
+.csat-wide__choices li {
+  font-size: 13px; color: var(--text2); padding: 4px 0; list-style: none;
+}
+.csat-wide__answer {
+  background: var(--green-pale);
+  border: 1px solid var(--green-border);
+  border-radius: 8px; padding: 0.9rem 1rem; margin-top: 0.75rem;
+  font-size: 13px; color: var(--text2); line-height: 1.8;
+}
+.csat-wide__answer strong { color: #059669; font-weight: 800; }
+
+/* ────────────────────────────────────────
+   FOOTER
+──────────────────────────────────────── */
+footer {
+  background: linear-gradient(135deg, var(--n1), var(--n2));
+  padding: 2rem; text-align: center;
+}
+.footer__logo { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+.footer__sub  { font-size: 12px; color: rgba(255,255,255,0.5); }
+
+/* ────────────────────────────────────────
+   FADE-IN
+──────────────────────────────────────── */
+.fade-in {
+  opacity: 0; transform: translateY(14px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.fade-in.visible { opacity: 1; transform: none; }
+
+/* ────────────────────────────────────────
+   RESPONSIVE
+──────────────────────────────────────── */
+@media(max-width: 680px) {
+  .topbar { padding: .65rem 1rem; }
+  .hero { padding: 2.5rem 1rem 2rem; }
+  .main { padding: 1.5rem 1rem 4rem; }
+  .concept-grid, .compare-grid, .meas-grid { grid-template-columns: 1fr; }
+  .unit-grid { grid-template-columns: repeat(2, 1fr); }
+  .tabs { justify-content: flex-start; }
+  .section__body { padding: 1rem; }
+  .info-table th { width: 80px; }
+  .btn--print span { display: none; }
+  .lesson-flow { flex-direction: column; }
+  .lesson-step { border-right: none; border-bottom: 1px solid var(--border); }
+  .hero__stats { flex-direction: column; align-items: center; }
+  .scale-track { min-width: 480px; }
+}
+
+@media print {
+  .topbar, .tabs-wrap, .read-progress { display: none !important; }
+  .section { box-shadow: none !important; break-inside: avoid; }
+  .fade-in { opacity: 1 !important; transform: none !important; }
 }
 </style>
 </head>
 <body>
 
+<!-- 스크롤 진행바 -->
+<div class="read-progress" id="readProgress"></div>
+
+<!-- ── TOPBAR ── -->
 <div class="topbar">
-  <a class="topbar-logo" href="#">
-    <div class="topbar-logo-icon">🔬</div>
+  <a class="topbar__logo" href="science.html">
+    <div class="topbar__logo-icon">🔬</div>
     <div>
-      <div class="topbar-logo-text">베타과학학원</div>
-      <div class="topbar-logo-sub">Beta Science Academy</div>
+      <div class="topbar__logo-text">베타과학학원</div>
+      <div class="topbar__logo-sub">Beta Science Academy</div>
     </div>
   </a>
-  <div class="topbar-btns">
-    <button class="btn-print" onclick="window.print()">🖨️ <span>학습자료 인쇄</span></button>
-    <button class="btn-test">✏️ 테스트 출력</button>
+  <div class="topbar__btns">
+    <a class="btn--back" href="science.html">← 목록으로</a>
+    <button class="btn--print" onclick="window.print()">🖨️ <span>인쇄 (A4)</span></button>
+    <button class="btn--primary">✏️ 테스트 출력</button>
   </div>
 </div>
 
+<!-- ── HERO ── -->
 <div class="hero">
-  <div class="hero-brand">베타과학학원</div>
-  <div class="hero-breadcrumb">Beta Science Academy | 목동 과학 전문<br><span>통합과학 Ⅰ. 과학의 기초 > 01. 과학의 기본량 > 1. 시간과 공간 (교과서 17쪽)</span></div>
-  <h1 class="hero-title">미시 세계와 거시 세계</h1>
-  <div class="hero-subtitle">물체의 크기에 따른 차이점 분석</div>
-  <div class="hero-badge-row">
-    <span class="hbadge">📚 내신 대비</span>
-    <span class="hbadge">🎯 수능 대비</span>
-    <span class="hbadge">✏️ 수행평가</span>
-    <span class="hbadge">🔬 탐구 활동</span>
-    <span class="hbadge">✍️ 세특 대비</span>
-  </div>
-</div>
+  <div class="hero__inner">
+    <div class="hero__breadcrumb">
+      베타과학학원 | Beta Science Academy | 과학 전문<br>
+      <span>통합과학 Ⅰ. 과학의 기초 > 1. 과학의 기본량 > 01. 자연 세계의 시간과 공간</span>
+    </div>
+  
+    <h1 class="hero__title">미시 세계와 거시 세계</h1>
+    <div class="hero__subtitle">완벽대비 학습자료</div>
+    <div class="hero__tagline">내신 · 수능 · 수행 · 탐구 · 세특 — 과학에 대한 준비는 이제 완벽합니다!</div>
+    <div class="hero__badges">
+      <span class="hbadge hbadge--white">📚 내신 대비</span>
+      <span class="hbadge hbadge--white">🎯 수능 대비</span>
+      <span class="hbadge hbadge--amber">✏️ 수행평가</span>
+      <span class="hbadge hbadge--white">🔬 탐구 활동</span>
+      <span class="hbadge hbadge--green">✍️ 세특 대비</span>
+    </div>
+    
 
+<!-- ── TABS ── -->
 <div class="tabs-wrap">
   <div class="tabs">
-    <button class="tab active" onclick="goTo('s1')">탐구 개요</button>
-    <button class="tab" onclick="goTo('s2')">핵심 개념</button>
-    <button class="tab" onclick="goTo('s3')">탐구 과정</button>
-    <button class="tab" onclick="goTo('s4')">결과 정리</button>
-    <button class="tab" onclick="goTo('s5')">확인 문제</button>
-    <button class="tab" onclick="goTo('s6')">세특·심화</button>
-    <button class="tab" onclick="goTo('s7')">최종 체크</button>
+    <button class="tab active" onclick="goTo('s-overview')">학습 개요</button>
+    <button class="tab" onclick="goTo('s-concept')">핵심 개념</button>
+    <button class="tab" onclick="goTo('s-measure')">측정 방법</button>
+    <button class="tab" onclick="goTo('s-scale')">크기 비교</button>
+    <button class="tab" onclick="goTo('s-problems')">확인 문제</button>
+    <button class="tab" onclick="goTo('s-setech')">세특·수능 심화</button>
+    <button class="tab" onclick="goTo('s-checklist')">최종 체크</button>
   </div>
 </div>
 
 <div class="main">
 
-  <section class="section fade-in" id="s1">
-    <div class="section-header">
-      <div class="section-num">1</div><div class="section-title">탐구 활동 개요</div><div class="section-badge">Beta Science</div>
+  <!-- ① 학습 개요 -->
+  <div class="section fade-in" id="s-overview">
+    <div class="section__header">
+      <div class="section__header-left">
+        <div class="section__num">①</div>
+        <div class="section__title">학습 활동 개요</div>
+      </div>
+      <span class="section__badge">Beta Science</span>
     </div>
-    <div class="section-body">
+    <div class="section__body">
       <table class="info-table">
-        <tr><th>대단원</th><td>Ⅰ. 과학의 기초</td><th>교과서</th><td>17쪽</td></tr>
-        <tr><th>중단원</th><td>과학의 기본량</td><th>배정 시간</th><td>50분 (2/5차시)</td></tr>
-        <tr><th>소단원</th><td>1. 시간과 공간</td><th>관련 단원</th><td>자연 세계의 시간과 공간</td></tr>
-        <tr><th>탐구 목표</th><td colspan="3">미시 세계와 거시 세계에서 물체의 크기에 따른 차이점을 분석할 수 있다.</td></tr>
-        <tr><th>학습 요소</th><td colspan="3">탐구 능력 · 문제 해결 능력 / 자료 수집·분석·해석 · 결론 도출 및 일반화</td></tr>
-        <tr><th>평가 방법</th><td>관찰 평가, 발표 평가, 보고서 평가</td><th>준비물</th><td>교과서, 스마트 기기, 관련 도서</td></tr>
+        <tr><th>단원</th><td>Ⅰ. 과학의 기초 > 1. 과학의 기본량 > 01. 자연 세계의 시간과 공간</td></tr>
+        <tr><th>교과서</th><td>17쪽 · 배정 시간: 50분 (2/5차시)</td></tr>
+        <tr><th>학습 목표</th><td>미시 세계와 거시 세계에서 물체의 크기에 따른 차이점을 분석할 수 있다.</td></tr>
+        <tr><th>학습 요소</th><td>미시 세계 / 거시 세계 / 공간 규모 / 시간 규모 / X선 회절법 / 공전 반경 추정법 / 측정 오차</td></tr>
+        <tr><th>과정·기능</th><td>탐구 능력 / 문제 해결 능력 / 자료 수집·분석·해석 · 결론 도출 및 일반화</td></tr>
+        <tr><th>교수 방법</th><td>탐구 실험 학습, 협동 학습</td></tr>
+        <tr><th>준비물</th><td>교과서, 스마트 기기, 미시 세계와 거시 세계 관련 참고 도서</td></tr>
+        <tr><th>평가 유형</th><td>
+          <div class="eval-badges">
+            <span class="eval-badge ev-ob">관찰 평가</span>
+            <span class="eval-badge ev-pr">보고서 평가</span>
+            <span class="eval-badge ev-se">자기 평가</span>
+            <span class="eval-badge ev-gr">모둠 평가</span>
+          </div>
+        </td></tr>
       </table>
-      <div class="q-box" style="margin-top:1rem;">📌 <strong>핵심 질문:</strong> 미시 세계와 거시 세계에서 물체의 크기 표현과 측정 방법의 차이는 무엇일까?</div>
-    </div>
-  </section>
 
-  <section class="section fade-in" id="s2">
-    <div class="section-header">
-      <div class="section-num">2</div><div class="section-title">핵심 개념 완전 정리</div><div class="section-badge">Beta Science</div>
+      <!-- 수업 흐름 -->
+      <div class="sub-title">📋 수업 흐름 (50분)</div>
+      <div class="lesson-flow">
+        <div class="lesson-step lesson-step--intro">
+         
+          <div class="lesson-step__time">5분</div>
+          <div class="lesson-step__label">도입</div>
+          <div class="lesson-step__desc">전시 확인 → 학습 목표 제시 → 생각해보기</div>
+        </div>
+        <div class="lesson-step lesson-step--main">
+         
+          <div class="lesson-step__time">35분</div>
+          <div class="lesson-step__label">전개</div>
+          <div class="lesson-step__desc">시뮬레이션 → 측정 방법 조사 → 차이점 논술</div>
+        </div>
+        <div class="lesson-step lesson-step--wrap">
+          
+          <div class="lesson-step__time">10분</div>
+          <div class="lesson-step__label">정리</div>
+          <div class="lesson-step__desc">점검하기 (지식·과정·가치) → 평가 → 차시 예고</div>
+        </div>
+      </div>
+
+      <div class="question-box">📌 <strong>핵심 질문:</strong> 미시 세계와 거시 세계에서 물체의 크기를 측정하는 방법이 왜 다를까? 그리고 크기 규모와 시간 규모는 어떤 관계가 있을까?</div>
     </div>
-    <div class="section-body">
+  </div>
+
+  <!-- ② 핵심 개념 -->
+  <div class="section fade-in" id="s-concept">
+    <div class="section__header">
+      <div class="section__header-left">
+        <div class="section__num">②</div>
+        <div class="section__title">핵심 개념 완전 정리</div>
+      </div>
+      <span class="section__badge">Beta Science</span>
+    </div>
+    <div class="section__body">
       <div class="concept-grid">
-        <div class="c-card">
-          <div class="c-card-title">🔬 미시 세계 (Micro World)</div>
-          <p class="c-card-desc">원자·분자·세포 등 매우 작은 규모의 세계. 수소 원자 반지름 ≈ 5.3 × 10⁻¹¹ m. 변화가 극히 짧은 시간에 일어나며 측정에 X선 등 특수 방법이 필요함.</p>
+        <div class="concept-card">
+          <div class="concept-card__title">🔬 미시 세계 (Microscopic World)</div><br>
+          <div class="concept-card__desc">원자·분자·세포 등 <strong>매우 작은 크기</strong>의 세계. 수소 원자 반지름 ≈ 5.3×10⁻¹¹ m. 변화가 극히 짧은 시간에 걸쳐 일어나며, 측정에 X선 등 특수 방법이 필요하다.</div>
         </div>
-        <div class="c-card">
-          <div class="c-card-title">🌌 거시 세계 (Macro World)</div>
-          <p class="c-card-desc">행성·별·은하 등 매우 큰 규모의 세계. 우리은하 지름 ≈ 10²¹ m. 중력과 공전을 이용해 크기를 추정하며 시간 규모도 매우 큼.</p>
+        <div class="concept-card">
+          <div class="concept-card__title">🌌 거시 세계 (Macroscopic World)</div><br>
+          <div class="concept-card__desc">행성·별·은하 등 <strong>매우 큰 크기</strong>의 세계. 우리은하 지름 ≈ 10²¹ m. 중력·공전을 이용해 크기를 추정하며, 시간 규모도 매우 크다.</div>
         </div>
-        <div class="c-card">
-          <div class="c-card-title">📐 공간 규모 (Spatial Scale)</div>
-          <p class="c-card-desc">물체의 크기 범위. 미시 세계(수소 원자 ~10⁻¹⁰m)부터 거시 세계(우리은하 ~10²¹m)까지 약 31자리 차이가 존재함.</p>
+        <div class="concept-card">
+          <div class="concept-card__title">📏 공간 규모 (Spatial Scale)</div><br>
+          <div class="concept-card__desc">물체의 크기 범위. 미시~거시 세계에 걸쳐 수소 원자(~10⁻¹⁰ m)부터 우리은하(~10²¹ m)까지 약 <strong>31자리 차이</strong> 존재.</div>
         </div>
-        <div class="c-card">
-          <div class="c-card-title">⏱️ 시간 규모 (Time Scale)</div>
-          <p class="c-card-desc">사건이 일어나는 시간 범위. 크기 규모와 대체로 비례함. 미시 세계의 반응은 펨토초(10⁻¹⁵s) 이하, 거시 세계의 변화는 수백만 년 단위.</p>
+        <div class="concept-card">
+          <div class="concept-card__title">⏱ 시간 규모 (Time Scale)</div><br>
+          <div class="concept-card__desc">사건이 일어나는 시간 범위. <strong>크기 규모와 대체로 비례.</strong> 미시 세계의 반응은 펨토초(10⁻¹⁵ s) 이하, 거시 세계의 변화는 수백만 년 단위.</div>
         </div>
+ <div class="concept-card">
+          <div class="concept-card__title">🔭 X선 회절법</div><br>
+          <div class="concept-card__desc">파장이 짧은 X선으로 수소 분자(H₂)에서 원자핵 간 거리를 측정하여 원자의 크기를 구하는 방법.</div>
+        </div>
+         <div class="concept-card">
+          <div class="concept-card__title">🌀 공전 반경 추정법</div><br>
+          <div class="concept-card__desc">별이 중력에 의해 은하 중심 주위를 회전하므로, 은하 원반 가장 바깥쪽 별의 회전 반경으로부터 은하의 크기를 추정하는 방법.</div>
+        </div>
+        
       </div>
-      
+
+      <div class="sub-title">⚖️ 미시 vs 거시 세계 비교</div>
       <div class="compare-grid">
-        <div class="c-card micro">
-          <h4>🔬 X선 회절법</h4>
-          <p class="c-card-desc">파장이 짧은 X선을 이용하여 수소 분자(H₂)에서 원자핵 간 거리를 측정하여 원자의 크기를 구하는 방법.</p>
+        <div class="compare-card compare-card--micro">
+          <div class="compare-card__title">🔬 미시 세계</div>
+          <ul class="compare-list">
+            <li><strong>대표 물체:</strong> 수소 원자, DNA, 세포, 박테리아</li>
+            <li><strong>크기 범위:</strong> 약 10⁻¹⁵ ~ 10⁻⁷ m</li>
+            <li><strong>시간 규모:</strong> 펨토초(10⁻¹⁵ s) ~ 마이크로초(10⁻⁶ s)</li>
+            <li><strong>측정 방법:</strong> X선 회절, 전자현미경, 분광법</li>
+            <li><strong>측정 오차:</strong> 1 mm도 매우 큰 오차로 취급됨</li>
+            <li><strong>특징:</strong> 변화가 극히 짧은 시간에 걸쳐 일어남</li>
+          </ul>
         </div>
-        <div class="c-card macro">
-          <h4>🌀 공전 반경 추정법</h4>
-          <p class="c-card-desc">별이 중력에 의해 은하 중심 주위를 회전하므로, 은하 원반 가장 바깥쪽 별의 회전 반경으로부터 은하의 크기를 추정하는 방법.</p>
+        <div class="compare-card compare-card--macro">
+          <div class="compare-card__title">🌌 거시 세계</div>
+          <ul class="compare-list">
+            <li><strong>대표 물체:</strong> 사람, 자동차, 지구, 태양, 우리은하</li>
+            <li><strong>크기 범위:</strong> 약 10⁻³ ~ 10²⁶ m</li>
+            <li><strong>시간 규모:</strong> 초(s) ~ 수십억 년</li>
+            <li><strong>측정 방법:</strong> 자, 레이더, 레이저, 공전 반경 추정</li>
+            <li><strong>측정 오차:</strong> 1 mm는 충분히 무시 가능</li>
+            <li><strong>특징:</strong> 중력·전자기력이 지배, 변화가 장기간에 걸쳐 일어남</li>
+          </ul>
         </div>
       </div>
-    </div>
-  </section>
 
-  <section class="section fade-in" id="s3">
-    <div class="section-header">
-      <div class="section-num">3</div><div class="section-title">탐구 과정 & 크기 규모 비교</div><div class="section-badge">Beta Science</div>
+      <div class="sub-title">🔑 핵심 원리</div>
+      <div class="point-box">💡 <strong>크기 규모와 시간 규모는 대체로 비례한다.</strong> 예를 들어 수소 원자처럼 극히 작은 물체의 화학 반응은 펨토초 단위로 일어나지만, 우리은하처럼 극히 큰 천체의 변화(별의 진화, 은하 회전 등)는 수백만~수십억 년에 걸쳐 일어난다. 따라서 <strong>측정 오차의 허용 범위도 규모에 따라 달리 판단</strong>해야 한다.</div>
+
+      <div class="warn-box">⚠️ <strong>자주 틀리는 포인트:</strong> "거시 세계의 변화는 미시 세계의 변화보다 더 짧은 시간 규모에서 일어난다"는 <strong>틀린</strong> 설명이다! 크기 규모와 시간 규모는 비례하므로, 거시 세계 변화가 훨씬 느리게(더 긴 시간에 걸쳐) 일어난다.</div>
     </div>
-    <div class="section-body">
-      <div class="q-box" style="background:#fff; border:1px solid var(--border);">
-        <p style="font-size:14px; margin-bottom:10px;"><strong>[탐구 과정]</strong> 스마트 기기로 '우주의 규모' 시뮬레이션을 실행하여 가장 작은 물체와 가장 큰 물체를 찾아보자.</p>
-        <p style="font-size:13.5px; color:var(--n2);"><strong>예시 답안:</strong> 가장 작은 물체 → 수소 원자 (반지름 ≈ 5.3 × 10⁻¹¹ m) / 가장 큰 물체 → 우리은하 (지름 ≈ 10²¹ m)</p>
+  </div>
+
+  <!-- ③ 측정 방법 -->
+  <div class="section fade-in" id="s-measure">
+    <div class="section__header">
+      <div class="section__header-left">
+        <div class="section__num">③</div>
+        <div class="section__title">탐구 과정 &amp; 측정 방법</div>
+      </div>
+      <span class="section__badge">Beta Science</span>
+    </div>
+    <div class="section__body">
+      <div class="sub-title">🎯 탐구 과정 (교과서 17쪽)</div>
+
+      <div class="csat-box" style="margin-bottom:1rem;">
+        <div class="csat-label">📌 탐구 과정 ①</div>
+        <div class="csat-q">스마트 기기로 <strong>'우주의 규모' 시뮬레이션</strong>을 실행하여 가장 작은 물체와 가장 큰 물체를 찾는다. (QR 코드 또는 인터넷 검색 '규모 비교')</div>
+        <div class="answer-box"><strong>예시 답안:</strong> 가장 작은 물체 → <strong>수소 원자</strong> (반지름 ≈ 5.3 × 10⁻¹¹ m) / 가장 큰 물체 → <strong>우리은하</strong> (지름 ≈ 10²¹ m)<br>※ 중학교 과학에서 다루었던 물체를 기준으로 설정. '쿼크', '중성미자' 등은 고교 수준 초과이므로 제외.</div>
       </div>
 
-      <p style="font-weight:800; font-size:14px; margin: 1.5rem 0 0.5rem;">📊 크기 규모 비교표</p>
+      <div class="csat-box" style="margin-bottom:1rem;">
+        <div class="csat-label">📌 탐구 과정 ②</div>
+        <div class="csat-q">두 물체의 크기를 측정하는 방법을 조사하고, <strong>측정 방법이 다른 까닭</strong>을 모둠별로 토의한다.</div>
+        <div class="answer-box"><strong>측정 방법이 다른 까닭:</strong> 자연 현상의 규모는 매우 다양하며, 규모에 따라 탐구 대상의 측정 방법이 다르기 때문이다. 미시 세계는 일반적인 도구로는 측정 불가능하여 X선이나 전자현미경 같은 특수 장비가 필요하다.</div>
+      </div>
+
+      <div class="sub-title">🔬 크기 규모 비교표</div>
       <table class="data-table">
-        <thead>
-          <tr><th>물체</th><th>크기 (m)</th><th>측정 방법</th><th>세계 구분</th></tr>
-        </thead>
+        <thead><tr><th>물체</th><th>크기 (m)</th><th>측정 방법</th><th>세계 구분</th></tr></thead>
         <tbody>
-          <tr><td>양성자</td><td>~10⁻¹⁵ m</td><td>입자 충돌 실험</td><td><span class="tag-micro">미시</span></td></tr>
-          <tr><td>수소 원자</td><td>~5.3 × 10⁻¹¹ m</td><td>X선 회절법</td><td><span class="tag-micro">미시</span></td></tr>
-          <tr><td>DNA</td><td>~2 × 10⁻⁹ m</td><td>전자현미경</td><td><span class="tag-micro">미시</span></td></tr>
-          <tr><td>세균</td><td>~10⁻⁶ m</td><td>광학현미경</td><td><span class="tag-micro">미시</span></td></tr>
-          <tr><td>사람</td><td>~1.7 m</td><td>자 (줄자)</td><td>거시</td></tr>
-          <tr><td>지구</td><td>~6.4 × 10⁶ m</td><td>위성 측량</td><td>거시</td></tr>
-          <tr><td>태양</td><td>~7 × 10⁸ m</td><td>삼각 측량·레이더</td><td>거시</td></tr>
-          <tr><td>우리은하</td><td>~10²¹ m</td><td>공전 반경 추정법</td><td>거시</td></tr>
+          <tr><td>양성자</td><td>~10⁻¹⁵ m</td><td>입자 충돌 실험</td><td><span class="tag--micro">미시</span></td></tr>
+          <tr><td>수소 원자</td><td>~5.3 × 10⁻¹¹ m</td><td>X선 회절법</td><td><span class="tag--micro">미시</span></td></tr>
+          <tr><td>DNA</td><td>~2 × 10⁻⁹ m</td><td>전자현미경</td><td><span class="tag--micro">미시</span></td></tr>
+          <tr><td>세균</td><td>~10⁻⁶ m</td><td>광학현미경</td><td><span class="tag--micro">미시</span></td></tr>
+          <tr><td>사람</td><td>~1.7 m</td><td>자(줄자)</td><td><span class="tag--mid">일반</span></td></tr>
+          <tr><td>지구</td><td>~6.4 × 10⁶ m</td><td>위성 측량</td><td><span class="tag--macro">거시</span></td></tr>
+          <tr><td>태양</td><td>~7 × 10⁸ m</td><td>삼각 측량·레이더</td><td><span class="tag--macro">거시</span></td></tr>
+          <tr><td>우리은하</td><td>~10²¹ m</td><td>공전 반경 추정법</td><td><span class="tag--macro">거시</span></td></tr>
         </tbody>
       </table>
-    </div>
-  </section>
 
-  <section class="section fade-in" id="s4">
-    <div class="section-header">
-      <div class="section-num">4</div><div class="section-title">결과 정리 — 논술 모범 답안</div><div class="section-badge">Beta Science</div>
-    </div>
-    <div class="section-body">
-      <div class="q-box">
-        <p class="q-title">Q1. 시뮬레이션에서 크기가 가장 작은 물체와 가장 큰 물체를 찾아 써 보자.</p>
-        <p class="c-card-desc"><strong>가장 작은 물체:</strong> 수소 원자 / <strong>가장 큰 물체:</strong> 우리은하<br><small>(중학교 수준 기준. 쿼크 등은 고교 수준 초과이므로 제외)</small></p>
-      </div>
-
-      <div class="q-box">
-        <p class="q-title">Q2. 수소 원자와 우리은하의 측정 방법이 다른 까닭을 토의해 보자.</p>
-        <div class="ans-box">
-          <span class="ans-label">베타과학학원 모범 답안</span>
-          <p class="c-card-desc" style="color:#065F46;">자연 현상의 규모는 매우 다양하며, 규모에 따라 측정 방법이 달라지기 때문이다. 수소 원자처럼 극히 작은 물체는 가시광선보다 파장이 짧은 X선을 사용해야 하며, 우리은하처럼 극히 큰 물체는 직접 측정이 불가능하므로 중력과 회전 같은 물리 법칙을 이용한 간접 추정법을 사용한다.</p>
+      <div class="sub-title">⚗️ 두 가지 핵심 측정 방법</div>
+      <div class="meas-grid">
+        <div class="meas-card meas-card--xray">
+          <div class="meas-card__icon">🔬</div>
+          <div class="meas-card__title">X선 회절법</div>
+          <div class="meas-card__target">미시 세계 (원자·분자)</div>
+          <ol class="meas-card__steps">
+            <li>파장이 짧은 X선을 수소 분자(H₂)에 조사한다</li>
+            <li>원자핵 간 거리에 따라 X선이 회절·간섭한다</li>
+            <li>간섭 패턴을 분석하여 원자 사이 거리를 측정한다</li>
+            <li>원자의 크기(반지름)를 계산한다</li>
+          </ol>
+        </div>
+        <div class="meas-card meas-card--orbit">
+          <div class="meas-card__icon">🌌</div>
+          <div class="meas-card__title">공전 반경 추정법</div>
+          <div class="meas-card__target">거시 세계 (은하)</div>
+          <ol class="meas-card__steps">
+            <li>별은 중력에 의해 은하 중심 주위를 회전한다</li>
+            <li>은하 원반 가장 바깥쪽에서 공전하는 별을 찾는다</li>
+            <li>해당 별의 회전 반경을 도플러 효과 등으로 측정한다</li>
+            <li>그 반경으로부터 은하의 크기를 추정한다</li>
+          </ol>
         </div>
       </div>
 
-      <div class="q-box">
-        <p class="q-title">Q3. 미시 세계와 거시 세계의 크기에 따른 차이점을 규모와 관련지어 설명해 보자.</p>
-        <div class="ans-box">
-          <span class="ans-label">베타과학학원 모범 답안</span>
-          <p class="c-card-desc" style="color:#065F46;">
-            1. 크기 규모와 시간 규모는 비례한다. 미시 세계의 변화는 펨토초 단위의 극히 짧은 시간에 일어나지만, 거시 세계의 변화는 수백만 년에 걸쳐 일어난다.<br>
-            2. 측정 오차의 허용 범위가 다르다. 1 mm 오차는 미시 세계에서는 아주 큰 값이지만 거시 세계에서는 충분히 무시할 수 있는 값이다.
-          </p>
+      <div class="point-box">💡 <strong>왜 측정 방법이 다른가?</strong> 수소 원자처럼 극히 작은 물체는 가시광선보다 파장이 훨씬 짧은 X선을 사용해야 구조를 파악할 수 있다. 우리은하처럼 극히 큰 물체는 직접 측정이 불가능하므로 물리 법칙(중력, 회전)을 이용한 간접 추정법을 사용한다.</div>
+    </div>
+  </div>
+
+  <!-- ④ 크기 비교 -->
+  <div class="section fade-in" id="s-scale">
+    <div class="section__header">
+      <div class="section__header-left">
+        <div class="section__num">④</div>
+        <div class="section__title">크기 규모 비교 &amp; 논술 모범 답안</div>
+      </div>
+      <span class="section__badge">Beta Science</span>
+    </div>
+    <div class="section__body">
+      <div class="sub-title">📊 크기 스케일 시각화 (작은 것 → 큰 것)</div>
+      <div class="scale-viz">
+        <div class="scale-track">
+          <div class="scale-item si-1"><div class="scale-item__obj">⚛</div><div class="scale-item__name">양성자</div><div class="scale-item__size">10⁻¹⁵m</div></div>
+          <div class="scale-item si-2"><div class="scale-item__obj">🔵</div><div class="scale-item__name">수소 원자</div><div class="scale-item__size">10⁻¹⁰m</div></div>
+          <div class="scale-item si-3"><div class="scale-item__obj">🧬</div><div class="scale-item__name">DNA</div><div class="scale-item__size">10⁻⁹m</div></div>
+          <div class="scale-item si-4"><div class="scale-item__obj">🦠</div><div class="scale-item__name">세균</div><div class="scale-item__size">10⁻⁶m</div></div>
+          <div class="scale-item si-5"><div class="scale-item__obj">🐛</div><div class="scale-item__name">곤충</div><div class="scale-item__size">10⁻³m</div></div>
+          <div class="scale-item si-6"><div class="scale-item__obj">🧑</div><div class="scale-item__name">사람</div><div class="scale-item__size">1.7m</div></div>
+          <div class="scale-item si-7"><div class="scale-item__obj">🏔</div><div class="scale-item__name">에베레스트</div><div class="scale-item__size">10⁴m</div></div>
+          <div class="scale-item si-8"><div class="scale-item__obj">🌍</div><div class="scale-item__name">지구</div><div class="scale-item__size">10⁶m</div></div>
+          <div class="scale-item si-9"><div class="scale-item__obj">☀</div><div class="scale-item__name">태양</div><div class="scale-item__size">10⁸m</div></div>
+          <div class="scale-item si-10"><div class="scale-item__obj">🪐</div><div class="scale-item__name">태양계</div><div class="scale-item__size">10¹²m</div></div>
+          <div class="scale-item si-11"><div class="scale-item__obj">🌌</div><div class="scale-item__name">우리은하</div><div class="scale-item__size">10²¹m</div></div>
+        </div>
+        <div class="scale-legend">
+          <span>← 미시 세계 (작음)</span>
+          <span>거시 세계 (큼) →</span>
         </div>
       </div>
-    </div>
-  </section>
 
-  <section class="section fade-in" id="s5">
-    <div class="section-header">
-      <div class="section-num">5</div><div class="section-title">확인 문제 &amp; 정답 해설</div><div class="section-badge">Beta Science</div>
-    </div>
-    <div class="section-body">
-      <p style="font-weight:800; font-size:14px; margin-bottom:10px;">🔘 O/X 문제</p>
-      <div class="prob-card">
-        <p class="prob-q">1. 미시 세계의 물체는 일반적인 자(ruler)로 크기를 측정하기 어렵다. (O/X)</p>
-        <button class="ox-btn" onclick="reveal(this)">정답 확인</button>
-        <div class="reveal-ans">정답: O | 가시광선보다 작은 미시 세계는 X선이나 전자현미경이 필요합니다.</div>
-      </div>
-      <div class="prob-card">
-        <p class="prob-q">2. 거시 세계의 변화는 미시 세계보다 대체로 더 짧은 시간 규모에서 일어난다. (O/X)</p>
-        <button class="ox-btn" onclick="reveal(this)">정답 확인</button>
-        <div class="reveal-ans">정답: X | 크기 규모가 클수록 시간 규모도 대체로 비례하여 커집니다.</div>
+      <div class="sub-title">📐 크기 규모와 시간 규모 비례 관계</div>
+      <div class="proportion-box" id="proportionBox">
+        <div class="proportion-row">
+          <div class="proportion-label">수소 원자</div>
+          <div class="proportion-bar-wrap">
+            <div class="proportion-bar" data-width="2%" style="width:0%"></div>
+          </div>
+          <div class="proportion-val">~10⁻¹⁰ m</div>
+        </div>
+        <div class="proportion-row">
+          <div class="proportion-label">세균</div>
+          <div class="proportion-bar-wrap">
+            <div class="proportion-bar" data-width="8%" style="width:0%"></div>
+          </div>
+          <div class="proportion-val">~10⁻⁶ m</div>
+        </div>
+        <div class="proportion-row">
+          <div class="proportion-label">사람</div>
+          <div class="proportion-bar-wrap">
+            <div class="proportion-bar" data-width="20%" style="width:0%"></div>
+          </div>
+          <div class="proportion-val">~1.7 m</div>
+        </div>
+        <div class="proportion-row">
+          <div class="proportion-label">지구</div>
+          <div class="proportion-bar-wrap">
+            <div class="proportion-bar" data-width="45%" style="width:0%"></div>
+          </div>
+          <div class="proportion-val">~10⁶ m</div>
+        </div>
+        <div class="proportion-row">
+          <div class="proportion-label">태양계</div>
+          <div class="proportion-bar-wrap">
+            <div class="proportion-bar" data-width="75%" style="width:0%"></div>
+          </div>
+          <div class="proportion-val">~10¹² m</div>
+        </div>
+        <div class="proportion-row">
+          <div class="proportion-label">우리은하</div>
+          <div class="proportion-bar-wrap">
+            <div class="proportion-bar" data-width="100%" style="width:0%"></div>
+          </div>
+          <div class="proportion-val">~10²¹ m</div>
+        </div>
       </div>
 
-      <p style="font-weight:800; font-size:14px; margin: 2rem 0 10px;">📋 수능형 문제</p>
-      <div class="q-box" style="background:#fff; border:1px solid var(--border);">
-        <p class="prob-q">표는 물체의 크기를 나타낸 것이다. 옳은 것만을 보기에 있는 대로 고른 것은?</p>
-        <table class="data-table" style="max-width:400px; margin:10px auto;">
+      <div class="sub-title">📝 논술 모범 답안</div>
+      <div class="qa-item">
+        <div class="qa-q">Q1. <span>미시 세계와 거시 세계에서 동일한 측정 기기를 사용하기 어려운 이유를 크기 규모와 관련지어 두 가지 이상 서술하시오.</span></div>
+      </div>
+      <div class="model-answer">
+        <div class="model-answer__header">✅ 베타과학학원 | 논술 모범 답안</div>
+        <div class="model-answer__title">[ 측정 기기가 다른 두 가지 이유 ]</div>
+        <p>① <strong>탐구 대상의 크기 규모에 따라 측정 도구의 분해능이 달라야 하기 때문이다.</strong> 원자 수준의 미시 세계(~10⁻¹⁰ m)에서는 가시광선보다 파장이 훨씬 짧은 X선이나 전자선을 이용한 특수 장비가 필요하며, 일반적인 자나 광학 기기로는 분해 불가능하다.</p>
+        <p>② <strong>오차의 허용 범위가 규모에 따라 달라지기 때문이다.</strong> 측정 오차의 범위가 1 mm라고 할 때, 미시 세계(nm~μm 수준)에서는 측정 대상보다 수백만 배 크므로 측정 자체가 무의미해지지만, 거시 세계(지구 크기 수준)에서는 충분히 무시할 수 있는 오차다. 오차의 판단은 측정 대상의 규모에 따라 달라진다.</p>
+      </div>
+
+      <div class="qa-item" style="margin-top:1.25rem;">
+        <div class="qa-q">Q2. <span>미시 세계와 거시 세계의 물체의 크기에 따른 차이점을 규모와 관련지어 설명해 보자. (규모의 두 가지 측면 — 크기 규모·시간 규모 — 을 연결하여 서술)</span></div>
+      </div>
+      <div class="model-answer">
+        <div class="model-answer__header">✅ 베타과학학원 | 논술 모범 답안</div>
+        <div class="model-answer__title">[ 크기 규모와 시간 규모의 연관성 ]</div>
+        <p>① <strong>크기 규모가 매우 작거나 큰 경우에는 변화의 정도가 나타나는 시간 규모도 대체로 크기에 비례하여 나타난다.</strong> 미시 세계의 변화는 대부분 극히 짧은 시간(펨토초 단위)에 걸쳐 일어나는 반면, 거시 세계의 변화는 수백만 년에 걸쳐 일어난다.</p>
+        <p>② <strong>탐구 대상의 측정 오차를 규모에 따라 다르게 판단해야 한다.</strong> 예를 들어 측정 오차의 범위가 1 mm라고 할 때, 미시 세계에서는 아주 큰 값이지만 거시 세계에서는 충분히 무시할 수 있는 값이다.</p>
+        <p>③ <strong>측정 방법이 다른 까닭:</strong> 자연 현상의 규모는 매우 다양하며, 규모에 따라 탐구 대상의 측정 방법이 달라지기 때문이다. 미시 세계는 일반적인 도구로는 측정 불가능하여 X선이나 전자현미경 같은 특수 장비가 필요하다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ 확인 문제 -->
+  <div class="section fade-in" id="s-problems">
+    <div class="section__header">
+      <div class="section__header-left">
+        <div class="section__num">⑤</div>
+        <div class="section__title">탐구 확인 문제 &amp; 정답 해설</div>
+      </div>
+      <span class="section__badge">Beta Science</span>
+    </div>
+    <div class="section__body">
+
+      <!-- O/X -->
+      <div class="sub-title">① O/X 확인 문제 <span class="tag--pill tp--navy">내신 대비</span></div>
+      <ul class="ox-list">
+        <li class="ox-item">
+          <div class="ox-badge ox--o">O</div>
+          <div>
+            <div class="ox-stmt">미시 세계의 물체는 일반적인 자(ruler)로 크기를 측정하기 어렵다.</div>
+            <div class="ox-explain">미시 세계의 물체(원자·분자 수준)는 가시광선의 파장보다 훨씬 작아 일반 도구로 측정 불가능하며, X선·전자현미경 등이 필요하다.</div>
+          </div>
+        </li>
+        <li class="ox-item">
+          <div class="ox-badge ox--x">X</div>
+          <div>
+            <div class="ox-stmt">거시 세계의 변화는 미시 세계의 변화보다 대체로 더 짧은 시간 규모에서 일어난다.</div>
+            <div class="ox-explain">크기 규모와 시간 규모는 비례한다. 거시 세계(우리은하)의 변화 시간 규모가 미시 세계(수소 원자)보다 훨씬 길다. (펨토초 vs 수백만 년)</div>
+          </div>
+        </li>
+        <li class="ox-item">
+          <div class="ox-badge ox--x">X</div>
+          <div>
+            <div class="ox-stmt">측정 오차의 범위가 1 mm라면, 미시 세계와 거시 세계에서 모두 같은 의미를 갖는다.</div>
+            <div class="ox-explain">미시 세계에서 1 mm 오차는 측정 대상 크기(nm~μm)에 비해 매우 큰 오차이지만, 거시 세계(지구 크기 수준)에서는 충분히 무시 가능한 오차다. 오차의 판단은 측정 대상의 규모에 따라 달라진다.</div>
+          </div>
+        </li>
+      </ul>
+
+      <!-- 보기 선택 -->
+      <div class="sub-title" style="margin-top:1.5rem;">② 보기 선택 문제 <span class="tag--pill tp--navy">내신 대비</span></div>
+      <div class="csat-box">
+        <div class="csat-label">선택 01 · 내신</div>
+        <div class="csat-q">다음 중 미시 세계의 물체에 해당하는 것을 모두 고르시오.<br><small style="color:var(--text3);">ㄱ. 수소 원자 &nbsp; ㄴ. 우리은하 &nbsp; ㄷ. DNA &nbsp; ㄹ. 지구 &nbsp; ㅁ. 세균</small></div>
+        <div class="answer-box"><strong>정답: ㄱ, ㄷ, ㅁ</strong><br>수소 원자(~10⁻¹⁰ m), DNA(~10⁻⁹ m), 세균(~10⁻⁶ m)은 미시 세계. 우리은하·지구는 거시 세계.</div>
+      </div>
+      <div class="csat-box">
+        <div class="csat-label">선택 02 · 내신</div>
+        <div class="csat-q">수소 원자의 크기를 알아내는 데 사용하는 측정 방법으로 옳은 것은?<br><small style="color:var(--text3);">① 광학 현미경 &nbsp; ② X선 회절법 &nbsp; ③ 레이더 측거법 &nbsp; ④ 공전 반경 추정법 &nbsp; ⑤ 삼각 측량법</small></div>
+        <div class="answer-box"><strong>정답: ②</strong> 수소 원자 크기(~10⁻¹⁰ m)는 가시광선(~10⁻⁷ m)보다 훨씬 작아 파장이 짧은 X선 회절법을 사용해야 한다.</div>
+      </div>
+
+      <!-- 수능형 -->
+      <div class="sub-title" style="margin-top:1.5rem;">③ 수능 유형 문제 <span class="tag--pill tp--green">수능 대비</span></div>
+      <div class="csat-wide">
+        <div class="csat-wide__num">🎯 수능형 01 · 수능</div>
+        <div class="csat-wide__q">
+          표는 몇 가지 물체의 크기를 나타낸 것이다. 이에 대한 설명으로 옳은 것만을 &lt;보기&gt;에서 있는 대로 고른 것은?
+        </div>
+        <table class="csat-table">
           <thead><tr><th>물체</th><th>크기 (m)</th></tr></thead>
           <tbody>
             <tr><td>수소 원자 반지름</td><td>5.3 × 10⁻¹¹</td></tr>
+            <tr><td>세균</td><td>1 × 10⁻⁶</td></tr>
             <tr><td>사람</td><td>1.7 × 10⁰</td></tr>
             <tr><td>우리은하 지름</td><td>~10²¹</td></tr>
           </tbody>
         </table>
-        <p style="font-size:13px; padding:10px; background:var(--bg2);">
-          &lt;보기&gt;<br>
-          ㄱ. 수소 원자 측정 시 가시광선보다 파장이 짧은 X선을 이용한다.<br>
-          ㄴ. 우리은하의 시간 규모는 수소 원자보다 짧다.<br>
-          ㄷ. 오차 1 mm는 원자 측정 시 무시할 수 없는 값이다.
-        </p>
-        <button class="ox-btn" onclick="reveal(this)">정답 확인</button>
-        <div class="reveal-ans">정답: ㄱ, ㄷ | ㄴ. 거시 세계의 시간 규모가 훨씬 깁니다.</div>
+        <ul class="csat-wide__choices">
+          <li>ㄱ. 수소 원자의 크기를 측정할 때는 가시광선보다 파장이 짧은 X선을 이용한다.</li>
+          <li>ㄴ. 우리은하의 크기 변화가 일어나는 시간 규모는 수소 원자의 화학 반응이 일어나는 시간 규모보다 짧다.</li>
+          <li>ㄷ. 측정 오차 1 mm는 세균의 크기 측정에서는 매우 큰 오차이지만, 사람의 키 측정에서는 무시할 수 있다.</li>
+        </ul>
+        <div class="csat-wide__answer"><strong>정답: ㄱ, ㄷ</strong><br>ㄴ은 틀렸다. 크기 규모와 시간 규모는 비례하므로 거시 세계(우리은하)의 변화 시간 규모가 미시 세계(수소 원자)보다 훨씬 길다.<br>ㄷ 옳음: 1 mm 오차는 세균(10⁻⁶ m) 대비 수백만 배로 매우 크지만, 사람(~1.7 m) 측정에서는 충분히 무시 가능하다.</div>
       </div>
-    </div>
-  </section>
 
-  <section class="section fade-in" id="s6">
-    <div class="section-header">
-      <div class="section-num">6</div><div class="section-title">세특 · 수능 심화</div><div class="section-badge">Beta Science</div>
-    </div>
-    <div class="section-body">
-      <p style="font-weight:800; font-size:14px; margin-bottom:10px;">📊 단위 심화 — 특수 단위 정리</p>
-      <table class="data-table">
-        <thead>
-          <tr><th>단위</th><th>표기</th><th>SI 환산</th><th>주요 사용 분야</th></tr>
-        </thead>
+      <!-- 서술형 -->
+      <div class="sub-title" style="margin-top:1.5rem;">④ 서술형 문제 <span class="tag--pill tp--amber">수행평가</span></div>
+      <div class="csat-box">
+        <div class="csat-label">서술 01 · 수행평가</div>
+        <div class="csat-q">미시 세계와 거시 세계에서 동일한 측정 기기를 사용하기 어려운 이유를 크기 규모와 관련지어 두 가지 이상 서술하시오.</div>
+        <div class="answer-box">
+          <strong>모범 답안</strong><br>
+          ① 탐구 대상의 크기 규모에 따라 측정 도구의 분해능이 달라야 하기 때문이다. 원자 수준의 미시 세계에서는 가시광선보다 파장이 짧은 X선이나 전자선을 이용한 특수 장비가 필요하며, 일반적인 자나 광학 기기로는 분해 불가능하다.<br>
+          ② 오차의 허용 범위가 규모에 따라 달라지기 때문이다. 미시 세계에서 1 mm 오차는 측정 대상보다 수백만 배 크므로 측정 자체가 무의미해지지만, 거시 세계에서는 충분히 무시할 수 있는 오차다.
+        </div>
+      </div>
+
+      <!-- 채점 기준 -->
+      <div class="sub-title">⑤ 채점 기준표 <span class="tag--pill tp--navy">서술형</span></div>
+      <table class="rubric-table">
+        <thead><tr><th>항목</th><th>채점 기준</th><th>배점</th></tr></thead>
         <tbody>
-          <tr><td>나노미터</td><td>nm</td><td>10⁻⁹ m</td><td>분자, 나노기술</td></tr>
-          <tr><td>옹스트롬</td><td>Å</td><td>10⁻¹⁰ m</td><td>원자 반지름, 결합 길이</td></tr>
-          <tr><td>천문단위</td><td>AU</td><td>≈ 1.5 × 10¹¹ m</td><td>태양계 내 거리</td></tr>
-          <tr><td>광년</td><td>ly</td><td>≈ 9.46 × 10¹⁵ m</td><td>항성 간 거리</td></tr>
-          <tr><td>펨토초</td><td>fs</td><td>10⁻¹⁵ s</td><td>초고속 화학 반응</td></tr>
+          <tr><td>측정 방법 차이</td><td>분해능(파장 차이) 관점에서 명확히 서술, X선 예시 포함</td><td>상/중/하</td></tr>
+          <tr><td>오차 판단 기준</td><td>규모에 따른 오차 허용 범위 차이를 구체적 수치와 함께 서술</td><td>상/중/하</td></tr>
+          <tr><td>크기·시간 비례</td><td>크기 규모와 시간 규모가 비례함을 미시·거시 예시와 함께 서술</td><td>상/중/하</td></tr>
         </tbody>
       </table>
-      <div class="q-box" style="background:#fdf9f0; border-left-color:var(--amber);">
-        <p class="q-title">📝 세특 기록 Tip</p>
-        <p class="c-card-desc">"미시 세계와 거시 세계의 크기 차이를 분석하여 수소 원자와 우리은하의 규모 차이가 약 10²¹배임을 계산함. 이를 통해 규모에 따라 지배하는 물리 법칙(양자역학/뉴턴역학)이 달라짐을 탐구함."</p>
-      </div>
     </div>
-  </section>
+  </div>
 
-  <section class="section fade-in" id="s7">
-    <div class="section-header">
-      <div class="section-num">7</div><div class="section-title">최종 점검 체크리스트</div><div class="section-badge">Beta Science</div>
+  <!-- ⑥ 세특·수능 심화 -->
+  <div class="section fade-in" id="s-setech">
+    <div class="section__header">
+      <div class="section__header-left">
+        <div class="section__num">⑥</div>
+        <div class="section__title">세특 · 수능 심화</div>
+      </div>
+      <span class="section__badge">Beta Science</span>
     </div>
-    <div class="section-body">
+    <div class="section__body">
+
+      <!-- 단위 심화 -->
+      <div class="sub-title">📏 단위 심화 — 특수 단위 정리</div>
+      <div class="unit-grid">
+        <div class="unit-card">
+          <div class="unit-card__symbol">nm</div>
+          <div class="unit-card__name">나노미터</div>
+          <div class="unit-card__eq">1 nm = 10⁻⁹ m</div>
+          <div class="unit-card__use">원자·분자·나노 기술</div>
+        </div>
+        <div class="unit-card">
+          <div class="unit-card__symbol">Å</div>
+          <div class="unit-card__name">옹스트롬</div>
+          <div class="unit-card__eq">1 Å = 10⁻¹⁰ m</div>
+          <div class="unit-card__use">원자 반지름, 결합 길이</div>
+        </div>
+        <div class="unit-card">
+          <div class="unit-card__symbol">AU</div>
+          <div class="unit-card__name">천문단위</div>
+          <div class="unit-card__eq">1 AU ≈ 1.496×10¹¹ m</div>
+          <div class="unit-card__use">태양계 내 거리</div>
+        </div>
+        <div class="unit-card">
+          <div class="unit-card__symbol">ly</div>
+          <div class="unit-card__name">광년</div>
+          <div class="unit-card__eq">1 ly ≈ 9.46×10¹⁵ m</div>
+          <div class="unit-card__use">별 사이의 거리</div>
+        </div>
+        <div class="unit-card">
+          <div class="unit-card__symbol">pc</div>
+          <div class="unit-card__name">파섹</div>
+          <div class="unit-card__eq">1 pc ≈ 3.09×10¹⁶ m</div>
+          <div class="unit-card__use">은하 규모 거리</div>
+        </div>
+        <div class="unit-card">
+          <div class="unit-card__symbol">fs</div>
+          <div class="unit-card__name">펨토초</div>
+          <div class="unit-card__eq">1 fs = 10⁻¹⁵ s</div>
+          <div class="unit-card__use">화학 반응, 레이저 펄스</div>
+        </div>
+      </div>
+
+      <!-- 2028 수능 연계 -->
+      <div class="sub-title">🔗 연계 개념 — 2028 수능 통합과학 주목 포인트</div>
+      <div class="setech-ex setech-ex--navy">
+        <div class="setech-ex__label">📌 2028 수능 개편 핵심</div>
+        <div class="setech-ex__text">통합과학1의 '과학의 기초' 단원은 <strong>탐구 설계·수행·해석·해석 능력</strong>을 평가하는 수능 핵심 영역이 된다. 특히 <strong>규모(scale) 개념을 수치로 비교하고 측정 방법을 추론하는 문항</strong>이 출제 예상된다. ㄴ 선지처럼 "거시/미시 세계의 시간 규모 대소 비교" 함정 문제에 주의하자.</div>
+      </div>
+
+      <!-- 심화 지식 -->
+      <div class="sub-title">🚀 심화 지식</div>
+      <table class="adv-table">
+        <thead><tr><th>주제</th><th>핵심 내용</th><th>관련 탐구</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>X선 회절과 결정 구조</td>
+            <td>X선 회절법(브래그 법칙: 2d sinθ = nλ)으로 결정 내 원자 간 거리 측정. DNA 이중나선 구조 발견(왓슨·크릭)에도 X선 회절이 결정적 역할을 했다.</td>
+            <td>소금 결정 X선 회절 분석</td>
+          </tr>
+          <tr>
+            <td>도플러 효과와 천문 측정</td>
+            <td>빛의 도플러 효과로 별의 회전 속도를 측정, 은하 크기 추정에 활용. 적색편이(멀어짐), 청색편이(가까워짐)로 운동 방향도 판단.</td>
+            <td>은하 회전 곡선 분석</td>
+          </tr>
+          <tr>
+            <td>나노기술</td>
+            <td>1~100 nm 스케일을 다루는 기술. 반도체 소자(현재 3 nm 공정), 약물 전달 나노입자, 탄소 나노튜브 등에 활용. 미시 세계 이해가 핵심.</td>
+            <td>나노소재 탐구</td>
+          </tr>
+          <tr>
+            <td>우주 거리 사다리</td>
+            <td>거리에 따라 다른 측정 방법 사용: 레이더(태양계) → 연주시차(가까운 별) → 세페이드 변광성(먼 별) → 초신성(은하 간 거리). 각 방법의 한계 거리가 다르다.</td>
+            <td>연주시차 계산</td>
+          </tr>
+          <tr>
+            <td>페르미 추정</td>
+            <td>정확한 측정 없이 규모를 어림하는 방법. 예: "서울 시내 피아노 조율사 수는?" 과학적 사고력과 규모 감각을 키울 수 있어 수능 서술형에 자주 등장.</td>
+            <td>규모 추정 탐구</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 세특 서술 예시 -->
+      <div class="sub-title">📝 세특 서술 예시</div>
+      <div class="setech-ex setech-ex--beige">
+        <div class="setech-ex__label">✅ 베타과학학원 | 세특 기재 예시 ① (탐구 능력 강조)</div>
+        <div class="setech-ex__title">세특 기재 예시 ① (탐구 능력 강조)</div>
+        <div class="setech-ex__text">미시 세계와 거시 세계의 크기 비교 탐구 활동에서 수소 원자(~10⁻¹⁰ m)와 우리은하(~10²¹ m)의 측정 방법 차이를 과학적으로 분석함. X선 회절법과 공전 반경 추정법의 원리를 정확히 이해하고, 탐구 대상의 규모에 따라 측정 방법과 오차 허용 범위가 달라진다는 핵심 원리를 스스로 도출함. <strong>크기 규모와 시간 규모가 비례함을 수치 사례를 들어 논리적으로 설명하여 과학적 사고력이 우수함.</strong></div>
+      </div>
+      <div class="setech-ex setech-ex--green">
+        <div class="setech-ex__label">✅ 베타과학학원 | 세특 기재 예시 ② (모둠 활동·의사소통 강조)</div>
+        <div class="setech-ex__title">세특 기재 예시 ② (모둠 활동·의사소통 강조)</div>
+        <div class="setech-ex__text">모둠 토의에서 미시 세계와 거시 세계의 측정 방법 차이에 대해 주도적으로 의견을 제시함. 시뮬레이션을 활용해 수소 원자부터 우리은하까지 약 31자리에 달하는 크기 차이를 시각적으로 파악하고, 측정 오차의 개념을 규모와 연결하여 팀원들에게 명확하게 설명하는 의사소통 능력을 발휘함. <strong>자연 세계의 다양한 규모를 올바르게 기술해야 하는 필요성을 인식하고 과학적 엄밀성의 중요성을 체득함.</strong></div>
+      </div>
+      <div class="setech-ex setech-ex--navy">
+        <div class="setech-ex__label">✅ 베타과학학원 | 세특 기재 예시 ③ (개념 연계·심화)</div>
+        <div class="setech-ex__title">세특 기재 예시 ③ (개념 연계·심화 탐구)</div>
+        <div class="setech-ex__text">미시·거시 세계 탐구에서 그치지 않고 X선 회절법의 원리(브래그 법칙)와 공전 반경 추정법(도플러 효과)까지 자발적으로 탐구하여 심화 이해를 도모함. 페르미 추정을 활용한 규모 어림 활동에서 창의적 접근을 보였으며, <strong>나노기술과 천문학적 거리 측정이라는 현대 과학 기술과의 연계 탐구를 통해 과학의 실용적 가치와 탐구의 즐거움을 동시에 체득함.</strong></div>
+      </div>
+
+      <!-- 점검하기 표 -->
+      <div class="sub-title">📋 점검하기 — 학습 목표 체크</div>
+      <table class="rubric-table">
+        <thead><tr><th>평가 영역</th><th>점검 문항</th><th>달성 여부</th></tr></thead>
+        <tbody>
+          <tr><td>지식·이해</td><td>미시 세계와 거시 세계의 차이점을 설명할 수 있나요?</td><td>□ 완전 이해 &nbsp; □ 보완 필요</td></tr>
+          <tr><td>과정·기능</td><td>공간 규모의 크기에 따른 차이점을 분석하고 설명했나요?</td><td>□ 완전 이해 &nbsp; □ 보완 필요</td></tr>
+          <tr><td>가치·태도</td><td>자연 현상을 올바르게 기술해야 하는 필요성을 인식했나요?</td><td>□ 완전 이해 &nbsp; □ 보완 필요</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ⑦ 최종 체크리스트 -->
+  <div class="section fade-in" id="s-checklist">
+    <div class="section__header">
+      <div class="section__header-left">
+        <div class="section__num">⑦</div>
+        <div class="section__title">최종 점검 체크리스트</div>
+      </div>
+      <span class="section__badge">Beta Science</span>
+    </div>
+    <div class="section__body">
+      <div class="point-box" style="margin-bottom:1rem; margin-top:0;">✅ 아래 항목을 모두 체크하면 이번 학습 활동 완벽 대비 완료! 에이원 마스터 기준: 위 10개 항목을 모두 체크했다면 이 단원 완벽 정복! 다음 단원으로 넘어가세요.</div>
       <div class="check-progress">
-        <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progressBar" style="width:0%"></div>
+        </div>
         <div class="progress-text" id="progressText">0 / 10</div>
       </div>
-      <div class="checklist-wrap">
-        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>미시 세계와 거시 세계의 정의를 각각 말할 수 있다.</span></div>
-        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>수소 원자의 크기를 측정하는 방법(X선 회절법)을 안다.</span></div>
-        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>우리은하의 크기를 추정하는 방법을 설명할 수 있다.</span></div>
-        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>미시 세계와 거시 세계에서 측정 방법이 다른 이유를 서술한다.</span></div>
-        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>크기 규모와 시간 규모가 대체로 비례함을 이해한다.</span></div>
-        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>측정 오차의 허용 범위가 규모에 따라 달라짐을 안다.</span></div>
-        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>nm, Å, AU, ly, fs 등 특수 단위를 SI 단위로 변환한다.</span></div>
-        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>수능 유형 문제에서 보기의 참·거짓을 판별할 수 있다.</span></div>
-        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>탐구 결과를 세특에 활용할 핵심 문장을 작성할 수 있다.</span></div>
-        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span>교과서 점검 항목 3가지를 모두 달성했다.</span></div>
-      </div>
-      <div class="q-box" style="margin-top:20px; border-left:none; background:#fffdf0; border:1px solid #ffecb3;">
-        🏆 <strong>베타 마스터 기준:</strong> 위 10개 항목을 모두 체크했다면 이 단원 완벽 정복!
-      </div>
+      <ul class="checklist">
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">미시 세계와 거시 세계의 정의를 각각 말할 수 있다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">수소 원자의 크기를 측정하는 방법(X선 회절법)의 원리를 설명할 수 있다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">우리은하의 크기를 추정하는 방법(공전 반경 추정법)을 설명할 수 있다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">미시 세계와 거시 세계에서 측정 방법이 다른 이유를 서술할 수 있다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">크기 규모와 시간 규모가 대체로 비례함을 사례를 들어 설명할 수 있다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">측정 오차의 허용 범위가 규모에 따라 다르게 판단됨을 이해한다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">nm, Å, AU, ly, fs 등 특수 단위를 SI 단위(m, s)로 변환할 수 있다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">수능 유형 문제에서 '보기' 선택지의 참·거짓을 정확히 판별할 수 있다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">탐구 활동 결과를 세특에 활용할 수 있는 핵심 문장을 작성할 수 있다.</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">교과서 점검하기(지식·이해 / 과정·기능 / 가치·태도) 3가지 항목을 모두 달성했다.</div></li>
+      </ul>
     </div>
-  </section>
+  </div>
 
 </div>
 
+<!-- FOOTER -->
 <footer>
-  <div class="footer-logo">베타과학학원 | Beta Science Academy</div>
-  <div class="footer-sub">내신 · 수능 · 수행 · 탐구 · 세특 — 과학에 대한 준비는 이제 완벽합니다!</div>
-  <p style="font-size:10px; margin-top:20px; opacity:0.4;">본 자료는 베타과학학원 전용 학습자료입니다. 무단 배포를 금합니다.</p>
+  <div class="footer__logo">베타과학학원 | Beta Science Academy</div>
+  <div class="footer__sub">내신 · 수능 · 수행 · 탐구 · 세특 — 과학에 대한 준비는 이제 완벽합니다!</div>
 </footer>
 
 <script>
-function goTo(id){
+/* ── 스크롤 진행바 ── */
+window.addEventListener('scroll', () => {
+  const el = document.documentElement;
+  const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+  document.getElementById('readProgress').style.width = pct + '%';
+});
+
+/* ── 탭 네비게이션 ── */
+function goTo(id) {
   const el = document.getElementById(id);
-  if(el) window.scrollTo({top: el.offsetTop - 110, behavior: 'smooth'});
+  if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 110, behavior: 'smooth' });
 }
+const tabs = document.querySelectorAll('.tab');
+const secs = ['s-overview','s-concept','s-measure','s-scale','s-problems','s-setech','s-checklist'];
+window.addEventListener('scroll', () => {
+  let cur = 0;
+  secs.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top < 160) cur = i;
+  });
+  tabs.forEach((t, i) => t.classList.toggle('active', i === cur));
+});
 
-function reveal(btn) {
-  const ans = btn.nextElementSibling;
-  ans.style.display = (ans.style.display === 'block') ? 'none' : 'block';
-  btn.textContent = (ans.style.display === 'block') ? '정답 숨기기' : '정답 확인';
-}
-
-function toggleCheck(item){
+/* ── 체크리스트 ── */
+function toggleCheck(item) {
   item.classList.toggle('checked');
   const all = document.querySelectorAll('.check-item');
   const chk = document.querySelectorAll('.check-item.checked').length;
-  document.getElementById('progressBar').style.width = (chk / all.length * 100) + '%';
+  document.getElementById('progressBar').style.width = Math.round(chk / all.length * 100) + '%';
   document.getElementById('progressText').textContent = chk + ' / ' + all.length;
 }
 
+/* ── fade-in ── */
 const obs = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if(entry.isIntersecting) entry.target.classList.add('visible');
+  entries.forEach((en, i) => {
+    if (en.isIntersecting) {
+      setTimeout(() => en.target.classList.add('visible'), i * 100);
+      obs.unobserve(en.target);
+    }
   });
-}, {threshold: 0.1});
+}, { threshold: 0.08 });
 document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
 
-// 탭 활성화 로직
-window.addEventListener('scroll', () => {
-  const sections = ['s1', 's2', 's3', 's4', 's5', 's6', 's7'];
-  const tabs = document.querySelectorAll('.tab');
-  let current = 0;
-  sections.forEach((id, i) => {
-    const el = document.getElementById(id);
-    if(el && window.pageYOffset >= el.offsetTop - 150) current = i;
+/* ── 비례 막대 애니메이션 ── */
+const propObs = new IntersectionObserver((entries) => {
+  entries.forEach(en => {
+    if (en.isIntersecting) {
+      en.target.querySelectorAll('.proportion-bar').forEach(bar => {
+        bar.style.width = bar.dataset.width;
+      });
+      propObs.unobserve(en.target);
+    }
   });
-  tabs.forEach((tab, i) => tab.classList.toggle('active', i === current));
-});
+}, { threshold: 0.2 });
+const propBox = document.getElementById('proportionBox');
+if (propBox) propObs.observe(propBox);
 </script>
 </body>
 </html>
