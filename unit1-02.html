@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미시 세계와 거시 세계 | 베타과학학원</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
+
+:root {
+  /* 원장님이 처음 보내주신 네이비 색상 체계 적용 */
+  --n1: #1B2B5E;   /* 딥 네이비 */
+  --n2: #2E4FA3;   /* 미디엄 블루 */
+  --n3: #4F73D4;   /* 브라이트 블루 */
+  --n-pale: #EEF2FB;
+  --n-soft: #D6DFF5;
+  --n-mid: #B0C0E8;
+
+  --bg: #FFFFFF;
+  --bg2: #F5F7FD;
+  --bg3: #EEF2FB;
+
+  --text: #1A1F36;
+  --text2: #4A5070;
+  --text3: #8A90AA;
+
+  --border: #DDE2F0;
+  --green: #10B981;
+  --amber: #F59E0B;
+  --rose: #F43F5E;
+
+  --shadow: 0 2px 12px rgba(27,43,94,0.08);
+  --shadow-m: 0 4px 20px rgba(27,43,94,0.13);
+  --radius: 14px;
+  --font: 'Noto Sans KR', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg2); color: var(--text); overflow-x: hidden; line-height: 1.7; }
+
+/* ── topbar ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--n1);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.6rem 2rem;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.2);
+}
+.topbar-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+.topbar-logo-icon { font-size: 18px; }
+.topbar-logo-text { font-size: 14px; font-weight: 700; color: #fff; }
+.btn-print {
+  background: var(--amber); border: none; color: #000;
+  font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 6px; cursor: pointer;
+}
+
+/* ── hero ── */
+.hero {
+  background: linear-gradient(180deg, var(--n1) 0%, var(--n2) 100%);
+  padding: 4rem 2rem; text-align: center; color: #fff;
+}
+.hero-title-main { font-size: 28px; font-weight: 900; color: var(--amber); margin-bottom: 8px; }
+.hero-title-sub { font-size: 22px; font-weight: 700; margin-bottom: 15px; }
+.hero-breadcrumb { font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 25px; }
+.hero-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.hbadge {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);
+  padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: 600;
+}
+
+/* ── main content ── */
+.main { max-width: 1000px; margin: -30px auto 50px; padding: 0 1.5rem; }
+.section { 
+  background: #fff; border-radius: var(--radius); margin-bottom: 2rem; 
+  box-shadow: var(--shadow); overflow: hidden; border: 1px solid var(--border);
+}
+.section-header {
+  background: var(--n2); color: #fff; padding: 1rem 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.section-title { font-size: 16px; font-weight: 800; }
+.section-body { padding: 1.5rem; }
+
+/* ── tables ── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; border: 1px solid var(--border); }
+.data-table th { background: var(--bg2); color: var(--n1); padding: 12px; font-weight: 700; text-align: left; border-bottom: 2px solid var(--n-soft); }
+.data-table td { padding: 12px; border-bottom: 1px solid var(--border); }
+.tag-micro { background: var(--n-pale); color: var(--n2); padding: 2px 8px; border-radius: 4px; font-weight: 700; }
+
+/* ── boxes ── */
+.q-box { background: var(--bg2); border: 1px solid var(--n-soft); border-radius: 10px; padding: 1.2rem; margin-bottom: 1rem; }
+.answer-box { background: #F0FDF4; border: 1px solid #A7F3D0; border-radius: 10px; padding: 1.2rem; color: #065F46; }
+
+/* ── checklist ── */
+.checklist { list-style: none; }
+.check-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+.check-box { width: 20px; height: 20px; border: 2px solid var(--n-soft); border-radius: 4px; flex-shrink: 0; }
+.check-item.checked .check-box { background: var(--n2); border-color: var(--n2); position: relative; }
+.check-item.checked .check-box::after { content: '✓'; color: #fff; position: absolute; left: 3px; top: -2px; font-weight: 900; }
+
+/* ── footer ── */
+footer { background: var(--n1); color: #fff; padding: 3rem 2rem; text-align: center; }
+.footer-logo { font-size: 18px; font-weight: 800; margin-bottom: 10px; }
+.footer-sub { font-size: 12px; color: rgba(255,255,255,0.5); }
+
+@media(max-width: 600px) {
+  .hero-title-main { font-size: 20px; }
+  .hero-title-sub { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="topbar-logo" href="#">
+    <span class="topbar-logo-icon">🔬</span>
+    <span class="topbar-logo-text">베타과학학원 | Beta Science Academy | 목동 과학 전문</span>
+  </a>
+  <button class="btn-print" onclick="window.print()">PDF / 인쇄 (A4)</button>
+</div>
+
+<div class="hero">
+  <div class="hero-title-main">베타과학학원</div>
+  <div class="hero-breadcrumb">A1 Science Academy · 목동 과학 전문</div>
+  <div class="hero-title-sub">🔬 통합과학 I | 미시 세계와 거시 세계<br>완벽대비 학습자료</div>
+  <div class="hero-breadcrumb">I. 과학의 기초 > 01. 과학의 기본량 > 1. 시간과 공간 (교과서 17쪽 · 2/5차시)</div>
+  <div class="hero-badges">
+    <span class="hbadge">📚 내신 대비</span>
+    <span class="hbadge">🎯 수능 대비</span>
+    <span class="hbadge">✏️ 수행평가</span>
+    <span class="hbadge">🔬 탐구 활동</span>
+    <span class="hbadge">📝 세특 대비</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="section" id="s-overview">
+    <div class="section-header">
+      <div class="section-title">① 탐구 활동 개요</div>
+      <span style="font-size: 11px; background: var(--amber); color: #000; padding: 2px 8px; border-radius: 4px; font-weight: 700;">Beta Science Academy</span>
+    </div>
+    <div class="section-body">
+      <table class="data-table">
+        <tr><th style="width: 150px;">대단원</th><td>I. 과학의 기초</td><th style="width: 150px;">교과서</th><td>17쪽</td></tr>
+        <tr><th>중단원</th><td>과학의 기본량</td><th>배정 시간</th><td>50분 (2/5차시)</td></tr>
+        <tr><th>소단원</th><td>1. 시간과 공간</td><td colspan="2"></td></tr>
+        <tr><th>탐구 목표</th><td colspan="3">미시 세계와 거시 세계에서 물체의 크기에 따른 차이점을 분석할 수 있다.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-title">② 미시 vs 거시 세계 비교</div></div>
+    <div class="section-body">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div class="q-box" style="border-top: 4px solid var(--n3);">
+          <h4 style="margin-bottom: 10px;">🔬 미시 세계</h4>
+          <p style="font-size: 13px; color: var(--text2);">대표 물체: 수소 원자, DNA, 세포<br>크기 범위: 약 10⁻¹⁵ ~ 10⁻⁷ m<br>지배 원리: 양자역학</p>
+        </div>
+        <div class="q-box" style="border-top: 4px solid var(--amber);">
+          <h4 style="margin-bottom: 10px;">🌌 거시 세계</h4>
+          <p style="font-size: 13px; color: var(--text2);">대표 물체: 사람, 지구, 태양, 은하<br>크기 범위: 약 10⁰ ~ 10²⁶ m<br>지배 원리: 뉴턴 역학</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-title">④ 결과 및 정리 — 논술 모범 답안</div></div>
+    <div class="section-body">
+      <div class="q-box">
+        <p style="font-weight: 700; margin-bottom: 8px;">Q1. 미시 세계와 거시 세계의 측정 방법이 다른 까닭은 무엇인가?</p>
+        <p style="font-size: 13px; color: var(--text2);">자연 현상의 규모가 매우 다양하며, 규모에 따라 탐구 대상의 측정 방법이 달라지기 때문이다. 미시 세계는 일반적인 도구로는 측정 불가능하여 X선이나 전자현미경 같은 특수 장비가 필요하다.</p>
+      </div>
+      <div class="answer-box">
+        <p style="font-weight: 800; margin-bottom: 5px;">✅ 베타과학학원 모범 답안</p>
+        <p style="font-size: 13px;">크기 규모가 매우 작거나 큰 경우에는 변화의 정도가 나타나는 시간 규모도 대체로 크기에 비례하여 나타난다. 미시 세계의 변화는 극히 짧은 시간에 일어나며, 거시 세계의 변화는 수백만 년에 걸쳐 일어난다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-title">⑧ 최종 점검 체크리스트</div></div>
+    <div class="section-body">
+      <ul class="checklist">
+        <li class="check-item" onclick="this.classList.toggle('checked')"><div class="check-box"></div><div class="check-label">미시 세계와 거시 세계의 정의를 각각 말할 수 있다.</div></li>
+        <li class="check-item" onclick="this.classList.toggle('checked')"><div class="check-box"></div><div class="check-label">수소 원자의 크기를 측정하는 방법(X선 회절법)을 설명할 수 있다.</div></li>
+        <li class="check-item" onclick="this.classList.toggle('checked')"><div class="check-box"></div><div class="check-label">미시 세계와 거시 세계에서 측정 방법이 다른 이유를 서술할 수 있다.</div></li>
+        <li class="check-item" onclick="this.classList.toggle('checked')"><div class="check-box"></div><div class="check-label">특수 단위를 SI 단위(m, s)로 변환할 수 있다.</div></li>
+      </ul>
+      <div style="margin-top: 20px; background: #FFFBEB; padding: 15px; border-radius: 8px; font-size: 13px; border: 1px solid #FEF3C7;">
+        🏆 <strong>베타 마스터 기준:</strong> 위 항목을 모두 체크했다면 이 단원 완벽 정복! 다음 단원으로 넘어가세요.
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">베타과학학원</div>
+  <div class="footer-sub">Beta Science Academy · 목동 과학 전문</div>
+  <p style="font-size: 12px; color: var(--amber); margin-top: 15px;">내신 · 수능 · 수행 · 탐구 · 세특 — 과학에 대한 준비는 이제 완벽합니다!</p>
+  <p style="font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 10px;">본 자료는 베타과학학원 전용 학습자료입니다. 무단 복제 및 배포를 금합니다.</p>
+</footer>
+
+</body>
+</html>
