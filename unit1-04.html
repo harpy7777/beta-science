@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>신호와 정보 완벽대비 | 베타과학학원</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --n1:        #1B2B5E;
+  --n2:        #2E4FA3;
+  --n3:        #4F73D4;
+  --n-pale:    #EEF2FB;
+  --n-soft:    #D6DFF5;
+  --n-mid:     #B0C0E8;
+  --bg:        #FFFFFF;
+  --bg2:       #F5F7FD;
+  --bg3:       #EEF2FB;
+  --text:      #1A1F36;
+  --text2:     #4A5070;
+  --text3:     #8A90AA;
+  --border:    #DDE2F0;
+  --green:     #10B981;
+  --green-pale:#ECFDF5;
+  --green-b:   #A7F3D0;
+  --amber:     #F59E0B;
+  --amber-pale:#FFFBEB;
+  --amber-b:   #FDE68A;
+  --beige:     #FAF7F2;
+  --beige-b:   #E8DDD0;
+  --beige-acc: #C4A882;
+  --shadow:    0 2px 12px rgba(27,43,94,0.08);
+  --shadow-m:  0 4px 20px rgba(27,43,94,0.13);
+  --radius:    14px;
+  --font:      'Noto Sans KR', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); overflow-x: hidden; line-height: 1.7; }
+
+/* ── TOPBAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.97); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.7rem 2rem;
+  box-shadow: 0 1px 8px rgba(27,43,94,0.07);
+}
+.topbar-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+.topbar-logo-icon {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--n1), var(--n2));
+  border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.topbar-logo-text { font-size: 13px; font-weight: 800; color: var(--n1); }
+.topbar-logo-sub  { font-size: 10px; color: var(--text3); }
+.topbar-btns { display: flex; gap: 8px; }
+.btn-print {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg3); border: 1px solid var(--n-soft);
+  color: var(--n2); font-size: 12px; font-weight: 700;
+  padding: 7px 14px; border-radius: 8px; cursor: pointer;
+  font-family: var(--font); transition: all .2s;
+}
+.btn-print:hover { background: var(--n-soft); }
+.btn-test {
+  display: flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, var(--n1), var(--n2));
+  border: none; color: #fff; font-size: 12px; font-weight: 700;
+  padding: 7px 16px; border-radius: 8px; cursor: pointer;
+  font-family: var(--font); transition: all .2s;
+  box-shadow: 0 2px 10px rgba(27,43,94,0.25);
+}
+.btn-test:hover { background: linear-gradient(135deg, var(--n2), var(--n3)); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(27,43,94,0.3); }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, var(--n1) 0%, var(--n2) 55%, var(--n3) 100%);
+  padding: 3.5rem 2rem 3rem; text-align: center;
+  position: relative; overflow: hidden;
+}
+.hero::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 4px; background: linear-gradient(90deg, var(--n3), var(--n-mid), var(--n3));
+}
+.hero-top    { font-size: 13px; color: rgba(255,255,255,0.55); margin-bottom: 0.5rem; font-weight: 500; letter-spacing: .03em; }
+.hero-title  { font-size: clamp(1.9rem, 4.5vw, 3rem); font-weight: 900; color: #fff; line-height: 1.15; margin-bottom: 1.2rem; }
+.hero-title span { color: var(--n-mid); }
+.hero-tagline { font-size: 13px; color: rgba(255,255,255,0.55); margin-bottom: 1.75rem; }
+.hero-badge-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.hbadge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 16px; border-radius: 100px;
+  font-size: 13px; font-weight: 600;
+  border: 1.5px solid transparent; cursor: default;
+  transition: background .2s;
+}
+.hb-blue   { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.35); color: rgba(255,255,255,0.95); }
+.hb-red    { background: rgba(239,68,68,0.18);   border-color: rgba(239,68,68,0.4);   color: #FCA5A5; }
+.hb-green  { background: rgba(16,185,129,0.18);  border-color: rgba(16,185,129,0.4);  color: #6EE7B7; }
+.hb-amber  { background: rgba(245,158,11,0.22);  border-color: rgba(245,158,11,0.4);  color: #FCD34D; }
+.hb-purple { background: rgba(139,92,246,0.2);   border-color: rgba(139,92,246,0.4);  color: #C4B5FD; }
+
+/* ── TABS ── */
+.tabs-wrap {
+  position: sticky; top: 49px; z-index: 90;
+  background: #fff; border-bottom: 2px solid var(--border);
+  box-shadow: 0 2px 8px rgba(27,43,94,0.05);
+}
+.tabs {
+  display: flex; justify-content: center; gap: 2px;
+  padding: 0.4rem 1rem; max-width: 900px; margin: 0 auto; overflow-x: auto;
+}
+.tab {
+  padding: 7px 15px; border-radius: 8px 8px 0 0;
+  font-size: 13px; font-weight: 600; color: var(--text3);
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+  border: none; background: transparent; font-family: var(--font);
+}
+.tab:hover  { color: var(--n2); background: var(--bg3); }
+.tab.active { color: var(--n2); background: var(--n-pale); border-bottom: 2px solid var(--n2); }
+
+/* ── READ PROGRESS ── */
+.read-progress {
+  position: fixed; top: 0; left: 0; z-index: 200;
+  height: 3px; width: 0%;
+  background: linear-gradient(90deg, var(--n3), var(--green));
+  transition: width .1s linear;
+}
+
+/* ── MAIN ── */
+.main { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+
+/* ── SECTION ── */
+.section { margin-bottom: 1.75rem; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.section-header {
+  background: linear-gradient(135deg, var(--n1) 0%, var(--n2) 100%);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.9rem 1.5rem;
+}
+.section-header-left { display: flex; align-items: center; gap: 10px; }
+.section-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: #fff;
+}
+.section-title { font-size: 14px; font-weight: 800; color: #fff; }
+.section-badge {
+  font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
+  background: rgba(255,255,255,0.18); color: rgba(255,255,255,0.95);
+  border: 1px solid rgba(255,255,255,0.28);
+}
+.section-body { background: #fff; padding: 1.5rem; }
+
+/* ── OVERVIEW LIST ── */
+.overview-list { list-style: none; border-left: 3px solid var(--n3); padding-left: 1.1rem; }
+.overview-list li {
+  font-size: 13px; color: var(--text); padding: 5px 0;
+  border-bottom: 1px solid var(--border); line-height: 1.7;
+}
+.overview-list li:last-child { border-bottom: none; }
+.overview-list li strong { color: var(--n1); font-weight: 700; }
+
+/* ── SUB TITLE ── */
+.sub-title {
+  font-size: 13px; font-weight: 800; color: var(--n1);
+  margin: 1.25rem 0 0.75rem;
+  display: flex; align-items: center; gap: 8px;
+  padding-bottom: 6px; border-bottom: 2px solid var(--n-pale);
+}
+
+/* ── CONCEPT GRID ── */
+.concept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.25rem; }
+.concept-card {
+  border-radius: 10px; padding: 1.1rem 1.2rem;
+  background: var(--bg2); border: 1px solid var(--border); border-top: 3px solid var(--n2);
+  transition: box-shadow .2s, transform .2s; text-align: center;
+}
+.concept-card:hover { box-shadow: var(--shadow-m); transform: translateY(-2px); }
+.concept-card-title { font-size: 14px; font-weight: 700; color: var(--n1); margin-bottom: 8px; }
+.concept-card-hl    { display: inline; background: #FEF08A; border-radius: 3px; padding: 0 2px; }
+.concept-card-desc  { font-size: 13px; color: var(--text2); line-height: 1.75; }
+.concept-card-desc strong { color: var(--text); font-weight: 700; }
+/* amber variant */
+.concept-card.amber { border-top-color: var(--amber); }
+/* green variant */
+.concept-card.green { border-top-color: var(--green); }
+/* rose variant */
+.concept-card.rose  { border-top-color: #F43F5E; }
+
+/* ── COMPARE GRID (뛸 때 / 자전거) ── */
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+.compare-card { border-radius: 10px; padding: 1.1rem; }
+.compare-card.blue {
+  background: var(--n-pale); border: 1px solid var(--n-soft); border-top: 3px solid var(--n2);
+}
+.compare-card.amber {
+  background: var(--amber-pale); border: 1px solid var(--amber-b); border-top: 3px solid var(--amber);
+}
+.compare-card-title {
+  font-size: 14px; font-weight: 800; margin-bottom: 10px; text-align: center;
+}
+.compare-card.blue  .compare-card-title { color: var(--n1); }
+.compare-card.amber .compare-card-title { color: #78350F; }
+.compare-list { list-style: none; }
+.compare-list li {
+  font-size: 13px; padding: 4px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  color: var(--text2); display: flex; gap: 6px;
+}
+.compare-list li:last-child { border-bottom: none; }
+.compare-list li::before { content: '•'; font-size: 11px; flex-shrink: 0; margin-top: 3px; }
+.compare-card.blue  .compare-list li::before { color: var(--n3); }
+.compare-card.amber .compare-list li::before { color: var(--amber); }
+.compare-list li strong { font-weight: 700; }
+.compare-card.blue  .compare-list li strong { color: var(--n1); }
+.compare-card.amber .compare-list li strong { color: #78350F; }
+
+/* ── PROCESS STEPS ── */
+.process-box {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-left: 4px solid var(--n2);
+  border-radius: 10px; padding: 1.1rem 1.25rem; margin-bottom: 1.25rem;
+}
+.process-box-title { font-size: 13px; font-weight: 800; color: var(--n1); margin-bottom: 10px; }
+.process-steps { list-style: none; counter-reset: pstep; }
+.process-steps li {
+  counter-increment: pstep;
+  font-size: 13px; color: var(--text2); padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex; gap: 10px; line-height: 1.6;
+}
+.process-steps li:last-child { border-bottom: none; }
+.process-steps li::before {
+  content: counter(pstep) ".";
+  color: var(--n2); font-weight: 800; font-size: 13px; flex-shrink: 0;
+}
+
+/* ── DATA TABLE ── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 1rem; }
+.data-table thead th {
+  background: linear-gradient(90deg, var(--n1), var(--n2));
+  color: #fff; padding: 0.7rem 1rem; font-weight: 700; text-align: center;
+}
+.data-table td {
+  padding: 0.65rem 1rem; border-bottom: 1px solid var(--border);
+  color: var(--text); text-align: center; font-size: 13px;
+}
+.data-table tbody tr:nth-child(even) td { background: var(--bg2); }
+.data-table tbody tr:hover td { background: var(--n-pale); }
+.data-table td:first-child { font-weight: 700; color: var(--n1); text-align: center; }
+
+/* ── QA ── */
+.qa-item { margin-bottom: 1.25rem; }
+.qa-q { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1.7; }
+.qa-answer-box {
+  background: var(--green-pale); border: 1px solid var(--green-b);
+  border-left: 4px solid var(--green);
+  border-radius: 8px; padding: 0.9rem 1.1rem;
+}
+.qa-answer-header {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; font-weight: 700; color: #059669; margin-bottom: 6px;
+}
+.qa-answer-header span { color: var(--text3); font-weight: 500; }
+.qa-answer-text { font-size: 13px; color: var(--text2); line-height: 1.9; }
+.qa-answer-text strong { color: #065F46; font-weight: 700; }
+
+/* ── OX / 단답형 ── */
+.problem-box {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.1rem 1.25rem; margin-bottom: 1rem;
+}
+.problem-box-label {
+  font-size: 12px; font-weight: 700; color: var(--n2); margin-bottom: 8px;
+}
+.problem-q  { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.75; margin-bottom: 10px; }
+.answer-reveal {
+  background: #fff; border: 1px solid var(--border);
+  border-left: 3px solid var(--n3);
+  border-radius: 8px; padding: 0.75rem 1rem;
+  font-size: 13px; color: var(--text2); line-height: 1.8;
+}
+.answer-reveal .ans-label { font-weight: 800; margin-right: 4px; }
+.ans-x   { color: #DC2626; }
+.ans-o   { color: #16A34A; }
+.ans-blk { color: var(--n2); }
+
+/* ── SETECH BOX ── */
+.setech-wrap {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+}
+.setech-deep-title {
+  font-size: 14px; font-weight: 800; color: var(--n1);
+  display: flex; align-items: center; gap: 7px; margin-bottom: 10px;
+}
+.setech-deep-body { font-size: 13px; color: var(--text2); line-height: 1.9; }
+.setech-deep-body strong { color: var(--text); font-weight: 700; }
+
+.setech-quote {
+  background: var(--beige); border: 1px solid var(--beige-b);
+  border-left: 4px solid var(--beige-acc);
+  border-radius: 8px; padding: 1rem 1.25rem; margin-top: 1rem;
+}
+.setech-quote-header {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; font-weight: 700; color: #8B6A3A; margin-bottom: 8px;
+}
+.setech-quote-header span { color: var(--n2); font-weight: 700; }
+.setech-quote-text {
+  font-size: 13px; color: #5C4A2A; line-height: 1.95; font-style: italic;
+}
+
+/* ── CHECKLIST ── */
+.check-progress {
+  background: var(--n-pale); border-radius: 8px;
+  padding: 0.8rem 1rem; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.progress-bar-wrap { flex: 1; height: 6px; background: var(--n-soft); border-radius: 3px; overflow: hidden; }
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--n1), var(--n2), var(--n3));
+  border-radius: 3px; transition: width .4s;
+}
+.progress-text { font-size: 12px; color: var(--n1); font-weight: 700; white-space: nowrap; }
+.checklist { list-style: none; }
+.check-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 0.7rem 0.5rem; border-bottom: 1px solid var(--border);
+  cursor: pointer; border-radius: 6px; transition: background .15s;
+}
+.check-item:hover  { background: var(--bg2); }
+.check-item:last-child { border-bottom: none; }
+.check-box {
+  width: 18px; height: 18px; border: 2px solid var(--n3);
+  border-radius: 4px; flex-shrink: 0; margin-top: 2px;
+  transition: all .2s; display: flex; align-items: center; justify-content: center;
+}
+.check-item.checked .check-box { background: linear-gradient(135deg, var(--n2), var(--n3)); border-color: var(--n2); }
+.check-item.checked .check-box::after { content: '✓'; color: #fff; font-size: 11px; font-weight: 800; }
+.check-label { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.check-item.checked .check-label { color: var(--text3); text-decoration: line-through; }
+
+/* ── FOOTER ── */
+footer { background: linear-gradient(135deg, var(--n1), var(--n2)); padding: 2rem; text-align: center; }
+.footer-logo { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+.footer-sub  { font-size: 12px; color: rgba(255,255,255,0.5); }
+
+/* ── FADE-IN ── */
+.fade-in { opacity: 0; transform: translateY(14px); transition: opacity .5s ease, transform .5s ease; }
+.fade-in.visible { opacity: 1; transform: none; }
+
+/* ── RESPONSIVE ── */
+@media(max-width: 680px) {
+  .topbar { padding: .65rem 1rem; }
+  .hero   { padding: 2.5rem 1rem 2rem; }
+  .main   { padding: 1.5rem 1rem 4rem; }
+  .concept-grid, .compare-grid { grid-template-columns: 1fr; }
+  .tabs   { justify-content: flex-start; }
+  .section-body { padding: 1rem; }
+  .btn-print span { display: none; }
+}
+@media print {
+  .topbar, .tabs-wrap, .read-progress { display: none !important; }
+  .section { box-shadow: none !important; break-inside: avoid; }
+  .fade-in { opacity: 1 !important; transform: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="read-progress" id="readProgress"></div>
+
+<!-- ── TOPBAR ── -->
+<div class="topbar">
+  <a class="topbar-logo" href="science.html">
+    <div class="topbar-logo-icon">🔬</div>
+    <div>
+      <div class="topbar-logo-text">베타과학학원</div>
+      <div class="topbar-logo-sub">Beta Science Academy</div>
+    </div>
+  </a>
+  <div class="topbar-btns">
+    <button class="btn-print" onclick="window.print()">🖨️ <span>PDF / 인쇄 (A4)</span></button>
+    <button class="btn-test">✏️ 테스트 출력하기</button>
+  </div>
+</div>
+
+<!-- ── HERO ── -->
+
+<div class="hero">
+
+  <div class="hero-breadcrumb">
+
+    베타과학학원 | Beta Science Academy | 과학 전문<br>
+
+  
+  </div>
+
+  <h1 class="hero-title">통합과학 1-2. <br> 
+신호와 정보 완벽대비</h1>
+
+  <div class="hero-tagline">내신 · 수능 · 수행 · 탐구 · 세특 — 과학에 대한 준비는 이제 완벽합니다!</div>
+
+  <div class="hero-badge-row">
+
+    <span class="hbadge hb-w">📚 내신 대비</span>
+
+    <span class="hbadge hb-w">🎯 수능 대비</span>
+
+    <span class="hbadge hb-w">✏️ 수행평가</span>
+
+    <span class="hbadge hb-w">🔬 탐구 활동</span>
+
+    <span class="hbadge hb-w">✍️ 세특 대비</span>
+
+  </div>
+
+</div>
+
+
+<!-- ── TABS ── -->
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="goTo('s-overview')">탐구 개요</button>
+    <button class="tab" onclick="goTo('s-concept')">핵심 개념</button>
+    <button class="tab" onclick="goTo('s-process')">탐구 과정</button>
+    <button class="tab" onclick="goTo('s-result')">결과 정리</button>
+    <button class="tab" onclick="goTo('s-problems')">확인 문제</button>
+    <button class="tab" onclick="goTo('s-setech')">세특·수능 심화</button>
+    <button class="tab" onclick="goTo('s-checklist')">최종 체크</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ① 탐구 활동 개요 -->
+  <div class="section fade-in" id="s-overview">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-num">①</div>
+        <div class="section-title">탐구 활동 개요</div>
+      </div>
+      <span class="section-badge">Beta Science</span>
+    </div>
+    <div class="section-body">
+      <ul class="overview-list">
+        <li><strong>단원명:</strong> 통합과학 Ⅰ. 과학의 기초 &gt; 2. 측정 표준과 정보 &gt; 신호와 정보</li>
+        <li><strong>탐구 목표:</strong> 스마트 기기를 활용해 길이(거리), 시간, 온도 등의 기본량을 측정하고 분석할 수 있다.</li>
+        <li><strong>과학 역량:</strong> 탐구 능력, 문제 해결 능력</li>
+        <li><strong>평가 유형:</strong> 관찰 평가, 구술 평가, 보고서 평가</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ② 핵심 개념 완전 정리 -->
+  <div class="section fade-in" id="s-concept">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-num">②</div>
+        <div class="section-title">핵심 개념 완전 정리</div>
+      </div>
+      <span class="section-badge">Beta Science</span>
+    </div>
+    <div class="section-body">
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-title">기본량 (Basic Quantities)</div>
+          <div class="concept-card-desc">과학 측정의 바탕이 되는 물리량. 본 탐구에서는 <span class="concept-card-hl">길이 (거리)</span>와 <span class="concept-card-hl">시간</span> 을 다룸.</div>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-title">스마트 기기 센서</div>
+          <div class="concept-card-desc">스마트폰에 내장된 센서와 앱(시계, 거리 측정 앱)을 활용하여 기본량을 객관적으로 측정.</div>
+        </div>
+        <div class="concept-card amber">
+          <div class="concept-card-title">속력 (Speed)</div>
+          <div class="concept-card-desc">단위 시간당 이동한 거리.<br><strong>속력 = 거리 ÷ 시간 (m/s)</strong><br>거리가 같을 때 시간이 짧을수록 속력이 빠름.</div>
+        </div>
+        <div class="concept-card green">
+          <div class="concept-card-title">측정의 객관성</div>
+          <div class="concept-card-desc">스프레드시트·표·그래프 등을 이용하여 측정값을 체계적으로 정리하고, <strong>오차 없이</strong> 데이터를 분석.</div>
+        </div>
+      </div>
+
+      <div class="sub-title">🏃 뛸 때 vs 🚲 자전거 탈 때 비교</div>
+      <div class="compare-grid">
+        <div class="compare-card blue">
+          <div class="compare-card-title">🏃 뛰어서 이동할 때</div>
+          <ul class="compare-list">
+            <li><strong>측정 대상:</strong> 친구가 나무까지 이동</li>
+            <li><strong>이동 거리:</strong> 일정함</li>
+            <li><strong>이동 시간:</strong> 자전거에 비해 상대적으로 김</li>
+            <li><strong>속력 분석:</strong> 속력이 더 <strong>느림</strong></li>
+          </ul>
+        </div>
+        <div class="compare-card amber">
+          <div class="compare-card-title">🚲 자전거 타고 이동할 때</div>
+          <ul class="compare-list">
+            <li><strong>측정 대상:</strong> 친구가 나무까지 이동</li>
+            <li><strong>이동 거리:</strong> 일정함 (뛸 때와 동일)</li>
+            <li><strong>이동 시간:</strong> 뛰는 것에 비해 상대적으로 짧음</li>
+            <li><strong>속력 분석:</strong> 속력이 더 <strong>빠름</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ 탐구 과정 및 결과 분석표 -->
+  <div class="section fade-in" id="s-process">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-num">③</div>
+        <div class="section-title">탐구 과정 및 결과 분석표</div>
+      </div>
+      <span class="section-badge">Beta Science</span>
+    </div>
+    <div class="section-body">
+
+      <div class="process-box">
+        <div class="process-box-title">[탐구 단계]</div>
+        <ol class="process-steps">
+          <li>스마트 기기에 길이와 시간 측정 애플리케이션 설치.</li>
+          <li>모둠별로 측정할 기본량, 대상, 방법을 정하기.</li>
+          <li>설치한 앱을 이용하여 친구와 나무 사이의 거리 측정.</li>
+          <li>한 사람이 나무까지 이동(뛸 때/자전거 탈 때)하는 동안 다른 사람이 시간 측정.</li>
+          <li>스프레드시트 등을 이용하여 표/그래프로 정리하고 속력 분석.</li>
+        </ol>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th>이동 거리 (m)</th>
+            <th>걸린 시간 (s)</th>
+            <th>분석된 속력 (m/s)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>뛸 때</td>
+            <td>(예) 50m</td>
+            <td>(예) 10초</td>
+            <td>5 m/s</td>
+          </tr>
+          <tr>
+            <td>자전거 탈 때</td>
+            <td>(예) 50m</td>
+            <td>(예) 5초</td>
+            <td>10 m/s</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
+  <!-- ④ 결과 및 정리 — 서술형/논술 대비 -->
+  <div class="section fade-in" id="s-result">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-num">④</div>
+        <div class="section-title">결과 및 정리 — 서술형/논술 대비</div>
+      </div>
+      <span class="section-badge">Beta Science</span>
+    </div>
+    <div class="section-body">
+
+      <div class="qa-item">
+        <div class="qa-q">Q1. 위 탐구에서 측정한 결과를 분석하여 얻은 정보를 구체적으로 서술하시오.</div>
+        <div class="qa-answer-box">
+          <div class="qa-answer-header">
+            💡 베타과학학원 모범 답안
+            <span>Beta Science Academy</span>
+          </div>
+          <div class="qa-answer-text">
+            친구가 나무까지 뛰어서 이동할 때 걸린 시간보다, 자전거를 타고 이동할 때 걸린 시간이 더 짧습니다.
+            <strong>거리가 일정할 때 걸린 시간이 짧을수록 속력이 빠르므로</strong>, 자전거를 탈 때가 뛰어서 이동할 때보다
+            <strong>속력이 빠르다</strong>는 것을 알 수 있습니다.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ⑤ 탐구 확인 문제 & 정답 해설 -->
+  <div class="section fade-in" id="s-problems">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-num">⑤</div>
+        <div class="section-title">탐구 확인 문제 &amp; 정답 해설</div>
+      </div>
+      <span class="section-badge">Beta Science</span>
+    </div>
+    <div class="section-body">
+
+      <div class="problem-box">
+        <div class="problem-box-label">[O/X 문제]</div>
+        <div class="problem-q">스마트 기기에는 기본량을 측정하는 데 필요한 센서가 내장되어 있지 않으므로 별도의 전문 장비가 필수적이다.</div>
+        <div class="answer-reveal">
+          <span class="ans-label ans-x">정답: X</span>
+          | 해설: 스마트 기기에는 가속도, GPS 센서 등 기본량을 측정하는 데 필요한 센서가 내장되어 있어 이를 통해 측정할 수 있습니다.
+        </div>
+      </div>
+
+      <div class="problem-box">
+        <div class="problem-box-label">[단답형 문제]</div>
+        <div class="problem-q">한국표준과학연구원(KRISS)에서 DNA, 단백질 등 생명체를 구성하는 물질에 대한 측정 표준을 주로 연구하는 본부의 이름은 무엇인가?</div>
+        <div class="answer-reveal">
+          <span class="ans-label ans-blk">정답: 바이오의료측정본부</span>
+          | 해설: 과학의 한계에 도전하는 한국표준과학연구원 내의 바이오의료측정본부(바이오물질측정그룹)에서 생명체 구성 물질의 측정 표준을 연구합니다.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ⑥ 세특·수능 심화 가이드 -->
+  <div class="section fade-in" id="s-setech">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-num">⑥</div>
+        <div class="section-title">세특·수능 심화 가이드</div>
+      </div>
+      <span class="section-badge">Beta Science</span>
+    </div>
+    <div class="section-body">
+
+      <div class="setech-wrap">
+        <div class="setech-deep-title">📌 측정 표준기관의 중요성 (심화 개념)</div>
+        <div class="setech-deep-body">
+          기본량의 측정은 과학의 출발점입니다. 우리나라의 <strong>한국표준과학연구원</strong>은 국가 측정 표준의 확립을 담당하며, 특히 최근에는 <strong>바이오의료측정본부</strong> 등을 통해 첨단 바이오산업(DNA, 단백질 정량 등)에 필요한 측정 기술과 표준을 선도하고 있습니다.
+        </div>
+
+        <div class="setech-quote">
+          <div class="setech-quote-header">
+            📝 학교생활기록부 세특 기재 예시
+            <span>베타과학학원 제공</span>
+          </div>
+          <div class="setech-quote-text">
+            "스마트 기기의 내장 센서와 애플리케이션을 활용하여 길이와 시간이라는 기본량을 직접 측정하는 탐구를 주도적으로 수행함. 스프레드시트 프로그램을 이용해 측정값을 표로 체계화하고, 뛰는 경우와 자전거를 타는 경우의 속력을 비교 분석하여 객관적인 결론을 도출해냄. 나아가 측정의 정확성과 표준의 중요성에 관심을 가지고, 한국표준과학연구원(KRISS) 바이오의료측정본부의 단백질 측정 표준 연구 사례를 추가 조사하여 발표하는 등 과학적 소양과 융합적 탐구 능력이 돋보임."
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ⑦ 최종 점검 체크리스트 -->
+  <div class="section fade-in" id="s-checklist">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="section-num">⑦</div>
+        <div class="section-title">최종 점검 체크리스트</div>
+      </div>
+      <span class="section-badge">Beta Science</span>
+    </div>
+    <div class="section-body">
+      <div class="check-progress">
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progressBar" style="width:0%"></div>
+        </div>
+        <div class="progress-text" id="progressText">0 / 8</div>
+      </div>
+      <ul class="checklist">
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">측정할 기본량, 측정 대상, 측정 방법을 모둠원과 명확히 정했는가?</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">스마트 기기에 내장된 센서의 존재와 앱 활용법을 이해했는가?</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">스마트폰 시계와 거리 측정 앱을 이용해 이동 거리와 시간을 오차 없이 측정했는가?</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">측정한 결과를 스프레드시트나 표, 그래프 형태로 체계적으로 정리했는가?</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">거리와 시간 데이터를 활용해 각 상황별 '속력'을 정확하게 분석해냈는가?</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">뛸 때와 자전거 탈 때의 속력 차이를 근거를 들어 서술할 수 있는가?</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">한국표준과학연구원(바이오의료측정본부)이 측정 표준과 관련해 어떤 역할을 하는지 알고 있는가?</div></li>
+        <li class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div class="check-label">모둠원과 협동하며 적극적으로 실험하고 결론을 도출했는가?</div></li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-logo">베타과학학원 | Beta Science Academy </div>
+  <div class="footer-sub">내신 · 수능 · 수행 · 탐구 · 세특 — 과학에 대한 준비는 이제 완벽합니다!</div>
+</footer>
+
+<script>
+/* 스크롤 진행바 */
+window.addEventListener('scroll', () => {
+  const el = document.documentElement;
+  const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+  document.getElementById('readProgress').style.width = pct + '%';
+});
+
+/* 탭 네비게이션 */
+function goTo(id) {
+  const el = document.getElementById(id);
+  if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 110, behavior: 'smooth' });
+}
+const tabs = document.querySelectorAll('.tab');
+const secs = ['s-overview','s-concept','s-process','s-result','s-problems','s-setech','s-checklist'];
+window.addEventListener('scroll', () => {
+  let cur = 0;
+  secs.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top < 160) cur = i;
+  });
+  tabs.forEach((t, i) => t.classList.toggle('active', i === cur));
+});
+
+/* 체크리스트 */
+function toggleCheck(item) {
+  item.classList.toggle('checked');
+  const all = document.querySelectorAll('.check-item');
+  const chk = document.querySelectorAll('.check-item.checked').length;
+  document.getElementById('progressBar').style.width = Math.round(chk / all.length * 100) + '%';
+  document.getElementById('progressText').textContent = chk + ' / ' + all.length;
+}
+
+/* fade-in */
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach((en, i) => {
+    if (en.isIntersecting) {
+      setTimeout(() => en.target.classList.add('visible'), i * 100);
+      obs.unobserve(en.target);
+    }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
