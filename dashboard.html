@@ -683,7 +683,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // 1. 여기에 원장님의 파이어베이스 설정값을 직접 넣으세요 (firebase-config.js에 있는 내용)
+  // 1. 설정값 (원장님의 설정값으로 다시 확인해서 채워주세요)
   const firebaseConfig = {
     apiKey: "여기에_입력",
     authDomain: "여기에_입력",
@@ -693,10 +693,10 @@
     appId: "여기에_입력"
   };
 
-  // 2. 연결 및 실행
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  // 상단 통계 숫자 업데이트 함수
   function updateStats() {
     onSnapshot(collection(db, "students"), (snapshot) => {
       document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = snapshot.size;
@@ -714,18 +714,46 @@
     });
   }
 
+  // 하단 테스트 목록 업데이트 함수 (가짜 데이터 삭제 기능 포함)
   function renderRecentTests() {
     const q = query(collection(db, "tests"), orderBy("regDate", "desc"), limit(10));
     onSnapshot(q, (snapshot) => {
-      const tbody = document.querySelector('.section-card:nth-child(3) tbody');
-      document.querySelector('.test-count-badge').textContent = `${snapshot.size}개`;
+      const tbody = document.querySelector('.section-card:nth-child(3) table tbody');
+      const countBadge = document.querySelector('.test-count-badge');
+      
+      // 1. 실시간 개수 업데이트
+      countBadge.textContent = `${snapshot.size}개`;
+      
+      // 2. 중요: 기존 가짜 데이터를 싹 비웁니다.
+      tbody.innerHTML = ""; 
+
+      // 3. 데이터가 없으면 안내 문구 표시
+      if (snapshot.empty) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #64748b;">등록된 테스트가 없습니다.</td></tr>';
+        return;
+      }
+      
+      // 4. 파이어베이스 데이터를 표로 만듦
       tbody.innerHTML = snapshot.docs.map(doc => {
         const t = doc.data();
-        return `<tr><td>${t.testId}</td><td>${t.unitName}</td><td>${t.subject}</td><td><span class="grade-badge">${t.grade}</span></td><td><div class="action-icons"><button class="action-btn">✏️</button><button class="action-btn del">🗑️</button></div></td></tr>`;
+        return `
+          <tr>
+            <td style="font-size:12px; color:#64748b">${t.testId || '-'}</td>
+            <td style="font-weight:600">${t.unitName || '제목 없음'}</td>
+            <td>${t.subject || '-'}</td>
+            <td><span class="grade-badge">${t.grade || '-'}</span></td>
+            <td>
+              <div class="action-icons">
+                <button class="action-btn">✏️</button>
+                <button class="action-btn del">🗑️</button>
+              </div>
+            </td>
+          </tr>`;
       }).join('');
     });
   }
 
+  // 실행 명령
   updateStats();
   renderRecentTests();
 </script>
