@@ -121,17 +121,91 @@
   </main>
 </div>
 <div class="toast" id="toast"></div>
-<script>
-  let pendingStudents=[{id:1,name:'개복구',grade:'고등1학년',test:'진명여고 2025 1학기 통합과학',score:21,action:'',done:false},{id:2,name:'차도윤',grade:'고등1학년',test:'신서고 2025 1학기 통합과학',score:45,action:'',done:false},{id:3,name:'이하준',grade:'중등2학년',test:'중3 내신 기압과날씨변화',score:58,action:'',done:false}];
-  let doneStudents=[{id:4,name:'김대근',grade:'중등1학년',test:'중3 내신 화학반응',score:62,action:'방과후 개인 보충 수업 진행',done:true},{id:5,name:'최수혁',grade:'중등2학년',test:'동촌고 2025 1학기 통합과학',score:55,action:'학부모 면담 후 추가 과제 부여',done:true}];
-  function scoreLevel(s){return s<40?'danger':s<60?'warning':'success';}
-  function renderPending(){const list=document.getElementById('pendingList');document.getElementById('pendingCount').textContent=pendingStudents.length;if(!pendingStudents.length){list.innerHTML=`<div class="empty-state"><div class="empty-check"><svg width="24" height="24" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><p>모든 학생의 대처방안이 입력되었습니다</p></div>`;return;}list.innerHTML=pendingStudents.map(s=>`<div class="student-item ${scoreLevel(s.score)}" id="item-${s.id}"><div class="student-avatar">${s.name[0]}</div><div class="student-info"><div class="student-name">${s.name}</div><div class="student-meta">${s.grade} · ${s.test}</div></div><span class="score-chip ${scoreLevel(s.score)}">${s.score}점</span><div class="action-area"><span class="action-label">대처방안 입력</span><input class="action-input" id="input-${s.id}" type="text" placeholder="대처방안을 입력하세요..." value="${s.action}"><div style="display:flex;gap:6px;width:100%;justify-content:flex-end"><button class="btn-save-action" onclick="saveAction(${s.id})">저장</button><button class="btn-complete" onclick="markDone(${s.id})">완료 처리</button></div></div></div>`).join('');}
-  function renderDone(){const list=document.getElementById('doneList');document.getElementById('doneCount').textContent=doneStudents.length;if(!doneStudents.length){list.innerHTML='<div class="empty-state"><p>처리 완료된 학생이 없습니다</p></div>';return;}list.innerHTML=doneStudents.map(s=>`<div class="student-item" style="border-left:4px solid var(--success);background:#f9fffe"><div class="student-avatar" style="background:#d1fae5;color:#065f46">${s.name[0]}</div><div class="student-info"><div class="student-name">${s.name}</div><div class="student-meta">${s.grade} · ${s.test}</div></div><span class="score-chip success">${s.score}점</span><div class="action-area"><input class="action-input filled" type="text" value="${s.action}" readonly><div class="completed-badge"><svg width="14" height="14" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>처리 완료</div></div></div>`).join('');}
-  function saveAction(id){const v=document.getElementById(`input-${id}`).value.trim(),s=pendingStudents.find(x=>x.id===id);if(s){s.action=v;document.getElementById(`input-${id}`).classList.add('filled');}showToast('대처방안이 저장되었습니다');}
-  function markDone(id){const idx=pendingStudents.findIndex(x=>x.id===id);if(idx===-1)return;const v=document.getElementById(`input-${id}`)?.value.trim()||'';if(!v){showToast('대처방안을 먼저 입력해주세요');return;}const s={...pendingStudents[idx],action:v,done:true};pendingStudents.splice(idx,1);doneStudents.unshift(s);renderPending();renderDone();showToast(`✓ ${s.name} 학생 처리 완료`);}
-  function showHistory(){const sec=document.getElementById('historySection'),all=[...doneStudents,...pendingStudents];sec.style.display=sec.style.display==='none'?'block':'none';document.getElementById('historyBody').innerHTML=all.map(s=>`<tr><td style="font-weight:600">${s.name}</td><td style="color:var(--text-muted)">${s.test}</td><td><span style="font-weight:700;color:${s.score<60?'var(--danger)':'var(--warning)'}">${s.score}점</span></td><td>${s.done?'<span class="tag-success">완료</span>':'<span class="tag-warning">대기중</span>'}</td><td>${s.action||'<span style="color:var(--text-muted)">-</span>'}</td><td style="color:var(--text-muted);font-size:12px">2026. 4. 18.</td></tr>`).join('');if(sec.style.display==='block')sec.scrollIntoView({behavior:'smooth',block:'start'});}
-  function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
-  renderPending();renderDone();
+<script type="module">
+  // 설정 파일을 따로 만드셨으므로 import로 가져옵니다.
+  // (파일명이 다르다면 './firebase-config.js' 부분을 실제 파일명으로 바꾸세요)
+  import { firebaseConfig } from './firebase-config.js'; 
+  
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  // 연결 초기화
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const colRef = collection(db, "specialManagement");
+
+  // [데이터 불러오기] 파이어베이스의 데이터를 실시간으로 감시해서 화면에 뿌려줍니다.
+  onSnapshot(colRef, (snapshot) => {
+    const allData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    const pending = allData.filter(s => !s.done);
+    const done = allData.filter(s => s.done);
+
+    renderPending(pending);
+    renderDone(done);
+    renderHistory(allData);
+  });
+
+  // [화면 그리기 함수들] - 버튼에서 인식할 수 있게 window를 붙여줍니다.
+  window.renderPending = (data) => {
+    const list = document.getElementById('pendingList');
+    document.getElementById('pendingCount').textContent = data.length;
+    if (!data.length) {
+      list.innerHTML = `<div class="empty-state"><p>모든 학생의 대처방안이 입력되었습니다</p></div>`;
+      return;
+    }
+    list.innerHTML = data.map(s => `
+      <div class="student-item ${s.score < 40 ? 'danger' : s.score < 60 ? 'warning' : 'success'}">
+        <div class="student-avatar">${s.name[0]}</div>
+        <div class="student-info">
+          <div class="student-name">${s.name}</div>
+          <div class="student-meta">${s.grade} · ${s.test}</div>
+        </div>
+        <span class="score-chip ${s.score < 40 ? 'danger' : s.score < 60 ? 'warning' : 'success'}">${s.score}점</span>
+        <div class="action-area">
+          <input class="action-input" id="input-${s.id}" type="text" placeholder="대처방안 입력" value="${s.action || ''}">
+          <div style="display:flex;gap:6px;margin-top:5px">
+            <button class="btn-save-action" onclick="saveAction('${s.id}')">저장</button>
+            <button class="btn-complete" onclick="markDone('${s.id}')">완료</button>
+          </div>
+        </div>
+      </div>`).join('');
+  };
+
+  window.renderDone = (data) => {
+    const list = document.getElementById('doneList');
+    document.getElementById('doneCount').textContent = data.length;
+    list.innerHTML = data.map(s => `
+      <div class="student-item" style="border-left:4px solid var(--success)">
+        <div class="student-info">
+          <div class="student-name">${s.name}</div>
+          <div class="student-meta">${s.test}</div>
+        </div>
+        <div class="action-area">
+          <input class="action-input filled" type="text" value="${s.action}" readonly>
+        </div>
+      </div>`).join('');
+  };
+
+  // [데이터 수정 함수] 저장 버튼을 누르면 파이어베이스의 값을 바꿉니다.
+  window.saveAction = async (id) => {
+    const val = document.getElementById(`input-${id}`).value;
+    await updateDoc(doc(db, "specialManagement", id), { action: val });
+    showToast("저장되었습니다!");
+  };
+
+  window.markDone = async (id) => {
+    const val = document.getElementById(`input-${id}`).value;
+    await updateDoc(doc(db, "specialManagement", id), { action: val, done: true });
+    showToast("처리가 완료되었습니다!");
+  };
+
+  window.showToast = (m) => {
+    const t = document.getElementById('toast');
+    t.textContent = m;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  };
 </script>
 </body>
 </html>
