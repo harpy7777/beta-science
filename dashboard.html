@@ -679,6 +679,98 @@
 
   </main>
 </div>
+<script type="module">
+  import { firebaseConfig } from './firebase-config.js';
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // 1. 통계 업데이트 (학생 수, 평균 점수 등)
+  function updateStats() {
+    // 학생 수 연동 (students 컬렉션)
+    onSnapshot(collection(db, "students"), (snapshot) => {
+      document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = snapshot.size;
+    });
+
+    // 테스트 현황 및 평균 점수 연동 (grades 컬렉션 기준)
+    onSnapshot(collection(db, "grades"), (snapshot) => {
+      let totalScore = 0;
+      let count = snapshot.size;
+      
+      snapshot.forEach(doc => {
+        totalScore += Number(doc.data().score || 0);
+      });
+
+      const avg = count > 0 ? (totalScore / count).toFixed(1) : 0;
+      
+      document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = count; // 이번 주/전체 제출 건수
+      document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = avg;   // 평균 점수
+    });
+
+    // 특별 관리 대상 연동 (specialManagement 중 done이 false인 경우)
+    onSnapshot(collection(db, "specialManagement"), (snapshot) => {
+      const pendingCount = snapshot.docs.filter(d => !d.data().done).length;
+      document.querySelector('.stat-card:nth-child(4) .stat-value').textContent = pendingCount;
+    });
+  }
+
+  // 2. 최근 테스트 결과 표 연동 (최신 5건)
+  function renderRecentGrades() {
+    const q = query(collection(db, "grades"), orderBy("date", "desc"), limit(5));
+    const tbody = document.querySelector('.section-card:nth-child(2) tbody');
+
+    onSnapshot(q, (snapshot) => {
+      if (snapshot.empty) return;
+      
+      tbody.innerHTML = snapshot.docs.map(doc => {
+        const d = doc.data();
+        const scoreClass = d.score >= 80 ? 'score-high' : d.score >= 60 ? 'score-mid' : 'score-low';
+        return `
+          <tr>
+            <td>${d.studentName}</td>
+            <td>${d.testName}</td>
+            <td><span class="score-badge ${scoreClass}">${d.score}점</span></td>
+            <td>${d.date}</td>
+          </tr>`;
+      }).join('');
+    });
+  }
+
+  // 3. 등록된 테스트 관리 목록 연동 (최신 10건)
+  function renderRecentTests() {
+    const q = query(collection(db, "tests"), orderBy("regDate", "desc"), limit(10));
+    const tbody = document.querySelector('.section-card:nth-child(3) tbody');
+    const countBadge = document.querySelector('.test-count-badge');
+
+    onSnapshot(q, (snapshot) => {
+      countBadge.textContent = `${snapshot.size}개`;
+      
+      tbody.innerHTML = snapshot.docs.map(doc => {
+        const t = doc.data();
+        return `
+          <tr>
+            <td style="font-size:12px; color:var(--text-muted)">${t.testId}</td>
+            <td style="font-weight:600">${t.unitName}</td>
+            <td>${t.subject}</td>
+            <td><span class="grade-badge">${t.grade}</span></td>
+            <td>
+              <div class="action-icons">
+                <button class="action-btn">✏️</button>
+                <button class="action-btn del">🗑️</button>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+    });
+  }
+
+  // 실행
+  updateStats();
+  renderRecentGrades();
+  renderRecentTests();
+
+</script>
 </body>
 </html>
