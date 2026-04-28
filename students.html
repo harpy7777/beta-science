@@ -166,40 +166,94 @@
     </div>
   </div>
 </div>
-<script>
+<script type="module">
+  // 1. 아까 만든 설정 파일에서 auth와 db를 가져옵니다.
+  import { db } from './firebase-config.js';
+  import { 
+    collection, 
+    addDoc, 
+    getDocs, 
+    doc, 
+    updateDoc, 
+    deleteDoc, 
+    query, 
+    orderBy, 
+    onSnapshot 
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
   const ITEMS_PER_PAGE = 10;
-  let currentPage = 1, editingIndex = null;
-  let students = [
-    { id: 'm01007', name: '김대근', grade: '중등1학년', subject: '-', phone: '010-5538-0529', regDate: '2026. 4. 28.' },
-    { id: 'm01009', name: '김인후', grade: '중등1학년', subject: '-', phone: '010-4420-7902', regDate: '2026. 4. 28.' },
-    { id: 'm01008', name: '박진환', grade: '중등1학년', subject: '-', phone: '010-3895-7418', regDate: '2026. 4. 28.' },
-    { id: 'm01005', name: '이하준', grade: '중등2학년', subject: '-', phone: '010-8973-7455', regDate: '2026. 4. 28.' },
-    { id: 'm02102', name: '주승아', grade: '중등2학년', subject: '-', phone: '010-4447-1178', regDate: '2026. 4. 28.' },
-    { id: 'm02101', name: '최수혁', grade: '중등2학년', subject: '-', phone: '010-8725-0893', regDate: '2026. 4. 28.' },
-    { id: 'm03001', name: '정민서', grade: '중등3학년', subject: '통합과학', phone: '010-1234-5678', regDate: '2026. 4. 20.' },
-    { id: 'h01001', name: '김가현', grade: '고등1학년', subject: '통합과학', phone: '010-9876-5432', regDate: '2026. 3. 15.' },
-    { id: 'h01002', name: '김재호', grade: '고등1학년', subject: '통합과학, 물리', phone: '010-5555-1234', regDate: '2026. 3. 15.' },
-    { id: 'h01003', name: '차도윤', grade: '고등1학년', subject: '통합과학', phone: '010-7777-8888', regDate: '2026. 3. 20.' },
-    { id: 'h02001', name: '박소연', grade: '고등2학년', subject: '물리, 화학', phone: '010-2222-3333', regDate: '2026. 2. 10.' },
-    { id: 'h02002', name: '이도현', grade: '고등2학년', subject: '물리', phone: '010-6666-9999', regDate: '2026. 2. 10.' },
-  ];
-  let filtered = [...students];
-  function gradeBadgeClass(g) { return {'중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3','고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3'}[g]||'grade-mid1'; }
-  function renderTable() {
+  let currentPage = 1;
+  let editingId = null; // 인덱스 대신 파이어베이스 문서 ID를 사용합니다.
+  let students = [];
+  let filtered = [];
+
+  // 학년별 배지 클래스 (기존 로직 유지)
+  function gradeBadgeClass(g) { 
+    return {'중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3','고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3'}[g]||'grade-mid1'; 
+  }
+
+  // 2. 실시간 데이터 불러오기 (onSnapshot)
+  // 데이터가 변할 때마다 자동으로 화면을 갱신합니다.
+  const q = query(collection(db, "students"), orderBy("regDate", "desc"));
+  onSnapshot(q, (snapshot) => {
+    students = snapshot.docs.map(doc => ({
+      fireId: doc.id, // 파이어베이스 내부 ID
+      ...doc.data()
+    }));
+    filterStudents(); // 데이터를 가져온 후 필터링 및 렌더링
+  });
+
+  // 테이블 렌더링 (틀 유지)
+  window.renderTable = function() {
     const tbody = document.getElementById('studentTableBody'), empty = document.getElementById('emptyState');
     const start = (currentPage-1)*ITEMS_PER_PAGE, pageData = filtered.slice(start, start+ITEMS_PER_PAGE);
+    
     document.getElementById('countDisplay').textContent = filtered.length;
-    if (!filtered.length) { tbody.innerHTML=''; empty.style.display='block'; } else {
+    
+    if (!filtered.length) { 
+      tbody.innerHTML=''; empty.style.display='block'; 
+    } else {
       empty.style.display='none';
       tbody.innerHTML = pageData.map(s => {
-        const ri = students.indexOf(s);
-        const subs = s.subject&&s.subject!=='-' ? s.subject.split(',').map(x=>`<span class="subject-tag">${x.trim()}</span>`).join('') : '<span style="color:var(--text-muted)">-</span>';
-        return `<tr><td class="student-id">${s.id}</td><td style="font-weight:500">${s.name}</td><td><span class="grade-badge ${gradeBadgeClass(s.grade)}">${s.grade}</span></td><td>${subs}</td><td>${s.phone}</td><td style="color:var(--text-muted);font-size:13px">${s.regDate}</td><td><div class="action-icons"><button class="action-btn" onclick="openEditModal(${ri})"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn del" onclick="deleteStudent(${ri})"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></td></tr>`;
+        const subs = s.subject && s.subject !== '-' ? s.subject.split(',').map(x=>`<span class="subject-tag">${x.trim()}</span>`).join('') : '<span style="color:var(--text-muted)">-</span>';
+        return `
+          <tr>
+            <td class="student-id">${s.id}</td>
+            <td style="font-weight:500">${s.name}</td>
+            <td><span class="grade-badge ${gradeBadgeClass(s.grade)}">${s.grade}</span></td>
+            <td>${subs}</td>
+            <td>${s.phone}</td>
+            <td style="color:var(--text-muted);font-size:13px">${s.regDate}</td>
+            <td>
+              <div class="action-icons">
+                <button class="action-btn" onclick="openEditModal('${s.fireId}')">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="action-btn del" onclick="deleteStudent('${s.fireId}', '${s.name}')">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>`;
       }).join('');
     }
     renderPagination();
   }
-  function renderPagination() {
+
+  // 필터링 및 검색
+  window.filterStudents = function() {
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    const g = document.getElementById('gradeFilter').value;
+    filtered = students.filter(s => 
+      (!q || s.name.toLowerCase().includes(q) || s.id.toLowerCase().includes(q)) && 
+      (!g || s.grade === g)
+    );
+    currentPage = 1;
+    renderTable();
+  }
+
+  // 페이지네이션
+  window.renderPagination = function() {
     const total = Math.ceil(filtered.length/ITEMS_PER_PAGE), pg = document.getElementById('pagination');
     if (total<=1){pg.innerHTML='';return;}
     let h=`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
@@ -207,15 +261,84 @@
     h+=`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>›</button>`;
     pg.innerHTML=h;
   }
-  function goPage(p){const t=Math.ceil(filtered.length/ITEMS_PER_PAGE);if(p<1||p>t)return;currentPage=p;renderTable();}
-  function filterStudents(){const q=document.getElementById('searchInput').value.trim().toLowerCase(),g=document.getElementById('gradeFilter').value;filtered=students.filter(s=>(!q||s.name.toLowerCase().includes(q)||s.id.toLowerCase().includes(q))&&(!g||s.grade===g));currentPage=1;renderTable();}
-  function openAddModal(){editingIndex=null;document.getElementById('modalTitle').textContent='학생 추가';['inputId','inputName','inputSubject','inputPhone'].forEach(id=>document.getElementById(id).value='');document.getElementById('inputGrade').value='';document.getElementById('inputId').disabled=false;document.getElementById('studentModal').classList.add('open');}
-  function openEditModal(i){editingIndex=i;const s=students[i];document.getElementById('modalTitle').textContent='학생 정보 수정';document.getElementById('inputId').value=s.id;document.getElementById('inputId').disabled=true;document.getElementById('inputName').value=s.name;document.getElementById('inputGrade').value=s.grade;document.getElementById('inputSubject').value=s.subject==='-'?'':s.subject;document.getElementById('inputPhone').value=s.phone;document.getElementById('studentModal').classList.add('open');}
-  function closeModal(){document.getElementById('studentModal').classList.remove('open');}
-  function saveStudent(){const name=document.getElementById('inputName').value.trim(),grade=document.getElementById('inputGrade').value;if(!name){alert('이름을 입력해주세요.');return;}if(!grade){alert('학년을 선택해주세요.');return;}const today=new Date(),d=`${today.getFullYear()}. ${today.getMonth()+1}. ${today.getDate()}.`;if(editingIndex===null){const id=document.getElementById('inputId').value.trim()||`s${Date.now()}`;students.unshift({id,name,grade,subject:document.getElementById('inputSubject').value.trim()||'-',phone:document.getElementById('inputPhone').value.trim()||'-',regDate:d});}else{students[editingIndex]={...students[editingIndex],name,grade,subject:document.getElementById('inputSubject').value.trim()||'-',phone:document.getElementById('inputPhone').value.trim()||'-'};}closeModal();filterStudents();}
-  function deleteStudent(i){if(!confirm(`"${students[i].name}" 학생을 삭제하시겠습니까?`))return;students.splice(i,1);filterStudents();}
-  document.getElementById('studentModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
-  filterStudents();
+
+  window.goPage = function(p){
+    const t=Math.ceil(filtered.length/ITEMS_PER_PAGE);
+    if(p<1||p>t) return;
+    currentPage=p;
+    renderTable();
+  }
+
+  // 모달 열기/닫기
+  window.openAddModal = function() {
+    editingId = null;
+    document.getElementById('modalTitle').textContent='학생 추가';
+    ['inputId','inputName','inputSubject','inputPhone'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('inputGrade').value='';
+    document.getElementById('inputId').disabled=false;
+    document.getElementById('studentModal').classList.add('open');
+  }
+
+  window.openEditModal = function(fireId) {
+    editingId = fireId;
+    const s = students.find(item => item.fireId === fireId);
+    document.getElementById('modalTitle').textContent='학생 정보 수정';
+    document.getElementById('inputId').value=s.id;
+    document.getElementById('inputId').disabled=true;
+    document.getElementById('inputName').value=s.name;
+    document.getElementById('inputGrade').value=s.grade;
+    document.getElementById('inputSubject').value=s.subject==='-'?'':s.subject;
+    document.getElementById('inputPhone').value=s.phone;
+    document.getElementById('studentModal').classList.add('open');
+  }
+
+  window.closeModal = function() {
+    document.getElementById('studentModal').classList.remove('open');
+  }
+
+  // 3. 학생 정보 저장 (추가 및 수정)
+  window.saveStudent = async function() {
+    const name = document.getElementById('inputName').value.trim();
+    const grade = document.getElementById('inputGrade').value;
+    const id = document.getElementById('inputId').value.trim() || `s${Date.now()}`;
+    const subject = document.getElementById('inputSubject').value.trim() || '-';
+    const phone = document.getElementById('inputPhone').value.trim() || '-';
+
+    if(!name || !grade) { alert('이름과 학년을 입력해주세요.'); return; }
+
+    try {
+      if (editingId === null) {
+        // 새 학생 추가
+        const today = new Date();
+        const d = `${today.getFullYear()}. ${today.getMonth()+1}. ${today.getDate()}.`;
+        await addDoc(collection(db, "students"), { id, name, grade, subject, phone, regDate: d });
+      } else {
+        // 기존 학생 수정
+        const studentRef = doc(db, "students", editingId);
+        await updateDoc(studentRef, { name, grade, subject, phone });
+      }
+      closeModal();
+    } catch (e) {
+      console.error("Error saving document: ", e);
+      alert("저장 중 오류가 발생했습니다.");
+    }
+  }
+
+  // 4. 학생 삭제
+  window.deleteStudent = async function(fireId, name) {
+    if(!confirm(`"${name}" 학생을 삭제하시겠습니까?`)) return;
+    try {
+      await deleteDoc(doc(db, "students", fireId));
+    } catch (e) {
+      console.error("Error deleting document: ", e);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  }
+
+  // 배경 클릭 시 모달 닫기
+  document.getElementById('studentModal').addEventListener('click', function(e){
+    if(e.target===this) closeModal();
+  });
 </script>
 </body>
 </html>
