@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>특별관리 - 베타과학</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --primary: #2563eb; --primary-light: #eff6ff; --primary-dark: #1d4ed8;
+    --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff;
+    --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0;
+    --danger: #ef4444; --danger-light: #fef2f2;
+    --success: #10b981; --success-light: #f0fdf4;
+    --warning: #f59e0b; --warning-light: #fffbeb;
+    --radius: 10px;
+  }
+  body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .app-wrapper { max-width: var(--max-width); margin: 0 auto; display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* 탑바 */
+  .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 32px; height: 56px; position: sticky; top: 0; z-index: 100; }
+  .logo-area { display: flex; flex-direction: column; align-items: center; line-height: 1.1; flex-shrink: 0; min-width: 80px; }
+  .logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
+  .logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
+  .topbar-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+  .nav-tabs { display: flex; gap: 2px; list-style: none; }
+  .nav-tabs a { display: block; padding: 8px 14px; font-size: 14px; color: var(--text-muted); text-decoration: none; border-radius: 6px; white-space: nowrap; transition: background 0.15s, color 0.15s; }
+  .nav-tabs a:hover { background: var(--bg); color: var(--text); }
+  .nav-tabs a.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .academy-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .badge-admin { font-size: 11px; padding: 2px 8px; background: #f1f5f9; border-radius: 20px; color: var(--text-muted); }
+
+  /* 메인 */
+  .main-content { padding: 28px 24px; flex: 1; }
+
+  /* 페이지 헤더 */
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+  .page-header-left h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .page-header-left p { font-size: 14px; color: var(--text-muted); }
+  .btn-outline { display: flex; align-items: center; gap: 6px; padding: 9px 18px; border: 1px solid var(--border); border-radius: 8px; background: var(--white); font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; text-decoration: none; transition: background 0.1s; }
+  .btn-outline:hover { background: #f1f5f9; color: var(--text); }
+
+  /* 통계 카드 2개 */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+  .stat-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .stat-status { font-size: 13px; font-weight: 600; }
+  .stat-status.warning { color: var(--warning); }
+  .stat-status.success { color: var(--success); }
+  .stat-icon-wrap { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .stat-icon-wrap.warning { background: var(--warning-light); }
+  .stat-icon-wrap.success { background: var(--success-light); }
+  .stat-number { font-size: 36px; font-weight: 800; margin-bottom: 4px; }
+  .stat-number.warning { color: var(--warning); }
+  .stat-number.success { color: var(--success); }
+  .stat-desc { font-size: 14px; color: var(--text-muted); }
+
+  /* 섹션 카드 */
+  .section-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; }
+  .section-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .section-header h2 { font-size: 17px; font-weight: 700; }
+  .section-body { padding: 24px; }
+
+  /* 빈 상태 */
+  .empty-state { text-align: center; padding: 48px 20px; }
+  .empty-check { width: 56px; height: 56px; border-radius: 50%; background: var(--success-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+  .empty-state p { font-size: 15px; color: var(--text-muted); font-weight: 500; }
+
+  /* 학생 카드 리스트 */
+  .student-list { display: flex; flex-direction: column; gap: 12px; }
+  .student-item { border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; background: var(--white); transition: border-color 0.15s; }
+  .student-item:hover { border-color: #94a3b8; }
+  .student-item.danger { border-left: 4px solid var(--danger); background: #fff9f9; }
+  .student-item.warning { border-left: 4px solid var(--warning); background: #fffdf5; }
+
+  .student-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: var(--primary); flex-shrink: 0; }
+  .student-info { flex: 1; }
+  .student-name { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .student-meta { font-size: 13px; color: var(--text-muted); }
+
+  .score-chip { padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
+  .score-chip.danger { background: var(--danger); }
+  .score-chip.warning { background: var(--warning); }
+  .score-chip.success { background: var(--success); }
+
+  .action-area { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; min-width: 220px; }
+  .action-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+
+  .action-input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; color: var(--text); font-family: inherit; outline: none; transition: border 0.15s; background: var(--white); }
+  .action-input:focus { border-color: var(--primary); }
+  .action-input.filled { border-color: var(--success); background: var(--success-light); }
+
+  .btn-save-action { padding: 7px 14px; background: var(--primary); color: white; border: none; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .btn-save-action:hover { background: var(--primary-dark); }
+  .btn-complete { padding: 7px 14px; background: var(--success); color: white; border: none; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+  .completed-badge { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--success); }
+
+  /* 이력 테이블 */
+  .history-section { margin-top: 24px; }
+  .history-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; padding-top: 20px; border-top: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { font-size: 12px; font-weight: 600; color: var(--text-muted); text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); background: #f8fafc; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f8fafc; }
+  tbody td { font-size: 13px; padding: 12px 14px; }
+
+  .tag-danger { display: inline-block; padding: 2px 8px; background: var(--danger-light); color: var(--danger); border-radius: 4px; font-size: 11px; font-weight: 700; }
+  .tag-warning { display: inline-block; padding: 2px 8px; background: var(--warning-light); color: #92400e; border-radius: 4px; font-size: 11px; font-weight: 700; }
+  .tag-success { display: inline-block; padding: 2px 8px; background: var(--success-light); color: #065f46; border-radius: 4px; font-size: 11px; font-weight: 700; }
+
+  /* 토스트 */
+  .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1e293b; color: white; padding: 11px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; opacity: 0; transition: opacity 0.3s, transform 0.3s; z-index: 999; white-space: nowrap; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="app-wrapper">
+  <header class="topbar">
+    <div class="logo-area"><span class="brand">BETA</span><span class="brand-sub">SCIENCE</span></div>
+    <div class="topbar-divider"></div>
+    <nav><ul class="nav-tabs">
+      <li><a href="dashboard.html">대시보드</a></li>
+      <li><a href="students.html">학생 관리</a></li>
+      <li><a href="test-create.html">테스트 생성</a></li>
+      <li><a href="test-manage.html">테스트 관리</a></li>
+      <li><a href="grades.html">성적 조회</a></li>
+      <li><a href="analysis.html">학생별 분석</a></li>
+      <li><a href="special.html" class="active">특별관리</a></li>
+      <li><a href="sms.html">SMS설정</a></li>
+    </ul></nav>
+    <div class="topbar-right">
+      <span class="academy-name">베타과학학원</span>
+      <span class="badge-admin">관리자 모드</span>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>
+          <svg width="22" height="22" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          특별 관리 대상
+        </h1>
+        <p>70점 미만 학생들의 대처방안을 입력하고 관리하세요</p>
+      </div>
+      <button class="btn-outline" onclick="showHistory()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.7"/></svg>
+        전체 이력 보기
+      </button>
+    </div>
+
+    <!-- 통계 카드 -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <span class="stat-status warning">대기 중</span>
+          <div class="stat-icon-wrap warning">
+            <svg width="20" height="20" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+        </div>
+        <div class="stat-number warning" id="pendingCount">3</div>
+        <div class="stat-desc">대처방안 미입력 학생</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <span class="stat-status success">처리 완료</span>
+          <div class="stat-icon-wrap success">
+            <svg width="20" height="20" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+        <div class="stat-number success" id="doneCount">2</div>
+        <div class="stat-desc">대처방안 입력 완료</div>
+      </div>
+    </div>
+
+    <!-- 대처방안 입력 필요 섹션 -->
+    <div class="section-card" id="pendingSection">
+      <div class="section-header">
+        <svg width="18" height="18" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <h2>대처방안 입력 필요</h2>
+      </div>
+      <div class="section-body">
+        <div class="student-list" id="pendingList"></div>
+      </div>
+    </div>
+
+    <!-- 처리 완료 섹션 -->
+    <div class="section-card" id="doneSection">
+      <div class="section-header">
+        <svg width="18" height="18" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        <h2>처리 완료</h2>
+      </div>
+      <div class="section-body">
+        <div class="student-list" id="doneList"></div>
+      </div>
+    </div>
+
+    <!-- 전체 이력 -->
+    <div class="section-card" id="historySection" style="display:none;">
+      <div class="section-header">
+        <svg width="18" height="18" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.7"/></svg>
+        <h2>전체 관리 이력</h2>
+      </div>
+      <div class="section-body">
+        <table>
+          <thead>
+            <tr><th>학생명</th><th>테스트</th><th>점수</th><th>상태</th><th>대처방안</th><th>날짜</th></tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let pendingStudents = [
+    { id: 1, name: '개복구', grade: '고등1학년', test: '진명여고 2025 1학기 통합과학', score: 21, action: '', done: false },
+    { id: 2, name: '차도윤', grade: '고등1학년', test: '신서고 2025 1학기 통합과학', score: 45, action: '', done: false },
+    { id: 3, name: '이하준', grade: '중등2학년', test: '중3 내신 기압과날씨변화', score: 58, action: '', done: false },
+  ];
+  let doneStudents = [
+    { id: 4, name: '김대근', grade: '중등1학년', test: '중3 내신 화학반응', score: 62, action: '방과후 개인 보충 수업 진행', done: true },
+    { id: 5, name: '최수혁', grade: '중등2학년', test: '동촌고 2025 1학기 통합과학', score: 55, action: '학부모 면담 후 추가 과제 부여', done: true },
+  ];
+
+  function scoreLevel(s) { return s < 40 ? 'danger' : s < 60 ? 'warning' : 'success'; }
+
+  function renderPending() {
+    const list = document.getElementById('pendingList');
+    document.getElementById('pendingCount').textContent = pendingStudents.length;
+    if (pendingStudents.length === 0) {
+      list.innerHTML = `<div class="empty-state">
+        <div class="empty-check"><svg width="24" height="24" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <p>모든 학생의 대처방안이 입력되었습니다</p>
+      </div>`;
+      return;
+    }
+    list.innerHTML = pendingStudents.map(s => `
+      <div class="student-item ${scoreLevel(s.score)}" id="item-${s.id}">
+        <div class="student-avatar">${s.name[0]}</div>
+        <div class="student-info">
+          <div class="student-name">${s.name}</div>
+          <div class="student-meta">${s.grade} · ${s.test}</div>
+        </div>
+        <span class="score-chip ${scoreLevel(s.score)}">${s.score}점</span>
+        <div class="action-area">
+          <span class="action-label">대처방안 입력</span>
+          <input class="action-input" id="input-${s.id}" type="text" placeholder="대처방안을 입력하세요..." value="${s.action}">
+          <div style="display:flex;gap:6px;width:100%;justify-content:flex-end">
+            <button class="btn-save-action" onclick="saveAction(${s.id})">저장</button>
+            <button class="btn-complete" onclick="markDone(${s.id})">완료 처리</button>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  function renderDone() {
+    const list = document.getElementById('doneList');
+    document.getElementById('doneCount').textContent = doneStudents.length;
+    if (doneStudents.length === 0) {
+      list.innerHTML = '<div class="empty-state"><p style="color:var(--text-muted)">처리 완료된 학생이 없습니다</p></div>';
+      return;
+    }
+    list.innerHTML = doneStudents.map(s => `
+      <div class="student-item" style="border-left:4px solid var(--success);background:#f9fffe">
+        <div class="student-avatar" style="background:#d1fae5;color:#065f46">${s.name[0]}</div>
+        <div class="student-info">
+          <div class="student-name">${s.name}</div>
+          <div class="student-meta">${s.grade} · ${s.test}</div>
+        </div>
+        <span class="score-chip success">${s.score}점</span>
+        <div class="action-area">
+          <input class="action-input filled" type="text" value="${s.action}" readonly>
+          <div class="completed-badge">
+            <svg width="14" height="14" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            처리 완료
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  function saveAction(id) {
+    const val = document.getElementById(`input-${id}`).value.trim();
+    const s = pendingStudents.find(x => x.id === id);
+    if (s) { s.action = val; document.getElementById(`input-${id}`).classList.add('filled'); }
+    showToast('대처방안이 저장되었습니다');
+  }
+
+  function markDone(id) {
+    const idx = pendingStudents.findIndex(x => x.id === id);
+    if (idx === -1) return;
+    const val = document.getElementById(`input-${id}`)?.value.trim() || '';
+    if (!val) { showToast('대처방안을 먼저 입력해주세요'); return; }
+    const s = { ...pendingStudents[idx], action: val, done: true };
+    pendingStudents.splice(idx, 1);
+    doneStudents.unshift(s);
+    renderPending(); renderDone();
+    showToast(`✓ ${s.name} 학생 처리 완료`);
+  }
+
+  function showHistory() {
+    const sec = document.getElementById('historySection');
+    const all = [...doneStudents, ...pendingStudents];
+    sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
+    document.getElementById('historyBody').innerHTML = all.map(s => `
+      <tr>
+        <td style="font-weight:600">${s.name}</td>
+        <td style="color:var(--text-muted)">${s.test}</td>
+        <td><span style="font-weight:700;color:${s.score<60?'var(--danger)':'var(--warning)'}">${s.score}점</span></td>
+        <td>${s.done ? '<span class="tag-success">완료</span>' : '<span class="tag-warning">대기중</span>'}</td>
+        <td>${s.action || '<span style="color:var(--text-muted)">-</span>'}</td>
+        <td style="color:var(--text-muted);font-size:12px">2026. 4. 18.</td>
+      </tr>`).join('');
+    if (sec.style.display === 'block') sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  renderPending(); renderDone();
+</script>
+</body>
+</html>
