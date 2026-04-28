@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>성적 조회 - 베타과학</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --primary: #2563eb; --primary-light: #eff6ff; --primary-dark: #1d4ed8;
+    --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff;
+    --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0;
+    --danger: #ef4444; --success: #10b981; --radius: 10px;
+  }
+  body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  .app-wrapper { max-width: var(--max-width); margin: 0 auto; display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* 탑바 */
+  .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 32px; height: 56px; position: sticky; top: 0; z-index: 100; }
+  .logo-area { display: flex; flex-direction: column; align-items: center; line-height: 1.1; flex-shrink: 0; min-width: 80px; }
+  .logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
+  .logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
+  .topbar-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+  .nav-tabs { display: flex; gap: 2px; list-style: none; }
+  .nav-tabs a { display: block; padding: 8px 14px; font-size: 14px; color: var(--text-muted); text-decoration: none; border-radius: 6px; white-space: nowrap; transition: background 0.15s, color 0.15s; }
+  .nav-tabs a:hover { background: var(--bg); color: var(--text); }
+  .nav-tabs a.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .academy-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .badge-admin { font-size: 11px; padding: 2px 8px; background: #f1f5f9; border-radius: 20px; color: var(--text-muted); }
+
+  /* 메인 */
+  .main-content { padding: 28px 24px; flex: 1; }
+  .page-header { margin-bottom: 24px; }
+  .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .page-header p { font-size: 14px; color: var(--text-muted); }
+
+  /* 카드 공통 */
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 20px; }
+  .card-title { font-size: 17px; font-weight: 700; margin-bottom: 20px; }
+
+  /* 필터 그리드 */
+  .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 7px; }
+  .form-group select {
+    width: 100%; padding: 11px 36px 11px 14px;
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 14px; color: var(--text); background: var(--white);
+    cursor: pointer; outline: none; transition: border 0.15s; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+  }
+  .form-group select:focus { border-color: var(--primary); }
+  .form-group select:disabled { background-color: #f8fafc; color: var(--text-muted); cursor: not-allowed; }
+
+  /* 빈 상태 */
+  .empty-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 80px 20px; text-align: center; color: var(--text-muted); margin-bottom: 20px; }
+  .empty-icon { width: 60px; height: 60px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .empty-card h3 { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .empty-card p { font-size: 14px; }
+
+  /* 결과 헤더 */
+  .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .result-title { font-size: 17px; font-weight: 700; }
+  .result-meta { font-size: 13px; color: var(--text-muted); }
+
+  /* 통계 미니 카드 */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .mini-stat { background: #f8fafc; border-radius: 8px; padding: 14px 16px; }
+  .mini-stat .label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; }
+  .mini-stat .value { font-size: 22px; font-weight: 700; color: var(--text); }
+  .mini-stat .value.blue { color: var(--primary); }
+  .mini-stat .value.green { color: var(--success); }
+  .mini-stat .value.red { color: var(--danger); }
+
+  /* 테이블 */
+  .table-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { font-size: 13px; font-weight: 600; color: var(--text-muted); text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); background: #f8fafc; white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f8fafc; }
+  tbody td { font-size: 14px; padding: 13px 16px; color: var(--text); }
+
+  .rank-badge { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; font-size: 13px; font-weight: 700; }
+  .rank-1 { background: #fef3c7; color: #92400e; }
+  .rank-2 { background: #f1f5f9; color: #475569; }
+  .rank-3 { background: #fce7f3; color: #9d174d; }
+  .rank-n { background: #f8fafc; color: var(--text-muted); }
+
+  .score-bar-wrap { display: flex; align-items: center; gap: 10px; }
+  .score-bar { flex: 1; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; max-width: 120px; }
+  .score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+  .score-high .score-bar-fill { background: var(--primary); }
+  .score-mid .score-bar-fill { background: var(--success); }
+  .score-low .score-bar-fill { background: var(--danger); }
+
+  .score-num { font-weight: 700; font-size: 15px; min-width: 36px; }
+  .score-num.high { color: var(--primary); }
+  .score-num.mid { color: var(--success); }
+  .score-num.low { color: var(--danger); }
+
+  .grade-pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .grade-mid1 { background: #ede9fe; color: #6d28d9; }
+  .grade-mid2 { background: #dbeafe; color: #1d4ed8; }
+  .grade-mid3 { background: #d1fae5; color: #065f46; }
+  .grade-high1 { background: #fef3c7; color: #92400e; }
+  .grade-high2 { background: #fee2e2; color: #991b1b; }
+  .grade-high3 { background: #fce7f3; color: #9d174d; }
+</style>
+</head>
+<body>
+<div class="app-wrapper">
+  <header class="topbar">
+    <div class="logo-area"><span class="brand">BETA</span><span class="brand-sub">SCIENCE</span></div>
+    <div class="topbar-divider"></div>
+    <nav><ul class="nav-tabs">
+      <li><a href="dashboard.html">대시보드</a></li>
+      <li><a href="students.html">학생 관리</a></li>
+      <li><a href="test-create.html">테스트 생성</a></li>
+      <li><a href="test-manage.html">테스트 관리</a></li>
+      <li><a href="grades.html" class="active">성적 조회</a></li>
+      <li><a href="analysis.html">학생별 분석</a></li>
+      <li><a href="special.html">특별관리</a></li>
+      <li><a href="sms.html">SMS설정</a></li>
+    </ul></nav>
+    <div class="topbar-right">
+      <span class="academy-name">베타과학학원</span>
+      <span class="badge-admin">관리자 모드</span>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>성적 조회</h1>
+      <p>테스트를 선택하면 응시한 학생들의 성적을 순위별로 확인할 수 있습니다</p>
+    </div>
+
+    <!-- 테스트 선택 -->
+    <div class="card">
+      <div class="card-title">테스트 선택</div>
+      <div class="filter-grid">
+        <div class="form-group">
+          <label>학년 선택</label>
+          <select id="gradeSelect" onchange="onGradeChange()">
+            <option value="">학년을 먼저 선택하세요</option>
+            <option>고등1학년</option>
+            <option>고등2학년</option>
+            <option>고등3학년</option>
+            <option>중등1학년</option>
+            <option>중등2학년</option>
+            <option>중등3학년</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>테스트 선택</label>
+          <select id="testSelect" onchange="onTestChange()" disabled>
+            <option value="">학년을 먼저 선택하세요</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 결과 영역 -->
+    <div id="emptyArea" class="empty-card">
+      <div class="empty-icon">
+        <svg width="26" height="26" fill="none" stroke="#94a3b8" stroke-width="2" viewBox="0 0 24 24">
+          <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+      </div>
+      <h3>테스트를 선택해주세요</h3>
+      <p>위에서 테스트를 선택하면 응시 학생들의 성적이 표시됩니다</p>
+    </div>
+
+    <div id="resultArea" style="display:none;">
+      <!-- 통계 -->
+      <div class="stats-row">
+        <div class="mini-stat"><div class="label">응시 학생</div><div class="value blue" id="statCount">0</div></div>
+        <div class="mini-stat"><div class="label">평균 점수</div><div class="value" id="statAvg">0</div></div>
+        <div class="mini-stat"><div class="label">최고 점수</div><div class="value green" id="statMax">0</div></div>
+        <div class="mini-stat"><div class="label">최저 점수</div><div class="value red" id="statMin">0</div></div>
+      </div>
+
+      <!-- 성적 테이블 -->
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>순위</th>
+              <th>학생명</th>
+              <th>학년</th>
+              <th>점수</th>
+              <th>제출일</th>
+            </tr>
+          </thead>
+          <tbody id="gradesBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const testsByGrade = {
+    '고등1학년': [
+      { id: 'test-1776487996459', name: '덕원여고 2025 1학기 중간고사 통합과학' },
+      { id: 'test-1776487890002', name: '진명여고 2025 1학기 중간고사 통합과학' },
+      { id: 'test-1776487755919', name: '양정고등학교 2025 1학기 중간고사 통합과학' },
+      { id: 'test-1776487650896', name: '동촌고 2025 1학기 중간고사 통합과학' },
+      { id: 'test-1776487481767', name: '마포고 2025 1학기 중간고사 통합과학' },
+    ],
+    '고등2학년': [
+      { id: '고2물리 내신6', name: '고2물리 내신6 역학' },
+      { id: '고2물리 내신5', name: '고2물리 내신5 전기' },
+    ],
+    '중등3학년': [
+      { id: '중3-기압', name: '중3 내신 기압과날씨변화' },
+      { id: '중3-화학', name: '중3 내신 화학반응' },
+    ],
+  };
+
+  // 가상 성적 데이터 생성
+  const mockStudents = {
+    '고등1학년': ['김가현','김재호','차도윤','개복구','이서연','박민준','최지우','정하늘','윤서준','한예은'],
+    '고등2학년': ['박소연','이도현','김민지','최준혁','오지원'],
+    '중등3학년': ['정민서','김태양','이채원','박준서'],
+  };
+
+  function onGradeChange() {
+    const grade = document.getElementById('gradeSelect').value;
+    const testSel = document.getElementById('testSelect');
+    testSel.innerHTML = '<option value="">테스트를 선택하세요</option>';
+    testSel.disabled = !grade;
+    if (grade && testsByGrade[grade]) {
+      testsByGrade[grade].forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id; opt.textContent = t.name;
+        testSel.appendChild(opt);
+      });
+    }
+    document.getElementById('emptyArea').style.display = 'block';
+    document.getElementById('resultArea').style.display = 'none';
+  }
+
+  function onTestChange() {
+    const grade = document.getElementById('gradeSelect').value;
+    const testId = document.getElementById('testSelect').value;
+    if (!testId) {
+      document.getElementById('emptyArea').style.display = 'block';
+      document.getElementById('resultArea').style.display = 'none';
+      return;
+    }
+    document.getElementById('emptyArea').style.display = 'none';
+    document.getElementById('resultArea').style.display = 'block';
+
+    const students = (mockStudents[grade] || []).map(name => ({
+      name, grade,
+      score: Math.floor(Math.random() * 45) + 50,
+      date: '2026. 4. 18.'
+    }));
+    students.sort((a, b) => b.score - a.score);
+
+    const scores = students.map(s => s.score);
+    const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
+    document.getElementById('statCount').textContent = students.length + '명';
+    document.getElementById('statAvg').textContent = avg + '점';
+    document.getElementById('statMax').textContent = Math.max(...scores) + '점';
+    document.getElementById('statMin').textContent = Math.min(...scores) + '점';
+
+    const gradePillClass = g => ({'고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3','중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3'}[g]||'grade-high1');
+    const scoreClass = s => s >= 80 ? 'high' : s >= 60 ? 'mid' : 'low';
+    const rankClass = r => r===1?'rank-1':r===2?'rank-2':r===3?'rank-3':'rank-n';
+
+    document.getElementById('gradesBody').innerHTML = students.map((s, i) => {
+      const rank = i + 1;
+      const sc = scoreClass(s.score);
+      const pct = s.score;
+      return `
+        <tr>
+          <td><span class="rank-badge ${rankClass(rank)}">${rank}</span></td>
+          <td style="font-weight:600">${s.name}</td>
+          <td><span class="grade-pill ${gradePillClass(s.grade)}">${s.grade}</span></td>
+          <td>
+            <div class="score-bar-wrap score-${sc}">
+              <span class="score-num ${sc}">${s.score}점</span>
+              <div class="score-bar"><div class="score-bar-fill" style="width:${pct}%"></div></div>
+            </div>
+          </td>
+          <td style="color:var(--text-muted);font-size:13px">${s.date}</td>
+        </tr>`;
+    }).join('');
+  }
+</script>
+</body>
+</html>
