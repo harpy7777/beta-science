@@ -716,25 +716,28 @@
 
   // 하단 테스트 목록 업데이트 함수 (가짜 데이터 삭제 기능 포함)
   function renderRecentTests() {
+    // 1. 파이어베이스의 'tests' 컬렉션 연결
     const q = query(collection(db, "tests"), orderBy("regDate", "desc"), limit(10));
+    
     onSnapshot(q, (snapshot) => {
-      const tbody = document.querySelector('.section-card:nth-child(3) table tbody');
+      // 2. [수정] 아래쪽 표의 위치를 아주 정확하게 찾아갑니다.
+      const tables = document.querySelectorAll('table');
+      const testTableBody = tables[1].querySelector('tbody'); // 두 번째 표의 몸통
       const countBadge = document.querySelector('.test-count-badge');
       
-      // 1. 실시간 개수 업데이트
+      // 개수 배지 업데이트
       countBadge.textContent = `${snapshot.size}개`;
       
-      // 2. 중요: 기존 가짜 데이터를 싹 비웁니다.
-      tbody.innerHTML = ""; 
+      // ✨ 3. [핵심] 기존의 가짜 데이터(덕원여고 등)를 무조건 삭제합니다.
+      testTableBody.innerHTML = ""; 
 
-      // 3. 데이터가 없으면 안내 문구 표시
       if (snapshot.empty) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #64748b;">등록된 테스트가 없습니다.</td></tr>';
+        testTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #64748b;">등록된 테스트가 없습니다.</td></tr>';
         return;
       }
       
-      // 4. 파이어베이스 데이터를 표로 만듦
-      tbody.innerHTML = snapshot.docs.map(doc => {
+      // 4. 진짜 데이터를 표에 채웁니다.
+      testTableBody.innerHTML = snapshot.docs.map(doc => {
         const t = doc.data();
         return `
           <tr>
