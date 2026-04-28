@@ -5,80 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>베타과학학원 온라인 테스트</title>
 <style>
+/* 원장님의 기존 CSS 디자인을 그대로 유지합니다 */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;background:linear-gradient(160deg,#f0eeff 0%,#f5f0ff 50%,#ede9ff 100%);min-height:100vh}
-
 .ta-header{background:linear-gradient(90deg,#6c63ff,#534AB7);padding:1rem;text-align:center;color:#fff;display:flex;align-items:center;justify-content:center;gap:12px}
 .ta-header-icon{width:44px;height:44px;background:rgba(255,255,255,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
 .ta-header-title{font-size:18px;font-weight:600}
 .ta-header-sub{font-size:12px;opacity:0.85}
 .ta-body{max-width:640px;margin:0 auto;padding:1.5rem 1rem}
-
 .ta-login-card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(100,100,200,0.12)}
 .ta-login-hero{background:linear-gradient(135deg,#7c6fff,#534AB7);padding:2.5rem 2rem;text-align:center;position:relative;overflow:hidden}
-.ta-login-hero::before{content:'';position:absolute;width:200px;height:200px;background:rgba(255,255,255,0.06);border-radius:50%;top:-60px;right:-40px}
-.ta-login-hero::after{content:'';position:absolute;width:150px;height:150px;background:rgba(255,255,255,0.06);border-radius:50%;bottom:-50px;left:-30px}
 .ta-hero-icon{width:72px;height:72px;background:rgba(255,255,255,0.18);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 1rem;position:relative;z-index:1}
 .ta-hero-title{color:#fff;font-size:26px;font-weight:700;margin-bottom:8px;position:relative;z-index:1}
 .ta-hero-badge{display:inline-block;background:rgba(255,255,255,0.2);color:#fff;font-size:13px;padding:4px 14px;border-radius:20px;position:relative;z-index:1}
 .ta-form{padding:2rem}
 .ta-form label{font-size:13px;font-weight:500;color:#333;display:block;margin-bottom:6px}
-.ta-form select,.ta-form input{width:100%;padding:12px 14px;border:1.5px solid #e0e4f0;border-radius:10px;font-size:14px;background:#f8f9ff;color:#222;margin-bottom:1.25rem;outline:none;font-family:inherit;-webkit-appearance:none;appearance:none}
-.ta-form select:focus,.ta-form input:focus{border-color:#534AB7;background:#fff}
-.ta-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.ta-btn{padding:14px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:inherit}
-.ta-btn-dark{background:#1a1a2e;color:#fff}
-.ta-btn-primary{background:linear-gradient(90deg,#7c6fff,#534AB7);color:#fff}
-
+.ta-form select, .ta-form input{width:100%;padding:12px 14px;border:1.5px solid #e0e4f0;border-radius:10px;font-size:14px;background:#f8f9ff;color:#222;margin-bottom:1.25rem;outline:none;font-family:inherit}
+.ta-btn-primary{width:100%;padding:14px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;border:none;background:linear-gradient(90deg,#7c6fff,#534AB7);color:#fff}
 .ta-test-card{background:#fff;border-radius:16px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 2px 12px rgba(100,100,200,0.08)}
 .ta-progress{background:#f0f0f8;border-radius:4px;height:6px;margin-bottom:1.5rem;overflow:hidden}
 .ta-progress-bar{background:linear-gradient(90deg,#7c6fff,#534AB7);height:100%;border-radius:4px;transition:width 0.3s}
-.ta-q-num{font-size:12px;color:#888;margin-bottom:8px}
 .ta-q-text{font-size:16px;font-weight:500;color:#1a1a2e;margin-bottom:1.25rem;line-height:1.6}
 .ta-option{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid #e0e4f0;border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all 0.15s;background:#fff}
 .ta-option:hover{border-color:#534AB7;background:#f5f0ff}
-.ta-option.selected{border-color:#534AB7;background:#ede9ff}
-.ta-option.correct{border-color:#22c55e;background:#f0fff4}
-.ta-option.wrong{border-color:#ef4444;background:#fff0f0}
-.ta-option-num{width:28px;height:28px;border-radius:50%;background:#f0f0f8;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#666;flex-shrink:0}
-.ta-option.correct .ta-option-num{background:#22c55e;color:#fff}
-.ta-option.wrong .ta-option-num{background:#ef4444;color:#fff}
-.ta-ox-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
-.ta-ox-btn{padding:20px;border-radius:12px;font-size:24px;font-weight:700;cursor:pointer;border:2px solid #e0e4f0;background:#fff;transition:all 0.15s;font-family:inherit}
-.ta-ox-btn:hover{border-color:#534AB7}
-.ta-ox-btn.correct{border-color:#22c55e;background:#f0fff4}
-.ta-ox-btn.wrong{border-color:#ef4444;background:#fff0f0}
-.ta-next-btn{width:100%;padding:14px;background:linear-gradient(90deg,#7c6fff,#534AB7);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-top:1rem;font-family:inherit}
-.ta-next-btn:disabled{opacity:0.4;cursor:not-allowed}
-
-.explanation-box{margin-top:1rem;padding:14px 16px;border-radius:12px;font-size:14px;line-height:1.6;display:none}
-.explanation-box.correct{background:#f0fff4;border:1.5px solid #86efac;color:#166534}
-.explanation-box.wrong{background:#fff0f0;border:1.5px solid #fca5a5;color:#991b1b}
-.explanation-box .ex-title{font-weight:600;margin-bottom:4px;font-size:13px}
-.explanation-box .ex-text{font-size:13px}
-
+.ta-option.selected{border-color:#534AB7;background:#ede9ff; font-weight: 600;}
+.ta-next-btn{width:100%;padding:14px;background:linear-gradient(90deg,#7c6fff,#534AB7);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-top:1rem}
 .ta-result-card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(100,100,200,0.12);text-align:center}
 .ta-result-hero{background:linear-gradient(135deg,#7c6fff,#534AB7);padding:2.5rem 2rem}
 .ta-result-score{font-size:56px;font-weight:700;color:#fff}
-.ta-result-label{color:rgba(255,255,255,0.8);font-size:14px;margin-top:4px}
-.ta-result-body{padding:1.5rem}
-.ta-result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1.5rem}
-.ta-result-stat{background:#f8f9ff;border-radius:10px;padding:12px}
-.ta-result-stat-num{font-size:22px;font-weight:600;color:#1a1a2e}
-.ta-result-stat-label{font-size:11px;color:#888;margin-top:2px}
-.ta-grade{display:inline-block;font-size:32px;font-weight:700;padding:8px 28px;border-radius:40px;margin-bottom:1.5rem}
-.grade-a{background:#f0fff4;color:#16a34a}
-.grade-b{background:#ede9ff;color:#534AB7}
-.grade-c{background:#fffbeb;color:#d97706}
-.grade-f{background:#fff0f0;color:#ef4444}
-
-.wrong-note{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;border:1.5px solid #fca5a5;text-align:left}
-.wrong-note-q{font-size:14px;font-weight:500;color:#1a1a2e;margin-bottom:6px}
-.wrong-note-ans{font-size:12px;color:#166534;margin-bottom:4px}
-.wrong-note-ex{font-size:12px;color:#666;line-height:1.5}
-
 .loading{text-align:center;padding:3rem;color:#888;font-size:14px}
-.error-msg{background:#fff0f0;color:#ef4444;padding:12px;border-radius:8px;font-size:13px;margin-bottom:1rem}
 </style>
 </head>
 <body>
@@ -97,32 +52,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans
       <div class="ta-login-hero">
         <div class="ta-hero-icon">📋</div>
         <div class="ta-hero-title">온라인 테스트</div>
-        <div style="height:8px"></div>
-        <div id="ta-subject-badge" class="ta-hero-badge">과목을 선택하세요</div>
+        <div id="ta-subject-badge" class="ta-hero-badge">정보를 입력하세요</div>
       </div>
       <div class="ta-form">
-        <div id="sheet-loading" class="loading">📡 문제 불러오는 중...</div>
-        <div id="sheet-error" class="error-msg" style="display:none"></div>
-        <div id="login-form" style="display:none">
-          <label>과목</label>
-          <select id="ta-subject" onchange="updateSubjectBadge()">
-            <option value="">과목을 선택하세요</option>
-          </select>
-          <label>학년</label>
-          <select id="ta-grade">
-            <option value="">학년을 선택하세요</option>
-            <option>중1</option><option>중2</option><option>중3</option>
-            <option>고1</option><option>고2</option><option>고3</option>
-          </select>
-          <label>학생 ID</label>
-          <input type="text" id="ta-id" placeholder="학원에서 부여받은 ID를 입력하세요">
-          <label>학생 이름</label>
-          <input type="text" id="ta-name" placeholder="이름을 입력하세요">
-          <div class="ta-btn-row">
-            <button class="ta-btn ta-btn-dark" onclick="showRecords()">📁 기록 보기</button>
-            <button class="ta-btn ta-btn-primary" onclick="startTest()">▶ 테스트 시작</button>
-          </div>
-        </div>
+        <label>테스트 코드 (배포 ID)</label>
+        <input type="text" id="ta-test-code" placeholder="원장님이 알려주신 코드를 입력하세요">
+        <label>학년</label>
+        <select id="ta-grade">
+          <option value="">학년을 선택하세요</option>
+          <option>중등1학년</option><option>중등2학년</option><option>중등3학년</option>
+          <option>고등1학년</option><option>고등2학년</option><option>고등3학년</option>
+        </select>
+        <label>학생 이름</label>
+        <input type="text" id="ta-name" placeholder="이름을 입력하세요">
+        <button class="ta-btn-primary" onclick="startTest()">▶ 테스트 시작</button>
       </div>
     </div>
   </div>
@@ -134,14 +77,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans
         <span style="font-size:13px;color:#534AB7;font-weight:500" id="ta-q-counter"></span>
       </div>
       <div class="ta-progress"><div class="ta-progress-bar" id="ta-prog"></div></div>
-      <div class="ta-q-num" id="ta-q-num"></div>
       <div class="ta-q-text" id="ta-q-text"></div>
-      <div id="ta-options"></div>
-      <div class="explanation-box" id="explanation-box">
-        <div class="ex-title" id="ex-title"></div>
-        <div class="ex-text" id="ex-text"></div>
+      <div id="ta-options">
+        <div class="ta-option" onclick="selectOption(1)"><div style="width:24px">①</div> 1번</div>
+        <div class="ta-option" onclick="selectOption(2)"><div style="width:24px">②</div> 2번</div>
+        <div class="ta-option" onclick="selectOption(3)"><div style="width:24px">③</div> 3번</div>
+        <div class="ta-option" onclick="selectOption(4)"><div style="width:24px">④</div> 4번</div>
+        <div class="ta-option" onclick="selectOption(5)"><div style="width:24px">⑤</div> 5번</div>
       </div>
-      <button class="ta-next-btn" id="ta-next-btn" disabled onclick="nextQuestion()">다음 문제 →</button>
+      <button class="ta-next-btn" id="ta-next-btn" onclick="nextQuestion()">다음 문제 →</button>
     </div>
   </div>
 
@@ -149,236 +93,120 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans
     <div class="ta-result-card">
       <div class="ta-result-hero">
         <div class="ta-result-score" id="res-score">0점</div>
-        <div class="ta-result-label" id="res-name-label"></div>
+        <div style="color:white; margin-top:10px;" id="res-msg">테스트가 완료되었습니다!</div>
       </div>
-      <div class="ta-result-body">
-        <div class="ta-result-grid">
-          <div class="ta-result-stat"><div class="ta-result-stat-num" id="res-correct">0</div><div class="ta-result-stat-label">정답</div></div>
-          <div class="ta-result-stat"><div class="ta-result-stat-num" id="res-wrong">0</div><div class="ta-result-stat-label">오답</div></div>
-          <div class="ta-result-stat"><div class="ta-result-stat-num" id="res-total">0</div><div class="ta-result-stat-label">전체</div></div>
-        </div>
-        <div id="res-grade" class="ta-grade grade-b">B</div>
-        <div id="wrong-note-section" style="display:none;margin-bottom:1.5rem">
-          <div style="font-size:14px;font-weight:600;color:#1a1a2e;margin-bottom:10px;text-align:left">📖 오답 노트</div>
-          <div id="wrong-note-list"></div>
-        </div>
-        <button class="ta-btn ta-btn-primary" style="width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit" onclick="resetTest()">다시 풀기</button>
+      <div style="padding:2rem">
+        <p style="color:#666; margin-bottom:1.5rem">점수가 원장님께 전송되었습니다.</p>
+        <button class="ta-btn-primary" onclick="location.reload()">처음으로</button>
       </div>
-    </div>
-  </div>
-
-  <div id="ta-records" style="display:none">
-    <div class="ta-test-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-        <div style="font-size:16px;font-weight:600;color:#1a1a2e">내 성적 기록</div>
-        <button onclick="document.getElementById('ta-records').style.display='none';document.getElementById('ta-login').style.display='block'" style="background:none;border:none;color:#534AB7;font-size:13px;cursor:pointer">← 돌아가기</button>
-      </div>
-      <div id="records-list"></div>
     </div>
   </div>
 </div>
 
-<script>
-const SHEET_ID='1R0gmqetHtF2sQBcXQ6d2zMI6zLKxR9DpLQG3UExKPj8';
-const SHEET_NAME='Sheet1';
-let allQuestions={},currentQuestions=[],currentQ=0,answers=[],isAnswered=false;
-let taSubject='',taGrade='',taName='',taId='';
-let records=[];
-try{records=JSON.parse(localStorage.getItem('beta_records')||'[]');}catch(e){}
+<script type="module">
+  import { db } from './firebase-config.js';
+  import { doc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-async function loadFromSheet(){
-  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
-  try{
-    const res=await fetch(url);
-    const text=await res.text();
-    const json=JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
-    const rows=json.table.rows;
-    if(!rows||rows.length===0){showSheetError('시트에 데이터가 없습니다.');return;}
-    allQuestions={};
-    rows.forEach(row=>{
-      const c=row.c;
-      if(!c||!c[0]||!c[0].v) return;
-      const subject=String(c[0].v).trim();
-      const type=String(c[1]?.v||'').trim().toLowerCase();
-      const q=String(c[2]?.v||'').trim();
-      const opt1=String(c[3]?.v||'').trim();
-      const opt2=String(c[4]?.v||'').trim();
-      const opt3=String(c[5]?.v||'').trim();
-      const opt4=String(c[6]?.v||'').trim();
-      const ans=String(c[7]?.v||'').trim();
-      const explain=String(c[8]?.v||'').trim();
-      if(!subject||!q||!ans) return;
-      if(!allQuestions[subject]) allQuestions[subject]=[];
-      if(type==='ox'){
-        allQuestions[subject].push({type:'ox',q,ans:ans.toUpperCase(),explain});
+  let currentTest = null;
+  let currentQ = 0;
+  let userAnswers = [];
+  let selectedOption = null;
+
+  // 테스트 시작
+  window.startTest = async function() {
+    const code = document.getElementById('ta-test-code').value.trim();
+    const name = document.getElementById('ta-name').value.trim();
+    const grade = document.getElementById('ta-grade').value;
+
+    if(!code || !name || !grade) { alert('모든 정보를 입력해주세요.'); return; }
+
+    try {
+      const docRef = doc(db, "tests", code);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        currentTest = docSnap.data();
+        currentTest.fireId = docSnap.id;
+        document.getElementById('ta-login').style.display = 'none';
+        document.getElementById('ta-test').style.display = 'block';
+        document.getElementById('ta-student-info').textContent = `${grade} ${name}`;
+        renderQuestion();
       } else {
-        const ansIdx=parseInt(ans)-1;
-        allQuestions[subject].push({type:'mc',q,opts:[opt1,opt2,opt3,opt4].filter(o=>o),ans:isNaN(ansIdx)?0:ansIdx,explain});
+        alert('존재하지 않는 테스트 코드입니다.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('데이터를 불러오는 중 오류가 발생했습니다.');
+    }
+  }
+
+  // 보기 선택
+  window.selectOption = function(num) {
+    selectedOption = num;
+    const opts = document.querySelectorAll('.ta-option');
+    opts.forEach(opt => opt.classList.remove('selected'));
+    opts[num-1].classList.add('selected');
+  }
+
+  // 문제 출력
+  function renderQuestion() {
+    const qData = currentTest.questions[currentQ];
+    document.getElementById('ta-q-counter').textContent = `${currentQ + 1} / ${currentTest.questions.length}`;
+    document.getElementById('ta-q-text').textContent = qData.question || `${currentQ + 1}번 문제입니다.`;
+    document.getElementById('ta-prog').style.width = `${((currentQ) / currentTest.questions.length) * 100}%`;
+    
+    // 초기화
+    selectedOption = null;
+    document.querySelectorAll('.ta-option').forEach(opt => opt.classList.remove('selected'));
+    document.getElementById('ta-next-btn').textContent = (currentQ === currentTest.questions.length - 1) ? "제출하기" : "다음 문제 →";
+  }
+
+  // 다음 문제 또는 제출
+  window.nextQuestion = function() {
+    if(selectedOption === null) { alert('답을 선택해주세요.'); return; }
+    
+    userAnswers.push(selectedOption);
+
+    if (currentQ < currentTest.questions.length - 1) {
+      currentQ++;
+      renderQuestion();
+    } else {
+      submitTest();
+    }
+  }
+
+  // 최종 제출 및 채점
+  async function submitTest() {
+    let correctCount = 0;
+    currentTest.questions.forEach((q, idx) => {
+      if(String(q.answer) === String(userAnswers[idx])) {
+        correctCount++;
       }
     });
-    const subjects=Object.keys(allQuestions);
-    if(subjects.length===0){showSheetError('문제 형식을 확인해주세요.');return;}
-    const sel=document.getElementById('ta-subject');
-    sel.innerHTML='<option value="">과목을 선택하세요</option>';
-    subjects.forEach(s=>{const opt=document.createElement('option');opt.value=s;opt.textContent=s;sel.appendChild(opt);});
-    document.getElementById('sheet-loading').style.display='none';
-    document.getElementById('login-form').style.display='block';
-  }catch(e){showSheetError('시트를 불러오지 못했습니다. 공유 설정을 확인해주세요.');}
-}
 
-function showSheetError(msg){
-  document.getElementById('sheet-loading').style.display='none';
-  const err=document.getElementById('sheet-error');
-  err.style.display='block';err.textContent='⚠️ '+msg;
-  document.getElementById('login-form').style.display='block';
-}
+    const score = Math.round((correctCount / currentTest.questions.length) * 100);
+    const name = document.getElementById('ta-name').value.trim();
+    const grade = document.getElementById('ta-grade').value;
 
-function updateSubjectBadge(){
-  document.getElementById('ta-subject-badge').textContent=document.getElementById('ta-subject').value||'과목을 선택하세요';
-}
+    try {
+      // 파이어베이스 'grades' 컬렉션에 성적 저장
+      await addDoc(collection(db, "grades"), {
+        testId: currentTest.fireId,
+        testUnit: currentTest.unitName || currentTest.unit,
+        studentName: name,
+        grade: grade,
+        score: score,
+        date: new Date().toLocaleDateString('ko-KR')
+      });
 
-function startTest(){
-  taSubject=document.getElementById('ta-subject').value;
-  taGrade=document.getElementById('ta-grade').value;
-  taId=document.getElementById('ta-id').value.trim();
-  taName=document.getElementById('ta-name').value.trim();
-  if(!taSubject||!taGrade||!taName){alert('과목, 학년, 이름을 입력해주세요');return;}
-  const qs=allQuestions[taSubject]||[];
-  if(qs.length===0){alert('등록된 문제가 없습니다.');return;}
-  currentQuestions=[...qs].sort(()=>Math.random()-0.5);
-  currentQ=0;answers=[];
-  document.getElementById('ta-login').style.display='none';
-  document.getElementById('ta-test').style.display='block';
-  document.getElementById('ta-student-info').textContent=taGrade+' '+taName;
-  renderQuestion();
-}
-
-function renderQuestion(){
-  const q=currentQuestions[currentQ];
-  const total=currentQuestions.length;
-  isAnswered=false;
-  document.getElementById('ta-q-counter').textContent=(currentQ+1)+' / '+total;
-  document.getElementById('ta-q-num').textContent=(currentQ+1)+'번 문제 '+(q.type==='ox'?'(OX)':'(4지선다)');
-  document.getElementById('ta-q-text').textContent=q.q;
-  document.getElementById('ta-prog').style.width=Math.round((currentQ/total)*100)+'%';
-  document.getElementById('ta-next-btn').disabled=true;
-  document.getElementById('ta-next-btn').textContent=currentQ===total-1?'결과 보기 →':'다음 문제 →';
-  const exBox=document.getElementById('explanation-box');
-  exBox.style.display='none';exBox.className='explanation-box';
-  const opts=document.getElementById('ta-options');
-  if(q.type==='ox'){
-    opts.innerHTML=`<div class="ta-ox-row">
-      <button class="ta-ox-btn" onclick="selectOX(this,'O')">O</button>
-      <button class="ta-ox-btn" onclick="selectOX(this,'X')">X</button>
-    </div>`;
-  } else {
-    opts.innerHTML=q.opts.map((o,i)=>`<div class="ta-option" onclick="selectMC(this,${i})">
-      <div class="ta-option-num">${['①','②','③','④'][i]}</div>
-      <div style="font-size:14px;color:#333">${o}</div>
-    </div>`).join('');
+      document.getElementById('ta-test').style.display = 'none';
+      document.getElementById('ta-result').style.display = 'block';
+      document.getElementById('res-score').textContent = score + '점';
+    } catch (e) {
+      console.error(e);
+      alert('성적 저장 중 오류가 발생했습니다.');
+    }
   }
-}
-
-function showExplanation(isCorrect,explain){
-  const exBox=document.getElementById('explanation-box');
-  exBox.style.display='block';
-  exBox.className='explanation-box '+(isCorrect?'correct':'wrong');
-  document.getElementById('ex-title').textContent=isCorrect?'✅ 정답입니다!':'❌ 오답입니다';
-  document.getElementById('ex-text').textContent=explain||(isCorrect?'':'다시 한번 확인해보세요.');
-}
-
-function selectOX(el,val){
-  if(isAnswered) return;
-  isAnswered=true;
-  const q=currentQuestions[currentQ];
-  answers[currentQ]=val;
-  const isCorrect=val===q.ans;
-  document.querySelectorAll('.ta-ox-btn').forEach(b=>{
-    if(b.textContent===q.ans) b.classList.add('correct');
-    else if(b===el&&!isCorrect) b.classList.add('wrong');
-  });
-  showExplanation(isCorrect,q.explain);
-  document.getElementById('ta-next-btn').disabled=false;
-}
-
-function selectMC(el,idx){
-  if(isAnswered) return;
-  isAnswered=true;
-  const q=currentQuestions[currentQ];
-  answers[currentQ]=idx;
-  const isCorrect=idx===q.ans;
-  document.querySelectorAll('.ta-option').forEach((o,i)=>{
-    if(i===q.ans) o.classList.add('correct');
-    else if(i===idx&&!isCorrect) o.classList.add('wrong');
-  });
-  showExplanation(isCorrect,q.explain);
-  document.getElementById('ta-next-btn').disabled=false;
-}
-
-function nextQuestion(){
-  if(currentQ<currentQuestions.length-1){currentQ++;renderQuestion();}
-  else showResult();
-}
-
-function showResult(){
-  let correct=0;
-  const wrongList=[];
-  currentQuestions.forEach((q,i)=>{
-    if(answers[i]===q.ans) correct++;
-    else wrongList.push({q,userAns:answers[i]});
-  });
-  const total=currentQuestions.length;
-  const score=Math.round((correct/total)*100);
-  const gr=score>=90?'A':score>=80?'B':score>=70?'C':score>=60?'D':'F';
-  const rec={name:taName,id:taId,subject:taSubject,grade:taGrade,score,correct,total,letterGrade:gr,date:new Date().toLocaleDateString('ko-KR')};
-  records.unshift(rec);
-  try{localStorage.setItem('beta_records',JSON.stringify(records.slice(0,100)));}catch(e){}
-  document.getElementById('ta-test').style.display='none';
-  document.getElementById('ta-result').style.display='block';
-  document.getElementById('res-score').textContent=score+'점';
-  document.getElementById('res-name-label').textContent=taGrade+' '+taName+' | '+taSubject;
-  document.getElementById('res-correct').textContent=correct;
-  document.getElementById('res-wrong').textContent=total-correct;
-  document.getElementById('res-total').textContent=total;
-  const gradeEl=document.getElementById('res-grade');
-  gradeEl.textContent=gr;
-  gradeEl.className='ta-grade grade-'+(gr==='A'?'a':gr==='B'?'b':gr==='C'||gr==='D'?'c':'f');
-  if(wrongList.length>0){
-    document.getElementById('wrong-note-section').style.display='block';
-    document.getElementById('wrong-note-list').innerHTML=wrongList.map((w,i)=>`
-      <div class="wrong-note">
-        <div class="wrong-note-q">${i+1}. ${w.q.q}</div>
-        <div class="wrong-note-ans">✅ 정답: ${w.q.type==='ox'?w.q.ans:w.q.opts[w.q.ans]}</div>
-        ${w.q.explain?`<div class="wrong-note-ex">💡 ${w.q.explain}</div>`:''}
-      </div>`).join('');
-  } else {
-    document.getElementById('wrong-note-section').style.display='none';
-  }
-}
-
-function resetTest(){
-  document.getElementById('ta-result').style.display='none';
-  document.getElementById('ta-login').style.display='block';
-}
-
-function showRecords(){
-  const id=document.getElementById('ta-id').value.trim();
-  const name=document.getElementById('ta-name').value.trim();
-  if(!id&&!name){alert('ID 또는 이름을 입력하면 본인 기록을 볼 수 있어요');return;}
-  const filtered=records.filter(r=>(!id||r.id===id)&&(!name||r.name===name));
-  document.getElementById('ta-login').style.display='none';
-  document.getElementById('ta-records').style.display='block';
-  const el=document.getElementById('records-list');
-  if(filtered.length===0){el.innerHTML='<div style="text-align:center;color:#888;padding:2rem">기록이 없습니다</div>';return;}
-  el.innerHTML=filtered.map(r=>`<div style="padding:12px 0;border-bottom:1px solid #f0f0f8;display:flex;justify-content:space-between;align-items:center">
-    <div><div style="font-size:14px;font-weight:500;color:#1a1a2e">${r.subject}</div>
-    <div style="font-size:12px;color:#888;margin-top:2px">${r.date} · ${r.grade}</div></div>
-    <div style="text-align:right"><div style="font-size:20px;font-weight:700;color:#534AB7">${r.score}점</div>
-    <div style="font-size:11px;color:#888">${r.correct}/${r.total} 정답</div></div>
-  </div>`).join('');
-}
-
-loadFromSheet();
 </script>
 </body>
 </html>
