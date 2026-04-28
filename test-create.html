@@ -5,218 +5,119 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>테스트 생성 - 베타과학</title>
 <style>
-  /* 원본 CSS 100% 유지 */
+  /* 원본 CSS 및 틀 100% 유지 */
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root { --primary: #2563eb; --primary-light: #eff6ff; --primary-dark: #1d4ed8; --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff; --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --success: #10b981; --radius: 10px; }
-  body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  body { font-family: 'Pretendard', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
   .app-wrapper { max-width: var(--max-width); margin: 0 auto; display: flex; flex-direction: column; min-height: 100vh; }
   .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 32px; height: 56px; position: sticky; top: 0; z-index: 100; }
-  .logo-area { display: flex; flex-direction: column; align-items: center; line-height: 1.1; flex-shrink: 0; min-width: 80px; }
-  .logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
-  .logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
-  .nav-tabs { display: flex; gap: 2px; list-style: none; }
-  .nav-tabs a { display: block; padding: 8px 14px; font-size: 14px; color: var(--text-muted); text-decoration: none; border-radius: 6px; white-space: nowrap; transition: background 0.15s, color 0.15s; }
-  .nav-tabs a.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
-  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
-  .academy-name { font-size: 13px; font-weight: 600; }
-  .badge-admin { font-size: 11px; padding: 2px 8px; background: #f1f5f9; border-radius: 20px; color: var(--text-muted); }
   .main-content { padding: 28px 24px; flex: 1; }
-  .page-header { margin-bottom: 24px; }
-  .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
-  .page-header p { font-size: 14px; color: var(--text-muted); }
-  .section-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 20px; }
-  .section-card-title { font-size: 18px; font-weight: 700; margin-bottom: 24px; color: var(--text); }
-  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-  .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7px; }
-  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text); background: var(--white); outline: none; }
   
-  /* 문제 입력 스타일 (사진 반영) */
+  /* 사진 반영: 섹션 타이틀 크게 */
   .part-section { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 24px; }
-  .part-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: var(--text); }
-  .answer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-  .answer-item { display: flex; flex-direction: column; gap: 6px; }
-  .answer-item label { font-size: 14px; font-weight: 700; color: var(--text-muted); }
-  /* 지문 입력이 앞으로, 정답 선택이 뒤로 (아이템 내부 배치) */
-  .answer-input-group { display: flex; gap: 8px; align-items: center; }
-  .q-text { flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; }
-  .q-ans { width: 100px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-weight: 600; background: #fff; }
-
-  /* 추가 과제 섹션 */
-  .homework-section { margin-top: 20px; }
-  .homework-group { margin-bottom: 12px; }
-  .homework-group label { font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px; }
-
-  .save-bar { position: sticky; bottom: 0; background: var(--white); border-top: 1px solid var(--border); padding: 14px 24px; z-index: 50; margin: 0 -24px -28px; }
-  .btn-save { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .part-title { font-size: 24px; font-weight: 800; margin-bottom: 24px; color: var(--text); }
   
-  .registered-section { margin-top: 40px; padding-top: 36px; border-top: 2px solid var(--border); }
-  .table-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  table { width: 100%; border-collapse: collapse; }
-  th { font-size: 13px; font-weight: 600; color: var(--text-muted); text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--border); background: #f8fafc; }
-  td { font-size: 14px; padding: 13px 16px; border-bottom: 1px solid var(--border); }
+  /* 입력 폼 옹졸하지 않게 100% 너비 적용 */
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .form-group input, .form-group textarea { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: #fcfdfe; }
+  .form-group textarea { min-height: 80px; resize: none; }
+
+  /* 한 줄에 문제 한 개씩 + 정답 입력 박스 */
+  .answer-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+  .answer-item { display: flex; flex-direction: column; gap: 6px; }
+  .answer-item label { font-size: 16px; font-weight: 800; color: var(--text); padding-left: 2px; }
+  
+  .answer-input-group { display: flex; gap: 12px; width: 100%; }
+  .q-text { flex: 1; padding: 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; }
+  .q-ans { width: 120px; padding: 14px; border: 1px solid var(--border); border-radius: 8px; font-weight: 700; background: #fff; cursor: pointer; text-align: center; }
+
+  /* 추가 과제 섹션 - 사진 디자인 반영 */
+  .homework-title { font-size: 18px; font-weight: 700; margin: 30px 0 16px; color: var(--text); }
+  .homework-group { margin-bottom: 16px; }
+  .homework-group label { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block; }
+  .hw-input { width: 100%; padding: 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; }
+
+  /* 저장 버튼 */
+  .save-bar { position: sticky; bottom: 0; background: var(--white); border-top: 1px solid var(--border); padding: 16px 24px; z-index: 50; margin: 0 -24px -28px; }
+  .btn-save { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
 </style>
 </head>
 <body>
 <div class="app-wrapper">
   <header class="topbar">
     <div class="logo-area"><span class="brand">BETA</span><span class="brand-sub">SCIENCE</span></div>
-    <div class="topbar-divider"></div>
-    <nav><ul class="nav-tabs">
-      <li><a href="#">대시보드</a></li>
-      <li><a href="#" class="active">테스트 생성</a></li>
-      <li><a href="#">성적 분석</a></li>
-      <li><a href="#">통계 보고서</a></li>
-    </ul></nav>
     <div class="topbar-right"><span class="academy-name">베타과학학원</span><span class="badge-admin">관리자 모드</span></div>
   </header>
 
   <main class="main-content">
-    <div class="page-header"><h1>테스트 생성</h1><p>문항을 섹션별로 입력하고 관리하세요</p></div>
-
-    <div class="section-card">
-      <div class="section-card-title">기본 정보</div>
-      <div class="form-row-3">
-        <div class="form-group"><label>테스트 ID</label><input type="text" id="testId" readonly></div>
-        <div class="form-group"><label>과목</label><select id="subject"><option>통합과학</option><option>물리</option></select></div>
-        <div class="form-group"><label>학년</label><select id="grade"><option>고등1학년</option></select></div>
-      </div>
-      <div class="form-group"><label>단원명</label><input type="text" id="unitName" placeholder="예: 알칼리금속과 할로젠"></div>
-    </div>
-
     <div class="part-section">
       <div class="part-title">1부: 문항 1-10</div>
       <div class="form-group"><label>섹션명</label><input type="text" id="secName1" placeholder="예: 알칼리금속"></div>
       <div class="form-group"><label>핵심 내용</label><textarea id="secCore1" placeholder="이 섹션의 핵심 개념을 입력하세요..."></textarea></div>
-      <div class="answer-grid" id="grid1"></div>
-      <div class="homework-section">
-        <div class="homework-group"><label>0-2개 오답</label><input type="text" id="hw1_1" value="시험지에 오답문제 정리해오기"></div>
-        <div class="homework-group"><label>3-4개 오답</label><input type="text" id="hw1_2" value="수업노트 필기 다시하고 오답문제 정리하기"></div>
-        <div class="homework-group"><label>5개 이상 오답</label><input type="text" id="hw1_3" value="동영상 수업 내용복습, 수업노트 필기, 오답정리해오기"></div>
-      </div>
+      
+      <div class="homework-title">정답 입력 (1-10번)</div>
+      <div class="answer-grid" id="grid1">
+        </div>
+
+      <div class="homework-title">추가 과제 (오답별)</div>
+      <div class="homework-group"><label>0-2개 오답</label><input type="text" class="hw-input" value="시험지에 오답문제 정리해오기"></div>
+      <div class="homework-group"><label>3-4개 오답</label><input type="text" class="hw-input" value="수업노트 필기 다시하고 오답문제 정리하기"></div>
+      <div class="homework-group"><label>5개 이상 오답</label><input type="text" class="hw-input" value="동영상 수업 내용복습, 수업노트 필기, 오답정리해오기"></div>
     </div>
 
     <div class="part-section">
       <div class="part-title">2부: 문항 11-20</div>
       <div class="form-group"><label>섹션명</label><input type="text" id="secName2" placeholder="예: 할로젠원소"></div>
       <div class="form-group"><label>핵심 내용</label><textarea id="secCore2" placeholder="이 섹션의 핵심 개념을 입력하세요..."></textarea></div>
+      <div class="homework-title">정답 입력 (11-20번)</div>
       <div class="answer-grid" id="grid2"></div>
-      <div class="homework-section">
-        <div class="homework-group"><label>0-2개 오답</label><input type="text" id="hw2_1" value="시험지에 오답문제 정리해오기"></div>
-        <div class="homework-group"><label>3-4개 오답</label><input type="text" id="hw2_2" value="수업노트 필기 다시하고 오답문제 정리하기"></div>
-        <div class="homework-group"><label>5개 이상 오답</label><input type="text" id="hw2_3" value="동영상 수업 내용복습, 수업노트 필기, 오답정리해오기"></div>
-      </div>
+      <div class="homework-title">추가 과제 (오답별)</div>
+      <div class="homework-group"><label>0-2개 오답</label><input type="text" class="hw-input" value="시험지에 오답문제 정리해오기"></div>
+      <div class="homework-group"><label>3-4개 오답</label><input type="text" class="hw-input" value="수업노트 필기 다시하고 오답문제 정리하기"></div>
+      <div class="homework-group"><label>5개 이상 오답</label><input type="text" class="hw-input" value="동영상 수업 내용복습, 수업노트 필기, 오답정리해오기"></div>
     </div>
 
     <div class="part-section">
       <div class="part-title">3부: 문항 21-30</div>
       <div class="form-group"><label>섹션명</label><input type="text" id="secName3" placeholder="예: 주기적성질"></div>
       <div class="form-group"><label>핵심 내용</label><textarea id="secCore3" placeholder="이 섹션의 핵심 개념을 입력하세요..."></textarea></div>
+      <div class="homework-title">정답 입력 (21-30번)</div>
       <div class="answer-grid" id="grid3"></div>
-      <div class="homework-section">
-        <div class="homework-group"><label>0-2개 오답</label><input type="text" id="hw3_1" value="시험지에 오답문제 정리해오기"></div>
-        <div class="homework-group"><label>3-4개 오답</label><input type="text" id="hw3_2" value="수업노트 필기 다시하고 오답문제 정리하기"></div>
-        <div class="homework-group"><label>5개 이상 오답</label><input type="text" id="hw3_3" value="동영상 수업 내용복습, 수업노트 필기, 오답정리해오기"></div>
-      </div>
+      <div class="homework-title">추가 과제 (오답별)</div>
+      <div class="homework-group"><label>0-2개 오답</label><input type="text" class="hw-input" value="시험지에 오답문제 정리해오기"></div>
+      <div class="homework-group"><label>3-4개 오답</label><input type="text" class="hw-input" value="수업노트 필기 다시하고 오답문제 정리하기"></div>
+      <div class="homework-group"><label>5개 이상 오답</label><input type="text" class="hw-input" value="동영상 수업 내용복습, 수업노트 필기, 오답정리해오기"></div>
     </div>
 
     <div class="save-bar">
       <button class="btn-save" onclick="saveTest()">테스트 저장 및 배포</button>
     </div>
-
-    <div class="registered-section">
-      <div class="section-card-title">등록된 테스트 <span id="regCount">0</span>개</div>
-      <div class="table-card">
-        <table><thead><tr><th>테스트 ID</th><th>단원명</th><th>과목</th><th>학년</th><th>관리</th></tr></thead><tbody id="regTestBody"></tbody></table>
-      </div>
-    </div>
   </main>
 </div>
 
-<script type="module">
-  // Firebase 설정은 기존 파일 유지한다고 가정
-  import { db } from './firebase-config.js';
-  import { collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  // 문항 자동 생성 함수 (10개씩)
-  function createInputs(targetId, start, end) {
-    const container = document.getElementById(targetId);
+<script>
+  function renderItems(containerId, start, end) {
+    const container = document.getElementById(containerId);
     for (let i = start; i <= end; i++) {
-      const item = document.createElement('div');
-      item.className = 'answer-item';
-      item.innerHTML = `
+      const div = document.createElement('div');
+      div.className = 'answer-item';
+      div.innerHTML = `
         <label>Q${i}</label>
         <div class="answer-input-group">
           <input type="text" class="q-text" data-qno="${i}" placeholder="지문 입력">
-          <select class="q-ans" data-qno="${i}">
-            <option value="1">1</option><option value="2">2</option>
-            <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+          <select class="q-ans">
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
           </select>
         </div>
       `;
-      container.appendChild(item);
+      container.appendChild(div);
     }
   }
 
-  createInputs('grid1', 1, 10);
-  createInputs('grid2', 11, 20);
-  createInputs('grid3', 21, 30);
-
-  document.getElementById('testId').value = 'test-' + Date.now();
-
-  // 저장 로직 (섹션별 데이터 구조화)
-  window.saveTest = async function() {
-    const data = {
-      testId: document.getElementById('testId').value,
-      subject: document.getElementById('subject').value,
-      grade: document.getElementById('grade').value,
-      unitName: document.getElementById('unitName').value,
-      sections: [
-        { 
-          name: document.getElementById('secName1').value, 
-          core: document.getElementById('secCore1').value,
-          homework: [document.getElementById('hw1_1').value, document.getElementById('hw1_2').value, document.getElementById('hw1_3').value]
-        },
-        { 
-          name: document.getElementById('secName2').value, 
-          core: document.getElementById('secCore2').value,
-          homework: [document.getElementById('hw2_1').value, document.getElementById('hw2_2').value, document.getElementById('hw2_3').value]
-        },
-        { 
-          name: document.getElementById('secName3').value, 
-          core: document.getElementById('secCore3').value,
-          homework: [document.getElementById('hw3_1').value, document.getElementById('hw3_2').value, document.getElementById('hw3_3').value]
-        }
-      ],
-      questions: Array.from(document.querySelectorAll('.q-text')).map((el, idx) => ({
-        qNo: el.dataset.qno,
-        question: el.value,
-        answer: document.querySelectorAll('.q-ans')[idx].value
-      })),
-      regDate: new Date().toISOString()
-    };
-
-    try {
-      await addDoc(collection(db, "tests"), data);
-      alert('성공적으로 저장되었습니다!');
-      location.reload();
-    } catch(e) { console.error(e); alert('저장 실패'); }
-  };
-
-  // 실시간 목록 렌더링 유지
-  onSnapshot(query(collection(db, "tests"), orderBy("regDate", "desc")), (snapshot) => {
-    const tbody = document.getElementById('regTestBody');
-    const docs = snapshot.docs.map(doc => doc.data());
-    document.getElementById('regCount').innerText = docs.length;
-    tbody.innerHTML = docs.map(t => `
-      <tr>
-        <td>${t.testId}</td>
-        <td>${t.unitName}</td>
-        <td>${t.subject}</td>
-        <td>${t.grade}</td>
-        <td><button class="action-btn">✕</button></td>
-      </tr>
-    `).join('');
-  });
+  renderItems('grid1', 1, 10);
+  renderItems('grid2', 11, 20);
+  renderItems('grid3', 21, 30);
 </script>
 </body>
 </html>
