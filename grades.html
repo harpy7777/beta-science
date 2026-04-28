@@ -110,15 +110,122 @@
     </div>
   </main>
 </div>
-<script>
-  const testsByGrade = {
-    '고등1학년': [{id:'t1',name:'덕원여고 2025 1학기 중간고사 통합과학'},{id:'t2',name:'진명여고 2025 1학기 중간고사 통합과학'},{id:'t3',name:'양정고등학교 2025 1학기 중간고사 통합과학'},{id:'t4',name:'동촌고 2025 1학기 중간고사 통합과학'},{id:'t5',name:'마포고 2025 1학기 중간고사 통합과학'}],
-    '고등2학년': [{id:'p1',name:'고2물리 내신6 역학'},{id:'p2',name:'고2물리 내신5 전기'}],
-    '중등3학년': [{id:'m1',name:'중3 내신 기압과날씨변화'},{id:'m2',name:'중3 내신 화학반응'}],
+<script type="module">
+  import { db } from './firebase-config.js';
+  import { 
+    collection, 
+    getDocs, 
+    query, 
+    where, 
+    orderBy, 
+    onSnapshot 
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  let allTests = []; // 파이어베이스에서 가져온 테스트 목록
+
+  // 1. 페이지 로드 시 'tests' 컬렉션에서 전체 테스트 목록 미리 가져오기
+  const loadAllTests = async () => {
+    const q = query(collection(db, "tests"), orderBy("regDate", "desc"));
+    onSnapshot(q, (snapshot) => {
+      allTests = snapshot.docs.map(doc => ({ fireId: doc.id, ...doc.data() }));
+    });
   };
-  const mockStudents = {'고등1학년':['김가현','김재호','차도윤','개복구','이서연','박민준','최지우','정하늘','윤서준','한예은'],'고등2학년':['박소연','이도현','김민지','최준혁','오지원'],'중등3학년':['정민서','김태양','이채원','박준서']};
-  function onGradeChange(){const g=document.getElementById('gradeSelect').value,s=document.getElementById('testSelect');s.innerHTML='<option value="">테스트를 선택하세요</option>';s.disabled=!g;if(g&&testsByGrade[g])testsByGrade[g].forEach(t=>{const o=document.createElement('option');o.value=t.id;o.textContent=t.name;s.appendChild(o);});document.getElementById('emptyArea').style.display='block';document.getElementById('resultArea').style.display='none';}
-  function onTestChange(){const g=document.getElementById('gradeSelect').value,tid=document.getElementById('testSelect').value;if(!tid){document.getElementById('emptyArea').style.display='block';document.getElementById('resultArea').style.display='none';return;}document.getElementById('emptyArea').style.display='none';document.getElementById('resultArea').style.display='block';const students=(mockStudents[g]||[]).map(n=>({name:n,grade:g,score:Math.floor(Math.random()*45)+50,date:'2026. 4. 18.'}));students.sort((a,b)=>b.score-a.score);const sc=students.map(s=>s.score),avg=sc.length?Math.round(sc.reduce((a,b)=>a+b,0)/sc.length):0;document.getElementById('statCount').textContent=students.length+'명';document.getElementById('statAvg').textContent=avg+'점';document.getElementById('statMax').textContent=Math.max(...sc)+'점';document.getElementById('statMin').textContent=Math.min(...sc)+'점';const gpc=g=>({'고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3','중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3'}[g]||'grade-high1'),scc=s=>s>=80?'high':s>=60?'mid':'low',rc=r=>r===1?'rank-1':r===2?'rank-2':r===3?'rank-3':'rank-n';document.getElementById('gradesBody').innerHTML=students.map((s,i)=>{const r=i+1,c=scc(s.score);return`<tr><td><span class="rank-badge ${rc(r)}">${r}</span></td><td style="font-weight:600">${s.name}</td><td><span class="grade-pill ${gpc(s.grade)}">${s.grade}</span></td><td><div class="score-bar-wrap score-${c}"><span class="score-num ${c}">${s.score}점</span><div class="score-bar"><div class="score-bar-fill" style="width:${s.score}%"></div></div></div></td><td style="color:var(--text-muted);font-size:13px">${s.date}</td></tr>`;}).join('');}
+  loadAllTests();
+
+  // 학년 선택 시 해당 학년의 테스트만 필터링해서 셀렉트박스에 채우기
+  window.onGradeChange = function() {
+    const g = document.getElementById('gradeSelect').value;
+    const s = document.getElementById('testSelect');
+    
+    s.innerHTML = '<option value="">테스트를 선택하세요</option>';
+    s.disabled = !g;
+
+    if (g) {
+      const filteredTests = allTests.filter(t => t.grade === g);
+      if(filteredTests.length === 0) {
+        s.innerHTML = '<option value="">등록된 테스트가 없습니다</option>';
+      } else {
+        filteredTests.forEach(t => {
+          const o = document.createElement('option');
+          o.value = t.fireId; // 파이어베이스 고유 ID를 값으로 사용
+          o.textContent = t.unitName || t.unit || t.testId;
+          s.appendChild(o);
+        });
+      }
+    }
+    document.getElementById('emptyArea').style.display = 'block';
+    document.getElementById('resultArea').style.display = 'none';
+  }
+
+  // 테스트 선택 시 해당 테스트를 치른 학생들의 성적 실시간 조회
+  window.onTestChange = function() {
+    const testId = document.getElementById('testSelect').value;
+    if (!testId) {
+      document.getElementById('emptyArea').style.display = 'block';
+      document.getElementById('resultArea').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('emptyArea').style.display = 'none';
+    document.getElementById('resultArea').style.display = 'block';
+
+    // 2. 'grades' 컬렉션에서 해당 testId를 가진 성적 데이터 실시간 감시
+    // (아직 성적 입력 전이라면 데이터가 없을 수 있습니다)
+    const q = query(collection(db, "grades"), where("testId", "==", testId), orderBy("score", "desc"));
+    
+    onSnapshot(q, (snapshot) => {
+      const students = snapshot.docs.map(doc => doc.data());
+      renderResults(students);
+    });
+  }
+
+  // 화면 렌더링 및 통계 계산 함수 (기존 디자인 유지)
+  function renderResults(students) {
+    const tbody = document.getElementById('gradesBody');
+    
+    if (students.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--text-muted);">아직 등록된 성적이 없습니다.</td></tr>';
+      updateStats([]);
+      return;
+    }
+
+    updateStats(students);
+
+    const gpc = g => ({'고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3','중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3'}[g]||'grade-high1');
+    const scc = s => s >= 80 ? 'high' : s >= 60 ? 'mid' : 'low';
+    const rc = r => r === 1 ? 'rank-1' : r === 2 ? 'rank-2' : r === 3 ? 'rank-3' : 'rank-n';
+
+    tbody.innerHTML = students.map((s, i) => {
+      const r = i + 1;
+      const c = scc(s.score);
+      return `
+        <tr>
+          <td><span class="rank-badge ${rc(r)}">${r}</span></td>
+          <td style="font-weight:600">${s.studentName}</td>
+          <td><span class="grade-pill ${gpc(s.grade)}">${s.grade}</span></td>
+          <td>
+            <div class="score-bar-wrap score-${c}">
+              <span class="score-num ${c}">${s.score}점</span>
+              <div class="score-bar">
+                <div class="score-bar-fill" style="width:${s.score}%"></div>
+              </div>
+            </div>
+          </td>
+          <td style="color:var(--text-muted);font-size:13px">${s.date || '-'}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  // 상단 미니 통계 업데이트
+  function updateStats(students) {
+    const sc = students.map(s => Number(s.score));
+    const avg = sc.length ? Math.round(sc.reduce((a, b) => a + b, 0) / sc.length) : 0;
+    
+    document.getElementById('statCount').textContent = students.length + '명';
+    document.getElementById('statAvg').textContent = avg + '점';
+    document.getElementById('statMax').textContent = (sc.length ? Math.max(...sc) : 0) + '점';
+    document.getElementById('statMin').textContent = (sc.length ? Math.min(...sc) : 0) + '점';
+  }
 </script>
 </body>
 </html>
