@@ -169,36 +169,151 @@
   </main>
 </div>
 <div class="toast" id="toast"></div>
-<script>
+<script type="module">
+  // 1. 설정 파일에서 데이터베이스 가져오기
+  import { db } from './firebase-config.js';
+  import { 
+    collection, 
+    addDoc, 
+    getDocs, 
+    doc, 
+    updateDoc, 
+    deleteDoc, 
+    query, 
+    orderBy, 
+    onSnapshot 
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // 정답 그리드 생성 함수 (기존 로직 유지)
   function buildAnswerGrid(id, start) {
     const g = document.getElementById(id);
     for (let i = start; i < start+10; i++) {
       const d = document.createElement('div'); d.className='answer-item';
-      d.innerHTML=`<label>Q${i}</label><select><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>`;
+      d.innerHTML=`<label>Q${i}</label><select class="q-answer" data-qno="${i}"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>`;
       g.appendChild(d);
     }
   }
   buildAnswerGrid('answers-part1',1); buildAnswerGrid('answers-part2',11); buildAnswerGrid('answers-part3',21);
+
+  // 테스트 ID 자동 생성
   document.getElementById('testId').value = 'test-' + Date.now();
-  function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
-  let allTests = [
-    {id:'test-1776487996459',unit:'덕원여고 2025 1학기 중간고사 통합과학',subject:'통합과학',grade:'고등1학년'},
-    {id:'test-1776487890002',unit:'진명여고 2025 1학기 중간고사 통합과학',subject:'통합과학',grade:'고등1학년'},
-    {id:'test-1776487755919',unit:'양정고등학교 2025 1학기 중간고사 통합과학',subject:'통합과학',grade:'고등1학년'},
-    {id:'test-1776487650896',unit:'동촌고 2025 1학기 중간고사 통합과학',subject:'통합과학',grade:'고등1학년'},
-    {id:'test-1776487481767',unit:'마포고 2025 1학기 중간고사 통합과학',subject:'통합과학',grade:'고등1학년'},
-    {id:'중3 내신 기압과날씨변화',unit:'중3 내신 기압과날씨변화',subject:'내신대비',grade:'중등3학년'},
-    {id:'고2물리 내신6',unit:'고2물리 내신6 역학',subject:'물리',grade:'고등2학년'},
-  ];
-  let filteredTests=[...allTests];
-  function gradeBadgeClass(g){return {'고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3','중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3'}[g]||'grade-high1';}
-  function saveTest(){const s=document.getElementById('subject').value,g=document.getElementById('grade').value,u=document.getElementById('unitName').value.trim();if(!s){showToast('과목을 선택해주세요.');return;}if(!g){showToast('학년을 선택해주세요.');return;}allTests.unshift({id:document.getElementById('testId').value,unit:u||'(단원명 없음)',subject:s,grade:g});filterRegistered();showToast('✓ 테스트가 저장되었습니다!');document.getElementById('testId').value='test-'+Date.now();document.getElementById('subject').value='';document.getElementById('grade').value='';document.getElementById('unitName').value='';window.scrollTo({top:0,behavior:'smooth'});}
-  function filterRegistered(){const g=document.getElementById('regGradeFilter').value,s=document.getElementById('regSubjectFilter').value;filteredTests=allTests.filter(t=>(!g||t.grade===g)&&(!s||t.subject===s));renderRegistered();}
-  function resetRegFilter(){document.getElementById('regGradeFilter').value='';document.getElementById('regSubjectFilter').value='';filterRegistered();}
-  function renderRegistered(){const tbody=document.getElementById('regTestBody');document.getElementById('regCount').textContent=filteredTests.length+'개';if(!filteredTests.length){tbody.innerHTML='<tr class="empty-row"><td colspan="5">등록된 테스트가 없습니다</td></tr>';return;}tbody.innerHTML=filteredTests.map((t,i)=>{const ri=allTests.indexOf(t);return`<tr><td class="test-id-sm">${t.id}</td><td style="font-weight:500">${t.unit}</td><td><span class="subject-pill">${t.subject}</span></td><td><span class="grade-badge ${gradeBadgeClass(t.grade)}">${t.grade}</span></td><td><div class="action-icons"><button class="action-btn" onclick="editRegTest(${ri})"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn del" onclick="deleteRegTest(${ri})"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></td></tr>`;}).join('');}
-  function editRegTest(i){const t=allTests[i];document.getElementById('testId').value=t.id;document.getElementById('unitName').value=t.unit;document.getElementById('subject').value=t.subject;document.getElementById('grade').value=t.grade;window.scrollTo({top:0,behavior:'smooth'});showToast('수정할 내용을 변경 후 저장하세요');}
-  function deleteRegTest(i){if(!confirm(`"${allTests[i].unit}" 테스트를 삭제하시겠습니까?`))return;allTests.splice(i,1);filterRegistered();}
-  filterRegistered();
+
+  let allTests = [];
+  let filteredTests = [];
+
+  // 알림 표시 함수
+  window.showToast = function(m){
+    const t=document.getElementById('toast');
+    t.textContent=m;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2500);
+  }
+
+  // 학년 배지 클래스
+  function gradeBadgeClass(g){
+    return {'고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3','중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3'}[g]||'grade-high1';
+  }
+
+  // 2. 실시간 테스트 목록 불러오기
+  const q = query(collection(db, "tests"), orderBy("regDate", "desc"));
+  onSnapshot(q, (snapshot) => {
+    allTests = snapshot.docs.map(doc => ({
+      fireId: doc.id,
+      ...doc.data()
+    }));
+    filterRegistered();
+  });
+
+  // 3. 테스트 저장 (추가)
+  window.saveTest = async function() {
+    const s = document.getElementById('subject').value;
+    const g = document.getElementById('grade').value;
+    const u = document.getElementById('unitName').value.trim();
+    const id = document.getElementById('testId').value;
+
+    if(!s){showToast('과목을 선택해주세요.'); return;}
+    if(!g){showToast('학년을 선택해주세요.'); return;}
+
+    // 정답 데이터 수집 (필요시 나중에 성적 채점에 사용)
+    const answers = {};
+    document.querySelectorAll('.q-answer').forEach(sel => {
+      answers[sel.dataset.qno] = sel.value;
+    });
+
+    try {
+      await addDoc(collection(db, "tests"), {
+        id: id,
+        unit: u || '(단원명 없음)',
+        subject: s,
+        grade: g,
+        answers: answers, // 정답지 저장
+        regDate: new Date().toISOString()
+      });
+
+      showToast('✓ 테스트가 저장되었습니다!');
+      
+      // 입력창 초기화
+      document.getElementById('testId').value = 'test-' + Date.now();
+      document.getElementById('subject').value = '';
+      document.getElementById('grade').value = '';
+      document.getElementById('unitName').value = '';
+      window.scrollTo({top:0, behavior:'smooth'});
+    } catch (e) {
+      console.error("Error adding document: ", e);
+      showToast('저장 중 오류가 발생했습니다.');
+    }
+  }
+
+  // 필터링 및 렌더링
+  window.filterRegistered = function() {
+    const g = document.getElementById('regGradeFilter').value;
+    const s = document.getElementById('regSubjectFilter').value;
+    filteredTests = allTests.filter(t => (!g || t.grade === g) && (!s || t.subject === s));
+    renderRegistered();
+  }
+
+  window.resetRegFilter = function() {
+    document.getElementById('regGradeFilter').value = '';
+    document.getElementById('regSubjectFilter').value = '';
+    filterRegistered();
+  }
+
+  window.renderRegistered = function() {
+    const tbody = document.getElementById('regTestBody');
+    document.getElementById('regCount').textContent = filteredTests.length + '개';
+    
+    if(!filteredTests.length){
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="5">등록된 테스트가 없습니다</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = filteredTests.map((t) => `
+      <tr>
+        <td class="test-id-sm">${t.id}</td>
+        <td style="font-weight:500">${t.unit}</td>
+        <td><span class="subject-pill">${t.subject}</span></td>
+        <td><span class="grade-badge ${gradeBadgeClass(t.grade)}">${t.grade}</span></td>
+        <td>
+          <div class="action-icons">
+            <button class="action-btn del" onclick="deleteRegTest('${t.fireId}', '${t.unit}')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            </button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  // 테스트 삭제
+  window.deleteRegTest = async function(fireId, unit) {
+    if(!confirm(`"${unit}" 테스트를 삭제하시겠습니까?`)) return;
+    try {
+      await deleteDoc(doc(db, "tests", fireId));
+      showToast('삭제되었습니다.');
+    } catch (e) {
+      console.error("Error deleting document: ", e);
+      showToast('삭제 중 오류가 발생했습니다.');
+    }
+  }
 </script>
 </body>
 </html>
