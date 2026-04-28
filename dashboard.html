@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>베타과학 - 학원 관리 시스템</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --primary: #2563eb;
+    --primary-light: #eff6ff;
+    --primary-dark: #1d4ed8;
+    --sidebar-width: 220px;
+    --max-width: 1200px;
+    --bg: #f5f6fa;
+    --white: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --radius: 10px;
+  }
+
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── 전체 래퍼 ── */
+  .app-wrapper {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* ── 상단 탑바 (네비게이션) ── */
+  .topbar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.1;
+    flex-shrink: 0;
+    min-width: 80px;
+  }
+
+  .logo-area .brand {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--primary);
+  }
+
+  .logo-area .brand-sub {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--primary);
+    text-transform: uppercase;
+  }
+
+  .topbar-divider {
+    width: 1px;
+    height: 28px;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+
+  .nav-tabs {
+    display: flex;
+    gap: 2px;
+    list-style: none;
+  }
+
+  .nav-tabs a {
+    display: block;
+    padding: 8px 14px;
+    font-size: 14px;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .nav-tabs a:hover {
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .nav-tabs a.active {
+    background: var(--primary-light);
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  .topbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .academy-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .badge-admin {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: #f1f5f9;
+    border-radius: 20px;
+    color: var(--text-muted);
+  }
+
+  /* ── 메인 콘텐츠 ── */
+  .main-content {
+    padding: 28px 24px;
+    flex: 1;
+  }
+
+  .page-header {
+    margin-bottom: 24px;
+  }
+
+  .page-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .page-header p {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  /* ── 통계 카드 4개 ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .stat-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stat-icon.blue { background: #eff6ff; }
+  .stat-icon.green { background: #f0fdf4; }
+  .stat-icon.amber { background: #fffbeb; }
+  .stat-icon.red { background: #fef2f2; }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .stat-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* ── 최근 테스트 결과 섹션 ── */
+  .section-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .view-all {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .view-all:hover { text-decoration: underline; }
+
+  /* ── 테이블 ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    background: #f8fafc;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f8fafc; }
+
+  tbody td {
+    font-size: 14px;
+    padding: 14px 12px;
+    color: var(--text);
+  }
+
+  .score-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+  }
+
+  .score-high { background: #2563eb; }
+  .score-mid { background: #10b981; }
+  .score-low { background: #ef4444; }
+
+  /* 등록 테스트 관리 */
+  .test-count-badge {
+    background: #ef4444;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-left: 8px;
+  }
+
+  .filter-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+
+  .filter-select {
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--white);
+    cursor: pointer;
+    min-width: 140px;
+  }
+
+  .btn-reset {
+    padding: 7px 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-muted);
+    background: var(--white);
+    cursor: pointer;
+    margin-left: auto;
+  }
+
+  .btn-reset:hover { background: #f1f5f9; }
+
+  .btn-create {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 7px 14px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .btn-create:hover { background: var(--primary-dark); }
+
+  .grade-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    background: #10b981;
+    color: white;
+  }
+
+  .grade-badge.middle { background: #8b5cf6; }
+
+  .action-icons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .action-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: background 0.1s;
+  }
+
+  .action-btn:hover { background: #f1f5f9; }
+  .action-btn.del:hover { background: #fef2f2; border-color: #fca5a5; }
+
+  .view-more-btn {
+    display: block;
+    margin: 16px auto 0;
+    padding: 10px 28px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--white);
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.1s;
+    font-weight: 500;
+  }
+
+  .view-more-btn:hover { background: #f1f5f9; }
+
+  svg.icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 900px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 600px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .nav-tabs a { padding: 8px 10px; font-size: 13px; }
+    .main-content { padding: 16px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-wrapper">
+
+  <!-- 상단 탑바 -->
+  <header class="topbar">
+    <div class="logo-area">
+      <span class="brand">BETA</span>
+      <span class="brand-sub">SCIENCE</span>
+    </div>
+
+    <div class="topbar-divider"></div>
+
+    <nav>
+      <ul class="nav-tabs">
+        <li><a href="#" class="active">대시보드</a></li>
+        <li><a href="#">학생 관리</a></li>
+        <li><a href="#">테스트 생성</a></li>
+        <li><a href="#">테스트 관리</a></li>
+        <li><a href="#">성적 조회</a></li>
+        <li><a href="#">학생별 분석</a></li>
+        <li><a href="#">특별관리</a></li>
+        <li><a href="#">SMS설정</a></li>
+      </ul>
+    </nav>
+
+    <div class="topbar-right">
+      <span class="academy-name">베타과학학원</span>
+      <span class="badge-admin">관리자 모드</span>
+    </div>
+  </header>
+
+  <!-- 메인 콘텐츠 -->
+  <main class="main-content">
+
+    <div class="page-header">
+      <h1>대시보드</h1>
+      <p>학생 성적 및 과제 현황을 확인하세요</p>
+    </div>
+
+    <!-- 통계 카드 -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <div class="stat-icon blue">
+            <svg class="icon" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <span class="stat-label">전체</span>
+        </div>
+        <div class="stat-value">198</div>
+        <div class="stat-desc">등록 학생 수</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <div class="stat-icon green">
+            <svg class="icon" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </div>
+          <span class="stat-label">이번 주</span>
+        </div>
+        <div class="stat-value">0</div>
+        <div class="stat-desc">제출된 테스트</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <div class="stat-icon amber">
+            <svg class="icon" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </div>
+          <span class="stat-label">평균</span>
+        </div>
+        <div class="stat-value">76.5</div>
+        <div class="stat-desc">전체 평균 점수</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <div class="stat-icon red">
+            <svg class="icon" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <span class="stat-label">추가과제</span>
+        </div>
+        <div class="stat-value">634</div>
+        <div class="stat-desc">집중 관리 필요</div>
+      </div>
+    </div>
+
+    <!-- 최근 테스트 결과 -->
+    <div class="section-card">
+      <div class="section-header">
+        <span class="section-title">최근 테스트 결과</span>
+        <a href="#" class="view-all">전체보기 ›</a>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>학생</th>
+            <th>테스트</th>
+            <th>점수</th>
+            <th>제출일</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>김가현</td>
+            <td>양정고등학교 2025 1학기 중간고사 통합과학</td>
+            <td><span class="score-badge score-high">84점</span></td>
+            <td>2026. 4. 18.</td>
+          </tr>
+          <tr>
+            <td>김재호</td>
+            <td>양정고등학교 2025 1학기 중간고사 통합과학</td>
+            <td><span class="score-badge score-high">86점</span></td>
+            <td>2026. 4. 18.</td>
+          </tr>
+          <tr>
+            <td>개복구</td>
+            <td>진명여고 2025 1학기 중간고사 통합과학</td>
+            <td><span class="score-badge score-low">21점</span></td>
+            <td>2026. 4. 18.</td>
+          </tr>
+          <tr>
+            <td>차도윤</td>
+            <td>신서고 2025 1학기 중간고사 통합과학</td>
+            <td><span class="score-badge score-low">45점</span></td>
+            <td>2026. 4. 18.</td>
+          </tr>
+          <tr>
+            <td>김재호</td>
+            <td>신서고 2025 1학기 중간고사 통합과학</td>
+            <td><span class="score-badge score-high">68점</span></td>
+            <td>2026. 4. 18.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 등록된 테스트 관리 -->
+    <div class="section-card">
+      <div class="section-header">
+        <div style="display:flex; align-items:center;">
+          <span class="section-title">등록된 테스트 관리</span>
+          <span class="test-count-badge">131개</span>
+        </div>
+        <button class="btn-create">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          테스트 생성
+        </button>
+      </div>
+
+      <div class="filter-row">
+        <select class="filter-select">
+          <option>전체 학년</option>
+          <option>고1학년</option>
+          <option>고2학년</option>
+          <option>고3학년</option>
+          <option>중3학년</option>
+        </select>
+        <select class="filter-select">
+          <option>전체 과목</option>
+          <option>통합과학</option>
+          <option>물리</option>
+          <option>화학</option>
+          <option>생물</option>
+          <option>내신대비</option>
+        </select>
+        <button class="btn-reset">필터 초기화</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>테스트 ID</th>
+            <th>단원명</th>
+            <th>과목</th>
+            <th>학년</th>
+            <th>관리</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>test-1776487996459</td>
+            <td>덕원여고 2025 1학기 중간고사 통합과학</td>
+            <td>통합과학</td>
+            <td><span class="grade-badge">고1학년</span></td>
+            <td>
+              <div class="action-icons">
+                <button class="action-btn" title="수정">✏️</button>
+                <button class="action-btn del" title="삭제">🗑️</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>test-1776487890002</td>
+            <td>진명여고 2025 1학기 중간고사 통합과학</td>
+            <td>통합과학</td>
+            <td><span class="grade-badge">고1학년</span></td>
+            <td><div class="action-icons"><button class="action-btn">✏️</button><button class="action-btn del">🗑️</button></div></td>
+          </tr>
+          <tr>
+            <td>test-1776487755919</td>
+            <td>양정고등학교 2025 1학기 중간고사 통합과학</td>
+            <td>통합과학</td>
+            <td><span class="grade-badge">고1학년</span></td>
+            <td><div class="action-icons"><button class="action-btn">✏️</button><button class="action-btn del">🗑️</button></div></td>
+          </tr>
+          <tr>
+            <td>test-1776487650896</td>
+            <td>동촌고 2025 1학기 중간고사 통합과학</td>
+            <td>통합과학</td>
+            <td><span class="grade-badge">고1학년</span></td>
+            <td><div class="action-icons"><button class="action-btn">✏️</button><button class="action-btn del">🗑️</button></div></td>
+          </tr>
+          <tr>
+            <td>test-1776487481767</td>
+            <td>마포고 2025 1학기 중간고사 통합과학</td>
+            <td>통합과학</td>
+            <td><span class="grade-badge">고1학년</span></td>
+            <td><div class="action-icons"><button class="action-btn">✏️</button><button class="action-btn del">🗑️</button></div></td>
+          </tr>
+          <tr>
+            <td>test-1776487320610</td>
+            <td>한가람고 2025 1학기 중간고사 통합과학</td>
+            <td>통합과학</td>
+            <td><span class="grade-badge">고1학년</span></td>
+            <td><div class="action-icons"><button class="action-btn">✏️</button><button class="action-btn del">🗑️</button></div></td>
+          </tr>
+          <tr>
+            <td>test-1775865932437</td>
+            <td>신서고 2025 1학기 중간고사 통합과학</td>
+            <td>통합과학</td>
+            <td><span class="grade-badge">고1학년</span></td>
+            <td><div class="action-icons"><button class="action-btn">✏️</button><button class="action-btn del">🗑️</button></div></td>
+          </tr>
+          <tr>
+            <td>test-1775865825746</td>
+            <td>경복여고 2025 1학기 중간고사 통합과학</td>
+            <td>통합과학</td>
+            <td><span class="grade-badge">고1학년</span></td>
+            <td><div class="action-icons"><button class="action-btn">✏️</button><button class="action-btn del">🗑️</button></div></td>
+          </tr>
+          <tr>
+            <td>중3 내신 기압과날씨변화</td>
+            <td>중3 내신 기압과날씨변화</td>
+            <td>내신대비</td>
+            <td><span class="grade-badge middle">중3학년</span></td>
+            <td><div class="action-icons"><button class="action-btn">✏️</button><button class="action-btn del">🗑️</button></div></td>
+          </tr>
+          <tr>
+            <td>고2물리 내신6</td>
+            <td>고2물리 내신6 역학</td>
+            <td>물리</td>
+            <td><span class="grade-badge" style="background:#f59e0b;">고2학년</span></td>
+            <td><div class="action-icons"><button class="action-btn">✏️</button><button class="action-btn del">🗑️</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <button class="view-more-btn">전체 131개 테스트 보기</button>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>
