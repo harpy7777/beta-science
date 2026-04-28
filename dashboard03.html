@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>테스트 관리 - 베타과학</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --primary: #2563eb;
+    --primary-light: #eff6ff;
+    --primary-dark: #1d4ed8;
+    --max-width: 1200px;
+    --bg: #f5f6fa;
+    --white: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --danger: #ef4444;
+    --danger-dark: #dc2626;
+    --success: #10b981;
+    --radius: 10px;
+  }
+
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── 중앙 정렬 래퍼 ── */
+  .app-wrapper {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* ── 탑바 ── */
+  .topbar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo-area { display: flex; flex-direction: column; align-items: center; line-height: 1.1; flex-shrink: 0; min-width: 80px; }
+  .logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
+  .logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
+  .topbar-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+  .nav-tabs { display: flex; gap: 2px; list-style: none; }
+  .nav-tabs a { display: block; padding: 8px 14px; font-size: 14px; color: var(--text-muted); text-decoration: none; border-radius: 6px; white-space: nowrap; transition: background 0.15s, color 0.15s; }
+  .nav-tabs a:hover { background: var(--bg); color: var(--text); }
+  .nav-tabs a.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .academy-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .badge-admin { font-size: 11px; padding: 2px 8px; background: #f1f5f9; border-radius: 20px; color: var(--text-muted); }
+
+  /* ── 메인 ── */
+  .main-content { padding: 28px 24px; flex: 1; }
+
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+  .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .page-header p { font-size: 14px; color: var(--text-muted); }
+
+  .btn-primary {
+    display: flex; align-items: center; gap: 6px;
+    padding: 11px 22px; background: var(--primary); color: white;
+    border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; text-decoration: none; white-space: nowrap;
+    transition: background 0.15s; flex-shrink: 0;
+  }
+  .btn-primary:hover { background: var(--primary-dark); }
+
+  /* ── 필터 카드 ── */
+  .filter-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 24px 24px; margin-bottom: 20px;
+  }
+  .filter-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .filter-card-header h3 { font-size: 16px; font-weight: 700; }
+  .filter-summary { background: var(--success); color: white; font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 20px; white-space: nowrap; }
+
+  .filter-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; align-items: end; }
+  .filter-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 7px; }
+
+  .filter-select {
+    width: 100%; padding: 11px 36px 11px 14px;
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 14px; color: var(--text); background: var(--white);
+    cursor: pointer; outline: none; transition: border 0.15s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+  }
+  .filter-select:focus { border-color: var(--primary); }
+
+  .btn-reset {
+    width: 100%; padding: 11px 20px;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--white); font-size: 14px; color: var(--text-muted);
+    cursor: pointer; font-weight: 500; transition: background 0.1s, color 0.1s;
+  }
+  .btn-reset:hover { background: #f1f5f9; color: var(--text); }
+
+  /* ── 테이블 ── */
+  .table-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    font-size: 13px; font-weight: 600; color: var(--text-muted);
+    text-align: left; padding: 13px 20px;
+    border-bottom: 1px solid var(--border); background: #f8fafc; white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f8fafc; }
+  tbody td { font-size: 14px; padding: 14px 20px; color: var(--text); vertical-align: middle; }
+
+  .test-id-cell { font-size: 13px; color: var(--text-muted); font-family: monospace; }
+
+  .subject-pill {
+    display: inline-block; padding: 5px 14px;
+    border: 1px solid var(--border); border-radius: 20px;
+    font-size: 13px; color: var(--text); background: var(--white); font-weight: 500;
+  }
+
+  /* 원형 학년 뱃지 */
+  .grade-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 52px; height: 52px; border-radius: 50%;
+    font-size: 11px; font-weight: 800; text-align: center;
+    color: white; line-height: 1.3;
+  }
+  .grade-high1 { background: #10b981; }
+  .grade-high2 { background: #f59e0b; }
+  .grade-high3 { background: #ef4444; }
+  .grade-mid1  { background: #8b5cf6; }
+  .grade-mid2  { background: #2563eb; }
+  .grade-mid3  { background: #0891b2; }
+
+  /* 수정 / 삭제 버튼 */
+  .action-cell { display: flex; gap: 8px; align-items: center; }
+
+  .btn-edit {
+    display: flex; align-items: center; gap: 5px; padding: 8px 16px;
+    border: 1px solid var(--border); border-radius: 7px; background: var(--white);
+    font-size: 13px; font-weight: 600; color: var(--text);
+    cursor: pointer; transition: background 0.1s; white-space: nowrap;
+  }
+  .btn-edit:hover { background: #f1f5f9; }
+
+  .btn-delete {
+    display: flex; align-items: center; gap: 5px; padding: 8px 16px;
+    border: none; border-radius: 7px; background: var(--danger);
+    font-size: 13px; font-weight: 600; color: white;
+    cursor: pointer; transition: background 0.15s; white-space: nowrap;
+  }
+  .btn-delete:hover { background: var(--danger-dark); }
+
+  /* 빈 상태 */
+  .empty-state { text-align: center; padding: 64px 20px; color: var(--text-muted); }
+  .empty-state p { font-size: 15px; margin-top: 14px; }
+
+  /* 페이지네이션 */
+  .pagination { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 22px 0 6px; }
+  .page-btn {
+    width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 7px;
+    background: var(--white); font-size: 13px; color: var(--text-muted);
+    cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s;
+  }
+  .page-btn:hover:not(:disabled) { background: #f1f5f9; color: var(--text); }
+  .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: 700; }
+  .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* 삭제 모달 */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--white); border-radius: 14px; padding: 28px; width: 100%; max-width: 420px; margin: 16px; }
+  .modal-icon { width: 48px; height: 48px; border-radius: 50%; background: #fef2f2; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .modal p { font-size: 14px; color: var(--text-muted); line-height: 1.65; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .btn-secondary { padding: 10px 22px; border: 1px solid var(--border); border-radius: 8px; background: var(--white); font-size: 14px; color: var(--text); cursor: pointer; }
+  .btn-secondary:hover { background: #f1f5f9; }
+  .btn-danger-modal { padding: 10px 22px; background: var(--danger); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .btn-danger-modal:hover { background: var(--danger-dark); }
+
+  @media (max-width: 768px) {
+    .filter-row { grid-template-columns: 1fr 1fr; }
+    .filter-row > :last-child { grid-column: span 2; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-wrapper">
+  <header class="topbar">
+    <div class="logo-area">
+      <span class="brand">BETA</span>
+      <span class="brand-sub">SCIENCE</span>
+    </div>
+    <div class="topbar-divider"></div>
+    <nav>
+      <ul class="nav-tabs">
+        <li><a href="dashboard.html">대시보드</a></li>
+        <li><a href="students.html">학생 관리</a></li>
+        <li><a href="test-create.html">테스트 생성</a></li>
+        <li><a href="test-manage.html" class="active">테스트 관리</a></li>
+        <li><a href="grades.html">성적 조회</a></li>
+        <li><a href="analysis.html">학생별 분석</a></li>
+        <li><a href="special.html">특별관리</a></li>
+        <li><a href="sms.html">SMS설정</a></li>
+      </ul>
+    </nav>
+    <div class="topbar-right">
+      <span class="academy-name">베타과학학원</span>
+      <span class="badge-admin">관리자 모드</span>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div>
+        <h1>테스트 관리</h1>
+        <p>등록된 테스트를 조회, 수정, 삭제할 수 있습니다</p>
+      </div>
+      <a href="test-create.html" class="btn-primary">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        새 테스트 생성
+      </a>
+    </div>
+
+    <!-- 필터 -->
+    <div class="filter-card">
+      <div class="filter-card-header">
+        <h3>필터</h3>
+        <span class="filter-summary" id="filterSummary">총 0개 / 필터 결과 0개</span>
+      </div>
+      <div class="filter-row">
+        <div class="filter-group">
+          <label>학년</label>
+          <select class="filter-select" id="gradeFilter" onchange="filterTests()">
+            <option value="">전체 학년</option>
+            <option>고등1학년</option><option>고등2학년</option><option>고등3학년</option>
+            <option>중등1학년</option><option>중등2학년</option><option>중등3학년</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>과목</label>
+          <select class="filter-select" id="subjectFilter" onchange="filterTests()">
+            <option value="">전체 과목</option>
+            <option>통합과학</option><option>물리</option><option>화학</option>
+            <option>생물</option><option>내신대비</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label style="visibility:hidden">초기화</label>
+          <button class="btn-reset" onclick="resetFilter()">필터 초기화</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 테이블 -->
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>테스트 ID</th>
+            <th>단원명</th>
+            <th>과목</th>
+            <th>학년</th>
+            <th>관리</th>
+          </tr>
+        </thead>
+        <tbody id="testTableBody"></tbody>
+      </table>
+      <div id="emptyState" class="empty-state" style="display:none;">
+        <svg width="44" height="44" fill="none" stroke="#cbd5e1" stroke-width="1.5" viewBox="0 0 24 24">
+          <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+        <p>조건에 맞는 테스트가 없습니다</p>
+      </div>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+  </main>
+</div>
+
+<!-- 삭제 모달 -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-icon">
+      <svg width="22" height="22" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+      </svg>
+    </div>
+    <h3>테스트 삭제</h3>
+    <p id="deleteMsg">이 테스트를 삭제하시겠습니까?</p>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal()">취소</button>
+      <button class="btn-danger-modal" onclick="confirmDelete()">삭제하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const ITEMS_PER_PAGE = 15;
+  let currentPage = 1;
+  let deleteTarget = null;
+
+  let tests = [
+    { id: 'test-1776487996459', unit: '덕원여고 2025 1학기 중간고사 통합과학', subject: '통합과학', grade: '고등1학년' },
+    { id: 'test-1776487890002', unit: '진명여고 2025 1학기 중간고사 통합과학', subject: '통합과학', grade: '고등1학년' },
+    { id: 'test-1776487755919', unit: '양정고등학교 2025 1학기 중간고사 통합과학', subject: '통합과학', grade: '고등1학년' },
+    { id: 'test-1776487650896', unit: '동촌고 2025 1학기 중간고사 통합과학', subject: '통합과학', grade: '고등1학년' },
+    { id: 'test-1776487481767', unit: '마포고 2025 1학기 중간고사 통합과학', subject: '통합과학', grade: '고등1학년' },
+    { id: 'test-1776487320610', unit: '한가람고 2025 1학기 중간고사 통합과학', subject: '통합과학', grade: '고등1학년' },
+    { id: 'test-1775865932437', unit: '신서고 2025 1학기 중간고사 통합과학', subject: '통합과학', grade: '고등1학년' },
+    { id: 'test-1775865825746', unit: '경복여고 2025 1학기 중간고사 통합과학', subject: '통합과학', grade: '고등1학년' },
+    { id: 'test-1775865700001', unit: '상암고 2025 1학기 중간고사 통합과학', subject: '통합과학', grade: '고등1학년' },
+    { id: 'test-1775865600002', unit: '목동고 2025 1학기 중간고사 통합과학', subject: '통합과학', grade: '고등1학년' },
+    { id: 'test-1775865500003', unit: '은광여고 2025 1학기 중간고사 통합과학', subject: '통합과학', grade: '고등1학년' },
+    { id: 'test-1775865400004', unit: '영락고 2025 1학기 중간고사 통합과학', subject: '통합과학', grade: '고등1학년' },
+    { id: 'test-1775865300005', unit: '강서고 2025 1학기 중간고사 통합과학', subject: '통합과학', grade: '고등1학년' },
+    { id: 'test-1775865200006', unit: '한성고 2025 1학기 중간고사 통합과학', subject: '통합과학', grade: '고등1학년' },
+    { id: 'test-1775865100007', unit: '성산고 2025 1학기 중간고사 통합과학', subject: '통합과학', grade: '고등1학년' },
+    { id: '중3 내신 기압과날씨변화', unit: '중3 내신 기압과날씨변화', subject: '내신대비', grade: '중등3학년' },
+    { id: '고2물리 내신6', unit: '고2물리 내신6 역학', subject: '물리', grade: '고등2학년' },
+    { id: '고2물리 내신5', unit: '고2물리 내신5 전기', subject: '물리', grade: '고등2학년' },
+    { id: '중3 내신 화학반응', unit: '중3 내신 화학반응', subject: '내신대비', grade: '중등3학년' },
+  ];
+
+  let filtered = [...tests];
+
+  function gradeBadgeClass(grade) {
+    const map = { '고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3','중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3' };
+    return map[grade] || 'grade-high1';
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('testTableBody');
+    const empty = document.getElementById('emptyState');
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const pageData = filtered.slice(start, start + ITEMS_PER_PAGE);
+
+    document.getElementById('filterSummary').textContent = `총 ${tests.length}개 / 필터 결과 ${filtered.length}개`;
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      tbody.innerHTML = pageData.map(t => {
+        const realIdx = tests.indexOf(t);
+        const gradeLabel = t.grade.replace('학년', '') + '<br>학년';
+        return `
+          <tr>
+            <td class="test-id-cell">${t.id}</td>
+            <td style="font-weight:500">${t.unit}</td>
+            <td><span class="subject-pill">${t.subject}</span></td>
+            <td><span class="grade-badge ${gradeBadgeClass(t.grade)}">${gradeLabel}</span></td>
+            <td>
+              <div class="action-cell">
+                <button class="btn-edit" onclick="editTest(${realIdx})">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  수정
+                </button>
+                <button class="btn-delete" onclick="askDelete(${realIdx})">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                  삭제
+                </button>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+    renderPagination();
+  }
+
+  function renderPagination() {
+    const total = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+    const pg = document.getElementById('pagination');
+    if (total <= 1) { pg.innerHTML = ''; return; }
+    let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+    for (let i = 1; i <= total; i++) html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===Math.ceil(filtered.length/ITEMS_PER_PAGE)?'disabled':''}>›</button>`;
+    pg.innerHTML = html;
+  }
+
+  function goPage(p) {
+    const total = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+    if (p < 1 || p > total) return;
+    currentPage = p;
+    renderTable();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function filterTests() {
+    const g = document.getElementById('gradeFilter').value;
+    const s = document.getElementById('subjectFilter').value;
+    filtered = tests.filter(t => (!g || t.grade === g) && (!s || t.subject === s));
+    currentPage = 1;
+    renderTable();
+  }
+
+  function resetFilter() {
+    document.getElementById('gradeFilter').value = '';
+    document.getElementById('subjectFilter').value = '';
+    filterTests();
+  }
+
+  function editTest(idx) {
+    window.location.href = `test-create.html?edit=${encodeURIComponent(tests[idx].id)}`;
+  }
+
+  function askDelete(idx) {
+    deleteTarget = idx;
+    document.getElementById('deleteMsg').innerHTML =
+      `<strong>"${tests[idx].unit}"</strong> 테스트를 삭제하시겠습니까?<br>삭제된 데이터는 복구할 수 없습니다.`;
+    document.getElementById('deleteModal').classList.add('open');
+  }
+
+  function confirmDelete() {
+    if (deleteTarget !== null) { tests.splice(deleteTarget, 1); deleteTarget = null; filterTests(); }
+    closeModal();
+  }
+
+  function closeModal() { document.getElementById('deleteModal').classList.remove('open'); }
+
+  document.getElementById('deleteModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+  renderTable();
+</script>
+</body>
+</html>
