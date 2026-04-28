@@ -4,68 +4,195 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>베타과학학원 온라인 테스트</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-/* 원장님의 기존 CSS 디자인을 그대로 유지합니다 */
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;background:linear-gradient(160deg,#f0eeff 0%,#f5f0ff 50%,#ede9ff 100%);min-height:100vh}
-.ta-header{background:linear-gradient(90deg,#6c63ff,#534AB7);padding:1rem;text-align:center;color:#fff;display:flex;align-items:center;justify-content:center;gap:12px}
-.ta-header-icon{width:44px;height:44px;background:rgba(255,255,255,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}
-.ta-header-title{font-size:18px;font-weight:600}
-.ta-header-sub{font-size:12px;opacity:0.85}
-.ta-body{max-width:640px;margin:0 auto;padding:1.5rem 1rem}
-.ta-login-card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(100,100,200,0.12)}
-.ta-login-hero{background:linear-gradient(135deg,#7c6fff,#534AB7);padding:2.5rem 2rem;text-align:center;position:relative;overflow:hidden}
-.ta-hero-icon{width:72px;height:72px;background:rgba(255,255,255,0.18);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 1rem;position:relative;z-index:1}
-.ta-hero-title{color:#fff;font-size:26px;font-weight:700;margin-bottom:8px;position:relative;z-index:1}
-.ta-hero-badge{display:inline-block;background:rgba(255,255,255,0.2);color:#fff;font-size:13px;padding:4px 14px;border-radius:20px;position:relative;z-index:1}
-.ta-form{padding:2rem}
-.ta-form label{font-size:13px;font-weight:500;color:#333;display:block;margin-bottom:6px}
-.ta-form select, .ta-form input{width:100%;padding:12px 14px;border:1.5px solid #e0e4f0;border-radius:10px;font-size:14px;background:#f8f9ff;color:#222;margin-bottom:1.25rem;outline:none;font-family:inherit}
-.ta-btn-primary{width:100%;padding:14px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;border:none;background:linear-gradient(90deg,#7c6fff,#534AB7);color:#fff}
-.ta-test-card{background:#fff;border-radius:16px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 2px 12px rgba(100,100,200,0.08)}
-.ta-progress{background:#f0f0f8;border-radius:4px;height:6px;margin-bottom:1.5rem;overflow:hidden}
-.ta-progress-bar{background:linear-gradient(90deg,#7c6fff,#534AB7);height:100%;border-radius:4px;transition:width 0.3s}
-.ta-q-text{font-size:16px;font-weight:500;color:#1a1a2e;margin-bottom:1.25rem;line-height:1.6}
-.ta-option{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid #e0e4f0;border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all 0.15s;background:#fff}
-.ta-option:hover{border-color:#534AB7;background:#f5f0ff}
-.ta-option.selected{border-color:#534AB7;background:#ede9ff; font-weight: 600;}
-.ta-next-btn{width:100%;padding:14px;background:linear-gradient(90deg,#7c6fff,#534AB7);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-top:1rem}
-.ta-result-card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(100,100,200,0.12);text-align:center}
-.ta-result-hero{background:linear-gradient(135deg,#7c6fff,#534AB7);padding:2.5rem 2rem}
-.ta-result-score{font-size:56px;font-weight:700;color:#fff}
-.loading{text-align:center;padding:3rem;color:#888;font-size:14px}
+  /* 1. 디자인 컨셉: 프리미엄 화이트 & 딥 네이비 */
+  :root {
+    --navy-dark: #001529;
+    --navy-mid: #003366;
+    --navy-light: #004080;
+    --gradient-navy: linear-gradient(135deg, #001529 0%, #003366 100%);
+    --bg-white: #ffffff;
+    --border-color: #e5e7eb;
+    --text-main: #111827;
+    --text-muted: #6b7280;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body { 
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+    background-color: var(--bg-white); 
+    color: var(--text-main);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* 상단 헤더 - 진한 남색 그라데이션 */
+  .ta-header { 
+    background: var(--gradient-navy); 
+    padding: 1.2rem; 
+    text-align: center; 
+    color: #fff; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  .ta-header-icon { 
+    width: 48px; height: 48px; 
+    background: rgba(255,255,255,0.1); 
+    border-radius: 12px; 
+    display: flex; align-items: center; justify-content: center; 
+    font-size: 24px;
+  }
+
+  /* 로고 텍스트 강조 */
+  .ta-header-title { font-size: 20px; font-weight: 850; letter-spacing: -0.5px; }
+  .ta-header-sub { font-size: 11px; font-weight: 700; opacity: 0.9; letter-spacing: 1.5px; margin-top: 2px; }
+
+  .ta-body { max-width: 500px; margin: 0 auto; padding: 3rem 1.5rem; }
+
+  /* 카드 디자인 - 더 깔끔하고 고급스럽게 */
+  .ta-login-card { 
+    background: #fff; 
+    border-radius: var(--radius); 
+    overflow: hidden; 
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  }
+
+  .ta-login-hero { 
+    background: var(--gradient-navy); 
+    padding: 3rem 2rem; 
+    text-align: center; 
+    color: #fff;
+  }
+
+  .ta-hero-icon { font-size: 40px; margin-bottom: 1rem; opacity: 0.9; }
+  .ta-hero-title { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+  .ta-hero-badge { 
+    display: inline-block; 
+    background: rgba(255,255,255,0.15); 
+    padding: 4px 16px; 
+    border-radius: 30px; 
+    font-size: 13px; 
+    font-weight: 600; 
+  }
+
+  /* 폼 스타일 */
+  .ta-form { padding: 2.5rem 2rem; }
+  .ta-form label { font-size: 13px; font-weight: 700; color: var(--navy-dark); display: block; margin-bottom: 8px; }
+  
+  .ta-form select, .ta-form input { 
+    width: 100%; padding: 14px; 
+    border: 1.5px solid var(--border-color); 
+    border-radius: 8px; 
+    font-size: 15px; 
+    background: #fcfcfc; 
+    color: var(--text-main); 
+    margin-bottom: 1.5rem; 
+    outline: none; 
+    transition: all 0.2s;
+  }
+
+  .ta-form select:focus, .ta-form input:focus { 
+    border-color: var(--navy-mid); 
+    background: #fff; 
+    box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+  }
+
+  /* 버튼 - 딥 네이비 그라데이션 */
+  .ta-btn-primary { 
+    width: 100%; padding: 16px; 
+    border-radius: 8px; 
+    font-size: 16px; font-weight: 800; 
+    cursor: pointer; border: none; 
+    background: var(--gradient-navy); 
+    color: #fff; 
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .ta-btn-primary:hover { 
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0, 21, 41, 0.3);
+  }
+
+  /* 시험지 화면 디자인 */
+  .ta-test-card { 
+    background: #fff; border-radius: var(--radius); padding: 2rem; 
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  }
+
+  .ta-progress { background: #f0f2f5; border-radius: 10px; height: 8px; margin: 1.5rem 0; overflow: hidden; }
+  .ta-progress-bar { background: var(--navy-mid); height: 100%; transition: width 0.3s; }
+
+  .ta-q-text { font-size: 18px; font-weight: 700; color: var(--navy-dark); margin-bottom: 2rem; line-height: 1.6; }
+  
+  .ta-option { 
+    display: flex; align-items: center; gap: 15px; 
+    padding: 15px 20px; border: 1.5px solid var(--border-color); 
+    border-radius: 10px; margin-bottom: 12px; 
+    cursor: pointer; transition: all 0.2s; background: #fff;
+  }
+
+  .ta-option:hover { border-color: var(--navy-mid); background: #f8fbff; }
+  .ta-option.selected { border-color: var(--navy-mid); background: #f0f7ff; color: var(--navy-mid); font-weight: 700; border-width: 2px; }
+
+  /* 결과 화면 */
+  .ta-result-hero { background: var(--gradient-navy); padding: 4rem 2rem; text-align: center; color: #fff; border-radius: var(--radius) var(--radius) 0 0; }
+  .ta-result-score { font-size: 72px; font-weight: 900; }
 </style>
 </head>
 <body>
 
-<div class="ta-header">
-  <div class="ta-header-icon">📖</div>
+<header class="ta-header">
+  <div class="ta-header-icon"><i class="fas fa-microscope"></i></div>
   <div>
     <div class="ta-header-title">베타과학학원</div>
     <div class="ta-header-sub">BETA SCIENCE ACADEMY</div>
   </div>
-</div>
+</header>
 
 <div class="ta-body">
   <div id="ta-login">
     <div class="ta-login-card">
       <div class="ta-login-hero">
-        <div class="ta-hero-icon">📋</div>
-        <div class="ta-hero-title">온라인 테스트</div>
-        <div id="ta-subject-badge" class="ta-hero-badge">정보를 입력하세요</div>
+        <div class="ta-hero-icon"><i class="fas fa-file-signature"></i></div>
+        <div class="ta-hero-title">ONLINE TEST</div>
+        <div id="ta-subject-badge" class="ta-hero-badge">Student Verification</div>
       </div>
       <div class="ta-form">
-        <label>테스트 코드 (배포 ID)</label>
-        <input type="text" id="ta-test-code" placeholder="원장님이 알려주신 코드를 입력하세요">
-        <label>학년</label>
+        <label><i class="fas fa-book"></i> 과목</label>
+        <select id="ta-subject">
+          <option value="">과목을 선택하세요</option>
+          <option value="중등과학">중등과학</option>
+          <option value="통합과학">통합과학</option>
+          <option value="화학">화학</option>
+          <option value="생명과학">생명과학</option>
+          <option value="물리">물리</option>
+          <option value="지구과학">지구과학</option>
+          <option value="내신대비">내신대비</option>
+        </select>
+
+        <label><i class="fas fa-key"></i> 테스트 코드 (배포 ID)</label>
+        <input type="text" id="ta-test-code" placeholder="코드를 입력하세요">
+
+        <label><i class="fas fa-user-grad"></i> 학년</label>
         <select id="ta-grade">
-          <option value="">학년을 선택하세요</option>
+          <option value="">학년 선택</option>
           <option>중등1학년</option><option>중등2학년</option><option>중등3학년</option>
           <option>고등1학년</option><option>고등2학년</option><option>고등3학년</option>
         </select>
-        <label>학생 이름</label>
+
+        <label><i class="fas fa-id-card"></i> 학생 성명</label>
         <input type="text" id="ta-name" placeholder="이름을 입력하세요">
-        <button class="ta-btn-primary" onclick="startTest()">▶ 테스트 시작</button>
+        
+        <button class="ta-btn-primary" onclick="startTest()">테스트 응시하기</button>
       </div>
     </div>
   </div>
@@ -73,31 +200,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans
   <div id="ta-test" style="display:none">
     <div class="ta-test-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-        <span style="font-size:13px;color:#666" id="ta-student-info"></span>
-        <span style="font-size:13px;color:#534AB7;font-weight:500" id="ta-q-counter"></span>
+        <span style="font-size:14px; font-weight:700; color:var(--navy-mid)" id="ta-student-info"></span>
+        <span style="font-size:14px; font-weight:800; color:var(--text-muted)" id="ta-q-counter"></span>
       </div>
       <div class="ta-progress"><div class="ta-progress-bar" id="ta-prog"></div></div>
       <div class="ta-q-text" id="ta-q-text"></div>
       <div id="ta-options">
-        <div class="ta-option" onclick="selectOption(1)"><div style="width:24px">①</div> 1번</div>
-        <div class="ta-option" onclick="selectOption(2)"><div style="width:24px">②</div> 2번</div>
-        <div class="ta-option" onclick="selectOption(3)"><div style="width:24px">③</div> 3번</div>
-        <div class="ta-option" onclick="selectOption(4)"><div style="width:24px">④</div> 4번</div>
-        <div class="ta-option" onclick="selectOption(5)"><div style="width:24px">⑤</div> 5번</div>
+        <div class="ta-option" onclick="selectOption(1)"><span>①</span> 1번</div>
+        <div class="ta-option" onclick="selectOption(2)"><span>②</span> 2번</div>
+        <div class="ta-option" onclick="selectOption(3)"><span>③</span> 3번</div>
+        <div class="ta-option" onclick="selectOption(4)"><span>④</span> 4번</div>
+        <div class="ta-option" onclick="selectOption(5)"><span>⑤</span> 5번</div>
       </div>
-      <button class="ta-next-btn" id="ta-next-btn" onclick="nextQuestion()">다음 문제 →</button>
+      <button class="ta-btn-primary" style="margin-top:2rem;" id="ta-next-btn" onclick="nextQuestion()">다음 문제 이동</button>
     </div>
   </div>
 
   <div id="ta-result" style="display:none">
     <div class="ta-result-card">
       <div class="ta-result-hero">
-        <div class="ta-result-score" id="res-score">0점</div>
-        <div style="color:white; margin-top:10px;" id="res-msg">테스트가 완료되었습니다!</div>
+        <div class="ta-result-score" id="res-score">0</div>
+        <div style="font-size:18px; font-weight:700; margin-top:10px;">TEST COMPLETED</div>
       </div>
-      <div style="padding:2rem">
-        <p style="color:#666; margin-bottom:1.5rem">점수가 원장님께 전송되었습니다.</p>
-        <button class="ta-btn-primary" onclick="location.reload()">처음으로</button>
+      <div style="padding:3rem 2rem; text-align:center;">
+        <p style="font-size:15px; color:var(--text-muted); margin-bottom:2rem;">성적 데이터가 성공적으로 전송되었습니다.<br>수고하셨습니다.</p>
+        <button class="ta-btn-primary" onclick="location.reload()">메인화면 돌아가기</button>
       </div>
     </div>
   </div>
@@ -112,13 +239,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans
   let userAnswers = [];
   let selectedOption = null;
 
-  // 테스트 시작
   window.startTest = async function() {
     const code = document.getElementById('ta-test-code').value.trim();
     const name = document.getElementById('ta-name').value.trim();
     const grade = document.getElementById('ta-grade').value;
+    const subject = document.getElementById('ta-subject').value;
 
-    if(!code || !name || !grade) { alert('모든 정보를 입력해주세요.'); return; }
+    if(!code || !name || !grade || !subject) { alert('모든 항목을 입력해주세요.'); return; }
 
     try {
       const docRef = doc(db, "tests", code);
@@ -129,18 +256,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans
         currentTest.fireId = docSnap.id;
         document.getElementById('ta-login').style.display = 'none';
         document.getElementById('ta-test').style.display = 'block';
-        document.getElementById('ta-student-info').textContent = `${grade} ${name}`;
+        document.getElementById('ta-student-info').textContent = `${grade} | ${name}`;
         renderQuestion();
       } else {
-        alert('존재하지 않는 테스트 코드입니다.');
+        alert('유효하지 않은 테스트 코드입니다.');
       }
     } catch (e) {
       console.error(e);
-      alert('데이터를 불러오는 중 오류가 발생했습니다.');
+      alert('데이터 로딩 실패');
     }
   }
 
-  // 보기 선택
   window.selectOption = function(num) {
     selectedOption = num;
     const opts = document.querySelectorAll('.ta-option');
@@ -148,23 +274,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans
     opts[num-1].classList.add('selected');
   }
 
-  // 문제 출력
   function renderQuestion() {
     const qData = currentTest.questions[currentQ];
-    document.getElementById('ta-q-counter').textContent = `${currentQ + 1} / ${currentTest.questions.length}`;
-    document.getElementById('ta-q-text').textContent = qData.question || `${currentQ + 1}번 문제입니다.`;
-    document.getElementById('ta-prog').style.width = `${((currentQ) / currentTest.questions.length) * 100}%`;
+    document.getElementById('ta-q-counter').textContent = `Question ${currentQ + 1} / ${currentTest.questions.length}`;
+    document.getElementById('ta-q-text').textContent = qData.question || `${currentQ + 1}번 문항입니다. 적절한 답을 선택하세요.`;
+    document.getElementById('ta-prog').style.width = `${((currentQ + 1) / currentTest.questions.length) * 100}%`;
     
-    // 초기화
     selectedOption = null;
     document.querySelectorAll('.ta-option').forEach(opt => opt.classList.remove('selected'));
-    document.getElementById('ta-next-btn').textContent = (currentQ === currentTest.questions.length - 1) ? "제출하기" : "다음 문제 →";
+    document.getElementById('ta-next-btn').textContent = (currentQ === currentTest.questions.length - 1) ? "최종 답안 제출하기" : "다음 문제 이동";
   }
 
-  // 다음 문제 또는 제출
   window.nextQuestion = function() {
-    if(selectedOption === null) { alert('답을 선택해주세요.'); return; }
-    
+    if(selectedOption === null) { alert('답안을 선택해 주세요.'); return; }
     userAnswers.push(selectedOption);
 
     if (currentQ < currentTest.questions.length - 1) {
@@ -175,24 +297,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans
     }
   }
 
-  // 최종 제출 및 채점
   async function submitTest() {
     let correctCount = 0;
     currentTest.questions.forEach((q, idx) => {
-      if(String(q.answer) === String(userAnswers[idx])) {
-        correctCount++;
-      }
+      if(String(q.answer) === String(userAnswers[idx])) correctCount++;
     });
 
     const score = Math.round((correctCount / currentTest.questions.length) * 100);
     const name = document.getElementById('ta-name').value.trim();
     const grade = document.getElementById('ta-grade').value;
+    const subject = document.getElementById('ta-subject').value;
 
     try {
-      // 파이어베이스 'grades' 컬렉션에 성적 저장
       await addDoc(collection(db, "grades"), {
         testId: currentTest.fireId,
         testUnit: currentTest.unitName || currentTest.unit,
+        subject: subject,
         studentName: name,
         grade: grade,
         score: score,
@@ -201,10 +321,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans
 
       document.getElementById('ta-test').style.display = 'none';
       document.getElementById('ta-result').style.display = 'block';
-      document.getElementById('res-score').textContent = score + '점';
+      document.getElementById('res-score').textContent = score;
     } catch (e) {
       console.error(e);
-      alert('성적 저장 중 오류가 발생했습니다.');
+      alert('성적 제출 오류');
     }
   }
 </script>
