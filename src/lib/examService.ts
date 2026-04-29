@@ -3,15 +3,16 @@ import {
   collection, addDoc, getDoc, getDocs, doc, query, where, orderBy, serverTimestamp, updateDoc 
 } from 'firebase/firestore';
 
-// 1. 규격 정의 - 화면 코드(q.text)와 일치시킴
+// 1. 규격 정의 - 화면 코드와 100% 일치 (text, answer)
 export type QuestionType = 'multiple' | 'ox';
 
 export interface Question {
   id: string;
   type: QuestionType;
-  text: string; // 'question'에서 'text'로 수정 (에러 해결 핵심)
+  text: string;   // q.text 에 대응
+  answer: string; // q.answer 에 대응 (에러 해결 핵심!)
   options?: string[];
-  correctAnswer: string;
+  correctAnswer?: string; // 혹시 몰라 기존 이름도 남겨둠
 }
 
 export interface Exam {
@@ -75,12 +76,14 @@ export const getExamsByTeacher = async (teacherId: string) => {
   return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
-// 8. 채점 로직
+// 8. 채점 로직 (명칭 대응)
 export const calculateScore = (exam: any, answers: any) => {
   const questions = exam.questions || []; 
   let correctCount = 0;
   questions.forEach((q: any, idx: number) => {
-    if (answers[`q${idx}`] === q.correctAnswer) correctCount++;
+    // q.answer 또는 q.correctAnswer 중 있는 것을 사용
+    const rightAnswer = q.answer || q.correctAnswer;
+    if (answers[`q${idx}`] === rightAnswer) correctCount++;
   });
   return questions.length > 0 ? Math.round((correctCount / questions.length) * 100) : 0;
 };
