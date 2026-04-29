@@ -1,6 +1,6 @@
 'use client';
 // src/app/student/[examId]/page.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { getExam, submitStudentAnswers, calculateScore, Exam } from '@/lib/examService';
 import { FlaskConical, ChevronLeft, ChevronRight, CheckCircle, ArrowLeft } from 'lucide-react';
@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 
 type Phase = 'name' | 'exam' | 'result';
 
-export default function StudentExamPage() {
+function StudentExamInner() {
   const { examId } = useParams<{ examId: string }>();
   const searchParams = useSearchParams();
   const isPreview = searchParams.get('preview') === '1';
@@ -317,5 +317,17 @@ export default function StudentExamPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function StudentExamPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-green-50">
+        <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <StudentExamInner />
+    </Suspense>
   );
 }
