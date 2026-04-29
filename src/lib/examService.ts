@@ -1,97 +1,47 @@
 import { db } from './firebase';
 import { 
-  collection, 
-  addDoc, 
-  getDoc, 
-  getDocs, 
-  doc, 
-  query, 
-  where, 
-  updateDoc,
-  DocumentData
+  collection, addDoc, getDoc, getDocs, doc, query, where, orderBy, serverTimestamp 
 } from 'firebase/firestore';
 
-// 시험지 생성 (saveExam이라는 이름으로도 쓸 수 있게 함)
-export const createExam = async (examData: any) => {
-  try {
-    const docRef = await addDoc(collection(db, 'exams'), {
-      ...examData,
-      createdAt: new Date().toISOString()
-    });
-    return docRef.id;
-  } catch (error) {
-    throw error;
+// 1. 접속 코드로 시험지 찾기 (학생용)
+export const getExamByCode = async (accessCode: string) => {
+  const q = query(collection(db, 'exams'), where("accessCode", "==", accessCode), where("isPublished", "==", true));
+  const querySnapshot = await getDocs(q);
+  if (!querySnapshot.empty) {
+    const doc = querySnapshot.docs[0];
+    return { id: doc.id, ...doc.data() };
   }
+  return null;
 };
-export const saveExam = createExam; // 이름 중복 대응
 
-// 특정 시험지 조회 (getExamByCode라는 이름으로도 쓸 수 있게 함)
-export const getExam = async (examId: string) => {
-  try {
-    const docRef = doc(db, 'exams', examId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
-    }
-    return null;
-  } catch (error) {
-    throw error;
-  }
+// 2. 시험지 저장 (saveExam)
+export const saveExam = async (examData: any) => {
+  return await addDoc(collection(db, 'exams'), { ...examData, createdAt: serverTimestamp() });
 };
-export const getExamByCode = getExam; // 이름 중복 대응
 
-// 점수 계산 로직 추가
+// 3. 학생 답안 제출 (submitStudentAnswers)
+export const submitStudentAnswers = async (answerData: any) => {
+  return await addDoc(collection(db, 'studentAnswers'), { ...answerData, submittedAt: serverTimestamp() });
+};
+
+// 4. 점수 계산 (calculateScore)
 export const calculateScore = (questions: any[], answers: any) => {
-  let score = 0;
-  questions.forEach((q, index) => {
-    if (answers[index] === q.correctAnswer) {
-      score++;
-    }
+  let correctCount = 0;
+  questions.forEach((q, idx) => {
+    if (answers[`q${idx}`] === q.correctAnswer) correctCount++;
   });
-  return Math.round((score / questions.length) * 100);
+  return Math.round((correctCount / questions.length) * 100);
 };
 
-// 선생님별 시험 목록 조회
+// 5. 선생님용 목록 조회 및 기타 호환용
 export const getExamsByTeacher = async (teacherId: string) => {
-  try {
-    const q = query(collection(db, 'exams'), where("teacherId", "==", teacherId));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  } catch (error) {
-    throw error;
-  }
+  const q = query(collection(db, 'exams'), where("teacherId", "==", teacherId), orderBy("createdAt", "desc"));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
-// 학생 답안 제출
-export const submitStudentAnswers = async (data: any) => {
-  try {
-    const docRef = await addDoc(collection(db, 'submissions'), {
-      ...data,
-      submittedAt: new Date().toISOString()
-    });
-    return docRef.id;
-  } catch (error) {
-    throw error;
-  }
-};
-
-// 시험지 수정
-export const updateExam = async (examId: string, examData: any) => {
-  try {
-    const docRef = doc(db, 'exams', examId);
-    await updateDoc(docRef, examData);
-  } catch (error) {
-    throw error;
-  }
-};
-
-// 결과 조회
 export const getAnswersByExam = async (examId: string) => {
-  try {
-    const q = query(collection(db, 'submissions'), where("examId", "==", examId));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  } catch (error) {
-    throw error;
-  }
+  const q = query(collection(db, 'studentAnswers'), where("examId", "==", examId), orderBy("submittedAt", "desc"));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
