@@ -40,16 +40,22 @@ export interface StudentAnswer {
   date?: string;
 }
 
+// undefined 값 제거 (Firestore는 undefined 저장 불가)
+function removeUndefined(obj: unknown): unknown {
+  return JSON.parse(JSON.stringify(obj));
+}
+
 // ─── 시험지 저장 (신규) ────────────────────────────────────────────────────
 export async function saveExam(
   exam: Omit<Exam, 'id' | 'createdAt' | 'regDate'>
 ): Promise<string> {
   const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-  const docRef = await addDoc(collection(db, 'tests'), {
+  const data = removeUndefined({
     ...exam,
     accessCode: code,
     regDate: Timestamp.now(),
   });
+  const docRef = await addDoc(collection(db, 'tests'), data as object);
   return docRef.id;
 }
 
@@ -58,7 +64,8 @@ export async function updateExam(
   examId: string,
   exam: Partial<Omit<Exam, 'id' | 'createdAt' | 'regDate'>>
 ): Promise<void> {
-  await updateDoc(doc(db, 'tests', examId), { ...exam });
+  const data = removeUndefined(exam);
+  await updateDoc(doc(db, 'tests', examId), data as object);
 }
 
 // ─── 선생님 시험지 목록 ────────────────────────────────────────────────────
@@ -100,7 +107,6 @@ export async function submitStudentAnswers(payload: {
   score: number;
   totalQuestions: number;
 }): Promise<string> {
-  // exam 정보(testName)도 함께 저장하기 위해 exam을 다시 조회
   const exam = await getExam(payload.examId);
   const docRef = await addDoc(collection(db, 'grades'), {
     examId: payload.examId,
