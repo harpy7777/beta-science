@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>베타과학 - 학원 관리 시스템</title>
 <style>
-  /* 스타일 부분은 원본과 100% 동일하므로 생략하지 않고 그대로 유지합니다 */
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
     --primary: #2563eb; --primary-light: #eff6ff; --primary-dark: #1d4ed8;
@@ -114,42 +113,34 @@
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-card-header">
-          <div class="stat-icon blue">
-            <svg class="icon" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
+          <div class="stat-icon blue"><svg class="icon" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
           <span class="stat-label">전체</span>
         </div>
-        <div class="stat-value">0</div>
+        <div class="stat-value" id="stat-total-students">0</div>
         <div class="stat-desc">등록 학생 수</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-header">
-          <div class="stat-icon green">
-            <svg class="icon" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          </div>
-          <span class="stat-label">이번 주</span>
+          <div class="stat-icon green"><svg class="icon" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+          <span class="stat-label">누적</span>
         </div>
-        <div class="stat-value">0</div>
+        <div class="stat-value" id="stat-total-grades">0</div>
         <div class="stat-desc">제출된 테스트</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-header">
-          <div class="stat-icon amber">
-            <svg class="icon" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          </div>
+          <div class="stat-icon amber"><svg class="icon" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
           <span class="stat-label">평균</span>
         </div>
-        <div class="stat-value">0</div>
+        <div class="stat-value" id="stat-avg-score">0</div>
         <div class="stat-desc">전체 평균 점수</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-header">
-          <div class="stat-icon red">
-            <svg class="icon" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          </div>
-          <span class="stat-label">추가과제</span>
+          <div class="stat-icon red"><svg class="icon" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+          <span class="stat-label">미완료</span>
         </div>
-        <div class="stat-value">0</div>
+        <div class="stat-value" id="stat-pending-special">0</div>
         <div class="stat-desc">집중 관리 필요</div>
       </div>
     </div>
@@ -161,15 +152,10 @@
       </div>
       <table>
         <thead>
-          <tr>
-            <th>학생</th>
-            <th>테스트</th>
-            <th>점수</th>
-            <th>제출일</th>
-          </tr>
+          <tr><th>학생</th><th>테스트</th><th>점수</th><th>제출일</th></tr>
         </thead>
         <tbody id="recentGradesBody">
-          <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:30px;">데이터를 불러오는 중이거나 등록된 결과가 없습니다.</td></tr>
+          <tr><td colspan="4" style="text-align:center; padding:40px; color:var(--text-muted);">데이터를 불러오는 중...</td></tr>
         </tbody>
       </table>
     </div>
@@ -178,143 +164,109 @@
       <div class="section-header">
         <div style="display:flex; align-items:center;">
           <span class="section-title">등록된 테스트 관리</span>
-          <span class="test-count-badge">0개</span>
+          <span class="test-count-badge" id="test-total-badge">0개</span>
         </div>
-        <a href="test-create.html" class="btn-create">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          테스트 생성
-        </a>
+        <a href="test-create.html" class="btn-create">테스트 생성</a>
       </div>
-
-      <div class="filter-row">
-        <select class="filter-select"><option>전체 학년</option><option>고1학년</option><option>고2학년</option><option>고3학년</option><option>중3학년</option></select>
-        <select class="filter-select"><option>전체 과목</option><option>통합과학</option><option>물리</option><option>화학</option><option>생물</option><option>내신대비</option></select>
-        <button class="btn-reset">필터 초기화</button>
-      </div>
-
       <table>
         <thead>
-          <tr>
-            <th>테스트 ID</th>
-            <th>단원명</th>
-            <th>과목</th>
-            <th>학년</th>
-            <th>관리</th>
-          </tr>
+          <tr><th>테스트 ID</th><th>단원명</th><th>과목</th><th>학년</th><th>관리</th></tr>
         </thead>
         <tbody id="recentTestsBody">
-          <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:30px;">등록된 테스트가 없습니다.</td></tr>
+          <tr><td colspan="5" style="text-align:center; padding:40px; color:var(--text-muted);">데이터를 불러오는 중...</td></tr>
         </tbody>
       </table>
-      <a href="test-manage.html" class="view-more-btn" id="totalTestBtn">전체 테스트 보기</a>
+      <a href="test-manage.html" class="view-more-btn" id="view-more-tests-btn">전체 테스트 보기</a>
     </div>
   </main>
 </div>
 
 <script type="module">
-  // Firebase SDK 로드
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // 1. 원장님의 파이어베이스 설정값 (이미 firebase-config.js를 쓰고 계시다면 유지, 아니면 아래를 채우세요)
+  // 베타과학 전용 설정값 적용 완료
   const firebaseConfig = {
-    apiKey: "여기에_직접_입력하거나_연결확인",
-    authDomain: "여기에_직접_입력하거나_연결확인",
-    projectId: "여기에_직접_입력하거나_연결확인",
-    storageBucket: "여기에_직접_입력하거나_연결확인",
-    messagingSenderId: "여기에_직접_입력하거나_연결확인",
-    appId: "여기에_직접_입력하거나_연결확인"
+    apiKey: "AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain: "beta-science.firebaseapp.com",
+    projectId: "beta-science",
+    storageBucket: "beta-science.firebasestorage.app",
+    messagingSenderId: "650652155367",
+    appId: "1:650652155367:web:41d2958e675cb4edd4d142",
+    measurementId: "G-SPNVBHPWP6"
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // 1. 상단 통계 실시간 연동
-  function updateStats() {
-    // 등록 학생 수
-    onSnapshot(collection(db, "students"), (snapshot) => {
-      document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = snapshot.size;
+  // 1. 실시간 통계 업데이트
+  function initStats() {
+    onSnapshot(collection(db, "students"), snap => {
+      document.getElementById('stat-total-students').textContent = snap.size;
     });
 
-    // 성적 및 평균
-    onSnapshot(collection(db, "grades"), (snapshot) => {
-      let totalScore = 0;
-      snapshot.forEach(doc => { totalScore += Number(doc.data().score || 0); });
-      const avg = snapshot.size > 0 ? (totalScore / snapshot.size).toFixed(1) : 0;
-      document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = snapshot.size;
-      document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = avg;
+    onSnapshot(collection(db, "grades"), snap => {
+      let total = 0;
+      snap.forEach(doc => total += Number(doc.data().score || 0));
+      const avg = snap.size > 0 ? (total / snap.size).toFixed(1) : 0;
+      document.getElementById('stat-total-grades').textContent = snap.size;
+      document.getElementById('stat-avg-score').textContent = avg;
     });
 
-    // 추가과제(특별관리)
-    onSnapshot(collection(db, "specialManagement"), (snapshot) => {
-      const pendingCount = snapshot.docs.filter(d => !d.data().done).length;
-      document.querySelector('.stat-card:nth-child(4) .stat-value').textContent = pendingCount;
+    onSnapshot(collection(db, "specialManagement"), snap => {
+      const pending = snap.docs.filter(d => !d.data().done).length;
+      document.getElementById('stat-pending-special').textContent = pending;
     });
   }
 
-  // 2. 최근 테스트 결과 표 렌더링
-  function renderRecentGrades() {
+  // 2. 최근 성적 리스트 (5건)
+  function initRecentGrades() {
     const q = query(collection(db, "grades"), orderBy("date", "desc"), limit(5));
-    const tbody = document.getElementById('recentGradesBody');
-
-    onSnapshot(q, (snapshot) => {
-      if (snapshot.empty) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:30px;">등록된 성적 데이터가 없습니다.</td></tr>';
+    onSnapshot(q, snap => {
+      const tbody = document.getElementById('recentGradesBody');
+      if(snap.empty) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">등록된 데이터가 없습니다.</td></tr>';
         return;
       }
-      tbody.innerHTML = snapshot.docs.map(doc => {
+      tbody.innerHTML = snap.docs.map(doc => {
         const d = doc.data();
         const scoreClass = d.score >= 80 ? 'score-high' : d.score >= 60 ? 'score-mid' : 'score-low';
-        return `
-          <tr>
-            <td>${d.studentName || '이름 없음'}</td>
-            <td>${d.testName || '테스트명 없음'}</td>
-            <td><span class="score-badge ${scoreClass}">${d.score}점</span></td>
-            <td>${d.date || '-'}</td>
-          </tr>`;
+        return `<tr>
+          <td>${d.studentName || '-'}</td>
+          <td>${d.testName || '-'}</td>
+          <td><span class="score-badge ${scoreClass}">${d.score}점</span></td>
+          <td>${d.date || '-'}</td>
+        </tr>`;
       }).join('');
     });
   }
 
-  // 3. 테스트 관리 목록 렌더링
-  function renderRecentTests() {
-    const q = query(collection(db, "tests"), orderBy("regDate", "desc"), limit(10));
-    const tbody = document.getElementById('recentTestsBody');
-    const countBadge = document.querySelector('.test-count-badge');
-    const totalBtn = document.getElementById('totalTestBtn');
-
-    onSnapshot(q, (snapshot) => {
-      countBadge.textContent = `${snapshot.size}개`;
-      totalBtn.textContent = `전체 ${snapshot.size}개 테스트 보기`;
-      
-      if (snapshot.empty) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:30px;">등록된 테스트가 없습니다.</td></tr>';
+  // 3. 최근 테스트 리스트 (5건)
+  function initRecentTests() {
+    const q = query(collection(db, "tests"), orderBy("regDate", "desc"), limit(5));
+    onSnapshot(q, snap => {
+      const tbody = document.getElementById('recentTestsBody');
+      document.getElementById('test-total-badge').textContent = snap.size + '개';
+      if(snap.empty) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">등록된 테스트가 없습니다.</td></tr>';
         return;
       }
-
-      tbody.innerHTML = snapshot.docs.map(doc => {
+      tbody.innerHTML = snap.docs.map(doc => {
         const t = doc.data();
-        return `
-          <tr>
-            <td style="font-size:12px; color:var(--text-muted)">${t.testId || 'ID없음'}</td>
-            <td style="font-weight:600">${t.unitName || '단원명 없음'}</td>
-            <td>${t.subject || '-'}</td>
-            <td><span class="grade-badge">${t.grade || '-'}</span></td>
-            <td>
-              <div class="action-icons">
-                <button class="action-btn">✏️</button>
-                <button class="action-btn del">🗑️</button>
-              </div>
-            </td>
-          </tr>`;
+        return `<tr>
+          <td style="font-size:12px; color:var(--text-muted)">${t.testId || '-'}</td>
+          <td style="font-weight:600">${t.unitName || '-'}</td>
+          <td>${t.subject || '-'}</td>
+          <td><span class="grade-badge">${t.grade || '-'}</span></td>
+          <td><div class="action-icons"><button class="action-btn">✏️</button><button class="action-btn del">🗑️</button></div></td>
+        </tr>`;
       }).join('');
     });
   }
 
-  // 초기 실행
-  updateStats();
-  renderRecentGrades();
-  renderRecentTests();
+  initStats();
+  initRecentGrades();
+  initRecentTests();
 </script>
 </body>
 </html>
