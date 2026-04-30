@@ -6,23 +6,15 @@
 <title>SMS설정 - 베타과학</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root {
-    --primary: #1a3fc4; --primary-light: #eef2ff; --primary-dark: #1530a0;
-    --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff;
-    --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0;
-    --danger: #ef4444; --success: #10b981; --warning: #f59e0b;
-    --radius: 10px;
-  }
+  :root { --primary: #1a3fc4; --primary-light: #eef2ff; --primary-dark: #1530a0; --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff; --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --success: #10b981; --warning: #f59e0b; --radius: 10px; }
   body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
   .app-wrapper { max-width: var(--max-width); margin: 0 auto; display: flex; flex-direction: column; min-height: 100vh; }
-
-  /* 탑바 */
   .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 32px; height: 56px; position: sticky; top: 0; z-index: 100; }
   .logo-area { display: flex; flex-direction: row; align-items: center; gap: 8px; text-decoration: none; cursor: pointer; flex-shrink: 0; }
-.logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.logo-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
-.logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
-.logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
+  .logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .logo-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
+  .logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
+  .logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
   .topbar-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
   .nav-tabs { display: flex; gap: 2px; list-style: none; }
   .nav-tabs a { display: block; padding: 8px 14px; font-size: 14px; color: var(--text-muted); text-decoration: none; border-radius: 6px; white-space: nowrap; transition: background 0.15s, color 0.15s; }
@@ -31,142 +23,70 @@
   .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
   .academy-name { font-size: 13px; font-weight: 600; color: var(--text); }
   .badge-admin { font-size: 11px; padding: 2px 8px; background: #f1f5f9; border-radius: 20px; color: var(--text-muted); }
-
-  /* 메인 */
   .main-content { padding: 28px 24px; flex: 1; padding-bottom: 100px; }
-
   .page-header { margin-bottom: 24px; }
   .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
   .page-header p { font-size: 14px; color: var(--text-muted); }
-
-  /* 레이아웃: 좌(설정) + 우(미리보기) */
   .layout { display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: start; }
-
-  /* 카드 */
   .card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; }
   .card-header { padding: 18px 24px; border-bottom: 1px solid var(--border); }
   .card-header h2 { font-size: 16px; font-weight: 700; }
   .card-header p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
   .card-body { padding: 24px; }
-
-  /* 폼 */
   .form-group { margin-bottom: 20px; }
   .form-group:last-child { margin-bottom: 0; }
   .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7px; }
   .form-group .hint { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
-
-  .form-input {
-    width: 100%; padding: 11px 14px;
-    border: 1px solid var(--border); border-radius: 8px;
-    font-size: 14px; color: var(--text); background: var(--white);
-    outline: none; transition: border 0.15s; font-family: inherit;
-  }
+  .form-input { width: 100%; padding: 11px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text); background: var(--white); outline: none; transition: border 0.15s; font-family: inherit; }
   .form-input:focus { border-color: var(--primary); }
-
-  /* 점수별 메시지 그리드 */
   .score-msg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .score-msg-item label { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
   .score-dot { width: 8px; height: 8px; border-radius: 50%; }
-  .score-msg-item textarea {
-    width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
-    font-size: 13px; color: var(--text); background: var(--white);
-    outline: none; resize: vertical; min-height: 60px; font-family: inherit;
-    transition: border 0.15s; line-height: 1.5;
-  }
+  .score-msg-item textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text); background: var(--white); outline: none; resize: vertical; min-height: 60px; font-family: inherit; transition: border 0.15s; line-height: 1.5; }
   .score-msg-item textarea:focus { border-color: var(--primary); }
   .score-msg-full { grid-column: span 2; }
-
-  /* 파트별 피드백 */
   .feedback-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
   .feedback-item label { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; display: block; text-align: center; }
-  .feedback-item input {
-    width: 100%; padding: 9px 8px; border: 1px solid var(--border); border-radius: 8px;
-    font-size: 13px; color: var(--text); text-align: center; background: var(--white);
-    outline: none; font-family: inherit; transition: border 0.15s;
-  }
+  .feedback-item input { width: 100%; padding: 9px 8px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text); text-align: center; background: var(--white); outline: none; font-family: inherit; transition: border 0.15s; }
   .feedback-item input:focus { border-color: var(--primary); }
-
-  /* 과제 유형명 */
   .hw-type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .hw-type-item label { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: block; }
-  .hw-type-item input {
-    width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
-    font-size: 13px; color: var(--text); background: var(--white);
-    outline: none; font-family: inherit; transition: border 0.15s;
-  }
+  .hw-type-item input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text); background: var(--white); outline: none; font-family: inherit; transition: border 0.15s; }
   .hw-type-item input:focus { border-color: var(--primary); }
-
-  /* 기본 과제 */
   .hw-default-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
   .hw-default-item label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; display: block; }
-  .hw-default-item textarea {
-    width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
-    font-size: 13px; color: var(--text); background: var(--white);
-    outline: none; resize: vertical; min-height: 70px; font-family: inherit;
-    transition: border 0.15s; line-height: 1.6;
-  }
+  .hw-default-item textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text); background: var(--white); outline: none; resize: vertical; min-height: 70px; font-family: inherit; transition: border 0.15s; line-height: 1.6; }
   .hw-default-item textarea:focus { border-color: var(--primary); }
-
-  /* 미리보기 패널 */
   .preview-sticky { position: sticky; top: 72px; }
   .preview-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
   .preview-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
   .preview-header h3 { font-size: 15px; font-weight: 700; }
   .preview-body { padding: 20px; }
-  .sms-bubble {
-    background: #f8fafc; border: 1px solid var(--border); border-radius: 12px;
-    padding: 16px; font-size: 13px; line-height: 1.8; color: var(--text);
-    white-space: pre-wrap; font-family: inherit; min-height: 200px;
-  }
+  .sms-bubble { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-size: 13px; line-height: 1.8; color: var(--text); white-space: pre-wrap; font-family: inherit; min-height: 200px; }
   .preview-meta { margin-top: 10px; font-size: 12px; color: var(--text-muted); text-align: right; }
-
-  /* 저장 바 */
-  .save-bar {
-    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: var(--max-width);
-    background: var(--white); border-top: 1px solid var(--border);
-    padding: 14px 24px; z-index: 50;
-  }
-  .btn-save {
-    width: 100%; padding: 14px; background: var(--primary); color: white;
-    border: none; border-radius: 10px; font-size: 15px; font-weight: 700;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: background 0.15s;
-  }
+  .save-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--max-width); background: var(--white); border-top: 1px solid var(--border); padding: 14px 24px; z-index: 50; }
+  .btn-save { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s; }
   .btn-save:hover { background: var(--primary-dark); }
-
-  /* 토스트 */
   .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1e293b; color: white; padding: 11px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; opacity: 0; transition: opacity 0.3s, transform 0.3s; z-index: 999; white-space: nowrap; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  @media (max-width: 900px) {
-    .layout { grid-template-columns: 1fr; }
-    .preview-sticky { position: static; }
-    .score-msg-grid { grid-template-columns: 1fr; }
-    .score-msg-full { grid-column: span 1; }
-    .feedback-grid { grid-template-columns: repeat(3, 1fr); }
-  }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .preview-sticky { position: static; } .score-msg-grid { grid-template-columns: 1fr; } .score-msg-full { grid-column: span 1; } .feedback-grid { grid-template-columns: repeat(3, 1fr); } }
 </style>
 </head>
 <body>
 <div class="app-wrapper">
   <header class="topbar">
     <a href="index.html" class="logo-area">
-  <div class="logo-icon">
-    <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-      <path d="M9 3h6M9 3v7L4.5 17A2 2 0 0 0 6.4 20h11.2a2 2 0 0 0 1.9-3L15 10V3"/>
-      <line x1="6.5" y1="14" x2="17.5" y2="14"/>
-    </svg>
-  </div>
-  <div class="logo-text">
-    <span class="brand">BETA</span>
-    <span class="brand-sub">SCIENCE</span>
-  </div>
-</a>
-
-적용 대상 파일 6개:
-analysis.html grades.html sms.html special.html test-create.html test-manage.html
-각 파일에서 위 3가지를 찾아서 바꾸면 끝입니다! Ctrl+H (찾아 바꾸기) 쓰면 빠르게 됩니다 😊Sonnet 4.6
+      <div class="logo-icon">
+        <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <path d="M9 3h6M9 3v7L4.5 17A2 2 0 0 0 6.4 20h11.2a2 2 0 0 0 1.9-3L15 10V3"/>
+          <line x1="6.5" y1="14" x2="17.5" y2="14"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="brand">BETA</span>
+        <span class="brand-sub">SCIENCE</span>
+      </div>
+    </a>
     <div class="topbar-divider"></div>
     <nav><ul class="nav-tabs">
       <li><a href="dashboard.html">대시보드</a></li>
@@ -178,26 +98,15 @@ analysis.html grades.html sms.html special.html test-create.html test-manage.htm
       <li><a href="special.html">특별관리</a></li>
       <li><a href="sms.html" class="active">SMS설정</a></li>
     </ul></nav>
-    <div class="topbar-right">
-      <span class="academy-name">베타과학학원</span>
-      <span class="badge-admin">관리자 모드</span>
-    </div>
+    <div class="topbar-right"><span class="academy-name">베타과학학원</span><span class="badge-admin">관리자 모드</span></div>
   </header>
-
   <main class="main-content">
     <div class="page-header">
-      <h1>
-        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        SMS 문자 설정
-      </h1>
+      <h1><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>SMS 문자 설정</h1>
       <p>학부모에게 발송되는 성적 알림 문자의 내용을 설정하세요</p>
     </div>
-
     <div class="layout">
-      <!-- 왼쪽: 설정 -->
       <div>
-
-        <!-- 학원 정보 -->
         <div class="card">
           <div class="card-header"><h2>학원 정보</h2></div>
           <div class="card-body">
@@ -208,41 +117,20 @@ analysis.html grades.html sms.html special.html test-create.html test-manage.htm
             </div>
           </div>
         </div>
-
-        <!-- 점수별 평가 메시지 -->
         <div class="card">
           <div class="card-header"><h2>점수별 평가 메시지</h2></div>
           <div class="card-body">
             <div class="score-msg-grid">
-              <div class="score-msg-item">
-                <label><span class="score-dot" style="background:#10b981"></span>90점 이상</label>
-                <textarea id="msg90" oninput="updatePreview()">훌륭합니다!</textarea>
-              </div>
-              <div class="score-msg-item">
-                <label><span class="score-dot" style="background:#2563eb"></span>80점 이상</label>
-                <textarea id="msg80" oninput="updatePreview()">잘했어요!</textarea>
-              </div>
-              <div class="score-msg-item">
-                <label><span class="score-dot" style="background:#f59e0b"></span>70점 이상</label>
-                <textarea id="msg70" oninput="updatePreview()">조금만 더 노력하면 완벽해요!</textarea>
-              </div>
-              <div class="score-msg-item">
-                <label><span class="score-dot" style="background:#f97316"></span>60점 이상</label>
-                <textarea id="msg60" oninput="updatePreview()">조금 더 복습이 필요해요.</textarea>
-              </div>
-              <div class="score-msg-item score-msg-full">
-                <label><span class="score-dot" style="background:#ef4444"></span>60점 미만</label>
-                <textarea id="msg59" oninput="updatePreview()">열심히 복습해주세요!</textarea>
-              </div>
+              <div class="score-msg-item"><label><span class="score-dot" style="background:#10b981"></span>90점 이상</label><textarea id="msg90" oninput="updatePreview()">훌륭합니다!</textarea></div>
+              <div class="score-msg-item"><label><span class="score-dot" style="background:#1a3fc4"></span>80점 이상</label><textarea id="msg80" oninput="updatePreview()">잘했어요!</textarea></div>
+              <div class="score-msg-item"><label><span class="score-dot" style="background:#f59e0b"></span>70점 이상</label><textarea id="msg70" oninput="updatePreview()">조금만 더 노력하면 완벽해요!</textarea></div>
+              <div class="score-msg-item"><label><span class="score-dot" style="background:#f97316"></span>60점 이상</label><textarea id="msg60" oninput="updatePreview()">조금 더 복습이 필요해요.</textarea></div>
+              <div class="score-msg-item score-msg-full"><label><span class="score-dot" style="background:#ef4444"></span>60점 미만</label><textarea id="msg59" oninput="updatePreview()">열심히 복습해주세요!</textarea></div>
             </div>
           </div>
         </div>
-
-        <!-- 파트별 점수 피드백 -->
         <div class="card">
-          <div class="card-header">
-            <h2>파트별 점수 피드백</h2>
-          </div>
+          <div class="card-header"><h2>파트별 점수 피드백</h2></div>
           <div class="card-body">
             <div class="feedback-grid">
               <div class="feedback-item"><label>90% 이상</label><input id="fb90" type="text" value="우수" oninput="updatePreview()"></div>
@@ -253,8 +141,6 @@ analysis.html grades.html sms.html special.html test-create.html test-manage.htm
             </div>
           </div>
         </div>
-
-        <!-- 과제 유형명 -->
         <div class="card">
           <div class="card-header"><h2>과제 유형명</h2></div>
           <div class="card-body">
@@ -265,38 +151,21 @@ analysis.html grades.html sms.html special.html test-create.html test-manage.htm
             </div>
           </div>
         </div>
-
-        <!-- 기본 과제 내용 -->
         <div class="card">
-          <div class="card-header">
-            <h2>기본 과제 내용</h2>
-            <p>테스트별 과제가 설정되지 않았을 때 사용됩니다</p>
-          </div>
+          <div class="card-header"><h2>기본 과제 내용</h2><p>테스트별 과제가 설정되지 않았을 때 사용됩니다</p></div>
           <div class="card-body">
             <div class="hw-default-grid">
-              <div class="hw-default-item">
-                <label>0-2개 오답 과제</label>
-                <textarea id="hw1" oninput="updatePreview()">시험지에 오답문제 정리해오기</textarea>
-              </div>
-              <div class="hw-default-item">
-                <label>3-4개 오답 과제</label>
-                <textarea id="hw2" oninput="updatePreview()">수업노트 필기 다시하고 오답문제 정리하기</textarea>
-              </div>
-              <div class="hw-default-item">
-                <label>5개 이상 오답 과제</label>
-                <textarea id="hw3" oninput="updatePreview()">동영상 수업 내용복습, 수업노트 필기, 오답정리해오기</textarea>
-              </div>
+              <div class="hw-default-item"><label>0-2개 오답 과제</label><textarea id="hw1" oninput="updatePreview()">시험지에 오답문제 정리해오기</textarea></div>
+              <div class="hw-default-item"><label>3-4개 오답 과제</label><textarea id="hw2" oninput="updatePreview()">수업노트 필기 다시하고 오답문제 정리하기</textarea></div>
+              <div class="hw-default-item"><label>5개 이상 오답 과제</label><textarea id="hw3" oninput="updatePreview()">동영상 수업 내용복습, 수업노트 필기, 오답정리해오기</textarea></div>
             </div>
           </div>
         </div>
-
       </div>
-
-      <!-- 오른쪽: 미리보기 -->
       <div class="preview-sticky">
         <div class="preview-card">
           <div class="preview-header">
-            <svg width="16" height="16" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <svg width="16" height="16" fill="none" stroke="#1a3fc4" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             <h3>문자 미리보기</h3>
           </div>
           <div class="preview-body">
@@ -307,8 +176,6 @@ analysis.html grades.html sms.html special.html test-create.html test-manage.htm
       </div>
     </div>
   </main>
-
-  <!-- 저장 바 -->
   <div class="save-bar">
     <button class="btn-save" onclick="saveSettings()">
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -316,9 +183,7 @@ analysis.html grades.html sms.html special.html test-create.html test-manage.htm
     </button>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script>
   function updatePreview() {
     const academy = document.getElementById('academyName').value || '베타과학학원';
@@ -327,8 +192,7 @@ analysis.html grades.html sms.html special.html test-create.html test-manage.htm
     const fb90 = document.getElementById('fb90').value || '우수';
     const fb70 = document.getElementById('fb70').value || '보통';
     const fb59 = document.getElementById('fb59').value || '복습필요';
-
-    const preview =
+    document.getElementById('previewBubble').textContent =
 `[${academy} 성적알림]
 
 홍길동 학생
@@ -350,20 +214,13 @@ DNA 구조: 6/10 (${fb59})
 DNA 구조(심화): 동영상 수업 내용복습, 수업노트 필기, 오답정리해오기
 
 문의: ${academy}`;
-
-    document.getElementById('previewBubble').textContent = preview;
   }
-
-  function saveSettings() {
-    showToast('✓ SMS 설정이 저장되었습니다');
-  }
-
+  function saveSettings() { showToast('✓ SMS 설정이 저장되었습니다'); }
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2500);
   }
-
   updatePreview();
 </script>
 </body>
