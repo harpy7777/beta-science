@@ -6,15 +6,15 @@
 <title>특별관리 - 베타과학</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  --primary: #1a3fc4; --primary-light: #eef2ff; --primary-dark: #1530a0; --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff; --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --danger-light: #fef2f2; --success: #10b981; --success-light: #f0fdf4; --warning: #f59e0b; --warning-light: #fffbeb; --radius: 10px; }
+  :root { --primary: #1a3fc4; --primary-light: #eef2ff; --primary-dark: #1530a0; --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff; --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --danger-light: #fef2f2; --success: #10b981; --success-light: #f0fdf4; --warning: #f59e0b; --warning-light: #fffbeb; --radius: 10px; }
   body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
   .app-wrapper { max-width: var(--max-width); margin: 0 auto; display: flex; flex-direction: column; min-height: 100vh; }
   .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 32px; height: 56px; position: sticky; top: 0; z-index: 100; }
   .logo-area { display: flex; flex-direction: row; align-items: center; gap: 8px; text-decoration: none; cursor: pointer; flex-shrink: 0; }
-.logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.logo-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
-.logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
-.logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
+  .logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .logo-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
+  .logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
+  .logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
   .topbar-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
   .nav-tabs { display: flex; gap: 2px; list-style: none; }
   .nav-tabs a { display: block; padding: 8px 14px; font-size: 14px; color: var(--text-muted); text-decoration: none; border-radius: 6px; white-space: nowrap; transition: background 0.15s, color 0.15s; }
@@ -44,7 +44,6 @@
   .section-header h2 { font-size: 17px; font-weight: 700; }
   .section-body { padding: 24px; }
   .empty-state { text-align: center; padding: 48px 20px; }
-  .empty-check { width: 56px; height: 56px; border-radius: 50%; background: var(--success-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
   .empty-state p { font-size: 15px; color: var(--text-muted); font-weight: 500; }
   .student-list { display: flex; flex-direction: column; gap: 12px; }
   .student-item { border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; background: var(--white); transition: border-color 0.15s; }
@@ -58,23 +57,18 @@
   .score-chip { padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
   .score-chip.danger { background: var(--danger); } .score-chip.warning { background: var(--warning); } .score-chip.success { background: var(--success); }
   .action-area { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; min-width: 220px; }
-  .action-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
   .action-input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; color: var(--text); font-family: inherit; outline: none; transition: border 0.15s; background: var(--white); }
   .action-input:focus { border-color: var(--primary); }
   .action-input.filled { border-color: var(--success); background: var(--success-light); }
   .btn-save-action { padding: 7px 14px; background: var(--primary); color: white; border: none; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; }
   .btn-save-action:hover { background: var(--primary-dark); }
   .btn-complete { padding: 7px 14px; background: var(--success); color: white; border: none; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; }
-  .completed-badge { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--success); }
   table { width: 100%; border-collapse: collapse; }
   thead th { font-size: 12px; font-weight: 600; color: var(--text-muted); text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); background: #f8fafc; }
   tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: #f8fafc; }
   tbody td { font-size: 13px; padding: 12px 14px; }
-  .tag-danger { display: inline-block; padding: 2px 8px; background: var(--danger-light); color: var(--danger); border-radius: 4px; font-size: 11px; font-weight: 700; }
-  .tag-warning { display: inline-block; padding: 2px 8px; background: var(--warning-light); color: #92400e; border-radius: 4px; font-size: 11px; font-weight: 700; }
-  .tag-success { display: inline-block; padding: 2px 8px; background: var(--success-light); color: #065f46; border-radius: 4px; font-size: 11px; font-weight: 700; }
   .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1e293b; color: white; padding: 11px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; opacity: 0; transition: opacity 0.3s, transform 0.3s; z-index: 999; white-space: nowrap; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
@@ -83,21 +77,17 @@
 <div class="app-wrapper">
   <header class="topbar">
     <a href="index.html" class="logo-area">
-  <div class="logo-icon">
-    <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-      <path d="M9 3h6M9 3v7L4.5 17A2 2 0 0 0 6.4 20h11.2a2 2 0 0 0 1.9-3L15 10V3"/>
-      <line x1="6.5" y1="14" x2="17.5" y2="14"/>
-    </svg>
-  </div>
-  <div class="logo-text">
-    <span class="brand">BETA</span>
-    <span class="brand-sub">SCIENCE</span>
-  </div>
-</a>
-
-적용 대상 파일 6개:
-analysis.html grades.html sms.html special.html test-create.html test-manage.html
-각 파일에서 위 3가지를 찾아서 바꾸면 끝입니다! Ctrl+H (찾아 바꾸기) 쓰면 빠르게 됩니다 😊
+      <div class="logo-icon">
+        <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <path d="M9 3h6M9 3v7L4.5 17A2 2 0 0 0 6.4 20h11.2a2 2 0 0 0 1.9-3L15 10V3"/>
+          <line x1="6.5" y1="14" x2="17.5" y2="14"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="brand">BETA</span>
+        <span class="brand-sub">SCIENCE</span>
+      </div>
+    </a>
     <div class="topbar-divider"></div>
     <nav><ul class="nav-tabs">
       <li><a href="dashboard.html">대시보드</a></li>
@@ -120,8 +110,8 @@ analysis.html grades.html sms.html special.html test-create.html test-manage.htm
       <button class="btn-outline" onclick="showHistory()"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.7"/></svg>전체 이력 보기</button>
     </div>
     <div class="stats-grid">
-      <div class="stat-card"><div class="stat-card-top"><span class="stat-status warning">대기 중</span><div class="stat-icon-wrap warning"><svg width="20" height="20" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div></div><div class="stat-number warning" id="pendingCount">3</div><div class="stat-desc">대처방안 미입력 학생</div></div>
-      <div class="stat-card"><div class="stat-card-top"><span class="stat-status success">처리 완료</span><div class="stat-icon-wrap success"><svg width="20" height="20" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="stat-number success" id="doneCount">2</div><div class="stat-desc">대처방안 입력 완료</div></div>
+      <div class="stat-card"><div class="stat-card-top"><span class="stat-status warning">대기 중</span><div class="stat-icon-wrap warning"><svg width="20" height="20" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div></div><div class="stat-number warning" id="pendingCount">0</div><div class="stat-desc">대처방안 미입력 학생</div></div>
+      <div class="stat-card"><div class="stat-card-top"><span class="stat-status success">처리 완료</span><div class="stat-icon-wrap success"><svg width="20" height="20" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="stat-number success" id="doneCount">0</div><div class="stat-desc">대처방안 입력 완료</div></div>
     </div>
     <div class="section-card">
       <div class="section-header"><svg width="18" height="18" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><h2>대처방안 입력 필요</h2></div>
@@ -132,52 +122,42 @@ analysis.html grades.html sms.html special.html test-create.html test-manage.htm
       <div class="section-body"><div class="student-list" id="doneList"></div></div>
     </div>
     <div class="section-card" id="historySection" style="display:none;">
-      <div class="section-header"><svg width="18" height="18" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.7"/></svg><h2>전체 관리 이력</h2></div>
+      <div class="section-header"><svg width="18" height="18" fill="none" stroke="#1a3fc4" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.7"/></svg><h2>전체 관리 이력</h2></div>
       <div class="section-body"><table><thead><tr><th>학생명</th><th>테스트</th><th>점수</th><th>상태</th><th>대처방안</th><th>날짜</th></tr></thead><tbody id="historyBody"></tbody></table></div>
     </div>
   </main>
 </div>
 <div class="toast" id="toast"></div>
 <script type="module">
-  // 설정 파일을 따로 만드셨으므로 import로 가져옵니다.
-  // (파일명이 다르다면 './firebase-config.js' 부분을 실제 파일명으로 바꾸세요)
-  import { firebaseConfig } from './firebase-config.js'; 
-  
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // 연결 초기화
+  const firebaseConfig = {
+    apiKey: "AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain: "beta-science.firebaseapp.com",
+    projectId: "beta-science",
+    storageBucket: "beta-science.firebasestorage.app",
+    messagingSenderId: "650652155367",
+    appId: "1:650652155367:web:41d2958e675cb4edd4d142"
+  };
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  const colRef = collection(db, "specialManagement");
 
-  // [데이터 불러오기] 파이어베이스의 데이터를 실시간으로 감시해서 화면에 뿌려줍니다.
-  onSnapshot(colRef, (snapshot) => {
-    const allData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    
-    const pending = allData.filter(s => !s.done);
-    const done = allData.filter(s => s.done);
-
-    renderPending(pending);
-    renderDone(done);
-    renderHistory(allData);
+  onSnapshot(collection(db, "specialManagement"), (snapshot) => {
+    const all = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderPending(all.filter(s => !s.done));
+    renderDone(all.filter(s => s.done));
+    renderHistory(all);
   });
 
-  // [화면 그리기 함수들] - 버튼에서 인식할 수 있게 window를 붙여줍니다.
   window.renderPending = (data) => {
     const list = document.getElementById('pendingList');
     document.getElementById('pendingCount').textContent = data.length;
-    if (!data.length) {
-      list.innerHTML = `<div class="empty-state"><p>모든 학생의 대처방안이 입력되었습니다</p></div>`;
-      return;
-    }
+    if (!data.length) { list.innerHTML = `<div class="empty-state"><p>모든 학생의 대처방안이 입력되었습니다</p></div>`; return; }
     list.innerHTML = data.map(s => `
-      <div class="student-item ${s.score < 40 ? 'danger' : s.score < 60 ? 'warning' : 'success'}">
+      <div class="student-item ${s.score < 40 ? 'danger' : s.score < 60 ? 'warning' : ''}">
         <div class="student-avatar">${s.name[0]}</div>
-        <div class="student-info">
-          <div class="student-name">${s.name}</div>
-          <div class="student-meta">${s.grade} · ${s.test}</div>
-        </div>
+        <div class="student-info"><div class="student-name">${s.name}</div><div class="student-meta">${s.grade} · ${s.test}</div></div>
         <span class="score-chip ${s.score < 40 ? 'danger' : s.score < 60 ? 'warning' : 'success'}">${s.score}점</span>
         <div class="action-area">
           <input class="action-input" id="input-${s.id}" type="text" placeholder="대처방안 입력" value="${s.action || ''}">
@@ -192,19 +172,26 @@ analysis.html grades.html sms.html special.html test-create.html test-manage.htm
   window.renderDone = (data) => {
     const list = document.getElementById('doneList');
     document.getElementById('doneCount').textContent = data.length;
+    if (!data.length) { list.innerHTML = `<div class="empty-state"><p>처리 완료된 항목이 없습니다</p></div>`; return; }
     list.innerHTML = data.map(s => `
       <div class="student-item" style="border-left:4px solid var(--success)">
-        <div class="student-info">
-          <div class="student-name">${s.name}</div>
-          <div class="student-meta">${s.test}</div>
-        </div>
-        <div class="action-area">
-          <input class="action-input filled" type="text" value="${s.action}" readonly>
-        </div>
+        <div class="student-info"><div class="student-name">${s.name}</div><div class="student-meta">${s.test}</div></div>
+        <div class="action-area"><input class="action-input filled" type="text" value="${s.action}" readonly></div>
       </div>`).join('');
   };
 
-  // [데이터 수정 함수] 저장 버튼을 누르면 파이어베이스의 값을 바꿉니다.
+  window.renderHistory = (data) => {
+    document.getElementById('historyBody').innerHTML = data.map(s => `
+      <tr><td>${s.name}</td><td>${s.test}</td><td>${s.score}점</td>
+      <td>${s.done ? '<span style="color:var(--success);font-weight:600">완료</span>' : '<span style="color:var(--warning);font-weight:600">대기</span>'}</td>
+      <td>${s.action || '-'}</td><td style="color:var(--text-muted)">${s.date || '-'}</td></tr>`).join('');
+  };
+
+  window.showHistory = () => {
+    const sec = document.getElementById('historySection');
+    sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
+  };
+
   window.saveAction = async (id) => {
     const val = document.getElementById(`input-${id}`).value;
     await updateDoc(doc(db, "specialManagement", id), { action: val });
@@ -219,8 +206,7 @@ analysis.html grades.html sms.html special.html test-create.html test-manage.htm
 
   window.showToast = (m) => {
     const t = document.getElementById('toast');
-    t.textContent = m;
-    t.classList.add('show');
+    t.textContent = m; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2000);
   };
 </script>
