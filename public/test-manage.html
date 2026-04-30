@@ -6,11 +6,13 @@
 <title>테스트 관리 - 베타과학</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root { --primary: #2563eb; --primary-light: #eff6ff; --primary-dark: #1d4ed8; --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff; --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --danger-dark: #dc2626; --success: #10b981; --radius: 10px; }
+  :root { --primary: #1a3fc4; --primary-light: #eef2ff; --primary-dark: #1530a0; --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff; --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --danger-dark: #dc2626; --success: #10b981; --radius: 10px; }
   body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
   .app-wrapper { max-width: var(--max-width); margin: 0 auto; display: flex; flex-direction: column; min-height: 100vh; }
   .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 32px; height: 56px; position: sticky; top: 0; z-index: 100; }
-  .logo-area { display: flex; flex-direction: column; align-items: center; line-height: 1.1; flex-shrink: 0; min-width: 80px; }
+  .logo-area { display: flex; flex-direction: row; align-items: center; gap: 8px; text-decoration: none; cursor: pointer; flex-shrink: 0; }
+  .logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .logo-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
   .logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
   .logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
   .topbar-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
@@ -48,7 +50,7 @@
   .subject-pill { display: inline-block; padding: 5px 14px; border: 1px solid var(--border); border-radius: 20px; font-size: 13px; color: var(--text); background: var(--white); font-weight: 500; }
   .grade-badge { display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; font-size: 11px; font-weight: 800; text-align: center; color: white; line-height: 1.3; }
   .grade-high1 { background: #10b981; } .grade-high2 { background: #f59e0b; } .grade-high3 { background: #ef4444; }
-  .grade-mid1 { background: #8b5cf6; } .grade-mid2 { background: #2563eb; } .grade-mid3 { background: #0891b2; }
+  .grade-mid1 { background: #8b5cf6; } .grade-mid2 { background: #1a3fc4; } .grade-mid3 { background: #0891b2; }
   .action-cell { display: flex; gap: 8px; align-items: center; }
   .btn-edit { display: flex; align-items: center; gap: 5px; padding: 8px 16px; border: 1px solid var(--border); border-radius: 7px; background: var(--white); font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; transition: background 0.1s; white-space: nowrap; }
   .btn-edit:hover { background: #f1f5f9; }
@@ -77,7 +79,18 @@
 <body>
 <div class="app-wrapper">
   <header class="topbar">
-    <div class="logo-area"><span class="brand">BETA</span><span class="brand-sub">SCIENCE</span></div>
+    <a href="index.html" class="logo-area">
+      <div class="logo-icon">
+        <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <path d="M9 3h6M9 3v7L4.5 17A2 2 0 0 0 6.4 20h11.2a2 2 0 0 0 1.9-3L15 10V3"/>
+          <line x1="6.5" y1="14" x2="17.5" y2="14"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="brand">BETA</span>
+        <span class="brand-sub">SCIENCE</span>
+      </div>
+    </a>
     <div class="topbar-divider"></div>
     <nav><ul class="nav-tabs">
       <li><a href="dashboard.html">대시보드</a></li>
@@ -126,147 +139,98 @@
   </div>
 </div>
 <script type="module">
-  // 1. 파이어베이스 연동을 위한 설정 가져오기
-  import { db } from './firebase-config.js';
-  import { 
-    collection, 
-    doc, 
-    deleteDoc, 
-    query, 
-    orderBy, 
-    onSnapshot 
-  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, doc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  const ITEMS_PER_PAGE = 15; 
-  let currentPage = 1;
-  let deleteTargetFireId = null; // 인덱스 대신 파이어베이스 문서 ID 사용
-  let deleteTargetUnitName = "";
+  const firebaseConfig = {
+    apiKey: "AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain: "beta-science.firebaseapp.com",
+    projectId: "beta-science",
+    storageBucket: "beta-science.firebasestorage.app",
+    messagingSenderId: "650652155367",
+    appId: "1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-  let tests = [];
-  let filtered = [];
+  const ITEMS_PER_PAGE = 15;
+  let currentPage = 1, deleteTargetFireId = null, tests = [], filtered = [];
 
-  // 학년 배지 스타일 (기존 틀 유지)
-  function gradeBadgeClass(g){
-    return {'고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3','중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3'}[g]||'grade-high1';
-  }
+  function gradeBadgeClass(g){ return {'고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3','중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3'}[g]||'grade-high1'; }
 
-  // 2. 실시간으로 'tests' 서랍(컬렉션)에서 데이터 가져오기
-  const q = query(collection(db, "tests"), orderBy("regDate", "desc"));
-  onSnapshot(q, (snapshot) => {
-    tests = snapshot.docs.map(doc => ({
-      fireId: doc.id, // 파이어베이스 고유 ID
-      ...doc.data()
-    }));
-    filterTests(); // 데이터를 가져오면 자동으로 필터링 및 화면 갱신
+  onSnapshot(query(collection(db,"tests"), orderBy("regDate","desc")), (snapshot) => {
+    tests = snapshot.docs.map(d => ({ fireId: d.id, ...d.data() }));
+    filterTests();
   });
 
-  // 테이블 렌더링 함수 (기존 틀 유지)
-  window.renderTable = function(){
-    const tbody = document.getElementById('testTableBody'), empty = document.getElementById('emptyState');
-    const start = (currentPage-1)*ITEMS_PER_PAGE, pageData = filtered.slice(start, start+ITEMS_PER_PAGE);
-    
-    document.getElementById('filterSummary').textContent = `총 ${tests.length}개 / 필터 결과 ${filtered.length}개`;
-    
-    if(!filtered.length){
-      tbody.innerHTML = '';
-      empty.style.display = 'block';
-    } else {
-      empty.style.display = 'none';
+  window.renderTable = function() {
+    const tbody=document.getElementById('testTableBody'), empty=document.getElementById('emptyState');
+    const start=(currentPage-1)*ITEMS_PER_PAGE, pageData=filtered.slice(start,start+ITEMS_PER_PAGE);
+    document.getElementById('filterSummary').textContent=`총 ${tests.length}개 / 필터 결과 ${filtered.length}개`;
+    if (!filtered.length) { tbody.innerHTML=''; empty.style.display='block'; }
+    else {
+      empty.style.display='none';
       tbody.innerHTML = pageData.map(t => {
-        const gl = t.grade.replace('학년','') + '<br>학년';
-        const unitName = t.unitName || t.unit || '(단원명 없음)'; // 필드명 호환성 유지
-        
-        return `
-          <tr>
-            <td class="test-id-cell">${t.testId || t.id}</td>
-            <td style="font-weight:500">${unitName}</td>
-            <td><span class="subject-pill">${t.subject}</span></td>
-            <td><span class="grade-badge ${gradeBadgeClass(t.grade)}">${gl}</span></td>
-            <td>
-              <div class="action-cell">
-                <button class="btn-edit" onclick="editTest('${t.fireId}')">
-                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>수정
-                </button>
-                <button class="btn-delete" onclick="askDelete('${t.fireId}', '${unitName}')">
-                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>삭제
-                </button>
-              </div>
-            </td>
-          </tr>`;
-      }).join('');
+        const gl=t.grade.replace('학년','')+'<br>학년';
+        const unitName=t.unitName||t.unit||'(단원명 없음)';
+        return `<tr>
+          <td class="test-id-cell">${t.testId||t.id}</td>
+          <td style="font-weight:500">${unitName}</td>
+          <td><span class="subject-pill">${t.subject}</span></td>
+          <td><span class="grade-badge ${gradeBadgeClass(t.grade)}">${gl}</span></td>
+          <td><div class="action-cell">
+            <button class="btn-edit" onclick="editTest('${t.fireId}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>수정</button>
+            <button class="btn-delete" onclick="askDelete('${t.fireId}','${unitName}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>삭제</button>
+          </div></td>
+        </tr>`}).join('');
     }
     renderPagination();
   }
 
-  // 필터링 기능 (기존 로직 유지)
-  window.filterTests = function(){
-    const g = document.getElementById('gradeFilter').value;
-    const s = document.getElementById('subjectFilter').value;
-    filtered = tests.filter(t => (!g || t.grade === g) && (!s || t.subject === s));
-    currentPage = 1;
-    renderTable();
+  window.filterTests = function() {
+    const g=document.getElementById('gradeFilter').value, s=document.getElementById('subjectFilter').value;
+    filtered=tests.filter(t=>(!g||t.grade===g)&&(!s||t.subject===s));
+    currentPage=1; renderTable();
   }
 
-  window.resetFilter = function(){
-    document.getElementById('gradeFilter').value = '';
-    document.getElementById('subjectFilter').value = '';
+  window.resetFilter = function() {
+    document.getElementById('gradeFilter').value='';
+    document.getElementById('subjectFilter').value='';
     filterTests();
   }
 
-  // 페이지네이션 (기존 로직 유지)
-  window.renderPagination = function(){
-    const total = Math.ceil(filtered.length/ITEMS_PER_PAGE), pg = document.getElementById('pagination');
-    if(total <= 1){ pg.innerHTML = ''; return; }
-    let h = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
-    for(let i=1; i<=total; i++) h += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
-    h += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>›</button>`;
-    pg.innerHTML = h;
+  window.renderPagination = function() {
+    const total=Math.ceil(filtered.length/ITEMS_PER_PAGE), pg=document.getElementById('pagination');
+    if(total<=1){pg.innerHTML='';return;}
+    let h=`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+    for(let i=1;i<=total;i++) h+=`<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    h+=`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>›</button>`;
+    pg.innerHTML=h;
   }
 
-  window.goPage = function(p){
-    const t = Math.ceil(filtered.length/ITEMS_PER_PAGE);
-    if(p < 1 || p > t) return;
-    currentPage = p;
-    renderTable();
-    window.scrollTo({top:0, behavior:'smooth'});
+  window.goPage = function(p) {
+    const t=Math.ceil(filtered.length/ITEMS_PER_PAGE);
+    if(p<1||p>t)return; currentPage=p; renderTable(); window.scrollTo({top:0,behavior:'smooth'});
   }
 
-  // 수정 버튼 클릭 시 (나중에 구현할 기능을 위해 연결만 해둠)
-  window.editTest = function(fireId){
-    alert('수정 기능은 test-create.html과 연동이 필요합니다. 현재는 준비 중입니다.');
-    // window.location.href=`test-create.html?edit=${fireId}`; 
-  }
+  window.editTest = function(fireId) { alert('수정 기능 준비 중입니다.'); }
 
-  // 삭제 프로세스
-  window.askDelete = function(fireId, unitName){
-    deleteTargetFireId = fireId;
-    deleteTargetUnitName = unitName;
-    document.getElementById('deleteMsg').innerHTML = `<strong>"${unitName}"</strong> 테스트를 삭제하시겠습니까?<br>삭제된 데이터는 복구할 수 없습니다.`;
+  window.askDelete = function(fireId, unitName) {
+    deleteTargetFireId=fireId;
+    document.getElementById('deleteMsg').innerHTML=`<strong>"${unitName}"</strong> 테스트를 삭제하시겠습니까?<br>삭제된 데이터는 복구할 수 없습니다.`;
     document.getElementById('deleteModal').classList.add('open');
   }
 
-  window.confirmDelete = async function(){
-    if(deleteTargetFireId !== null){
-      try {
-        await deleteDoc(doc(db, "tests", deleteTargetFireId));
-        closeModal();
-        // 삭제 성공 알림 등 필요시 추가
-      } catch (e) {
-        console.error("삭제 실패:", e);
-        alert("삭제 중 오류가 발생했습니다.");
-      }
+  window.confirmDelete = async function() {
+    if(deleteTargetFireId) {
+      try { await deleteDoc(doc(db,"tests",deleteTargetFireId)); closeModal(); }
+      catch(e) { alert("삭제 중 오류가 발생했습니다."); }
     }
   }
 
-  window.closeModal = function(){
-    document.getElementById('deleteModal').classList.remove('open');
-    deleteTargetFireId = null;
-  }
+  window.closeModal = function() { document.getElementById('deleteModal').classList.remove('open'); deleteTargetFireId=null; }
 
-  // 모달 닫기 이벤트
-  document.getElementById('deleteModal').addEventListener('click', function(e){
-    if(e.target === this) closeModal();
-  });
+  document.getElementById('deleteModal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
 </script>
 </body>
 </html>
