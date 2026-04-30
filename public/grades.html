@@ -6,15 +6,15 @@
 <title>성적 조회 - 베타과학</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  --primary: #1a3fc4; --primary-light: #eef2ff; --primary-dark: #1530a0; --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff; --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --success: #10b981; --radius: 10px; }
+  :root { --primary: #1a3fc4; --primary-light: #eef2ff; --primary-dark: #1530a0; --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff; --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --success: #10b981; --radius: 10px; }
   body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
   .app-wrapper { max-width: var(--max-width); margin: 0 auto; display: flex; flex-direction: column; min-height: 100vh; }
   .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 32px; height: 56px; position: sticky; top: 0; z-index: 100; }
   .logo-area { display: flex; flex-direction: row; align-items: center; gap: 8px; text-decoration: none; cursor: pointer; flex-shrink: 0; }
-.logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.logo-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
-.logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
-.logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
+  .logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .logo-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
+  .logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
+  .logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
   .topbar-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
   .nav-tabs { display: flex; gap: 2px; list-style: none; }
   .nav-tabs a { display: block; padding: 8px 14px; font-size: 14px; color: var(--text-muted); text-decoration: none; border-radius: 6px; white-space: nowrap; transition: background 0.15s, color 0.15s; }
@@ -69,17 +69,17 @@
 <div class="app-wrapper">
   <header class="topbar">
     <a href="index.html" class="logo-area">
-  <div class="logo-icon">
-    <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-      <path d="M9 3h6M9 3v7L4.5 17A2 2 0 0 0 6.4 20h11.2a2 2 0 0 0 1.9-3L15 10V3"/>
-      <line x1="6.5" y1="14" x2="17.5" y2="14"/>
-    </svg>
-  </div>
-  <div class="logo-text">
-    <span class="brand">BETA</span>
-    <span class="brand-sub">SCIENCE</span>
-  </div>
-</a>
+      <div class="logo-icon">
+        <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <path d="M9 3h6M9 3v7L4.5 17A2 2 0 0 0 6.4 20h11.2a2 2 0 0 0 1.9-3L15 10V3"/>
+          <line x1="6.5" y1="14" x2="17.5" y2="14"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="brand">BETA</span>
+        <span class="brand-sub">SCIENCE</span>
+      </div>
+    </a>
     <div class="topbar-divider"></div>
     <nav><ul class="nav-tabs">
       <li><a href="dashboard.html">대시보드</a></li>
@@ -124,20 +124,23 @@
   </main>
 </div>
 <script type="module">
-  import { db } from './firebase-config.js';
-  import { 
-    collection, 
-    getDocs, 
-    query, 
-    where, 
-    orderBy, 
-    onSnapshot 
-  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  let allTests = []; // 파이어베이스에서 가져온 테스트 목록
+  const firebaseConfig = {
+    apiKey: "AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain: "beta-science.firebaseapp.com",
+    projectId: "beta-science",
+    storageBucket: "beta-science.firebasestorage.app",
+    messagingSenderId: "650652155367",
+    appId: "1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-  // 1. 페이지 로드 시 'tests' 컬렉션에서 전체 테스트 목록 미리 가져오기
-  const loadAllTests = async () => {
+  let allTests = [];
+
+  const loadAllTests = () => {
     const q = query(collection(db, "tests"), orderBy("regDate", "desc"));
     onSnapshot(q, (snapshot) => {
       allTests = snapshot.docs.map(doc => ({ fireId: doc.id, ...doc.data() }));
@@ -145,22 +148,19 @@
   };
   loadAllTests();
 
-  // 학년 선택 시 해당 학년의 테스트만 필터링해서 셀렉트박스에 채우기
   window.onGradeChange = function() {
     const g = document.getElementById('gradeSelect').value;
     const s = document.getElementById('testSelect');
-    
     s.innerHTML = '<option value="">테스트를 선택하세요</option>';
     s.disabled = !g;
-
     if (g) {
-      const filteredTests = allTests.filter(t => t.grade === g);
-      if(filteredTests.length === 0) {
+      const filtered = allTests.filter(t => t.grade === g);
+      if (!filtered.length) {
         s.innerHTML = '<option value="">등록된 테스트가 없습니다</option>';
       } else {
-        filteredTests.forEach(t => {
+        filtered.forEach(t => {
           const o = document.createElement('option');
-          o.value = t.fireId; // 파이어베이스 고유 ID를 값으로 사용
+          o.value = t.fireId;
           o.textContent = t.unitName || t.unit || t.testId;
           s.appendChild(o);
         });
@@ -170,7 +170,6 @@
     document.getElementById('resultArea').style.display = 'none';
   }
 
-  // 테스트 선택 시 해당 테스트를 치른 학생들의 성적 실시간 조회
   window.onTestChange = function() {
     const testId = document.getElementById('testSelect').value;
     if (!testId) {
@@ -178,66 +177,45 @@
       document.getElementById('resultArea').style.display = 'none';
       return;
     }
-
     document.getElementById('emptyArea').style.display = 'none';
     document.getElementById('resultArea').style.display = 'block';
-
-    // 2. 'grades' 컬렉션에서 해당 testId를 가진 성적 데이터 실시간 감시
-    // (아직 성적 입력 전이라면 데이터가 없을 수 있습니다)
     const q = query(collection(db, "grades"), where("testId", "==", testId), orderBy("score", "desc"));
-    
     onSnapshot(q, (snapshot) => {
-      const students = snapshot.docs.map(doc => doc.data());
-      renderResults(students);
+      renderResults(snapshot.docs.map(doc => doc.data()));
     });
   }
 
-  // 화면 렌더링 및 통계 계산 함수 (기존 디자인 유지)
   function renderResults(students) {
     const tbody = document.getElementById('gradesBody');
-    
-    if (students.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--text-muted);">아직 등록된 성적이 없습니다.</td></tr>';
+    if (!students.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">아직 등록된 성적이 없습니다.</td></tr>';
       updateStats([]);
       return;
     }
-
     updateStats(students);
-
     const gpc = g => ({'고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3','중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3'}[g]||'grade-high1');
     const scc = s => s >= 80 ? 'high' : s >= 60 ? 'mid' : 'low';
-    const rc = r => r === 1 ? 'rank-1' : r === 2 ? 'rank-2' : r === 3 ? 'rank-3' : 'rank-n';
-
-    tbody.innerHTML = students.map((s, i) => {
-      const r = i + 1;
-      const c = scc(s.score);
-      return `
-        <tr>
-          <td><span class="rank-badge ${rc(r)}">${r}</span></td>
-          <td style="font-weight:600">${s.studentName}</td>
-          <td><span class="grade-pill ${gpc(s.grade)}">${s.grade}</span></td>
-          <td>
-            <div class="score-bar-wrap score-${c}">
-              <span class="score-num ${c}">${s.score}점</span>
-              <div class="score-bar">
-                <div class="score-bar-fill" style="width:${s.score}%"></div>
-              </div>
-            </div>
-          </td>
-          <td style="color:var(--text-muted);font-size:13px">${s.date || '-'}</td>
-        </tr>`;
-    }).join('');
+    const rc = r => r===1?'rank-1':r===2?'rank-2':r===3?'rank-3':'rank-n';
+    tbody.innerHTML = students.map((s,i) => `
+      <tr>
+        <td><span class="rank-badge ${rc(i+1)}">${i+1}</span></td>
+        <td style="font-weight:600">${s.studentName}</td>
+        <td><span class="grade-pill ${gpc(s.grade)}">${s.grade}</span></td>
+        <td><div class="score-bar-wrap score-${scc(s.score)}">
+          <span class="score-num ${scc(s.score)}">${s.score}점</span>
+          <div class="score-bar"><div class="score-bar-fill" style="width:${s.score}%"></div></div>
+        </div></td>
+        <td style="color:var(--text-muted);font-size:13px">${s.date||'-'}</td>
+      </tr>`).join('');
   }
 
-  // 상단 미니 통계 업데이트
   function updateStats(students) {
     const sc = students.map(s => Number(s.score));
-    const avg = sc.length ? Math.round(sc.reduce((a, b) => a + b, 0) / sc.length) : 0;
-    
-    document.getElementById('statCount').textContent = students.length + '명';
-    document.getElementById('statAvg').textContent = avg + '점';
-    document.getElementById('statMax').textContent = (sc.length ? Math.max(...sc) : 0) + '점';
-    document.getElementById('statMin').textContent = (sc.length ? Math.min(...sc) : 0) + '점';
+    const avg = sc.length ? Math.round(sc.reduce((a,b)=>a+b,0)/sc.length) : 0;
+    document.getElementById('statCount').textContent = students.length+'명';
+    document.getElementById('statAvg').textContent = avg+'점';
+    document.getElementById('statMax').textContent = (sc.length?Math.max(...sc):0)+'점';
+    document.getElementById('statMin').textContent = (sc.length?Math.min(...sc):0)+'점';
   }
 </script>
 </body>
