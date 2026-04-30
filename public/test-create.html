@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>테스트 생성 - 베타과학</title>
 <style>
-  /* 원본 CSS 그대로 유지 */
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root { --primary: #2563eb; --primary-light: #eff6ff; --primary-dark: #1d4ed8; --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff; --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --success: #10b981; --radius: 10px; }
+  :root { --primary: #1a3fc4; --primary-light: #eef2ff; --primary-dark: #1530a0; --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff; --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --success: #10b981; --radius: 10px; }
   body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
   .app-wrapper { max-width: var(--max-width); margin: 0 auto; display: flex; flex-direction: column; min-height: 100vh; }
   .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 32px; height: 56px; position: sticky; top: 0; z-index: 100; }
-  .logo-area { display: flex; flex-direction: column; align-items: center; line-height: 1.1; flex-shrink: 0; min-width: 80px; }
+  .logo-area { display: flex; flex-direction: row; align-items: center; gap: 8px; text-decoration: none; cursor: pointer; flex-shrink: 0; }
+  .logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .logo-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
   .logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
   .logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
   .topbar-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
@@ -37,56 +38,40 @@
   .form-group textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
   .part-section { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 20px; }
   .part-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: var(--text); }
-
-  /* ── 파트 내부 섹션명 / 핵심내용 ── */
   .part-field-label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7px; }
   .part-field-input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text); background: var(--white); outline: none; transition: border 0.15s; font-family: inherit; margin-bottom: 16px; }
   .part-field-input:focus { border-color: var(--primary); }
   .part-field-textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text); background: var(--white); outline: none; transition: border 0.15s; font-family: inherit; resize: vertical; min-height: 100px; line-height: 1.6; margin-bottom: 20px; }
   .part-field-textarea:focus { border-color: var(--primary); }
-
-  /* ── 정답 입력: 사진과 동일하게 5열 드롭다운 ── */
   .answer-block-label { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
   .answer-row-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 14px; }
   .answer-cell { display: flex; flex-direction: column; gap: 5px; }
   .answer-cell .q-label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
   .answer-cell select { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-weight: 400; color: var(--text); background: var(--white); outline: none; transition: border 0.15s; font-family: inherit; cursor: pointer; }
   .answer-cell select:focus { border-color: var(--primary); }
-
-  /* ── 추가 과제 ── */
   .task-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
   .task-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
   .task-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; margin-top: 10px; }
   .task-input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text); background: var(--white); outline: none; font-family: inherit; transition: border 0.15s; }
   .task-input:focus { border-color: var(--primary); }
-
-  /* ── 저장 버튼: 사진처럼 섹션 밖 일반 버튼 ── */
   .save-wrap { margin-bottom: 20px; }
   .btn-save { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s; font-family: inherit; }
   .btn-save:hover { background: var(--primary-dark); }
-
-  /* ── 등록된 테스트 ── */
   .registered-section { margin-top: 40px; padding-top: 36px; border-top: 2px solid var(--border); }
   .registered-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
   .registered-header h2 { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-  /* 사진: 초록 배지 */
   .count-badge { background: var(--success); color: white; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
-
-  /* ── 필터 카드 ── */
   .filter-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 14px; display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px; align-items: end; }
   .filter-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7px; }
   .filter-group select { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text); background: var(--white); outline: none; font-family: inherit; }
   .btn-filter-reset { padding: 10px 20px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; font-family: inherit; white-space: nowrap; transition: background 0.15s; }
   .btn-filter-reset:hover { background: var(--bg); }
-
-  /* ── 테이블 ── */
   .table-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
   .table-card table { width: 100%; border-collapse: collapse; }
   .table-card thead th { font-size: 13px; font-weight: 600; color: var(--text-muted); text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--border); background: #f8fafc; }
   .table-card tbody tr { border-bottom: 1px solid var(--border); }
   .table-card tbody tr:last-child { border-bottom: none; }
   .table-card tbody td { font-size: 14px; padding: 13px 16px; color: var(--text); vertical-align: middle; }
-  /* 사진: 과목은 테두리 배지, 학년은 초록 원형 배지 */
   .badge-subject { display: inline-block; border: 1px solid var(--border); border-radius: 20px; padding: 2px 10px; font-size: 12px; color: var(--text); }
   .badge-grade { display: inline-flex; align-items: center; justify-content: center; background: var(--success); color: white; border-radius: 50%; width: 52px; height: 52px; font-size: 11px; font-weight: 700; text-align: center; line-height: 1.3; }
   .action-btns { display: flex; gap: 6px; align-items: center; }
@@ -94,7 +79,6 @@
   .action-btn:hover { background: var(--bg); }
   .action-btn.del { color: var(--danger); border-color: #fecaca; }
   .action-btn.del:hover { background: #fff5f5; }
-
   .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1e293b; color: white; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 500; opacity: 0; transition: opacity 0.3s, transform 0.3s; z-index: 999; pointer-events: none; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
@@ -102,7 +86,18 @@
 <body>
 <div class="app-wrapper">
   <header class="topbar">
-    <div class="logo-area"><span class="brand">BETA</span><span class="brand-sub">SCIENCE</span></div>
+    <a href="index.html" class="logo-area">
+      <div class="logo-icon">
+        <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <path d="M9 3h6M9 3v7L4.5 17A2 2 0 0 0 6.4 20h11.2a2 2 0 0 0 1.9-3L15 10V3"/>
+          <line x1="6.5" y1="14" x2="17.5" y2="14"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="brand">BETA</span>
+        <span class="brand-sub">SCIENCE</span>
+      </div>
+    </a>
     <div class="topbar-divider"></div>
     <nav><ul class="nav-tabs">
       <li><a href="dashboard.html">대시보드</a></li>
@@ -116,299 +111,190 @@
     </ul></nav>
     <div class="topbar-right"><span class="academy-name">베타과학학원</span><span class="badge-admin">관리자 모드</span></div>
   </header>
-
   <main class="main-content">
     <div class="page-header">
       <h1>테스트 생성</h1>
       <p>새로운 테스트를 생성하고 문항을 입력하세요</p>
     </div>
-
-    <!-- 기본 정보 -->
     <div class="section-card">
       <div class="section-card-title">기본 정보</div>
       <div class="form-row-3">
-        <div class="form-group">
-          <label>테스트 ID</label>
-          <input type="text" id="testId" placeholder="예: TEST001" readonly>
+        <div class="form-group"><label>테스트 ID</label><input type="text" id="testId" placeholder="예: TEST001" readonly></div>
+        <div class="form-group"><label>과목 <span class="req">*</span></label>
+          <select id="subject"><option value="">과목 선택</option><option>통합과학</option><option>물리</option><option>화학</option><option>생물</option><option>내신대비</option></select>
         </div>
-        <div class="form-group">
-          <label>과목 <span class="req">*</span></label>
-          <select id="subject">
-            <option value="">과목 선택</option>
-            <option>통합과학</option><option>물리</option><option>화학</option><option>생물</option><option>내신대비</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>학년 <span class="req">*</span></label>
-          <select id="grade">
-            <option value="">학년 선택</option>
-            <option>중등1학년</option><option>중등2학년</option><option>중등3학년</option>
-            <option>고등1학년</option><option>고등2학년</option><option>고등3학년</option>
-          </select>
+        <div class="form-group"><label>학년 <span class="req">*</span></label>
+          <select id="grade"><option value="">학년 선택</option><option>중등1학년</option><option>중등2학년</option><option>중등3학년</option><option>고등1학년</option><option>고등2학년</option><option>고등3학년</option></select>
         </div>
       </div>
-      <div class="form-row-1">
-        <div class="form-group">
-          <label>단원명</label>
-          <input type="text" id="unitName" placeholder="예: 알칼리금속과 할로젠">
-        </div>
-      </div>
+      <div class="form-row-1"><div class="form-group"><label>단원명</label><input type="text" id="unitName" placeholder="예: 알칼리금속과 할로젠"></div></div>
     </div>
-
-    <!-- 1부: 문항 1-10 -->
     <div class="part-section">
       <div class="part-title">1부: 문항 1-10</div>
-
       <label class="part-field-label">섹션명</label>
       <input type="text" class="part-field-input" id="sec1-name" placeholder="예: 알칼리금속">
-
       <label class="part-field-label">핵심 내용</label>
       <textarea class="part-field-textarea" id="sec1-content" placeholder="이 섹션의 핵심 개념을 입력하세요..."></textarea>
-
       <div class="answer-block-label">정답 입력 (1-10번)</div>
       <div class="answer-row-5" id="p1r1"></div>
       <div class="answer-row-5" id="p1r2"></div>
-
       <hr class="task-divider">
       <div class="task-title">추가 과제 (오답별)</div>
-      <label class="task-label">0-2개 오답</label>
-      <input type="text" class="task-input" id="task1-low" value="시험지에 오답문제 정리해오기">
-      <label class="task-label">3-4개 오답</label>
-      <input type="text" class="task-input" id="task1-mid" value="수업노트 필기 다시하고 오답문제 정리하기">
-      <label class="task-label">5개 이상 오답</label>
-      <input type="text" class="task-input" id="task1-high" value="동영상 수업 내용복습, 수업노트 필기, 오답정리해오기">
+      <label class="task-label">0-2개 오답</label><input type="text" class="task-input" id="task1-low" value="시험지에 오답문제 정리해오기">
+      <label class="task-label">3-4개 오답</label><input type="text" class="task-input" id="task1-mid" value="수업노트 필기 다시하고 오답문제 정리하기">
+      <label class="task-label">5개 이상 오답</label><input type="text" class="task-input" id="task1-high" value="동영상 수업 내용복습, 수업노트 필기, 오답정리해오기">
     </div>
-
-    <!-- 2부: 문항 11-20 -->
     <div class="part-section">
       <div class="part-title">2부: 문항 11-20</div>
-
       <label class="part-field-label">섹션명</label>
       <input type="text" class="part-field-input" id="sec2-name" placeholder="예: 할로젠원소">
-
       <label class="part-field-label">핵심 내용</label>
       <textarea class="part-field-textarea" id="sec2-content" placeholder="이 섹션의 핵심 개념을 입력하세요..."></textarea>
-
       <div class="answer-block-label">정답 입력 (11-20번)</div>
       <div class="answer-row-5" id="p2r1"></div>
       <div class="answer-row-5" id="p2r2"></div>
-
       <hr class="task-divider">
       <div class="task-title">추가 과제 (오답별)</div>
-      <label class="task-label">0-2개 오답</label>
-      <input type="text" class="task-input" id="task2-low" value="시험지에 오답문제 정리해오기">
-      <label class="task-label">3-4개 오답</label>
-      <input type="text" class="task-input" id="task2-mid" value="수업노트 필기 다시하고 오답문제 정리하기">
-      <label class="task-label">5개 이상 오답</label>
-      <input type="text" class="task-input" id="task2-high" value="동영상 수업 내용복습, 수업노트 필기, 오답정리해오기">
+      <label class="task-label">0-2개 오답</label><input type="text" class="task-input" id="task2-low" value="시험지에 오답문제 정리해오기">
+      <label class="task-label">3-4개 오답</label><input type="text" class="task-input" id="task2-mid" value="수업노트 필기 다시하고 오답문제 정리하기">
+      <label class="task-label">5개 이상 오답</label><input type="text" class="task-input" id="task2-high" value="동영상 수업 내용복습, 수업노트 필기, 오답정리해오기">
     </div>
-
-    <!-- 3부: 문항 21-30 -->
     <div class="part-section">
       <div class="part-title">3부: 문항 21-30</div>
-
       <label class="part-field-label">섹션명</label>
       <input type="text" class="part-field-input" id="sec3-name" placeholder="예: 주기율표">
-
       <label class="part-field-label">핵심 내용</label>
       <textarea class="part-field-textarea" id="sec3-content" placeholder="이 섹션의 핵심 개념을 입력하세요..."></textarea>
-
       <div class="answer-block-label">정답 입력 (21-30번)</div>
       <div class="answer-row-5" id="p3r1"></div>
       <div class="answer-row-5" id="p3r2"></div>
-
       <hr class="task-divider">
       <div class="task-title">추가 과제 (오답별)</div>
-      <label class="task-label">0-2개 오답</label>
-      <input type="text" class="task-input" id="task3-low" value="시험지에 오답문제 정리해오기">
-      <label class="task-label">3-4개 오답</label>
-      <input type="text" class="task-input" id="task3-mid" value="수업노트 필기 다시하고 오답문제 정리하기">
-      <label class="task-label">5개 이상 오답</label>
-      <input type="text" class="task-input" id="task3-high" value="동영상 수업 내용복습, 수업노트 필기, 오답정리해오기">
+      <label class="task-label">0-2개 오답</label><input type="text" class="task-input" id="task3-low" value="시험지에 오답문제 정리해오기">
+      <label class="task-label">3-4개 오답</label><input type="text" class="task-input" id="task3-mid" value="수업노트 필기 다시하고 오답문제 정리하기">
+      <label class="task-label">5개 이상 오답</label><input type="text" class="task-input" id="task3-high" value="동영상 수업 내용복습, 수업노트 필기, 오답정리해오기">
     </div>
-
-    <!-- 저장 버튼: 사진처럼 파란 풀너비, sticky 아님 -->
     <div class="save-wrap">
       <button class="btn-save" onclick="saveTest()">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         테스트 저장
       </button>
     </div>
-
-    <!-- 등록된 테스트 -->
     <div class="registered-section">
       <div class="registered-header">
         <h2>등록된 테스트 <span class="count-badge" id="regCount">0개</span></h2>
       </div>
-
-      <!-- 필터 카드 -->
       <div class="filter-card">
-        <div class="filter-group">
-          <label>학년 필터</label>
-          <select id="filterGrade" onchange="renderTable()">
-            <option value="">전체 학년</option>
-            <option>중등1학년</option><option>중등2학년</option><option>중등3학년</option>
-            <option>고등1학년</option><option>고등2학년</option><option>고등3학년</option>
-          </select>
+        <div class="filter-group"><label>학년 필터</label>
+          <select id="filterGrade" onchange="renderTable()"><option value="">전체 학년</option><option>중등1학년</option><option>중등2학년</option><option>중등3학년</option><option>고등1학년</option><option>고등2학년</option><option>고등3학년</option></select>
         </div>
-        <div class="filter-group">
-          <label>과목 필터</label>
-          <select id="filterSubject" onchange="renderTable()">
-            <option value="">전체 과목</option>
-            <option>통합과학</option><option>물리</option><option>화학</option><option>생물</option><option>내신대비</option>
-          </select>
+        <div class="filter-group"><label>과목 필터</label>
+          <select id="filterSubject" onchange="renderTable()"><option value="">전체 과목</option><option>통합과학</option><option>물리</option><option>화학</option><option>생물</option><option>내신대비</option></select>
         </div>
         <button class="btn-filter-reset" onclick="resetFilter()">필터 초기화</button>
       </div>
-
       <div class="table-card">
         <table>
-          <thead>
-            <tr>
-              <th>테스트 ID</th>
-              <th>단원명</th>
-              <th>과목</th>
-              <th>학년</th>
-              <th>관리</th>
-            </tr>
-          </thead>
+          <thead><tr><th>테스트 ID</th><th>단원명</th><th>과목</th><th>학년</th><th>관리</th></tr></thead>
           <tbody id="regTestBody"></tbody>
         </table>
       </div>
     </div>
   </main>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script type="module">
-  import { db } from './firebase-config.js';
-  import { collection, addDoc, doc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, doc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  /* ── 정답 드롭다운 셀 생성 ── */
+  const firebaseConfig = {
+    apiKey: "AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain: "beta-science.firebaseapp.com",
+    projectId: "beta-science",
+    storageBucket: "beta-science.firebasestorage.app",
+    messagingSenderId: "650652155367",
+    appId: "1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
   function makeCell(qNo) {
     const cell = document.createElement('div');
     cell.className = 'answer-cell';
-    cell.innerHTML = `
-      <span class="q-label">Q${qNo}</span>
-      <select class="q-ans" data-qno="${qNo}">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-      </select>`;
+    cell.innerHTML = `<span class="q-label">Q${qNo}</span><select class="q-ans" data-qno="${qNo}"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>`;
     return cell;
   }
+  for (let i=1;  i<=5;  i++) document.getElementById('p1r1').appendChild(makeCell(i));
+  for (let i=6;  i<=10; i++) document.getElementById('p1r2').appendChild(makeCell(i));
+  for (let i=11; i<=15; i++) document.getElementById('p2r1').appendChild(makeCell(i));
+  for (let i=16; i<=20; i++) document.getElementById('p2r2').appendChild(makeCell(i));
+  for (let i=21; i<=25; i++) document.getElementById('p3r1').appendChild(makeCell(i));
+  for (let i=26; i<=30; i++) document.getElementById('p3r2').appendChild(makeCell(i));
 
-  // 1부 Q1-5 / Q6-10
-  for (let i = 1;  i <= 5;  i++) document.getElementById('p1r1').appendChild(makeCell(i));
-  for (let i = 6;  i <= 10; i++) document.getElementById('p1r2').appendChild(makeCell(i));
-  // 2부 Q11-15 / Q16-20
-  for (let i = 11; i <= 15; i++) document.getElementById('p2r1').appendChild(makeCell(i));
-  for (let i = 16; i <= 20; i++) document.getElementById('p2r2').appendChild(makeCell(i));
-  // 3부 Q21-25 / Q26-30
-  for (let i = 21; i <= 25; i++) document.getElementById('p3r1').appendChild(makeCell(i));
-  for (let i = 26; i <= 30; i++) document.getElementById('p3r2').appendChild(makeCell(i));
-
-  /* ── 테스트 ID 자동 생성 ── */
   document.getElementById('testId').value = 'test-' + Date.now();
 
-  /* ── 전체 데이터 ── */
   let allTests = [];
-
-  /* ── 실시간 목록 ── */
   onSnapshot(query(collection(db, "tests"), orderBy("regDate", "desc")), (snapshot) => {
     allTests = snapshot.docs.map(d => ({ fireId: d.id, ...d.data() }));
     document.getElementById('regCount').textContent = allTests.length + '개';
     renderTable();
   });
 
-  /* ── 테이블 렌더 (필터 포함) ── */
   window.renderTable = function() {
     const fg = document.getElementById('filterGrade').value;
     const fs = document.getElementById('filterSubject').value;
-    const list = allTests.filter(t => (!fg || t.grade === fg) && (!fs || t.subject === fs));
+    const list = allTests.filter(t => (!fg || t.grade===fg) && (!fs || t.subject===fs));
     const tbody = document.getElementById('regTestBody');
-    if (!list.length) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:24px;">등록된 테스트가 없습니다.</td></tr>`;
-      return;
-    }
+    if (!list.length) { tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:24px;">등록된 테스트가 없습니다.</td></tr>`; return; }
     tbody.innerHTML = list.map(t => `
       <tr>
         <td style="font-family:monospace;font-size:13px;">${t.testId}</td>
-        <td style="font-weight:600;">${t.unitName || '-'}</td>
-        <td><span class="badge-subject">${t.subject || '-'}</span></td>
-        <td><span class="badge-grade">${(t.grade || '-').replace('학년','<br>년')}</span></td>
-        <td>
-          <div class="action-btns">
-            <button class="action-btn" title="수정" onclick="editTest('${t.fireId}')">
-              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            </button>
-            <button class="action-btn del" title="삭제" onclick="deleteTest('${t.fireId}')">
-              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-            </button>
-          </div>
-        </td>
+        <td style="font-weight:600;">${t.unitName||'-'}</td>
+        <td><span class="badge-subject">${t.subject||'-'}</span></td>
+        <td><span class="badge-grade">${(t.grade||'-').replace('학년','<br>년')}</span></td>
+        <td><div class="action-btns">
+          <button class="action-btn" onclick="editTest('${t.fireId}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="action-btn del" onclick="deleteTest('${t.fireId}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+        </div></td>
       </tr>`).join('');
   };
 
   window.resetFilter = function() {
-    document.getElementById('filterGrade').value = '';
-    document.getElementById('filterSubject').value = '';
+    document.getElementById('filterGrade').value='';
+    document.getElementById('filterSubject').value='';
     renderTable();
   };
 
-  /* ── 저장 ── */
   window.saveTest = async function() {
-    const sub  = document.getElementById('subject').value;
-    const grd  = document.getElementById('grade').value;
-    const unit = document.getElementById('unitName').value;
-    if (!sub || !grd) { alert('과목과 학년을 선택해주세요.'); return; }
-
-    const answers = {};
-    document.querySelectorAll('.q-ans').forEach(s => { answers['q' + s.dataset.qno] = s.value; });
-
-    const parts = [
-      { range:'1-10',  sectionName: document.getElementById('sec1-name').value, sectionContent: document.getElementById('sec1-content').value, taskLow: document.getElementById('task1-low').value, taskMid: document.getElementById('task1-mid').value, taskHigh: document.getElementById('task1-high').value },
-      { range:'11-20', sectionName: document.getElementById('sec2-name').value, sectionContent: document.getElementById('sec2-content').value, taskLow: document.getElementById('task2-low').value, taskMid: document.getElementById('task2-mid').value, taskHigh: document.getElementById('task2-high').value },
-      { range:'21-30', sectionName: document.getElementById('sec3-name').value, sectionContent: document.getElementById('sec3-content').value, taskLow: document.getElementById('task3-low').value, taskMid: document.getElementById('task3-mid').value, taskHigh: document.getElementById('task3-high').value },
+    const sub=document.getElementById('subject').value, grd=document.getElementById('grade').value, unit=document.getElementById('unitName').value;
+    if (!sub||!grd) { alert('과목과 학년을 선택해주세요.'); return; }
+    const answers={};
+    document.querySelectorAll('.q-ans').forEach(s=>{answers['q'+s.dataset.qno]=s.value;});
+    const parts=[
+      {range:'1-10',  sectionName:document.getElementById('sec1-name').value, sectionContent:document.getElementById('sec1-content').value, taskLow:document.getElementById('task1-low').value, taskMid:document.getElementById('task1-mid').value, taskHigh:document.getElementById('task1-high').value},
+      {range:'11-20', sectionName:document.getElementById('sec2-name').value, sectionContent:document.getElementById('sec2-content').value, taskLow:document.getElementById('task2-low').value, taskMid:document.getElementById('task2-mid').value, taskHigh:document.getElementById('task2-high').value},
+      {range:'21-30', sectionName:document.getElementById('sec3-name').value, sectionContent:document.getElementById('sec3-content').value, taskLow:document.getElementById('task3-low').value, taskMid:document.getElementById('task3-mid').value, taskHigh:document.getElementById('task3-high').value},
     ];
-
     try {
-      await addDoc(collection(db, "tests"), {
-        testId:   document.getElementById('testId').value,
-        subject:  sub,
-        grade:    grd,
-        unitName: unit || '미지정 단원',
-        answers,
-        parts,
-        regDate:  new Date().toLocaleString()
-      });
+      await addDoc(collection(db,"tests"),{testId:document.getElementById('testId').value, subject:sub, grade:grd, unitName:unit||'미지정 단원', answers, parts, regDate:new Date().toLocaleString()});
       showToast('저장되었습니다.');
-      setTimeout(() => location.reload(), 1200);
-    } catch(e) { alert('오류 발생: ' + e.message); }
+      setTimeout(()=>location.reload(),1200);
+    } catch(e) { alert('오류 발생: '+e.message); }
   };
 
   window.deleteTest = async function(id) {
     if (confirm('삭제하시겠습니까?')) {
-      try {
-        await deleteDoc(doc(db, "tests", id));
-        showToast('삭제되었습니다.');
-      } catch(e) { alert('삭제 오류: ' + e.message); }
+      try { await deleteDoc(doc(db,"tests",id)); showToast('삭제되었습니다.'); }
+      catch(e) { alert('삭제 오류: '+e.message); }
     }
   };
 
-  window.editTest = function(id) {
-    // 수정 기능 추후 구현
-    alert('수정 기능 준비 중입니다. ID: ' + id);
-  };
+  window.editTest = function(id) { alert('수정 기능 준비 중입니다. ID: '+id); };
 
   function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2200);
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2200);
   }
 </script>
 </body>
