@@ -79,7 +79,10 @@ export default function TeacherPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-white flex items-center justify-center p-4">
         <div className="card p-8 w-full max-w-sm border-green-200">
-          <div className="flex items-center gap-3 mb-8">
+          <div
+            className="flex items-center gap-3 mb-8 cursor-pointer"
+            onClick={() => router.push('/')}
+          >
             <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center">
               <FlaskConical size={20} className="text-white" />
             </div>
@@ -133,7 +136,10 @@ export default function TeacherPage() {
       {/* Header */}
       <header className="bg-white border-b border-green-100 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div
+            className="flex items-center gap-3 cursor-pointer"
+            onClick={() => router.push('/')}
+          >
             <div className="w-9 h-9 bg-green-600 rounded-xl flex items-center justify-center">
               <FlaskConical size={18} className="text-white" />
             </div>
