@@ -7,7 +7,7 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
-    --primary: #2563eb; --primary-light: #eff6ff; --primary-dark: #1d4ed8;
+    --primary: #1a3fc4; --primary-light: #eef2ff; --primary-dark: #1530a0;
     --sidebar-width: 220px; --max-width: 1200px; --bg: #f5f6fa;
     --white: #ffffff; --text: #1e293b; --text-muted: #64748b;
     --border: #e2e8f0; --success: #10b981; --warning: #f59e0b;
@@ -16,7 +16,9 @@
   body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
   .app-wrapper { max-width: var(--max-width); margin: 0 auto; display: flex; flex-direction: column; min-height: 100vh; }
   .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 32px; height: 56px; position: sticky; top: 0; z-index: 100; }
-  .logo-area { display: flex; flex-direction: column; align-items: center; line-height: 1.1; flex-shrink: 0; min-width: 80px; }
+  .logo-area { display: flex; flex-direction: row; align-items: center; gap: 8px; text-decoration: none; cursor: pointer; flex-shrink: 0; }
+  .logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .logo-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
   .logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
   .logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
   .topbar-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
@@ -35,7 +37,7 @@
   .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 8px; }
   .stat-card-header { display: flex; align-items: center; justify-content: space-between; }
   .stat-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-  .stat-icon.blue { background: #eff6ff; }
+  .stat-icon.blue { background: #eef2ff; }
   .stat-icon.green { background: #f0fdf4; }
   .stat-icon.amber { background: #fffbeb; }
   .stat-icon.red { background: #fef2f2; }
@@ -54,14 +56,10 @@
   tbody tr:hover { background: #f8fafc; }
   tbody td { font-size: 14px; padding: 14px 12px; color: var(--text); }
   .score-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; color: white; }
-  .score-high { background: #2563eb; }
+  .score-high { background: #1a3fc4; }
   .score-mid { background: #10b981; }
   .score-low { background: #ef4444; }
   .test-count-badge { background: #ef4444; color: white; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-left: 8px; }
-  .filter-row { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; }
-  .filter-select { padding: 7px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; color: var(--text); background: var(--white); cursor: pointer; min-width: 140px; }
-  .btn-reset { padding: 7px 14px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; color: var(--text-muted); background: var(--white); cursor: pointer; margin-left: auto; }
-  .btn-reset:hover { background: #f1f5f9; }
   .btn-create { display: flex; align-items: center; gap: 4px; padding: 7px 14px; background: var(--primary); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; }
   .btn-create:hover { background: var(--primary-dark); }
   .grade-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; background: #10b981; color: white; }
@@ -81,10 +79,20 @@
 
 <div class="app-wrapper">
   <header class="topbar">
-    <div class="logo-area">
-      <span class="brand">BETA</span>
-      <span class="brand-sub">SCIENCE</span>
-    </div>
+    <!-- 로고: 클릭하면 index.html로 이동 -->
+    <a href="index.html" class="logo-area">
+      <div class="logo-icon">
+        <!-- 플라스크(비커) 아이콘 -->
+        <svg width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <path d="M9 3h6M9 3v7L4.5 17A2 2 0 0 0 6.4 20h11.2a2 2 0 0 0 1.9-3L15 10V3"/>
+          <line x1="6.5" y1="14" x2="17.5" y2="14"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="brand">BETA</span>
+        <span class="brand-sub">SCIENCE</span>
+      </div>
+    </a>
     <div class="topbar-divider"></div>
     <nav>
       <ul class="nav-tabs">
@@ -113,7 +121,7 @@
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-card-header">
-          <div class="stat-icon blue"><svg class="icon" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="stat-icon blue"><svg class="icon" fill="none" stroke="#1a3fc4" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
           <span class="stat-label">전체</span>
         </div>
         <div class="stat-value" id="stat-total-students">0</div>
@@ -176,7 +184,7 @@
           <tr><td colspan="5" style="text-align:center; padding:40px; color:var(--text-muted);">데이터를 불러오는 중...</td></tr>
         </tbody>
       </table>
-      <a href="test-manage.html" class="view-more-btn" id="view-more-tests-btn">전체 테스트 보기</a>
+      <a href="test-manage.html" class="view-more-btn">전체 테스트 보기</a>
     </div>
   </main>
 </div>
@@ -185,26 +193,22 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // 베타과학 전용 설정값 적용 완료
   const firebaseConfig = {
     apiKey: "AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
     authDomain: "beta-science.firebaseapp.com",
     projectId: "beta-science",
     storageBucket: "beta-science.firebasestorage.app",
     messagingSenderId: "650652155367",
-    appId: "1:650652155367:web:41d2958e675cb4edd4d142",
-    measurementId: "G-SPNVBHPWP6"
+    appId: "1:650652155367:web:41d2958e675cb4edd4d142"
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // 1. 실시간 통계 업데이트
   function initStats() {
     onSnapshot(collection(db, "students"), snap => {
       document.getElementById('stat-total-students').textContent = snap.size;
     });
-
     onSnapshot(collection(db, "grades"), snap => {
       let total = 0;
       snap.forEach(doc => total += Number(doc.data().score || 0));
@@ -212,19 +216,17 @@
       document.getElementById('stat-total-grades').textContent = snap.size;
       document.getElementById('stat-avg-score').textContent = avg;
     });
-
     onSnapshot(collection(db, "specialManagement"), snap => {
       const pending = snap.docs.filter(d => !d.data().done).length;
       document.getElementById('stat-pending-special').textContent = pending;
     });
   }
 
-  // 2. 최근 성적 리스트 (5건)
   function initRecentGrades() {
     const q = query(collection(db, "grades"), orderBy("date", "desc"), limit(5));
     onSnapshot(q, snap => {
       const tbody = document.getElementById('recentGradesBody');
-      if(snap.empty) {
+      if (snap.empty) {
         tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">등록된 데이터가 없습니다.</td></tr>';
         return;
       }
@@ -241,13 +243,12 @@
     });
   }
 
-  // 3. 최근 테스트 리스트 (5건)
   function initRecentTests() {
     const q = query(collection(db, "tests"), orderBy("regDate", "desc"), limit(5));
     onSnapshot(q, snap => {
       const tbody = document.getElementById('recentTestsBody');
       document.getElementById('test-total-badge').textContent = snap.size + '개';
-      if(snap.empty) {
+      if (snap.empty) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">등록된 테스트가 없습니다.</td></tr>';
         return;
       }
