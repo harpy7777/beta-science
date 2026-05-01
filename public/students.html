@@ -12,7 +12,7 @@
     --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0;
     --success: #10b981; --danger: #ef4444; --radius: 10px;
   }
-  body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; visibility: hidden; }
   .app-wrapper { max-width: var(--max-width); margin: 0 auto; display: flex; flex-direction: column; min-height: 100vh; }
   .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 32px; height: 56px; position: sticky; top: 0; z-index: 100; }
   .logo-area { display: flex; flex-direction: row; align-items: center; gap: 8px; text-decoration: none; cursor: pointer; flex-shrink: 0; }
@@ -28,6 +28,13 @@
   .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
   .academy-name { font-size: 13px; font-weight: 600; color: var(--text); }
   .badge-admin { font-size: 11px; padding: 2px 8px; background: #f1f5f9; border-radius: 20px; color: var(--text-muted); }
+  .btn-logout {
+    padding: 6px 14px; background: transparent;
+    border: 1.5px solid #c7d2fe; border-radius: 20px;
+    font-family: inherit; font-size: 11px; font-weight: 600;
+    color: var(--primary); cursor: pointer; transition: all 0.18s; white-space: nowrap;
+  }
+  .btn-logout:hover { background: var(--primary-light); }
   .main-content { padding: 28px 24px; flex: 1; }
   .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
   .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
@@ -116,8 +123,10 @@
     <div class="topbar-right">
       <span class="academy-name">베타과학학원</span>
       <span class="badge-admin">관리자 모드</span>
+      <button class="btn-logout" onclick="doLogout()">로그아웃</button>
     </div>
   </header>
+
   <main class="main-content">
     <div class="page-header">
       <div><h1>학생 관리</h1><p>학생 정보를 추가, 수정, 삭제할 수 있습니다</p></div>
@@ -184,10 +193,11 @@
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import {
-    getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot
-  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    getFirestore, doc, getDoc, collection, addDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
@@ -199,8 +209,29 @@
   };
 
   const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
   const db = getFirestore(app);
 
+  // ── 인증 가드 ──
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.replace("/login.html"); return; }
+    try {
+      const snap = await getDoc(doc(db, "users", user.uid));
+      if (!snap.exists() || snap.data().status !== "approved") {
+        await signOut(auth); window.location.replace("/login.html"); return;
+      }
+      document.body.style.visibility = "visible";
+      initStudents();
+    } catch(e) { window.location.replace("/login.html"); }
+  });
+
+  // ── 로그아웃 ──
+  window.doLogout = async function() {
+    await signOut(auth);
+    window.location.replace("/login.html");
+  };
+
+  // ── 학생 데이터 ──
   const ITEMS_PER_PAGE = 10;
   let currentPage = 1;
   let editingId = null;
@@ -208,21 +239,20 @@
   let filtered = [];
 
   function gradeBadgeClass(g) {
-    return {
-      '중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3',
-      '고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3'
-    }[g] || 'grade-mid1';
+    return { '중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3',
+      '고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3' }[g] || 'grade-mid1';
   }
 
-  const q = query(collection(db, "students"), orderBy("regDate", "desc"));
-  onSnapshot(q, (snapshot) => {
-    students = snapshot.docs.map(d => ({ fireId: d.id, ...d.data() }));
-    filterStudents();
-  }, (error) => {
-    console.error("Firestore 오류:", error);
-    document.getElementById('studentTableBody').innerHTML =
-      '<tr><td colspan="7" style="text-align:center; padding:40px; color:var(--danger);">데이터 로드 실패: ' + error.message + '</td></tr>';
-  });
+  function initStudents() {
+    const q = query(collection(db, "students"), orderBy("regDate", "desc"));
+    onSnapshot(q, (snapshot) => {
+      students = snapshot.docs.map(d => ({ fireId: d.id, ...d.data() }));
+      filterStudents();
+    }, (error) => {
+      document.getElementById('studentTableBody').innerHTML =
+        `<tr><td colspan="7" style="text-align:center; padding:40px; color:var(--danger);">데이터 로드 실패: ${error.message}</td></tr>`;
+    });
+  }
 
   window.renderTable = function() {
     const tbody = document.getElementById('studentTableBody');
@@ -231,33 +261,29 @@
     const pageData = filtered.slice(start, start + ITEMS_PER_PAGE);
     document.getElementById('countDisplay').textContent = filtered.length;
     if (!filtered.length) {
-      tbody.innerHTML = '';
-      empty.style.display = 'block';
+      tbody.innerHTML = ''; empty.style.display = 'block';
     } else {
       empty.style.display = 'none';
       tbody.innerHTML = pageData.map(s => {
         const subs = s.subject && s.subject !== '-'
           ? s.subject.split(',').map(x => `<span class="subject-tag">${x.trim()}</span>`).join('')
           : '<span style="color:var(--text-muted)">-</span>';
-        return `
-          <tr>
-            <td class="student-id">${s.id || '-'}</td>
-            <td style="font-weight:500">${s.name || '-'}</td>
-            <td><span class="grade-badge ${gradeBadgeClass(s.grade)}">${s.grade || '-'}</span></td>
-            <td>${subs}</td>
-            <td>${s.phone || '-'}</td>
-            <td style="color:var(--text-muted);font-size:13px">${s.regDate || '-'}</td>
-            <td>
-              <div class="action-icons">
-                <button class="action-btn" onclick="openEditModal('${s.fireId}')">
-                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </button>
-                <button class="action-btn del" onclick="deleteStudent('${s.fireId}', '${s.name}')">
-                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-                </button>
-              </div>
-            </td>
-          </tr>`;
+        return `<tr>
+          <td class="student-id">${s.id||'-'}</td>
+          <td style="font-weight:500">${s.name||'-'}</td>
+          <td><span class="grade-badge ${gradeBadgeClass(s.grade)}">${s.grade||'-'}</span></td>
+          <td>${subs}</td>
+          <td>${s.phone||'-'}</td>
+          <td style="color:var(--text-muted);font-size:13px">${s.regDate||'-'}</td>
+          <td><div class="action-icons">
+            <button class="action-btn" onclick="openEditModal('${s.fireId}')">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="action-btn del" onclick="deleteStudent('${s.fireId}','${s.name}')">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            </button>
+          </div></td>
+        </tr>`;
       }).join('');
     }
     renderPagination();
@@ -267,11 +293,10 @@
     const search = document.getElementById('searchInput').value.trim().toLowerCase();
     const grade = document.getElementById('gradeFilter').value;
     filtered = students.filter(s =>
-      (!search || (s.name && s.name.toLowerCase().includes(search)) || (s.id && s.id.toLowerCase().includes(search))) &&
+      (!search || (s.name&&s.name.toLowerCase().includes(search)) || (s.id&&s.id.toLowerCase().includes(search))) &&
       (!grade || s.grade === grade)
     );
-    currentPage = 1;
-    renderTable();
+    currentPage = 1; renderTable();
   }
 
   window.renderPagination = function() {
@@ -288,8 +313,7 @@
   window.goPage = function(p) {
     const t = Math.ceil(filtered.length / ITEMS_PER_PAGE);
     if (p < 1 || p > t) return;
-    currentPage = p;
-    renderTable();
+    currentPage = p; renderTable();
   }
 
   window.openAddModal = function() {
@@ -335,20 +359,14 @@
         await updateDoc(doc(db, "students", editingId), { name, grade, subject, phone });
       }
       closeModal();
-    } catch (e) {
-      console.error("저장 오류:", e);
-      alert("저장 중 오류가 발생했습니다: " + e.message);
-    }
+    } catch(e) { alert("저장 중 오류가 발생했습니다: " + e.message); }
   }
 
   window.deleteStudent = async function(fireId, name) {
     if (!confirm(`"${name}" 학생을 삭제하시겠습니까?`)) return;
     try {
       await deleteDoc(doc(db, "students", fireId));
-    } catch (e) {
-      console.error("삭제 오류:", e);
-      alert("삭제 중 오류가 발생했습니다: " + e.message);
-    }
+    } catch(e) { alert("삭제 중 오류가 발생했습니다: " + e.message); }
   }
 
   document.getElementById('studentModal').addEventListener('click', function(e) {
