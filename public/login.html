@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>베타과학학원 · 로그인</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink:        #E8375A;
+      --pink-hover:  #D02B4E;
+      --pink-light:  #F07090;
+      --pink-pale:   #FCEEF2;
+      --pink-pale2:  #FAE6EC;
+      --pink-border: #F4C8D4;
+      --dark:        #1A1A2E;
+      --gray:        #64748B;
+      --gray-light:  #F8FAFC;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: #FFFFFF;
+      overflow: hidden;
+    }
+
+    /* 배경 글로우 */
+    .bg1 {
+      position: fixed; top: -160px; right: -120px;
+      width: 580px; height: 580px;
+      background: radial-gradient(circle, rgba(232,55,90,0.11) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .bg2 {
+      position: fixed; bottom: -130px; left: -90px;
+      width: 440px; height: 440px;
+      background: radial-gradient(circle, rgba(232,55,90,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .bg3 {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        135deg, transparent, transparent 48px,
+        rgba(232,55,90,0.012) 48px, rgba(232,55,90,0.012) 49px
+      );
+      pointer-events: none;
+    }
+
+    .container {
+      width: 100%; max-width: 420px;
+      position: relative; z-index: 1;
+      animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    /* ── 로고 영역 ── */
+    .logo-area {
+      text-align: center;
+      margin-bottom: 26px;
+    }
+
+    /* 학원 이름 + 아이콘 인라인 */
+    .logo-name-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+
+    .logo-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--dark);
+      letter-spacing: -0.5px;
+    }
+
+    /* 글씨 높이에 딱 맞는 작은 아이콘 */
+    .logo-icon {
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 26px; height: 26px;
+      background: linear-gradient(145deg, #E8375A 0%, #F06080 100%);
+      border-radius: 7px;
+      box-shadow: 0 3px 10px rgba(232,55,90,0.32);
+      flex-shrink: 0;
+    }
+
+    .logo-sub {
+      font-size: 13px;
+      color: var(--gray);
+    }
+
+    /* ── 카드 ── */
+    .card {
+      background: white;
+      border-radius: 22px;
+      padding: 36px 32px;
+      box-shadow:
+        0 2px 4px rgba(232,55,90,0.05),
+        0 10px 30px rgba(232,55,90,0.1),
+        0 0 0 1px var(--pink-border);
+    }
+
+    /* 탭 */
+    .tab-group {
+      display: flex;
+      background: var(--pink-pale);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 28px;
+      border: 1px solid var(--pink-border);
+    }
+
+    .tab-btn {
+      flex: 1; padding: 10px;
+      border: none; background: transparent;
+      border-radius: 9px;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 14px; font-weight: 500;
+      color: var(--pink-light);
+      cursor: pointer; transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: white;
+      color: var(--pink);
+      font-weight: 700;
+      box-shadow: 0 2px 10px rgba(232,55,90,0.14);
+    }
+
+    /* 폼 */
+    .form-group { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-size: 13px; font-weight: 600;
+      color: var(--dark); margin-bottom: 7px;
+    }
+
+    input {
+      width: 100%; padding: 12px 14px;
+      border: 1.5px solid #EDF0F5;
+      border-radius: 11px;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 14px; color: var(--dark);
+      background: var(--gray-light);
+      transition: all 0.2s; outline: none;
+    }
+
+    input:focus {
+      border-color: var(--pink);
+      background: #FFFBFC;
+      box-shadow: 0 0 0 4px rgba(232,55,90,0.09);
+    }
+
+    input::placeholder { color: #C4CBD8; }
+
+    .btn-primary {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #E8375A 0%, #F05878 100%);
+      color: white; border: none; border-radius: 11px;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all 0.22s;
+      margin-top: 8px;
+      box-shadow: 0 6px 20px rgba(232,55,90,0.36);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #D02B4E 0%, #E8375A 100%);
+      box-shadow: 0 10px 30px rgba(232,55,90,0.46);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.65; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* 알림 */
+    .alert {
+      padding: 11px 14px; border-radius: 10px;
+      font-size: 13px; margin-bottom: 18px;
+      display: none; line-height: 1.5;
+    }
+    .alert.error   { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+    .alert.warning { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+    .alert.success { background: #F0FDF4; color: #16A34A; border: 1px solid #BBF7D0; }
+
+    .pink-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--pink-border), transparent);
+      margin: 22px 0;
+    }
+
+    .foot-note {
+      text-align: center; font-size: 12px; color: var(--pink-light);
+    }
+
+    .back-link {
+      text-align: center; margin-top: 18px;
+      font-size: 13px; color: var(--gray);
+    }
+    .back-link a { color: var(--pink); text-decoration: none; font-weight: 600; }
+    .back-link a:hover { text-decoration: underline; }
+
+    .spinner {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      vertical-align: middle; margin-right: 5px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    #signupForm { display: none; }
+  </style>
+</head>
+<body>
+  <div class="bg1"></div>
+  <div class="bg2"></div>
+  <div class="bg3"></div>
+
+  <div class="container">
+    <!-- 로고 -->
+    <div class="logo-area">
+      <div class="logo-name-row">
+        <div class="logo-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+               stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 18h8"/><path d="M3 21h18"/>
+            <path d="M14 21v-4a2 2 0 0 0-2-2H4"/>
+            <path d="M14 7v4"/><path d="M10 11V3"/>
+            <path d="M10 3h4"/><path d="M14 3v4"/>
+            <circle cx="17" cy="7" r="3"/>
+          </svg>
+        </div>
+        <span class="logo-title">베타과학학원</span>
+      </div>
+      <div class="logo-sub">선생님 전용 · 통합 업무 허브</div>
+    </div>
+
+    <!-- 카드 -->
+    <div class="card">
+      <div class="tab-group">
+        <button class="tab-btn active" onclick="switchTab('login')">로그인</button>
+        <button class="tab-btn" onclick="switchTab('signup')">가입 신청</button>
+      </div>
+
+      <!-- 로그인 -->
+      <div id="loginForm">
+        <div id="loginAlert" class="alert"></div>
+        <div class="form-group">
+          <label>이메일</label>
+          <input type="email" id="loginEmail" placeholder="이메일 주소를 입력하세요">
+        </div>
+        <div class="form-group">
+          <label>비밀번호</label>
+          <input type="password" id="loginPassword" placeholder="비밀번호를 입력하세요"
+            onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <button class="btn-primary" id="loginBtn" onclick="doLogin()">로그인</button>
+      </div>
+
+      <!-- 가입 신청 -->
+      <div id="signupForm">
+        <div id="signupAlert" class="alert"></div>
+        <div class="form-group">
+          <label>이름</label>
+          <input type="text" id="signupName" placeholder="실명을 입력하세요">
+        </div>
+        <div class="form-group">
+          <label>이메일</label>
+          <input type="email" id="signupEmail" placeholder="이메일 주소를 입력하세요">
+        </div>
+        <div class="form-group">
+          <label>비밀번호</label>
+          <input type="password" id="signupPassword" placeholder="8자 이상 입력하세요">
+        </div>
+        <div class="form-group">
+          <label>비밀번호 확인</label>
+          <input type="password" id="signupPasswordConfirm" placeholder="비밀번호를 한 번 더 입력하세요">
+        </div>
+        <button class="btn-primary" id="signupBtn" onclick="doSignup()">가입 신청하기</button>
+      </div>
+
+      <div class="pink-divider"></div>
+      <div class="foot-note">승인된 선생님만 로그인 가능합니다</div>
+    </div>
+
+    <div class="back-link">
+      <a href="index.html">← 허브 메인으로 돌아가기</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+      authDomain: "beta-science.firebaseapp.com",
+      projectId: "beta-science",
+      storageBucket: "beta-science.firebasestorage.app",
+      messagingSenderId: "650652155367",
+      appId: "1:650652155367:web:41d2958e675cb4edd4d142"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.doLogin = async function() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginBtn');
+      if (!email || !password) { showAlert('loginAlert','error','이메일과 비밀번호를 입력해주세요.'); return; }
+      btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>확인 중...';
+      try {
+        const c = await signInWithEmailAndPassword(auth, email, password);
+        const snap = await getDoc(doc(db,'users',c.user.uid));
+        if (!snap.exists()) { showAlert('loginAlert','error','계정 정보를 찾을 수 없습니다.'); await auth.signOut(); return; }
+        const d = snap.data();
+        if (d.status==='pending')  { showAlert('loginAlert','warning','⏳ 승인 대기 중입니다. 관리자 승인 후 이용 가능합니다.'); await auth.signOut(); return; }
+        if (d.status==='rejected') { showAlert('loginAlert','error','가입이 거절되었습니다. 관리자에게 문의하세요.'); await auth.signOut(); return; }
+        if (d.status==='approved') { sessionStorage.setItem('teacher_uid',c.user.uid); sessionStorage.setItem('teacher_name',d.name); window.location.href='index.html'; }
+      } catch(err) {
+        showAlert('loginAlert','error', (err.code==='auth/invalid-credential'||err.code==='auth/wrong-password') ? '이메일 또는 비밀번호가 올바르지 않습니다.' : '오류가 발생했습니다.');
+      } finally { btn.disabled=false; btn.innerHTML='로그인'; }
+    };
+
+    window.doSignup = async function() {
+      const name=document.getElementById('signupName').value.trim();
+      const email=document.getElementById('signupEmail').value.trim();
+      const pw=document.getElementById('signupPassword').value;
+      const pw2=document.getElementById('signupPasswordConfirm').value;
+      const btn=document.getElementById('signupBtn');
+      if (!name||!email||!pw||!pw2) { showAlert('signupAlert','error','모든 항목을 입력해주세요.'); return; }
+      if (pw.length<8) { showAlert('signupAlert','error','비밀번호는 8자 이상이어야 합니다.'); return; }
+      if (pw!==pw2) { showAlert('signupAlert','error','비밀번호가 일치하지 않습니다.'); return; }
+      btn.disabled=true; btn.innerHTML='<span class="spinner"></span>신청 중...';
+      try {
+        const c=await createUserWithEmailAndPassword(auth,email,pw);
+        await setDoc(doc(db,'users',c.user.uid),{name,email,role:'teacher',status:'pending',createdAt:serverTimestamp()});
+        await auth.signOut();
+        showAlert('signupAlert','success','✅ 신청 완료! 관리자 승인 후 로그인 가능합니다.');
+        btn.innerHTML='신청 완료 ✓';
+      } catch(err) {
+        showAlert('signupAlert','error',err.code==='auth/email-already-in-use'?'이미 사용 중인 이메일입니다.':'오류가 발생했습니다.');
+        btn.disabled=false; btn.innerHTML='가입 신청하기';
+      }
+    };
+
+    function showAlert(id,type,msg) {
+      const el=document.getElementById(id);
+      el.className=`alert ${type}`; el.textContent=msg; el.style.display='block';
+    }
+  </script>
+
+  <script>
+    function switchTab(t) {
+      const [a,b]=document.querySelectorAll('.tab-btn');
+      const lf=document.getElementById('loginForm'), sf=document.getElementById('signupForm');
+      if(t==='login'){a.classList.add('active');b.classList.remove('active');lf.style.display='block';sf.style.display='none';}
+      else{a.classList.remove('active');b.classList.add('active');lf.style.display='none';sf.style.display='block';}
+    }
+  </script>
+</body>
+</html>
