@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>베타과학학원 · 허브 (인증 가드 예시)</title>
+</head>
+<body>
+
+<!--
+=======================================================================
+  📌 index.html (허브 페이지)에 아래 코드를 추가하는 방법
+=======================================================================
+
+① <head> 맨 아래에 Firebase SDK 추가:
+-->
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ✅ 여기에 Firebase 프로젝트 설정 입력 (login.html, admin-approval.html과 동일)
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // 페이지 로드 시 인증 확인
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      // 로그인 안 됨 → 로그인 페이지로
+      window.location.href = 'login.html';
+      return;
+    }
+
+    // Firestore에서 승인 상태 확인
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+
+    if (!userDoc.exists() || userDoc.data().status !== 'approved') {
+      // 미승인 → 로그인 페이지로
+      await auth.signOut();
+      window.location.href = 'login.html';
+      return;
+    }
+
+    // ✅ 승인된 선생님 → 페이지 표시
+    document.body.style.visibility = 'visible';
+
+    // 선생님 이름 표시 (있다면 헤더에)
+    const name = userDoc.data().name;
+    const nameEl = document.getElementById('teacherName'); // 헤더에 id="teacherName" 추가 시 자동 표시
+    if (nameEl) nameEl.textContent = name + ' 선생님';
+  });
+
+  // 페이지가 깜빡이지 않도록 초기에는 숨김
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.style.visibility = 'hidden';
+  });
+
+  // 로그아웃 함수 (헤더 로그아웃 버튼에 onclick="doLogout()" 추가)
+  window.doLogout = async function() {
+    await auth.signOut();
+    window.location.href = 'login.html';
+  };
+</script>
+
+<!--
+=======================================================================
+  📌 index.html <body> 태그에 style="visibility:hidden" 추가:
+  <body style="visibility:hidden">
+  → 인증 확인 전 페이지 깜빡임 방지
+
+  📌 선생님 이름 표시할 위치에 추가:
+  <span id="teacherName"></span>
+
+  📌 로그아웃 버튼:
+  <button onclick="doLogout()">로그아웃</button>
+=======================================================================
+
+  📁 최종 파일 구조:
+  beta-science/
+  ├── index.html          ← 위 코드 추가 (허브, 로그인 보호)
+  ├── login.html          ← 로그인 + 가입 신청 페이지 (새 파일)
+  ├── admin-approval.html ← 관리자 승인 페이지 (새 파일)
+  └── pages/...
+
+  📌 Firestore 보안 규칙 (Firebase Console → Firestore → 규칙):
+
+  rules_version = '2';
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      match /users/{uid} {
+        // 본인 데이터 읽기/쓰기 허용
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+        // 관리자는 모든 users 읽기/쓰기 가능
+        allow read, write: if request.auth != null && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      }
+    }
+  }
+-->
+
+</body>
+</html>
