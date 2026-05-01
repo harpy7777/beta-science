@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>베타과학학원 · 관리자 승인</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink:        #E8375A;
+      --pink-hover:  #D02B4E;
+      --pink-light:  #F07090;
+      --pink-pale:   #FCEEF2;
+      --pink-pale2:  #FAE6EC;
+      --pink-border: #F4C8D4;
+      --dark:        #1A1A2E;
+      --gray:        #64748B;
+      --gray-light:  #F8FAFC;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--gray-light); min-height: 100vh; }
+
+    /* ── 로그인 화면 ── */
+    #adminLoginScreen {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      background: #FFFFFF; padding: 20px; overflow: hidden; position: relative;
+    }
+
+    .bg1 {
+      position: fixed; top: -160px; right: -120px;
+      width: 580px; height: 580px;
+      background: radial-gradient(circle, rgba(232,55,90,0.11) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .bg2 {
+      position: fixed; bottom: -130px; left: -90px;
+      width: 440px; height: 440px;
+      background: radial-gradient(circle, rgba(232,55,90,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .login-card {
+      background: white; border-radius: 22px;
+      padding: 42px 36px; width: 100%; max-width: 400px;
+      box-shadow: 0 10px 30px rgba(232,55,90,0.12), 0 0 0 1px var(--pink-border);
+      position: relative; z-index: 1;
+      animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    .login-logo { text-align: center; margin-bottom: 28px; }
+
+    /* 이름 + 아이콘 인라인 */
+    .name-row {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-bottom: 5px;
+    }
+    .login-title { font-size: 18px; font-weight: 700; color: var(--dark); }
+    .name-icon-sm {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px;
+      background: linear-gradient(145deg, #E8375A, #F06080);
+      border-radius: 6px;
+      box-shadow: 0 3px 8px rgba(232,55,90,0.3);
+      flex-shrink: 0;
+    }
+    .login-sub { font-size: 13px; color: var(--gray); }
+
+    /* ── 메인 화면 ── */
+    #adminMainScreen { display: none; }
+
+    .topbar {
+      background: white;
+      border-bottom: 1px solid var(--pink-border);
+      padding: 0 28px; height: 62px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(232,55,90,0.07);
+    }
+
+    .topbar-left { display: flex; align-items: center; gap: 10px; }
+
+    /* 상단바 이름 + 아이콘 */
+    .topbar-name-row { display: flex; align-items: center; gap: 6px; }
+    .topbar-title { font-size: 16px; font-weight: 700; color: var(--dark); }
+    .topbar-icon-sm {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px;
+      background: linear-gradient(145deg, #E8375A, #F06080);
+      border-radius: 5px;
+      box-shadow: 0 2px 6px rgba(232,55,90,0.28);
+      flex-shrink: 0;
+    }
+
+    .topbar-badge {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+      color: var(--pink); background: var(--pink-pale2);
+      border: 1px solid var(--pink-border);
+      padding: 3px 10px; border-radius: 20px;
+    }
+
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .admin-name { font-size: 13px; color: var(--gray); }
+
+    .btn-logout {
+      padding: 7px 16px;
+      border: 1.5px solid var(--pink-border); background: transparent;
+      color: var(--pink); border-radius: 8px;
+      font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.18s;
+    }
+    .btn-logout:hover { background: var(--pink-pale); }
+
+    .main-content { padding: 28px; max-width: 900px; margin: 0 auto; }
+
+    /* 통계 */
+    .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 24px; }
+
+    .stat-card {
+      background: white; border-radius: 16px; padding: 22px 20px;
+      border: 1px solid #EEEEF5; text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .stat-num { font-size: 34px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+    .stat-num.p { color: #D97706; }
+    .stat-num.a { color: #16A34A; }
+    .stat-num.r { color: #DC2626; }
+    .stat-label { font-size: 13px; color: var(--gray); }
+
+    /* 섹션 */
+    .section {
+      background: white; border-radius: 16px;
+      border: 1px solid #EEEEF5; overflow: hidden; margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .section-header {
+      padding: 18px 22px; border-bottom: 1px solid #F5F5FA;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .section-title {
+      font-size: 15px; font-weight: 700; color: var(--dark);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .count-badge {
+      background: var(--pink); color: white;
+      font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 20px;
+    }
+    .refresh-btn {
+      background: none; border: none; color: var(--pink);
+      font-size: 13px; font-weight: 500; font-family: inherit;
+      cursor: pointer; padding: 4px 10px; border-radius: 6px; transition: background 0.15s;
+    }
+    .refresh-btn:hover { background: var(--pink-pale); }
+
+    /* 유저 행 */
+    .user-row {
+      display: flex; align-items: center;
+      padding: 14px 22px; border-bottom: 1px solid #FAFAFA;
+      gap: 14px; transition: background 0.15s;
+    }
+    .user-row:last-child { border-bottom: none; }
+    .user-row:hover { background: var(--pink-pale); }
+
+    .user-avatar {
+      width: 42px; height: 42px; border-radius: 12px;
+      background: var(--pink-pale2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: var(--pink);
+      flex-shrink: 0; border: 1px solid var(--pink-border);
+    }
+
+    .user-info { flex: 1; min-width: 0; }
+    .user-name  { font-size: 14px; font-weight: 600; color: var(--dark); }
+    .user-email { font-size: 12px; color: var(--gray); margin-top: 2px; }
+    .user-date  { font-size: 11px; color: #C4CBD8; margin-top: 2px; }
+
+    .action-btns { display: flex; gap: 8px; flex-shrink: 0; }
+
+    .btn-approve {
+      padding: 7px 18px; background: linear-gradient(135deg,#16A34A,#22C55E);
+      color: white; border: none; border-radius: 8px;
+      font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 3px 10px rgba(22,163,74,0.24);
+    }
+    .btn-approve:hover { box-shadow: 0 5px 16px rgba(22,163,74,0.38); transform: translateY(-1px); }
+
+    .btn-reject {
+      padding: 7px 18px; background: transparent; color: #DC2626;
+      border: 1.5px solid #FECACA; border-radius: 8px;
+      font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-reject:hover { background: #FEF2F2; }
+
+    .btn-revoke {
+      padding: 7px 18px; background: transparent; color: var(--gray);
+      border: 1.5px solid #E5E7EB; border-radius: 8px;
+      font-family: 'Noto Sans KR', sans-serif; font-size: 13px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-revoke:hover { background: #F3F4F6; color: var(--dark); }
+
+    .empty-state { text-align: center; padding: 44px 20px; color: var(--gray); font-size: 14px; }
+    .empty-state .icon { font-size: 32px; margin-bottom: 10px; }
+
+    /* 공통 폼 */
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--dark); margin-bottom: 7px; }
+    input {
+      width: 100%; padding: 12px 14px;
+      border: 1.5px solid #EDF0F5; border-radius: 11px;
+      font-family: 'Noto Sans KR', sans-serif; font-size: 14px; color: var(--dark);
+      background: var(--gray-light); transition: all 0.2s; outline: none;
+    }
+    input:focus { border-color: var(--pink); background: #FFFBFC; box-shadow: 0 0 0 4px rgba(232,55,90,0.09); }
+    input::placeholder { color: #C4CBD8; }
+
+    .btn-primary {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg,#E8375A,#F05878);
+      color: white; border: none; border-radius: 11px;
+      font-family: 'Noto Sans KR', sans-serif; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all 0.22s;
+      box-shadow: 0 6px 20px rgba(232,55,90,0.34);
+    }
+    .btn-primary:hover { background: linear-gradient(135deg,#D02B4E,#E8375A); box-shadow: 0 10px 28px rgba(232,55,90,0.44); }
+    .btn-primary:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    .alert { padding: 12px 14px; border-radius: 10px; font-size: 13px; margin-bottom: 16px; display: none; }
+    .alert.error { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+
+    .spinner {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.35); border-top-color: white;
+      border-radius: 50%; animation: spin 0.65s linear infinite;
+      vertical-align: middle; margin-right: 5px;
+    }
+
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--dark); color: white;
+      padding: 13px 22px; border-radius: 12px;
+      font-size: 14px; font-weight: 500;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+      border-left: 3px solid var(--pink);
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.22,1,0.36,1); z-index: 1000;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── 관리자 로그인 ── -->
+  <div id="adminLoginScreen">
+    <div class="bg1"></div>
+    <div class="bg2"></div>
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="name-row">
+          <div class="name-icon-sm">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                 stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 18h8"/><path d="M3 21h18"/>
+              <path d="M14 21v-4a2 2 0 0 0-2-2H4"/>
+              <path d="M14 7v4"/><path d="M10 11V3"/>
+              <path d="M10 3h4"/><path d="M14 3v4"/>
+              <circle cx="17" cy="7" r="3"/>
+            </svg>
+          </div>
+          <span class="login-title">베타과학학원</span>
+        </div>
+        <div class="login-sub">관리자 전용 승인 페이지</div>
+      </div>
+
+      <div id="adminLoginAlert" class="alert error"></div>
+
+      <div class="form-group">
+        <label>관리자 이메일</label>
+        <input type="email" id="adminEmail" placeholder="이메일 주소를 입력하세요">
+      </div>
+      <div class="form-group">
+        <label>비밀번호</label>
+        <input type="password" id="adminPassword" placeholder="비밀번호를 입력하세요"
+          onkeydown="if(event.key==='Enter')adminLogin()">
+      </div>
+      <button class="btn-primary" id="adminLoginBtn" onclick="adminLogin()">관리자 로그인</button>
+      <div style="text-align:center; margin-top:18px;">
+        <a href="index.html" style="font-size:13px; color:var(--pink); text-decoration:none; font-weight:500;">← 허브로 돌아가기</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 관리자 메인 ── -->
+  <div id="adminMainScreen">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-name-row">
+          <div class="topbar-icon-sm">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                 stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 18h8"/><path d="M3 21h18"/>
+              <path d="M14 21v-4a2 2 0 0 0-2-2H4"/>
+              <path d="M14 7v4"/><path d="M10 11V3"/>
+              <path d="M10 3h4"/><path d="M14 3v4"/>
+              <circle cx="17" cy="7" r="3"/>
+            </svg>
+          </div>
+          <span class="topbar-title">베타과학학원</span>
+        </div>
+        <span class="topbar-badge">관리자 페이지</span>
+      </div>
+      <div class="topbar-right">
+        <span class="admin-name" id="adminName"></span>
+        <button class="btn-logout" onclick="doLogout()">로그아웃</button>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-num p" id="statPending">-</div><div class="stat-label">⏳ 승인 대기</div></div>
+        <div class="stat-card"><div class="stat-num a" id="statApproved">-</div><div class="stat-label">✅ 승인 완료</div></div>
+        <div class="stat-card"><div class="stat-num r" id="statRejected">-</div><div class="stat-label">❌ 거절됨</div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">⏳ 승인 대기 중 <span class="count-badge" id="pendingBadge">0</span></div>
+          <button class="refresh-btn" onclick="loadUsers()">↻ 새로고침</button>
+        </div>
+        <div id="pendingList"><div class="empty-state"><div class="icon">✅</div>대기 중인 신청이 없습니다</div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-header"><div class="section-title">✅ 승인된 선생님</div></div>
+        <div id="approvedList"><div class="empty-state"><div class="icon">👩‍🏫</div>승인된 선생님이 없습니다</div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-header"><div class="section-title">❌ 거절된 신청</div></div>
+        <div id="rejectedList"><div class="empty-state"><div class="icon">📭</div>거절된 신청이 없습니다</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+      authDomain: "beta-science.firebaseapp.com",
+      projectId: "beta-science",
+      storageBucket: "beta-science.firebasestorage.app",
+      messagingSenderId: "650652155367",
+      appId: "1:650652155367:web:41d2958e675cb4edd4d142"
+    };
+
+    // ✅ 관리자 UID — Firebase Console → Authentication에서 확인 후 입력
+    const ADMIN_UIDS = ['YOUR_ADMIN_UID_HERE'];
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user && ADMIN_UIDS.includes(user.uid)) {
+        document.getElementById('adminLoginScreen').style.display = 'none';
+        document.getElementById('adminMainScreen').style.display = 'block';
+        const snap = await getDoc(doc(db,'users',user.uid));
+        document.getElementById('adminName').textContent = (snap.exists()?snap.data().name:user.email) + ' 관리자';
+        loadUsers();
+      }
+    });
+
+    window.adminLogin = async function() {
+      const email=document.getElementById('adminEmail').value.trim();
+      const pw=document.getElementById('adminPassword').value;
+      const btn=document.getElementById('adminLoginBtn');
+      const al=document.getElementById('adminLoginAlert');
+      btn.disabled=true; btn.innerHTML='<span class="spinner"></span>확인 중...'; al.style.display='none';
+      try {
+        const c=await signInWithEmailAndPassword(auth,email,pw);
+        if(!ADMIN_UIDS.includes(c.user.uid)) { await signOut(auth); al.textContent='관리자 권한이 없는 계정입니다.'; al.style.display='block'; }
+      } catch { al.textContent='이메일 또는 비밀번호가 올바르지 않습니다.'; al.style.display='block'; }
+      finally { btn.disabled=false; btn.innerHTML='관리자 로그인'; }
+    };
+
+    window.doLogout = async ()=>{ await signOut(auth); location.reload(); };
+
+    window.loadUsers = async function() {
+      const snap=await getDocs(collection(db,'users'));
+      const all=[]; snap.forEach(d=>all.push({id:d.id,...d.data()}));
+      const t=all.filter(u=>u.role==='teacher');
+      const pending=t.filter(u=>u.status==='pending');
+      const approved=t.filter(u=>u.status==='approved');
+      const rejected=t.filter(u=>u.status==='rejected');
+      document.getElementById('statPending').textContent=pending.length;
+      document.getElementById('statApproved').textContent=approved.length;
+      document.getElementById('statRejected').textContent=rejected.length;
+      document.getElementById('pendingBadge').textContent=pending.length;
+      render('pendingList',pending,'pending');
+      render('approvedList',approved,'approved');
+      render('rejectedList',rejected,'rejected');
+    };
+
+    function render(id,users,type) {
+      const el=document.getElementById(id);
+      if(!users.length){
+        const ic={pending:'✅',approved:'👩‍🏫',rejected:'📭'};
+        const ms={pending:'대기 중인 신청이 없습니다',approved:'승인된 선생님이 없습니다',rejected:'거절된 신청이 없습니다'};
+        el.innerHTML=`<div class="empty-state"><div class="icon">${ic[type]}</div>${ms[type]}</div>`; return;
+      }
+      el.innerHTML=users.map(u=>{
+        const init=u.name?u.name.charAt(0):'?';
+        const date=u.createdAt?new Date(u.createdAt.seconds*1000).toLocaleDateString('ko-KR'):'';
+        let act='';
+        if(type==='pending')  act=`<button class="btn-approve" onclick="updateStatus('${u.id}','approved')">승인</button><button class="btn-reject" onclick="updateStatus('${u.id}','rejected')">거절</button>`;
+        if(type==='approved') act=`<button class="btn-revoke" onclick="updateStatus('${u.id}','pending')">승인 취소</button>`;
+        if(type==='rejected') act=`<button class="btn-approve" onclick="updateStatus('${u.id}','approved')">재승인</button>`;
+        return `<div class="user-row">
+          <div class="user-avatar">${init}</div>
+          <div class="user-info">
+            <div class="user-name">${u.name||'이름 없음'}</div>
+            <div class="user-email">${u.email}</div>
+            <div class="user-date">신청일: ${date}</div>
+          </div>
+          <div class="action-btns">${act}</div>
+        </div>`;
+      }).join('');
+    }
+
+    window.updateStatus = async function(uid,status) {
+      await updateDoc(doc(db,'users',uid),{status});
+      const m={approved:'✅ 승인되었습니다',rejected:'❌ 거절되었습니다',pending:'↩️ 승인이 취소되었습니다'};
+      const t=document.getElementById('toast');
+      t.textContent=m[status]; t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'),2500);
+      loadUsers();
+    };
+  </script>
+</body>
+</html>
