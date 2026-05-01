@@ -7,7 +7,7 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root { --primary: #1a3fc4; --primary-light: #eef2ff; --primary-dark: #1530a0; --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff; --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --danger-light: #fef2f2; --success: #10b981; --success-light: #f0fdf4; --warning: #f59e0b; --warning-light: #fffbeb; --radius: 10px; }
-  body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; visibility: hidden; }
   .app-wrapper { max-width: var(--max-width); margin: 0 auto; display: flex; flex-direction: column; min-height: 100vh; }
   .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 32px; height: 56px; position: sticky; top: 0; z-index: 100; }
   .logo-area { display: flex; flex-direction: row; align-items: center; gap: 8px; text-decoration: none; cursor: pointer; flex-shrink: 0; }
@@ -23,6 +23,8 @@
   .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
   .academy-name { font-size: 13px; font-weight: 600; color: var(--text); }
   .badge-admin { font-size: 11px; padding: 2px 8px; background: #f1f5f9; border-radius: 20px; color: var(--text-muted); }
+  .btn-logout { padding: 6px 14px; background: transparent; border: 1.5px solid #c7d2fe; border-radius: 20px; font-family: inherit; font-size: 11px; font-weight: 600; color: var(--primary); cursor: pointer; transition: all 0.18s; white-space: nowrap; }
+  .btn-logout:hover { background: var(--primary-light); }
   .main-content { padding: 28px 24px; flex: 1; }
   .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
   .page-header-left h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
@@ -83,10 +85,7 @@
           <line x1="6.5" y1="14" x2="17.5" y2="14"/>
         </svg>
       </div>
-      <div class="logo-text">
-        <span class="brand">BETA</span>
-        <span class="brand-sub">SCIENCE</span>
-      </div>
+      <div class="logo-text"><span class="brand">BETA</span><span class="brand-sub">SCIENCE</span></div>
     </a>
     <div class="topbar-divider"></div>
     <nav><ul class="nav-tabs">
@@ -99,8 +98,13 @@
       <li><a href="special.html" class="active">특별관리</a></li>
       <li><a href="sms.html">SMS설정</a></li>
     </ul></nav>
-    <div class="topbar-right"><span class="academy-name">베타과학학원</span><span class="badge-admin">관리자 모드</span></div>
+    <div class="topbar-right">
+      <span class="academy-name">베타과학학원</span>
+      <span class="badge-admin">관리자 모드</span>
+      <button class="btn-logout" onclick="doLogout()">로그아웃</button>
+    </div>
   </header>
+
   <main class="main-content">
     <div class="page-header">
       <div class="page-header-left">
@@ -109,18 +113,22 @@
       </div>
       <button class="btn-outline" onclick="showHistory()"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.7"/></svg>전체 이력 보기</button>
     </div>
+
     <div class="stats-grid">
       <div class="stat-card"><div class="stat-card-top"><span class="stat-status warning">대기 중</span><div class="stat-icon-wrap warning"><svg width="20" height="20" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div></div><div class="stat-number warning" id="pendingCount">0</div><div class="stat-desc">대처방안 미입력 학생</div></div>
       <div class="stat-card"><div class="stat-card-top"><span class="stat-status success">처리 완료</span><div class="stat-icon-wrap success"><svg width="20" height="20" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div><div class="stat-number success" id="doneCount">0</div><div class="stat-desc">대처방안 입력 완료</div></div>
     </div>
+
     <div class="section-card">
       <div class="section-header"><svg width="18" height="18" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><h2>대처방안 입력 필요</h2></div>
       <div class="section-body"><div class="student-list" id="pendingList"></div></div>
     </div>
+
     <div class="section-card">
       <div class="section-header"><svg width="18" height="18" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><h2>처리 완료</h2></div>
       <div class="section-body"><div class="student-list" id="doneList"></div></div>
     </div>
+
     <div class="section-card" id="historySection" style="display:none;">
       <div class="section-header"><svg width="18" height="18" fill="none" stroke="#1a3fc4" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.7"/></svg><h2>전체 관리 이력</h2></div>
       <div class="section-body"><table><thead><tr><th>학생명</th><th>테스트</th><th>점수</th><th>상태</th><th>대처방안</th><th>날짜</th></tr></thead><tbody id="historyBody"></tbody></table></div>
@@ -128,9 +136,11 @@
   </main>
 </div>
 <div class="toast" id="toast"></div>
+
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, collection, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
@@ -140,15 +150,35 @@
     messagingSenderId: "650652155367",
     appId: "1:650652155367:web:41d2958e675cb4edd4d142"
   };
+
   const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
   const db = getFirestore(app);
 
-  onSnapshot(collection(db, "specialManagement"), (snapshot) => {
-    const all = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderPending(all.filter(s => !s.done));
-    renderDone(all.filter(s => s.done));
-    renderHistory(all);
+  // ── 인증 가드 ──
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.replace("/login.html"); return; }
+    try {
+      const snap = await getDoc(doc(db, "users", user.uid));
+      if (!snap.exists() || snap.data().status !== "approved") {
+        await signOut(auth); window.location.replace("/login.html"); return;
+      }
+      document.body.style.visibility = "visible";
+      initPage();
+    } catch(e) { window.location.replace("/login.html"); }
   });
+
+  // ── 로그아웃 ──
+  window.doLogout = async function() { await signOut(auth); window.location.replace("/login.html"); };
+
+  function initPage() {
+    onSnapshot(collection(db, "specialManagement"), (snapshot) => {
+      const all = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderPending(all.filter(s => !s.done));
+      renderDone(all.filter(s => s.done));
+      renderHistory(all);
+    });
+  }
 
   window.renderPending = (data) => {
     const list = document.getElementById('pendingList');
