@@ -25,6 +25,8 @@ export interface Exam {
   regDate?: Timestamp;
   isPublished: boolean;
   accessCode?: string;
+  grade?: string;        // 추가: 학년 (중1, 중2, 중3, 고1, 고2, 고3)
+  codepenUrl?: string;   // 추가: CodePen URL
 }
 
 export interface StudentAnswer {
@@ -38,11 +40,38 @@ export interface StudentAnswer {
   timestamp?: Timestamp;
   testName?: string;
   date?: string;
+  grade?: string;
 }
 
-// undefined 값 제거 (Firestore는 undefined 저장 불가)
+export interface AcademySettings {
+  entranceCode: string;
+  updatedAt?: Timestamp;
+}
+
 function removeUndefined(obj: unknown): unknown {
   return JSON.parse(JSON.stringify(obj));
+}
+
+// ─── 학원 입장코드 조회 ────────────────────────────────────────────────────
+export async function getAcademyEntranceCode(): Promise<string | null> {
+  const snap = await getDoc(doc(db, 'settings', 'academy'));
+  if (!snap.exists()) return null;
+  return (snap.data() as AcademySettings).entranceCode ?? null;
+}
+
+// ─── 학원 입장코드 저장/수정 ───────────────────────────────────────────────
+export async function setAcademyEntranceCode(code: string): Promise<void> {
+  await updateDoc(doc(db, 'settings', 'academy'), {
+    entranceCode: code.toUpperCase(),
+    updatedAt: Timestamp.now(),
+  });
+}
+
+// ─── 입장코드 검증 ─────────────────────────────────────────────────────────
+export async function verifyEntranceCode(code: string): Promise<boolean> {
+  const stored = await getAcademyEntranceCode();
+  if (!stored) return false;
+  return stored.toUpperCase() === code.toUpperCase();
 }
 
 // ─── 시험지 저장 (신규) ────────────────────────────────────────────────────
@@ -79,6 +108,29 @@ export async function getExamsByTeacher(teacherId: string): Promise<Exam[]> {
   return snap.docs.map(d => ({ id: d.id, ...d.data() }) as Exam);
 }
 
+// ─── 학년별 게시된 시험지 목록 ────────────────────────────────────────────
+export async function getExamsByGrade(grade: string): Promise<Exam[]> {
+  const q = query(
+    collection(db, 'tests'),
+    where('grade', '==', grade),
+    where('isPublished', '==', true),
+    orderBy('regDate', 'desc')
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }) as Exam);
+}
+
+// ─── 전체 게시된 시험지 목록 ──────────────────────────────────────────────
+export async function getAllPublishedExams(): Promise<Exam[]> {
+  const q = query(
+    collection(db, 'tests'),
+    where('isPublished', '==', true),
+    orderBy('regDate', 'desc')
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }) as Exam);
+}
+
 // ─── 시험지 단건 조회 ──────────────────────────────────────────────────────
 export async function getExam(examId: string): Promise<Exam | null> {
   const snap = await getDoc(doc(db, 'tests', examId));
@@ -106,6 +158,7 @@ export async function submitStudentAnswers(payload: {
   answers: Record<string, string>;
   score: number;
   totalQuestions: number;
+  grade?: string;
 }): Promise<string> {
   const exam = await getExam(payload.examId);
   const docRef = await addDoc(collection(db, 'grades'), {
@@ -114,6 +167,7 @@ export async function submitStudentAnswers(payload: {
     answers: payload.answers,
     score: payload.score,
     totalQuestions: payload.totalQuestions,
+    grade: payload.grade ?? exam?.grade ?? '',
     testName: exam?.title ?? '',
     date: new Date().toLocaleDateString('ko-KR'),
     timestamp: Timestamp.now(),
@@ -126,6 +180,17 @@ export async function getAnswersByExam(examId: string): Promise<StudentAnswer[]>
   const q = query(
     collection(db, 'grades'),
     where('examId', '==', examId),
+    orderBy('timestamp', 'desc')
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }) as StudentAnswer);
+}
+
+// ─── 학생 이름별 성적 조회 ─────────────────────────────────────────────────
+export async function getAnswersByStudent(studentName: string): Promise<StudentAnswer[]> {
+  const q = query(
+    collection(db, 'grades'),
+    where('studentName', '==', studentName),
     orderBy('timestamp', 'desc')
   );
   const snap = await getDocs(q);
