@@ -244,6 +244,9 @@ function CreateExamInner() {
   const [saved, setSaved] = useState(false);
   const [savedExamId, setSavedExamId] = useState<string | null>(null);
 
+  const [grade, setGrade] = useState('');
+  const [codepenUrl, setCodepenUrl] = useState('');
+
   // 일괄 입력 UI 상태
   const [oxBulk, setOxBulk] = useState('');
   const [mcBulk, setMcBulk] = useState('');
@@ -263,6 +266,8 @@ function CreateExamInner() {
         if (exam) {
           setTitle(exam.title);
           setQuestions(exam.questions);
+          setGrade(exam.grade ?? '');
+          setCodepenUrl(exam.codepenUrl ?? '');
           // 기존 문제를 파싱된 상태로 복원
           setOxParsed(exam.questions.filter(q => q.type === 'ox'));
           setMcParsed(exam.questions.filter(q => q.type === 'multiple'));
@@ -302,6 +307,8 @@ function CreateExamInner() {
         teacherId: user!.uid,
         questions: allQuestions,
         isPublished: publish,
+        grade,
+        codepenUrl: codepenUrl.trim(),
       };
       let id: string;
       if (editId) {
@@ -425,8 +432,34 @@ function CreateExamInner() {
                 onKeyDown={e => { if (e.key === 'Enter' && title.trim()) setStep(2); }}
                 autoFocus
               />
+
+              {/* 학년 선택 */}
+              <div className="mt-5">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">학년</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {['중1','중2','중3','고1','고2','고3'].map(g => (
+                    <button
+                      key={g}
+                      type="button"
+                      onClick={() => setGrade(g)}
+                      className={`py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${
+                        grade === g
+                          ? 'bg-green-600 text-white border-green-600'
+                          : 'border-gray-200 text-gray-500 hover:border-green-300 hover:text-green-600'
+                      }`}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <button
-                onClick={() => { if (!title.trim()) { toast.error('단원명을 입력하세요'); return; } setStep(2); }}
+                onClick={() => {
+                  if (!title.trim()) { toast.error('단원명을 입력하세요'); return; }
+                  if (!grade) { toast.error('학년을 선택하세요'); return; }
+                  setStep(2);
+                }}
                 className="btn-primary w-full mt-6"
               >
                 다음: 문제 추가 →
@@ -658,21 +691,31 @@ function CreateExamInner() {
               </div>
             </div>
 
-            {/* CodePen 안내 */}
+            {/* CodePen 안내 + URL 입력 */}
             <div className="card p-5 border-2 border-dashed border-green-200 bg-green-50/40">
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-3 mb-4">
                 <FileText size={20} className="text-green-600 shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <div className="font-bold text-gray-800 text-sm mb-1">CodePen으로 배포하기</div>
                   <p className="text-xs text-gray-500 leading-relaxed">
-                    버튼을 클릭하면 새 탭에 퀴즈 코드가 자동 로드된 CodePen이 열립니다.<br />
-                    CodePen에서 <strong>저장(Ctrl+S)</strong> 후 생성된 URL을 노션에 저장하세요.
+                    1. 아래 버튼으로 CodePen 열기 → Ctrl+S 저장 → URL 복사<br />
+                    2. 복사한 URL을 아래에 붙여넣으면 학생 목록에 자동 연결됩니다.
                   </p>
                 </div>
                 <button onClick={openCodePen} className="btn-secondary text-xs flex items-center gap-1.5 shrink-0 border-green-300 text-green-700 hover:bg-green-50">
                   <ExternalLink size={13} />
                   CodePen 열기
                 </button>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1.5">CodePen URL (저장 후 붙여넣기)</label>
+                <input
+                  type="url"
+                  className="input-field text-sm"
+                  placeholder="https://codepen.io/..."
+                  value={codepenUrl}
+                  onChange={e => setCodepenUrl(e.target.value)}
+                />
               </div>
             </div>
 
@@ -681,7 +724,7 @@ function CreateExamInner() {
               <div className="card p-4 bg-green-50 border border-green-200">
                 <div className="flex items-center gap-2 text-green-700 font-semibold text-sm">
                   <CheckCircle size={16} />
-                  Firebase에 저장 완료! 이제 CodePen URL을 노션에 저장하세요.
+                  저장 완료! CodePen URL도 입력했다면 학생 목록에서 바로 접근 가능합니다.
                 </div>
               </div>
             )}
