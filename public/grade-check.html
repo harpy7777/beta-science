@@ -81,7 +81,7 @@ body {
 }
 .stu-thead {
   display: grid;
-  grid-template-columns: 200px 70px 100px 110px 110px 1fr;
+  grid-template-columns: 200px 80px 100px 110px 110px 1fr 100px;
   padding: 0.65rem 1.2rem;
   background: #fdf2f8; border-bottom: 1px solid #fce7f3;
   font-size: 10px; font-weight: 700; color: #c9a8bc;
@@ -89,12 +89,14 @@ body {
 }
 .stu-row {
   display: grid;
-  grid-template-columns: 200px 70px 100px 110px 110px 1fr;
+  grid-template-columns: 200px 80px 100px 110px 110px 1fr 100px;
   padding: 0.8rem 1.2rem;
   border-bottom: 1px solid #fdf2f8;
-  align-items: center; cursor: pointer;
+  align-items: center; cursor: default;
   transition: background 0.15s; color: inherit;
 }
+.stu-row:hover { background: #fffbfe; }
+.stu-row-clickable { cursor: pointer; }
 .stu-row:last-child { border-bottom: none; }
 .stu-row:hover { background: #fffbfe; }
 
@@ -105,7 +107,8 @@ body {
   font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
 }
 .stu-name  { font-size: 13px; font-weight: 600; color: #1d1d1f; }
-.grade-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 6px; background: #fdf2f8; color: #db2777; }
+.grade-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 6px; background: #fdf2f8; color: #db2777; display: inline-block; text-align: center; }
+.grade-cell { display: flex; align-items: center; justify-content: center; }
 
 .score-pill {
   display: inline-flex; align-items: center; justify-content: center;
@@ -122,6 +125,19 @@ body {
 .avg-fill  { height: 100%; background: #db2777; border-radius: 3px; transition: width 0.5s; }
 .avg-num   { font-size: 11px; font-weight: 700; color: #db2777; min-width: 28px; text-align: right; }
 .empty-row { padding: 2.5rem; text-align: center; font-size: 13px; color: #aeaeb2; }
+
+.fb-view-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; color: #db2777;
+  background: #fdf2f8; border: 1px solid #fce7f3;
+  border-radius: 8px; padding: 5px 11px;
+  cursor: pointer; font-family: inherit;
+  transition: background 0.15s; white-space: nowrap;
+}
+.fb-view-btn:hover { background: #fce7f3; }
+.fb-none-tag {
+  font-size: 11px; color: #aeaeb2;
+}
 
 /* ══ 상세 뷰 ══ */
 .back-row   { margin-bottom: 1rem; }
@@ -289,7 +305,7 @@ body {
 
 /* 반응형 */
 @media (max-width: 700px) {
-  .stu-thead, .stu-row { grid-template-columns: 1fr 60px 80px 1fr; }
+  .stu-thead, .stu-row { grid-template-columns: 1fr 60px 80px 80px; }
   .col-h { display: none; }
   .mini-grid { grid-template-columns: repeat(2,1fr); }
 }
@@ -341,11 +357,12 @@ body {
     <div class="stu-table">
       <div class="stu-thead">
         <div>학생</div>
-        <div>학년</div>
+        <div style="text-align:center;">학년</div>
         <div>OX 평균</div>
         <div>4지선다 평균</div>
         <div class="col-h">마스터 평균</div>
         <div>4주 종합</div>
+        <div style="text-align:center;">피드백</div>
       </div>
       <div id="list-body">
         <div class="empty-row">학생 데이터를 불러오는 중입니다...</div>
@@ -445,7 +462,7 @@ body {
 <!-- 피드백 모달 -->
 <div class="modal-bg" id="modal">
   <div class="modal-box">
-    <div class="modal-title">피드백 상세</div>
+    <div class="modal-title" id="modal-title-text">피드백 상세</div>
     <div class="modal-body" id="modal-body"></div>
     <button class="modal-close" onclick="closeModal()">닫기</button>
   </div>
@@ -524,12 +541,12 @@ function renderList() {
     const grade = s.grade || s.year || '—';
     const color = avatarColor(name);
     return `
-    <div class="stu-row" onclick="window.openStu('${s.uid}','${esc(name)}','${grade}','${color}')">
-      <div class="stu-name-wrap">
+    <div class="stu-row">
+      <div class="stu-name-wrap" style="cursor:pointer;" onclick="window.openStu('${s.uid}','${esc(name)}','${grade}','${color}')">
         <div class="stu-av" style="background:${color};">${name[0]}</div>
         <span class="stu-name">${name}</span>
       </div>
-      <div><span class="grade-tag">${grade}</span></div>
+      <div class="grade-cell"><span class="grade-tag">${grade}</span></div>
       <div id="c-ox-${s.uid}"><span class="score-pill p-na">—</span></div>
       <div id="c-mc-${s.uid}"><span class="score-pill p-na">—</span></div>
       <div class="col-h" id="c-ms-${s.uid}"><span class="score-pill p-na">—</span></div>
@@ -538,6 +555,9 @@ function renderList() {
           <div class="avg-track"><div class="avg-fill" id="c-bar-${s.uid}" style="width:0;"></div></div>
           <span class="avg-num" id="c-avg-${s.uid}">—</span>
         </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;" id="c-fb-${s.uid}">
+        <span class="fb-none-tag">—</span>
       </div>
     </div>`;
   }).join('');
@@ -563,6 +583,24 @@ async function loadSummary(s) {
     setTxt(`c-avg-${s.uid}`, allA!==null ? allA+'점' : '—');
     const bar = document.getElementById(`c-bar-${s.uid}`);
     if(bar) bar.style.width = (allA||0)+'%';
+  } catch { /* 무음 */ }
+
+  // 피드백 존재 여부 확인 후 버튼 표시
+  try {
+    const fbSnap = await getDoc(doc(db,'feedbacks',s.uid));
+    const fbEl = document.getElementById(`c-fb-${s.uid}`);
+    if (!fbEl) return;
+    const name = s.name || s.displayName || '이름없음';
+    if (fbSnap.exists() && fbSnap.data().text) {
+      const txt = fbSnap.data().text;
+      feedbacks[s.uid] = txt;
+      fbEl.innerHTML = `<button class="fb-view-btn" onclick="event.stopPropagation();showFbModal('${esc(name)}','${s.uid}')">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M12 1H2a1 1 0 00-1 1v7a1 1 0 001 1h3l2 2 2-2h3a1 1 0 001-1V2a1 1 0 00-1-1z" stroke="#db2777" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        피드백 보기
+      </button>`;
+    } else {
+      fbEl.innerHTML = `<span class="fb-none-tag">—</span>`;
+    }
   } catch { /* 무음 */ }
 }
 
@@ -729,11 +767,33 @@ window.saveFb = async ()=>{
     await setDoc(doc(db,'feedbacks',cur.uid),{text:txt,updatedAt:new Date()});
     feedbacks[cur.uid]=txt;
     renderFb();
+    // 목록의 피드백 버튼도 업데이트
+    const fbEl = document.getElementById(`c-fb-${cur.uid}`);
+    if (fbEl) {
+      const name = cur.name;
+      if (txt) {
+        fbEl.innerHTML = `<button class="fb-view-btn" onclick="event.stopPropagation();showFbModal('${esc(name)}','${cur.uid}')">
+          <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M12 1H2a1 1 0 00-1 1v7a1 1 0 001 1h3l2 2 2-2h3a1 1 0 001-1V2a1 1 0 00-1-1z" stroke="#db2777" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          피드백 보기
+        </button>`;
+      } else {
+        fbEl.innerHTML = `<span class="fb-none-tag">—</span>`;
+      }
+    }
   } catch(e){ alert('저장 실패: '+e.message); }
+};
+
+/* 목록에서 피드백 모달 바로 열기 */
+window.showFbModal = (name, uid) => {
+  const txt = feedbacks[uid] || '';
+  document.getElementById('modal-title-text').textContent = `${name} · 피드백 상세`;
+  document.getElementById('modal-body').textContent = txt || '작성된 피드백이 없습니다.';
+  document.getElementById('modal').classList.add('open');
 };
 
 /* 모달 */
 window.openModal = txt => {
+  document.getElementById('modal-title-text').textContent = '피드백 상세';
   document.getElementById('modal-body').textContent=txt;
   document.getElementById('modal').classList.add('open');
 };
