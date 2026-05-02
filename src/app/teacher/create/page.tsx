@@ -167,13 +167,13 @@ function render() {
   html += '<div class="q-text">' + q.text + '</div>';
   if (q.type === 'ox') {
     html += '<div class="ox-row">';
-    html += '<button class="ox-btn O" onclick="answerOX(\'O\')">O</button>';
-    html += '<button class="ox-btn X" onclick="answerOX(\'X\')">X</button>';
+    html += '<button class="ox-btn O" onclick="answerOX(&quot;O&quot;)">O</button>';
+    html += '<button class="ox-btn X" onclick="answerOX(&quot;X&quot;)">X</button>';
     html += '</div>';
   } else {
     html += '<div class="mc-list">';
     (q.choices||[]).forEach((c,i) => {
-      html += '<button class="mc-opt" onclick="answerMC(\'' + (i+1) + '\')">'
+      html += '<button class="mc-opt" onclick="answerMC(&quot;' + (i+1) + '&quot;)">'
            + '<span class="num">' + NUMS[i] + '</span>' + c + '</button>';
     });
     html += '</div>';
