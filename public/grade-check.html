@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>베타과학학원 · 학생 성적 확인</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  background: #fafafa;
+  color: #1d1d1f;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  visibility: hidden;
+}
+
+/* ── Header ── */
+.header {
+  background: #ffffff;
+  border-bottom: 1px solid #f0e8ed;
+  padding: 0 1.5rem;
+  height: 54px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 300;
+}
+.header-left { display: flex; align-items: center; gap: 9px; }
+.logo-mark {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, #f472b6 0%, #db2777 100%);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.brand-name { font-size: 14px; font-weight: 600; color: #1d1d1f; letter-spacing: -0.3px; }
+.header-badge {
+  display: flex; align-items: center; gap: 5px;
+  background: #f0fdf4; border: 1px solid #bbf7d0;
+  border-radius: 20px; padding: 4px 10px;
+  font-size: 10px; font-weight: 600; color: #16a34a;
+  letter-spacing: 0.05em; white-space: nowrap;
+}
+.dot-green {
+  width: 5px; height: 5px; background: #22c55e; border-radius: 50%;
+  animation: blink 2s ease-in-out infinite; flex-shrink: 0;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── Sub bar ── */
+.sub-bar {
+  background: #ffffff; border-bottom: 1px solid #f5f0f3;
+  padding: 0 1.5rem; height: 46px;
+  display: flex; align-items: center; gap: 8px;
+}
+.back-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 600; color: #db2777;
+  background: none; border: none; cursor: pointer;
+  font-family: inherit; padding: 4px 8px; border-radius: 8px;
+  text-decoration: none; transition: background 0.15s;
+}
+.back-btn:hover { background: #fdf2f8; }
+.sub-sep { color: #e0d0d8; font-size: 14px; }
+.sub-title { font-size: 13px; font-weight: 600; color: #1d1d1f; }
+.sub-hint  { font-size: 11px; color: #aeaeb2; margin-left: 4px; }
+
+/* ── Layout ── */
+.wrap { max-width: 960px; margin: 0 auto; padding: 1.4rem 1rem 3rem; }
+.view { display: none; }
+.view.active { display: block; }
+
+/* ══ 목록 뷰 ══ */
+.list-top {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;
+}
+.list-heading { font-size: 1rem; font-weight: 700; color: #1d1d1f; letter-spacing: -0.02em; }
+.list-meta    { font-size: 11px; color: #aeaeb2; }
+
+.stu-table {
+  background: #ffffff; border: 1px solid #fce7f3; border-radius: 16px; overflow: hidden;
+}
+.stu-thead {
+  display: grid;
+  grid-template-columns: 200px 70px 100px 110px 110px 1fr;
+  padding: 0.65rem 1.2rem;
+  background: #fdf2f8; border-bottom: 1px solid #fce7f3;
+  font-size: 10px; font-weight: 700; color: #c9a8bc;
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+.stu-row {
+  display: grid;
+  grid-template-columns: 200px 70px 100px 110px 110px 1fr;
+  padding: 0.8rem 1.2rem;
+  border-bottom: 1px solid #fdf2f8;
+  align-items: center; cursor: pointer;
+  transition: background 0.15s; color: inherit;
+}
+.stu-row:last-child { border-bottom: none; }
+.stu-row:hover { background: #fffbfe; }
+
+.stu-name-wrap { display: flex; align-items: center; gap: 10px; }
+.stu-av {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.stu-name  { font-size: 13px; font-weight: 600; color: #1d1d1f; }
+.grade-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 6px; background: #fdf2f8; color: #db2777; }
+
+.score-pill {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 44px; padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 700;
+}
+.p-ox { background: #dbeafe; color: #1e40af; }
+.p-mc { background: #ede9fe; color: #5b21b6; }
+.p-ms { background: #d1fae5; color: #065f46; }
+.p-na { background: #f5f5f7; color: #aeaeb2; font-weight: 500; }
+
+.avg-wrap  { display: flex; align-items: center; gap: 8px; }
+.avg-track { flex: 1; height: 5px; background: #fce7f3; border-radius: 3px; overflow: hidden; }
+.avg-fill  { height: 100%; background: #db2777; border-radius: 3px; transition: width 0.5s; }
+.avg-num   { font-size: 11px; font-weight: 700; color: #db2777; min-width: 28px; text-align: right; }
+.empty-row { padding: 2.5rem; text-align: center; font-size: 13px; color: #aeaeb2; }
+
+/* ══ 상세 뷰 ══ */
+.back-row   { margin-bottom: 1rem; }
+.back-detail {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 600; color: #db2777;
+  background: none; border: none; cursor: pointer;
+  font-family: inherit; padding: 4px 0; transition: opacity 0.15s;
+}
+.back-detail:hover { opacity: 0.7; }
+
+/* 프로필 */
+.profile-card {
+  background: #ffffff; border: 1px solid #fce7f3; border-radius: 16px;
+  padding: 1.2rem 1.4rem;
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;
+}
+.p-av {
+  width: 50px; height: 50px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.p-name  { font-size: 1.1rem; font-weight: 700; color: #1d1d1f; letter-spacing: -0.02em; }
+.p-meta  { font-size: 11px; color: #aeaeb2; margin-top: 3px; }
+.p-right { margin-left: auto; text-align: right; }
+.p-avg-n { font-size: 1.5rem; font-weight: 700; color: #db2777; letter-spacing: -0.03em; line-height: 1; }
+.p-avg-l { font-size: 10px; color: #aeaeb2; margin-top: 3px; letter-spacing: 0.05em; }
+
+/* 미니 스탯 */
+.mini-grid {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 1rem;
+}
+.mini-card {
+  background: #ffffff; border: 1px solid #fce7f3; border-radius: 12px;
+  padding: 0.9rem 0.7rem; text-align: center;
+}
+.mini-n { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; }
+.mini-l { font-size: 10px; color: #aeaeb2; margin-top: 3px; font-weight: 500; }
+
+/* 차트 */
+.chart-card {
+  background: #ffffff; border: 1px solid #fce7f3; border-radius: 16px;
+  padding: 1.2rem 1.4rem; margin-bottom: 1rem;
+}
+.chart-head {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;
+}
+.chart-title  { font-size: 13px; font-weight: 600; color: #1d1d1f; }
+.legend       { display: flex; gap: 12px; }
+.leg          { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #6e6e73; }
+.leg-dot      { width: 8px; height: 8px; border-radius: 50%; }
+
+.chart-body   { display: flex; align-items: flex-end; gap: 8px; height: 120px; }
+.chart-col    { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.chart-bars   { display: flex; align-items: flex-end; gap: 3px; height: 90px; }
+.cbar         { width: 16px; border-radius: 3px 3px 0 0; transition: height 0.5s ease; }
+.chart-wlbl   { font-size: 10px; color: #aeaeb2; }
+.chart-wpct   { font-size: 10px; font-weight: 700; color: #db2777; }
+
+/* 주차 탭 */
+.week-tabs { display: flex; gap: 6px; margin-bottom: 1rem; }
+.wtab {
+  padding: 5px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 500; font-family: inherit;
+  border: 1px solid #fce7f3; background: #ffffff; color: #6e6e73;
+  cursor: pointer; transition: all 0.15s;
+}
+.wtab.on { background: #db2777; color: #fff; border-color: #db2777; }
+.wtab:hover:not(.on) { background: #fdf2f8; }
+
+/* 기록 */
+.records { display: flex; flex-direction: column; gap: 10px; }
+.rec-card {
+  background: #ffffff; border: 1px solid #fce7f3; border-radius: 14px; padding: 1rem 1.2rem;
+}
+.rec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.rec-left { display: flex; align-items: center; gap: 8px; }
+.rec-right { text-align: right; flex-shrink: 0; }
+.tbadge {
+  font-size: 10px; font-weight: 700; padding: 3px 9px;
+  border-radius: 6px; white-space: nowrap;
+}
+.t-ox { background: #dbeafe; color: #1e40af; }
+.t-mc { background: #ede9fe; color: #5b21b6; }
+.t-ms { background: #d1fae5; color: #065f46; }
+.rec-title { font-size: 13px; font-weight: 600; color: #1d1d1f; }
+.rec-score { font-size: 1rem; font-weight: 700; line-height: 1; }
+.rec-date  { font-size: 10px; color: #aeaeb2; margin-top: 2px; }
+
+.score-track { height: 5px; background: #f5f5f7; border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
+.score-fill  { height: 100%; border-radius: 3px; transition: width 0.6s; }
+
+.q-list { border-top: 1px solid #fdf2f8; padding-top: 8px; display: flex; flex-direction: column; gap: 5px; }
+.q-row  { display: flex; align-items: flex-start; gap: 7px; font-size: 12px; color: #3c3c43; line-height: 1.45; }
+.q-icon {
+  width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; margin-top: 1px;
+  display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800;
+}
+.q-o { background: #dcfce7; color: #15803d; }
+.q-x { background: #fee2e2; color: #dc2626; }
+
+/* 피드백 */
+.fb-wrap {
+  background: #ffffff; border: 1px solid #fce7f3; border-radius: 14px;
+  padding: 1rem 1.2rem; margin-top: 10px;
+}
+.fb-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; }
+.fb-title {
+  font-size: 13px; font-weight: 600; color: #1d1d1f;
+  display: flex; align-items: center; gap: 6px;
+}
+.fb-icon {
+  width: 22px; height: 22px; background: #fdf2f8; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+}
+.fb-edit {
+  font-size: 11px; font-weight: 600; color: #db2777;
+  background: #fdf2f8; border: 1px solid #fce7f3; border-radius: 8px;
+  padding: 5px 12px; cursor: pointer; font-family: inherit; transition: background 0.15s;
+}
+.fb-edit:hover { background: #fce7f3; }
+.fb-body {
+  font-size: 12px; color: #3c3c43; line-height: 1.75;
+  background: #fffbfe; border: 1px solid #fdf2f8; border-radius: 10px;
+  padding: 0.8rem 1rem; min-height: 56px; white-space: pre-wrap;
+}
+.fb-na { color: #aeaeb2; font-style: italic; }
+.fb-ta {
+  display: none; width: 100%; min-height: 90px; resize: vertical;
+  border: 1px solid #fce7f3; border-radius: 10px;
+  padding: 0.8rem 1rem; font-size: 12px; font-family: inherit;
+  color: #1d1d1f; outline: none; margin-top: 8px; transition: border-color 0.15s;
+}
+.fb-ta:focus { border-color: #db2777; }
+.fb-save {
+  display: none; margin-top: 8px; padding: 6px 18px;
+  background: #db2777; border: none; border-radius: 8px;
+  font-size: 12px; font-weight: 600; color: #fff;
+  cursor: pointer; font-family: inherit; transition: background 0.15s;
+}
+.fb-save:hover { background: #be185d; }
+
+/* 모달 */
+.modal-bg {
+  display: none; position: fixed; inset: 0;
+  background: rgba(29,29,31,0.4); z-index: 500;
+  align-items: center; justify-content: center; padding: 1rem;
+}
+.modal-bg.open { display: flex; }
+.modal-box {
+  background: #ffffff; border-radius: 20px;
+  padding: 1.8rem 1.6rem; max-width: 420px; width: 100%;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.14);
+  animation: mIn 0.2s ease;
+}
+@keyframes mIn { from{transform:translateY(10px);opacity:0} to{transform:none;opacity:1} }
+.modal-title { font-size: 1rem; font-weight: 700; color: #1d1d1f; margin-bottom: 0.8rem; }
+.modal-body  { font-size: 13px; color: #3c3c43; line-height: 1.75; margin-bottom: 1.4rem; white-space: pre-wrap; }
+.modal-close {
+  padding: 8px 22px; background: #db2777; border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 600; color: #fff;
+  cursor: pointer; font-family: inherit; transition: background 0.15s;
+}
+.modal-close:hover { background: #be185d; }
+
+/* 반응형 */
+@media (max-width: 700px) {
+  .stu-thead, .stu-row { grid-template-columns: 1fr 60px 80px 1fr; }
+  .col-h { display: none; }
+  .mini-grid { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 420px) {
+  .wtab { padding: 4px 10px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="6.5" cy="6.5" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M1 16c0-3 2.5-5.5 5.5-5.5S12 13 12 16" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="header-badge"><span class="dot-green"></span>SYSTEM ONLINE</div>
+    <button onclick="doLogout()" style="padding:6px 14px;background:transparent;border:1.5px solid #f4c8d4;border-radius:20px;font-family:inherit;font-size:11px;font-weight:600;color:#e8375a;cursor:pointer;"
+      onmouseover="this.style.background='#fceef2'" onmouseout="this.style.background='transparent'">로그아웃</button>
+  </div>
+</header>
+
+<!-- Sub bar -->
+<div class="sub-bar">
+  <a class="back-btn" href="index.html">
+    <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="#db2777" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    홈으로
+  </a>
+  <span class="sub-sep">›</span>
+  <span class="sub-title" id="bar-title">학생 성적 확인</span>
+  <span class="sub-hint"  id="bar-hint">학생 이름을 클릭하면 4주치 기록을 볼 수 있습니다</span>
+</div>
+
+<!-- Main -->
+<div class="wrap">
+
+  <!-- 목록 뷰 -->
+  <div id="v-list" class="view active">
+    <div class="list-top">
+      <span class="list-heading">전체 학생</span>
+      <span class="list-meta" id="stu-count">불러오는 중...</span>
+    </div>
+    <div class="stu-table">
+      <div class="stu-thead">
+        <div>학생</div>
+        <div>학년</div>
+        <div>OX 평균</div>
+        <div>4지선다 평균</div>
+        <div class="col-h">마스터 평균</div>
+        <div>4주 종합</div>
+      </div>
+      <div id="list-body">
+        <div class="empty-row">학생 데이터를 불러오는 중입니다...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 상세 뷰 -->
+  <div id="v-detail" class="view">
+
+    <div class="back-row">
+      <button class="back-detail" onclick="goList()">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M9 11L5 7l4-4" stroke="#db2777" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        학생 목록으로
+      </button>
+    </div>
+
+    <!-- 프로필 카드 -->
+    <div class="profile-card">
+      <div class="p-av" id="d-av"></div>
+      <div>
+        <div class="p-name" id="d-name"></div>
+        <div class="p-meta" id="d-meta"></div>
+      </div>
+      <div class="p-right">
+        <div class="p-avg-n" id="d-avg">—</div>
+        <div class="p-avg-l">4주 평균</div>
+      </div>
+    </div>
+
+    <!-- 미니 스탯 -->
+    <div class="mini-grid">
+      <div class="mini-card">
+        <div class="mini-n" id="d-cnt" style="color:#db2777;">0</div>
+        <div class="mini-l">총 응시 횟수</div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-n" id="d-ox" style="color:#1e40af;">—</div>
+        <div class="mini-l">OX 평균</div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-n" id="d-mc" style="color:#5b21b6;">—</div>
+        <div class="mini-l">4지선다 평균</div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-n" id="d-ms" style="color:#065f46;">—</div>
+        <div class="mini-l">마스터 평균</div>
+      </div>
+    </div>
+
+    <!-- 4주 차트 -->
+    <div class="chart-card">
+      <div class="chart-head">
+        <span class="chart-title">4주 성적 추이</span>
+        <div class="legend">
+          <div class="leg"><div class="leg-dot" style="background:#1e40af;"></div>OX</div>
+          <div class="leg"><div class="leg-dot" style="background:#5b21b6;"></div>4지선다</div>
+          <div class="leg"><div class="leg-dot" style="background:#065f46;"></div>마스터</div>
+        </div>
+      </div>
+      <div class="chart-body" id="d-chart"></div>
+    </div>
+
+    <!-- 주차 탭 -->
+    <div class="week-tabs">
+      <button class="wtab on" onclick="pickWeek(0,this)">이번 주</button>
+      <button class="wtab"    onclick="pickWeek(1,this)">1주 전</button>
+      <button class="wtab"    onclick="pickWeek(2,this)">2주 전</button>
+      <button class="wtab"    onclick="pickWeek(3,this)">3주 전</button>
+    </div>
+
+    <!-- 기록 카드들 -->
+    <div class="records" id="d-records"></div>
+
+    <!-- 피드백 -->
+    <div class="fb-wrap">
+      <div class="fb-head">
+        <div class="fb-title">
+          <div class="fb-icon">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+              <path d="M14 2H2a1 1 0 00-1 1v8a1 1 0 001 1h4l2 2 2-2h4a1 1 0 001-1V3a1 1 0 00-1-1z" stroke="#db2777" stroke-width="1.3" stroke-linejoin="round"/>
+              <path d="M5 7h6M5 10h3" stroke="#db2777" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          선생님 피드백
+        </div>
+        <button class="fb-edit" id="fb-toggle" onclick="toggleFb()">피드백 작성</button>
+      </div>
+      <div class="fb-body" id="fb-body"><span class="fb-na">아직 작성된 피드백이 없습니다.</span></div>
+      <textarea class="fb-ta" id="fb-ta" placeholder="학생에 대한 피드백을 입력하세요.&#10;&#10;예) OX 개념은 잘 잡혀 있지만, 4지선다 화학 결합 단원에서 오답이 잦습니다. 해당 단원 복습을 권장합니다."></textarea>
+      <button class="fb-save" id="fb-save-btn" onclick="saveFb()">저장하기</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- 피드백 모달 -->
+<div class="modal-bg" id="modal">
+  <div class="modal-box">
+    <div class="modal-title">피드백 상세</div>
+    <div class="modal-body" id="modal-body"></div>
+    <button class="modal-close" onclick="closeModal()">닫기</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, getDocs, getDoc, setDoc, doc,
+  query, where, orderBy, Timestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const cfg = {
+  apiKey:            "AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+  authDomain:        "beta-science.firebaseapp.com",
+  projectId:         "beta-science",
+  storageBucket:     "beta-science.firebasestorage.app",
+  messagingSenderId: "650652155367",
+  appId:             "1:650652155367:web:41d2958e675cb4edd4d142"
+};
+const app  = initializeApp(cfg);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+/* 색상 팔레트 */
+const COLORS = ['#db2777','#7c3aed','#0369a1','#047857','#b45309','#be123c','#4f46e5','#0f766e','#9a3412','#1d4ed8'];
+const avatarColor = n => COLORS[([...n].reduce((h,c)=>h*31+c.charCodeAt(0)|0,0)>>>0)%COLORS.length];
+
+/* 상태 */
+let students  = [];
+let recs      = {};   // uid → answer[]
+let cur       = null;
+let curWeek   = 0;
+let feedbacks = {};
+
+/* 인증 */
+onAuthStateChanged(auth, async user => {
+  if (!user) { location.replace('/login.html'); return; }
+  try {
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (!snap.exists() || snap.data().status !== 'approved') {
+      await auth.signOut(); location.replace('/login.html'); return;
+    }
+    document.body.style.visibility = 'visible';
+    await loadStudents();
+  } catch { location.replace('/login.html'); }
+});
+window.doLogout = async () => { await auth.signOut(); location.replace('/login.html'); };
+
+/* 학생 목록 로드 */
+async function loadStudents() {
+  try {
+    const snaps = await getDocs(collection(db, 'users'));
+    students = [];
+    snaps.forEach(d => { const u = d.data(); if (u.role === 'student') students.push({uid:d.id,...u}); });
+    if (!students.length) {
+      const s2 = await getDocs(collection(db, 'students'));
+      s2.forEach(d => students.push({uid:d.id,...d.data()}));
+    }
+  } catch { students = []; }
+  renderList();
+  students.forEach(loadSummary);
+}
+
+/* 목록 렌더 */
+function renderList() {
+  setTxt('stu-count', `총 ${students.length}명`);
+  const body = document.getElementById('list-body');
+  if (!students.length) {
+    body.innerHTML = '<div class="empty-row">등록된 학생이 없습니다.</div>';
+    return;
+  }
+  body.innerHTML = students.map(s => {
+    const name  = s.name || s.displayName || '이름없음';
+    const grade = s.grade || s.year || '—';
+    const color = avatarColor(name);
+    return `
+    <div class="stu-row" onclick="window.openStu('${s.uid}','${esc(name)}','${grade}','${color}')">
+      <div class="stu-name-wrap">
+        <div class="stu-av" style="background:${color};">${name[0]}</div>
+        <span class="stu-name">${name}</span>
+      </div>
+      <div><span class="grade-tag">${grade}</span></div>
+      <div id="c-ox-${s.uid}"><span class="score-pill p-na">—</span></div>
+      <div id="c-mc-${s.uid}"><span class="score-pill p-na">—</span></div>
+      <div class="col-h" id="c-ms-${s.uid}"><span class="score-pill p-na">—</span></div>
+      <div>
+        <div class="avg-wrap">
+          <div class="avg-track"><div class="avg-fill" id="c-bar-${s.uid}" style="width:0;"></div></div>
+          <span class="avg-num" id="c-avg-${s.uid}">—</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadSummary(s) {
+  try {
+    const since = new Date(); since.setDate(since.getDate()-28);
+    const q = query(collection(db,'answers'),
+      where('studentId','==',s.uid),
+      where('submittedAt','>=',Timestamp.fromDate(since)));
+    const snap = await getDocs(q);
+    let ox=[],mc=[],ms=[];
+    snap.forEach(d => {
+      const r=d.data(), sc=scoreOf(r), t=r.testType||'mc';
+      if(t==='ox') ox.push(sc); else if(t==='master') ms.push(sc); else mc.push(sc);
+    });
+    const avg = arr => arr.length ? Math.round(arr.reduce((s,v)=>s+v,0)/arr.length) : null;
+    const allA = avg([...ox,...mc,...ms]);
+    set(`c-ox-${s.uid}`,  pill(avg(ox),'p-ox'));
+    set(`c-mc-${s.uid}`,  pill(avg(mc),'p-mc'));
+    set(`c-ms-${s.uid}`,  pill(avg(ms),'p-ms'));
+    setTxt(`c-avg-${s.uid}`, allA!==null ? allA+'점' : '—');
+    const bar = document.getElementById(`c-bar-${s.uid}`);
+    if(bar) bar.style.width = (allA||0)+'%';
+  } catch { /* 무음 */ }
+}
+
+function pill(v, cls) {
+  return v!==null
+    ? `<span class="score-pill ${cls}">${v}점</span>`
+    : `<span class="score-pill p-na">—</span>`;
+}
+
+/* 학생 상세 열기 */
+window.openStu = async (uid, name, grade, color) => {
+  cur={uid,name,grade,color}; curWeek=0;
+  const av=document.getElementById('d-av');
+  av.textContent=name[0]; av.style.background=color;
+  setTxt('d-name',name); setTxt('d-meta',`${grade} · 최근 4주 기록`);
+  setTxt('bar-title',name); setTxt('bar-hint','4주치 성적 기록');
+  setTxt('d-avg','계산 중...');
+
+  /* 피드백 */
+  try {
+    const fs = await getDoc(doc(db,'feedbacks',uid));
+    feedbacks[uid] = fs.exists() ? (fs.data().text||'') : '';
+  } catch { feedbacks[uid]=''; }
+  renderFb();
+
+  /* 4주 기록 */
+  try {
+    const since = new Date(); since.setDate(since.getDate()-28);
+    const q = query(collection(db,'answers'),
+      where('studentId','==',uid),
+      where('submittedAt','>=',Timestamp.fromDate(since)),
+      orderBy('submittedAt','desc'));
+    const snap = await getDocs(q);
+    recs[uid]=[];
+    snap.forEach(d=>recs[uid].push({id:d.id,...d.data()}));
+  } catch { recs[uid]=[]; }
+
+  renderDetail();
+  switchView('detail');
+};
+
+function renderDetail() {
+  const all = recs[cur.uid]||[];
+  const ox  = all.filter(r=>(r.testType||'mc')==='ox');
+  const mc  = all.filter(r=>(r.testType||'mc')==='mc');
+  const ms  = all.filter(r=>(r.testType||'mc')==='master');
+  const avg = arr => arr.length ? Math.round(arr.map(scoreOf).reduce((s,v)=>s+v,0)/arr.length) : null;
+  const allA= avg(all);
+
+  setTxt('d-avg', allA!==null ? allA+'점' : '—');
+  setTxt('d-cnt', all.length);
+  setTxt('d-ox',  avg(ox)!==null  ? avg(ox)+'점'  : '—');
+  setTxt('d-mc',  avg(mc)!==null  ? avg(mc)+'점'  : '—');
+  setTxt('d-ms',  avg(ms)!==null  ? avg(ms)+'점'  : '—');
+
+  renderChart(all);
+  renderRecs(0);
+  document.querySelectorAll('.wtab').forEach((t,i)=>t.classList.toggle('on',i===0));
+}
+
+/* 차트 */
+function renderChart(all) {
+  const el=document.getElementById('d-chart');
+  el.innerHTML=[0,1,2,3].map(w=>{
+    const {s,e}=wkRange(w);
+    const wr  = all.filter(r=>inRange(r,s,e));
+    const avg = arr => arr.length ? Math.round(arr.reduce((s,v)=>s+v,0)/arr.length) : 0;
+    const oxA = avg(wr.filter(r=>(r.testType||'mc')==='ox').map(scoreOf));
+    const mcA = avg(wr.filter(r=>(r.testType||'mc')==='mc').map(scoreOf));
+    const msA = avg(wr.filter(r=>(r.testType||'mc')==='master').map(scoreOf));
+    const segs= [oxA,mcA,msA].filter(v=>v>0);
+    const tot = segs.length ? Math.round(segs.reduce((s,v)=>s+v,0)/segs.length) : 0;
+    const lbl = w===0?'이번주':`${w}주전`;
+    return `
+    <div class="chart-col">
+      <div class="chart-wpct">${tot?tot+'점':'—'}</div>
+      <div class="chart-bars">
+        <div class="cbar" style="height:${oxA}%;background:#1e40af;" title="OX ${oxA}점"></div>
+        <div class="cbar" style="height:${mcA}%;background:#5b21b6;" title="4지선다 ${mcA}점"></div>
+        <div class="cbar" style="height:${msA}%;background:#065f46;" title="마스터 ${msA}점"></div>
+      </div>
+      <div class="chart-wlbl">${lbl}</div>
+    </div>`;
+  }).join('');
+}
+
+/* 기록 렌더 */
+function renderRecs(wi) {
+  const {s,e} = wkRange(wi);
+  const wr = (recs[cur.uid]||[]).filter(r=>inRange(r,s,e));
+  const el = document.getElementById('d-records');
+  if (!wr.length) {
+    el.innerHTML=`<div style="background:#fff;border:1px solid #fce7f3;border-radius:14px;padding:2rem;text-align:center;font-size:13px;color:#aeaeb2;">이 주차에 응시한 기록이 없습니다.</div>`;
+    return;
+  }
+  el.innerHTML = wr.map(r=>{
+    const type  = r.testType||'mc';
+    const sc    = scoreOf(r);
+    const bCls  = type==='ox'?'t-ox':type==='master'?'t-ms':'t-mc';
+    const bLbl  = type==='ox'?'OX 문제':type==='master'?'마스터테스트':'4지선다';
+    const sCol  = type==='ox'?'#1e40af':type==='master'?'#065f46':'#5b21b6';
+    const title = r.examTitle||r.title||'—';
+    const date  = fmtDate(r.submittedAt);
+    const answers = r.answers||r.responses||[];
+    const qHtml = answers.length ? `
+      <div class="q-list">${answers.map((a,i)=>{
+        const ok  = a.isCorrect!==undefined ? a.isCorrect : a.correct===true;
+        const qt  = a.question||a.questionText||`Q${i+1}. 문항`;
+        const qts = qt.length>50 ? qt.slice(0,50)+'…' : qt;
+        return `<div class="q-row">
+          <div class="q-icon ${ok?'q-o':'q-x'}">${ok?'O':'X'}</div>
+          <span>${qts}</span>
+        </div>`;
+      }).join('')}</div>` : '';
+    return `
+    <div class="rec-card">
+      <div class="rec-head">
+        <div class="rec-left">
+          <span class="tbadge ${bCls}">${bLbl}</span>
+          <span class="rec-title">${title}</span>
+        </div>
+        <div class="rec-right">
+          <div class="rec-score" style="color:${sCol};">${sc}점</div>
+          <div class="rec-date">${date}</div>
+        </div>
+      </div>
+      <div class="score-track"><div class="score-fill" style="width:${sc}%;background:${sCol};"></div></div>
+      ${qHtml}
+    </div>`;
+  }).join('');
+}
+
+window.pickWeek = (i,el) => {
+  curWeek=i;
+  document.querySelectorAll('.wtab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  renderRecs(i);
+};
+
+/* 피드백 */
+function renderFb() {
+  const txt = feedbacks[cur?.uid]||'';
+  const el  = document.getElementById('fb-body');
+  el.innerHTML = txt
+    ? txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>')
+    : '<span class="fb-na">아직 작성된 피드백이 없습니다.</span>';
+  document.getElementById('fb-ta').value=txt;
+  document.getElementById('fb-ta').style.display='none';
+  document.getElementById('fb-save-btn').style.display='none';
+  document.getElementById('fb-toggle').textContent='피드백 작성';
+}
+window.toggleFb = ()=>{
+  const ta=document.getElementById('fb-ta');
+  const sv=document.getElementById('fb-save-btn');
+  const btn=document.getElementById('fb-toggle');
+  const open=ta.style.display==='block';
+  ta.style.display=open?'none':'block';
+  sv.style.display=open?'none':'inline-block';
+  btn.textContent=open?'피드백 작성':'취소';
+};
+window.saveFb = async ()=>{
+  const txt=document.getElementById('fb-ta').value.trim();
+  try {
+    await setDoc(doc(db,'feedbacks',cur.uid),{text:txt,updatedAt:new Date()});
+    feedbacks[cur.uid]=txt;
+    renderFb();
+  } catch(e){ alert('저장 실패: '+e.message); }
+};
+
+/* 모달 */
+window.openModal = txt => {
+  document.getElementById('modal-body').textContent=txt;
+  document.getElementById('modal').classList.add('open');
+};
+window.closeModal = ()=>document.getElementById('modal').classList.remove('open');
+
+/* 뷰 전환 */
+function switchView(v){
+  document.getElementById('v-list').classList.toggle('active', v==='list');
+  document.getElementById('v-detail').classList.toggle('active', v==='detail');
+}
+window.goList = ()=>{
+  switchView('list');
+  setTxt('bar-title','학생 성적 확인');
+  setTxt('bar-hint','학생 이름을 클릭하면 4주치 기록을 볼 수 있습니다');
+};
+
+/* 유틸 */
+function scoreOf(r){ return typeof r.score==='number'?r.score:(r.percentage||0); }
+function wkRange(w){
+  const e=new Date(); e.setDate(e.getDate()-w*7); e.setHours(23,59,59,999);
+  const s=new Date(e); s.setDate(e.getDate()-6); s.setHours(0,0,0,0);
+  return {s,e};
+}
+function inRange(r,s,e){
+  const d=r.submittedAt?.toDate?r.submittedAt.toDate():new Date(r.submittedAt||0);
+  return d>=s&&d<=e;
+}
+function fmtDate(ts){
+  if(!ts)return '';
+  const d=ts.toDate?ts.toDate():new Date(ts);
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+}
+function esc(s){ return s.replace(/'/g,"\\'"); }
+function set(id,html){ const e=document.getElementById(id); if(e)e.innerHTML=html; }
+function setTxt(id,txt){ const e=document.getElementById(id); if(e)e.textContent=txt; }
+
+</script>
+</body>
+</html>
