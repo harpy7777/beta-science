@@ -81,22 +81,24 @@ body {
 }
 .stu-thead {
   display: grid;
-  grid-template-columns: 200px 80px 100px 110px 110px 1fr 100px;
+  grid-template-columns: 200px 80px 100px 110px 110px 1fr 110px;
   padding: 0.65rem 1.2rem;
   background: #fdf2f8; border-bottom: 1px solid #fce7f3;
   font-size: 10px; font-weight: 700; color: #c9a8bc;
   letter-spacing: 0.1em; text-transform: uppercase;
 }
+.stu-thead > div { display: flex; align-items: center; justify-content: center; }
+.stu-thead > div:first-child { justify-content: flex-start; }
 .stu-row {
   display: grid;
-  grid-template-columns: 200px 80px 100px 110px 110px 1fr 100px;
+  grid-template-columns: 200px 80px 100px 110px 110px 1fr 110px;
   padding: 0.8rem 1.2rem;
   border-bottom: 1px solid #fdf2f8;
   align-items: center; cursor: default;
   transition: background 0.15s; color: inherit;
 }
-.stu-row:hover { background: #fffbfe; }
-.stu-row-clickable { cursor: pointer; }
+.stu-row > div { display: flex; align-items: center; justify-content: center; }
+.stu-row > div:first-child { justify-content: flex-start; }
 .stu-row:last-child { border-bottom: none; }
 .stu-row:hover { background: #fffbfe; }
 
@@ -120,7 +122,7 @@ body {
 .p-ms { background: #d1fae5; color: #065f46; }
 .p-na { background: #f5f5f7; color: #aeaeb2; font-weight: 500; }
 
-.avg-wrap  { display: flex; align-items: center; gap: 8px; }
+.avg-wrap  { display: flex; align-items: center; gap: 6px; width: 100%; }
 .avg-track { flex: 1; height: 5px; background: #fce7f3; border-radius: 3px; overflow: hidden; }
 .avg-fill  { height: 100%; background: #db2777; border-radius: 3px; transition: width 0.5s; }
 .avg-num   { font-size: 11px; font-weight: 700; color: #db2777; min-width: 28px; text-align: right; }
@@ -303,6 +305,23 @@ body {
 }
 .modal-close:hover { background: #be185d; }
 
+.fb-preset-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 0.75rem 0.9rem; border: 1.5px solid #fce7f3;
+  border-radius: 10px; cursor: pointer; transition: all 0.15s;
+  font-size: 12px; color: #3c3c43; line-height: 1.6;
+}
+.fb-preset-item:hover { background: #fffbfe; border-color: #f9a8d4; }
+.fb-preset-item.selected { background: #fdf2f8; border-color: #db2777; }
+.preset-radio {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid #fce7f3; flex-shrink: 0; margin-top: 2px;
+  transition: all 0.15s;
+}
+.fb-preset-item.selected .preset-radio {
+  background: #db2777; border-color: #db2777;
+}
+
 /* 반응형 */
 @media (max-width: 700px) {
   .stu-thead, .stu-row { grid-template-columns: 1fr 60px 80px 80px; }
@@ -428,10 +447,10 @@ body {
 
     <!-- 주차 탭 -->
     <div class="week-tabs">
-      <button class="wtab on" onclick="pickWeek(0,this)">이번 주</button>
-      <button class="wtab"    onclick="pickWeek(1,this)">1주 전</button>
-      <button class="wtab"    onclick="pickWeek(2,this)">2주 전</button>
-      <button class="wtab"    onclick="pickWeek(3,this)">3주 전</button>
+      <button class="wtab on" onclick="pickWeek(0,this)">1주차</button>
+      <button class="wtab"    onclick="pickWeek(1,this)">2주차</button>
+      <button class="wtab"    onclick="pickWeek(2,this)">3주차</button>
+      <button class="wtab"    onclick="pickWeek(3,this)">4주차</button>
     </div>
 
     <!-- 기록 카드들 -->
@@ -459,12 +478,53 @@ body {
   </div>
 </div>
 
-<!-- 피드백 모달 -->
+<!-- 피드백 선택 모달 -->
 <div class="modal-bg" id="modal">
-  <div class="modal-box">
+  <div class="modal-box" style="max-width:480px;">
     <div class="modal-title" id="modal-title-text">피드백 상세</div>
-    <div class="modal-body" id="modal-body"></div>
-    <button class="modal-close" onclick="closeModal()">닫기</button>
+
+    <!-- 보기 모드 -->
+    <div id="modal-view-mode">
+      <div class="modal-body" id="modal-body"></div>
+      <div style="display:flex;gap:8px;margin-top:1.2rem;">
+        <button class="modal-close" onclick="closeModal()">닫기</button>
+      </div>
+    </div>
+
+    <!-- 선택 모드 (목록에서 피드백 보기 버튼 클릭 시) -->
+    <div id="modal-select-mode" style="display:none;">
+      <p style="font-size:12px;color:#6e6e73;margin-bottom:0.8rem;">아래 피드백 중 하나를 선택하거나 직접 입력하세요.</p>
+      <div id="fb-presets" style="display:flex;flex-direction:column;gap:6px;margin-bottom:1rem;">
+        <div class="fb-preset-item" onclick="selectPreset(this)">
+          <div class="preset-radio"></div>
+          <span>핵심 개념을 대부분 파악하고 있네요. 몇 가지 헷갈리는 부분만 보완하면 완벽해질 거예요. 멋진 결과입니다!</span>
+        </div>
+        <div class="fb-preset-item" onclick="selectPreset(this)">
+          <div class="preset-radio"></div>
+          <span>잘했습니다! 기본적인 개념은 잘 잡혀있지만, 일부 문제에서 실수가 있었네요. 해설을 꼼꼼히 다시 보고 오답을 확인하면 실력이 쑥쑥 늘 거예요. 할 수 있어요!</span>
+        </div>
+        <div class="fb-preset-item" onclick="selectPreset(this)">
+          <div class="preset-radio"></div>
+          <span>괜찮아요, 충분히 가능성이 보여요! 아직은 개념이 조금 헷갈리는 것 같아요. 틀린 문제들을 중심으로 기본 개념부터 다시 한번 차근차근 복습해봅시다. 포기하지 않으면 반드시 해낼 수 있습니다!</span>
+        </div>
+        <div class="fb-preset-item" onclick="selectPreset(this)">
+          <div class="preset-radio"></div>
+          <span>OX 개념은 잘 잡혀 있지만, 4지선다 화학 결합 단원에서 오답이 잦습니다. 해당 단원 복습을 권장합니다.</span>
+        </div>
+        <div class="fb-preset-item" onclick="selectPreset(this)">
+          <div class="preset-radio"></div>
+          <span>마스터테스트 결과가 우수합니다! 심화 문제도 잘 풀고 있어요. 이 페이스를 유지하면 좋겠습니다.</span>
+        </div>
+      </div>
+      <div style="margin-bottom:0.8rem;">
+        <div style="font-size:11px;color:#aeaeb2;margin-bottom:5px;font-weight:500;">직접 입력</div>
+        <textarea id="modal-custom-ta" style="width:100%;min-height:70px;resize:vertical;border:1px solid #fce7f3;border-radius:10px;padding:0.7rem 0.9rem;font-size:12px;font-family:inherit;color:#1d1d1f;outline:none;" placeholder="직접 피드백을 입력하세요..." oninput="clearPresetSelection()"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="saveModalFb()" style="padding:8px 20px;background:#db2777;border:none;border-radius:10px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;">저장하기</button>
+        <button onclick="closeModal()" style="padding:8px 18px;background:#f5f5f7;border:none;border-radius:10px;font-size:13px;font-weight:500;color:#6e6e73;cursor:pointer;font-family:inherit;">취소</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -673,7 +733,7 @@ function renderChart(all) {
     const msA = avg(wr.filter(r=>(r.testType||'mc')==='master').map(scoreOf));
     const segs= [oxA,mcA,msA].filter(v=>v>0);
     const tot = segs.length ? Math.round(segs.reduce((s,v)=>s+v,0)/segs.length) : 0;
-    const lbl = w===0?'이번주':`${w}주전`;
+    const lbl = `${w+1}주차`;
     return `
     <div class="chart-col">
       <div class="chart-wpct">${tot?tot+'점':'—'}</div>
@@ -783,21 +843,80 @@ window.saveFb = async ()=>{
   } catch(e){ alert('저장 실패: '+e.message); }
 };
 
-/* 목록에서 피드백 모달 바로 열기 */
+/* 목록에서 피드백 버튼 클릭 */
+let modalUid = null, modalName = null;
+
 window.showFbModal = (name, uid) => {
+  modalUid = uid; modalName = name;
   const txt = feedbacks[uid] || '';
-  document.getElementById('modal-title-text').textContent = `${name} · 피드백 상세`;
-  document.getElementById('modal-body').textContent = txt || '작성된 피드백이 없습니다.';
+  document.getElementById('modal-title-text').textContent = `${name} · 피드백`;
+  if (txt) {
+    document.getElementById('modal-view-mode').style.display = 'block';
+    document.getElementById('modal-select-mode').style.display = 'none';
+    document.getElementById('modal-body').innerHTML =
+      txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>');
+  } else {
+    document.getElementById('modal-view-mode').style.display = 'none';
+    document.getElementById('modal-select-mode').style.display = 'block';
+    document.getElementById('modal-custom-ta').value = '';
+    document.querySelectorAll('.fb-preset-item').forEach(e=>e.classList.remove('selected'));
+  }
   document.getElementById('modal').classList.add('open');
+};
+
+window.switchToSelectMode = () => {
+  const existing = feedbacks[modalUid] || '';
+  document.getElementById('modal-view-mode').style.display = 'none';
+  document.getElementById('modal-select-mode').style.display = 'block';
+  document.getElementById('modal-custom-ta').value = '';
+  document.querySelectorAll('.fb-preset-item').forEach(el => {
+    el.classList.remove('selected');
+    if (el.querySelector('span').textContent.trim() === existing.trim()) el.classList.add('selected');
+  });
+};
+
+window.selectPreset = (el) => {
+  document.querySelectorAll('.fb-preset-item').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('modal-custom-ta').value = '';
+};
+
+window.clearPresetSelection = () => {
+  document.querySelectorAll('.fb-preset-item').forEach(e=>e.classList.remove('selected'));
+};
+
+window.saveModalFb = async () => {
+  const sel = document.querySelector('.fb-preset-item.selected');
+  const custom = document.getElementById('modal-custom-ta').value.trim();
+  const txt = sel ? sel.querySelector('span').textContent.trim() : custom;
+  if (!txt) { alert('피드백을 선택하거나 입력해주세요.'); return; }
+  try {
+    await setDoc(doc(db,'feedbacks',modalUid),{text:txt,updatedAt:new Date()});
+    feedbacks[modalUid] = txt;
+    const fbEl = document.getElementById(`c-fb-${modalUid}`);
+    if (fbEl) {
+      fbEl.innerHTML = `<button class="fb-view-btn" onclick="event.stopPropagation();showFbModal('${esc(modalName)}','${modalUid}')">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M12 1H2a1 1 0 00-1 1v7a1 1 0 001 1h3l2 2 2-2h3a1 1 0 001-1V2a1 1 0 00-1-1z" stroke="#db2777" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        피드백 보기</button>`;
+    }
+    if (cur && cur.uid === modalUid) renderFb();
+    closeModal();
+  } catch(e){ alert('저장 실패: '+e.message); }
 };
 
 /* 모달 */
 window.openModal = txt => {
+  modalUid=null; modalName=null;
   document.getElementById('modal-title-text').textContent = '피드백 상세';
-  document.getElementById('modal-body').textContent=txt;
+  document.getElementById('modal-view-mode').style.display = 'block';
+  document.getElementById('modal-select-mode').style.display = 'none';
+  document.getElementById('modal-body').textContent = txt;
   document.getElementById('modal').classList.add('open');
 };
-window.closeModal = ()=>document.getElementById('modal').classList.remove('open');
+window.closeModal = () => {
+  document.getElementById('modal').classList.remove('open');
+  modalUid=null; modalName=null;
+};
 
 /* 뷰 전환 */
 function switchView(v){
@@ -813,9 +932,18 @@ window.goList = ()=>{
 /* 유틸 */
 function scoreOf(r){ return typeof r.score==='number'?r.score:(r.percentage||0); }
 function wkRange(w){
-  const e=new Date(); e.setDate(e.getDate()-w*7); e.setHours(23,59,59,999);
-  const s=new Date(e); s.setDate(e.getDate()-6); s.setHours(0,0,0,0);
-  return {s,e};
+  /* w=0: 이번(1주차), w=1: 지난(2주차), ... */
+  const now = new Date();
+  /* 이번 주 월요일 구하기 */
+  const day = now.getDay(); // 0=일
+  const diffToMon = (day === 0 ? -6 : 1 - day);
+  const mon = new Date(now);
+  mon.setDate(now.getDate() + diffToMon - w*7);
+  mon.setHours(0,0,0,0);
+  const sun = new Date(mon);
+  sun.setDate(mon.getDate() + 6);
+  sun.setHours(23,59,59,999);
+  return {s:mon, e:sun};
 }
 function inRange(r,s,e){
   const d=r.submittedAt?.toDate?r.submittedAt.toDate():new Date(r.submittedAt||0);
