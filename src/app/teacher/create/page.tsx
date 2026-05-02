@@ -89,8 +89,8 @@ function parseMCBulk(raw: string): Question[] {
   return results;
 }
 
-// ── CodePen HTML 생성 ──────────────────────────────────────────────────────
-function generateQuizHTML(title: string, questions: Question[]): string {
+// ── CodePen 분리 생성 (HTML / CSS / JS 각각) ──────────────────────────────
+function generateCodePenData(title: string, questions: Question[]): { html: string; css: string; js: string } {
   const allQ = questions.map(q => ({
     id: q.id,
     type: q.type,
@@ -101,63 +101,56 @@ function generateQuizHTML(title: string, questions: Question[]): string {
   }));
   const dataJson = JSON.stringify(allQ);
 
-  return `<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${title}</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:#f0fdf4;min-height:100vh}
-.header{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;padding:1.25rem 1rem;text-align:center}
-.header h1{font-size:20px;font-weight:700}
-.header p{font-size:13px;opacity:.8;margin-top:3px}
-.wrap{max-width:680px;margin:0 auto;padding:1.5rem 1rem}
-.progress-bar{background:#dcfce7;border-radius:10px;height:8px;margin-bottom:1.5rem;overflow:hidden}
-.progress-fill{height:100%;background:#16a34a;border-radius:10px;transition:.3s}
-.card{background:#fff;border-radius:16px;padding:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,.07)}
-.q-counter{font-size:13px;color:#6b7280;margin-bottom:.75rem}
-.q-type{display:inline-block;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;margin-bottom:.75rem}
-.q-type.ox{background:#dcfce7;color:#15803d}
-.q-type.mc{background:#dbeafe;color:#1d4ed8}
-.q-text{font-size:16px;font-weight:600;line-height:1.6;color:#1f2937;margin-bottom:1.25rem}
-.ox-row{display:flex;gap:12px}
-.ox-btn{flex:1;padding:16px;border-radius:12px;border:2px solid #e5e7eb;font-size:22px;font-weight:800;cursor:pointer;background:#fff;transition:.15s}
-.ox-btn.O{color:#16a34a;border-color:#86efac}
-.ox-btn.O:hover{background:#f0fdf4}
-.ox-btn.X{color:#dc2626;border-color:#fca5a5}
-.ox-btn.X:hover{background:#fef2f2}
-.ox-btn:disabled{opacity:.5;cursor:default}
-.mc-list{display:flex;flex-direction:column;gap:8px}
-.mc-opt{padding:12px 16px;border-radius:10px;border:2px solid #e5e7eb;font-size:14px;cursor:pointer;background:#fff;text-align:left;transition:.15s;display:flex;align-items:center;gap:10px}
-.mc-opt:hover:not(:disabled){border-color:#16a34a;background:#f0fdf4}
-.mc-opt:disabled{cursor:default;opacity:.7}
-.mc-opt .num{font-weight:700;color:#16a34a;min-width:22px;font-size:15px}
-.feedback{margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:14px;line-height:1.6;display:none}
-.feedback.ok{background:#dcfce7;color:#14532d;border:1.5px solid #86efac}
-.feedback.ng{background:#fee2e2;color:#7f1d1d;border:1.5px solid #fca5a5}
-.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem}
-.btn{padding:10px 22px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:inherit}
-.btn-next{background:#16a34a;color:#fff}.btn-next:hover{background:#15803d}
-.btn-prev{background:#f3f4f6;color:#374151}.btn-prev:hover{background:#e5e7eb}
-.score-card{background:#fff;border-radius:20px;padding:2.5rem 2rem;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.08)}
-.score-big{font-size:64px;font-weight:800;color:#16a34a;line-height:1}
-.score-denom{font-size:24px;color:#9ca3af}
-.score-msg{font-size:17px;color:#374151;margin-top:.75rem;font-weight:600}
-.score-pct{font-size:14px;color:#6b7280;margin-top:.25rem}
-.btn-restart{margin-top:1.5rem;padding:12px 36px;background:#16a34a;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
-.btn-restart:hover{background:#15803d}
-</style>
-</head>
-<body>
-<div class="header">
+  const html = `<div class="header">
   <h1>${title}</h1>
   <p>베타과학학원</p>
 </div>
-<div class="wrap" id="app"></div>
-<script>
-const QS = ${dataJson};
+<div class="wrap" id="app"></div>`;
+
+  const css = `* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans KR', -apple-system, sans-serif; background: #f0fdf4; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; padding: 1.25rem 1rem; text-align: center; }
+.header h1 { font-size: 20px; font-weight: 700; }
+.header p { font-size: 13px; opacity: .8; margin-top: 3px; }
+.wrap { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem; }
+.progress-bar { background: #dcfce7; border-radius: 10px; height: 8px; margin-bottom: 1.5rem; overflow: hidden; }
+.progress-fill { height: 100%; background: #16a34a; border-radius: 10px; transition: .3s; }
+.card { background: #fff; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,.07); }
+.q-counter { font-size: 13px; color: #6b7280; margin-bottom: .75rem; }
+.q-type { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 20px; margin-bottom: .75rem; }
+.q-type.ox { background: #dcfce7; color: #15803d; }
+.q-type.mc { background: #dbeafe; color: #1d4ed8; }
+.q-text { font-size: 16px; font-weight: 600; line-height: 1.6; color: #1f2937; margin-bottom: 1.25rem; }
+.ox-row { display: flex; gap: 12px; }
+.ox-btn { flex: 1; padding: 16px; border-radius: 12px; border: 2px solid #e5e7eb; font-size: 22px; font-weight: 800; cursor: pointer; background: #fff; transition: .15s; }
+.ox-btn.O { color: #16a34a; border-color: #86efac; }
+.ox-btn.O:hover { background: #f0fdf4; }
+.ox-btn.X { color: #dc2626; border-color: #fca5a5; }
+.ox-btn.X:hover { background: #fef2f2; }
+.ox-btn:disabled { opacity: .5; cursor: default; }
+.mc-list { display: flex; flex-direction: column; gap: 8px; }
+.mc-opt { padding: 12px 16px; border-radius: 10px; border: 2px solid #e5e7eb; font-size: 14px; cursor: pointer; background: #fff; text-align: left; transition: .15s; display: flex; align-items: center; gap: 10px; }
+.mc-opt:hover:not(:disabled) { border-color: #16a34a; background: #f0fdf4; }
+.mc-opt:disabled { cursor: default; opacity: .7; }
+.mc-opt .num { font-weight: 700; color: #16a34a; min-width: 22px; font-size: 15px; }
+.feedback { margin-top: 1rem; padding: 12px 16px; border-radius: 10px; font-size: 14px; line-height: 1.6; display: none; }
+.feedback.ok { background: #dcfce7; color: #14532d; border: 1.5px solid #86efac; }
+.feedback.ng { background: #fee2e2; color: #7f1d1d; border: 1.5px solid #fca5a5; }
+.nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; }
+.btn { padding: 10px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; }
+.btn-next { background: #16a34a; color: #fff; }
+.btn-next:hover { background: #15803d; }
+.btn-prev { background: #f3f4f6; color: #374151; }
+.btn-prev:hover { background: #e5e7eb; }
+.score-card { background: #fff; border-radius: 20px; padding: 2.5rem 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,.08); }
+.score-big { font-size: 64px; font-weight: 800; color: #16a34a; line-height: 1; }
+.score-denom { font-size: 24px; color: #9ca3af; }
+.score-msg { font-size: 17px; color: #374151; margin-top: .75rem; font-weight: 600; }
+.score-pct { font-size: 14px; color: #6b7280; margin-top: .25rem; }
+.btn-restart { margin-top: 1.5rem; padding: 12px 36px; background: #16a34a; color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.btn-restart:hover { background: #15803d; }`;
+
+  const js = `const QS = ${dataJson};
 let cur = 0, score = 0;
 const qs = [...QS].sort(() => Math.random() - 0.5);
 const app = document.getElementById('app');
@@ -200,7 +193,7 @@ function showFeedback(ok) {
   const fb = document.getElementById('fb');
   fb.className = 'feedback ' + (ok ? 'ok' : 'ng');
   fb.style.display = 'block';
-  fb.innerHTML = (ok ? '✅ 정답입니다!' : '❌ 오답! 정답: <b>' + (q.type==='ox'?q.answer: (NUMS[parseInt(q.answer)-1]||q.answer)) + '</b>')
+  fb.innerHTML = (ok ? '✅ 정답입니다!' : '❌ 오답! 정답: <b>' + (q.type==='ox' ? q.answer : (NUMS[parseInt(q.answer)-1]||q.answer)) + '</b>')
     + (q.explanation ? '<br>💡 ' + q.explanation : '');
   document.querySelectorAll('.ox-btn,.mc-opt').forEach(b => b.disabled = true);
   const nb = document.getElementById('nb');
@@ -231,10 +224,10 @@ function showScore() {
     + '</div>';
 }
 function restart() { cur=0; score=0; qs.sort(()=>Math.random()-.5); render(); }
-render();
-<\/script>
-</body>
-</html>`;
+render();`;
+
+  return { html, css, js };
+}
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -333,8 +326,8 @@ function CreateExamInner() {
   // ── CodePen 열기 ─────────────────────────────────────────────────────────
   function openCodePen() {
     if (allQuestions.length === 0) { toast.error('문제가 없습니다'); return; }
-    const html = generateQuizHTML(title || '온라인 테스트', allQuestions);
-    const data = JSON.stringify({ html, css: '', js: '' });
+    const { html, css, js } = generateCodePenData(title || '온라인 테스트', allQuestions);
+    const data = JSON.stringify({ html, css, js });
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = 'https://codepen.io/pen/define';
