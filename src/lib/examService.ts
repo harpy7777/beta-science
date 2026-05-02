@@ -206,3 +206,60 @@ export function calculateScore(
   const correct = exam.questions.filter(q => answers[q.id] === q.answer).length;
   return Math.round((correct / exam.questions.length) * 100);
 }
+// src/lib/examService.ts 에 추가할 코드
+// ─── 기존 코드 아래에 붙여넣으세요 ───────────────────────────────────────────
+//
+// ① Exam 타입에 subject 필드를 추가해야 합니다:
+//
+// export interface Exam {
+//   id?: string;
+//   title: string;
+//   teacherId: string;
+//   questions: Question[];
+//   isPublished: boolean;
+//   grade?: string;
+//   subject?: string;   ← 이 줄 추가
+//   codepenUrl?: string;
+//   createdAt?: string;
+// }
+//
+// ② 아래 Result 타입과 함수들을 파일 맨 아래에 추가하세요:
+
+import { db } from '@/lib/firebase';
+import {
+  collection, addDoc, getDocs,
+  query, orderBy, serverTimestamp
+} from 'firebase/firestore';
+
+// ── Result 타입 ──────────────────────────────────────────────────────────────
+export interface Result {
+  id?: string;
+  examId: string;
+  examTitle: string;
+  studentName: string;
+  grade: string;
+  subject?: string;
+  startedAt: string;
+  score: number | null;        // 맞은 개수 (미완료 시 null)
+  totalQuestions: number;
+  wrongCount: number | null;   // 틀린 개수 (미완료 시 null)
+}
+
+// ── 결과 저장 ─────────────────────────────────────────────────────────────────
+export async function saveResult(result: Omit<Result, 'id'>): Promise<string> {
+  const ref = await addDoc(collection(db, 'results'), {
+    ...result,
+    createdAt: serverTimestamp(),
+  });
+  return ref.id;
+}
+
+// ── 전체 결과 조회 (관리자용) ─────────────────────────────────────────────────
+export async function getAllResults(): Promise<Result[]> {
+  const q = query(collection(db, 'results'), orderBy('createdAt', 'desc'));
+  const snap = await getDocs(q);
+  return snap.docs.map(doc => ({
+    id: doc.id,
+    ...(doc.data() as Omit<Result, 'id'>),
+  }));
+}
