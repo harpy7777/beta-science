@@ -201,7 +201,7 @@
       <!-- OX퀴즈 패널 -->
       <div id="panel-ox" class="test-panel active">
         <table>
-          <thead><tr><th>테스트 ID</th><th>단원명</th><th>과목</th><th>학년</th><th>관리</th></tr></thead>
+          <thead><tr><th>등록일</th><th>단원명</th><th>과목</th><th>학년</th><th>관리</th></tr></thead>
           <tbody id="tbody-ox">
             <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">데이터를 불러오는 중...</td></tr>
           </tbody>
@@ -211,7 +211,7 @@
       <!-- 4지선다형 패널 -->
       <div id="panel-multi" class="test-panel">
         <table>
-          <thead><tr><th>테스트 ID</th><th>단원명</th><th>과목</th><th>학년</th><th>관리</th></tr></thead>
+          <thead><tr><th>등록일</th><th>단원명</th><th>과목</th><th>학년</th><th>관리</th></tr></thead>
           <tbody id="tbody-multi">
             <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">데이터를 불러오는 중...</td></tr>
           </tbody>
@@ -221,7 +221,7 @@
       <!-- 마스터 테스트 패널 -->
       <div id="panel-master" class="test-panel">
         <table>
-          <thead><tr><th>테스트 ID</th><th>단원명</th><th>과목</th><th>학년</th><th>관리</th></tr></thead>
+          <thead><tr><th>등록일</th><th>단원명</th><th>과목</th><th>학년</th><th>관리</th></tr></thead>
           <tbody id="tbody-master">
             <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">데이터를 불러오는 중...</td></tr>
           </tbody>
@@ -330,6 +330,22 @@
     return map[g] || '';
   }
 
+  // ── 날짜 포맷 (테스트 등록일) ──
+  function fmtRegDate(regDate) {
+    if (!regDate) return '-';
+    let d;
+    if (regDate.seconds) {
+      // Firestore Timestamp 객체
+      d = new Date(regDate.seconds * 1000);
+    } else if (typeof regDate === 'string') {
+      d = new Date(regDate);
+    } else {
+      return '-';
+    }
+    if (isNaN(d)) return '-';
+    return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+  }
+
   // ── tests 컬렉션 → OX퀴즈 / 4지선다형 탭으로 분리 ──
   // questions[].type === 'ox' 이면 OX탭
   // questions[].type === 'multiple' 이면 4지선다탭
@@ -357,7 +373,7 @@
         const gc = gradeCls(t.grade);
         const sc = subjCls(t.subject);
         return `<tr>
-          <td style="font-size:12px;color:var(--text-muted);font-family:monospace">${d.id}</td>
+          <td style="font-size:12px;color:var(--text-muted)">${fmtRegDate(t.regDate)}</td>
           <td style="font-weight:600">${t.title||'-'}</td>
           <td><span class="subj-badge ${sc}">${t.subject||'-'}</span></td>
           <td><span class="grade-badge ${gc}">${t.grade||'-'}</span></td>
@@ -394,7 +410,7 @@
         const gc = gradeCls(t.grade);
         const sc = subjCls(t.subject);
         return `<tr>
-          <td style="font-size:12px;color:var(--text-muted);font-family:monospace">${t.testId||d.id}</td>
+          <td style="font-size:12px;color:var(--text-muted)">${fmtRegDate(t.regDate)}</td>
           <td style="font-weight:600">${t.unitName||'-'}</td>
           <td><span class="subj-badge ${sc}">${t.subject||'-'}</span></td>
           <td><span class="grade-badge ${gc}">${t.grade||'-'}</span></td>
