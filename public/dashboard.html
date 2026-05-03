@@ -330,43 +330,51 @@
     return map[g] || '';
   }
 
-  // ── exams 컬렉션 → OX퀴즈 / 4지선다형 탭으로 분리 ──
+  // ── tests 컬렉션 → OX퀴즈 / 4지선다형 탭으로 분리 ──
+  // questions[].type === 'ox' 이면 OX탭
+  // questions[].type === 'multiple' 이면 4지선다탭
+  // 혼합(둘 다 있으면) OX탭에 표시
   function initExams() {
-    onSnapshot(collection(db, "exams"), snap => {
-      const oxDocs    = snap.docs.filter(d => (d.data().questions||[]).some(q => q.type === 'ox') && !(d.data().questions||[]).some(q => q.type === 'multiple'));
-      const multiDocs = snap.docs.filter(d => (d.data().questions||[]).some(q => q.type === 'multiple') && !(d.data().questions||[]).some(q => q.type === 'ox'));
-      const mixDocs   = snap.docs.filter(d => (d.data().questions||[]).some(q => q.type === 'ox') && (d.data().questions||[]).some(q => q.type === 'multiple'));
+    onSnapshot(collection(db, "tests"), snap => {
+      const oxList    = snap.docs.filter(d => {
+        const qs = d.data().questions || [];
+        const hasOx = qs.some(q => q.type === 'ox');
+        const hasMc = qs.some(q => q.type === 'multiple');
+        return hasOx; // OX 포함(혼합 포함) → OX탭
+      });
+      const multiList = snap.docs.filter(d => {
+        const qs = d.data().questions || [];
+        const hasOx = qs.some(q => q.type === 'ox');
+        const hasMc = qs.some(q => q.type === 'multiple');
+        return hasMc && !hasOx; // 4지선다만 있는 것 → 4지선다탭
+      });
 
-      // OX만 있는 것 + 혼합은 OX탭에
-      const oxList = [...oxDocs, ...mixDocs];
       document.getElementById('cnt-ox').textContent = oxList.length;
-      document.getElementById('cnt-multi').textContent = multiDocs.length;
+      document.getElementById('cnt-multi').textContent = multiList.length;
 
-      function makeRow(d, editBtn) {
+      function makeRow(d) {
         const t = d.data();
         const gc = gradeCls(t.grade);
         const sc = subjCls(t.subject);
         return `<tr>
-          <td style="font-size:12px;color:var(--text-muted);font-family:monospace">${t.testId||d.id}</td>
+          <td style="font-size:12px;color:var(--text-muted);font-family:monospace">${d.id}</td>
           <td style="font-weight:600">${t.title||'-'}</td>
           <td><span class="subj-badge ${sc}">${t.subject||'-'}</span></td>
           <td><span class="grade-badge ${gc}">${t.grade||'-'}</span></td>
           <td><div class="action-icons">
-            ${editBtn ? `<button class="action-btn" onclick="editExam('${d.id}')" title="수정">✏️</button>` : ''}
+            <button class="action-btn" onclick="editExam('${d.id}')" title="수정">✏️</button>
             <button class="action-btn del" onclick="deleteExam('${d.id}')" title="삭제">🗑️</button>
           </div></td>
         </tr>`;
       }
 
-      const tbodyOx = document.getElementById('tbody-ox');
-      tbodyOx.innerHTML = oxList.length === 0
+      document.getElementById('tbody-ox').innerHTML = oxList.length === 0
         ? '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">등록된 테스트가 없습니다.</td></tr>'
-        : oxList.map(d => makeRow(d, true)).join('');
+        : oxList.map(d => makeRow(d)).join('');
 
-      const tbodyMulti = document.getElementById('tbody-multi');
-      tbodyMulti.innerHTML = multiDocs.length === 0
+      document.getElementById('tbody-multi').innerHTML = multiList.length === 0
         ? '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">등록된 테스트가 없습니다.</td></tr>'
-        : multiDocs.map(d => makeRow(d, true)).join('');
+        : multiList.map(d => makeRow(d)).join('');
     });
   }
 
@@ -411,7 +419,7 @@
 
   window.deleteExam = async id => {
     if (!confirm('이 테스트를 삭제하시겠습니까?')) return;
-    try { await deleteDoc(doc(db, "exams", id)); }
+    try { await deleteDoc(doc(db, "tests", id)); }
     catch(e) { alert('삭제 오류: ' + e.message); }
   };
 
