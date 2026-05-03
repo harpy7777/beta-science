@@ -171,7 +171,7 @@
     <div class="section-card">
       <div class="section-header">
         <span class="section-title">최근 테스트 결과</span>
-        <a href="grades.html" class="view-all">전체보기 ›</a>
+        <a href="https://beta-science.vercel.app/grade-check.html" class="view-all">전체보기 ›</a>
       </div>
       <table>
         <thead><tr><th>학생</th><th>테스트</th><th>점수</th><th>제출일</th></tr></thead>
@@ -188,14 +188,17 @@
 
       <div class="test-tabs">
         <button class="test-tab-btn active" onclick="switchTab('ox',this)">
-          OX퀴즈 / 4지선다 <span class="tab-cnt" id="cnt-ox">0</span>
+          OX퀴즈 <span class="tab-cnt" id="cnt-ox">0</span>
+        </button>
+        <button class="test-tab-btn" onclick="switchTab('multi',this)">
+          4지선다형 <span class="tab-cnt" id="cnt-multi">0</span>
         </button>
         <button class="test-tab-btn" onclick="switchTab('master',this)">
           마스터 테스트 <span class="tab-cnt" id="cnt-master">0</span>
         </button>
       </div>
 
-      <!-- exams 컬렉션 (OX + 4지선다) -->
+      <!-- OX퀴즈 패널 -->
       <div id="panel-ox" class="test-panel active">
         <table>
           <thead><tr><th>테스트 ID</th><th>단원명</th><th>과목</th><th>학년</th><th>관리</th></tr></thead>
@@ -205,7 +208,17 @@
         </table>
       </div>
 
-      <!-- master-tests 컬렉션 -->
+      <!-- 4지선다형 패널 -->
+      <div id="panel-multi" class="test-panel">
+        <table>
+          <thead><tr><th>테스트 ID</th><th>단원명</th><th>과목</th><th>학년</th><th>관리</th></tr></thead>
+          <tbody id="tbody-multi">
+            <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">데이터를 불러오는 중...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 마스터 테스트 패널 -->
       <div id="panel-master" class="test-panel">
         <table>
           <thead><tr><th>테스트 ID</th><th>단원명</th><th>과목</th><th>학년</th><th>관리</th></tr></thead>
@@ -317,19 +330,19 @@
     return map[g] || '';
   }
 
-  // ── exams 컬렉션 (OX퀴즈 + 4지선다) ──
-  // create/page.tsx 저장 필드: title, grade, subject, questions[]
-  // 대단원 = testId / 소단원 = title(단원명)
+  // ── exams 컬렉션 → OX퀴즈 / 4지선다형 탭으로 분리 ──
   function initExams() {
     onSnapshot(collection(db, "exams"), snap => {
-      const tbody = document.getElementById('tbody-ox');
-      document.getElementById('cnt-ox').textContent = snap.size;
+      const oxDocs    = snap.docs.filter(d => (d.data().questions||[]).some(q => q.type === 'ox') && !(d.data().questions||[]).some(q => q.type === 'multiple'));
+      const multiDocs = snap.docs.filter(d => (d.data().questions||[]).some(q => q.type === 'multiple') && !(d.data().questions||[]).some(q => q.type === 'ox'));
+      const mixDocs   = snap.docs.filter(d => (d.data().questions||[]).some(q => q.type === 'ox') && (d.data().questions||[]).some(q => q.type === 'multiple'));
 
-      if (snap.empty) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">등록된 테스트가 없습니다.</td></tr>';
-        return;
-      }
-      tbody.innerHTML = snap.docs.map(d => {
+      // OX만 있는 것 + 혼합은 OX탭에
+      const oxList = [...oxDocs, ...mixDocs];
+      document.getElementById('cnt-ox').textContent = oxList.length;
+      document.getElementById('cnt-multi').textContent = multiDocs.length;
+
+      function makeRow(d, editBtn) {
         const t = d.data();
         const gc = gradeCls(t.grade);
         const sc = subjCls(t.subject);
@@ -339,17 +352,25 @@
           <td><span class="subj-badge ${sc}">${t.subject||'-'}</span></td>
           <td><span class="grade-badge ${gc}">${t.grade||'-'}</span></td>
           <td><div class="action-icons">
-            <button class="action-btn" onclick="editExam('${d.id}')" title="수정">✏️</button>
+            ${editBtn ? `<button class="action-btn" onclick="editExam('${d.id}')" title="수정">✏️</button>` : ''}
             <button class="action-btn del" onclick="deleteExam('${d.id}')" title="삭제">🗑️</button>
           </div></td>
         </tr>`;
-      }).join('');
+      }
+
+      const tbodyOx = document.getElementById('tbody-ox');
+      tbodyOx.innerHTML = oxList.length === 0
+        ? '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">등록된 테스트가 없습니다.</td></tr>'
+        : oxList.map(d => makeRow(d, true)).join('');
+
+      const tbodyMulti = document.getElementById('tbody-multi');
+      tbodyMulti.innerHTML = multiDocs.length === 0
+        ? '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">등록된 테스트가 없습니다.</td></tr>'
+        : multiDocs.map(d => makeRow(d, true)).join('');
     });
   }
 
   // ── master-tests 컬렉션 ──
-  // master-test/page.tsx 저장 필드: testId, subject, grade, unitName, parts[]
-  // 대단원 = testId / 소단원 = unitName(단원명)
   function initMasterTests() {
     const q = query(collection(db, "master-tests"), orderBy("regDate", "desc"));
     onSnapshot(q, snap => {
@@ -362,12 +383,11 @@
       }
       tbody.innerHTML = snap.docs.map(d => {
         const t = d.data();
-        const firstSection = (t.parts && t.parts[0] && t.parts[0].sectionName) ? t.parts[0].sectionName : '-';
         const gc = gradeCls(t.grade);
         const sc = subjCls(t.subject);
         return `<tr>
+          <td style="font-size:12px;color:var(--text-muted);font-family:monospace">${t.testId||d.id}</td>
           <td style="font-weight:600">${t.unitName||'-'}</td>
-          <td style="font-size:12px;color:var(--text-muted)">${firstSection}</td>
           <td><span class="subj-badge ${sc}">${t.subject||'-'}</span></td>
           <td><span class="grade-badge ${gc}">${t.grade||'-'}</span></td>
           <td><div class="action-icons">
