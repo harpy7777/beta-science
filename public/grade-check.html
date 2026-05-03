@@ -104,9 +104,9 @@ body {
 
 .stu-name-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; }
 .stu-av {
-  width: 30px; height: 30px; border-radius: 50%;
+  width: 24px; height: 24px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+  font-size: 9px; font-weight: 700; color: inherit; flex-shrink: 0;
 }
 .stu-name  { font-size: 13px; font-weight: 600; color: #1d1d1f; }
 .grade-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 6px; background: #fdf2f8; color: #db2777; display: inline-block; text-align: center; }
@@ -608,12 +608,14 @@ function renderList() {
 const grade = s.grade || s.year || '—';
 const color = avatarColor(name);
 const gradeClass = {'중등1학년':'g-m1','중등2학년':'g-m2','중등3학년':'g-m3','고등1학년':'g-h1','고등2학년':'g-h2','고등3학년':'g-h3'}[grade] || '';
-const gradeColor = {'중등1학년':'#1d4ed8','중등2학년':'#15803d','중등3학년':'#a16207','고등1학년':'#7e22ce','고등2학년':'#c2410c','고등3학년':'#db2777'}[grade] || color;
+// 변경 - bg: 연한 배경색, text: 진한 글자색
+const gradeBg   = {'중등1학년':'#eff6ff','중등2학년':'#f0fdf4','중등3학년':'#fefce8','고등1학년':'#fdf4ff','고등2학년':'#fff7ed','고등3학년':'#fdf2f8'}[grade] || '#f5f5f7';
+const gradeText = {'중등1학년':'#1d4ed8','중등2학년':'#15803d','중등3학년':'#a16207','고등1학년':'#7e22ce','고등2학년':'#c2410c','고등3학년':'#db2777'}[grade] || '#6e6e73';
 const gradeShort = {'중등1학년':'중1','중등2학년':'중2','중등3학년':'중3','고등1학년':'고1','고등2학년':'고2','고등3학년':'고3'}[grade] || grade;
     return `
     <div class="stu-row">
       <div class="stu-name-wrap" style="cursor:pointer;" onclick="window.openStu('${s.uid}','${esc(name)}','${grade}','${color}')">
-        <div class="stu-av" style="background:${gradeColor};">${gradeShort}</div>
+        <div class="stu-av" style="background:${gradeBg};color:${gradeText};">${gradeShort}</div>
 <span class="stu-name">${name}</span>
       </div>
       <div class="grade-cell"><span class="grade-tag ${gradeClass}">${grade}</span></div>
