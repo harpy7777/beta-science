@@ -110,7 +110,14 @@ body {
 }
 .stu-name  { font-size: 13px; font-weight: 600; color: #1d1d1f; }
 .grade-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 6px; background: #fdf2f8; color: #db2777; display: inline-block; text-align: center; }
-.grade-cell { display: flex; align-items: center; justify-content: center; }
+/* 학년별 색상 */
+.grade-tag.g-m1 { background: #eff6ff; color: #1d4ed8; } /* 중등1 - 파랑 */
+.grade-tag.g-m2 { background: #f0fdf4; color: #15803d; } /* 중등2 - 초록 */
+.grade-tag.g-m3 { background: #fefce8; color: #a16207; } /* 중등3 - 노랑 */
+.grade-tag.g-h1 { background: #fdf4ff; color: #7e22ce; } /* 고등1 - 보라 */
+.grade-tag.g-h2 { background: #fff7ed; color: #c2410c; } /* 고등2 - 주황 */
+.grade-tag.g-h3 { background: #fdf2f8; color: #db2777; } /* 고등3 - 핑크 */
+  .grade-cell { display: flex; align-items: center; justify-content: center; }
 
 .score-pill {
   display: inline-flex; align-items: center; justify-content: center;
@@ -599,6 +606,7 @@ function renderList() {
   body.innerHTML = students.map(s => {
     const name  = s.name || s.displayName || '이름없음';
     const grade = s.grade || s.year || '—';
+    const gradeClass = {'중등1학년':'g-m1','중등2학년':'g-m2','중등3학년':'g-m3','고등1학년':'g-h1','고등2학년':'g-h2','고등3학년':'g-h3'}[grade] || '';
     const color = avatarColor(name);
     return `
     <div class="stu-row">
@@ -606,7 +614,7 @@ function renderList() {
         <div class="stu-av" style="background:${color};">${name[0]}</div>
         <span class="stu-name">${name}</span>
       </div>
-      <div class="grade-cell"><span class="grade-tag">${grade}</span></div>
+      <div class="grade-cell"><span class="grade-tag ${gradeClass}">${grade}</span></div>
       <div id="c-ox-${s.uid}"><span class="score-pill p-na">—</span></div>
       <div id="c-mc-${s.uid}"><span class="score-pill p-na">—</span></div>
       <div class="col-h" id="c-ms-${s.uid}"><span class="score-pill p-na">—</span></div>
