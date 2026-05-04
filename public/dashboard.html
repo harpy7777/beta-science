@@ -21,13 +21,7 @@
   .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
   .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
   .topbar-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
-  /* 이 부분만 찾아서 교체하세요 */
-.nav-tabs { 
-  display: flex; 
-  gap: 25px;           /* 메뉴 글자 사이 간격을 넓힘 */
-  list-style: none; 
-  margin-left: 60px;   /* 로고로부터 메뉴를 중앙 쪽으로 밀어냄 */
-}
+  .nav-tabs { display: flex; gap: 25px; list-style: none; margin-left: 60px; }
   .nav-tabs a { display: block; padding: 8px 18px; font-size: 14px; color: var(--text-muted); text-decoration: none; border-radius: 6px; white-space: nowrap; transition: background 0.15s, color 0.15s; }
   .nav-tabs a:hover { background: var(--bg); color: var(--text); }
   .nav-tabs a.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
@@ -42,7 +36,22 @@
   .page-header p { font-size: 14px; color: var(--text-muted); }
 
   .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
-  .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+  .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 6px; }
+
+  /* 클릭 가능한 학생 카드 */
+  .stat-card.clickable {
+    cursor: pointer;
+    transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+  }
+  .stat-card.clickable:hover {
+    box-shadow: 0 4px 20px rgba(26, 63, 196, 0.13);
+    transform: translateY(-2px);
+    border-color: #c7d2fe;
+  }
+
   .stat-card-header { display: flex; align-items: center; justify-content: space-between; }
   .stat-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
   .stat-icon.blue { background: #eef2ff; } .stat-icon.green { background: #f0fdf4; }
@@ -50,6 +59,12 @@
   .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
   .stat-value { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; }
   .stat-desc { font-size: 12px; color: var(--text-muted); }
+
+  /* 전월 대비 변화율 */
+  .stat-change { font-size: 12px; font-weight: 600; }
+  .stat-change.up   { color: #10b981; }
+  .stat-change.down { color: #ef4444; }
+  .stat-change.same { color: var(--text-muted); }
 
   .section-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
   .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
@@ -141,33 +156,65 @@
     </div>
 
     <div class="stats-grid">
-      <div class="stat-card">
+
+      <!-- 학생 수 카드: 클릭 시 학생 관리 페이지 이동 -->
+      <a href="students.html" class="stat-card clickable" style="text-decoration:none; color:inherit;">
         <div class="stat-card-header">
-          <div class="stat-icon blue"><svg class="icon" fill="none" stroke="#1a3fc4" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-          <span class="stat-label">전체</span>
+          <div class="stat-icon blue">
+            <svg class="icon" fill="none" stroke="#1a3fc4" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <span class="stat-label" id="stat-student-period">전월 대비</span>
         </div>
         <div class="stat-value" id="stat-total-students">-</div>
+        <div id="stat-student-change" class="stat-change same">계산 중...</div>
         <div class="stat-desc">등록 학생 수</div>
-      </div>
+      </a>
+
       <div class="stat-card">
         <div class="stat-card-header">
-          <div class="stat-icon green"><svg class="icon" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+          <div class="stat-icon green">
+            <svg class="icon" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+          </div>
           <span class="stat-label">누적</span>
         </div>
         <div class="stat-value" id="stat-total-grades">-</div>
         <div class="stat-desc">제출된 테스트</div>
       </div>
+
       <div class="stat-card">
         <div class="stat-card-header">
-          <div class="stat-icon amber"><svg class="icon" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+          <div class="stat-icon amber">
+            <svg class="icon" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </div>
           <span class="stat-label">평균</span>
         </div>
         <div class="stat-value" id="stat-avg-score">-</div>
         <div class="stat-desc">전체 평균 점수</div>
       </div>
+
       <div class="stat-card">
         <div class="stat-card-header">
-          <div class="stat-icon red"><svg class="icon" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+          <div class="stat-icon red">
+            <svg class="icon" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
           <span class="stat-label">미완료</span>
         </div>
         <div class="stat-value" id="stat-pending-special">-</div>
@@ -273,21 +320,116 @@
 
   window.doLogout = async () => { await signOut(auth); window.location.replace("/login.html"); };
 
+  // ─────────────────────────────────────────────
+  // regDate 문자열 파싱: "2026. 5. 4." 또는 "2026.05.04" 등 처리
+  // ─────────────────────────────────────────────
+  function parseRegDate(raw) {
+    if (!raw) return null;
+
+    // Firestore Timestamp 객체
+    if (raw && typeof raw === 'object' && raw.seconds) {
+      return new Date(raw.seconds * 1000);
+    }
+
+    if (typeof raw !== 'string') return null;
+
+    // "2026. 5. 4." 또는 "2026. 5. 4" 형식 (students.html 저장 방식)
+    const korMatch = raw.match(/(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);
+    if (korMatch) {
+      return new Date(
+        parseInt(korMatch[1]),
+        parseInt(korMatch[2]) - 1,
+        parseInt(korMatch[3])
+      );
+    }
+
+    // ISO 또는 일반 날짜 문자열 시도
+    const d = new Date(raw);
+    return isNaN(d) ? null : d;
+  }
+
+  // ─────────────────────────────────────────────
+  // 전월 대비 학생 증감률 계산
+  // ─────────────────────────────────────────────
+  function calcStudentChange(docs) {
+    const now = new Date();
+    const year  = now.getFullYear();
+    const month = now.getMonth(); // 0-indexed
+
+    // 이번 달 1일 00:00
+    const startThisMonth = new Date(year, month, 1);
+    // 지난 달 1일 00:00
+    const startLastMonth = new Date(year, month - 1, 1);
+    // 지난 달 말일 23:59:59
+    const endLastMonth   = new Date(year, month, 0, 23, 59, 59);
+
+    let thisMonthNew = 0; // 이번 달 신규 등록
+    let lastMonthNew = 0; // 지난 달 신규 등록
+
+    docs.forEach(docSnap => {
+      const raw = docSnap.data().regDate;
+      const d = parseRegDate(raw);
+      if (!d) return;
+
+      if (d >= startThisMonth) {
+        thisMonthNew++;
+      } else if (d >= startLastMonth && d <= endLastMonth) {
+        lastMonthNew++;
+      }
+    });
+
+    const el = document.getElementById('stat-student-change');
+
+    if (lastMonthNew === 0) {
+      if (thisMonthNew > 0) {
+        el.textContent = `▲ 이번 달 ${thisMonthNew}명 신규`;
+        el.className = 'stat-change up';
+      } else {
+        el.textContent = '전월 신규 등록 없음';
+        el.className = 'stat-change same';
+      }
+    } else {
+      const diff = thisMonthNew - lastMonthNew;
+      const pct  = Math.round(Math.abs(diff / lastMonthNew) * 100);
+      if (diff > 0) {
+        el.textContent = `▲ 전월 대비 +${pct}% (+${diff}명)`;
+        el.className = 'stat-change up';
+      } else if (diff < 0) {
+        el.textContent = `▼ 전월 대비 -${pct}% (${diff}명)`;
+        el.className = 'stat-change down';
+      } else {
+        el.textContent = '전월 대비 변동 없음';
+        el.className = 'stat-change same';
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // 통계 초기화
+  // ─────────────────────────────────────────────
   function initStats() {
     onSnapshot(collection(db, "students"), s => {
       document.getElementById('stat-total-students').textContent = s.size;
+      calcStudentChange(s.docs);
     });
+
     onSnapshot(collection(db, "grades"), s => {
       let total = 0;
       s.forEach(d => total += Number(d.data().score || 0));
       document.getElementById('stat-total-grades').textContent = s.size;
-      document.getElementById('stat-avg-score').textContent = s.size > 0 ? (total / s.size).toFixed(1) : 0;
+      document.getElementById('stat-avg-score').textContent =
+        s.size > 0 ? (total / s.size).toFixed(1) : 0;
     });
+
     onSnapshot(collection(db, "specialManagement"), s => {
-      document.getElementById('stat-pending-special').textContent = s.docs.filter(d => !d.data().done).length;
+      document.getElementById('stat-pending-special').textContent =
+        s.docs.filter(d => !d.data().done).length;
     });
   }
 
+  // ─────────────────────────────────────────────
+  // 최근 테스트 결과
+  // ─────────────────────────────────────────────
   function initRecentGrades() {
     const q = query(collection(db, "grades"), orderBy("date", "desc"), limit(5));
     onSnapshot(q, s => {
@@ -299,11 +441,19 @@
       tbody.innerHTML = s.docs.map(d => {
         const r = d.data();
         const cls = r.score >= 80 ? 'score-high' : r.score >= 60 ? 'score-mid' : 'score-low';
-        return `<tr><td>${r.studentName||'-'}</td><td>${r.testName||'-'}</td><td><span class="score-badge ${cls}">${r.score}점</span></td><td>${r.date||'-'}</td></tr>`;
+        return `<tr>
+          <td>${r.studentName||'-'}</td>
+          <td>${r.testName||'-'}</td>
+          <td><span class="score-badge ${cls}">${r.score}점</span></td>
+          <td>${r.date||'-'}</td>
+        </tr>`;
       }).join('');
     });
   }
 
+  // ─────────────────────────────────────────────
+  // 헬퍼
+  // ─────────────────────────────────────────────
   function subjCls(s) {
     if (!s) return 's-default';
     if (s.includes('내신') || s.includes('내신대비')) return 's-naeshin';
@@ -329,18 +479,14 @@
 
   function fmtRegDate(regDate) {
     if (!regDate) return '-';
-    let d;
-    if (regDate.seconds) {
-      d = new Date(regDate.seconds * 1000);
-    } else if (typeof regDate === 'string') {
-      d = new Date(regDate);
-    } else {
-      return '-';
-    }
-    if (isNaN(d)) return '-';
+    const d = parseRegDate(regDate);
+    if (!d || isNaN(d)) return '-';
     return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
   }
 
+  // ─────────────────────────────────────────────
+  // 테스트 관리
+  // ─────────────────────────────────────────────
   function initExams() {
     onSnapshot(collection(db, "tests"), snap => {
       const oxList    = snap.docs.filter(d => {
@@ -410,6 +556,9 @@
     });
   }
 
+  // ─────────────────────────────────────────────
+  // 전역 함수
+  // ─────────────────────────────────────────────
   window.switchTab = (type, btn) => {
     document.querySelectorAll('.test-tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.test-panel').forEach(p => p.classList.remove('active'));
