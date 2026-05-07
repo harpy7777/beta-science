@@ -223,3 +223,14 @@ export async function getAllResults(): Promise<Result[]> {
     ...(d.data() as Omit<Result, 'id'>),
   }));
 }
+// 학생 ID로 학생 정보 조회
+export async function getStudentById(studentId: string): Promise<{ fireId: string; id: string; name: string; grade: string } | null> {
+  const q = query(
+    collection(db, 'students'),
+    where('id', '==', studentId.toLowerCase())
+  );
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  const d = snap.docs[0];
+  return { fireId: d.id, ...d.data() } as { fireId: string; id: string; name: string; grade: string };
+}
