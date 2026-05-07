@@ -285,9 +285,7 @@ body {
   <div class="header-left">
     <div class="logo-mark">
      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-  <!-- 머리 부분: 중앙(9)으로 이동 -->
   <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
-  <!-- 몸통 부분: 좌우 대칭이 맞도록 좌표 수정 -->
   <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" 
         stroke="rgba(255,255,255,0.9)" 
         stroke-width="1.4" 
@@ -472,7 +470,7 @@ import { initializeApp }               from "https://www.gstatic.com/firebasejs/
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore, collection, getDocs, getDoc, setDoc, addDoc, doc,
-  query, where, orderBy, Timestamp, onSnapshot
+  query, where, orderBy, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg = {
@@ -488,7 +486,6 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 
 const COLORS = ['#db2777','#7c3aed','#0369a1','#047857','#b45309','#be123c','#4f46e5','#0f766e','#9a3412','#1d4ed8'];
-const avatarColor = n => COLORS[([...n].reduce((h,c)=>h*31+c.charCodeAt(0)|0,0)>>>0)%COLORS.length];
 
 let students=[], recs={}, cur=null, curWeek=0, feedbacks={};
 let masterTests=[], selTest=null, selStudent=null, studentAnswers={};
@@ -517,15 +514,18 @@ window.switchMainTab = (tab, el) => {
   document.getElementById('tab-master').classList.toggle('active', tab==='master');
 };
 
-/* ── 학생 목록 ── */
+/* ── 학생 목록 로드 ── */
 async function loadStudents() {
   try {
-    const snaps = await getDocs(collection(db,'users'));
-    students=[];
-    snaps.forEach(d=>{ const u=d.data(); if(u.role==='student') students.push({uid:d.id,...u}); });
+    // students 컬렉션에서 먼저 로드 (id 필드 포함)
+    const s2 = await getDocs(collection(db,'students'));
+    students = [];
+    s2.forEach(d => students.push({uid: d.id, ...d.data()}));
+
+    // students 컬렉션이 비어있으면 users 컬렉션 fallback
     if (!students.length) {
-      const s2 = await getDocs(collection(db,'students'));
-      s2.forEach(d=>students.push({uid:d.id,...d.data()}));
+      const snaps = await getDocs(collection(db,'users'));
+      snaps.forEach(d=>{ const u=d.data(); if(u.role==='student') students.push({uid:d.id,...u}); });
     }
   } catch { students=[]; }
   renderList();
@@ -543,8 +543,10 @@ function renderList() {
     const gradeBg={'중등1학년':'#eff6ff','중등2학년':'#f0fdf4','중등3학년':'#fefce8','고등1학년':'#fdf4ff','고등2학년':'#fff7ed','고등3학년':'#fdf2f8'}[grade]||'#f5f5f7';
     const gradeText={'중등1학년':'#1d4ed8','중등2학년':'#15803d','중등3학년':'#a16207','고등1학년':'#7e22ce','고등2학년':'#c2410c','고등3학년':'#db2777'}[grade]||'#6e6e73';
     const gradeShort={'중등1학년':'중1','중등2학년':'중2','중등3학년':'중3','고등1학년':'고1','고등2학년':'고2','고등3학년':'고3'}[grade]||grade;
+    // studentId (s.id 필드) 사용
+    const studentId = s.id || s.uid;
     return `<div class="stu-row">
-      <div class="stu-name-wrap" style="cursor:pointer;" onclick="window.openStu('${s.uid}','${esc(name)}','${grade}','')">
+      <div class="stu-name-wrap" style="cursor:pointer;" onclick="window.openStu('${esc(studentId)}','${esc(name)}','${grade}','${s.uid}')">
         <div class="stu-av" style="background:${gradeBg};color:${gradeText};">${gradeShort}</div>
         <span class="stu-name">${name}</span>
       </div>
@@ -559,12 +561,26 @@ function renderList() {
 }
 
 async function loadSummary(s) {
+  // s.id = 학생ID(m01001), s.uid = Firebase doc ID
+  const studentId = s.id || s.uid;
   try {
     const since=new Date(); since.setDate(since.getDate()-28);
-    const q=query(collection(db,'answers'),where('studentId','==',s.uid),where('submittedAt','>=',Timestamp.fromDate(since)));
+    // grades 컬렉션에서 studentId 기준으로 조회
+    const q=query(
+      collection(db,'grades'),
+      where('studentId','==',studentId),
+      where('timestamp','>=',Timestamp.fromDate(since))
+    );
     const snap=await getDocs(q);
     let ox=[],mc=[],ms=[];
-    snap.forEach(d=>{ const r=d.data(),sc=scoreOf(r),t=r.testType||'mc'; if(t==='ox') ox.push(sc); else if(t==='master') ms.push(sc); else mc.push(sc); });
+    snap.forEach(d=>{
+      const r=d.data();
+      const sc=scoreOf(r);
+      const t=r.testType||'mc';
+      if(t==='ox') ox.push(sc);
+      else if(t==='master') ms.push(sc);
+      else mc.push(sc);
+    });
     const avg=arr=>arr.length?Math.round(arr.reduce((s,v)=>s+v,0)/arr.length):null;
     const allA=avg([...ox,...mc,...ms]);
     set(`c-ox-${s.uid}`,pill(avg(ox),'p-ox'));
@@ -573,7 +589,7 @@ async function loadSummary(s) {
     setTxt(`c-avg-${s.uid}`,allA!==null?allA+'점':'—');
     const bar=document.getElementById(`c-bar-${s.uid}`);
     if(bar) bar.style.width=(allA||0)+'%';
-  } catch {}
+  } catch(e) { console.error('loadSummary error:', e); }
   try {
     const fbSnap=await getDoc(doc(db,'feedbacks',s.uid));
     const fbEl=document.getElementById(`c-fb-${s.uid}`);
@@ -589,8 +605,10 @@ async function loadSummary(s) {
 function pill(v,cls){ return v!==null?`<span class="score-pill ${cls}">${v}점</span>`:`<span class="score-pill p-na">—</span>`; }
 
 /* ── 학생 상세 ── */
-window.openStu = async (uid,name,grade) => {
-  cur={uid,name,grade}; curWeek=0;
+// studentId = s.id (m01001), uid = Firebase doc ID
+window.openStu = async (studentId, name, grade, uid) => {
+  cur={studentId, name, grade, uid};
+  curWeek=0;
   const gradeBg={'중등1학년':'#eff6ff','중등2학년':'#f0fdf4','중등3학년':'#fefce8','고등1학년':'#fdf4ff','고등2학년':'#fff7ed','고등3학년':'#fdf2f8'}[grade]||'#f5f5f7';
   const gradeText={'중등1학년':'#1d4ed8','중등2학년':'#15803d','중등3학년':'#a16207','고등1학년':'#7e22ce','고등2학년':'#c2410c','고등3학년':'#db2777'}[grade]||'#6e6e73';
   const gradeShort={'중등1학년':'중1','중등2학년':'중2','중등3학년':'중3','고등1학년':'고1','고등2학년':'고2','고등3학년':'고3'}[grade]||grade;
@@ -605,11 +623,17 @@ window.openStu = async (uid,name,grade) => {
   renderFb();
   try {
     const since=new Date(); since.setDate(since.getDate()-28);
-    const q=query(collection(db,'answers'),where('studentId','==',uid),where('submittedAt','>=',Timestamp.fromDate(since)),orderBy('submittedAt','desc'));
+    // grades 컬렉션에서 studentId(m01001) 기준으로 조회
+    const q=query(
+      collection(db,'grades'),
+      where('studentId','==',studentId),
+      where('timestamp','>=',Timestamp.fromDate(since)),
+      orderBy('timestamp','desc')
+    );
     const snap=await getDocs(q);
     recs[uid]=[];
     snap.forEach(d=>recs[uid].push({id:d.id,...d.data()}));
-  } catch { recs[uid]=[]; }
+  } catch(e) { console.error('openStu recs error:', e); recs[uid]=[]; }
   renderDetail();
   document.getElementById('v-list').classList.remove('active');
   document.getElementById('v-detail').classList.add('active');
@@ -664,19 +688,14 @@ function renderRecs(wi) {
     const bCls=type==='ox'?'t-ox':type==='master'?'t-ms':'t-mc';
     const bLbl=type==='ox'?'OX 문제':type==='master'?'마스터테스트':'4지선다';
     const sCol=type==='ox'?'#1e40af':type==='master'?'#065f46':'#5b21b6';
-    const answers=r.answers||r.responses||[];
-    const qHtml=answers.length?`<div class="q-list">${answers.map((a,i)=>{
-      const ok=a.isCorrect!==undefined?a.isCorrect:a.correct===true;
-      const qt=(a.question||`Q${i+1}`).slice(0,50);
-      return `<div class="q-row"><div class="q-icon ${ok?'q-o':'q-x'}">${ok?'O':'X'}</div><span>${qt}</span></div>`;
-    }).join('')}</div>`:'';
+    // grades 컬렉션 구조: answers는 Record<string,string> 형태
+    const answerMap = r.answers || {};
     return `<div class="rec-card">
       <div class="rec-head">
-        <div class="rec-left"><span class="tbadge ${bCls}">${bLbl}</span><span class="rec-title">${r.examTitle||r.unitName||'—'}</span></div>
-        <div class="rec-right"><div class="rec-score" style="color:${sCol};">${sc}점</div><div class="rec-date">${fmtDate(r.submittedAt)}</div></div>
+        <div class="rec-left"><span class="tbadge ${bCls}">${bLbl}</span><span class="rec-title">${r.testName||r.examTitle||'—'}</span></div>
+        <div class="rec-right"><div class="rec-score" style="color:${sCol};">${sc}점</div><div class="rec-date">${fmtDate(r.timestamp)}</div></div>
       </div>
       <div class="score-track"><div class="score-fill" style="width:${sc}%;background:${sCol};"></div></div>
-      ${qHtml}
     </div>`;
   }).join('');
 }
@@ -775,12 +794,12 @@ function renderStudentGrid(){
   const grid=document.getElementById('ms-stu-grid');
   grid.innerHTML=students.map(s=>{
     const name=s.name||s.displayName||'이름없음';
-    return `<button class="stu-chip" id="chip-${s.uid}" onclick="selectStudent('${s.uid}','${esc(name)}')">${name}</button>`;
+    return `<button class="stu-chip" id="chip-${s.uid}" onclick="selectStudent('${s.uid}','${esc(name)}','${esc(s.id||s.uid)}')">${name}</button>`;
   }).join('');
 }
 
-window.selectStudent=async(uid,name)=>{
-  selStudent={uid,name};
+window.selectStudent=async(uid,name,studentId)=>{
+  selStudent={uid,name,studentId};
   document.querySelectorAll('.stu-chip').forEach(c=>c.classList.remove('sel'));
   document.getElementById(`chip-${uid}`)?.classList.add('sel');
   studentAnswers={};
@@ -845,24 +864,28 @@ window.saveMasterResult=async()=>{
     isCorrect:studentAnswers[q.qno]===q.correct
   }));
   try {
-    await addDoc(collection(db,'answers'),{
-      studentId:selStudent.uid,
-      studentName:selStudent.name,
-      testType:'master',
-      examTitle:selTest.unitName||'마스터테스트',
-      testId:selTest.testId,
-      subject:selTest.subject,
-      grade:selTest.grade,
+    // grades 컬렉션에 저장 (studentId = m01001 형태)
+    await addDoc(collection(db,'grades'),{
+      studentId: selStudent.studentId,   // m01001 형태
+      studentName: selStudent.name,
+      testType: 'master',
+      testName: selTest.unitName||'마스터테스트',
+      examTitle: selTest.unitName||'마스터테스트',
+      testId: selTest.testId,
+      subject: selTest.subject,
+      grade: selTest.grade,
       score,
+      totalQuestions: total,
+      wrongCount: total - correct,
       answers,
-      submittedAt:Timestamp.now()
+      date: new Date().toLocaleDateString('ko-KR'),
+      timestamp: Timestamp.now()
     });
     alert(`✅ ${selStudent.name} · ${score}점 저장 완료!`);
     studentAnswers={};
     document.querySelectorAll('.ans-btn').forEach(b=>b.classList.remove('sel'));
     updateScorePreview();
     loadMasterHistory();
-    // 목록 요약 갱신
     const stu=students.find(s=>s.uid===selStudent.uid);
     if(stu) loadSummary(stu);
   } catch(e){ alert('저장 실패: '+e.message); }
@@ -870,7 +893,11 @@ window.saveMasterResult=async()=>{
 
 async function loadMasterHistory(){
   try {
-    const q=query(collection(db,'answers'),where('testType','==','master'),orderBy('submittedAt','desc'));
+    const q=query(
+      collection(db,'grades'),
+      where('testType','==','master'),
+      orderBy('timestamp','desc')
+    );
     const snap=await getDocs(q);
     const body=document.getElementById('ms-history-body');
     if(snap.empty){ body.innerHTML=`<div style="text-align:center;color:#aeaeb2;font-size:13px;padding:1rem;">채점 기록이 없습니다.</div>`; return; }
@@ -879,15 +906,15 @@ async function loadMasterHistory(){
       return `<div class="ms-rec-row">
         <div>
           <div class="ms-rec-name">${r.studentName||'—'}</div>
-          <div style="font-size:11px;color:#6e6e73;">${r.examTitle||'—'} · ${r.subject||''}</div>
+          <div style="font-size:11px;color:#6e6e73;">${r.testName||r.examTitle||'—'} · ${r.subject||''}</div>
         </div>
         <div style="text-align:right;">
           <div class="ms-rec-score">${r.score}점</div>
-          <div class="ms-rec-date">${fmtDate(r.submittedAt)}</div>
+          <div class="ms-rec-date">${fmtDate(r.timestamp)}</div>
         </div>
       </div>`;
     }).join('');
-  } catch {}
+  } catch(e) { console.error('loadMasterHistory error:', e); }
 }
 
 /* ── 유틸 ── */
@@ -898,9 +925,16 @@ function wkRange(w){
   const sun=new Date(mon); sun.setDate(mon.getDate()+6); sun.setHours(23,59,59,999);
   return {s:mon,e:sun};
 }
-function inRange(r,s,e){ const d=r.submittedAt?.toDate?r.submittedAt.toDate():new Date(r.submittedAt||0); return d>=s&&d<=e; }
-function fmtDate(ts){ if(!ts)return ''; const d=ts.toDate?ts.toDate():new Date(ts); return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`; }
-function esc(s){ return s.replace(/'/g,"\\'"); }
+function inRange(r,s,e){
+  const d=r.timestamp?.toDate?r.timestamp.toDate():(r.submittedAt?.toDate?r.submittedAt.toDate():new Date(r.timestamp||r.submittedAt||0));
+  return d>=s&&d<=e;
+}
+function fmtDate(ts){
+  if(!ts)return '';
+  const d=ts.toDate?ts.toDate():new Date(ts);
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+}
+function esc(s){ return (s||'').replace(/'/g,"\\'"); }
 function set(id,html){ const e=document.getElementById(id); if(e)e.innerHTML=html; }
 function setTxt(id,txt){ const e=document.getElementById(id); if(e)e.textContent=txt; }
 </script>
