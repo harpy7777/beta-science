@@ -21,23 +21,13 @@
   .logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
   .logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
   .topbar-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
-  .nav-tabs { 
-  display: flex; 
-  gap: 25px;           /* 메뉴 글자 사이 간격을 넓힘 */
-  list-style: none; 
-  margin-left: 60px;   /* 로고로부터 메뉴를 중앙 쪽으로 밀어냄 */
-}
-.nav-tabs a { display: block; padding: 8px 18px; font-size: 14px; color: var(--text-muted); text-decoration: none; border-radius: 6px; white-space: nowrap; transition: background 0.15s, color 0.15s; }
-.nav-tabs a:hover { background: var(--bg); color: var(--text); }
-.nav-tabs a.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  .nav-tabs { display: flex; gap: 25px; list-style: none; margin-left: 60px; }
+  .nav-tabs a { display: block; padding: 8px 18px; font-size: 14px; color: var(--text-muted); text-decoration: none; border-radius: 6px; white-space: nowrap; transition: background 0.15s, color 0.15s; }
+  .nav-tabs a:hover { background: var(--bg); color: var(--text); }
+  .nav-tabs a.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
   .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
   .badge-admin { font-size: 11px; padding: 2px 8px; background: #f1f5f9; border-radius: 20px; color: var(--text-muted); }
-  .btn-logout {
-    padding: 6px 14px; background: transparent;
-    border: 1.5px solid #c7d2fe; border-radius: 20px;
-    font-family: inherit; font-size: 11px; font-weight: 600;
-    color: var(--primary); cursor: pointer; transition: all 0.18s; white-space: nowrap;
-  }
+  .btn-logout { padding: 6px 14px; background: transparent; border: 1.5px solid #c7d2fe; border-radius: 20px; font-family: inherit; font-size: 11px; font-weight: 600; color: var(--primary); cursor: pointer; transition: all 0.18s; white-space: nowrap; }
   .btn-logout:hover { background: var(--primary-light); }
   .main-content { padding: 28px 24px; flex: 1; }
   .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
@@ -63,17 +53,30 @@
   tbody td { font-size: 14px; padding: 14px 16px; color: var(--text); }
   .student-id { font-size: 13px; color: var(--text-muted); font-family: monospace; }
   .grade-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap; }
-  .grade-mid1 { background: #ede9fe; color: #6d28d9; }
-  .grade-mid2 { background: #dbeafe; color: #1d4ed8; }
-  .grade-mid3 { background: #d1fae5; color: #065f46; }
-  .grade-high1 { background: #fef3c7; color: #92400e; }
-  .grade-high2 { background: #fee2e2; color: #991b1b; }
-  .grade-high3 { background: #fce7f3; color: #9d174d; }
+  .grade-mid1{background:#ede9fe;color:#6d28d9} .grade-mid2{background:#dbeafe;color:#1d4ed8}
+  .grade-mid3{background:#d1fae5;color:#065f46} .grade-high1{background:#fef3c7;color:#92400e}
+  .grade-high2{background:#fee2e2;color:#991b1b} .grade-high3{background:#fce7f3;color:#9d174d}
   .subject-tag { display: inline-block; padding: 2px 8px; background: #f1f5f9; border-radius: 4px; font-size: 12px; color: var(--text-muted); margin: 2px; }
-  .action-icons { display: flex; gap: 6px; }
+  .action-icons { display: flex; gap: 6px; align-items: center; }
   .action-btn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s, border-color 0.1s; color: var(--text-muted); }
   .action-btn:hover { background: #f1f5f9; color: var(--text); }
   .action-btn.del:hover { background: #fef2f2; border-color: #fca5a5; color: var(--danger); }
+
+  /* 수업카드 버튼 */
+  .card-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 5px 10px; border-radius: 6px;
+    background: var(--primary-light); border: 1px solid #c7d2fe;
+    color: var(--primary); font-size: 12px; font-weight: 600;
+    cursor: pointer; white-space: nowrap; transition: background 0.15s;
+  }
+  .card-btn:hover { background: #dde4ff; }
+
+  /* 담당선생님 표시 */
+  .teacher-name { font-size: 13px; color: var(--text-muted); }
+  .teacher-name.assigned { color: var(--text); font-weight: 500; }
+
+  /* 모달 공통 */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--white); border-radius: 14px; padding: 28px; width: 100%; max-width: 480px; margin: 16px; max-height: 90vh; overflow-y: auto; }
@@ -83,11 +86,12 @@
   .modal-close:hover { background: #e2e8f0; }
   .form-group { margin-bottom: 16px; }
   .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-  .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text); outline: none; transition: border 0.15s; background: var(--white); }
-  .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text); outline: none; transition: border 0.15s; background: var(--white); font-family: inherit; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+  .form-group textarea { min-height: 80px; resize: vertical; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
-  .btn-secondary { padding: 10px 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--white); font-size: 14px; color: var(--text); cursor: pointer; }
+  .btn-secondary { padding: 10px 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--white); font-size: 14px; color: var(--text); cursor: pointer; font-family: inherit; }
   .btn-secondary:hover { background: #f1f5f9; }
   .pagination { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 20px 0 4px; }
   .page-btn { width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 6px; background: var(--white); font-size: 13px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s; }
@@ -96,6 +100,14 @@
   .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
   .empty-state p { font-size: 15px; margin-top: 12px; }
+
+  /* 수업카드 뷰 모달 */
+  .class-card-view { background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+  .class-card-row { display: flex; margin-bottom: 10px; gap: 8px; }
+  .class-card-label { font-size: 12px; font-weight: 600; color: var(--text-muted); min-width: 80px; padding-top: 2px; }
+  .class-card-value { font-size: 14px; color: var(--text); flex: 1; line-height: 1.5; }
+  .class-card-value.empty { color: var(--text-muted); font-style: italic; }
+  .class-card-section { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #c7d2fe; }
 </style>
 </head>
 <body>
@@ -108,22 +120,19 @@
           <line x1="6.5" y1="14" x2="17.5" y2="14"/>
         </svg>
       </div>
-      <div class="logo-text">
-        <span class="brand">BETA</span>
-        <span class="brand-sub">SCIENCE</span>
-      </div>
+      <div class="logo-text"><span class="brand">BETA</span><span class="brand-sub">SCIENCE</span></div>
     </a>
     <div class="topbar-divider"></div>
-   <nav>
-  <ul class="nav-tabs">
-    <li><a href="dashboard.html">대시보드</a></li>
-    <li><a href="students.html" class="active">학생 관리</a></li>
-    <li><a href="special.html">특별관리</a></li>
-    <li><a href="sms.html">SMS설정</a></li>
-    <li><a href="academy.html">학원관리</a></li>
-    <li><a href="teacher-board.html">선생님 게시판</a></li>
-  </ul>
-</nav></nav>
+    <nav>
+      <ul class="nav-tabs">
+        <li><a href="dashboard.html">대시보드</a></li>
+        <li><a href="students.html" class="active">학생 관리</a></li>
+        <li><a href="special.html">특별관리</a></li>
+        <li><a href="sms.html">SMS설정</a></li>
+        <li><a href="academy.html">학원관리</a></li>
+        <li><a href="teacher-board.html">선생님 게시판</a></li>
+      </ul>
+    </nav>
     <div class="topbar-right">
       <span class="badge-admin">관리자 모드</span>
       <button class="btn-logout" onclick="doLogout()">로그아웃</button>
@@ -156,9 +165,21 @@
     </div>
     <div class="table-card">
       <table>
-        <thead><tr><th>학생 ID</th><th>이름</th><th>학년</th><th>수강 과목</th><th>학부모 전화번호</th><th>등록일</th><th>수정/삭제</th></tr></thead>
+        <thead>
+          <tr>
+            <th>학생 ID</th>
+            <th>이름</th>
+            <th>학년</th>
+            <th>수강 과목</th>
+            <th>담당선생님</th>
+            <th>학부모 전화번호</th>
+            <th>등록일</th>
+            <th>수업카드</th>
+            <th>수정/삭제</th>
+          </tr>
+        </thead>
         <tbody id="studentTableBody">
-          <tr><td colspan="7" style="text-align:center; padding:40px; color:var(--text-muted);">데이터를 불러오는 중...</td></tr>
+          <tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">데이터를 불러오는 중...</td></tr>
         </tbody>
       </table>
       <div id="emptyState" class="empty-state" style="display:none;">
@@ -170,9 +191,13 @@
   </main>
 </div>
 
+<!-- 학생 추가/수정 모달 -->
 <div class="modal-overlay" id="studentModal">
   <div class="modal">
-    <div class="modal-header"><h2 id="modalTitle">학생 추가</h2><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-header">
+      <h2 id="modalTitle">학생 추가</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
     <div class="form-row">
       <div class="form-group"><label>학생 ID</label><input type="text" id="inputId" placeholder="예: m01010"></div>
       <div class="form-group"><label>이름 <span style="color:var(--danger)">*</span></label><input type="text" id="inputName" placeholder="학생 이름"></div>
@@ -195,11 +220,53 @@
   </div>
 </div>
 
+<!-- 수업카드 보기/편집 모달 -->
+<div class="modal-overlay" id="classCardModal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <h2 id="classCardTitle">수업카드</h2>
+      <button class="modal-close" onclick="closeClassCardModal()">✕</button>
+    </div>
+
+    <!-- 보기 모드 -->
+    <div id="classCardViewMode">
+      <div class="class-card-view" id="classCardViewContent"></div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeClassCardModal()">닫기</button>
+        <button class="btn-primary" onclick="switchToEditMode()">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          수정
+        </button>
+      </div>
+    </div>
+
+    <!-- 편집 모드 -->
+    <div id="classCardEditMode" style="display:none;">
+      <div class="class-card-section">기본 정보</div>
+      <div class="form-row">
+        <div class="form-group"><label>담당 선생님</label><input type="text" id="ccTeacher" placeholder="선생님 이름"></div>
+        <div class="form-group"><label>수업 요일/시간</label><input type="text" id="ccSchedule" placeholder="예: 월·수 오후 5시"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>수업 교재</label><input type="text" id="ccTextbook" placeholder="예: 개념원리 화학1"></div>
+        <div class="form-group"><label>수업 진도</label><input type="text" id="ccProgress" placeholder="예: 3단원 반응속도"></div>
+      </div>
+      <div class="class-card-section" style="margin-top:8px;">학습 현황</div>
+      <div class="form-group"><label>특이사항 / 메모</label><textarea id="ccMemo" placeholder="학생 특이사항, 학습 성향, 주의사항 등"></textarea></div>
+      <div class="form-group"><label>학부모 전달사항</label><textarea id="ccParentNote" placeholder="학부모에게 전달할 내용"></textarea></div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="switchToViewMode()">취소</button>
+        <button class="btn-primary" onclick="saveClassCard()">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import {
-    getFirestore, doc, getDoc, collection, addDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot
+    getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -227,30 +294,47 @@
     } catch(e) { window.location.replace("/login.html"); }
   });
 
-  window.doLogout = async function() {
-    await signOut(auth);
-    window.location.replace("/login.html");
-  };
+  window.doLogout = async function() { await signOut(auth); window.location.replace("/login.html"); };
 
   const ITEMS_PER_PAGE = 10;
   let currentPage = 1;
   let editingId = null;
   let students = [];
   let filtered = [];
+  // 수업카드 캐시: fireId → classCard data
+  let classCards = {};
+  // 현재 수업카드 보고 있는 학생
+  let currentCardFireId = null;
 
   function gradeBadgeClass(g) {
-    return { '중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3',
-      '고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3' }[g] || 'grade-mid1';
+    return {'중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3',
+      '고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3'}[g]||'grade-mid1';
   }
 
   function initStudents() {
     const q = query(collection(db, "students"), orderBy("regDate", "desc"));
     onSnapshot(q, (snapshot) => {
       students = snapshot.docs.map(d => ({ fireId: d.id, ...d.data() }));
+      // 수업카드도 같이 로드
+      students.forEach(s => loadClassCard(s.fireId));
       filterStudents();
     }, (error) => {
       document.getElementById('studentTableBody').innerHTML =
-        `<tr><td colspan="7" style="text-align:center; padding:40px; color:var(--danger);">데이터 로드 실패: ${error.message}</td></tr>`;
+        `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--danger);">데이터 로드 실패: ${error.message}</td></tr>`;
+    });
+  }
+
+  // 수업카드 실시간 감시
+  function loadClassCard(fireId) {
+    onSnapshot(doc(db, "classCards", fireId), (snap) => {
+      classCards[fireId] = snap.exists() ? snap.data() : null;
+      // 테이블 해당 행 담당선생님 업데이트
+      const teacherEl = document.getElementById(`teacher-${fireId}`);
+      if (teacherEl) {
+        const teacher = classCards[fireId]?.teacher || '';
+        teacherEl.textContent = teacher || '-';
+        teacherEl.className = 'teacher-name' + (teacher ? ' assigned' : '');
+      }
     });
   }
 
@@ -260,6 +344,7 @@
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     const pageData = filtered.slice(start, start + ITEMS_PER_PAGE);
     document.getElementById('countDisplay').textContent = filtered.length;
+
     if (!filtered.length) {
       tbody.innerHTML = ''; empty.style.display = 'block';
     } else {
@@ -268,18 +353,27 @@
         const subs = s.subject && s.subject !== '-'
           ? s.subject.split(',').map(x => `<span class="subject-tag">${x.trim()}</span>`).join('')
           : '<span style="color:var(--text-muted)">-</span>';
+        const teacher = classCards[s.fireId]?.teacher || '';
+        const hasCard = classCards[s.fireId] && Object.values(classCards[s.fireId]).some(v => v);
         return `<tr>
           <td class="student-id">${s.id||'-'}</td>
           <td style="font-weight:500">${s.name||'-'}</td>
           <td><span class="grade-badge ${gradeBadgeClass(s.grade)}">${s.grade||'-'}</span></td>
           <td>${subs}</td>
+          <td id="teacher-${s.fireId}" class="teacher-name${teacher ? ' assigned' : ''}">${teacher||'-'}</td>
           <td>${s.phone||'-'}</td>
           <td style="color:var(--text-muted);font-size:13px">${s.regDate||'-'}</td>
+          <td>
+            <button class="card-btn" onclick="openClassCard('${s.fireId}','${(s.name||'').replace(/'/g,"\\'")}')">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              ${hasCard ? '수업카드 보기' : '수업카드 작성'}
+            </button>
+          </td>
           <td><div class="action-icons">
             <button class="action-btn" onclick="openEditModal('${s.fireId}')">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
-            <button class="action-btn del" onclick="deleteStudent('${s.fireId}','${s.name}')">
+            <button class="action-btn del" onclick="deleteStudent('${s.fireId}','${(s.name||'').replace(/'/g,"\\'")}')">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
             </button>
           </div></td>
@@ -304,8 +398,7 @@
     const pg = document.getElementById('pagination');
     if (total <= 1) { pg.innerHTML = ''; return; }
     let h = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
-    for (let i = 1; i <= total; i++)
-      h += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    for (let i=1; i<=total; i++) h += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
     h += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>›</button>`;
     pg.innerHTML = h;
   }
@@ -339,9 +432,7 @@
     document.getElementById('studentModal').classList.add('open');
   }
 
-  window.closeModal = function() {
-    document.getElementById('studentModal').classList.remove('open');
-  }
+  window.closeModal = function() { document.getElementById('studentModal').classList.remove('open'); }
 
   window.saveStudent = async function() {
     const name = document.getElementById('inputName').value.trim();
@@ -366,12 +457,92 @@
     if (!confirm(`"${name}" 학생을 삭제하시겠습니까?`)) return;
     try {
       await deleteDoc(doc(db, "students", fireId));
+      // 수업카드도 같이 삭제
+      try { await deleteDoc(doc(db, "classCards", fireId)); } catch(e) {}
     } catch(e) { alert("삭제 중 오류가 발생했습니다: " + e.message); }
   }
 
-  document.getElementById('studentModal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-  });
+  // ─── 수업카드 ───
+  window.openClassCard = function(fireId, name) {
+    currentCardFireId = fireId;
+    document.getElementById('classCardTitle').textContent = `${name} · 수업카드`;
+    renderClassCardView(fireId);
+    document.getElementById('classCardViewMode').style.display = 'block';
+    document.getElementById('classCardEditMode').style.display = 'none';
+    document.getElementById('classCardModal').classList.add('open');
+  }
+
+  function renderClassCardView(fireId) {
+    const card = classCards[fireId];
+    const content = document.getElementById('classCardViewContent');
+    if (!card || !Object.values(card).some(v => v)) {
+      content.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-muted);">
+        <svg width="36" height="36" fill="none" stroke="#cbd5e1" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom:8px;"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        <p style="font-size:14px;">아직 수업카드가 작성되지 않았습니다.<br>수정 버튼을 눌러 작성해주세요.</p>
+      </div>`;
+      return;
+    }
+    const row = (label, value) => `
+      <div class="class-card-row">
+        <span class="class-card-label">${label}</span>
+        <span class="class-card-value${!value ? ' empty' : ''}">${value || '미입력'}</span>
+      </div>`;
+    content.innerHTML = `
+      <div class="class-card-section">기본 정보</div>
+      ${row('담당 선생님', card.teacher)}
+      ${row('수업 요일/시간', card.schedule)}
+      ${row('수업 교재', card.textbook)}
+      ${row('수업 진도', card.progress)}
+      <div class="class-card-section" style="margin-top:12px;">학습 현황</div>
+      ${row('특이사항/메모', card.memo)}
+      ${row('학부모 전달사항', card.parentNote)}
+    `;
+  }
+
+  window.switchToEditMode = function() {
+    const card = classCards[currentCardFireId] || {};
+    document.getElementById('ccTeacher').value = card.teacher || '';
+    document.getElementById('ccSchedule').value = card.schedule || '';
+    document.getElementById('ccTextbook').value = card.textbook || '';
+    document.getElementById('ccProgress').value = card.progress || '';
+    document.getElementById('ccMemo').value = card.memo || '';
+    document.getElementById('ccParentNote').value = card.parentNote || '';
+    document.getElementById('classCardViewMode').style.display = 'none';
+    document.getElementById('classCardEditMode').style.display = 'block';
+  }
+
+  window.switchToViewMode = function() {
+    document.getElementById('classCardViewMode').style.display = 'block';
+    document.getElementById('classCardEditMode').style.display = 'none';
+  }
+
+  window.saveClassCard = async function() {
+    if (!currentCardFireId) return;
+    const data = {
+      teacher:    document.getElementById('ccTeacher').value.trim(),
+      schedule:   document.getElementById('ccSchedule').value.trim(),
+      textbook:   document.getElementById('ccTextbook').value.trim(),
+      progress:   document.getElementById('ccProgress').value.trim(),
+      memo:       document.getElementById('ccMemo').value.trim(),
+      parentNote: document.getElementById('ccParentNote').value.trim(),
+      updatedAt:  new Date().toISOString()
+    };
+    try {
+      await setDoc(doc(db, "classCards", currentCardFireId), data);
+      classCards[currentCardFireId] = data;
+      renderClassCardView(currentCardFireId);
+      switchToViewMode();
+      renderTable(); // 담당선생님 컬럼 갱신
+    } catch(e) { alert('저장 실패: ' + e.message); }
+  }
+
+  window.closeClassCardModal = function() {
+    document.getElementById('classCardModal').classList.remove('open');
+    currentCardFireId = null;
+  }
+
+  document.getElementById('studentModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+  document.getElementById('classCardModal').addEventListener('click', function(e) { if (e.target === this) closeClassCardModal(); });
 </script>
 </body>
 </html>
