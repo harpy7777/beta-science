@@ -221,18 +221,32 @@ export default function TeacherPage() {
                         {exam.isPublished ? '게시됨' : '임시저장'}
                       </span>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-gray-400">
-                      <span>{exam.questions.length}문항</span>
-                      <span>
-                        OX {exam.questions.filter(q => q.type === 'ox').length}개 /
-                        4지선다 {exam.questions.filter(q => q.type === 'multiple').length}개
-                      </span>
-                      {exam.accessCode && (
-                        <span className="font-mono font-bold text-green-600">
-                          코드: {exam.accessCode}
-                        </span>
-                      )}
-                    </div>
+                   <div className="flex items-center gap-4 text-sm text-gray-400">
+  {(exam.grade || exam.subject) && (
+    <span className="flex items-center gap-1.5">
+      {exam.grade && (
+        <span className="bg-green-100 text-green-700 font-semibold text-xs px-2 py-0.5 rounded-full">
+          {exam.grade}
+        </span>
+      )}
+      {exam.subject && (
+        <span className="bg-blue-100 text-blue-700 font-semibold text-xs px-2 py-0.5 rounded-full">
+          {exam.subject}
+        </span>
+      )}
+    </span>
+  )}
+  <span>{exam.questions.length}문항</span>
+  <span>
+    OX {exam.questions.filter(q => q.type === 'ox').length}개 /
+    4지선다 {exam.questions.filter(q => q.type === 'multiple').length}개
+  </span>
+  {exam.accessCode && (
+    <span className="font-mono font-bold text-green-600">
+      코드: {exam.accessCode}
+    </span>
+  )}
+</div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {exam.accessCode && (
