@@ -54,6 +54,7 @@ export interface Result {
   examId: string;
   examTitle: string;
   studentName: string;
+  studentId?: string;
   grade: string;
   subject?: string;
   startedAt: string;
