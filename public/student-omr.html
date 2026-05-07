@@ -505,16 +505,22 @@ window.submitOMR = async () => {
 
   // Firebase 저장 → master-results 컬렉션
   try {
-    await addDoc(collection(db, 'master-results'), {
+    await addDoc(collection(db, 'answers'), {
       testId:      selectedTest.testId,
       testFireId:  selectedTest.fireId,
       unitName:    selectedTest.unitName,
       subject:     selectedTest.subject,
       testGrade:   selectedTest.grade,
       studentName,
-      studentGrade,
-      answers,
-      score,
+studentGrade,
+answers: Object.entries(answers).map(([qno, val]) => ({
+  question: `Q${qno.replace('q','')}`,
+  studentAnswer: val,
+  isCorrect: false
+})),
+score,
+testType: 'master',
+examTitle: selectedTest.unitName || '마스터테스트 OMR',
       correct,
       wrong,
       wrongNums,
