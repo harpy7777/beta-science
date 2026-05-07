@@ -23,12 +23,19 @@ function StudentExamInner() {
   const [score, setScore] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    getExam(examId).then(e => {
-      setExam(e);
-      setLoading(false);
-    });
-  }, [examId]);
+ useEffect(() => {
+  getExam(examId).then(e => {
+    setExam(e);
+    setLoading(false);
+  });
+  // localStorage에서 이름 자동 복원
+  const savedName = localStorage.getItem('studentName');
+  if (savedName) {
+    setStudentName(savedName);
+    setPhase('exam'); // 이름 입력 화면 건너뛰고 바로 시험으로
+    setCurrent(0);
+  }
+}, [examId]);
 
   function handleAnswer(questionId: string, value: string) {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
