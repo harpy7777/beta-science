@@ -41,17 +41,17 @@ export default function StudentTestPage() {
       // 응시 기록 저장
       try {
         await saveResult({
-          examId: exam.id!,
-          examTitle: exam.title,
-          studentName: student.name,
-          studentId: student.id,
-          grade: student.grade,
-          subject: exam.subject ?? '',
-          startedAt: new Date().toISOString(),
-          score: null,
-          totalQuestions: exam.questions.length,
-          wrongCount: null,
-        });
+  examId: exam.id!,
+  examTitle: exam.title,
+  studentName: student.name,
+  grade: student.grade,
+  subject: exam.subject ?? '',
+  startedAt: new Date().toISOString(),
+  score: null,
+  totalQuestions: exam.questions.length,
+  wrongCount: null,
+  ...(student.id ? { studentId: student.id } : {}),
+});
       } catch {
         // 기록 실패해도 시험은 진행
       }
