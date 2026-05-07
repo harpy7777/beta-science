@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>베타과학학원 · 마스터테스트 OMR</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  background: #f0fdf4; color: #1d1d1f; min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+.header {
+  background: #fff; border-bottom: 1px solid #bbf7d0;
+  padding: 0 1.5rem; height: 54px;
+  display: flex; align-items: center; justify-content: center;
+}
+.header-inner { display: flex; align-items: center; gap: 10px; }
+.logo { width: 32px; height: 32px; background: #16a34a; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.brand { font-size: 15px; font-weight: 700; color: #14532d; }
+.brand-sub { font-size: 11px; color: #16a34a; font-weight: 500; }
+
+/* ── 공통 카드 ── */
+.card {
+  background: #fff; border: 1px solid #bbf7d0; border-radius: 20px;
+  padding: 2rem; max-width: 520px; margin: 2rem auto;
+  box-shadow: 0 4px 24px rgba(22,163,74,0.08);
+}
+
+/* ── 입장 화면 ── */
+.entry-title { font-size: 1.1rem; font-weight: 700; color: #14532d; margin-bottom: 1.4rem; display: flex; align-items: center; gap: 8px; }
+.field-label { font-size: 11px; font-weight: 700; color: #16a34a; letter-spacing: 0.05em; margin-bottom: 6px; display: block; }
+.field-group { margin-bottom: 14px; }
+.inp {
+  width: 100%; padding: 11px 14px; border: 1.5px solid #bbf7d0;
+  border-radius: 12px; font-size: 14px; font-family: inherit;
+  color: #1d1d1f; outline: none; background: #fff; transition: border 0.15s;
+}
+.inp:focus { border-color: #16a34a; }
+
+/* 학년 선택 버튼 */
+.grade-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.grade-btn {
+  padding: 10px; border: 1.5px solid #bbf7d0; border-radius: 10px;
+  background: #fff; font-size: 13px; font-weight: 600; color: #6e6e73;
+  cursor: pointer; font-family: inherit; transition: all 0.15s; text-align: center;
+}
+.grade-btn.sel { background: #16a34a; color: #fff; border-color: #16a34a; }
+.grade-btn:hover:not(.sel) { border-color: #16a34a; color: #16a34a; }
+
+.enter-btn {
+  width: 100%; padding: 14px; background: #16a34a;
+  border: none; border-radius: 14px; font-size: 15px; font-weight: 700;
+  color: #fff; cursor: pointer; font-family: inherit; margin-top: 1.2rem;
+  transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.enter-btn:hover { background: #15803d; }
+.enter-btn:disabled { background: #bbf7d0; color: #fff; cursor: not-allowed; }
+
+/* ── 테스트 선택 화면 ── */
+.test-list { display: flex; flex-direction: column; gap: 10px; }
+.test-item {
+  padding: 14px 16px; border: 1.5px solid #bbf7d0; border-radius: 14px;
+  background: #f0fdf4; cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.test-item:hover { border-color: #16a34a; background: #dcfce7; }
+.test-name { font-size: 14px; font-weight: 700; color: #14532d; }
+.test-meta { font-size: 11px; color: #16a34a; margin-top: 3px; }
+.test-arrow { font-size: 18px; color: #16a34a; }
+.back-btn {
+  background: none; border: none; font-size: 12px; font-weight: 600;
+  color: #6e6e73; cursor: pointer; font-family: inherit; padding: 0;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 4px;
+  transition: color 0.15s;
+}
+.back-btn:hover { color: #16a34a; }
+
+/* ── OMR 화면 ── */
+.omr-wrap { max-width: 640px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+.omr-header-card {
+  background: #fff; border: 1px solid #bbf7d0; border-radius: 18px;
+  padding: 1.2rem 1.6rem; margin-bottom: 1.2rem;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+}
+.omr-title { font-size: 1rem; font-weight: 700; color: #14532d; }
+.omr-meta { font-size: 12px; color: #16a34a; margin-top: 3px; }
+.omr-student-badge {
+  background: #dcfce7; border: 1px solid #bbf7d0; border-radius: 10px;
+  padding: 6px 14px; font-size: 12px; font-weight: 700; color: #14532d;
+}
+
+/* OMR 섹션 카드 */
+.omr-section {
+  background: #fff; border: 1px solid #bbf7d0; border-radius: 16px;
+  padding: 1.2rem 1.4rem; margin-bottom: 10px;
+}
+.omr-section-title {
+  font-size: 13px; font-weight: 700; color: #14532d; margin-bottom: 12px;
+  padding-bottom: 8px; border-bottom: 1px solid #f0fdf4;
+  display: flex; align-items: center; gap: 6px;
+}
+.omr-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.omr-q { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.omr-q-num { font-size: 10px; font-weight: 700; color: #6e6e73; }
+.omr-choices { display: flex; flex-direction: column; gap: 4px; }
+.omr-choice {
+  width: 36px; height: 36px; border-radius: 50%; border: 2px solid #bbf7d0;
+  background: #f0fdf4; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #6e6e73; cursor: pointer;
+  transition: all 0.12s; user-select: none;
+}
+.omr-choice:hover { border-color: #16a34a; color: #16a34a; }
+.omr-choice.sel { background: #16a34a; border-color: #16a34a; color: #fff; }
+
+/* 진행바 */
+.progress-bar-wrap { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; }
+.progress-label { font-size: 11px; font-weight: 700; color: #16a34a; margin-bottom: 6px; display: flex; justify-content: space-between; }
+.progress-track { height: 8px; background: #dcfce7; border-radius: 99px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #16a34a, #4ade80); border-radius: 99px; transition: width 0.3s ease; }
+
+/* 제출 버튼 */
+.submit-btn {
+  width: 100%; padding: 16px; background: #16a34a;
+  border: none; border-radius: 16px; font-size: 16px; font-weight: 700;
+  color: #fff; cursor: pointer; font-family: inherit; margin-top: 1rem;
+  transition: background 0.15s; box-shadow: 0 4px 16px rgba(22,163,74,0.25);
+}
+.submit-btn:hover { background: #15803d; }
+.submit-btn:disabled { background: #bbf7d0; cursor: not-allowed; box-shadow: none; }
+
+/* ── 결과 화면 ── */
+.result-card {
+  background: #fff; border: 1px solid #bbf7d0; border-radius: 20px;
+  padding: 2.5rem 2rem; max-width: 520px; margin: 2rem auto; text-align: center;
+  box-shadow: 0 4px 24px rgba(22,163,74,0.1);
+}
+.result-emoji { font-size: 3rem; margin-bottom: 1rem; }
+.result-title { font-size: 1.3rem; font-weight: 700; color: #14532d; margin-bottom: 6px; }
+.result-sub { font-size: 13px; color: #6e6e73; margin-bottom: 1.8rem; }
+.result-score-box {
+  background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px;
+  padding: 1.4rem; margin-bottom: 1.4rem;
+}
+.result-score-num { font-size: 2.5rem; font-weight: 700; color: #16a34a; letter-spacing: -0.05em; }
+.result-score-lbl { font-size: 12px; color: #6e6e73; margin-top: 4px; }
+.result-task-box {
+  background: #fef9c3; border: 1px solid #fde68a; border-radius: 14px;
+  padding: 1rem 1.2rem; text-align: left; margin-bottom: 1.4rem;
+}
+.result-task-title { font-size: 11px; font-weight: 700; color: #854d0e; margin-bottom: 6px; }
+.result-task-text { font-size: 13px; color: #1d1d1f; line-height: 1.6; }
+.home-btn {
+  display: inline-block; padding: 12px 28px; background: #16a34a;
+  border: none; border-radius: 14px; font-size: 14px; font-weight: 700;
+  color: #fff; cursor: pointer; font-family: inherit; text-decoration: none;
+  transition: background 0.15s;
+}
+.home-btn:hover { background: #15803d; }
+
+/* 로딩 */
+.loading { text-align: center; padding: 3rem; color: #16a34a; font-size: 13px; }
+.spinner { width: 32px; height: 32px; border: 3px solid #bbf7d0; border-top-color: #16a34a; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-hint { font-size: 13px; color: #aeaeb2; padding: 2rem; text-align: center; }
+.error-msg { font-size: 12px; color: #dc2626; margin-top: 6px; }
+
+/* 화면 전환 */
+.screen { display: none; }
+.screen.active { display: block; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">🧪</div>
+    <div>
+      <div class="brand">베타과학학원</div>
+      <div class="brand-sub">마스터테스트 OMR</div>
+    </div>
+  </div>
+</header>
+
+<!-- ① 입장 화면 -->
+<div class="screen active" id="screen-entry">
+  <div class="card">
+    <div class="entry-title">🎓 학생 입장</div>
+
+    <div class="field-group">
+      <label class="field-label"># 학원 입장 코드</label>
+      <input class="inp" type="text" id="entry-code" placeholder="선생님께 받은 코드">
+      <div class="error-msg" id="code-error" style="display:none;">잘못된 코드입니다. 다시 확인해주세요.</div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">이름</label>
+      <input class="inp" type="text" id="entry-name" placeholder="본인 이름 입력">
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">학년</label>
+      <div class="grade-grid">
+        <button class="grade-btn" onclick="selGrade('중등1학년',this)">중1</button>
+        <button class="grade-btn" onclick="selGrade('중등2학년',this)">중2</button>
+        <button class="grade-btn" onclick="selGrade('중등3학년',this)">중3</button>
+        <button class="grade-btn" onclick="selGrade('고등1학년',this)">고1</button>
+        <button class="grade-btn" onclick="selGrade('고등2학년',this)">고2</button>
+        <button class="grade-btn" onclick="selGrade('고등3학년',this)">고3</button>
+      </div>
+    </div>
+
+    <button class="enter-btn" onclick="doEnter()" id="enter-btn">입장하기 →</button>
+  </div>
+</div>
+
+<!-- ② 테스트 선택 화면 -->
+<div class="screen" id="screen-select">
+  <div class="card">
+    <button class="back-btn" onclick="goBack('entry')">← 뒤로</button>
+    <div class="entry-title">📋 테스트 선택</div>
+    <div id="test-list-wrap"><div class="loading"><div class="spinner"></div>불러오는 중...</div></div>
+  </div>
+</div>
+
+<!-- ③ OMR 화면 -->
+<div class="screen" id="screen-omr">
+  <div class="omr-wrap">
+    <div class="omr-header-card">
+      <div>
+        <div class="omr-title" id="omr-test-title">—</div>
+        <div class="omr-meta" id="omr-test-meta">—</div>
+      </div>
+      <div class="omr-student-badge" id="omr-student-badge">—</div>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-label">
+        <span>답안 작성 현황</span>
+        <span id="progress-txt">0 / 30</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+
+    <div id="omr-sections"></div>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitOMR()">✓ 답안 제출하기</button>
+  </div>
+</div>
+
+<!-- ④ 결과 화면 -->
+<div class="screen" id="screen-result">
+  <div class="result-card">
+    <div class="result-emoji" id="result-emoji">🎉</div>
+    <div class="result-title" id="result-title">제출 완료!</div>
+    <div class="result-sub" id="result-sub">수고했어요!</div>
+    <div class="result-score-box">
+      <div class="result-score-num" id="result-score">—</div>
+      <div class="result-score-lbl">점 / 100점</div>
+    </div>
+    <div class="result-task-box" id="result-task-box" style="display:none;">
+      <div class="result-task-title">📌 이번 과제</div>
+      <div class="result-task-text" id="result-task-text">—</div>
+    </div>
+    <a href="/student-test" class="home-btn">홈으로 돌아가기</a>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, getDocs, addDoc, query, orderBy, where, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getDoc, doc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const cfg = {
+  apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+  authDomain:"beta-science.firebaseapp.com",
+  projectId:"beta-science",
+  storageBucket:"beta-science.firebasestorage.app",
+  messagingSenderId:"650652155367",
+  appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+};
+const app = initializeApp(cfg);
+const db  = getFirestore(app);
+
+// ── 학원 입장 코드 (settings에서 불러옴) ──
+const FALLBACK_CODE = 'BETA2024'; // Firebase에 없을 때 기본값
+let ACADEMY_CODE = FALLBACK_CODE;
+let validCode = false;
+
+// settings 컬렉션에서 코드 불러오기
+(async () => {
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'academy'));
+    if (snap.exists() && snap.data().entryCode) {
+      ACADEMY_CODE = snap.data().entryCode;
+    }
+  } catch {}
+})();
+
+// ── 상태 ──
+let studentName = '';
+let studentGrade = '';
+let selectedTest = null;   // { fireId, testId, subject, grade, unitName, parts }
+let answers = {};          // { q1: '2', q2: '1', ... }
+let allTests = [];
+
+// ── 화면 전환 ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0,0);
+}
+window.goBack = (to) => showScreen(to);
+
+// ── 학년 선택 ──
+window.selGrade = (g, el) => {
+  studentGrade = g;
+  document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+};
+
+// ── 입장 ──
+window.doEnter = async () => {
+  const code = document.getElementById('entry-code').value.trim().toUpperCase();
+  const name = document.getElementById('entry-name').value.trim();
+  const codeErr = document.getElementById('code-error');
+
+  codeErr.style.display = 'none';
+  if (!code) return alert('입장 코드를 입력해주세요');
+  if (!name) return alert('이름을 입력해주세요');
+  if (!studentGrade) return alert('학년을 선택해주세요');
+
+  if (code !== ACADEMY_CODE.toUpperCase() && code !== FALLBACK_CODE) {
+    codeErr.style.display = 'block';
+    return;
+  }
+
+  studentName = name;
+  validCode = true;
+  showScreen('select');
+  await loadTests();
+};
+
+// ── 테스트 목록 불러오기 ──
+async function loadTests() {
+  const wrap = document.getElementById('test-list-wrap');
+  wrap.innerHTML = '<div class="loading"><div class="spinner"></div>불러오는 중...</div>';
+  try {
+    const snap = await getDocs(query(collection(db, 'master-tests'), orderBy('regDate', 'desc')));
+    allTests = [];
+    snap.forEach(d => allTests.push({ fireId: d.id, ...d.data() }));
+
+    // 학년 필터 (같은 학년 우선, 나머지도 표시)
+    const sameGrade = allTests.filter(t => t.grade === studentGrade);
+    const others    = allTests.filter(t => t.grade !== studentGrade);
+    const sorted    = [...sameGrade, ...others];
+
+    if (!sorted.length) { wrap.innerHTML = '<div class="empty-hint">등록된 테스트가 없습니다</div>'; return; }
+
+    let html = '<div class="test-list">';
+    sorted.forEach(t => {
+      const isMatch = t.grade === studentGrade;
+      html += `<div class="test-item" onclick="selectTest('${t.fireId}')">
+        <div>
+          <div class="test-name">${esc(t.unitName||'—')}</div>
+          <div class="test-meta">${esc(t.subject||'—')} · ${esc(t.grade||'—')} ${isMatch?'<span style="color:#16a34a;font-weight:700;">✓ 내 학년</span>':''}</div>
+        </div>
+        <span class="test-arrow">›</span>
+      </div>`;
+    });
+    html += '</div>';
+    wrap.innerHTML = html;
+  } catch(e) {
+    wrap.innerHTML = `<div class="empty-hint">불러오기 실패: ${esc(e.message)}</div>`;
+  }
+}
+
+// ── 테스트 선택 ──
+window.selectTest = (fireId) => {
+  selectedTest = allTests.find(t => t.fireId === fireId);
+  if (!selectedTest) return;
+  answers = {};
+  buildOMR();
+  showScreen('omr');
+};
+
+// ── OMR 구성 ──
+function buildOMR() {
+  document.getElementById('omr-test-title').textContent = selectedTest.unitName || '—';
+  document.getElementById('omr-test-meta').textContent  = `${selectedTest.subject} · ${selectedTest.grade}`;
+  document.getElementById('omr-student-badge').textContent = `${studentName} (${studentGrade})`;
+
+  const sectionsEl = document.getElementById('omr-sections');
+  const parts = selectedTest.parts || [];
+
+  // 전체 문항 수 계산 (parts 기반, 최대 30)
+  let totalQ = 0;
+  parts.forEach(p => {
+    const qs = Object.keys(p.answers || {});
+    totalQ += qs.length;
+  });
+  totalQ = Math.min(totalQ, 30);
+
+  let html = '';
+  parts.forEach((part, pi) => {
+    const qNums = Object.keys(part.answers || {}).sort((a,b)=>Number(a.slice(1))-Number(b.slice(1)));
+    if (!qNums.length) return;
+
+    html += `<div class="omr-section">
+      <div class="omr-section-title">
+        <span style="background:#dcfce7;color:#16a34a;font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;">${pi+1}부 · ${part.range}번</span>
+        ${part.sectionName ? `<span>${esc(part.sectionName)}</span>` : ''}
+      </div>
+      <div class="omr-grid">`;
+
+    qNums.forEach(qno => {
+      const num = qno.replace('q','');
+      html += `<div class="omr-q">
+        <div class="omr-q-num">${num}번</div>
+        <div class="omr-choices">
+          ${[1,2,3,4].map(n => `
+            <div class="omr-choice" id="choice-${qno}-${n}" onclick="pickAnswer('${qno}',${n})">
+              ${['①','②','③','④'][n-1]}
+            </div>`).join('')}
+        </div>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  sectionsEl.innerHTML = html;
+  updateProgress();
+}
+
+// ── 답 선택 ──
+window.pickAnswer = (qno, n) => {
+  // 이전 선택 해제
+  [1,2,3,4].forEach(i => {
+    const el = document.getElementById(`choice-${qno}-${i}`);
+    if (el) el.classList.remove('sel');
+  });
+  const el = document.getElementById(`choice-${qno}-${n}`);
+  if (el) el.classList.add('sel');
+  answers[qno] = String(n);
+  updateProgress();
+};
+
+function updateProgress() {
+  const parts = selectedTest?.parts || [];
+  let total = 0;
+  parts.forEach(p => total += Object.keys(p.answers||{}).length);
+  total = Math.min(total, 30);
+  const done = Object.keys(answers).length;
+  const pct  = total ? Math.round(done/total*100) : 0;
+  document.getElementById('progress-txt').textContent  = `${done} / ${total}`;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+// ── 제출 ──
+window.submitOMR = async () => {
+  const parts = selectedTest?.parts || [];
+  let total = 0;
+  parts.forEach(p => total += Object.keys(p.answers||{}).length);
+  total = Math.min(total, 30);
+
+  const done = Object.keys(answers).length;
+  if (done < total) {
+    if (!confirm(`아직 ${total - done}문제를 선택하지 않았어요. 그래도 제출할까요?`)) return;
+  }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = '제출 중...';
+
+  // 채점
+  let correct = 0, wrong = 0;
+  const wrongNums = [];
+  parts.forEach(part => {
+    Object.entries(part.answers || {}).forEach(([qno, correctAns]) => {
+      const studentAns = answers[qno];
+      if (!studentAns) { wrong++; wrongNums.push(Number(qno.replace('q',''))); return; }
+      if (studentAns === String(correctAns)) correct++;
+      else { wrong++; wrongNums.push(Number(qno.replace('q',''))); }
+    });
+  });
+
+  const score = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+  // 과제 결정 (전체 오답 기준 첫 번째 파트의 task 사용)
+  const firstPart = parts[0];
+  let taskText = '';
+  if (firstPart) {
+    if (wrong <= 2)       taskText = firstPart.taskLow  || '';
+    else if (wrong <= 4)  taskText = firstPart.taskMid  || '';
+    else                  taskText = firstPart.taskHigh || '';
+  }
+
+  // Firebase 저장 → master-results 컬렉션
+  try {
+    await addDoc(collection(db, 'master-results'), {
+      testId:      selectedTest.testId,
+      testFireId:  selectedTest.fireId,
+      unitName:    selectedTest.unitName,
+      subject:     selectedTest.subject,
+      testGrade:   selectedTest.grade,
+      studentName,
+      studentGrade,
+      answers,
+      score,
+      correct,
+      wrong,
+      wrongNums,
+      total,
+      submittedAt: serverTimestamp(),
+      regDate:     new Date().toLocaleString(),
+    });
+  } catch(e) {
+    alert('제출 실패: ' + e.message);
+    btn.disabled = false; btn.textContent = '✓ 답안 제출하기';
+    return;
+  }
+
+  // 결과 화면
+  const emoji = score >= 90 ? '🎉' : score >= 70 ? '😊' : score >= 50 ? '😅' : '💪';
+  const msg   = score >= 90 ? '훌륭해요!' : score >= 70 ? '잘했어요!' : score >= 50 ? '더 열심히 해봐요!' : '다음엔 더 잘할 수 있어요!';
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-title').textContent = '제출 완료!';
+  document.getElementById('result-sub').textContent   = `${studentName}학생, ${msg}`;
+  document.getElementById('result-score').textContent = score;
+  if (taskText) {
+    document.getElementById('result-task-box').style.display = 'block';
+    document.getElementById('result-task-text').textContent  = taskText;
+  }
+  showScreen('result');
+};
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>
