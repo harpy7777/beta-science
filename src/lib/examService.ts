@@ -159,6 +159,7 @@ export async function getExamByCode(code: string): Promise<Exam | null> {
 export async function submitStudentAnswers(payload: {
   examId: string;
   studentName: string;
+  studentId?: string;
   answers: Record<string, string>;
   score: number;
   totalQuestions: number;
@@ -168,6 +169,7 @@ export async function submitStudentAnswers(payload: {
   const docRef = await addDoc(collection(db, 'grades'), {
     examId: payload.examId,
     studentName: payload.studentName,
+    studentId: payload.studentId ?? '',
     answers: payload.answers,
     score: payload.score,
     totalQuestions: payload.totalQuestions,
