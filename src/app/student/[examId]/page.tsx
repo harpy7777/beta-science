@@ -30,18 +30,23 @@ function StudentExamInner() {
   const [retryScore, setRetryScore] = useState(0);
   const [retryPhase, setRetryPhase] = useState<'exam' | 'result'>('exam');
 
-  useEffect(() => {
-    getExam(examId).then(e => {
-      setExam(e);
-      setLoading(false);
-    });
-    const savedName = localStorage.getItem('studentName');
-    if (savedName) {
-      setStudentName(savedName);
-      setPhase('exam');
-      setCurrent(0);
-    }
-  }, [examId]);
+  const [studentId, setStudentId] = useState('');
+
+useEffect(() => {
+  getExam(examId).then(e => {
+    setExam(e);
+    setLoading(false);
+  });
+  const savedName = localStorage.getItem('studentName');
+  const savedId = localStorage.getItem('studentId');
+  const savedGrade = localStorage.getItem('studentGrade');
+  if (savedName) {
+    setStudentName(savedName);
+    setPhase('exam');
+    setCurrent(0);
+  }
+  if (savedId) setStudentId(savedId);
+}, [examId]);
 
   // 자동 제출 (마지막 문제 답 선택 시)
   async function autoSubmit(finalAnswers: Record<string, string>) {
@@ -53,12 +58,13 @@ function StudentExamInner() {
       setSubmitting(true);
       try {
         await submitStudentAnswers({
-          examId: exam.id!,
-          studentName,
-          answers: finalAnswers,
-          score: s,
-          totalQuestions: exam.questions.length,
-        });
+  examId: exam.id!,
+  studentName,
+  studentId,
+  answers: finalAnswers,
+  score: s,
+  totalQuestions: exam.questions.length,
+});
       } catch {
         toast.error('제출 중 오류가 발생했습니다');
       } finally {
