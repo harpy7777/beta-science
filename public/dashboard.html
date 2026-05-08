@@ -102,7 +102,7 @@
         <li><a href="students.html">학생 관리</a></li>
         <li><a href="special.html">특별관리</a></li>
         <li><a href="sms.html">SMS설정</a></li>
-        <li><a href="academy.html">학원관리</a></li>
+        <li><a href="management.html">학원관리</a></li>
         <li><a href="teacher-board.html">선생님 게시판</a></li>
       </ul>
     </nav>
@@ -184,7 +184,7 @@
         <a href="https://beta-science.vercel.app/grade-check.html" class="view-all">전체보기 ›</a>
       </div>
       <table>
-        <thead><tr><th>학생</th><th>테스트</th><th>점수</th><th>제출일</th></tr></thead>
+        <thead><tr><th>학생</th><th>학년</th><th>테스트</th><th>OX 점수</th><th>4지선다 점수</th><th>마스터 점수</th><th>제출일</th></tr></thead>
         <tbody id="recentGradesBody">
           <tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted)">데이터를 불러오는 중...</td></tr>
         </tbody>
@@ -334,41 +334,68 @@
 
   // ─── 최근 테스트 결과 (등록된 학생만 표시) ───
   function initRecentGrades() {
-    // timestamp 기준으로 정렬 (date 필드 대신)
-    const q = query(collection(db, "grades"), orderBy("timestamp", "desc"), limit(20));
+    const q = query(collection(db, "grades"), orderBy("timestamp", "desc"), limit(30));
     onSnapshot(q, s => {
       const tbody = document.getElementById('recentGradesBody');
       if (s.empty) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted)">등록된 데이터가 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted)">등록된 데이터가 없습니다.</td></tr>';
         return;
       }
 
-      // 등록된 학생의 성적만 필터링 (최대 5개)
       const validRows = s.docs
         .filter(d => {
           const sid = d.data().studentId || '';
           return activeStudentIds.size === 0 || activeStudentIds.has(sid);
         })
-        .slice(0, 5);
+        .slice(0, 10);
 
       if (!validRows.length) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted)">등록된 데이터가 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted)">등록된 데이터가 없습니다.</td></tr>';
         return;
       }
 
       tbody.innerHTML = validRows.map(d => {
         const r = d.data();
-        const cls = r.score >= 80 ? 'score-high' : r.score >= 60 ? 'score-mid' : 'score-low';
-        // date 또는 timestamp에서 날짜 표시
+
         let dateStr = r.date || '';
         if (!dateStr && r.timestamp) {
           const dt = r.timestamp.toDate ? r.timestamp.toDate() : new Date(r.timestamp);
           dateStr = `${dt.getFullYear()}. ${dt.getMonth()+1}. ${dt.getDate()}.`;
         }
+
+        const grade = r.studentGrade || r.grade || '';
+        const gradeMap = {
+          '중1':'g-mid1','중2':'g-mid2','중3':'g-mid3',
+          '고1':'g-high1','고2':'g-high2','고3':'g-high3'
+        };
+        const gradeCls = gradeMap[grade] || '';
+        const gradeBadge = grade
+          ? `<span class="grade-badge ${gradeCls}">${grade}</span>`
+          : '<span style="color:var(--text-muted)">-</span>';
+
+        const cls = r.score >= 80 ? 'score-high' : r.score >= 60 ? 'score-mid' : 'score-low';
+
+        const oxScore = r.oxScore !== undefined
+          ? `<span class="score-badge ${cls}">${r.oxScore}점</span>`
+          : '<span style="color:var(--text-muted)">-</span>';
+
+        const multiScore = r.multiScore !== undefined
+          ? `<span class="score-badge ${cls}">${r.multiScore}점</span>`
+          : '<span style="color:var(--text-muted)">-</span>';
+
+        const masterScore = (r.testType === 'master' && r.score !== undefined)
+          ? `<span class="score-badge ${cls}">${r.score}점</span>`
+          : r.masterScore !== undefined
+            ? `<span class="score-badge ${cls}">${r.masterScore}점</span>`
+            : '<span style="color:var(--text-muted)">-</span>';
+
         return `<tr>
           <td>${r.studentName||'-'}</td>
+          <td>${gradeBadge}</td>
           <td>${r.testName||r.examTitle||'-'}</td>
-          <td><span class="score-badge ${cls}">${r.score}점</span></td>
+          <td>${oxScore}</td>
+          <td>${multiScore}</td>
+          <td>${masterScore}</td>
           <td>${dateStr||'-'}</td>
         </tr>`;
       }).join('');
