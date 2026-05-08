@@ -415,13 +415,12 @@ body {
       <!-- 테이블 -->
       <div style="overflow-x:auto;">
         <table class="data-table">
-          <thead>
+         <thead>
             <tr>
               <th>학생명</th>
               <th>과목</th>
-              <th>납부월</th>
-              <th>금액</th>
               <th>납부일</th>
+              <th>금액</th>
               <th>상태</th>
               <th>메모</th>
               <th></th>
@@ -572,17 +571,17 @@ body {
           <option>물리</option><option>지학</option><option>전체</option>
         </select>
       </div>
-      <div class="form-group">
-        <label class="form-label">납부월 *</label>
-        <input class="form-input" type="month" id="t-month">
+      <div class="form-group" style="grid-column: span 2;">
+        <label class="form-label">납부일 * (연월일 직접 선택)</label>
+        <input class="form-input" type="date" id="t-paydate" style="width:100%;">
       </div>
       <div class="form-group">
         <label class="form-label">금액 (원) *</label>
-        <input class="form-input" type="number" id="t-amount" placeholder="예: 280000" min="0">
-      </div>
-      <div class="form-group">
-        <label class="form-label">납부일</label>
-        <input class="form-input" type="date" id="t-date">
+        <input class="form-input" type="text" id="t-amount"
+          placeholder="예: 280000"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          style="width:100%; -moz-appearance:textfield;">
       </div>
       <div class="form-group">
         <label class="form-label">납부 상태 *</label>
@@ -603,7 +602,6 @@ body {
     </div>
   </div>
 </div>
-
 <!-- 상담 모달 -->
 <div class="modal-bg" id="consult-modal">
   <div class="modal-box">
@@ -936,22 +934,36 @@ window.renderTuition = function(){
 };
 window.setTFilter=(f,el)=>{ tFilter=f; document.querySelectorAll('#tab-tuition .fchip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); renderTuition(); };
 window.saveTuition = async () => {
-  const studentSel = document.getElementById('t-student');
-  const studentId  = studentSel.value;
-  const studentName= studentSel.options[studentSel.selectedIndex]?.text||'';
-  const subject    = document.getElementById('t-subject').value;
-  const month      = document.getElementById('t-month').value;
-  const amount     = document.getElementById('t-amount').value;
-  const payDate    = document.getElementById('t-date').value;
-  const status     = document.getElementById('t-status').value;
-  const note       = document.getElementById('t-note').value.trim();
-  if(!studentId||!month||!amount) return alert('학생, 납부월, 금액을 입력하세요');
+  const studentSel  = document.getElementById('t-student');
+  const studentId   = studentSel.value;
+  const studentName = studentSel.options[studentSel.selectedIndex]?.text || '';
+  const subject     = document.getElementById('t-subject').value;
+  const paydate     = document.getElementById('t-paydate').value;
+  const amountRaw   = document.getElementById('t-amount').value.replace(/[^0-9]/g, '');
+  const amount      = Number(amountRaw);
+  const status      = document.getElementById('t-status').value;
+  const note        = document.getElementById('t-note').value.trim();
+
+  if (!studentId) return alert('학생을 선택하세요');
+  if (!paydate)   return alert('납부일을 선택하세요');
+  if (!amountRaw) return alert('금액을 입력하세요');
+
+  const month = paydate.slice(0, 7); // YYYY-MM 자동 추출
+
   try {
-    await addDoc(collection(db,'tuition'),{studentId,studentName,subject,month,amount:Number(amount),payDate,status,note,createdAt:serverTimestamp()});
+    await addDoc(collection(db, 'tuition'), {
+      studentId, studentName, subject,
+      month, payDate: paydate,
+      amount, status, note,
+      createdAt: serverTimestamp()
+    });
     closeModal('tuition-modal');
     showToast('수납 내역이 저장되었습니다 ✓');
-    await loadTuition(); updateStats();
-  } catch(e){ alert('저장 실패: '+e.message); }
+    await loadTuition();
+    updateStats();
+  } catch(e) {
+    alert('저장 실패: ' + e.message);
+  }
 };
 window.delTuition = async id => {
   if(!confirm('삭제할까요?')) return;
@@ -1233,15 +1245,16 @@ window.renderAttend = function(){
   if(studentSel) list = list.filter(a=>a.studentId===studentSel);
   if(!list.length){ table.style.display='none'; return; }
   table.style.display='';
-  tbody.innerHTML = list.map(a=>{
-    const sCls = a.status==='출석'?'badge-green':a.status==='결석'?'badge-red':'badge-yellow';
+  tbody.innerHTML = list.map(t=>{
+    const sCls = t.status==='납부완료'?'badge-green':t.status==='미납'?'badge-red':'badge-yellow';
     return `<tr>
-      <td>${a.attendDate||'—'}</td>
-      <td><strong>${esc(a.studentName||'—')}</strong></td>
-      <td>${esc(a.subject||'—')}</td>
-      <td><span class="badge ${sCls}">${a.status}</span></td>
-      <td style="color:#6e6e73;font-size:11px;">${esc(a.note||'')}</td>
-      <td><button class="del-btn" onclick="delAttend('${a.id}')">✕</button></td>
+      <td><strong>${esc(t.studentName||'—')}</strong></td>
+      <td>${esc(t.subject||'—')}</td>
+      <td>${t.payDate||t.month||'—'}</td>
+      <td style="font-weight:700;">${t.amount?Number(t.amount).toLocaleString()+'원':'—'}</td>
+      <td><span class="badge ${sCls}">${t.status}</span></td>
+      <td style="color:#6e6e73;font-size:11px;">${esc(t.note||'')}</td>
+      <td><button class="del-btn" onclick="delTuition('${t.id}')">✕</button></td>
     </tr>`;
   }).join('');
 };
