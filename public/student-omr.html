@@ -74,7 +74,7 @@ body {
   transition: color 0.15s;
 }
 .back-btn:hover { color: #16a34a; }
-.omr-wrap { max-width: 640px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+.omr-wrap { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
 .omr-header-card {
   background: #fff; border: 1px solid #bbf7d0; border-radius: 18px;
   padding: 1.2rem 1.6rem; margin-bottom: 1.2rem;
@@ -96,13 +96,16 @@ body {
   display: flex; align-items: center; gap: 6px;
 }
 .omr-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-.omr-q { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+@media (max-width: 480px) {
+  .omr-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+}
+.omr-q { display: flex; flex-direction: column; align-items: center; gap: 5px; }
 .omr-q-num { font-size: 10px; font-weight: 700; color: #6e6e73; }
-.omr-choices { display: flex; flex-direction: column; gap: 4px; }
+.omr-choices { display: flex; flex-direction: column; gap: 3px; }
 .omr-choice {
-  width: 36px; height: 36px; border-radius: 50%; border: 2px solid #bbf7d0;
+  width: 34px; height: 34px; border-radius: 50%; border: 2px solid #bbf7d0;
   background: #f0fdf4; display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; color: #6e6e73; cursor: pointer;
+  font-size: 11px; font-weight: 700; color: #6e6e73; cursor: pointer;
   transition: all 0.12s; user-select: none;
 }
 .omr-choice:hover { border-color: #16a34a; color: #16a34a; }
@@ -254,7 +257,7 @@ body {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore, collection, getDocs, addDoc,
-  query, orderBy, where, serverTimestamp
+  query, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg = {
@@ -268,10 +271,32 @@ const cfg = {
 const app = initializeApp(cfg);
 const db  = getFirestore(app);
 
+// ──────────────────────────────────────────────
+// 학년 정규화 테이블
+// Firebase에 저장된 다양한 학년 표기 → UI 표기(고1, 중2 …)
+// ──────────────────────────────────────────────
+const GRADE_VARIANTS = {
+  '중1': ['중1','중1학년','중학1학년','중학교1학년','중학교 1학년','중 1학년'],
+  '중2': ['중2','중2학년','중학2학년','중학교2학년','중학교 2학년','중 2학년'],
+  '중3': ['중3','중3학년','중학3학년','중학교3학년','중학교 3학년','중 3학년'],
+  '고1': ['고1','고1학년','고등1학년','고등학교1학년','고등학교 1학년','고 1학년'],
+  '고2': ['고2','고2학년','고등2학년','고등학교2학년','고등학교 2학년','고 2학년'],
+  '고3': ['고3','고3학년','고등3학년','고등학교3학년','고등학교 3학년','고 3학년'],
+};
+
+// 공백 제거 후 매핑
+function normalizeGrade(raw) {
+  const s = String(raw || '').replace(/\s/g, '');
+  for (const [uiGrade, variants] of Object.entries(GRADE_VARIANTS)) {
+    if (variants.some(v => v.replace(/\s/g,'') === s)) return uiGrade;
+  }
+  return String(raw || '');
+}
+
 // ── 상태 ──
 let studentName  = '';
 let studentId    = '';
-let studentGrade = '';
+let studentGrade = '';   // 항상 UI 표기 (고1, 중2 등)
 let selectedTest = null;
 let answers      = {};
 let allTests     = [];
@@ -318,7 +343,6 @@ window.doEnter = async () => {
       idErr.style.display = 'block';
       return;
     }
-
     studentId   = student.id;
     studentName = student.name;
 
@@ -335,30 +359,56 @@ window.doEnter = async () => {
   }
 };
 
-// ── 테스트 목록 불러오기 ──
+// ──────────────────────────────────────────────
+// 테스트 목록 불러오기
+// 전략: studentGrade의 모든 변형으로 병렬 쿼리
+//       → 그래도 없으면 전체 조회 후 클라이언트 정규화 필터
+// ──────────────────────────────────────────────
 async function loadTests() {
   const wrap = document.getElementById('test-list-wrap');
   wrap.innerHTML = '<div class="loading"><div class="spinner"></div>불러오는 중...</div>';
 
-  // 복합 인덱스 시도 → 실패 시 단순 필터 fallback
-  const tryLoad = async (useOrder) => {
-    const constraints = [
-      collection(db, 'master-tests'),
-      where('grade', '==', studentGrade),
-    ];
-    if (useOrder) constraints.push(orderBy('regDate', 'desc'));
-    const snap = await getDocs(query(...constraints));
-    allTests = [];
-    snap.forEach(d => allTests.push({ fireId: d.id, ...d.data() }));
-  };
-
   try {
-    await tryLoad(true);
-  } catch {
-    try { await tryLoad(false); } catch(e2) {
-      wrap.innerHTML = `<div class="empty-hint">불러오기 실패: ${esc(e2.message)}</div>`;
-      return;
+    const variants = GRADE_VARIANTS[studentGrade] || [studentGrade];
+    const seen = new Set();
+    let docs = [];
+
+    // 1단계: 변형별 병렬 쿼리
+    const snaps = await Promise.all(
+      variants.map(v =>
+        getDocs(query(collection(db, 'master-tests'), where('grade', '==', v))).catch(() => null)
+      )
+    );
+    snaps.forEach(snap => {
+      if (!snap) return;
+      snap.forEach(d => {
+        if (!seen.has(d.id)) { seen.add(d.id); docs.push({ fireId: d.id, ...d.data() }); }
+      });
+    });
+
+    // 2단계: 여전히 없으면 전체 조회 후 클라이언트 정규화 필터 (fallback)
+    if (docs.length === 0) {
+      const allSnap = await getDocs(collection(db, 'master-tests'));
+      allSnap.forEach(d => {
+        const data = d.data();
+        if (normalizeGrade(data.grade) === studentGrade && !seen.has(d.id)) {
+          seen.add(d.id);
+          docs.push({ fireId: d.id, ...data });
+        }
+      });
     }
+
+    // regDate 내림차순 정렬
+    docs.sort((a, b) => {
+      const da = a.regDate ? new Date(a.regDate) : new Date(0);
+      const db2 = b.regDate ? new Date(b.regDate) : new Date(0);
+      return db2 - da;
+    });
+
+    allTests = docs;
+  } catch(e) {
+    wrap.innerHTML = `<div class="empty-hint">불러오기 실패: ${esc(e.message)}</div>`;
+    return;
   }
 
   if (!allTests.length) {
@@ -396,10 +446,15 @@ window.selectTest = (fireId) => {
   showScreen('omr');
 };
 
-// ── OMR 구성 ──
+// ──────────────────────────────────────────────
+// OMR 구성 — 5지선다
+// part.answers의 정답 최댓값으로 선택지 수 자동 감지
+// 기본값: 5지선다 (①②③④⑤)
+// ──────────────────────────────────────────────
 function buildOMR() {
   document.getElementById('omr-test-title').textContent    = selectedTest.unitName || '—';
-  document.getElementById('omr-test-meta').textContent     = `${selectedTest.subject || ''} · ${selectedTest.grade || ''}`;
+  document.getElementById('omr-test-meta').textContent     =
+    `${selectedTest.subject || ''} · ${normalizeGrade(selectedTest.grade || '')}`;
   document.getElementById('omr-student-badge').textContent = `${studentName} (${studentGrade})`;
 
   const parts = selectedTest.parts || [];
@@ -407,13 +462,18 @@ function buildOMR() {
 
   parts.forEach((part, pi) => {
     const qNums = Object.keys(part.answers || {})
-      .sort((a,b) => Number(a.slice(1)) - Number(b.slice(1)));
+      .sort((a, b) => Number(a.replace('q','')) - Number(b.replace('q','')));
     if (!qNums.length) return;
+
+    // 정답 중 최댓값으로 선택지 수 결정 (4 또는 5)
+    const maxAns = Math.max(...Object.values(part.answers || {}).map(v => Number(v)));
+    const choiceCount = (isFinite(maxAns) && maxAns >= 5) ? 5 : 5; // 기본 5지선다
+    const symbols = ['①','②','③','④','⑤'].slice(0, choiceCount);
 
     html += `<div class="omr-section">
       <div class="omr-section-title">
         <span style="background:#dcfce7;color:#16a34a;font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;">
-          ${pi+1}부 · ${part.range || ''}번
+          ${pi+1}부 · ${esc(part.range || '')}번
         </span>
         ${part.sectionName ? `<span>${esc(part.sectionName)}</span>` : ''}
       </div>
@@ -424,13 +484,14 @@ function buildOMR() {
       html += `<div class="omr-q">
         <div class="omr-q-num">${num}번</div>
         <div class="omr-choices">
-          ${[1,2,3,4].map(n=>`
-            <div class="omr-choice" id="choice-${qno}-${n}" onclick="pickAnswer('${qno}',${n})">
-              ${['①','②','③','④'][n-1]}
-            </div>`).join('')}
+          ${symbols.map((sym, idx) => {
+            const n = idx + 1;
+            return `<div class="omr-choice" id="choice-${qno}-${n}" onclick="pickAnswer('${qno}',${n})">${sym}</div>`;
+          }).join('')}
         </div>
       </div>`;
     });
+
     html += `</div></div>`;
   });
 
@@ -440,10 +501,10 @@ function buildOMR() {
 
 // ── 답 선택 ──
 window.pickAnswer = (qno, n) => {
-  [1,2,3,4].forEach(i => {
+  for (let i = 1; i <= 5; i++) {
     const el = document.getElementById(`choice-${qno}-${i}`);
     if (el) el.classList.remove('sel');
-  });
+  }
   const el = document.getElementById(`choice-${qno}-${n}`);
   if (el) el.classList.add('sel');
   answers[qno] = String(n);
@@ -474,16 +535,24 @@ window.submitOMR = async () => {
   const btn = document.getElementById('submit-btn');
   btn.disabled = true; btn.textContent = '제출 중...';
 
-  // 채점
+  // 채점: 정답 맵 생성
+  const correctMap = {};
+  parts.forEach(part => {
+    Object.entries(part.answers||{}).forEach(([qno, ans]) => {
+      correctMap[qno] = String(ans);
+    });
+  });
+
   let correct = 0, wrong = 0;
   const wrongNums = [];
-  parts.forEach(part => {
-    Object.entries(part.answers||{}).forEach(([qno, correctAns]) => {
-      const sa = answers[qno];
-      if (!sa) { wrong++; wrongNums.push(Number(qno.replace('q',''))); return; }
-      if (sa === String(correctAns)) correct++;
-      else { wrong++; wrongNums.push(Number(qno.replace('q',''))); }
-    });
+  Object.entries(correctMap).forEach(([qno, correctAns]) => {
+    const sa = answers[qno];
+    if (!sa || sa !== correctAns) {
+      wrong++;
+      wrongNums.push(Number(qno.replace('q','')));
+    } else {
+      correct++;
+    }
   });
 
   const score = total > 0 ? Math.round((correct/total)*100) : 0;
@@ -496,20 +565,22 @@ window.submitOMR = async () => {
   // Firebase 저장
   try {
     await addDoc(collection(db, 'answers'), {
-      testId:     selectedTest.testId    || '',
-      testFireId: selectedTest.fireId,
-      unitName:   selectedTest.unitName  || '',
-      subject:    selectedTest.subject   || '',
-      testGrade:  selectedTest.grade     || '',
+      testId:        selectedTest.testId    || '',
+      testFireId:    selectedTest.fireId,
+      unitName:      selectedTest.unitName  || '',
+      subject:       selectedTest.subject   || '',
+      testGrade:     selectedTest.grade     || '',
+      testGradeNorm: normalizeGrade(selectedTest.grade || ''),
       studentId,
       studentName,
       studentGrade,
-      answers: Object.entries(answers).map(([qno,val])=>({
+      answers: Object.entries(answers).map(([qno, val]) => ({
         question:      `Q${qno.replace('q','')}`,
         studentAnswer: val,
-        isCorrect:     false
+        isCorrect:     val === correctMap[qno],
       })),
-      score, testType:'master',
+      score,
+      testType:  'master',
       examTitle: selectedTest.unitName || '마스터테스트 OMR',
       correct, wrong, wrongNums, total,
       submittedAt: serverTimestamp(),
