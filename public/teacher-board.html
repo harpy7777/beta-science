@@ -1204,19 +1204,9 @@ let ccData = [], ccSubjFilter = '전체', studentList = [];
 // students 컬렉션에서 실시간으로 학생 목록 불러오기
 async function loadStudentList() {
   try {
-    // students 컬렉션 우선 시도, 없으면 users 컬렉션 폴백
-    let snap = null;
-    try {
-      snap = await getDocs(query(collection(db,'students'), orderBy('name','asc')));
-      if (snap.empty) throw new Error('empty');
-    } catch {
-      // users 컬렉션에서 student 역할 조회 (폴백)
-      snap = await getDocs(query(collection(db,'users'), where('role','==','student'), where('status','==','approved')));
-    }
-
+    const snap = await getDocs(query(collection(db,'students'), orderBy('name','asc')));
     studentList = [];
     snap.forEach(d => studentList.push({id:d.id, ...d.data()}));
-    studentList.sort((a,b) => (a.name||'').localeCompare(b.name||'','ko'));
 
     const sel = document.getElementById('cc-student');
     if (!studentList.length) {
@@ -1224,34 +1214,36 @@ async function loadStudentList() {
       return;
     }
     sel.innerHTML = studentList.map(s => {
-      const grade = s.grade || s.schoolGrade || '';
-      const displayName = s.name || s.email || s.id;
+      const grade = s.grade || '';
+      const subject = s.subject || '';
+      const displayName = s.name || s.id;
       const label = grade ? `${displayName} (${grade})` : displayName;
-      return `<option value="${s.id}" data-grade="${esc(grade)}" data-name="${esc(displayName)}">${esc(label)}</option>`;
+      return `<option value="${s.id}" data-grade="${esc(grade)}" data-subject="${esc(subject)}" data-name="${esc(displayName)}">${esc(label)}</option>`;
     }).join('');
 
-    // 첫 번째 학생 학년 표시
     onStudentChange();
   } catch(e) {
     console.error('학생 목록 로드 실패:', e);
-    const sel = document.getElementById('cc-student');
-    sel.innerHTML = '<option value="">학생 로드 실패</option>';
+    document.getElementById('cc-student').innerHTML = '<option value="">로드 실패</option>';
   }
 }
 
 // 학생 선택 시 학년 자동표시
+// 학생 선택 시 학년 + 과목 자동표시
 window.onStudentChange = function() {
   const sel = document.getElementById('cc-student');
   const opt = sel.options[sel.selectedIndex];
-  const grade = opt ? (opt.getAttribute('data-grade') || '') : '';
+  const grade   = opt ? (opt.getAttribute('data-grade')   || '') : '';
+  const subject = opt ? (opt.getAttribute('data-subject') || '') : '';
   const display = document.getElementById('cc-student-grade-display');
   if (!display) return;
-  if (grade) {
+  if (grade || subject) {
     display.style.display = 'flex';
-    display.innerHTML = `<span style="font-size:11px;margin-right:2px;">📚</span> ${esc(grade)}`;
+    display.innerHTML =
+      (grade   ? `<span style="font-size:11px;margin-right:2px;">📚</span><strong>${esc(grade)}</strong>` : '') +
+      (subject ? `<span style="margin-left:6px;color:#a21caf;font-size:11px;">${esc(subject)}</span>` : '');
   } else {
     display.style.display = 'none';
-    display.innerHTML = '';
   }
 };
 
