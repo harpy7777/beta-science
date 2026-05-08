@@ -283,10 +283,16 @@ function CreateExamInner() {
     if (allQuestions.length === 0) { toast.error('문제를 1개 이상 입력하세요'); return; }
     setSaving(true);
     try {
-      const payload = {
-        title: title.trim(), teacherId: user!.uid,
-        questions: allQuestions, isPublished: publish,
-        grade, subject, codepenUrl: codepenUrl.trim(),
+     const payload = {
+        title: title.trim(),
+        teacherId: user!.uid,
+        questions: allQuestions,
+        oxQuestions: oxParsed,
+        multipleQuestions: mcParsed,
+        isPublished: publish,
+        grade,
+        subject,
+        codepenUrl: codepenUrl.trim(),
       };
       if (editId) {
         await updateExam(editId, payload);
