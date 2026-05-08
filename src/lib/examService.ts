@@ -21,6 +21,8 @@ export interface Exam {
   title: string;
   teacherId: string;
   questions: Question[];
+  oxQuestions?: Question[];
+  multipleQuestions?: Question[];
   createdAt?: Timestamp;
   regDate?: Timestamp;
   isPublished: boolean;
@@ -166,17 +168,39 @@ export async function submitStudentAnswers(payload: {
   grade?: string;
 }): Promise<string> {
   const exam = await getExam(payload.examId);
+
+  // ✅ OX / 4지선다 분리 점수 계산
+  const oxQuestions       = (exam?.questions ?? []).filter(q => q.type === 'ox');
+  const multipleQuestions = (exam?.questions ?? []).filter(q => q.type === 'multiple');
+
+  let oxScore:    number | null = null;
+  let multiScore: number | null = null;
+
+  if (oxQuestions.length > 0) {
+    const correct = oxQuestions.filter(q => payload.answers[q.id] === q.answer).length;
+    oxScore = Math.round((correct / oxQuestions.length) * 100);
+  }
+
+  if (multipleQuestions.length > 0) {
+    const correct = multipleQuestions.filter(q => payload.answers[q.id] === q.answer).length;
+    multiScore = Math.round((correct / multipleQuestions.length) * 100);
+  }
+
   const docRef = await addDoc(collection(db, 'grades'), {
-    examId: payload.examId,
-    studentName: payload.studentName,
-    studentId: payload.studentId ?? '',
-    answers: payload.answers,
-    score: payload.score,
+    examId:         payload.examId,
+    studentName:    payload.studentName,
+    studentId:      payload.studentId ?? '',
+    answers:        payload.answers,
+    score:          payload.score,          // 전체 점수 (기존 호환)
+    oxScore,                                // ✅ OX 점수만
+    multiScore,                             // ✅ 4지선다 점수만
+    oxCount:        oxQuestions.length,
+    multiCount:     multipleQuestions.length,
     totalQuestions: payload.totalQuestions,
-    grade: payload.grade ?? exam?.grade ?? '',
-    testName: exam?.title ?? '',
-    date: new Date().toLocaleDateString('ko-KR'),
-    timestamp: Timestamp.now(),
+    grade:          payload.grade ?? exam?.grade ?? '',
+    testName:       exam?.title ?? '',
+    date:           new Date().toLocaleDateString('ko-KR'),
+    timestamp:      Timestamp.now(),
   });
   return docRef.id;
 }
