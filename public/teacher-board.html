@@ -189,22 +189,35 @@ body {
 .clear-btn:hover { background: #ebebec; }
 
 /* ── 문제은행 ── */
-.filter-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.filter-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
 .fchip { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; border: 1px solid #fce7f3; background: #fff; color: #6e6e73; cursor: pointer; transition: all 0.15s; }
 .fchip.on { background: #db2777; color: #fff; border-color: #db2777; }
+/* 학년 칩은 별도 색상 */
+.grade-chip-row .fchip.on { background: #5b21b6; border-color: #5b21b6; }
+.grade-chip-row .fchip { border-color: #e0e7ff; }
 .qbank-form { background: #fff; border: 1px solid #fce7f3; border-radius: 14px; padding: 12px 14px; margin-bottom: 14px; }
 .qbank-list { display: flex; flex-direction: column; gap: 8px; }
 .qbank-card { background: #fff; border: 1px solid #fce7f3; border-radius: 14px; padding: 12px 14px; transition: border-color 0.15s; }
 .qbank-card:hover { border-color: #fbcfe8; }
-.qbank-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.qbank-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
 .qbank-q { font-size: 13px; font-weight: 500; color: #1d1d1f; line-height: 1.5; }
-.qb-chip { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 5px; }
+.qb-chip { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 5px; white-space: nowrap; }
 .qbc-subj-물리 { background: #dbeafe; color: #1e40af; }
 .qbc-subj-화학 { background: #fce7f3; color: #db2777; }
 .qbc-subj-생물 { background: #d1fae5; color: #065f46; }
 .qbc-subj-지학 { background: #fef9c3; color: #854d0e; }
+.qbc-subj-통합과학 { background: #e0f2fe; color: #0369a1; }
+.qbc-subj-내신 { background: #fdf4ff; color: #7e22ce; }
 .qbc-diff { background: #f5f5f7; color: #6e6e73; }
 .qbc-type { background: #ede9fe; color: #5b21b6; }
+.qbc-grade { background: #ede9fe; color: #5b21b6; }
+
+/* ── 학년 뱃지 ── */
+.grade-badge {
+  font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 5px;
+  background: #ede9fe; color: #5b21b6; white-space: nowrap;
+}
+.cc-chip-grade { background: #ede9fe; color: #5b21b6; }
 
 /* ── 개념정리 ── */
 .concept-search { width: 100%; padding: 8px 14px; border: 1.5px solid #fce7f3; border-radius: 12px; font-size: 12px; font-family: inherit; color: #1d1d1f; outline: none; margin-bottom: 10px; transition: border 0.15s; }
@@ -275,6 +288,14 @@ body {
 }
 .cc-textarea:focus { border-color: #a21caf; }
 .cc-form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+
+/* 학생 선택 학년 표시 박스 */
+.student-grade-info {
+  margin-top: 5px; padding: 5px 9px; border-radius: 8px;
+  background: #fdf4ff; border: 1px solid #f3e8ff;
+  font-size: 11px; font-weight: 600; color: #7e22ce;
+  display: flex; align-items: center; gap: 5px; min-height: 26px;
+}
 
 /* 수업카드 리스트 */
 .cc-stats-row {
@@ -580,22 +601,47 @@ body {
   </div>
 </div>
 
-<!-- 문제은행 패널 -->
+<!-- ══════════════════════════════════════
+     문제은행 패널 (학년 + 내신 추가)
+══════════════════════════════════════ -->
 <div class="page-panel" id="panel-qbank">
   <div class="panel-bar"><span class="panel-bar-title">📝 문제은행</span><button class="close-btn" onclick="closePanel()">✕</button></div>
   <div class="panel-body">
-    <div class="filter-chips">
+
+    <!-- 과목 필터 -->
+    <div class="filter-chips" id="qbank-subj-chips">
       <button class="fchip on" onclick="setQFilter('전체',this)">전체</button>
       <button class="fchip" onclick="setQFilter('통합과학',this)">통합과학</button>
       <button class="fchip" onclick="setQFilter('화학',this)">화학</button>
       <button class="fchip" onclick="setQFilter('생물',this)">생물</button>
       <button class="fchip" onclick="setQFilter('물리',this)">물리</button>
       <button class="fchip" onclick="setQFilter('지학',this)">지학</button>
+      <button class="fchip" onclick="setQFilter('내신',this)">내신</button>
     </div>
+
+    <!-- 학년 필터 -->
+    <div class="filter-chips grade-chip-row" id="qbank-grade-chips">
+      <button class="fchip on" onclick="setQGradeFilter('전체',this)">학년 전체</button>
+      <button class="fchip" onclick="setQGradeFilter('중1',this)">중1</button>
+      <button class="fchip" onclick="setQGradeFilter('중2',this)">중2</button>
+      <button class="fchip" onclick="setQGradeFilter('중3',this)">중3</button>
+      <button class="fchip" onclick="setQGradeFilter('고1',this)">고1</button>
+      <button class="fchip" onclick="setQGradeFilter('고2',this)">고2</button>
+      <button class="fchip" onclick="setQGradeFilter('고3',this)">고3</button>
+    </div>
+
     <div class="qbank-form">
       <div class="section-label">문제 추가</div>
       <div class="form-row" style="margin-bottom:8px;">
-        <select class="form-select" id="q-subj"><option>통합과학</option><option>화학</option><option>생물</option><option>물리</option><option>지학</option></select>
+        <select class="form-select" id="q-subj">
+          <option>통합과학</option><option>화학</option><option>생물</option>
+          <option>물리</option><option>지학</option><option>내신</option>
+        </select>
+        <select class="form-select" id="q-grade" style="min-width:90px;">
+          <option value="">학년선택</option>
+          <option>중1</option><option>중2</option><option>중3</option>
+          <option>고1</option><option>고2</option><option>고3</option>
+        </select>
         <input class="form-input" type="text" id="q-unit" placeholder="단원명">
         <select class="form-select" id="q-diff"><option value="상">난이도 상</option><option value="중" selected>난이도 중</option><option value="하">난이도 하</option></select>
         <select class="form-select" id="q-type"><option>OX</option><option>4지선다</option><option>마스터</option></select>
@@ -607,23 +653,48 @@ body {
   </div>
 </div>
 
-<!-- 개념정리 패널 -->
+<!-- ══════════════════════════════════════
+     개념정리 패널 (학년 + 내신 추가)
+══════════════════════════════════════ -->
 <div class="page-panel" id="panel-concept">
   <div class="panel-bar"><span class="panel-bar-title">📚 개념정리 창고</span><button class="close-btn" onclick="closePanel()">✕</button></div>
   <div class="panel-body">
     <input class="concept-search" type="text" id="concept-search" placeholder="개념 검색..." oninput="filterConcepts()">
-    <div class="filter-chips">
+
+    <!-- 과목 필터 -->
+    <div class="filter-chips" id="concept-subj-chips">
       <button class="fchip on" onclick="setConceptFilter('전체',this)">전체</button>
       <button class="fchip" onclick="setConceptFilter('통합과학',this)">통합과학</button>
       <button class="fchip" onclick="setConceptFilter('화학',this)">화학</button>
       <button class="fchip" onclick="setConceptFilter('생물',this)">생물</button>
       <button class="fchip" onclick="setConceptFilter('물리',this)">물리</button>
       <button class="fchip" onclick="setConceptFilter('지학',this)">지학</button>
+      <button class="fchip" onclick="setConceptFilter('내신',this)">내신</button>
     </div>
+
+    <!-- 학년 필터 -->
+    <div class="filter-chips grade-chip-row" id="concept-grade-chips">
+      <button class="fchip on" onclick="setConceptGradeFilter('전체',this)">학년 전체</button>
+      <button class="fchip" onclick="setConceptGradeFilter('중1',this)">중1</button>
+      <button class="fchip" onclick="setConceptGradeFilter('중2',this)">중2</button>
+      <button class="fchip" onclick="setConceptGradeFilter('중3',this)">중3</button>
+      <button class="fchip" onclick="setConceptGradeFilter('고1',this)">고1</button>
+      <button class="fchip" onclick="setConceptGradeFilter('고2',this)">고2</button>
+      <button class="fchip" onclick="setConceptGradeFilter('고3',this)">고3</button>
+    </div>
+
     <div class="qbank-form">
       <div class="section-label">개념 추가</div>
       <div class="form-row" style="margin-bottom:8px;">
-        <select class="form-select" id="con-subj"><option>통합과학</option><option>화학</option><option>생물</option><option>물리</option><option>지학</option></select>
+        <select class="form-select" id="con-subj">
+          <option>통합과학</option><option>화학</option><option>생물</option>
+          <option>물리</option><option>지학</option><option>내신</option>
+        </select>
+        <select class="form-select" id="con-grade" style="min-width:90px;">
+          <option value="">학년선택</option>
+          <option>중1</option><option>중2</option><option>중3</option>
+          <option>고1</option><option>고2</option><option>고3</option>
+        </select>
         <input class="form-input" type="text" id="con-title" placeholder="개념 제목">
       </div>
       <textarea class="form-textarea" id="con-content" placeholder="개념 내용을 입력하세요..."></textarea>
@@ -633,7 +704,9 @@ body {
   </div>
 </div>
 
-<!-- 수업카드 패널 -->
+<!-- ══════════════════════════════════════
+     수업카드 패널 (학생 실시간 + 학년 자동표시 + 내신)
+══════════════════════════════════════ -->
 <div class="page-panel" id="panel-classcard">
   <div class="panel-bar">
     <span class="panel-bar-title">🗂️ 수업카드</span>
@@ -656,6 +729,7 @@ body {
       <button class="cc-tab" onclick="setCCSubjFilter('생물',this)">생물</button>
       <button class="cc-tab" onclick="setCCSubjFilter('물리',this)">물리</button>
       <button class="cc-tab" onclick="setCCSubjFilter('지학',this)">지학</button>
+      <button class="cc-tab" onclick="setCCSubjFilter('내신',this)">내신</button>
       <input class="cc-search-inp" type="text" id="cc-search" placeholder="학생명 또는 수업 내용 검색..." oninput="renderClassCards()">
       <button class="cc-write-btn" onclick="toggleCCForm()">+ 수업카드 작성</button>
     </div>
@@ -665,14 +739,24 @@ body {
       <div class="cc-form-title">📝 수업카드 작성</div>
 
       <div class="cc-form-grid">
+        <!-- 학생 선택 + 학년 자동표시 -->
         <div>
           <span class="cc-label">학생 선택 *</span>
-          <select class="cc-sel" id="cc-student"></select>
+          <select class="cc-sel" id="cc-student" onchange="onStudentChange()">
+            <option value="">불러오는 중...</option>
+          </select>
+          <div id="cc-student-grade-display" class="student-grade-info" style="display:none;"></div>
         </div>
+        <!-- 과목 (내신 포함) -->
         <div>
           <span class="cc-label">과목 *</span>
           <select class="cc-sel" id="cc-subj">
-            <option>통합과학</option><option>화학</option><option>생물</option><option>물리</option><option>지학</option>
+            <option>통합과학</option>
+            <option>화학</option>
+            <option>생물</option>
+            <option>물리</option>
+            <option>지학</option>
+            <option>내신</option>
           </select>
         </div>
         <div>
@@ -974,21 +1058,29 @@ window.clearDoneTasks = async () => {
   catch(e) { alert('오류: '+e.message); }
 };
 
-// ── 문제은행 ──
-let qbData=[], qFilter='전체';
+// ══════════════════════════════════════
+// 문제은행 (학년 필터 추가)
+// ══════════════════════════════════════
+let qbData=[], qFilter='전체', qGradeFilter='전체';
+
 async function loadQBank() {
-  try { const snap=await getDocs(query(collection(db,'qbank'),orderBy('createdAt','desc'))); qbData=[]; snap.forEach(d=>qbData.push({id:d.id,...d.data()})); }
-  catch { qbData=[]; }
+  try {
+    const snap=await getDocs(query(collection(db,'qbank'),orderBy('createdAt','desc')));
+    qbData=[]; snap.forEach(d=>qbData.push({id:d.id,...d.data()}));
+  } catch { qbData=[]; }
   renderQBank();
 }
+
 function renderQBank() {
-  const list=qFilter==='전체'?qbData:qbData.filter(q=>q.subject===qFilter);
+  let list = qFilter==='전체' ? qbData : qbData.filter(q=>q.subject===qFilter);
+  if (qGradeFilter !== '전체') list = list.filter(q=>(q.grade||'')=== qGradeFilter);
   const el=document.getElementById('qbank-list');
   if (!list.length) { el.innerHTML='<div class="empty-hint">문제가 없습니다</div>'; return; }
   el.innerHTML=list.map(q=>`
     <div class="qbank-card">
       <div class="qbank-card-top">
-        <span class="qb-chip qbc-subj-${q.subject}">${q.subject}</span>
+        <span class="qb-chip qbc-subj-${q.subject||'통합과학'}">${q.subject||'—'}</span>
+        ${q.grade?`<span class="qb-chip qbc-grade">${esc(q.grade)}</span>`:''}
         <span class="qb-chip qbc-type">${q.type}</span>
         <span class="qb-chip qbc-diff">난이도 ${q.difficulty}</span>
         ${q.unit?`<span class="qb-chip" style="background:#f5f5f7;color:#6e6e73;">${esc(q.unit)}</span>`:''}
@@ -997,64 +1089,171 @@ function renderQBank() {
       <div class="qbank-q">${esc(q.text)}</div>
     </div>`).join('');
 }
-window.setQFilter=(f,el)=>{ qFilter=f; document.querySelectorAll('#panel-qbank .fchip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); renderQBank(); };
-window.addQBank = async () => {
-  const text=document.getElementById('q-text').value.trim(); if(!text) return alert('문제 내용을 입력하세요');
-  const subject=document.getElementById('q-subj').value, unit=document.getElementById('q-unit').value.trim(),
-        difficulty=document.getElementById('q-diff').value, type=document.getElementById('q-type').value;
-  try { await addDoc(collection(db,'qbank'),{text,subject,unit,difficulty,type,createdAt:serverTimestamp()}); document.getElementById('q-text').value=''; document.getElementById('q-unit').value=''; await loadQBank(); }
-  catch(e) { alert('저장 실패: '+e.message); }
-};
-window.delQ = async id => { if(!confirm('삭제할까요?')) return; try { await deleteDoc(doc(db,'qbank',id)); await loadQBank(); } catch(e) { alert('삭제 실패: '+e.message); } };
 
-// ── 개념정리 ──
-let conceptData=[], conceptFilter='전체', conceptSearch='';
+window.setQFilter = (f, el) => {
+  qFilter=f;
+  document.querySelectorAll('#qbank-subj-chips .fchip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderQBank();
+};
+
+window.setQGradeFilter = (f, el) => {
+  qGradeFilter=f;
+  document.querySelectorAll('#qbank-grade-chips .fchip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderQBank();
+};
+
+window.addQBank = async () => {
+  const text=document.getElementById('q-text').value.trim();
+  if(!text) return alert('문제 내용을 입력하세요');
+  const subject=document.getElementById('q-subj').value;
+  const grade=document.getElementById('q-grade').value;
+  const unit=document.getElementById('q-unit').value.trim();
+  const difficulty=document.getElementById('q-diff').value;
+  const type=document.getElementById('q-type').value;
+  try {
+    await addDoc(collection(db,'qbank'),{text,subject,grade,unit,difficulty,type,createdAt:serverTimestamp()});
+    document.getElementById('q-text').value='';
+    document.getElementById('q-unit').value='';
+    document.getElementById('q-grade').value='';
+    await loadQBank();
+  } catch(e) { alert('저장 실패: '+e.message); }
+};
+window.delQ = async id => {
+  if(!confirm('삭제할까요?')) return;
+  try { await deleteDoc(doc(db,'qbank',id)); await loadQBank(); }
+  catch(e) { alert('삭제 실패: '+e.message); }
+};
+
+// ══════════════════════════════════════
+// 개념정리 (학년 필터 추가)
+// ══════════════════════════════════════
+let conceptData=[], conceptFilter='전체', conceptGradeFilter='전체', conceptSearch='';
+
 async function loadConcepts() {
-  try { const snap=await getDocs(query(collection(db,'concepts'),orderBy('createdAt','desc'))); conceptData=[]; snap.forEach(d=>conceptData.push({id:d.id,...d.data()})); }
-  catch { conceptData=[]; }
+  try {
+    const snap=await getDocs(query(collection(db,'concepts'),orderBy('createdAt','desc')));
+    conceptData=[]; snap.forEach(d=>conceptData.push({id:d.id,...d.data()}));
+  } catch { conceptData=[]; }
   renderConcepts();
 }
+
 function renderConcepts() {
   let list=conceptData;
   if(conceptFilter!=='전체') list=list.filter(c=>c.subject===conceptFilter);
+  if(conceptGradeFilter!=='전체') list=list.filter(c=>(c.grade||'')===conceptGradeFilter);
   if(conceptSearch) list=list.filter(c=>(c.title||'').includes(conceptSearch)||(c.content||'').includes(conceptSearch));
   const el=document.getElementById('concept-list');
   if(!list.length) { el.innerHTML='<div class="empty-hint">개념이 없습니다</div>'; return; }
   el.innerHTML=list.map(c=>`
     <div class="concept-card">
       <div class="concept-head" onclick="toggleConcept('${c.id}')">
-        <span class="qb-chip qbc-subj-${c.subject}" style="flex-shrink:0;">${c.subject}</span>
+        <span class="qb-chip qbc-subj-${c.subject||'통합과학'}" style="flex-shrink:0;">${c.subject||'—'}</span>
+        ${c.grade?`<span class="grade-badge">${esc(c.grade)}</span>`:''}
         <span class="concept-title">${esc(c.title)}</span>
         <button class="notice-del" onclick="event.stopPropagation();delConcept('${c.id}')">✕</button>
       </div>
       <div class="concept-body" id="cb-${c.id}"><div class="concept-text">${esc(c.content||'')}</div></div>
     </div>`).join('');
 }
-window.toggleConcept=id=>{ const b=document.getElementById('cb-'+id); if(b) b.classList.toggle('open'); };
-window.setConceptFilter=(f,el)=>{ conceptFilter=f; document.querySelectorAll('#panel-concept .fchip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); renderConcepts(); };
-window.filterConcepts=()=>{ conceptSearch=document.getElementById('concept-search').value; renderConcepts(); };
-window.addConcept = async () => {
-  const title=document.getElementById('con-title').value.trim(); if(!title) return alert('제목을 입력하세요');
-  const content=document.getElementById('con-content').value.trim(), subject=document.getElementById('con-subj').value;
-  try { await addDoc(collection(db,'concepts'),{title,content,subject,createdAt:serverTimestamp()}); document.getElementById('con-title').value=''; document.getElementById('con-content').value=''; await loadConcepts(); }
-  catch(e) { alert('저장 실패: '+e.message); }
-};
-window.delConcept = async id => { if(!confirm('삭제할까요?')) return; try { await deleteDoc(doc(db,'concepts',id)); await loadConcepts(); } catch(e) { alert('삭제 실패: '+e.message); } };
 
-// ── 수업카드 ──
+window.toggleConcept=id=>{ const b=document.getElementById('cb-'+id); if(b) b.classList.toggle('open'); };
+
+window.setConceptFilter=(f,el)=>{
+  conceptFilter=f;
+  document.querySelectorAll('#concept-subj-chips .fchip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderConcepts();
+};
+
+window.setConceptGradeFilter=(f,el)=>{
+  conceptGradeFilter=f;
+  document.querySelectorAll('#concept-grade-chips .fchip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderConcepts();
+};
+
+window.filterConcepts=()=>{ conceptSearch=document.getElementById('concept-search').value; renderConcepts(); };
+
+window.addConcept = async () => {
+  const title=document.getElementById('con-title').value.trim();
+  if(!title) return alert('제목을 입력하세요');
+  const content=document.getElementById('con-content').value.trim();
+  const subject=document.getElementById('con-subj').value;
+  const grade=document.getElementById('con-grade').value;
+  try {
+    await addDoc(collection(db,'concepts'),{title,content,subject,grade,createdAt:serverTimestamp()});
+    document.getElementById('con-title').value='';
+    document.getElementById('con-content').value='';
+    document.getElementById('con-grade').value='';
+    await loadConcepts();
+  } catch(e) { alert('저장 실패: '+e.message); }
+};
+window.delConcept = async id => {
+  if(!confirm('삭제할까요?')) return;
+  try { await deleteDoc(doc(db,'concepts',id)); await loadConcepts(); }
+  catch(e) { alert('삭제 실패: '+e.message); }
+};
+
+// ══════════════════════════════════════
+// 수업카드 (학생 실시간 로드 + 학년 자동표시)
+// ══════════════════════════════════════
 let ccData = [], ccSubjFilter = '전체', studentList = [];
 
+// students 컬렉션에서 실시간으로 학생 목록 불러오기
 async function loadStudentList() {
   try {
-    const snap = await getDocs(query(collection(db,'users'), where('role','==','student'), where('status','==','approved')));
+    // students 컬렉션 우선 시도, 없으면 users 컬렉션 폴백
+    let snap = null;
+    try {
+      snap = await getDocs(query(collection(db,'students'), orderBy('name','asc')));
+      if (snap.empty) throw new Error('empty');
+    } catch {
+      // users 컬렉션에서 student 역할 조회 (폴백)
+      snap = await getDocs(query(collection(db,'users'), where('role','==','student'), where('status','==','approved')));
+    }
+
     studentList = [];
     snap.forEach(d => studentList.push({id:d.id, ...d.data()}));
-    studentList.sort((a,b) => (a.name||'').localeCompare(b.name||''));
+    studentList.sort((a,b) => (a.name||'').localeCompare(b.name||'','ko'));
+
     const sel = document.getElementById('cc-student');
-    sel.innerHTML = studentList.map(s => `<option value="${s.id}">${esc(s.name||s.email||s.id)}</option>`).join('');
-    if (!studentList.length) sel.innerHTML = '<option value="">학생 없음</option>';
-  } catch(e) { console.error('학생 목록 로드 실패:', e); }
+    if (!studentList.length) {
+      sel.innerHTML = '<option value="">등록된 학생 없음</option>';
+      return;
+    }
+    sel.innerHTML = studentList.map(s => {
+      const grade = s.grade || s.schoolGrade || '';
+      const displayName = s.name || s.email || s.id;
+      const label = grade ? `${displayName} (${grade})` : displayName;
+      return `<option value="${s.id}" data-grade="${esc(grade)}" data-name="${esc(displayName)}">${esc(label)}</option>`;
+    }).join('');
+
+    // 첫 번째 학생 학년 표시
+    onStudentChange();
+  } catch(e) {
+    console.error('학생 목록 로드 실패:', e);
+    const sel = document.getElementById('cc-student');
+    sel.innerHTML = '<option value="">학생 로드 실패</option>';
+  }
 }
+
+// 학생 선택 시 학년 자동표시
+window.onStudentChange = function() {
+  const sel = document.getElementById('cc-student');
+  const opt = sel.options[sel.selectedIndex];
+  const grade = opt ? (opt.getAttribute('data-grade') || '') : '';
+  const display = document.getElementById('cc-student-grade-display');
+  if (!display) return;
+  if (grade) {
+    display.style.display = 'flex';
+    display.innerHTML = `<span style="font-size:11px;margin-right:2px;">📚</span> ${esc(grade)}`;
+  } else {
+    display.style.display = 'none';
+    display.innerHTML = '';
+  }
+};
 
 async function loadClassCards() {
   document.getElementById('cc-list-wrap').innerHTML = '<div class="cc-loading">불러오는 중...</div>';
@@ -1106,7 +1305,7 @@ window.renderClassCards = function() {
     return `<div class="cc-card" id="cc-${c.id}">
       <div class="cc-card-head" onclick="toggleCCCard('${c.id}')">
         <div class="cc-card-left">
-          <div class="cc-card-name">${esc(c.studentName||'—')}</div>
+          <div class="cc-card-name">${esc(c.studentName||'—')}${c.studentGrade?` <span class="grade-badge">${esc(c.studentGrade)}</span>`:''}</div>
           <div class="cc-card-meta">
             <span class="cc-chip cc-chip-subj">${esc(c.subject||'—')}</span>
             <span class="cc-chip cc-chip-teacher">${esc(c.teacher||'—')}</span>
@@ -1167,7 +1366,10 @@ window.toggleScoreNone = () => {
 window.saveClassCard = async () => {
   const studentSel = document.getElementById('cc-student');
   const studentId = studentSel.value;
-  const studentName = studentSel.options[studentSel.selectedIndex]?.text || '';
+  const selectedOpt = studentSel.options[studentSel.selectedIndex];
+  // 이름은 "(학년)" 부분 제거
+  const studentName = selectedOpt ? (selectedOpt.getAttribute('data-name') || selectedOpt.text) : '';
+  const studentGrade = selectedOpt ? (selectedOpt.getAttribute('data-grade') || '') : '';
   const subject = document.getElementById('cc-subj').value;
   const teacher = document.getElementById('cc-teacher').value.trim();
   const classDate = document.getElementById('cc-date').value;
@@ -1187,7 +1389,7 @@ window.saveClassCard = async () => {
 
   try {
     await addDoc(collection(db,'classCards'), {
-      studentId, studentName, subject, teacher, classDate,
+      studentId, studentName, studentGrade, subject, teacher, classDate,
       content, score, scoreNone, homework, attitude,
       homeworkDone, homeworkContent, createdAt: serverTimestamp()
     });
