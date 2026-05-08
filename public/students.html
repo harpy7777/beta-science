@@ -62,7 +62,7 @@
   .action-btn:hover { background: #f1f5f9; color: var(--text); }
   .action-btn.del:hover { background: #fef2f2; border-color: #fca5a5; color: var(--danger); }
 
-  /* 수업카드 버튼 */
+  /* 수업카드 버튼 - 작성/보기 구분 */
   .card-btn {
     display: inline-flex; align-items: center; gap: 4px;
     padding: 5px 10px; border-radius: 6px;
@@ -71,8 +71,11 @@
     cursor: pointer; white-space: nowrap; transition: background 0.15s;
   }
   .card-btn:hover { background: #dde4ff; }
+  .card-btn.has-card {
+    background: #ecfdf5; border-color: #6ee7b7; color: #065f46;
+  }
+  .card-btn.has-card:hover { background: #d1fae5; }
 
-  /* 담당선생님 표시 */
   .teacher-name { font-size: 13px; color: var(--text-muted); }
   .teacher-name.assigned { color: var(--text); font-weight: 500; }
 
@@ -104,10 +107,13 @@
   /* 수업카드 뷰 모달 */
   .class-card-view { background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
   .class-card-row { display: flex; margin-bottom: 10px; gap: 8px; }
-  .class-card-label { font-size: 12px; font-weight: 600; color: var(--text-muted); min-width: 80px; padding-top: 2px; }
-  .class-card-value { font-size: 14px; color: var(--text); flex: 1; line-height: 1.5; }
+  .class-card-label { font-size: 12px; font-weight: 600; color: var(--text-muted); min-width: 80px; padding-top: 2px; flex-shrink: 0; }
+  .class-card-value { font-size: 14px; color: var(--text); flex: 1; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
   .class-card-value.empty { color: var(--text-muted); font-style: italic; }
   .class-card-section { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #c7d2fe; }
+
+  /* 수업카드 메타 정보 */
+  .card-meta { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -222,7 +228,7 @@
 
 <!-- 수업카드 보기/편집 모달 -->
 <div class="modal-overlay" id="classCardModal">
-  <div class="modal" style="max-width:520px;">
+  <div class="modal" style="max-width:540px;">
     <div class="modal-header">
       <h2 id="classCardTitle">수업카드</h2>
       <button class="modal-close" onclick="closeClassCardModal()">✕</button>
@@ -230,7 +236,7 @@
 
     <!-- 보기 모드 -->
     <div id="classCardViewMode">
-      <div class="class-card-view" id="classCardViewContent"></div>
+      <div id="classCardViewContent"></div>
       <div class="modal-footer">
         <button class="btn-secondary" onclick="closeClassCardModal()">닫기</button>
         <button class="btn-primary" onclick="switchToEditMode()">
@@ -266,7 +272,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import {
-    getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot
+    getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot, getDocs
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -301,9 +307,10 @@
   let editingId = null;
   let students = [];
   let filtered = [];
-  // 수업카드 캐시: fireId → classCard data
+  // 수업카드 캐시: fireId → classCard data (null = 없음, object = 있음)
   let classCards = {};
-  // 현재 수업카드 보고 있는 학생
+  // 수업카드 로드 완료 여부 추적
+  let classCardsLoaded = false;
   let currentCardFireId = null;
 
   function gradeBadgeClass(g) {
@@ -311,12 +318,25 @@
       '고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3'}[g]||'grade-mid1';
   }
 
-  function initStudents() {
+  // ✅ 핵심 수정: 수업카드 전체를 먼저 로드한 뒤 학생 목록 렌더링
+  async function initStudents() {
+    // 1단계: classCards 컬렉션 전체 미리 로드
+    try {
+      const cardSnap = await getDocs(collection(db, "classCards"));
+      cardSnap.forEach(d => {
+        classCards[d.id] = d.data();
+      });
+    } catch(e) {
+      console.warn("수업카드 초기 로드 실패:", e.message);
+    }
+    classCardsLoaded = true;
+
+    // 2단계: 학생 목록 실시간 감시
     const q = query(collection(db, "students"), orderBy("regDate", "desc"));
     onSnapshot(q, (snapshot) => {
       students = snapshot.docs.map(d => ({ fireId: d.id, ...d.data() }));
-      // 수업카드도 같이 로드
-      students.forEach(s => loadClassCard(s.fireId));
+      // 새 학생에 대해 개별 수업카드 감시 등록
+      students.forEach(s => watchClassCard(s.fireId));
       filterStudents();
     }, (error) => {
       document.getElementById('studentTableBody').innerHTML =
@@ -324,18 +344,37 @@
     });
   }
 
-  // 수업카드 실시간 감시
-  function loadClassCard(fireId) {
+  // 수업카드 실시간 감시 (개별)
+  function watchClassCard(fireId) {
     onSnapshot(doc(db, "classCards", fireId), (snap) => {
       classCards[fireId] = snap.exists() ? snap.data() : null;
-      // 테이블 해당 행 담당선생님 업데이트
-      const teacherEl = document.getElementById(`teacher-${fireId}`);
-      if (teacherEl) {
-        const teacher = classCards[fireId]?.teacher || '';
-        teacherEl.textContent = teacher || '-';
-        teacherEl.className = 'teacher-name' + (teacher ? ' assigned' : '');
-      }
+      // 해당 행의 버튼과 담당선생님 즉시 갱신
+      updateCardBtnUI(fireId);
     });
+  }
+
+  // 특정 학생의 수업카드 버튼 UI만 즉시 업데이트
+  function updateCardBtnUI(fireId) {
+    const card = classCards[fireId];
+    const hasCard = card && Object.values(card).some(v => v && v !== '');
+
+    const btn = document.getElementById(`card-btn-${fireId}`);
+    if (btn) {
+      if (hasCard) {
+        btn.className = 'card-btn has-card';
+        btn.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> 수업카드 보기`;
+      } else {
+        btn.className = 'card-btn';
+        btn.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> 수업카드 작성`;
+      }
+    }
+
+    const teacherEl = document.getElementById(`teacher-${fireId}`);
+    if (teacherEl) {
+      const teacher = card?.teacher || '';
+      teacherEl.textContent = teacher || '-';
+      teacherEl.className = 'teacher-name' + (teacher ? ' assigned' : '');
+    }
   }
 
   window.renderTable = function() {
@@ -353,8 +392,11 @@
         const subs = s.subject && s.subject !== '-'
           ? s.subject.split(',').map(x => `<span class="subject-tag">${x.trim()}</span>`).join('')
           : '<span style="color:var(--text-muted)">-</span>';
-        const teacher = classCards[s.fireId]?.teacher || '';
-        const hasCard = classCards[s.fireId] && Object.values(classCards[s.fireId]).some(v => v);
+        const card = classCards[s.fireId];
+        const hasCard = card && Object.values(card).some(v => v && v !== '');
+        const teacher = card?.teacher || '';
+        const safeName = (s.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+
         return `<tr>
           <td class="student-id">${s.id||'-'}</td>
           <td style="font-weight:500">${s.name||'-'}</td>
@@ -364,7 +406,10 @@
           <td>${s.phone||'-'}</td>
           <td style="color:var(--text-muted);font-size:13px">${s.regDate||'-'}</td>
           <td>
-            <button class="card-btn" onclick="openClassCard('${s.fireId}','${(s.name||'').replace(/'/g,"\\'")}')">
+            <button
+              id="card-btn-${s.fireId}"
+              class="card-btn${hasCard ? ' has-card' : ''}"
+              onclick="openClassCard('${s.fireId}','${safeName}')">
               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
               ${hasCard ? '수업카드 보기' : '수업카드 작성'}
             </button>
@@ -373,7 +418,7 @@
             <button class="action-btn" onclick="openEditModal('${s.fireId}')">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
-            <button class="action-btn del" onclick="deleteStudent('${s.fireId}','${(s.name||'').replace(/'/g,"\\'")}')">
+            <button class="action-btn del" onclick="deleteStudent('${s.fireId}','${safeName}')">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
             </button>
           </div></td>
@@ -457,7 +502,6 @@
     if (!confirm(`"${name}" 학생을 삭제하시겠습니까?`)) return;
     try {
       await deleteDoc(doc(db, "students", fireId));
-      // 수업카드도 같이 삭제
       try { await deleteDoc(doc(db, "classCards", fireId)); } catch(e) {}
     } catch(e) { alert("삭제 중 오류가 발생했습니다: " + e.message); }
   }
@@ -475,28 +519,39 @@
   function renderClassCardView(fireId) {
     const card = classCards[fireId];
     const content = document.getElementById('classCardViewContent');
-    if (!card || !Object.values(card).some(v => v)) {
-      content.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-muted);">
-        <svg width="36" height="36" fill="none" stroke="#cbd5e1" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom:8px;"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-        <p style="font-size:14px;">아직 수업카드가 작성되지 않았습니다.<br>수정 버튼을 눌러 작성해주세요.</p>
-      </div>`;
+    const hasCard = card && Object.values(card).some(v => v && v !== '' && v !== card.updatedAt);
+
+    if (!hasCard) {
+      content.innerHTML = `
+        <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:32px 16px;text-align:center;">
+          <svg width="40" height="40" fill="none" stroke="#cbd5e1" stroke-width="1.5" viewBox="0 0 24 24" style="margin-bottom:12px;"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          <p style="font-size:14px;color:var(--text-muted);">아직 수업카드가 작성되지 않았습니다.<br>수정 버튼을 눌러 작성해주세요.</p>
+        </div>`;
       return;
     }
+
     const row = (label, value) => `
       <div class="class-card-row">
         <span class="class-card-label">${label}</span>
-        <span class="class-card-value${!value ? ' empty' : ''}">${value || '미입력'}</span>
+        <span class="class-card-value${!value ? ' empty' : ''}">${value ? value.replace(/</g,'&lt;').replace(/>/g,'&gt;') : '미입력'}</span>
       </div>`;
+
+    const updatedAt = card.updatedAt
+      ? new Date(card.updatedAt).toLocaleString('ko-KR', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})
+      : '';
+
     content.innerHTML = `
-      <div class="class-card-section">기본 정보</div>
-      ${row('담당 선생님', card.teacher)}
-      ${row('수업 요일/시간', card.schedule)}
-      ${row('수업 교재', card.textbook)}
-      ${row('수업 진도', card.progress)}
-      <div class="class-card-section" style="margin-top:12px;">학습 현황</div>
-      ${row('특이사항/메모', card.memo)}
-      ${row('학부모 전달사항', card.parentNote)}
-    `;
+      <div class="class-card-view">
+        <div class="class-card-section">기본 정보</div>
+        ${row('담당 선생님', card.teacher)}
+        ${row('수업 요일/시간', card.schedule)}
+        ${row('수업 교재', card.textbook)}
+        ${row('수업 진도', card.progress)}
+        <div class="class-card-section" style="margin-top:12px;">학습 현황</div>
+        ${row('특이사항/메모', card.memo)}
+        ${row('학부모 전달사항', card.parentNote)}
+        ${updatedAt ? `<div class="card-meta">최종 수정: ${updatedAt}</div>` : ''}
+      </div>`;
   }
 
   window.switchToEditMode = function() {
@@ -531,8 +586,8 @@
       await setDoc(doc(db, "classCards", currentCardFireId), data);
       classCards[currentCardFireId] = data;
       renderClassCardView(currentCardFireId);
+      updateCardBtnUI(currentCardFireId);
       switchToViewMode();
-      renderTable(); // 담당선생님 컬럼 갱신
     } catch(e) { alert('저장 실패: ' + e.message); }
   }
 
