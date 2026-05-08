@@ -61,6 +61,11 @@ body {
 .enter-btn:disabled { background: #bbf7d0; color: #fff; cursor: not-allowed; }
 
 /* ── 테스트 선택 화면 ── */
+.student-badge {
+  background: #dcfce7; border: 1px solid #bbf7d0; border-radius: 10px;
+  padding: 6px 14px; font-size: 12px; font-weight: 700; color: #14532d;
+  display: inline-block; margin-bottom: 14px;
+}
 .test-list { display: flex; flex-direction: column; gap: 10px; }
 .test-item {
   padding: 14px 16px; border: 1.5px solid #bbf7d0; border-radius: 14px;
@@ -167,7 +172,6 @@ body {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .empty-hint { font-size: 13px; color: #aeaeb2; padding: 2rem; text-align: center; }
-.error-msg { font-size: 12px; color: #dc2626; margin-top: 6px; }
 
 /* 화면 전환 */
 .screen { display: none; }
@@ -192,12 +196,6 @@ body {
     <div class="entry-title">🎓 학생 입장</div>
 
     <div class="field-group">
-      <label class="field-label"># 학원 입장 코드</label>
-      <input class="inp" type="text" id="entry-code" placeholder="선생님께 받은 코드">
-      <div class="error-msg" id="code-error" style="display:none;">잘못된 코드입니다. 다시 확인해주세요.</div>
-    </div>
-
-    <div class="field-group">
       <label class="field-label">이름</label>
       <input class="inp" type="text" id="entry-name" placeholder="본인 이름 입력">
     </div>
@@ -205,12 +203,12 @@ body {
     <div class="field-group">
       <label class="field-label">학년</label>
       <div class="grade-grid">
-        <button class="grade-btn" onclick="selGrade('중등1학년',this)">중1</button>
-        <button class="grade-btn" onclick="selGrade('중등2학년',this)">중2</button>
-        <button class="grade-btn" onclick="selGrade('중등3학년',this)">중3</button>
-        <button class="grade-btn" onclick="selGrade('고등1학년',this)">고1</button>
-        <button class="grade-btn" onclick="selGrade('고등2학년',this)">고2</button>
-        <button class="grade-btn" onclick="selGrade('고등3학년',this)">고3</button>
+        <button class="grade-btn" onclick="selGrade('중1',this)">중1</button>
+        <button class="grade-btn" onclick="selGrade('중2',this)">중2</button>
+        <button class="grade-btn" onclick="selGrade('중3',this)">중3</button>
+        <button class="grade-btn" onclick="selGrade('고1',this)">고1</button>
+        <button class="grade-btn" onclick="selGrade('고2',this)">고2</button>
+        <button class="grade-btn" onclick="selGrade('고3',this)">고3</button>
       </div>
     </div>
 
@@ -223,6 +221,7 @@ body {
   <div class="card">
     <button class="back-btn" onclick="goBack('entry')">← 뒤로</button>
     <div class="entry-title">📋 테스트 선택</div>
+    <div id="student-badge-wrap"></div>
     <div id="test-list-wrap"><div class="loading"><div class="spinner"></div>불러오는 중...</div></div>
   </div>
 </div>
@@ -266,7 +265,7 @@ body {
       <div class="result-task-title">📌 이번 과제</div>
       <div class="result-task-text" id="result-task-text">—</div>
     </div>
-    <a href="/student-test" class="home-btn">홈으로 돌아가기</a>
+    <a href="/student-omr.html" class="home-btn">홈으로 돌아가기</a>
   </div>
 </div>
 
@@ -274,9 +273,6 @@ body {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore, collection, getDocs, addDoc, query, orderBy, where, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import {
-  getDoc, doc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg = {
@@ -290,33 +286,18 @@ const cfg = {
 const app = initializeApp(cfg);
 const db  = getFirestore(app);
 
-// ── 학원 입장 코드 (settings에서 불러옴) ──
-const FALLBACK_CODE = 'BETA2024'; // Firebase에 없을 때 기본값
-let ACADEMY_CODE = FALLBACK_CODE;
-let validCode = false;
-
-// settings 컬렉션에서 코드 불러오기
-(async () => {
-  try {
-    const snap = await getDoc(doc(db, 'settings', 'academy'));
-    if (snap.exists() && snap.data().entryCode) {
-      ACADEMY_CODE = snap.data().entryCode;
-    }
-  } catch {}
-})();
-
 // ── 상태 ──
-let studentName = '';
+let studentName  = '';
 let studentGrade = '';
-let selectedTest = null;   // { fireId, testId, subject, grade, unitName, parts }
-let answers = {};          // { q1: '2', q2: '1', ... }
-let allTests = [];
+let selectedTest = null;
+let answers      = {};
+let allTests     = [];
 
 // ── 화면 전환 ──
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
 }
 window.goBack = (to) => showScreen(to);
 
@@ -329,49 +310,55 @@ window.selGrade = (g, el) => {
 
 // ── 입장 ──
 window.doEnter = async () => {
-  const code = document.getElementById('entry-code').value.trim().toUpperCase();
   const name = document.getElementById('entry-name').value.trim();
-  const codeErr = document.getElementById('code-error');
-
-  codeErr.style.display = 'none';
-  if (!code) return alert('입장 코드를 입력해주세요');
-  if (!name) return alert('이름을 입력해주세요');
+  if (!name)         return alert('이름을 입력해주세요');
   if (!studentGrade) return alert('학년을 선택해주세요');
 
-  if (code !== ACADEMY_CODE.toUpperCase() && code !== FALLBACK_CODE) {
-    codeErr.style.display = 'block';
-    return;
-  }
-
   studentName = name;
-  validCode = true;
+
+  // 학생 배지 표시
+  document.getElementById('student-badge-wrap').innerHTML =
+    `<div class="student-badge">${esc(studentName)} · ${esc(studentGrade)}</div>`;
+
   showScreen('select');
   await loadTests();
 };
 
-// ── 테스트 목록 불러오기 ──
+// ── 테스트 목록 불러오기 (해당 학년만) ──
 async function loadTests() {
   const wrap = document.getElementById('test-list-wrap');
   wrap.innerHTML = '<div class="loading"><div class="spinner"></div>불러오는 중...</div>';
   try {
-    const snap = await getDocs(query(collection(db, 'master-tests'), orderBy('regDate', 'desc')));
+    // 해당 학년 + isPublished=true 필터
+    const q = query(
+      collection(db, 'master-tests'),
+      where('grade', '==', studentGrade),
+      orderBy('regDate', 'desc')
+    );
+    const snap = await getDocs(q);
     allTests = [];
     snap.forEach(d => allTests.push({ fireId: d.id, ...d.data() }));
 
-    // 학년 필터 (같은 학년 우선, 나머지도 표시)
-    const sameGrade = allTests.filter(t => t.grade === studentGrade);
-    const others    = allTests.filter(t => t.grade !== studentGrade);
-    const sorted    = [...sameGrade, ...others];
-
-    if (!sorted.length) { wrap.innerHTML = '<div class="empty-hint">등록된 테스트가 없습니다</div>'; return; }
+    if (!allTests.length) {
+      wrap.innerHTML = `<div class="empty-hint">
+        <div style="font-size:2rem;margin-bottom:8px;">📭</div>
+        ${esc(studentGrade)}에 등록된 테스트가 없습니다<br>
+        <span style="font-size:11px;color:#aeaeb2;">선생님께 문의하세요</span>
+      </div>`;
+      return;
+    }
 
     let html = '<div class="test-list">';
-    sorted.forEach(t => {
-      const isMatch = t.grade === studentGrade;
+    allTests.forEach(t => {
+      // parts 기반 문항 수 계산
+      let totalQ = 0;
+      if (t.parts) t.parts.forEach(p => totalQ += Object.keys(p.answers || {}).length);
+      totalQ = Math.min(totalQ, 30);
+
       html += `<div class="test-item" onclick="selectTest('${t.fireId}')">
         <div>
-          <div class="test-name">${esc(t.unitName||'—')}</div>
-          <div class="test-meta">${esc(t.subject||'—')} · ${esc(t.grade||'—')} ${isMatch?'<span style="color:#16a34a;font-weight:700;">✓ 내 학년</span>':''}</div>
+          <div class="test-name">${esc(t.unitName || '—')}</div>
+          <div class="test-meta">${esc(t.subject || '—')} · ${totalQ}문제</div>
         </div>
         <span class="test-arrow">›</span>
       </div>`;
@@ -379,7 +366,39 @@ async function loadTests() {
     html += '</div>';
     wrap.innerHTML = html;
   } catch(e) {
-    wrap.innerHTML = `<div class="empty-hint">불러오기 실패: ${esc(e.message)}</div>`;
+    // orderBy 인덱스 없을 경우 fallback: 필터만 적용
+    try {
+      const q2 = query(
+        collection(db, 'master-tests'),
+        where('grade', '==', studentGrade)
+      );
+      const snap2 = await getDocs(q2);
+      allTests = [];
+      snap2.forEach(d => allTests.push({ fireId: d.id, ...d.data() }));
+
+      if (!allTests.length) {
+        wrap.innerHTML = `<div class="empty-hint">📭 ${esc(studentGrade)}에 등록된 테스트가 없습니다</div>`;
+        return;
+      }
+
+      let html = '<div class="test-list">';
+      allTests.forEach(t => {
+        let totalQ = 0;
+        if (t.parts) t.parts.forEach(p => totalQ += Object.keys(p.answers || {}).length);
+        totalQ = Math.min(totalQ, 30);
+        html += `<div class="test-item" onclick="selectTest('${t.fireId}')">
+          <div>
+            <div class="test-name">${esc(t.unitName || '—')}</div>
+            <div class="test-meta">${esc(t.subject || '—')} · ${totalQ}문제</div>
+          </div>
+          <span class="test-arrow">›</span>
+        </div>`;
+      });
+      html += '</div>';
+      wrap.innerHTML = html;
+    } catch(e2) {
+      wrap.innerHTML = `<div class="empty-hint">불러오기 실패: ${esc(e2.message)}</div>`;
+    }
   }
 }
 
@@ -394,24 +413,16 @@ window.selectTest = (fireId) => {
 
 // ── OMR 구성 ──
 function buildOMR() {
-  document.getElementById('omr-test-title').textContent = selectedTest.unitName || '—';
-  document.getElementById('omr-test-meta').textContent  = `${selectedTest.subject} · ${selectedTest.grade}`;
+  document.getElementById('omr-test-title').textContent  = selectedTest.unitName || '—';
+  document.getElementById('omr-test-meta').textContent   = `${selectedTest.subject} · ${selectedTest.grade}`;
   document.getElementById('omr-student-badge').textContent = `${studentName} (${studentGrade})`;
 
   const sectionsEl = document.getElementById('omr-sections');
   const parts = selectedTest.parts || [];
 
-  // 전체 문항 수 계산 (parts 기반, 최대 30)
-  let totalQ = 0;
-  parts.forEach(p => {
-    const qs = Object.keys(p.answers || {});
-    totalQ += qs.length;
-  });
-  totalQ = Math.min(totalQ, 30);
-
   let html = '';
   parts.forEach((part, pi) => {
-    const qNums = Object.keys(part.answers || {}).sort((a,b)=>Number(a.slice(1))-Number(b.slice(1)));
+    const qNums = Object.keys(part.answers || {}).sort((a,b) => Number(a.slice(1)) - Number(b.slice(1)));
     if (!qNums.length) return;
 
     html += `<div class="omr-section">
@@ -422,7 +433,7 @@ function buildOMR() {
       <div class="omr-grid">`;
 
     qNums.forEach(qno => {
-      const num = qno.replace('q','');
+      const num = qno.replace('q', '');
       html += `<div class="omr-q">
         <div class="omr-q-num">${num}번</div>
         <div class="omr-choices">
@@ -443,7 +454,6 @@ function buildOMR() {
 
 // ── 답 선택 ──
 window.pickAnswer = (qno, n) => {
-  // 이전 선택 해제
   [1,2,3,4].forEach(i => {
     const el = document.getElementById(`choice-${qno}-${i}`);
     if (el) el.classList.remove('sel');
@@ -457,19 +467,19 @@ window.pickAnswer = (qno, n) => {
 function updateProgress() {
   const parts = selectedTest?.parts || [];
   let total = 0;
-  parts.forEach(p => total += Object.keys(p.answers||{}).length);
+  parts.forEach(p => total += Object.keys(p.answers || {}).length);
   total = Math.min(total, 30);
   const done = Object.keys(answers).length;
-  const pct  = total ? Math.round(done/total*100) : 0;
-  document.getElementById('progress-txt').textContent  = `${done} / ${total}`;
-  document.getElementById('progress-fill').style.width = pct + '%';
+  const pct  = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('progress-txt').textContent   = `${done} / ${total}`;
+  document.getElementById('progress-fill').style.width  = pct + '%';
 }
 
 // ── 제출 ──
 window.submitOMR = async () => {
   const parts = selectedTest?.parts || [];
   let total = 0;
-  parts.forEach(p => total += Object.keys(p.answers||{}).length);
+  parts.forEach(p => total += Object.keys(p.answers || {}).length);
   total = Math.min(total, 30);
 
   const done = Object.keys(answers).length;
@@ -494,16 +504,16 @@ window.submitOMR = async () => {
 
   const score = total > 0 ? Math.round((correct / total) * 100) : 0;
 
-  // 과제 결정 (전체 오답 기준 첫 번째 파트의 task 사용)
+  // 과제 결정
   const firstPart = parts[0];
   let taskText = '';
   if (firstPart) {
-    if (wrong <= 2)       taskText = firstPart.taskLow  || '';
-    else if (wrong <= 4)  taskText = firstPart.taskMid  || '';
-    else                  taskText = firstPart.taskHigh || '';
+    if (wrong <= 2)      taskText = firstPart.taskLow  || '';
+    else if (wrong <= 4) taskText = firstPart.taskMid  || '';
+    else                 taskText = firstPart.taskHigh || '';
   }
 
-  // Firebase 저장 → master-results 컬렉션
+  // Firebase 저장
   try {
     await addDoc(collection(db, 'answers'), {
       testId:      selectedTest.testId,
@@ -512,21 +522,21 @@ window.submitOMR = async () => {
       subject:     selectedTest.subject,
       testGrade:   selectedTest.grade,
       studentName,
-studentGrade,
-answers: Object.entries(answers).map(([qno, val]) => ({
-  question: `Q${qno.replace('q','')}`,
-  studentAnswer: val,
-  isCorrect: false
-})),
-score,
-testType: 'master',
-examTitle: selectedTest.unitName || '마스터테스트 OMR',
+      studentGrade,
+      answers: Object.entries(answers).map(([qno, val]) => ({
+        question: `Q${qno.replace('q','')}`,
+        studentAnswer: val,
+        isCorrect: false
+      })),
+      score,
+      testType: 'master',
+      examTitle: selectedTest.unitName || '마스터테스트 OMR',
       correct,
       wrong,
       wrongNums,
       total,
       submittedAt: serverTimestamp(),
-      regDate:     new Date().toLocaleString(),
+      regDate: new Date().toLocaleString(),
     });
   } catch(e) {
     alert('제출 실패: ' + e.message);
