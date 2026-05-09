@@ -377,7 +377,6 @@
   const db = getFirestore(app);
 
   let activeStudentIds = new Set();
-  // fireId → { teacher, count } 캐시 (학생이름 클릭용)
   let studentFireIdMap = {}; // studentId(학번) → fireId 매핑
 
   onAuthStateChanged(auth, async (user) => {
@@ -402,11 +401,10 @@
   function initStudentWatch() {
     onSnapshot(collection(db, "students"), snap => {
       activeStudentIds = new Set(snap.docs.map(d => d.data().id).filter(Boolean));
-      // studentId(학번) → fireId 매핑 구축
       studentFireIdMap = {};
       snap.docs.forEach(d => {
         const sid = d.data().id;
-        if (sid) studentFireIdMap[sid] = d.id; // d.id = fireId
+        if (sid) studentFireIdMap[sid] = d.id;
       });
     });
   }
@@ -420,6 +418,14 @@
     if (m) return new Date(parseInt(m[1]), parseInt(m[2])-1, parseInt(m[3]));
     const d = new Date(raw);
     return isNaN(d) ? null : d;
+  }
+
+  // ─── timestamp → Date 변환 ───
+  function toDate(ts) {
+    if (!ts) return new Date(0);
+    if (ts && typeof ts === 'object' && ts.seconds) return new Date(ts.seconds * 1000);
+    if (ts && typeof ts.toDate === 'function') return ts.toDate();
+    return new Date(ts);
   }
 
   // ─── 전월 대비 학생 증감 ───
@@ -455,19 +461,45 @@
       calcStudentChange(s.docs);
     });
 
+    // ★ 전체 평균점수: 모든 학생의 모든 시험 점수 평균
     onSnapshot(collection(db, "grades"), s => {
-      let validCount = 0, totalScore = 0;
+      let validCount = 0;
+      let totalScore = 0;
+      let scoreCount = 0; // 실제 점수가 있는 건수
+
       s.forEach(d => {
         const r = d.data();
         const sid = r.studentId || '';
         if (activeStudentIds.size === 0 || activeStudentIds.has(sid)) {
           validCount++;
-          totalScore += Number(r.score || 0);
+          // 각 시험 타입별로 점수 계산해서 합산
+          const { oxScore, multiScore, masterScore } = calcScore(r);
+          if (oxScore !== undefined && oxScore !== null) {
+            totalScore += oxScore;
+            scoreCount++;
+          }
+          if (multiScore !== undefined && multiScore !== null) {
+            totalScore += multiScore;
+            scoreCount++;
+          }
+          if (masterScore !== undefined && masterScore !== null) {
+            totalScore += masterScore;
+            scoreCount++;
+          }
+          // 점수가 하나도 없는데 score 필드는 있는 경우
+          if (oxScore === undefined && multiScore === undefined && masterScore === undefined) {
+            const rawScore = Number(r.score);
+            if (!isNaN(rawScore)) {
+              totalScore += rawScore;
+              scoreCount++;
+            }
+          }
         }
       });
+
       document.getElementById('stat-total-grades').textContent = validCount;
       document.getElementById('stat-avg-score').textContent =
-        validCount > 0 ? (totalScore / validCount).toFixed(1) : '0';
+        scoreCount > 0 ? (totalScore / scoreCount).toFixed(1) : '0';
     });
 
     onSnapshot(collection(db, "specialManagement"), s => {
@@ -478,7 +510,6 @@
 
   // ─── 점수 계산 헬퍼 ───
   function calcScore(r) {
-    // OX 점수: oxScore 또는 oxAnswers 기반 계산
     let oxScore = undefined;
     if (r.oxScore !== undefined && r.oxScore !== null) {
       oxScore = Number(r.oxScore);
@@ -490,7 +521,6 @@
       oxScore = Number(r.score);
     }
 
-    // 4지선다 점수: multiScore 또는 multiAnswers 기반 계산
     let multiScore = undefined;
     if (r.multiScore !== undefined && r.multiScore !== null) {
       multiScore = Number(r.multiScore);
@@ -502,7 +532,6 @@
       multiScore = Number(r.score);
     }
 
-    // 마스터 점수
     let masterScore = undefined;
     if (r.testType === 'master' && r.score !== undefined) {
       masterScore = Number(r.score);
@@ -510,8 +539,6 @@
       masterScore = Number(r.masterScore);
     }
 
-    // 혼합 시험(OX+4지선다 둘 다 있는 경우): score 필드를 각각에 분배
-    // oxScore/multiScore 둘 다 없고 score만 있으면 → testType 보고 분류
     if (oxScore === undefined && multiScore === undefined && masterScore === undefined) {
       if (r.testType === 'ox') oxScore = Number(r.score || 0);
       else if (r.testType === 'multiple') multiScore = Number(r.score || 0);
@@ -526,9 +553,10 @@
     return `<span class="score-badge ${cls}">${score}점</span>`;
   }
 
-  // ─── 최근 테스트 결과 ───
+  // ─── 최근 테스트 결과 (학생별+시험별 첫 번째 본 점수만) ───
   function initRecentGrades() {
-    const q = query(collection(db, "grades"), orderBy("timestamp", "desc"), limit(30));
+    // timestamp 오름차순으로 전체 조회해서 첫 번째 본 점수를 추출
+    const q = query(collection(db, "grades"), orderBy("timestamp", "asc"));
     onSnapshot(q, s => {
       const tbody = document.getElementById('recentGradesBody');
       if (s.empty) {
@@ -536,40 +564,60 @@
         return;
       }
 
-      const validRows = s.docs
-        .filter(d => {
-          const sid = d.data().studentId || '';
-          return activeStudentIds.size === 0 || activeStudentIds.has(sid);
-        })
-        .slice(0, 10);
+      // 학생ID + 시험명(또는 examId)으로 그룹화 → 첫 번째 기록만 보존
+      const firstTestMap = new Map(); // key: "studentId_testKey" → 첫 번째 도큐먼트
 
-      if (!validRows.length) {
+      s.docs.forEach(d => {
+        const r = d.data();
+        const sid = r.studentId || '';
+        if (activeStudentIds.size > 0 && !activeStudentIds.has(sid)) return;
+
+        // 시험 식별 키: examId가 있으면 examId, 없으면 testName 사용
+        const testKey = r.examId || r.testId || r.testName || r.examTitle || 'unknown';
+        const mapKey = `${sid}_${testKey}`;
+
+        // 오름차순 정렬이므로 첫 번째 = 가장 먼저 본 시험
+        if (!firstTestMap.has(mapKey)) {
+          firstTestMap.set(mapKey, d);
+        }
+      });
+
+      // Map에서 값만 추출 → timestamp 내림차순으로 정렬 (최신 첫 시험이 위로)
+      const firstDocs = Array.from(firstTestMap.values()).sort((a, b) => {
+        const ta = toDate(a.data().timestamp).getTime();
+        const tb = toDate(b.data().timestamp).getTime();
+        return tb - ta; // 내림차순
+      }).slice(0, 10);
+
+      if (!firstDocs.length) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted)">등록된 데이터가 없습니다.</td></tr>';
         return;
       }
 
-      tbody.innerHTML = validRows.map(d => {
+      tbody.innerHTML = firstDocs.map(d => {
         const r = d.data();
 
         let dateStr = r.date || '';
         if (!dateStr && r.timestamp) {
-          const dt = r.timestamp.toDate ? r.timestamp.toDate() : new Date(r.timestamp);
+          const dt = toDate(r.timestamp);
           dateStr = `${dt.getFullYear()}. ${dt.getMonth()+1}. ${dt.getDate()}.`;
         }
 
         const grade = r.studentGrade || r.grade || '';
         const gradeMap = {
           '중1':'g-mid1','중2':'g-mid2','중3':'g-mid3',
-          '고1':'g-high1','고2':'g-high2','고3':'g-high3'
+          '고1':'g-high1','고2':'g-high2','고3':'g-high3',
+          '중등1학년':'g-mid1','중등2학년':'g-mid2','중등3학년':'g-mid3',
+          '고등1학년':'g-high1','고등2학년':'g-high2','고등3학년':'g-high3'
         };
         const gradeCls = gradeMap[grade] || '';
+        const gradeShort = grade.replace('등','').replace('학년','') || grade;
         const gradeBadge = grade
-          ? `<span class="grade-badge ${gradeCls}">${grade}</span>`
+          ? `<span class="grade-badge ${gradeCls}">${gradeShort}</span>`
           : '<span style="color:var(--text-muted)">-</span>';
 
         const { oxScore, multiScore, masterScore } = calcScore(r);
 
-        // 학생 이름 → 클릭 시 수업카드 모달
         const studentId = r.studentId || '';
         const studentName = r.studentName || '-';
         const safeName = studentName.replace(/'/g, "\\'");
@@ -592,15 +640,12 @@
 
   // ─── 학생 이름 클릭 → 수업카드 모달 ───
   window.openStudentClassCard = async function(studentId, studentName) {
-    // studentId는 학번(예: h01001) → fireId 조회
     const fireId = studentFireIdMap[studentId];
     if (!fireId) {
-      // fireId 없으면 직접 쿼리
       try {
         const snap = await getDocs(query(collection(db, "students"), where("id", "==", studentId)));
         if (snap.empty) { alert('학생 정보를 찾을 수 없습니다.'); return; }
-        const fid = snap.docs[0].id;
-        openClassCardModal(fid, studentName);
+        openClassCardModal(snap.docs[0].id, studentName);
       } catch(e) { alert('오류: ' + e.message); }
       return;
     }
@@ -728,8 +773,6 @@
   }
 
   // ─── 테스트 관리 ───
-  // OX: ox타입 문제만 있는 것 / 4지선다: multiple타입 문제만 있는 것
-  // 혼합(OX+4지선다 모두 포함): OX 탭에도 표시 + 4지선다 탭에도 표시
   function initExams() {
     onSnapshot(collection(db, "tests"), snap => {
       const oxList    = snap.docs.filter(d => (d.data().questions||[]).some(q=>q.type==='ox'));
@@ -748,6 +791,7 @@
     });
   }
 
+  // ★ 마스터 테스트 수정 버튼 추가
   function initMasterTests() {
     const q = query(collection(db, "master-tests"), orderBy("regDate", "desc"));
     onSnapshot(q, snap => {
@@ -765,6 +809,7 @@
           <td><span class="subj-badge ${subjCls(t.subject)}">${t.subject||'-'}</span></td>
           <td><span class="grade-badge ${gradeCls(t.grade)}">${t.grade||'-'}</span></td>
           <td><div class="action-icons">
+            <button class="action-btn" onclick="editMaster('${d.id}')" title="수정">✏️</button>
             <button class="action-btn del" onclick="deleteMaster('${d.id}','${(t.unitName||'').replace(/'/g,"\\'")}','${t.grade||''}')" title="삭제">🗑️</button>
           </div></td>
         </tr>`;
@@ -781,6 +826,9 @@
   };
 
   window.editExam = id => { window.location.href = `/teacher/create?edit=${id}`; };
+
+  // ★ 마스터 테스트 수정 → 마스터 테스트 생성 페이지로 이동 (edit 파라미터 전달)
+  window.editMaster = id => { window.location.href = `/teacher/master?edit=${id}`; };
 
   window.deleteExam = async (id, title, grade) => {
     if (!confirm(`"${title}" 테스트를 삭제하시겠습니까?\n이 테스트의 성적 기록도 함께 삭제됩니다.`)) return;
