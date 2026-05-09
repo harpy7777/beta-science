@@ -303,8 +303,11 @@
   const ITEMS_PER_PAGE = 10;
   let currentPage = 1, editingId = null;
   let students = [], filtered = [];
-  // fireId → { teacher, count, latestTeacher } 캐시
-  let ccCache = {};
+
+  // ★ ccCache: fireId → { count, teacher }  +  studentIdMap: 학번(id) → fireId
+  let ccCache = {};       // key: fireId
+  let ccByStudentId = {}; // key: 학번(s.id) → 이 경우도 처리 (기존 데이터 호환)
+  let studentIdToFireId = {}; // 학번 → fireId 매핑
 
   function gradeBadgeClass(g) {
     return {'중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3',
@@ -312,29 +315,67 @@
   }
 
   async function initStudents() {
-    // ── classCards 전체 집계: studentId = 학생의 fireId ──
-    // 가장 최근 선생님 이름을 가져오기 위해 classDate 내림차순 정렬
+    // ── 1단계: 학생 목록 먼저 로드해서 fireId ↔ 학번 매핑 구성 ──
     try {
-      const snap = await getDocs(query(collection(db, "classCards"), orderBy("classDate", "desc")));
-      const seen = new Set();
-      snap.forEach(d => {
-        const c   = d.data();
-        const sid = c.studentId; // ← 학생의 fireId
+      const studentSnap = await getDocs(collection(db, "students"));
+      studentSnap.forEach(d => {
+        const sid = d.data().id; // 학번 (h01001 등)
+        if (sid) studentIdToFireId[sid] = d.id; // fireId
+      });
+    } catch(e) { console.warn("학생 목록 사전 로드 실패:", e.message); }
+
+    // ── 2단계: classCards 전체 집계 ──
+    // classCards.studentId 에는 fireId 또는 학번이 저장될 수 있음
+    // 양쪽 모두 처리해서 ccCache에 fireId 기준으로 통합
+    try {
+      const ccSnap = await getDocs(query(collection(db, "classCards"), orderBy("classDate", "desc")));
+      const seenFireId = new Set();
+      const seenStudentId = new Set();
+
+      ccSnap.forEach(d => {
+        const c = d.data();
+        const sid = c.studentId; // fireId 또는 학번
         if (!sid) return;
-        if (!ccCache[sid]) ccCache[sid] = { count: 0, teacher: '' };
-        ccCache[sid].count++;
-        // 첫 번째(= 가장 최근) 레코드의 teacher를 담당선생님으로
-        if (!seen.has(sid)) {
-          ccCache[sid].teacher = c.teacher || '';
-          seen.add(sid);
+
+        // fireId인지 학번인지 판단:
+        // studentIdToFireId에 값으로 존재하면 fireId, 키로 존재하면 학번
+        let resolvedFireId = null;
+
+        // studentIdToFireId 의 values 중에 sid가 있으면 → sid가 fireId
+        const isFireId = Object.values(studentIdToFireId).includes(sid);
+        const isStudentId = Object.prototype.hasOwnProperty.call(studentIdToFireId, sid);
+
+        if (isFireId) {
+          resolvedFireId = sid;
+        } else if (isStudentId) {
+          resolvedFireId = studentIdToFireId[sid];
+        } else {
+          // 매핑 불명확 → sid 그대로 키로 사용 (fireId로 간주)
+          resolvedFireId = sid;
+        }
+
+        if (!resolvedFireId) return;
+
+        if (!ccCache[resolvedFireId]) ccCache[resolvedFireId] = { count: 0, teacher: '' };
+        ccCache[resolvedFireId].count++;
+
+        // 가장 최근(오름차순 정렬이므로 첫 번째) teacher 저장
+        if (!seenFireId.has(resolvedFireId)) {
+          ccCache[resolvedFireId].teacher = c.teacher || '';
+          seenFireId.add(resolvedFireId);
         }
       });
     } catch(e) { console.warn("classCards 집계 실패:", e.message); }
 
-    // 학생 목록 실시간
+    // ── 3단계: 학생 목록 실시간 감시 ──
     onSnapshot(
       query(collection(db, "students"), orderBy("regDate", "desc")),
       (snapshot) => {
+        // 새로운 학생이 추가될 때마다 매핑 업데이트
+        snapshot.docs.forEach(d => {
+          const sid = d.data().id;
+          if (sid) studentIdToFireId[sid] = d.id;
+        });
         students = snapshot.docs.map(d => ({ fireId: d.id, ...d.data() }));
         filterStudents();
       },
@@ -360,9 +401,9 @@
         ? s.subject.split(',').map(x => `<span class="subject-tag">${x.trim()}</span>`).join('')
         : '<span style="color:var(--text-muted)">-</span>';
 
+      // ★ fireId 기준으로 수업카드 조회
       const info    = ccCache[s.fireId] || { count: 0, teacher: '' };
       const hasCard = info.count > 0;
-      // 담당선생님: classCards에서 가져온 최신 teacher 이름
       const teacher = info.teacher || '-';
       const safeName = (s.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
@@ -376,7 +417,7 @@
         <td style="color:var(--text-muted);font-size:13px">${s.regDate||'-'}</td>
         <td>
           <button class="card-btn${hasCard?' has-card':''}"
-            onclick="openClassCardModal('${s.fireId}','${safeName}')">
+            onclick="openClassCardModal('${s.fireId}','${safeName}','${(s.id||'').replace(/'/g,"\\'")}')">
             <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
             ${hasCard ? `수업카드 보기 (${info.count}건)` : '수업카드 없음'}
           </button>
@@ -469,8 +510,8 @@
     catch(e) { alert("삭제 오류: " + e.message); }
   }
 
-  // ── 수업카드 조회 모달 ──
-  window.openClassCardModal = async function(fireId, name) {
+  // ── ★ 수업카드 조회 모달 (fireId + 학번 양쪽 쿼리) ──
+  window.openClassCardModal = async function(fireId, name, studentId) {
     document.getElementById('ccModalTitle').textContent = `${name} · 수업카드`;
     document.getElementById('cc-total').textContent = '—';
     document.getElementById('cc-month').textContent = '—';
@@ -479,13 +520,34 @@
     document.getElementById('classCardModal').classList.add('open');
 
     try {
-      // studentId = 학생의 fireId로 쿼리
-      const snap = await getDocs(query(
+      // ★ fireId로 먼저 쿼리
+      const snap1 = await getDocs(query(
         collection(db, "classCards"),
         where("studentId", "==", fireId),
         orderBy("classDate", "desc")
       ));
-      const cards = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      let cards = snap1.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      // ★ 학번(studentId)으로도 추가 쿼리 (기존 데이터 호환)
+      if (studentId && studentId !== fireId) {
+        try {
+          const snap2 = await getDocs(query(
+            collection(db, "classCards"),
+            where("studentId", "==", studentId),
+            orderBy("classDate", "desc")
+          ));
+          const cards2 = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
+          // 중복 제거 후 병합
+          const existingIds = new Set(cards.map(c => c.id));
+          cards2.forEach(c => { if (!existingIds.has(c.id)) cards.push(c); });
+          // 날짜 내림차순 재정렬
+          cards.sort((a, b) => (b.classDate || '').localeCompare(a.classDate || ''));
+        } catch(e2) {
+          // 학번 쿼리 실패해도 fireId 결과 사용
+          console.warn("학번 classCards 쿼리 실패:", e2.message);
+        }
+      }
+
       renderCCStats(cards);
       renderCCList(cards);
     } catch(e) {
