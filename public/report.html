@@ -82,6 +82,8 @@ body {
   background: #fff; outline: none; cursor: pointer; appearance: none; min-width: 110px;
 }
 .filter-select:focus { border-color: #db2777; }
+
+/* ★ 학생 카드 */
 .stu-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
 .stu-card {
   background: #ffffff; border: 1px solid #fce7f3; border-radius: 14px;
@@ -89,19 +91,21 @@ body {
   transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
 }
 .stu-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(219,39,119,0.1); border-color: #fbcfe8; }
-.stu-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.stu-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .stu-av { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
 .stu-card-name { font-size: 14px; font-weight: 700; color: #1d1d1f; letter-spacing: -0.02em; }
 .stu-card-grade { font-size: 11px; color: #aeaeb2; margin-top: 1px; }
-.stu-card-scores { display: flex; gap: 5px; flex-wrap: wrap; }
-.score-chip { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 6px; }
-.sc-ox { background: #dbeafe; color: #1e40af; }
-.sc-mc { background: #ede9fe; color: #5b21b6; }
-.sc-ms { background: #d1fae5; color: #065f46; }
-.stu-card-avg { margin-top: 8px; display: flex; align-items: center; gap: 6px; }
-.avg-track { flex: 1; height: 4px; background: #fce7f3; border-radius: 2px; overflow: hidden; }
-.avg-fill { height: 100%; background: linear-gradient(90deg, #f9a8d4, #db2777); border-radius: 2px; transition: width 0.5s; }
-.avg-num { font-size: 11px; font-weight: 700; color: #db2777; min-width: 30px; text-align: right; }
+
+/* ★ 응시 시험 이름 표시 영역 */
+.stu-card-tests { display: flex; flex-direction: column; gap: 3px; margin-bottom: 8px; min-height: 20px; }
+.stu-test-tag {
+  font-size: 10px; color: #7c3aed; background: #ede9fe;
+  padding: 2px 7px; border-radius: 5px; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+  display: inline-block;
+}
+.stu-test-more { font-size: 10px; color: #aeaeb2; }
+
 .empty-box { padding: 3rem; text-align: center; font-size: 13px; color: #aeaeb2; background: #fff; border: 1px solid #fce7f3; border-radius: 16px; }
 .back-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
 .back-detail {
@@ -139,7 +143,9 @@ body {
 .p-overall-n { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
 .p-overall-l { font-size: 10px; color: #aeaeb2; margin-top: 3px; letter-spacing: 0.05em; }
 .c-good { color: #0369a1; } .c-avg { color: #d97706; } .c-warn { color: #dc2626; }
-.mini-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 1rem; }
+
+/* ★ 미니 통계 (5개 → 4개, 평균 제거) */
+.mini-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1rem; }
 .mini-card { background: #ffffff; border: 1px solid #fce7f3; border-radius: 12px; padding: 0.85rem 0.6rem; text-align: center; }
 .mini-n { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; }
 .mini-l { font-size: 10px; color: #aeaeb2; margin-top: 3px; font-weight: 500; line-height: 1.3; }
@@ -183,7 +189,10 @@ body {
 .rt-row { display: grid; padding: 0.75rem 1.2rem; border-bottom: 1px solid #fdf2f8; align-items: center; transition: background 0.15s; }
 .rt-row:last-child { border-bottom: none; }
 .rt-row:hover { background: #fffbfe; }
-.gt-base { grid-template-columns: 1fr 90px 80px 80px 120px; }
+
+/* ★ 단원명, 시험일, 응시횟수, 점수, 점수바 */
+.gt-base { grid-template-columns: 1fr 90px 90px 80px 100px; }
+
 .cell-name { font-size: 12px; font-weight: 500; color: #1d1d1f; }
 .cell-date { font-size: 11px; color: #aeaeb2; }
 .cell-score { font-size: 13px; font-weight: 700; }
@@ -191,6 +200,18 @@ body {
 .bar-wrap { display: flex; align-items: center; gap: 6px; }
 .bar-track { flex: 1; height: 5px; background: #f5f5f7; border-radius: 3px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+
+/* ★ 응시 횟수 배지 */
+.attempt-badge {
+  display: inline-flex; align-items: center; font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 6px; white-space: nowrap;
+}
+.ab-first  { background: #dbeafe; color: #1e40af; }
+.ab-retry1 { background: #ede9fe; color: #5b21b6; }
+.ab-retry2 { background: #fef9c3; color: #854d0e; }
+.ab-retry3 { background: #fee2e2; color: #991b1b; }
+.ab-retry  { background: #f5f5f7; color: #6e6e73; }
+
 .fb-chip { display: inline-flex; align-items: center; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 6px; }
 .fb-g { background: #dcfce7; color: #166534; }
 .fb-a { background: #fef9c3; color: #854d0e; }
@@ -205,7 +226,7 @@ body {
 .q-stat b { color: #065f46; }
 .empty-state { padding: 2.5rem; text-align: center; font-size: 13px; color: #aeaeb2; }
 @media (max-width: 700px) {
-  .mini-grid { grid-template-columns: repeat(3, 1fr); }
+  .mini-grid { grid-template-columns: repeat(2, 1fr); }
   .analysis-row { grid-template-columns: 1fr; }
   .gt-base { grid-template-columns: 1fr 80px 70px; }
   .gt-base > *:nth-child(4), .gt-base > *:nth-child(5) { display: none; }
@@ -300,6 +321,8 @@ body {
       <div>
         <div class="p-name" id="r-name"></div>
         <div class="p-meta" id="r-meta"></div>
+        <!-- ★ 응시 시험 이름 표시 -->
+        <div id="r-test-names" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;"></div>
         <div class="p-badges" id="r-badges"></div>
       </div>
       <div class="p-right">
@@ -308,12 +331,12 @@ body {
       </div>
     </div>
 
+    <!-- ★ 4개 미니 카드 (평균 제거) -->
     <div class="mini-grid">
       <div class="mini-card"><div class="mini-n" id="r-cnt" style="color:#db2777;">0</div><div class="mini-l">총 응시 횟수</div></div>
       <div class="mini-card"><div class="mini-n" id="r-ox"  style="color:#1e40af;">—</div><div class="mini-l">OX 평균</div></div>
       <div class="mini-card"><div class="mini-n" id="r-mc"  style="color:#5b21b6;">—</div><div class="mini-l">4지선다 평균</div></div>
       <div class="mini-card"><div class="mini-n" id="r-ms"  style="color:#065f46;">—</div><div class="mini-l">마스터 평균</div></div>
-      <div class="mini-card"><div class="mini-n" id="r-tot" style="color:#db2777;">—</div><div class="mini-l">종합 평균</div></div>
     </div>
 
     <div class="analysis-row">
@@ -366,7 +389,7 @@ body {
 
 <script type="module">
 import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore, collection, getDocs, getDoc, doc,
   query, where, orderBy, Timestamp
@@ -391,28 +414,24 @@ const GRADE_SHORT = {'중등1학년':'중1','중등2학년':'중2','중등3학�
 let students=[], allRecs={}, curStu=null, curPeriod='all', curExam='all';
 let radarInst=null, trendInst=null;
 
-/* ── 인증 ── */
 onAuthStateChanged(auth, async user => {
   if (!user) { location.replace('/login.html'); return; }
   try {
     const snap = await getDoc(doc(db,'users',user.uid));
     if (!snap.exists() || snap.data().status !== 'approved') {
-      await auth.signOut(); location.replace('/login.html'); return;
+      await signOut(auth); location.replace('/login.html'); return;
     }
     document.body.style.visibility = 'visible';
     await loadStudents();
   } catch { location.replace('/login.html'); }
 });
-window.doLogout = async () => { await auth.signOut(); location.replace('/login.html'); };
+window.doLogout = async () => { await signOut(auth); location.replace('/login.html'); };
 
-/* ── 학생 로드 ── */
 async function loadStudents() {
   try {
-    // students 컬렉션 우선 (id 필드 포함)
     const s2 = await getDocs(collection(db,'students'));
     students = [];
     s2.forEach(d => students.push({uid: d.id, ...d.data()}));
-
     if (!students.length) {
       const snaps = await getDocs(collection(db,'users'));
       snaps.forEach(d => { const u=d.data(); if(u.role==='student') students.push({uid:d.id,...u}); });
@@ -427,29 +446,38 @@ async function loadCardSummary(s) {
   const studentId = s.id || s.uid;
   try {
     const since = new Date(); since.setDate(since.getDate()-28);
-    // grades 컬렉션에서 studentId(m01001) 기준으로 조회
     const q = query(
       collection(db,'grades'),
       where('studentId','==',studentId),
       where('timestamp','>=',Timestamp.fromDate(since))
     );
     const snap = await getDocs(q);
-    let ox=[],mc=[],ms=[];
-    snap.forEach(d => {
-      const r=d.data(), sc=scoreOf(r), t=r.testType||'mc';
-      if(t==='ox') ox.push(sc); else if(t==='master') ms.push(sc); else mc.push(sc);
+
+    // ★ 첫 번째 본 점수만 집계
+    const docsAsc = snap.docs.slice().sort((a,b)=>toDate(a.data().timestamp).getTime()-toDate(b.data().timestamp).getTime());
+    const firstMap = new Map();
+    const testNames = [];
+    const seenNames = new Set();
+
+    docsAsc.forEach(d => {
+      const r=d.data();
+      const testKey = r.examId||r.testId||r.testName||r.examTitle||'unknown';
+      if(!firstMap.has(testKey)) firstMap.set(testKey, r);
+      const tname = r.testName||r.examTitle||'';
+      if(tname && !seenNames.has(tname)) { seenNames.add(tname); testNames.push(tname); }
     });
-    const avg = arr => arr.length ? Math.round(arr.reduce((a,v)=>a+v,0)/arr.length) : null;
-    const allA = avg([...ox,...mc,...ms]);
+
     const card = document.getElementById(`sc-${s.uid}`);
     if (!card) return;
-    card.querySelector('.lbl-ox').textContent = avg(ox)!==null ? avg(ox)+'점' : '—';
-    card.querySelector('.lbl-mc').textContent = avg(mc)!==null ? avg(mc)+'점' : '—';
-    card.querySelector('.lbl-ms').textContent = avg(ms)!==null ? avg(ms)+'점' : '—';
-    const fill = card.querySelector('.avg-fill');
-    const num  = card.querySelector('.avg-num');
-    if(fill) fill.style.width = (allA||0)+'%';
-    if(num)  num.textContent  = allA!==null ? allA+'점' : '—';
+
+    // ★ 응시 시험명 표시
+    const testsWrap = card.querySelector('.stu-card-tests');
+    if(testsWrap && testNames.length) {
+      const show = testNames.slice(0,2);
+      const more = testNames.length - show.length;
+      testsWrap.innerHTML = show.map(n=>`<span class="stu-test-tag">${esc2(n)}</span>`).join('')
+        + (more>0?`<span class="stu-test-more">+${more}개</span>`:'');
+    }
   } catch(e) { console.error('loadCardSummary error:', e); }
 }
 
@@ -468,15 +496,7 @@ function renderCards(list) {
         <div class="stu-av" style="background:${bg};color:${col};">${short}</div>
         <div><div class="stu-card-name">${name}</div><div class="stu-card-grade">${grade}</div></div>
       </div>
-      <div class="stu-card-scores">
-        <span class="score-chip sc-ox lbl-ox">—</span>
-        <span class="score-chip sc-mc lbl-mc">—</span>
-        <span class="score-chip sc-ms lbl-ms">—</span>
-      </div>
-      <div class="stu-card-avg">
-        <div class="avg-track"><div class="avg-fill" style="width:0;"></div></div>
-        <div class="avg-num">—</div>
-      </div>
+      <div class="stu-card-tests"></div>
     </div>`;
   }).join('');
 }
@@ -493,8 +513,15 @@ window.filterCards = () => {
   filtered.forEach(loadCardSummary);
 };
 
+/* ── timestamp → Date ── */
+function toDate(ts) {
+  if(!ts) return new Date(0);
+  if(ts && typeof ts === 'object' && ts.seconds) return new Date(ts.seconds * 1000);
+  if(ts && typeof ts.toDate === 'function') return ts.toDate();
+  return new Date(ts);
+}
+
 /* ── 리포트 열기 ── */
-// studentId = s.id (m01001), uid = Firebase doc ID
 window.openReport = async (studentId, name, grade, uid) => {
   curStu = {studentId, name, grade, uid};
   curPeriod = 'all'; curExam = 'all';
@@ -516,11 +543,10 @@ window.openReport = async (studentId, name, grade, uid) => {
   setTxt('r-meta', `${grade} · 종합 성적 분석 리포트`);
 
   try {
-    // grades 컬렉션에서 studentId(m01001) 기준으로 전체 조회
     const q = query(
       collection(db,'grades'),
       where('studentId','==',studentId),
-      orderBy('timestamp','desc')
+      orderBy('timestamp','asc')  // ★ 오름차순으로 가져와서 첫 번째/재시험 판별
     );
     const snap = await getDocs(q);
     allRecs[uid] = [];
@@ -532,26 +558,72 @@ window.openReport = async (studentId, name, grade, uid) => {
   renderReport();
 };
 
+/* ── 재시험 정보 계산 ──
+ * 같은 시험(examId/testId/testName)을 여러 번 본 경우:
+ * 첫 번째 = '첫시험', 두 번째 = '재시험1', 세 번째 = '재시험2', ...
+ */
+function buildAttemptInfo(recs) {
+  // testKey → 해당 시험 기록들 (시간순 정렬됨, recs가 이미 asc)
+  const groupMap = new Map(); // testKey → [rec, ...]
+  recs.forEach(r => {
+    const testKey = r.examId||r.testId||r.testName||r.examTitle||'unknown';
+    if(!groupMap.has(testKey)) groupMap.set(testKey, []);
+    groupMap.get(testKey).push(r);
+  });
+  // 각 기록에 attemptLabel, attemptIndex, totalAttempts 부여
+  const infoMap = new Map(); // rec.id → {label, index, total, isRetry}
+  groupMap.forEach((arr) => {
+    arr.forEach((r, i) => {
+      const total = arr.length;
+      let label = '첫시험';
+      let isRetry = false;
+      if(i > 0) { label = `재시험${i}`; isRetry = true; }
+      infoMap.set(r.id, {label, index:i, total, isRetry});
+    });
+  });
+  return infoMap;
+}
+
 /* ── 리포트 렌더 ── */
 function renderReport() {
   const uid = curStu.uid;
   const all = allRecs[uid]||[];
   const filtered = filterByPeriod(all, curPeriod);
 
-  const ox  = filtered.filter(r=>(r.testType||'mc')==='ox');
-  const mc  = filtered.filter(r=>(r.testType||'mc')==='mc');
-  const ms  = filtered.filter(r=>(r.testType||'mc')==='master');
+  // ★ 응시 시험 이름 표시 (고유 시험명)
+  const testNamesEl = document.getElementById('r-test-names');
+  const seenTestNames = new Set();
+  const uniqueTestNames = [];
+  filtered.forEach(r => {
+    const n = r.testName||r.examTitle||'';
+    if(n && !seenTestNames.has(n)) { seenTestNames.add(n); uniqueTestNames.push(n); }
+  });
+  testNamesEl.innerHTML = uniqueTestNames.slice(0,4).map(n =>
+    `<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;background:#ede9fe;color:#5b21b6;">${esc2(n)}</span>`
+  ).join('') + (uniqueTestNames.length > 4 ? `<span style="font-size:10px;color:#aeaeb2;">+${uniqueTestNames.length-4}개</span>` : '');
+
+  // ★ 첫 번째 본 점수만으로 평균 계산
+  const attemptInfo = buildAttemptInfo(filtered);
+  const firstOnly = filtered.filter(r => {
+    const info = attemptInfo.get(r.id);
+    return !info || info.index === 0;
+  });
+
+  const ox  = firstOnly.filter(r=>(r.testType||'mc')==='ox');
+  const mc  = firstOnly.filter(r=>(r.testType||'mc')==='mc');
+  const ms  = firstOnly.filter(r=>(r.testType||'mc')==='master');
   const avg = arr => arr.length ? Math.round(arr.map(scoreOf).reduce((a,v)=>a+v,0)/arr.length) : null;
 
   const oxA=avg(ox), mcA=avg(mc), msA=avg(ms);
-  const vals=[oxA,mcA,msA].filter(v=>v!==null);
-  const total=vals.length ? Math.round(vals.reduce((a,v)=>a+v,0)/vals.length) : null;
 
   setTxt('r-cnt', filtered.length);
   setTxt('r-ox',  oxA!==null  ? oxA+'점'  : '—');
   setTxt('r-mc',  mcA!==null  ? mcA+'점'  : '—');
   setTxt('r-ms',  msA!==null  ? msA+'점'  : '—');
-  setTxt('r-tot', total!==null ? total+'점': '—');
+
+  // 종합 평가: 첫 번째 점수 기준
+  const vals=[oxA,mcA,msA].filter(v=>v!==null);
+  const total=vals.length ? Math.round(vals.reduce((a,v)=>a+v,0)/vals.length) : null;
 
   const oel=document.getElementById('r-overall');
   if(total!==null){
@@ -631,8 +703,7 @@ function drawRadar(oxA, mcA, msA) {
 function drawTrend(filtered) {
   const ctx=document.getElementById('trend-chart').getContext('2d');
   if(trendInst) trendInst.destroy();
-
-  const sorted=[...filtered].reverse();
+  const sorted=[...filtered]; // 이미 asc 정렬됨
   const oxR=sorted.filter(r=>(r.testType||'mc')==='ox');
   const mcR=sorted.filter(r=>(r.testType||'mc')==='mc');
   const msR=sorted.filter(r=>(r.testType||'mc')==='master');
@@ -641,8 +712,7 @@ function drawTrend(filtered) {
     const dr=recs.filter(r=>fmtDate(r.timestamp)===d);
     return dr.length?Math.round(dr.map(scoreOf).reduce((a,v)=>a+v,0)/dr.length):null;
   });
-
-  const combined=[...oxR,...mcR].sort((a,b)=>(a.timestamp?.seconds||0)-(b.timestamp?.seconds||0));
+  const combined=[...oxR,...mcR].sort((a,b)=>toDate(a.timestamp).getTime()-toDate(b.timestamp).getTime());
   const badge=document.getElementById('r-trend-badge');
   if(combined.length>=2){
     const diff=scoreOf(combined[combined.length-1])-scoreOf(combined[0]);
@@ -650,7 +720,6 @@ function drawTrend(filtered) {
     else if(diff<0) {badge.textContent=`하락세 (${diff}점)`;badge.className='trend-badge tb-dn';}
     else            {badge.textContent='보합세';badge.className='trend-badge tb-fl';}
   } else {badge.textContent='데이터 부족';badge.className='trend-badge tb-fl';}
-
   trendInst=new Chart(ctx,{
     type:'line',
     data:{
@@ -672,25 +741,43 @@ function drawTrend(filtered) {
   });
 }
 
+function attemptBadge(info) {
+  if(!info) return '';
+  if(info.index === 0) return `<span class="attempt-badge ab-first">첫시험</span>`;
+  const cls = info.index===1?'ab-retry1':info.index===2?'ab-retry2':info.index===3?'ab-retry3':'ab-retry';
+  return `<span class="attempt-badge ${cls}">재시험${info.index}</span>`;
+}
+
 function renderResults(filtered, examType) {
   const wrap=document.getElementById('r-result-wrap');
+  const attemptInfo = buildAttemptInfo(filtered);
+
   const oxR=filtered.filter(r=>(r.testType||'mc')==='ox');
   const mcR=filtered.filter(r=>(r.testType||'mc')==='mc');
   const msR=filtered.filter(r=>(r.testType||'mc')==='master');
   let html='';
 
+  function makeRows(recs, scoreClass, barColor) {
+    return recs.map(r => {
+      const sc=scoreOf(r);
+      const info = attemptInfo.get(r.id);
+      const attempts = info ? info.total : 1;
+      return `<div class="rt-row gt-base">
+        <div class="cell-name">${r.testName||r.examTitle||'—'}</div>
+        <div class="cell-date">${fmtDate(r.timestamp)}</div>
+        <div>${attemptBadge(info)} ${attempts>1?`<span style="font-size:10px;color:#aeaeb2;">총 ${attempts}회</span>`:''}</div>
+        <div class="cell-score ${scoreClass}">${sc}점</div>
+        <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:${sc}%;background:${barColor};"></div></div></div>
+      </div>`;
+    }).join('');
+  }
+
   if((examType==='all'||examType==='ox')&&oxR.length){
     html+=`<div class="result-section">
       <div class="result-section-title"><span class="rs-dot" style="background:#1e40af;"></span><span style="color:#1e40af;">OX 문제</span><span style="font-size:11px;color:#aeaeb2;font-weight:400;">(${oxR.length}회)</span></div>
       <div class="result-table">
-        <div class="rt-head gt-base"><div>단원</div><div>시험일</div><div>점수</div><div></div><div>점수 바</div></div>
-        ${oxR.map(r=>`<div class="rt-row gt-base">
-          <div class="cell-name">${r.testName||r.examTitle||'—'}</div>
-          <div class="cell-date">${fmtDate(r.timestamp)}</div>
-          <div class="cell-score cs-ox">${scoreOf(r)}점</div>
-          <div></div>
-          <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:${scoreOf(r)}%;background:#1e40af;"></div></div></div>
-        </div>`).join('')}
+        <div class="rt-head gt-base"><div>단원명</div><div>시험일</div><div>응시횟수</div><div>점수</div><div>점수 바</div></div>
+        ${makeRows(oxR,'cs-ox','#1e40af')}
       </div>
     </div>`;
   }
@@ -699,14 +786,8 @@ function renderResults(filtered, examType) {
     html+=`<div class="result-section">
       <div class="result-section-title"><span class="rs-dot" style="background:#5b21b6;"></span><span style="color:#5b21b6;">4지선다</span><span style="font-size:11px;color:#aeaeb2;font-weight:400;">(${mcR.length}회)</span></div>
       <div class="result-table">
-        <div class="rt-head gt-base"><div>단원</div><div>시험일</div><div>점수</div><div></div><div>점수 바</div></div>
-        ${mcR.map(r=>`<div class="rt-row gt-base">
-          <div class="cell-name">${r.testName||r.examTitle||'—'}</div>
-          <div class="cell-date">${fmtDate(r.timestamp)}</div>
-          <div class="cell-score cs-mc">${scoreOf(r)}점</div>
-          <div></div>
-          <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:${scoreOf(r)}%;background:#5b21b6;"></div></div></div>
-        </div>`).join('')}
+        <div class="rt-head gt-base"><div>단원명</div><div>시험일</div><div>응시횟수</div><div>점수</div><div>점수 바</div></div>
+        ${makeRows(mcR,'cs-mc','#5b21b6')}
       </div>
     </div>`;
   }
@@ -715,15 +796,17 @@ function renderResults(filtered, examType) {
     html+=`<div class="result-section">
       <div class="result-section-title"><span class="rs-dot" style="background:#10b981;"></span><span style="color:#065f46;">마스터테스트</span><span style="font-size:11px;color:#aeaeb2;font-weight:400;">(${msR.length}회)</span></div>
       <div class="result-table">
-        <div class="rt-head gt-base"><div>단원</div><div>시험일</div><div>점수</div><div>평가</div><div>점수 바</div></div>
+        <div class="rt-head gt-base"><div>단원명</div><div>시험일</div><div>응시횟수</div><div>점수</div><div>점수 바</div></div>
         ${msR.map(r=>{
           const sc=scoreOf(r);
+          const info = attemptInfo.get(r.id);
+          const attempts = info ? info.total : 1;
           const fb=sc>=80?`<span class="fb-chip fb-g">양호</span>`:sc>=60?`<span class="fb-chip fb-a">보통</span>`:`<span class="fb-chip fb-w">주의</span>`;
           return `<div class="rt-row gt-base">
             <div class="cell-name">${r.testName||r.examTitle||'—'}</div>
             <div class="cell-date">${fmtDate(r.timestamp)}</div>
-            <div class="cell-score cs-ms">${sc}점</div>
-            <div>${fb}</div>
+            <div style="display:flex;align-items:center;gap:4px;">${attemptBadge(info)} ${attempts>1?`<span style="font-size:10px;color:#aeaeb2;">총 ${attempts}회</span>`:''}</div>
+            <div class="cell-score cs-ms">${sc}점 ${fb}</div>
             <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:${sc}%;background:#10b981;"></div></div></div>
           </div>`;
         }).join('')}
@@ -737,7 +820,8 @@ function renderResults(filtered, examType) {
 function renderQAnalysis(msRecs) {
   const sec=document.getElementById('r-q-section');
   if(!msRecs.length){sec.style.display='none';return;}
-  const latest=msRecs[0];
+  // 가장 마지막(최근) 기록의 answers 사용
+  const latest=msRecs[msRecs.length-1];
   const answers=latest.answers||[];
   if(!answers.length){sec.style.display='none';return;}
   sec.style.display='block';
@@ -750,7 +834,6 @@ function renderQAnalysis(msRecs) {
     `총 <b>${answers.length}</b>문항 &nbsp;|&nbsp; 정답 <b style="color:#166534;">${correct}</b>개 &nbsp;|&nbsp; 오답 <b style="color:#991b1b;">${answers.length-correct}</b>개 &nbsp;|&nbsp; 정답률 <b>${Math.round(correct/answers.length*100)}%</b>`;
 }
 
-/* ── 이벤트 ── */
 window.setPeriod=(p,el)=>{
   curPeriod=p;
   document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('on'));
@@ -772,24 +855,24 @@ window.goList=()=>{
   setTxt('bar-hint','학생 이름을 클릭하면 종합 분석을 볼 수 있습니다');
 };
 
-/* ── 유틸 ── */
 function filterByPeriod(recs,period){
   if(period==='all') return recs;
   const days={'1w':7,'1m':30,'3m':90,'6m':180,'1y':365}[period]||0;
   if(!days) return recs;
   const since=new Date(); since.setDate(since.getDate()-days);
   return recs.filter(r=>{
-    const d=r.timestamp?.toDate?r.timestamp.toDate():new Date(r.timestamp||0);
+    const d=toDate(r.timestamp||0);
     return d>=since;
   });
 }
 function scoreOf(r){return typeof r.score==='number'?r.score:(r.percentage||0);}
 function fmtDate(ts){
   if(!ts) return '';
-  const d=ts.toDate?ts.toDate():new Date(ts);
+  const d=toDate(ts);
   return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
 }
 function esc(s){return (s||'').replace(/'/g,"\\'");}
+function esc2(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function setTxt(id,txt){const e=document.getElementById(id);if(e)e.textContent=txt;}
 </script>
 </body>
