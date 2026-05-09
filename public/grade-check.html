@@ -533,25 +533,21 @@ async function loadSummary(s) {
   try {
     const since=new Date(); since.setDate(since.getDate()-28);
     const q=query(
-      collection(db,'grades'),
-      where('studentId','==',studentId),
-      where('timestamp','>=',Timestamp.fromDate(since))
-    );
-    const snap=await getDocs(q);
-    let ox=[],mc=[],ms=[];
-    // ★ 첫 번째 본 점수만 집계
-    const firstMap = new Map();
-    const docsAsc = snap.docs.slice().sort((a,b)=>{
-      const ta=toDate(a.data().timestamp).getTime();
-      const tb=toDate(b.data().timestamp).getTime();
-      return ta-tb;
-    });
-    docsAsc.forEach(d=>{
-      const r=d.data();
-      const testKey = r.examId||r.testId||r.testName||r.examTitle||'unknown';
-      const mapKey = `${studentId}_${testKey}`;
-      if(!firstMap.has(mapKey)) firstMap.set(mapKey, r);
-    });
+  collection(db,'grades'),
+  where('studentId','==',studentId)
+);
+const snap=await getDocs(q);
+let ox=[],mc=[],ms=[];
+const firstMap = new Map();
+const docsAsc = snap.docs
+  .map(d => ({id:d.id,...d.data()}))
+  .filter(r => toDate(r.timestamp) >= since)
+  .sort((a,b) => toDate(a.timestamp).getTime() - toDate(b.timestamp).getTime());
+
+docsAsc.forEach(r=>{
+  const testKey = r.examId||r.testId||r.testName||r.examTitle||'unknown';
+  if(!firstMap.has(testKey)) firstMap.set(testKey, r);
+});
     // ★ 응시 시험명 목록 수집 (첫 번째 기록 기준, 최대 3개 표시)
     const testNames = [];
     const seenNames = new Set();
