@@ -76,7 +76,7 @@ function getTypeBadge(exam: Exam & { subType?: string }) {
 // ── 공통 상단 헤더 (마스터 테스트와 동일한 스타일) ──
 function TopHeader() {
   return (
-    <div className="bg-white border-b border-green-100 px-5 py-3 flex items-center gap-3 shadow-sm">
+    <div className="bg-white border-b border-green-100 px-5 py-3 flex items-center justify-center gap-3 shadow-sm">
       <div className="w-8 h-8 bg-green-600 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
         <FlaskConical size={16} className="text-white" />
       </div>
@@ -180,7 +180,7 @@ export default function StudentTestPage() {
                 <label className="block text-sm font-bold text-green-700 mb-1.5">학생 ID</label>
                 <input
                   type="text"
-                  className="w-full border-2 border-green-200 rounded-xl px-4 py-3 text-sm font-mono tracking-wider outline-none focus:border-green-500 transition-colors bg-white placeholder-gray-300"
+                  className="w-full border-2 border-green-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-green-500 transition-colors bg-white placeholder-gray-300"
                   placeholder="예: m01001, h01001"
                   value={studentIdInput}
                   onChange={e => setStudentIdInput(e.target.value.toLowerCase())}
