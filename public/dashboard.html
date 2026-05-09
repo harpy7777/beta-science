@@ -20,16 +20,21 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-si
 .app-wrapper{max-width:var(--mw);margin:0 auto;display:flex;flex-direction:column;min-height:100vh}
 
 /* ══ 공통 탑바 ══ */
-.topbar{background:var(--wh);border-bottom:1px solid var(--bd);padding:0 28px;display:flex;align-items:center;gap:20px;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(236,72,153,.06)}
+.topbar{background:var(--wh);border-bottom:1px solid var(--bd);padding:0 28px;display:flex;align-items:center;gap:12px;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(236,72,153,.06)}
 .logo-area{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0}
 .logo-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--pink),var(--pink-dk));border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(236,72,153,.35);flex-shrink:0}
 .logo-name{font-size:14px;font-weight:700;color:var(--tx);letter-spacing:-.01em}
 .topbar-divider{width:1px;height:20px;background:var(--bd);flex-shrink:0}
-.nav-tabs{display:flex;list-style:none;flex:1;justify-content:space-evenly;}
-.nav-tabs a{display:block;padding:7px 0;font-size:12px;font-weight:500;color:var(--mt);text-decoration:none;border-radius:20px;white-space:nowrap;transition:all .15s;text-align:center;}
+
+/* ══ 핵심 수정: nav가 남은 공간 전부 차지하도록 ══ */
+.topbar nav{flex:1;display:flex;align-items:center;min-width:0}
+.nav-tabs{display:flex;list-style:none;width:100%;justify-content:space-evenly;align-items:center}
+.nav-tabs li{flex:1;text-align:center}
+.nav-tabs a{display:block;padding:7px 6px;font-size:12px;font-weight:500;color:var(--mt);text-decoration:none;border-radius:20px;white-space:nowrap;transition:all .15s;text-align:center;}
 .nav-tabs a:hover{background:var(--pink-lt);color:var(--tx)}
 .nav-tabs a.active{background:#fce7f3;color:var(--pink);font-weight:700}
-.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+
+.topbar-right{flex-shrink:0;display:flex;align-items:center;gap:10px}
 .badge-admin{font-size:11px;padding:3px 10px;background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:20px;color:var(--pink);font-weight:700}
 .btn-logout{padding:5px 14px;background:transparent;border:1.5px solid #fbcfe8;border-radius:20px;font-family:inherit;font-size:11px;font-weight:700;color:var(--pink);cursor:pointer;transition:all .15s}
 .btn-logout:hover{background:var(--pink-lt)}
@@ -149,7 +154,7 @@ svg.icon{width:16px;height:16px;flex-shrink:0}
 .btn-secondary:hover{background:var(--pink-lt)}
 
 @media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.stats-grid{grid-template-columns:1fr}.nav-tabs a{padding:5px 9px;font-size:11px}.main-content{padding:16px 14px}}
+@media(max-width:600px){.stats-grid{grid-template-columns:1fr}.nav-tabs a{padding:5px 4px;font-size:10px}.main-content{padding:16px 14px}}
 </style>
 </head>
 <body>
@@ -168,14 +173,16 @@ svg.icon{width:16px;height:16px;flex-shrink:0}
     <span class="logo-name">베타과학학원</span>
   </a>
   <div class="topbar-divider"></div>
-  <nav><ul class="nav-tabs">
-    <li><a href="dashboard.html" class="active">대시보드</a></li>
-    <li><a href="students.html">학생 관리</a></li>
-    <li><a href="special.html">특별관리</a></li>
-    <li><a href="sms.html">SMS설정</a></li>
-    <li><a href="management.html">학원관리</a></li>
-    <li><a href="teacher-board.html">선생님 게시판</a></li>
-  </ul></nav>
+  <nav>
+    <ul class="nav-tabs">
+      <li><a href="dashboard.html" class="active">대시보드</a></li>
+      <li><a href="students.html">학생 관리</a></li>
+      <li><a href="special.html">특별관리</a></li>
+      <li><a href="sms.html">SMS설정</a></li>
+      <li><a href="management.html">학원관리</a></li>
+      <li><a href="teacher-board.html">선생님 게시판</a></li>
+    </ul>
+  </nav>
   <div class="topbar-right">
     <span class="badge-admin">관리자 모드</span>
     <button class="btn-logout" onclick="doLogout()">로그아웃</button>
