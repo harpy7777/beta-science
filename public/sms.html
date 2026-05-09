@@ -4,34 +4,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SMS설정 - 베타과학</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root { --primary: #1a3fc4; --primary-light: #eef2ff; --primary-dark: #1530a0; --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff; --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --success: #10b981; --warning: #f59e0b; --radius: 10px; }
-  body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; visibility: hidden; }
+  :root { --primary: #ec4899; --primary-light: #fdf2f8; --primary-dark: #be185d; --max-width: 1200px; --bg: #fef7fb; --white: #ffffff; --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0; --danger: #ef4444; --success: #10b981; --warning: #f59e0b; --radius: 10px; }
+  body { font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; visibility: hidden; }
   .app-wrapper { max-width: var(--max-width); margin: 0 auto; display: flex; flex-direction: column; min-height: 100vh; }
-  .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 32px; height: 56px; position: sticky; top: 0; z-index: 100; }
+  .topbar { background: var(--white); border-bottom: 1px solid #fce7f3; padding: 0 24px; display: flex; align-items: center; gap: 32px; height: 56px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 6px rgba(236,72,153,0.07); }
   .logo-area { display: flex; flex-direction: row; align-items: center; gap: 8px; text-decoration: none; cursor: pointer; flex-shrink: 0; }
-  .logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 8px rgba(236,72,153,0.30); }
   .logo-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
   .logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
   .logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
-  .topbar-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+  .topbar-divider { width: 1px; height: 28px; background: #fce7f3; flex-shrink: 0; }
   .nav-tabs { display: flex; gap: 25px; list-style: none; margin-left: 60px; }
-.nav-tabs a { display: block; padding: 8px 18px; font-size: 14px; color: var(--text-muted); text-decoration: none; border-radius: 6px; white-space: nowrap; transition: background 0.15s, color 0.15s; }
+  .nav-tabs a { display: block; padding: 8px 18px; font-size: 14px; color: var(--text-muted); text-decoration: none; border-radius: 6px; white-space: nowrap; transition: background 0.15s, color 0.15s; }
   .nav-tabs a:hover { background: var(--bg); color: var(--text); }
   .nav-tabs a.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
   .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
   .academy-name { font-size: 13px; font-weight: 600; color: var(--text); }
-  .badge-admin { font-size: 11px; padding: 2px 8px; background: #f1f5f9; border-radius: 20px; color: var(--text-muted); }
-  .btn-logout { padding: 6px 14px; background: transparent; border: 1.5px solid #c7d2fe; border-radius: 20px; font-family: inherit; font-size: 11px; font-weight: 600; color: var(--primary); cursor: pointer; transition: all 0.18s; white-space: nowrap; }
+  .badge-admin { font-size: 11px; padding: 2px 8px; background: #fdf2f8; border-radius: 20px; color: var(--primary); font-weight: 600; }
+  .btn-logout { padding: 6px 14px; background: transparent; border: 1.5px solid #fbcfe8; border-radius: 20px; font-family: inherit; font-size: 11px; font-weight: 600; color: var(--primary); cursor: pointer; transition: all 0.18s; white-space: nowrap; }
   .btn-logout:hover { background: var(--primary-light); }
   .main-content { padding: 28px 24px; flex: 1; padding-bottom: 100px; }
-  .page-header { margin-bottom: 24px; }
+  .page-header { margin-bottom: 24px; background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%); border-radius: 14px; padding: 22px 28px; border: 1px solid #fbcfe8; }
   .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
   .page-header p { font-size: 14px; color: var(--text-muted); }
   .layout { display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: start; }
-  .card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; }
-  .card-header { padding: 18px 24px; border-bottom: 1px solid var(--border); }
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; transition: border-color 0.15s; }
+  .card:hover { border-color: #fbcfe8; }
+  .card-header { padding: 18px 24px; border-bottom: 1px solid #fce7f3; }
   .card-header h2 { font-size: 16px; font-weight: 700; }
   .card-header p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
   .card-body { padding: 24px; }
@@ -60,15 +64,15 @@
   .hw-default-item textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text); background: var(--white); outline: none; resize: vertical; min-height: 70px; font-family: inherit; transition: border 0.15s; line-height: 1.6; }
   .hw-default-item textarea:focus { border-color: var(--primary); }
   .preview-sticky { position: sticky; top: 72px; }
-  .preview-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  .preview-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
-  .preview-header h3 { font-size: 15px; font-weight: 700; }
+  .preview-card { background: var(--white); border: 1px solid #fbcfe8; border-radius: var(--radius); overflow: hidden; }
+  .preview-header { padding: 16px 20px; border-bottom: 1px solid #fce7f3; display: flex; align-items: center; gap: 8px; background: #fdf2f8; }
+  .preview-header h3 { font-size: 15px; font-weight: 700; color: var(--primary); }
   .preview-body { padding: 20px; }
-  .sms-bubble { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-size: 13px; line-height: 1.8; color: var(--text); white-space: pre-wrap; font-family: inherit; min-height: 200px; }
+  .sms-bubble { background: #fdf2f8; border: 1px solid #fbcfe8; border-radius: 12px; padding: 16px; font-size: 13px; line-height: 1.8; color: var(--text); white-space: pre-wrap; font-family: inherit; min-height: 200px; }
   .preview-meta { margin-top: 10px; font-size: 12px; color: var(--text-muted); text-align: right; }
-  .save-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--max-width); background: var(--white); border-top: 1px solid var(--border); padding: 14px 24px; z-index: 50; }
-  .btn-save { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s; }
-  .btn-save:hover { background: var(--primary-dark); }
+  .save-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--max-width); background: var(--white); border-top: 1px solid #fce7f3; padding: 14px 24px; z-index: 50; }
+  .btn-save { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.15s; box-shadow: 0 4px 14px rgba(236,72,153,0.30); }
+  .btn-save:hover { opacity: 0.9; }
   .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1e293b; color: white; padding: 11px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; opacity: 0; transition: opacity 0.3s, transform 0.3s; z-index: 999; white-space: nowrap; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .preview-sticky { position: static; } .score-msg-grid { grid-template-columns: 1fr; } .score-msg-full { grid-column: span 1; } .feedback-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -122,7 +126,7 @@
           <div class="card-body">
             <div class="score-msg-grid">
               <div class="score-msg-item"><label><span class="score-dot" style="background:#10b981"></span>90점 이상</label><textarea id="msg90" oninput="updatePreview()">훌륭합니다!</textarea></div>
-              <div class="score-msg-item"><label><span class="score-dot" style="background:#1a3fc4"></span>80점 이상</label><textarea id="msg80" oninput="updatePreview()">잘했어요!</textarea></div>
+              <div class="score-msg-item"><label><span class="score-dot" style="background:#ec4899"></span>80점 이상</label><textarea id="msg80" oninput="updatePreview()">잘했어요!</textarea></div>
               <div class="score-msg-item"><label><span class="score-dot" style="background:#f59e0b"></span>70점 이상</label><textarea id="msg70" oninput="updatePreview()">조금만 더 노력하면 완벽해요!</textarea></div>
               <div class="score-msg-item"><label><span class="score-dot" style="background:#f97316"></span>60점 이상</label><textarea id="msg60" oninput="updatePreview()">조금 더 복습이 필요해요.</textarea></div>
               <div class="score-msg-item score-msg-full"><label><span class="score-dot" style="background:#ef4444"></span>60점 미만</label><textarea id="msg59" oninput="updatePreview()">열심히 복습해주세요!</textarea></div>
@@ -165,7 +169,7 @@
       <div class="preview-sticky">
         <div class="preview-card">
           <div class="preview-header">
-            <svg width="16" height="16" fill="none" stroke="#1a3fc4" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <svg width="16" height="16" fill="none" stroke="#ec4899" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             <h3>문자 미리보기</h3>
           </div>
           <div class="preview-body">
