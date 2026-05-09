@@ -12,6 +12,8 @@ function StudentExamInner() {
   const { examId } = useParams<{ examId: string }>();
   const searchParams = useSearchParams();
   const isPreview = searchParams.get('preview') === '1';
+  // ★ type 파라미터: 'ox' | 'multiple' | null(전체)
+  const typeFilter = searchParams.get('type') as 'ox' | 'multiple' | null;
   const router = useRouter();
 
   const [exam, setExam] = useState<Exam | null>(null);
@@ -23,7 +25,7 @@ function StudentExamInner() {
   const [score, setScore] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
-  // 재풀기용 - 틀린 문제만 추린 가상 시험지
+  // 재풀기용
   const [retryQuestions, setRetryQuestions] = useState<Exam['questions']>([]);
   const [isRetryMode, setIsRetryMode] = useState(false);
   const [retryAnswers, setRetryAnswers] = useState<Record<string, string>>({});
@@ -32,39 +34,52 @@ function StudentExamInner() {
 
   const [studentId, setStudentId] = useState('');
 
-useEffect(() => {
-  getExam(examId).then(e => {
-    setExam(e);
-    setLoading(false);
-  });
-  const savedName = localStorage.getItem('studentName');
-  const savedId = localStorage.getItem('studentId');
-  const savedGrade = localStorage.getItem('studentGrade');
-  if (savedName) {
-    setStudentName(savedName);
-    setPhase('exam');
-    setCurrent(0);
-  }
-  if (savedId) setStudentId(savedId);
-}, [examId]);
+  useEffect(() => {
+    getExam(examId).then(e => {
+      setExam(e);
+      setLoading(false);
+    });
+    const savedName = localStorage.getItem('studentName');
+    const savedId   = localStorage.getItem('studentId');
+    if (savedName) {
+      setStudentName(savedName);
+      setPhase('exam');
+      setCurrent(0);
+    }
+    if (savedId) setStudentId(savedId);
+  }, [examId]);
 
-  // 자동 제출 (마지막 문제 답 선택 시)
-  async function autoSubmit(finalAnswers: Record<string, string>) {
+  // ★ typeFilter에 따라 실제로 풀 문제 목록 결정
+  function getFilteredQuestions(e: Exam): Exam['questions'] {
+    if (!typeFilter) return e.questions;
+    return e.questions.filter((q: any) => q.type === typeFilter);
+  }
+
+  // 자동 제출
+  async function autoSubmit(finalAnswers: Record<string, string>, questionsForSubmit: Exam['questions']) {
     if (!exam) return;
-    const s = calculateScore(exam, finalAnswers);
+
+    // ★ typeFilter가 있을 때: 해당 타입 문제만으로 점수 계산
+    const virtualExam: Exam = { ...exam, questions: questionsForSubmit };
+    const s = calculateScore(virtualExam, finalAnswers);
     setScore(s);
 
     if (!isPreview) {
       setSubmitting(true);
       try {
         await submitStudentAnswers({
-  examId: exam.id!,
-  studentName,
-  studentId,
-  answers: finalAnswers,
-  score: s,
-  totalQuestions: exam.questions.length,
-});
+          examId: exam.id!,
+          studentName,
+          studentId,
+          answers: finalAnswers,
+          score: s,
+          totalQuestions: questionsForSubmit.length,
+          // ★ subType 기록 (OX만 / 4지선다만 구분)
+          ...(typeFilter ? { subType: typeFilter } : {}),
+          // ★ OX 점수 / 4지선다 점수 각각 저장
+          ...(typeFilter === 'ox'       ? { oxScore: s }    : {}),
+          ...(typeFilter === 'multiple' ? { multiScore: s } : {}),
+        });
       } catch {
         toast.error('제출 중 오류가 발생했습니다');
       } finally {
@@ -75,15 +90,15 @@ useEffect(() => {
   }
 
   function handleAnswer(questionId: string, value: string) {
+    if (!exam) return;
+    const filteredQs = getFilteredQuestions(exam);
     const newAnswers = { ...answers, [questionId]: value };
     setAnswers(newAnswers);
 
-    if (!exam) return;
-    if (current < exam.questions.length - 1) {
+    if (current < filteredQs.length - 1) {
       setCurrent(c => c + 1);
     } else {
-      // 마지막 문제 → 자동 제출
-      autoSubmit(newAnswers);
+      autoSubmit(newAnswers, filteredQs);
     }
   }
 
@@ -95,7 +110,6 @@ useEffect(() => {
     if (current < retryQuestions.length - 1) {
       setCurrent(c => c + 1);
     } else {
-      // 재풀기 마지막 문제 → 결과
       let correct = 0;
       retryQuestions.forEach(q => {
         if (newAnswers[q.id] === q.answer) correct++;
@@ -106,10 +120,11 @@ useEffect(() => {
     }
   }
 
-  // 틀린 문제만 다시 풀기 시작
+  // 틀린 문제만 다시 풀기
   function startRetry() {
     if (!exam) return;
-    const wrong = exam.questions.filter(q => answers[q.id] !== q.answer);
+    const filteredQs = getFilteredQuestions(exam);
+    const wrong = filteredQs.filter(q => answers[q.id] !== q.answer);
     if (wrong.length === 0) return;
     setRetryQuestions(wrong);
     setRetryAnswers({});
@@ -119,7 +134,6 @@ useEffect(() => {
     setIsRetryMode(true);
   }
 
-  // 재풀기 종료 후 메인 결과로
   function exitRetry() {
     setIsRetryMode(false);
     setCurrent(0);
@@ -130,7 +144,7 @@ useEffect(() => {
   }
 
   function next() {
-    const list = isRetryMode ? retryQuestions : exam?.questions ?? [];
+    const list = isRetryMode ? retryQuestions : (exam ? getFilteredQuestions(exam) : []);
     if (current < list.length - 1) setCurrent(c => c + 1);
   }
 
@@ -154,13 +168,45 @@ useEffect(() => {
     );
   }
 
-  const questions = isRetryMode ? retryQuestions : exam.questions;
+  // ★ 실제로 표시할 문제 목록 (typeFilter 적용)
+  const filteredQuestions = getFilteredQuestions(exam);
+
+  // typeFilter로 걸렀는데 문제가 없는 경우
+  if (filteredQuestions.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-5xl mb-4">📭</div>
+          <p className="text-gray-500">
+            {typeFilter === 'ox' ? 'OX 문제가 없습니다' : '4지선다 문제가 없습니다'}
+          </p>
+          <button onClick={() => router.back()} className="btn-primary mt-4">뒤로가기</button>
+        </div>
+      </div>
+    );
+  }
+
+  const questions = isRetryMode ? retryQuestions : filteredQuestions;
   const currentAnswers = isRetryMode ? retryAnswers : answers;
   const q = questions[current];
   const answered = Object.keys(currentAnswers).length;
 
-  // 틀린 문제 목록 (결과 화면용)
-  const wrongQuestions = exam.questions.filter(q => answers[q.id] !== q.answer);
+  // 틀린 문제 (filteredQuestions 기준)
+  const wrongQuestions = filteredQuestions.filter(q => answers[q.id] !== q.answer);
+
+  // ★ 시험 제목에 타입 표시
+  const examDisplayTitle = typeFilter === 'ox'
+    ? `${exam.title} (OX퀴즈)`
+    : typeFilter === 'multiple'
+    ? `${exam.title} (4지선다)`
+    : exam.title;
+
+  // ★ 타입 라벨/색상
+  const typeLabel = typeFilter === 'ox'
+    ? { text: 'OX퀴즈', bg: 'bg-green-100', color: 'text-green-700' }
+    : typeFilter === 'multiple'
+    ? { text: '4지선다', bg: 'bg-blue-100', color: 'text-blue-700' }
+    : null;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex flex-col">
@@ -174,8 +220,14 @@ useEffect(() => {
             <div>
               <div className="font-bold text-green-900 text-sm">베타과학학원</div>
               {(phase === 'exam' || isRetryMode) && (
-                <div className="text-xs text-green-600">
-                  {studentName} · {isRetryMode ? '오답 재풀기' : exam.title}
+                <div className="text-xs text-green-600 flex items-center gap-1.5">
+                  {studentName}
+                  {typeLabel && (
+                    <span className={`${typeLabel.bg} ${typeLabel.color} font-bold px-1.5 py-0.5 rounded text-[10px]`}>
+                      {typeLabel.text}
+                    </span>
+                  )}
+                  {isRetryMode ? ' · 오답 재풀기' : ` · ${examDisplayTitle}`}
                 </div>
               )}
             </div>
@@ -200,9 +252,17 @@ useEffect(() => {
           <div className="flex-1 flex flex-col items-center justify-center">
             <div className="card p-8 w-full max-w-sm text-center">
               <div className="text-4xl mb-4">👤</div>
-              <h2 className="text-xl font-black text-gray-800 mb-1">{exam.title}</h2>
-              <p className="text-gray-400 text-sm mb-6">{exam.questions.length}문항</p>
-              <div className="text-left mb-2">
+              <h2 className="text-xl font-black text-gray-800 mb-1">{examDisplayTitle}</h2>
+              {/* ★ 타입 배지 */}
+              {typeLabel && (
+                <span className={`inline-block ${typeLabel.bg} ${typeLabel.color} text-xs font-bold px-2.5 py-1 rounded-full mb-2`}>
+                  {typeLabel.text} · {filteredQuestions.length}문항
+                </span>
+              )}
+              {!typeLabel && (
+                <p className="text-gray-400 text-sm mb-6">{filteredQuestions.length}문항</p>
+              )}
+              <div className="text-left mb-2 mt-4">
                 <label className="text-sm font-semibold text-gray-700 block mb-1.5">이름을 입력하세요</label>
                 <input
                   type="text"
@@ -394,14 +454,22 @@ useEffect(() => {
             <div className="card p-8 w-full max-w-sm text-center">
               <CheckCircle size={48} className="text-green-500 mx-auto mb-4" />
               <h2 className="text-2xl font-black text-gray-800 mb-1">시험 완료!</h2>
-              <p className="text-gray-400 text-sm mb-6">{studentName}의 결과</p>
+              <p className="text-gray-400 text-sm mb-2">{studentName}의 결과</p>
+              {/* ★ 어떤 유형 시험인지 표시 */}
+              {typeLabel && (
+                <span className={`inline-block ${typeLabel.bg} ${typeLabel.color} text-xs font-bold px-2.5 py-1 rounded-full mb-4`}>
+                  {typeLabel.text} 결과
+                </span>
+              )}
 
               <div className="bg-green-50 rounded-2xl p-6 mb-4">
                 <div className="text-6xl font-black text-green-600 mb-1">{score}</div>
                 <div className="text-green-700 font-medium">점</div>
+                <div className="text-xs text-gray-400 mt-1">
+                  {filteredQuestions.length - wrongQuestions.length} / {filteredQuestions.length} 정답
+                </div>
               </div>
 
-              {/* 틀린 문제 수 요약 */}
               {wrongQuestions.length > 0 && (
                 <div className="bg-red-50 rounded-xl px-4 py-3 mb-6 text-sm text-red-700 font-semibold">
                   ❌ 틀린 문제 {wrongQuestions.length}개
@@ -414,7 +482,7 @@ useEffect(() => {
               )}
 
               <div className="space-y-3 mb-6 text-left">
-                {exam.questions.map((q, i) => {
+                {filteredQuestions.map((q, i) => {
                   const myAns = answers[q.id];
                   const isCorrect = myAns === q.answer;
                   return (
@@ -453,8 +521,31 @@ useEffect(() => {
                     <RefreshCw size={16} /> 틀린 문제 다시 풀기 ({wrongQuestions.length}개)
                   </button>
                 )}
-                <button onClick={() => router.push('/')} className="btn-secondary w-full">
-                  홈으로
+                {/* ★ 혼합 시험에서 OX만 풀었으면 → 4지선다로 이동, 반대도 동일 */}
+                {typeFilter === 'ox' && (
+                  <button
+                    onClick={() => {
+                      window.location.href = `/student/${examId}?type=multiple`;
+                    }}
+                    className="btn-primary w-full"
+                    style={{ background: 'linear-gradient(135deg, #1a3fc4, #3b5bdb)' }}
+                  >
+                    4지선다 문제 풀기 →
+                  </button>
+                )}
+                {typeFilter === 'multiple' && (
+                  <button
+                    onClick={() => {
+                      window.location.href = `/student/${examId}?type=ox`;
+                    }}
+                    className="btn-primary w-full"
+                    style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}
+                  >
+                    OX퀴즈 풀기 →
+                  </button>
+                )}
+                <button onClick={() => router.push('/student-test')} className="btn-secondary w-full">
+                  시험 목록으로
                 </button>
               </div>
             </div>
