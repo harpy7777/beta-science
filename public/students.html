@@ -303,7 +303,7 @@
   const ITEMS_PER_PAGE = 10;
   let currentPage = 1, editingId = null;
   let students = [], filtered = [];
-  // fireId → { teacher, count } 캐시
+  // fireId → { teacher, count, latestTeacher } 캐시
   let ccCache = {};
 
   function gradeBadgeClass(g) {
@@ -312,19 +312,21 @@
   }
 
   async function initStudents() {
-    // classCards 전체 미리 집계 (studentId = 학생의 fireId)
+    // ── classCards 전체 집계: studentId = 학생의 fireId ──
+    // 가장 최근 선생님 이름을 가져오기 위해 classDate 내림차순 정렬
     try {
       const snap = await getDocs(query(collection(db, "classCards"), orderBy("classDate", "desc")));
-      const seenTeacher = new Set();
+      const seen = new Set();
       snap.forEach(d => {
         const c   = d.data();
-        const sid = c.studentId;
+        const sid = c.studentId; // ← 학생의 fireId
         if (!sid) return;
         if (!ccCache[sid]) ccCache[sid] = { count: 0, teacher: '' };
         ccCache[sid].count++;
-        if (!seenTeacher.has(sid)) {
+        // 첫 번째(= 가장 최근) 레코드의 teacher를 담당선생님으로
+        if (!seen.has(sid)) {
           ccCache[sid].teacher = c.teacher || '';
-          seenTeacher.add(sid);
+          seen.add(sid);
         }
       });
     } catch(e) { console.warn("classCards 집계 실패:", e.message); }
@@ -357,9 +359,11 @@
       const subs = s.subject && s.subject !== '-'
         ? s.subject.split(',').map(x => `<span class="subject-tag">${x.trim()}</span>`).join('')
         : '<span style="color:var(--text-muted)">-</span>';
-      const info     = ccCache[s.fireId] || { count: 0, teacher: '' };
-      const hasCard  = info.count > 0;
-      const teacher  = info.teacher;
+
+      const info    = ccCache[s.fireId] || { count: 0, teacher: '' };
+      const hasCard = info.count > 0;
+      // 담당선생님: classCards에서 가져온 최신 teacher 이름
+      const teacher = info.teacher || '-';
       const safeName = (s.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
       return `<tr>
@@ -367,7 +371,7 @@
         <td style="font-weight:500">${s.name||'-'}</td>
         <td><span class="grade-badge ${gradeBadgeClass(s.grade)}">${s.grade||'-'}</span></td>
         <td>${subs}</td>
-        <td class="teacher-name${teacher?' assigned':''}">${teacher||'-'}</td>
+        <td class="teacher-name${teacher !== '-' ? ' assigned' : ''}">${esc(teacher)}</td>
         <td>${s.phone||'-'}</td>
         <td style="color:var(--text-muted);font-size:13px">${s.regDate||'-'}</td>
         <td>
@@ -475,7 +479,7 @@
     document.getElementById('classCardModal').classList.add('open');
 
     try {
-      // ✅ studentId = 학생의 fireId 로 쿼리
+      // studentId = 학생의 fireId로 쿼리
       const snap = await getDocs(query(
         collection(db, "classCards"),
         where("studentId", "==", fireId),
