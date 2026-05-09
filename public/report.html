@@ -445,27 +445,28 @@ async function loadStudents() {
 async function loadCardSummary(s) {
   const studentId = s.id || s.uid;
   try {
-    const since = new Date(); since.setDate(since.getDate()-28);
-    const q = query(
-      collection(db,'grades'),
-      where('studentId','==',studentId),
-      where('timestamp','>=',Timestamp.fromDate(since))
-    );
-    const snap = await getDocs(q);
+   const since = new Date(); since.setDate(since.getDate()-28);
+const q = query(
+  collection(db,'grades'),
+  where('studentId','==',studentId)
+);
+const snap = await getDocs(q);
 
-    // ★ 첫 번째 본 점수만 집계
-    const docsAsc = snap.docs.slice().sort((a,b)=>toDate(a.data().timestamp).getTime()-toDate(b.data().timestamp).getTime());
-    const firstMap = new Map();
-    const testNames = [];
-    const seenNames = new Set();
+const docsAsc = snap.docs
+  .map(d => d.data())
+  .filter(r => toDate(r.timestamp) >= since)
+  .sort((a,b) => toDate(a.timestamp).getTime() - toDate(b.timestamp).getTime());
 
-    docsAsc.forEach(d => {
-      const r=d.data();
-      const testKey = r.examId||r.testId||r.testName||r.examTitle||'unknown';
-      if(!firstMap.has(testKey)) firstMap.set(testKey, r);
-      const tname = r.testName||r.examTitle||'';
-      if(tname && !seenNames.has(tname)) { seenNames.add(tname); testNames.push(tname); }
-    });
+const firstMap = new Map();
+const testNames = [];
+const seenNames = new Set();
+
+docsAsc.forEach(r => {
+  const testKey = r.examId||r.testId||r.testName||r.examTitle||'unknown';
+  if(!firstMap.has(testKey)) firstMap.set(testKey, r);
+  const tname = r.testName||r.examTitle||'';
+  if(tname && !seenNames.has(tname)) { seenNames.add(tname); testNames.push(tname); }
+});
 
     const card = document.getElementById(`sc-${s.uid}`);
     if (!card) return;
