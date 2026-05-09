@@ -99,23 +99,40 @@ body {
 .form-input, .form-select, .form-textarea {
   border: 1.5px solid #fce7f3; border-radius: 10px; font-size: 12px;
   font-family: inherit; color: #1d1d1f; padding: 8px 12px;
-  outline: none; background: #fff; transition: border 0.15s;
+  outline: none; background: #ffffff; transition: border 0.15s;
+  color-scheme: light;
 }
-.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #db2777; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #db2777; background: #ffffff; }
 .form-input { flex: 1; min-width: 0; }
-.form-select { min-width: 100px; appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23aeaeb2' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+.form-select {
+  min-width: 100px; appearance: none; -webkit-appearance: none; cursor: pointer;
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23aeaeb2' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
+}
+.form-select:focus { background-color: #ffffff; }
 .form-textarea { width: 100%; resize: vertical; min-height: 72px; line-height: 1.6; }
 .form-label { font-size: 10px; font-weight: 700; color: #6e6e73; margin-bottom: 4px; display: block; letter-spacing: 0.04em; }
 .form-group { display: flex; flex-direction: column; flex: 1; min-width: 120px; }
 
-/* ── 드롭다운 옵션 흰색 배경 ── */
+/* ── 드롭다운 옵션 흰색 배경 (전역 적용) ── */
+select {
+  background-color: #ffffff !important;
+  color-scheme: light;
+}
+select:focus {
+  background-color: #ffffff !important;
+  outline: none;
+}
 select option {
-  background: #ffffff !important;
+  background-color: #ffffff !important;
   color: #1d1d1f !important;
   padding: 6px 10px;
+  font-weight: 500;
 }
-select:focus option:checked {
-  background: #fce7f3 !important;
+select option:checked,
+select option:hover {
+  background-color: #fce7f3 !important;
   color: #db2777 !important;
 }
 
@@ -155,6 +172,8 @@ select:focus option:checked {
 .badge-gray   { background: #f5f5f7; color: #6e6e73; }
 .badge-pink   { background: #fce7f3; color: #db2777; }
 .badge-orange { background: #ffedd5; color: #9a3412; }
+.badge-teal   { background: #ccfbf1; color: #0f766e; }
+.badge-indigo { background: #e0e7ff; color: #3730a3; }
 
 /* ── 원비 수납 ── */
 .tuition-summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
@@ -168,8 +187,13 @@ select:focus option:checked {
   cursor: pointer; transition: all 0.15s;
 }
 .fchip.on { background: #db2777; color: #fff; border-color: #db2777; }
-.month-select { padding: 5px 12px; border: 1.5px solid #fce7f3; border-radius: 10px; font-size: 12px; font-family: inherit; color: #1d1d1f; outline: none; background: #fff; appearance: none; cursor: pointer; }
-.month-select:focus { border-color: #db2777; }
+.month-select {
+  padding: 5px 12px; border: 1.5px solid #fce7f3; border-radius: 10px;
+  font-size: 12px; font-family: inherit; color: #1d1d1f; outline: none;
+  background: #ffffff !important; appearance: none; -webkit-appearance: none;
+  cursor: pointer; color-scheme: light;
+}
+.month-select:focus { border-color: #db2777; background: #ffffff !important; }
 
 /* ── 상담 기록 ── */
 .consult-card {
@@ -181,16 +205,15 @@ select:focus option:checked {
 .consult-meta { display: flex; gap: 6px; flex-wrap: wrap; }
 .consult-body { font-size: 12px; color: #3c3c43; line-height: 1.7; white-space: pre-wrap; margin-top: 6px; padding-top: 6px; border-top: 1px solid #fdf2f8; }
 
-/* ── 보강 스케줄 테이블 스타일 ── */
+/* ══════════════════════════════════════
+   보강 스케줄 - 균등 컬럼 레이아웃
+══════════════════════════════════════ */
 .makeup-table-header {
   display: flex; align-items: center;
-  padding: 7px 14px 7px 14px;
-  font-size: 10px; font-weight: 700; color: #aeaeb2;
-  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 7px 14px;
   border-bottom: 2px solid #fce7f3;
   margin-bottom: 4px;
 }
-/* ── 보강 스케줄 (한 줄 표시) ── */
 .makeup-row {
   background: #fff; border: 1.5px solid #fce7f3; border-radius: 10px;
   padding: 9px 14px; margin-bottom: 5px;
@@ -200,27 +223,37 @@ select:focus option:checked {
 .makeup-row:hover { border-color: #fbcfe8; }
 .makeup-row.done { opacity: 0.5; }
 
-/* 컬럼 공통 */
-.mc { font-size: 12px; color: #3c3c43; padding-right: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mc-name    { width: 80px;  flex-shrink: 0; font-weight: 700; color: #1d1d1f; }
-.mc-grade   { width: 80px;  flex-shrink: 0; color: #6e6e73; }
-.mc-subject { width: 80px;  flex-shrink: 0; }
-.mc-date    { width: 100px; flex-shrink: 0; color: #6e6e73; }
-.mc-teacher { width: 80px;  flex-shrink: 0; color: #6e6e73; }
-.mc-reason  { width: 80px;  flex-shrink: 0; }
-.mc-note    { flex: 1; min-width: 0; color: #aeaeb2; font-size: 11px; }
-.mc-actions { flex-shrink: 0; display: flex; gap: 6px; align-items: center; margin-left: auto; padding-left: 8px; }
+/* 공통 컬럼: padding으로 간격, flex 비율로 균등 배분 */
+.mc {
+  font-size: 12px; color: #3c3c43;
+  padding: 0 6px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* 비율 배분: 이름 1.2 | 학년 1 | 과목 1.2 | 날짜 1.4 | 선생님 1 | 사유 1.2 | 메모 1.5 */
+.mc-name    { flex: 1.2; font-weight: 700; color: #1d1d1f; padding-left: 0; }
+.mc-grade   { flex: 1;   }
+.mc-subject { flex: 1.2; }
+.mc-date    { flex: 1.4; color: #6e6e73; }
+.mc-teacher { flex: 1;   color: #6e6e73; }
+.mc-reason  { flex: 1.2; }
+.mc-note    { flex: 1.5; color: #aeaeb2; font-size: 11px; }
+.mc-actions { flex-shrink: 0; display: flex; gap: 6px; align-items: center; padding-left: 8px; }
 
-/* 헤더 컬럼 */
-.mh { font-size: 10px; font-weight: 700; color: #aeaeb2; letter-spacing: 0.05em; text-transform: uppercase; padding-right: 12px; white-space: nowrap; }
-.mh-name    { width: 80px;  flex-shrink: 0; }
-.mh-grade   { width: 80px;  flex-shrink: 0; }
-.mh-subject { width: 80px;  flex-shrink: 0; }
-.mh-date    { width: 100px; flex-shrink: 0; }
-.mh-teacher { width: 80px;  flex-shrink: 0; }
-.mh-reason  { width: 80px;  flex-shrink: 0; }
-.mh-note    { flex: 1; min-width: 0; }
-.mh-actions { flex-shrink: 0; width: 120px; }
+/* 헤더 컬럼 - 동일 비율 */
+.mh {
+  font-size: 10px; font-weight: 700; color: #aeaeb2;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  padding: 0 6px; white-space: nowrap;
+}
+.mh-name    { flex: 1.2; padding-left: 0; }
+.mh-grade   { flex: 1;   }
+.mh-subject { flex: 1.2; }
+.mh-date    { flex: 1.4; }
+.mh-teacher { flex: 1;   }
+.mh-reason  { flex: 1.2; }
+.mh-note    { flex: 1.5; }
+.mh-actions { flex-shrink: 0; width: 130px; }
+
 .makeup-done-btn {
   padding: 4px 10px; border: 1.5px solid #d1fae5; background: #fff;
   border-radius: 8px; font-size: 10px; font-weight: 700; color: #065f46;
@@ -531,9 +564,10 @@ select:focus option:checked {
         <table class="data-table" id="attend-table" style="display:none;">
           <thead>
             <tr>
-              <th>날짜</th>
-              <th>학생</th>
+              <th>이름</th>
+              <th>학년</th>
               <th>과목</th>
+              <th>날짜</th>
               <th>상태</th>
               <th>메모</th>
               <th></th>
@@ -642,7 +676,7 @@ select:focus option:checked {
   </div>
 </div>
 
-<!-- 보강 모달 (시간 필드 제거) -->
+<!-- 보강 모달 -->
 <div class="modal-bg" id="makeup-modal">
   <div class="modal-box">
     <div class="modal-title">🔄 보강 스케줄 추가</div>
@@ -849,7 +883,6 @@ async function loadAll(){
 }
 
 // ── 학생 목록 ──
-// 학생 옵션 텍스트: 이름 (학년) 형태로 표시
 function buildStudentOptionText(s) {
   const name  = s.name || s.email || s.id;
   const grade = s.grade || s.gradeLevel || '';
@@ -864,7 +897,6 @@ async function loadStudents(){
     studentList.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
   } catch(e){ studentList=[]; }
 
-  // 모달용 옵션 (이름+학년+수강과목 표시, value는 id)
   const opts = studentList.map(s =>
     `<option value="${s.id}">${esc(buildStudentOptionText(s))}</option>`
   ).join('');
@@ -875,7 +907,6 @@ async function loadStudents(){
     if(el) el.innerHTML = studentList.length ? opts : fallback;
   });
 
-  // 출결 탭 학생 선택 (이름+학년+수강과목 표시)
   const attSel = document.getElementById('attend-student-sel');
   if(attSel){
     attSel.innerHTML = '<option value="">-- 학생 선택 --</option>' + opts;
@@ -884,10 +915,39 @@ async function loadStudents(){
   setTxt('qs-total', studentList.length+'명');
 }
 
-// studentId로 실제 이름만 가져오기
 function getStudentName(id) {
   const s = studentList.find(s => s.id === id);
   return s ? (s.name || s.email || s.id) : '';
+}
+
+// ── 학년 색상 뱃지 ──
+function getGradeBadge(grade) {
+  if (!grade || grade === '—') return `<span class="badge badge-gray">${esc(grade||'—')}</span>`;
+  const g = grade.toLowerCase();
+  let cls = 'badge-gray';
+  if (g.includes('고3') || g.includes('고등3')) cls = 'badge-red';
+  else if (g.includes('고2') || g.includes('고등2')) cls = 'badge-orange';
+  else if (g.includes('고1') || g.includes('고등1')) cls = 'badge-yellow';
+  else if (g.includes('중3')) cls = 'badge-purple';
+  else if (g.includes('중2')) cls = 'badge-blue';
+  else if (g.includes('중1')) cls = 'badge-teal';
+  return `<span class="badge ${cls}">${esc(grade)}</span>`;
+}
+
+// ── 과목 색상 뱃지 ──
+function getSubjectBadge(subject) {
+  if (!subject || subject === '—') return `<span class="badge badge-gray">—</span>`;
+  const map = {
+    '통합과학': 'badge-green',
+    '화학':     'badge-blue',
+    '생물':     'badge-teal',
+    '물리':     'badge-orange',
+    '지학':     'badge-indigo',
+    '전체':     'badge-pink',
+    '기타':     'badge-gray',
+  };
+  const cls = map[subject] || 'badge-gray';
+  return `<span class="badge ${cls}">${esc(subject)}</span>`;
 }
 
 // ── 원비 수납 ──
@@ -938,7 +998,7 @@ window.setTFilter=(f,el)=>{ tFilter=f; document.querySelectorAll('#tab-tuition .
 window.saveTuition = async () => {
   const studentSel = document.getElementById('t-student');
   const studentId  = studentSel.value;
-  const studentName = getStudentName(studentId); // 이름만 저장
+  const studentName = getStudentName(studentId);
   const subject    = document.getElementById('t-subject').value;
   const paydate    = document.getElementById('t-paydate').value;
   const amountRaw  = document.getElementById('t-amount').value.replace(/[^0-9]/g, '');
@@ -1009,7 +1069,7 @@ window.setCFilter=(f,el)=>{ cFilter=f; document.querySelectorAll('#tab-consult .
 window.saveConsult = async () => {
   const studentSel = document.getElementById('c-student');
   const studentId  = studentSel.value;
-  const studentName= getStudentName(studentId); // 이름만 저장
+  const studentName= getStudentName(studentId);
   const type       = document.getElementById('c-type').value;
   const consultDate= document.getElementById('c-date').value;
   const target     = document.getElementById('c-target').value;
@@ -1044,7 +1104,6 @@ function updateMakeupStats(){
   setTxt('qs-makeup', upcoming+'건');
 }
 
-// 보강 카드 - 컬럼 헤더 + 한 줄 표시
 window.renderMakeup = function(){
   const search = (document.getElementById('makeup-search')?.value||'').trim().toLowerCase();
   let list = makeupData;
@@ -1086,8 +1145,8 @@ window.renderMakeup = function(){
 
     return `<div class="makeup-row ${done?'done':''}">
       <div class="mc mc-name">${done?'✓ ':''} ${esc(m.studentName||'—')}</div>
-      <div class="mc mc-grade">${esc(grade)}</div>
-      <div class="mc mc-subject">${esc(m.subject||'—')}</div>
+      <div class="mc mc-grade">${getGradeBadge(grade)}</div>
+      <div class="mc mc-subject">${getSubjectBadge(m.subject)}</div>
       <div class="mc mc-date">${m.makeupDate||'—'}</div>
       <div class="mc mc-teacher">${esc(m.teacher||'—')}</div>
       <div class="mc mc-reason">${m.reason?`<span class="badge badge-pink" style="font-size:9px;">${esc(m.reason)}</span>`:'-'}</div>
@@ -1104,11 +1163,10 @@ window.renderMakeup = function(){
 };
 window.setMFilter=(f,el)=>{ mFilter=f; document.querySelectorAll('#tab-makeup .fchip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); renderMakeup(); };
 
-// 시간 필드 제거된 저장 함수
 window.saveMakeup = async () => {
   const studentSel = document.getElementById('m-student');
   const studentId  = studentSel.value;
-  const studentName= getStudentName(studentId); // 이름만 저장
+  const studentName= getStudentName(studentId);
   const subject    = document.getElementById('m-subject').value;
   const makeupDate = document.getElementById('m-date').value;
   const teacher    = document.getElementById('m-teacher').value.trim();
@@ -1249,7 +1307,6 @@ window.renderAttend = function(){
     if(attStats) attStats.innerHTML='';
   }
 
-  // 출결 테이블
   const table = document.getElementById('attend-table');
   const tbody = document.getElementById('attend-tbody');
   let list = attendData;
@@ -1259,10 +1316,13 @@ window.renderAttend = function(){
   table.style.display='';
   tbody.innerHTML = list.map(a=>{
     const sCls = a.status==='출석'?'badge-green':a.status==='결석'?'badge-red':'badge-yellow';
+    const student = studentList.find(s=>s.id===a.studentId);
+    const grade   = student?.grade || student?.gradeLevel || '—';
     return `<tr>
-      <td>${a.attendDate||'—'}</td>
       <td><strong>${esc(a.studentName||'—')}</strong></td>
-      <td>${esc(a.subject||'—')}</td>
+      <td>${getGradeBadge(grade)}</td>
+      <td>${getSubjectBadge(a.subject)}</td>
+      <td>${a.attendDate||'—'}</td>
       <td><span class="badge ${sCls}">${a.status}</span></td>
       <td style="color:#6e6e73;font-size:11px;">${esc(a.note||'')}</td>
       <td><button class="del-btn" onclick="delAttend('${a.id}')">✕</button></td>
@@ -1272,7 +1332,7 @@ window.renderAttend = function(){
 window.saveAttend = async () => {
   const studentSel  = document.getElementById('a-student');
   const studentId   = studentSel.value;
-  const studentName = getStudentName(studentId); // 이름만 저장
+  const studentName = getStudentName(studentId);
   const subject     = document.getElementById('a-subject').value;
   const attendDate  = document.getElementById('a-date').value;
   const status      = document.getElementById('a-status').value;
@@ -1292,7 +1352,7 @@ window.delAttend = async id => {
 };
 
 // ── 통계 업데이트 ──
-function updateStats(){ /* renderTuition / renderConsults / updateMakeupStats 에서 처리 */ }
+function updateStats(){ }
 
 // ── 탭 전환 ──
 window.switchTab = (id, el) => {
