@@ -83,7 +83,6 @@ body {
 }
 .filter-select:focus { border-color: #db2777; }
 
-/* ★ 학생 카드 */
 .stu-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
 .stu-card {
   background: #ffffff; border: 1px solid #fce7f3; border-radius: 14px;
@@ -96,7 +95,6 @@ body {
 .stu-card-name { font-size: 14px; font-weight: 700; color: #1d1d1f; letter-spacing: -0.02em; }
 .stu-card-grade { font-size: 11px; color: #aeaeb2; margin-top: 1px; }
 
-/* ★ 응시 시험 이름 표시 영역 */
 .stu-card-tests { display: flex; flex-direction: column; gap: 3px; margin-bottom: 8px; min-height: 20px; }
 .stu-test-tag {
   font-size: 10px; color: #7c3aed; background: #ede9fe;
@@ -144,7 +142,6 @@ body {
 .p-overall-l { font-size: 10px; color: #aeaeb2; margin-top: 3px; letter-spacing: 0.05em; }
 .c-good { color: #0369a1; } .c-avg { color: #d97706; } .c-warn { color: #dc2626; }
 
-/* ★ 미니 통계 (5개 → 4개, 평균 제거) */
 .mini-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1rem; }
 .mini-card { background: #ffffff; border: 1px solid #fce7f3; border-radius: 12px; padding: 0.85rem 0.6rem; text-align: center; }
 .mini-n { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; }
@@ -190,7 +187,6 @@ body {
 .rt-row:last-child { border-bottom: none; }
 .rt-row:hover { background: #fffbfe; }
 
-/* ★ 단원명, 시험일, 응시횟수, 점수, 점수바 */
 .gt-base { grid-template-columns: 1fr 90px 90px 80px 100px; }
 
 .cell-name { font-size: 12px; font-weight: 500; color: #1d1d1f; }
@@ -201,7 +197,6 @@ body {
 .bar-track { flex: 1; height: 5px; background: #f5f5f7; border-radius: 3px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
 
-/* ★ 응시 횟수 배지 */
 .attempt-badge {
   display: inline-flex; align-items: center; font-size: 10px; font-weight: 700;
   padding: 2px 8px; border-radius: 6px; white-space: nowrap;
@@ -269,7 +264,6 @@ body {
 
 <div class="wrap">
 
-  <!-- 학생 목록 -->
   <div id="v-list" class="view active">
     <div class="list-top">
       <div>
@@ -294,7 +288,6 @@ body {
     </div>
   </div>
 
-  <!-- 리포트 뷰 -->
   <div id="v-report" class="view">
     <div class="back-row">
       <button class="back-detail" onclick="goList()">
@@ -321,7 +314,6 @@ body {
       <div>
         <div class="p-name" id="r-name"></div>
         <div class="p-meta" id="r-meta"></div>
-        <!-- ★ 응시 시험 이름 표시 -->
         <div id="r-test-names" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;"></div>
         <div class="p-badges" id="r-badges"></div>
       </div>
@@ -331,7 +323,6 @@ body {
       </div>
     </div>
 
-    <!-- ★ 4개 미니 카드 (평균 제거) -->
     <div class="mini-grid">
       <div class="mini-card"><div class="mini-n" id="r-cnt" style="color:#db2777;">0</div><div class="mini-l">총 응시 횟수</div></div>
       <div class="mini-card"><div class="mini-n" id="r-ox"  style="color:#1e40af;">—</div><div class="mini-l">OX 평균</div></div>
@@ -392,7 +383,7 @@ import { initializeApp }               from "https://www.gstatic.com/firebasejs/
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore, collection, getDocs, getDoc, doc,
-  query, where, orderBy, Timestamp
+  query, where, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg = {
@@ -442,36 +433,36 @@ async function loadStudents() {
   students.forEach(loadCardSummary);
 }
 
+/* ── loadCardSummary: timestamp 조건 제거 → JS에서 필터/정렬 ── */
 async function loadCardSummary(s) {
   const studentId = s.id || s.uid;
   try {
-   const since = new Date(); since.setDate(since.getDate()-28);
-const q = query(
-  collection(db,'grades'),
-  where('studentId','==',studentId)
-);
-const snap = await getDocs(q);
+    const since = new Date(); since.setDate(since.getDate()-28);
+    const q = query(
+      collection(db,'grades'),
+      where('studentId','==',studentId)
+    );
+    const snap = await getDocs(q);
 
-const docsAsc = snap.docs
-  .map(d => d.data())
-  .filter(r => toDate(r.timestamp) >= since)
-  .sort((a,b) => toDate(a.timestamp).getTime() - toDate(b.timestamp).getTime());
+    const docsAsc = snap.docs
+      .map(d => d.data())
+      .filter(r => toDate(r.timestamp) >= since)
+      .sort((a,b) => toDate(a.timestamp).getTime() - toDate(b.timestamp).getTime());
 
-const firstMap = new Map();
-const testNames = [];
-const seenNames = new Set();
+    const firstMap = new Map();
+    const testNames = [];
+    const seenNames = new Set();
 
-docsAsc.forEach(r => {
-  const testKey = r.examId||r.testId||r.testName||r.examTitle||'unknown';
-  if(!firstMap.has(testKey)) firstMap.set(testKey, r);
-  const tname = r.testName||r.examTitle||'';
-  if(tname && !seenNames.has(tname)) { seenNames.add(tname); testNames.push(tname); }
-});
+    docsAsc.forEach(r => {
+      const testKey = r.examId||r.testId||r.testName||r.examTitle||'unknown';
+      if(!firstMap.has(testKey)) firstMap.set(testKey, r);
+      const tname = r.testName||r.examTitle||'';
+      if(tname && !seenNames.has(tname)) { seenNames.add(tname); testNames.push(tname); }
+    });
 
     const card = document.getElementById(`sc-${s.uid}`);
     if (!card) return;
 
-    // ★ 응시 시험명 표시
     const testsWrap = card.querySelector('.stu-card-tests');
     if(testsWrap && testNames.length) {
       const show = testNames.slice(0,2);
@@ -514,7 +505,6 @@ window.filterCards = () => {
   filtered.forEach(loadCardSummary);
 };
 
-/* ── timestamp → Date ── */
 function toDate(ts) {
   if(!ts) return new Date(0);
   if(ts && typeof ts === 'object' && ts.seconds) return new Date(ts.seconds * 1000);
@@ -522,7 +512,7 @@ function toDate(ts) {
   return new Date(ts);
 }
 
-/* ── 리포트 열기 ── */
+/* ── openReport: orderBy 제거 → JS에서 정렬 ── */
 window.openReport = async (studentId, name, grade, uid) => {
   curStu = {studentId, name, grade, uid};
   curPeriod = 'all'; curExam = 'all';
@@ -546,12 +536,12 @@ window.openReport = async (studentId, name, grade, uid) => {
   try {
     const q = query(
       collection(db,'grades'),
-      where('studentId','==',studentId),
-      orderBy('timestamp','asc')  // ★ 오름차순으로 가져와서 첫 번째/재시험 판별
+      where('studentId','==',studentId)
     );
     const snap = await getDocs(q);
     allRecs[uid] = [];
     snap.forEach(d => allRecs[uid].push({id:d.id,...d.data()}));
+    allRecs[uid].sort((a,b) => toDate(a.timestamp).getTime() - toDate(b.timestamp).getTime());
   } catch(e) { console.error('openReport error:', e); allRecs[uid]=[]; }
 
   document.getElementById('v-list').classList.remove('active');
@@ -559,20 +549,14 @@ window.openReport = async (studentId, name, grade, uid) => {
   renderReport();
 };
 
-/* ── 재시험 정보 계산 ──
- * 같은 시험(examId/testId/testName)을 여러 번 본 경우:
- * 첫 번째 = '첫시험', 두 번째 = '재시험1', 세 번째 = '재시험2', ...
- */
 function buildAttemptInfo(recs) {
-  // testKey → 해당 시험 기록들 (시간순 정렬됨, recs가 이미 asc)
-  const groupMap = new Map(); // testKey → [rec, ...]
+  const groupMap = new Map();
   recs.forEach(r => {
     const testKey = r.examId||r.testId||r.testName||r.examTitle||'unknown';
     if(!groupMap.has(testKey)) groupMap.set(testKey, []);
     groupMap.get(testKey).push(r);
   });
-  // 각 기록에 attemptLabel, attemptIndex, totalAttempts 부여
-  const infoMap = new Map(); // rec.id → {label, index, total, isRetry}
+  const infoMap = new Map();
   groupMap.forEach((arr) => {
     arr.forEach((r, i) => {
       const total = arr.length;
@@ -585,13 +569,11 @@ function buildAttemptInfo(recs) {
   return infoMap;
 }
 
-/* ── 리포트 렌더 ── */
 function renderReport() {
   const uid = curStu.uid;
   const all = allRecs[uid]||[];
   const filtered = filterByPeriod(all, curPeriod);
 
-  // ★ 응시 시험 이름 표시 (고유 시험명)
   const testNamesEl = document.getElementById('r-test-names');
   const seenTestNames = new Set();
   const uniqueTestNames = [];
@@ -603,7 +585,6 @@ function renderReport() {
     `<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;background:#ede9fe;color:#5b21b6;">${esc2(n)}</span>`
   ).join('') + (uniqueTestNames.length > 4 ? `<span style="font-size:10px;color:#aeaeb2;">+${uniqueTestNames.length-4}개</span>` : '');
 
-  // ★ 첫 번째 본 점수만으로 평균 계산
   const attemptInfo = buildAttemptInfo(filtered);
   const firstOnly = filtered.filter(r => {
     const info = attemptInfo.get(r.id);
@@ -622,7 +603,6 @@ function renderReport() {
   setTxt('r-mc',  mcA!==null  ? mcA+'점'  : '—');
   setTxt('r-ms',  msA!==null  ? msA+'점'  : '—');
 
-  // 종합 평가: 첫 번째 점수 기준
   const vals=[oxA,mcA,msA].filter(v=>v!==null);
   const total=vals.length ? Math.round(vals.reduce((a,v)=>a+v,0)/vals.length) : null;
 
@@ -704,7 +684,7 @@ function drawRadar(oxA, mcA, msA) {
 function drawTrend(filtered) {
   const ctx=document.getElementById('trend-chart').getContext('2d');
   if(trendInst) trendInst.destroy();
-  const sorted=[...filtered]; // 이미 asc 정렬됨
+  const sorted=[...filtered];
   const oxR=sorted.filter(r=>(r.testType||'mc')==='ox');
   const mcR=sorted.filter(r=>(r.testType||'mc')==='mc');
   const msR=sorted.filter(r=>(r.testType||'mc')==='master');
@@ -821,7 +801,6 @@ function renderResults(filtered, examType) {
 function renderQAnalysis(msRecs) {
   const sec=document.getElementById('r-q-section');
   if(!msRecs.length){sec.style.display='none';return;}
-  // 가장 마지막(최근) 기록의 answers 사용
   const latest=msRecs[msRecs.length-1];
   const answers=latest.answers||[];
   if(!answers.length){sec.style.display='none';return;}
