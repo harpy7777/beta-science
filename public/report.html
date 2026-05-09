@@ -565,39 +565,45 @@ function toDate(ts) {
   return new Date(ts);
 }
 
-/* ✅ exams 컬렉션에서 examId로 subject를 가져와 grades 레코드에 연동 */
+/* ✅ exams 컬렉션 전체 로드 후 ID·제목 둘 다로 subject 연동 */
 async function enrichWithExamSubjects(records) {
-  // examId 또는 testId가 있는 레코드에서 고유 ID 수집
-  const examIds = [...new Set(
-    records.map(r => r.examId || r.testId).filter(Boolean)
-  )];
-  if (!examIds.length) return records;
+  try {
+    // exams 컬렉션 전체를 한 번에 조회
+    const examsSnap = await getDocs(collection(db, 'exams'));
 
-  // 각 exam 문서 병렬 조회
-  const examDataMap = {};
-  await Promise.all(examIds.map(async (eid) => {
-    try {
-      const eSnap = await getDoc(doc(db, 'exams', eid));
-      if (eSnap.exists()) {
-        examDataMap[eid] = eSnap.data();
-      }
-    } catch(e) {
-      console.warn('exam fetch error:', eid, e);
-    }
-  }));
+    const examsById    = new Map(); // doc.id → exam data
+    const examsByTitle = new Map(); // exam.title → exam data
 
-  // 레코드에 subject가 없으면 exam에서 가져와 채움
-  return records.map(r => {
-    if (r.subject) return r; // 이미 subject가 있으면 그대로
-    const eid = r.examId || r.testId;
-    if (eid && examDataMap[eid]) {
-      const examSubject = examDataMap[eid].subject || '';
-      if (examSubject) {
-        return { ...r, subject: examSubject };
+    examsSnap.forEach(d => {
+      const data = d.data();
+      examsById.set(d.id, data);
+      // title이 여러 개여도 마지막 것으로 덮어씀 (일반적으로 제목은 unique)
+      if (data.title) examsByTitle.set(data.title, data);
+    });
+
+    return records.map(r => {
+      if (r.subject) return r; // 이미 subject 있으면 그대로
+
+      // 1순위: examId / testId 로 매칭
+      const eid = r.examId || r.testId;
+      if (eid && examsById.has(eid)) {
+        const subject = examsById.get(eid).subject;
+        if (subject) return { ...r, subject };
       }
-    }
-    return r;
-  });
+
+      // 2순위: testName / examTitle 로 매칭
+      const title = r.testName || r.examTitle;
+      if (title && examsByTitle.has(title)) {
+        const subject = examsByTitle.get(title).subject;
+        if (subject) return { ...r, subject };
+      }
+
+      return r; // 매칭 실패 시 원본 유지
+    });
+  } catch(e) {
+    console.error('enrichWithExamSubjects error:', e);
+    return records;
+  }
 }
 
 window.openReport = async (studentId, name, grade, uid) => {
