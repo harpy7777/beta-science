@@ -181,23 +181,46 @@ select:focus option:checked {
 .consult-meta { display: flex; gap: 6px; flex-wrap: wrap; }
 .consult-body { font-size: 12px; color: #3c3c43; line-height: 1.7; white-space: pre-wrap; margin-top: 6px; padding-top: 6px; border-top: 1px solid #fdf2f8; }
 
+/* ── 보강 스케줄 테이블 스타일 ── */
+.makeup-table-header {
+  display: flex; align-items: center;
+  padding: 7px 14px 7px 14px;
+  font-size: 10px; font-weight: 700; color: #aeaeb2;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  border-bottom: 2px solid #fce7f3;
+  margin-bottom: 4px;
+}
 /* ── 보강 스케줄 (한 줄 표시) ── */
 .makeup-row {
   background: #fff; border: 1.5px solid #fce7f3; border-radius: 10px;
-  padding: 9px 14px; margin-bottom: 6px;
-  display: flex; align-items: center; gap: 10px;
+  padding: 9px 14px; margin-bottom: 5px;
+  display: flex; align-items: center;
   transition: border-color 0.15s;
 }
 .makeup-row:hover { border-color: #fbcfe8; }
 .makeup-row.done { opacity: 0.5; }
-.makeup-row-info {
-  flex: 1; min-width: 0;
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  font-size: 12px; color: #3c3c43;
-}
-.makeup-row-name { font-size: 13px; font-weight: 700; color: #1d1d1f; white-space: nowrap; }
-.makeup-row-sep { color: #d1d1d6; font-size: 11px; }
-.makeup-row-right { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+/* 컬럼 공통 */
+.mc { font-size: 12px; color: #3c3c43; padding-right: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mc-name    { width: 80px;  flex-shrink: 0; font-weight: 700; color: #1d1d1f; }
+.mc-grade   { width: 80px;  flex-shrink: 0; color: #6e6e73; }
+.mc-subject { width: 80px;  flex-shrink: 0; }
+.mc-date    { width: 100px; flex-shrink: 0; color: #6e6e73; }
+.mc-teacher { width: 80px;  flex-shrink: 0; color: #6e6e73; }
+.mc-reason  { width: 80px;  flex-shrink: 0; }
+.mc-note    { flex: 1; min-width: 0; color: #aeaeb2; font-size: 11px; }
+.mc-actions { flex-shrink: 0; display: flex; gap: 6px; align-items: center; margin-left: auto; padding-left: 8px; }
+
+/* 헤더 컬럼 */
+.mh { font-size: 10px; font-weight: 700; color: #aeaeb2; letter-spacing: 0.05em; text-transform: uppercase; padding-right: 12px; white-space: nowrap; }
+.mh-name    { width: 80px;  flex-shrink: 0; }
+.mh-grade   { width: 80px;  flex-shrink: 0; }
+.mh-subject { width: 80px;  flex-shrink: 0; }
+.mh-date    { width: 100px; flex-shrink: 0; }
+.mh-teacher { width: 80px;  flex-shrink: 0; }
+.mh-reason  { width: 80px;  flex-shrink: 0; }
+.mh-note    { flex: 1; min-width: 0; }
+.mh-actions { flex-shrink: 0; width: 120px; }
 .makeup-done-btn {
   padding: 4px 10px; border: 1.5px solid #d1fae5; background: #fff;
   border-radius: 8px; font-size: 10px; font-weight: 700; color: #065f46;
@@ -826,13 +849,11 @@ async function loadAll(){
 }
 
 // ── 학생 목록 ──
-// 학생 옵션 텍스트: 이름 (학년 / 수강과목) 형태로 표시
+// 학생 옵션 텍스트: 이름 (학년) 형태로 표시
 function buildStudentOptionText(s) {
-  const name    = s.name || s.email || s.id;
-  const grade   = s.grade || s.gradeLevel || '';
-  const subject = s.subject || s.subjects || s.course || '';
-  const parts   = [grade, subject].filter(Boolean);
-  return parts.length ? `${name} (${parts.join(' / ')})` : name;
+  const name  = s.name || s.email || s.id;
+  const grade = s.grade || s.gradeLevel || '';
+  return grade ? `${name} (${grade})` : name;
 }
 
 async function loadStudents(){
@@ -1023,7 +1044,7 @@ function updateMakeupStats(){
   setTxt('qs-makeup', upcoming+'건');
 }
 
-// 보강 카드 - 한 줄 표시
+// 보강 카드 - 컬럼 헤더 + 한 줄 표시
 window.renderMakeup = function(){
   const search = (document.getElementById('makeup-search')?.value||'').trim().toLowerCase();
   let list = makeupData;
@@ -1035,10 +1056,22 @@ window.renderMakeup = function(){
   if(!list.length){ el.innerHTML='<div class="empty-hint">보강 스케줄이 없습니다</div>'; return; }
 
   const today = new Date().toISOString().split('T')[0];
-  el.innerHTML = list.map(m=>{
+
+  // 컬럼 헤더
+  const header = `<div class="makeup-table-header">
+    <div class="mh mh-name">이름</div>
+    <div class="mh mh-grade">학년</div>
+    <div class="mh mh-subject">과목</div>
+    <div class="mh mh-date">날짜</div>
+    <div class="mh mh-teacher">선생님</div>
+    <div class="mh mh-reason">사유</div>
+    <div class="mh mh-note">메모</div>
+    <div class="mh mh-actions"></div>
+  </div>`;
+
+  const rows = list.map(m=>{
     const done = m.status==='완료';
 
-    // D-Day 계산
     let ddayTxt='', ddayCls='badge-gray';
     if(done){ ddayTxt='완료'; ddayCls='badge-green'; }
     else {
@@ -1048,33 +1081,26 @@ window.renderMakeup = function(){
       else{ ddayTxt=`${-diff}일 전`; ddayCls='badge-gray'; }
     }
 
-    // 학생 추가 정보 (학년, 수강과목)
     const student = studentList.find(s=>s.id===m.studentId);
-    const grade   = student?.grade || student?.gradeLevel || '';
-    const course  = student?.subject || student?.subjects || student?.course || '';
-
-    // 한 줄 구성 요소들
-    const infoParts = [
-      `<span class="makeup-row-name">${esc(m.studentName||'—')}</span>`
-    ];
-    if(grade)  infoParts.push(`<span class="makeup-row-sep">·</span><span>${esc(grade)}</span>`);
-    if(course) infoParts.push(`<span class="makeup-row-sep">·</span><span>${esc(course)}</span>`);
-    infoParts.push(`<span class="makeup-row-sep">·</span><span>${esc(m.subject||'—')}</span>`);
-    infoParts.push(`<span class="makeup-row-sep">·</span><span style="color:#6e6e73;">📅 ${m.makeupDate||'—'}</span>`);
-    if(m.teacher) infoParts.push(`<span class="makeup-row-sep">·</span><span style="color:#6e6e73;">👩‍🏫 ${esc(m.teacher)}</span>`);
-    if(m.reason)  infoParts.push(`<span class="badge badge-pink" style="font-size:9px;">${esc(m.reason)}</span>`);
-    if(m.note)    infoParts.push(`<span style="color:#aeaeb2;font-size:11px;">${esc(m.note)}</span>`);
+    const grade   = student?.grade || student?.gradeLevel || '—';
 
     return `<div class="makeup-row ${done?'done':''}">
-      ${done?`<span style="color:#16a34a;font-size:14px;flex-shrink:0;">✓</span>`:''}
-      <div class="makeup-row-info">${infoParts.join('')}</div>
-      <div class="makeup-row-right">
+      <div class="mc mc-name">${done?'✓ ':''} ${esc(m.studentName||'—')}</div>
+      <div class="mc mc-grade">${esc(grade)}</div>
+      <div class="mc mc-subject">${esc(m.subject||'—')}</div>
+      <div class="mc mc-date">${m.makeupDate||'—'}</div>
+      <div class="mc mc-teacher">${esc(m.teacher||'—')}</div>
+      <div class="mc mc-reason">${m.reason?`<span class="badge badge-pink" style="font-size:9px;">${esc(m.reason)}</span>`:'-'}</div>
+      <div class="mc mc-note">${esc(m.note||'')}</div>
+      <div class="mc-actions">
         <span class="badge ${ddayCls}">${ddayTxt}</span>
         ${!done?`<button class="makeup-done-btn" onclick="completeMakeup('${m.id}')">완료</button>`:''}
         <button class="makeup-del-btn" onclick="delMakeup('${m.id}')">✕</button>
       </div>
     </div>`;
   }).join('');
+
+  el.innerHTML = header + rows;
 };
 window.setMFilter=(f,el)=>{ mFilter=f; document.querySelectorAll('#tab-makeup .fchip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); renderMakeup(); };
 
