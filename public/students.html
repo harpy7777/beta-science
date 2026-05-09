@@ -4,36 +4,39 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>학생 관리 - 베타과학</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
-    --primary: #1a3fc4; --primary-light: #eef2ff; --primary-dark: #1530a0;
-    --max-width: 1200px; --bg: #f5f6fa; --white: #ffffff;
+    --primary: #ec4899; --primary-light: #fdf2f8; --primary-dark: #be185d;
+    --max-width: 1200px; --bg: #fef7fb; --white: #ffffff;
     --text: #1e293b; --text-muted: #64748b; --border: #e2e8f0;
     --success: #10b981; --danger: #ef4444; --radius: 10px;
   }
-  body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; visibility: hidden; }
+  body { font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; visibility: hidden; }
   .app-wrapper { max-width: var(--max-width); margin: 0 auto; display: flex; flex-direction: column; min-height: 100vh; }
-  .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 32px; height: 56px; position: sticky; top: 0; z-index: 100; }
+  .topbar { background: var(--white); border-bottom: 1px solid #fce7f3; padding: 0 24px; display: flex; align-items: center; gap: 32px; height: 56px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 6px rgba(236,72,153,0.07); }
   .logo-area { display: flex; flex-direction: row; align-items: center; gap: 8px; text-decoration: none; cursor: pointer; flex-shrink: 0; }
-  .logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 8px rgba(236,72,153,0.30); }
   .logo-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
   .logo-area .brand { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; color: var(--primary); }
   .logo-area .brand-sub { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; color: var(--primary); text-transform: uppercase; }
-  .topbar-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+  .topbar-divider { width: 1px; height: 28px; background: #fce7f3; flex-shrink: 0; }
   .nav-tabs { display: flex; gap: 25px; list-style: none; margin-left: 60px; }
   .nav-tabs a { display: block; padding: 8px 18px; font-size: 14px; color: var(--text-muted); text-decoration: none; border-radius: 6px; white-space: nowrap; transition: background 0.15s, color 0.15s; }
   .nav-tabs a:hover { background: var(--bg); color: var(--text); }
   .nav-tabs a.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
   .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
-  .badge-admin { font-size: 11px; padding: 2px 8px; background: #f1f5f9; border-radius: 20px; color: var(--text-muted); }
-  .btn-logout { padding: 6px 14px; background: transparent; border: 1.5px solid #c7d2fe; border-radius: 20px; font-family: inherit; font-size: 11px; font-weight: 600; color: var(--primary); cursor: pointer; transition: all 0.18s; white-space: nowrap; }
+  .badge-admin { font-size: 11px; padding: 2px 8px; background: #fdf2f8; border-radius: 20px; color: var(--primary); font-weight: 600; }
+  .btn-logout { padding: 6px 14px; background: transparent; border: 1.5px solid #fbcfe8; border-radius: 20px; font-family: inherit; font-size: 11px; font-weight: 600; color: var(--primary); cursor: pointer; transition: all 0.18s; white-space: nowrap; }
   .btn-logout:hover { background: var(--primary-light); }
   .main-content { padding: 28px 24px; flex: 1; }
-  .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%); border-radius: 14px; padding: 22px 28px; border: 1px solid #fbcfe8; }
   .page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
   .page-header p { font-size: 14px; color: var(--text-muted); }
-  .btn-primary { display: flex; align-items: center; gap: 6px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.15s; font-family: inherit; }
+  .btn-primary { display: flex; align-items: center; gap: 6px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.15s; font-family: inherit; box-shadow: 0 2px 8px rgba(236,72,153,0.25); }
   .btn-primary:hover { background: var(--primary-dark); }
   .search-filter-row { display: flex; gap: 12px; margin-bottom: 16px; align-items: center; }
   .search-box { position: relative; flex: 1; max-width: 400px; }
@@ -42,27 +45,29 @@
   .search-box input:focus { border-color: var(--primary); }
   .search-box input::placeholder { color: var(--text-muted); }
   .filter-select { padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text); background: var(--white); cursor: pointer; min-width: 120px; outline: none; }
+  .filter-select:focus { border-color: var(--primary); }
   .student-count { margin-left: auto; font-size: 13px; color: var(--text-muted); }
   .student-count strong { color: var(--text); font-weight: 600; }
-  .table-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .table-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: border-color 0.15s; }
+  .table-card:hover { border-color: #fbcfe8; }
   table { width: 100%; border-collapse: collapse; }
-  thead th { font-size: 13px; font-weight: 600; color: var(--text-muted); text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); background: #f8fafc; white-space: nowrap; }
+  thead th { font-size: 13px; font-weight: 600; color: var(--text-muted); text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); background: #fdf2f8; white-space: nowrap; }
   tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
   tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: #f8fafc; }
+  tbody tr:hover { background: #fdf2f8; }
   tbody td { font-size: 14px; padding: 14px 16px; color: var(--text); }
   .student-id { font-size: 13px; color: var(--text-muted); font-family: monospace; }
   .grade-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap; }
   .grade-mid1{background:#ede9fe;color:#6d28d9} .grade-mid2{background:#dbeafe;color:#1d4ed8}
   .grade-mid3{background:#d1fae5;color:#065f46} .grade-high1{background:#fef3c7;color:#92400e}
   .grade-high2{background:#fee2e2;color:#991b1b} .grade-high3{background:#fce7f3;color:#9d174d}
-  .subject-tag { display: inline-block; padding: 2px 8px; background: #f1f5f9; border-radius: 4px; font-size: 12px; color: var(--text-muted); margin: 2px; }
+  .subject-tag { display: inline-block; padding: 2px 8px; background: #fdf2f8; border-radius: 4px; font-size: 12px; color: var(--text-muted); margin: 2px; }
   .action-icons { display: flex; gap: 6px; align-items: center; }
   .action-btn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s, border-color 0.1s; color: var(--text-muted); }
-  .action-btn:hover { background: #f1f5f9; color: var(--text); }
+  .action-btn:hover { background: #fdf2f8; color: var(--text); }
   .action-btn.del:hover { background: #fef2f2; border-color: #fca5a5; color: var(--danger); }
-  .card-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 6px; background: var(--primary-light); border: 1px solid #c7d2fe; color: var(--primary); font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
-  .card-btn:hover { background: #dde4ff; }
+  .card-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 6px; background: var(--primary-light); border: 1px solid #fbcfe8; color: var(--primary); font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+  .card-btn:hover { background: #fce7f3; }
   .card-btn.has-card { background: #ecfdf5; border-color: #6ee7b7; color: #065f46; }
   .card-btn.has-card:hover { background: #d1fae5; }
   .teacher-name { font-size: 13px; color: var(--text-muted); }
@@ -72,19 +77,19 @@
   .modal { background: var(--white); border-radius: 14px; padding: 28px; width: 100%; max-width: 480px; margin: 16px; max-height: 90vh; overflow-y: auto; }
   .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
   .modal-header h2 { font-size: 18px; font-weight: 700; }
-  .modal-close { width: 32px; height: 32px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer; font-size: 16px; color: var(--text-muted); display: flex; align-items: center; justify-content: center; }
-  .modal-close:hover { background: #e2e8f0; }
+  .modal-close { width: 32px; height: 32px; border: none; background: #fdf2f8; border-radius: 6px; cursor: pointer; font-size: 16px; color: var(--text-muted); display: flex; align-items: center; justify-content: center; }
+  .modal-close:hover { background: #fce7f3; }
   .form-group { margin-bottom: 16px; }
   .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
   .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text); outline: none; transition: border 0.15s; background: var(--white); font-family: inherit; }
   .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; padding-top: 20px; border-top: 1px solid #fce7f3; }
   .btn-secondary { padding: 10px 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--white); font-size: 14px; color: var(--text); cursor: pointer; font-family: inherit; }
-  .btn-secondary:hover { background: #f1f5f9; }
+  .btn-secondary:hover { background: #fdf2f8; }
   .pagination { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 20px 0 4px; }
   .page-btn { width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 6px; background: var(--white); font-size: 13px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s; }
-  .page-btn:hover { background: #f1f5f9; color: var(--text); }
+  .page-btn:hover { background: #fdf2f8; color: var(--text); }
   .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: 600; }
   .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
@@ -95,7 +100,7 @@
   .cc-modal-header { padding: 22px 24px 0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
   .cc-modal-header h2 { font-size: 18px; font-weight: 700; }
   .cc-stat-bar { display: flex; gap: 8px; padding: 16px 24px 0; flex-shrink: 0; }
-  .cc-stat-chip { flex: 1; padding: 10px 8px; border-radius: 10px; border: 1px solid var(--border); background: #f8fafc; text-align: center; }
+  .cc-stat-chip { flex: 1; padding: 10px 8px; border-radius: 10px; border: 1px solid #fce7f3; background: #fdf2f8; text-align: center; }
   .cc-stat-chip .num { font-size: 20px; font-weight: 700; color: var(--primary); }
   .cc-stat-chip .lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
   .cc-list-scroll { flex: 1; overflow-y: auto; padding: 14px 24px 8px; }
@@ -132,7 +137,7 @@
   .cc-body-item-val { font-size: 13px; font-weight: 700; color: var(--text); }
   .cc-empty   { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; line-height: 1.8; }
   .cc-loading { text-align: center; padding: 32px; color: var(--text-muted); font-size: 13px; }
-  .cc-modal-footer { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; gap: 8px; }
+  .cc-modal-footer { padding: 14px 24px; border-top: 1px solid #fce7f3; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; gap: 8px; }
   .cc-write-link { font-size: 12px; color: #a21caf; font-weight: 600; cursor: pointer; padding: 7px 14px; border: 1.5px solid #f3e8ff; border-radius: 8px; background: none; font-family: inherit; transition: background 0.15s; white-space: nowrap; }
   .cc-write-link:hover { background: #fdf4ff; }
 </style>
@@ -304,10 +309,9 @@
   let currentPage = 1, editingId = null;
   let students = [], filtered = [];
 
-  // ★ ccCache: fireId → { count, teacher }  +  studentIdMap: 학번(id) → fireId
-  let ccCache = {};       // key: fireId
-  let ccByStudentId = {}; // key: 학번(s.id) → 이 경우도 처리 (기존 데이터 호환)
-  let studentIdToFireId = {}; // 학번 → fireId 매핑
+  let ccCache = {};
+  let ccByStudentId = {};
+  let studentIdToFireId = {};
 
   function gradeBadgeClass(g) {
     return {'중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3',
@@ -315,51 +319,36 @@
   }
 
   async function initStudents() {
-    // ── 1단계: 학생 목록 먼저 로드해서 fireId ↔ 학번 매핑 구성 ──
     try {
       const studentSnap = await getDocs(collection(db, "students"));
       studentSnap.forEach(d => {
-        const sid = d.data().id; // 학번 (h01001 등)
-        if (sid) studentIdToFireId[sid] = d.id; // fireId
+        const sid = d.data().id;
+        if (sid) studentIdToFireId[sid] = d.id;
       });
     } catch(e) { console.warn("학생 목록 사전 로드 실패:", e.message); }
 
-    // ── 2단계: classCards 전체 집계 ──
-    // classCards.studentId 에는 fireId 또는 학번이 저장될 수 있음
-    // 양쪽 모두 처리해서 ccCache에 fireId 기준으로 통합
     try {
       const ccSnap = await getDocs(query(collection(db, "classCards"), orderBy("classDate", "desc")));
       const seenFireId = new Set();
-      const seenStudentId = new Set();
 
       ccSnap.forEach(d => {
         const c = d.data();
-        const sid = c.studentId; // fireId 또는 학번
+        const sid = c.studentId;
         if (!sid) return;
 
-        // fireId인지 학번인지 판단:
-        // studentIdToFireId에 값으로 존재하면 fireId, 키로 존재하면 학번
-        let resolvedFireId = null;
-
-        // studentIdToFireId 의 values 중에 sid가 있으면 → sid가 fireId
         const isFireId = Object.values(studentIdToFireId).includes(sid);
         const isStudentId = Object.prototype.hasOwnProperty.call(studentIdToFireId, sid);
 
-        if (isFireId) {
-          resolvedFireId = sid;
-        } else if (isStudentId) {
-          resolvedFireId = studentIdToFireId[sid];
-        } else {
-          // 매핑 불명확 → sid 그대로 키로 사용 (fireId로 간주)
-          resolvedFireId = sid;
-        }
+        let resolvedFireId = null;
+        if (isFireId) { resolvedFireId = sid; }
+        else if (isStudentId) { resolvedFireId = studentIdToFireId[sid]; }
+        else { resolvedFireId = sid; }
 
         if (!resolvedFireId) return;
 
         if (!ccCache[resolvedFireId]) ccCache[resolvedFireId] = { count: 0, teacher: '' };
         ccCache[resolvedFireId].count++;
 
-        // 가장 최근(오름차순 정렬이므로 첫 번째) teacher 저장
         if (!seenFireId.has(resolvedFireId)) {
           ccCache[resolvedFireId].teacher = c.teacher || '';
           seenFireId.add(resolvedFireId);
@@ -367,11 +356,9 @@
       });
     } catch(e) { console.warn("classCards 집계 실패:", e.message); }
 
-    // ── 3단계: 학생 목록 실시간 감시 ──
     onSnapshot(
       query(collection(db, "students"), orderBy("regDate", "desc")),
       (snapshot) => {
-        // 새로운 학생이 추가될 때마다 매핑 업데이트
         snapshot.docs.forEach(d => {
           const sid = d.data().id;
           if (sid) studentIdToFireId[sid] = d.id;
@@ -401,7 +388,6 @@
         ? s.subject.split(',').map(x => `<span class="subject-tag">${x.trim()}</span>`).join('')
         : '<span style="color:var(--text-muted)">-</span>';
 
-      // ★ fireId 기준으로 수업카드 조회
       const info    = ccCache[s.fireId] || { count: 0, teacher: '' };
       const hasCard = info.count > 0;
       const teacher = info.teacher || '-';
@@ -510,7 +496,6 @@
     catch(e) { alert("삭제 오류: " + e.message); }
   }
 
-  // ── ★ 수업카드 조회 모달 (fireId + 학번 양쪽 쿼리) ──
   window.openClassCardModal = async function(fireId, name, studentId) {
     document.getElementById('ccModalTitle').textContent = `${name} · 수업카드`;
     document.getElementById('cc-total').textContent = '—';
@@ -520,7 +505,6 @@
     document.getElementById('classCardModal').classList.add('open');
 
     try {
-      // ★ fireId로 먼저 쿼리
       const snap1 = await getDocs(query(
         collection(db, "classCards"),
         where("studentId", "==", fireId),
@@ -528,7 +512,6 @@
       ));
       let cards = snap1.docs.map(d => ({ id: d.id, ...d.data() }));
 
-      // ★ 학번(studentId)으로도 추가 쿼리 (기존 데이터 호환)
       if (studentId && studentId !== fireId) {
         try {
           const snap2 = await getDocs(query(
@@ -537,15 +520,10 @@
             orderBy("classDate", "desc")
           ));
           const cards2 = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
-          // 중복 제거 후 병합
           const existingIds = new Set(cards.map(c => c.id));
           cards2.forEach(c => { if (!existingIds.has(c.id)) cards.push(c); });
-          // 날짜 내림차순 재정렬
           cards.sort((a, b) => (b.classDate || '').localeCompare(a.classDate || ''));
-        } catch(e2) {
-          // 학번 쿼리 실패해도 fireId 결과 사용
-          console.warn("학번 classCards 쿼리 실패:", e2.message);
-        }
+        } catch(e2) { console.warn("학번 classCards 쿼리 실패:", e2.message); }
       }
 
       renderCCStats(cards);
@@ -613,10 +591,7 @@
   }
 
   window.toggleCC = id => { document.getElementById('cci-'+id)?.classList.toggle('open'); }
-
-  window.closeClassCardModal = function() {
-    document.getElementById('classCardModal').classList.remove('open');
-  }
+  window.closeClassCardModal = function() { document.getElementById('classCardModal').classList.remove('open'); }
 
   function esc(s) {
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
