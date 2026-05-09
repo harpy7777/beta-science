@@ -72,8 +72,6 @@ body {
 
 /* ── Section Heading ── */
 .section-heading { font-size: 13px; font-weight: 700; color: #6e6e73; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.9rem; }
-.section-label { font-size: 10px; font-weight: 700; color: #aeaeb2; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
-.divider { height: 1px; background: #fce7f3; margin: 14px 0; }
 
 /* ── Quick Stats ── */
 .quick-stats { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 2rem; }
@@ -105,10 +103,22 @@ body {
 }
 .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #db2777; }
 .form-input { flex: 1; min-width: 0; }
-.form-select { min-width: 100px; appearance: none; cursor: pointer; }
+.form-select { min-width: 100px; appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23aeaeb2' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
 .form-textarea { width: 100%; resize: vertical; min-height: 72px; line-height: 1.6; }
 .form-label { font-size: 10px; font-weight: 700; color: #6e6e73; margin-bottom: 4px; display: block; letter-spacing: 0.04em; }
 .form-group { display: flex; flex-direction: column; flex: 1; min-width: 120px; }
+
+/* ── 드롭다운 옵션 흰색 배경 ── */
+select option {
+  background: #ffffff !important;
+  color: #1d1d1f !important;
+  padding: 6px 10px;
+}
+select:focus option:checked {
+  background: #fce7f3 !important;
+  color: #db2777 !important;
+}
+
 .btn-primary {
   padding: 8px 20px; background: linear-gradient(135deg, #f472b6, #db2777);
   border: none; border-radius: 10px; font-size: 12px; font-weight: 600;
@@ -134,7 +144,6 @@ body {
 .data-table td { padding: 10px 10px; border-bottom: 1px solid #f5f5f7; vertical-align: middle; }
 .data-table tr:last-child td { border-bottom: none; }
 .data-table tr:hover td { background: #fdf2f8; }
-.data-table tr.done-row td { opacity: 0.5; }
 
 /* ── Badge / Chip ── */
 .badge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 6px; white-space: nowrap; }
@@ -148,9 +157,7 @@ body {
 .badge-orange { background: #ffedd5; color: #9a3412; }
 
 /* ── 원비 수납 ── */
-.tuition-summary {
-  display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px;
-}
+.tuition-summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
 .ts-box { background: #fafafa; border: 1px solid #f5f5f7; border-radius: 12px; padding: 12px; text-align: center; }
 .ts-num { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.03em; }
 .ts-lbl { font-size: 10px; color: #aeaeb2; margin-top: 3px; font-weight: 500; }
@@ -168,27 +175,29 @@ body {
 .consult-card {
   background: #fff; border: 1px solid #fce7f3; border-left: 3px solid #db2777;
   border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
-  transition: border-color 0.15s;
 }
-.consult-card:hover { border-color: #f472b6; border-left-color: #db2777; }
 .consult-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
 .consult-name { font-size: 13px; font-weight: 700; color: #1d1d1f; }
 .consult-meta { display: flex; gap: 6px; flex-wrap: wrap; }
 .consult-body { font-size: 12px; color: #3c3c43; line-height: 1.7; white-space: pre-wrap; margin-top: 6px; padding-top: 6px; border-top: 1px solid #fdf2f8; }
-.consult-actions { display: flex; gap: 6px; margin-top: 8px; justify-content: flex-end; }
 
-/* ── 보강 스케줄 ── */
-.makeup-card {
-  background: #fff; border: 1.5px solid #fce7f3; border-radius: 12px;
-  padding: 10px 14px; margin-bottom: 7px; display: flex; align-items: center; gap: 10px;
+/* ── 보강 스케줄 (한 줄 표시) ── */
+.makeup-row {
+  background: #fff; border: 1.5px solid #fce7f3; border-radius: 10px;
+  padding: 9px 14px; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 10px;
   transition: border-color 0.15s;
 }
-.makeup-card:hover { border-color: #fbcfe8; }
-.makeup-card.done { opacity: 0.5; }
-.makeup-left { flex: 1; min-width: 0; }
-.makeup-title { font-size: 13px; font-weight: 600; color: #1d1d1f; }
-.makeup-sub { font-size: 11px; color: #6e6e73; margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
-.makeup-right { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.makeup-row:hover { border-color: #fbcfe8; }
+.makeup-row.done { opacity: 0.5; }
+.makeup-row-info {
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 12px; color: #3c3c43;
+}
+.makeup-row-name { font-size: 13px; font-weight: 700; color: #1d1d1f; white-space: nowrap; }
+.makeup-row-sep { color: #d1d1d6; font-size: 11px; }
+.makeup-row-right { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
 .makeup-done-btn {
   padding: 4px 10px; border: 1.5px solid #d1fae5; background: #fff;
   border-radius: 8px; font-size: 10px; font-weight: 700; color: #065f46;
@@ -201,7 +210,6 @@ body {
   border-radius: 6px; transition: color 0.15s;
 }
 .makeup-del-btn:hover { color: #dc2626; }
-.makeup-check-icon { width: 22px; height: 22px; border-radius: 50%; background: #d1fae5; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
 
 /* ── 중간기말 시험 스케줄 ── */
 .exam-big-card {
@@ -211,15 +219,6 @@ body {
 .exam-big-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
 .exam-big-title { font-size: 14px; font-weight: 700; color: #1d1d1f; }
 .exam-big-dday { font-size: 1rem; font-weight: 700; }
-.exam-big-body { margin-top: 10px; display: flex; gap: 12px; flex-wrap: wrap; }
-.exam-subject-chip {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  background: #f0f9ff; border-radius: 10px; padding: 8px 14px;
-  min-width: 70px;
-}
-.esc-subj { font-size: 11px; font-weight: 700; color: #0284c7; }
-.esc-date { font-size: 10px; color: #6e6e73; }
-.exam-big-actions { margin-top: 10px; display: flex; justify-content: flex-end; gap: 6px; }
 
 /* ── 출결 현황 ── */
 .attend-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 12px; }
@@ -257,9 +256,6 @@ body {
   .tuition-summary { grid-template-columns: 1fr; }
 }
 
-/* 로딩 */
-.loading-txt { text-align: center; padding: 2rem; color: #aeaeb2; font-size: 12px; }
-
 /* 탭 콘텐츠 */
 .tab-content { display: none; }
 .tab-content.active { display: block; }
@@ -280,14 +276,6 @@ body {
 .progress-bar { height: 6px; background: #f5f5f7; border-radius: 99px; overflow: hidden; margin-top: 4px; }
 .progress-fill { height: 100%; border-radius: 99px; transition: width 0.4s ease; }
 
-/* 체크박스 스타일 */
-.custom-check {
-  width: 18px; height: 18px; border-radius: 5px; border: 2px solid #fce7f3;
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
-  flex-shrink: 0; transition: all 0.15s; background: #fff;
-}
-.custom-check.checked { background: #db2777; border-color: #db2777; }
-
 /* 알림 토스트 */
 .toast {
   position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px);
@@ -296,6 +284,9 @@ body {
   transition: transform 0.3s ease; pointer-events: none;
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
+
+/* 로딩 */
+.loading-txt { text-align: center; padding: 2rem; color: #aeaeb2; font-size: 12px; }
 </style>
 </head>
 <body>
@@ -384,9 +375,7 @@ body {
         <span class="panel-title">💰 원비 수납 현황</span>
         <button class="btn-primary btn-sm" onclick="openModal('tuition-modal')">+ 수납 등록</button>
       </div>
-
-      <!-- 월별 요약 -->
-      <div class="tuition-summary" id="tuition-summary">
+      <div class="tuition-summary">
         <div class="ts-box">
           <div class="ts-num" id="ts-paid" style="color:#16a34a;">0</div>
           <div class="ts-lbl">납부 완료</div>
@@ -401,8 +390,6 @@ body {
           <div class="ts-lbl">분납 진행중</div>
         </div>
       </div>
-
-      <!-- 필터 -->
       <div class="tuition-filters">
         <select class="month-select" id="tuition-month-sel" onchange="renderTuition()"></select>
         <button class="fchip on" onclick="setTFilter('전체',this)">전체</button>
@@ -411,11 +398,9 @@ body {
         <button class="fchip" onclick="setTFilter('분납',this)">분납</button>
         <input class="search-inp" type="text" id="tuition-search" placeholder="학생명 검색..." oninput="renderTuition()">
       </div>
-
-      <!-- 테이블 -->
       <div style="overflow-x:auto;">
         <table class="data-table">
-         <thead>
+          <thead>
             <tr>
               <th>학생명</th>
               <th>과목</th>
@@ -441,7 +426,6 @@ body {
         <span class="panel-title">📞 상담 기록</span>
         <button class="btn-primary btn-sm" onclick="openModal('consult-modal')">+ 상담 추가</button>
       </div>
-
       <div class="tuition-filters">
         <button class="fchip on" onclick="setCFilter('전체',this)">전체</button>
         <button class="fchip" onclick="setCFilter('전화상담',this)">📱 전화</button>
@@ -450,7 +434,6 @@ body {
         <button class="fchip" onclick="setCFilter('후속필요',this)">🔔 후속필요</button>
         <input class="search-inp" type="text" id="consult-search" placeholder="학생명 또는 내용 검색..." oninput="renderConsults()">
       </div>
-
       <div id="consult-list"><div class="loading-txt">불러오는 중...</div></div>
     </div>
   </div>
@@ -464,14 +447,12 @@ body {
         <span class="panel-title">🔄 보강 스케줄</span>
         <button class="btn-primary btn-sm" onclick="openModal('makeup-modal')">+ 보강 추가</button>
       </div>
-
       <div class="tuition-filters">
         <button class="fchip on" onclick="setMFilter('전체',this)">전체</button>
         <button class="fchip" onclick="setMFilter('예정',this)">예정</button>
         <button class="fchip" onclick="setMFilter('완료',this)">완료</button>
         <input class="search-inp" type="text" id="makeup-search" placeholder="학생명 또는 과목 검색..." oninput="renderMakeup()">
       </div>
-
       <div id="makeup-list"><div class="loading-txt">불러오는 중...</div></div>
     </div>
   </div>
@@ -485,7 +466,6 @@ body {
         <span class="panel-title">📋 중간기말 시험 일정</span>
         <button class="btn-primary btn-sm" onclick="openModal('bigsched-modal')">+ 일정 추가</button>
       </div>
-
       <div class="tuition-filters">
         <button class="fchip on" onclick="setBFilter('전체',this)">전체</button>
         <button class="fchip" onclick="setBFilter('중간고사',this)">중간고사</button>
@@ -493,7 +473,6 @@ body {
         <button class="fchip" onclick="setBFilter('모의고사',this)">모의고사</button>
         <button class="fchip" onclick="setBFilter('수능',this)">수능</button>
       </div>
-
       <div id="bigsched-list"><div class="loading-txt">불러오는 중...</div></div>
     </div>
   </div>
@@ -510,27 +489,21 @@ body {
           <button class="btn-primary btn-sm" onclick="openModal('attend-modal')">+ 출결 입력</button>
         </div>
       </div>
-
       <div class="attend-legend">
         <div class="al-item"><div class="al-dot" style="background:#d1fae5;"></div>출석</div>
         <div class="al-item"><div class="al-dot" style="background:#fee2e2;"></div>결석</div>
         <div class="al-item"><div class="al-dot" style="background:#fef9c3;"></div>지각</div>
         <div class="al-item"><div class="al-dot" style="background:#f5f5f7;"></div>수업없음</div>
       </div>
-
-      <!-- 학생 선택 -->
       <div class="tuition-filters" style="margin-bottom:14px;">
-        <select class="form-select" id="attend-student-sel" onchange="renderAttend()" style="min-width:140px;">
+        <select class="form-select" id="attend-student-sel" onchange="renderAttend()" style="min-width:180px;">
           <option value="">-- 학생 선택 --</option>
         </select>
         <div id="attend-stats" style="font-size:12px;color:#6e6e73;display:flex;gap:12px;"></div>
       </div>
-
       <div id="attend-calendar-wrap">
         <div class="empty-hint">학생을 선택하면 출결 현황이 표시됩니다</div>
       </div>
-
-      <!-- 출결 현황 테이블 -->
       <div style="overflow-x:auto;margin-top:14px;">
         <table class="data-table" id="attend-table" style="display:none;">
           <thead>
@@ -569,6 +542,7 @@ body {
         <select class="form-select" id="t-subject" style="width:100%;">
           <option>통합과학</option><option>화학</option><option>생물</option>
           <option>물리</option><option>지학</option><option>전체</option>
+          <option>기타</option>
         </select>
       </div>
       <div class="form-group" style="grid-column: span 2;">
@@ -577,11 +551,7 @@ body {
       </div>
       <div class="form-group">
         <label class="form-label">금액 (원) *</label>
-        <input class="form-input" type="text" id="t-amount"
-          placeholder="예: 280000"
-          inputmode="numeric"
-          pattern="[0-9]*"
-          style="width:100%; -moz-appearance:textfield;">
+        <input class="form-input" type="text" id="t-amount" placeholder="예: 280000" inputmode="numeric" pattern="[0-9]*" style="width:100%;">
       </div>
       <div class="form-group">
         <label class="form-label">납부 상태 *</label>
@@ -602,6 +572,7 @@ body {
     </div>
   </div>
 </div>
+
 <!-- 상담 모달 -->
 <div class="modal-bg" id="consult-modal">
   <div class="modal-box">
@@ -648,7 +619,7 @@ body {
   </div>
 </div>
 
-<!-- 보강 모달 -->
+<!-- 보강 모달 (시간 필드 제거) -->
 <div class="modal-bg" id="makeup-modal">
   <div class="modal-box">
     <div class="modal-title">🔄 보강 스케줄 추가</div>
@@ -669,10 +640,6 @@ body {
         <input class="form-input" type="date" id="m-date">
       </div>
       <div class="form-group">
-        <label class="form-label">시간 *</label>
-        <input class="form-input" type="time" id="m-time">
-      </div>
-      <div class="form-group">
         <label class="form-label">담당 선생님</label>
         <input class="form-input" type="text" id="m-teacher" placeholder="선생님 이름">
       </div>
@@ -683,10 +650,10 @@ body {
           <option>시험대비</option><option>기타</option>
         </select>
       </div>
-    </div>
-    <div class="form-group" style="margin-bottom:10px;">
-      <label class="form-label">메모</label>
-      <input class="form-input" type="text" id="m-note" placeholder="메모 (선택)" style="width:100%;">
+      <div class="form-group">
+        <label class="form-label">메모</label>
+        <input class="form-input" type="text" id="m-note" placeholder="메모 (선택)">
+      </div>
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('makeup-modal')">취소</button>
@@ -807,7 +774,6 @@ const db   = getFirestore(app);
   document.getElementById('today-date').textContent = `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일`;
   document.getElementById('today-day').textContent = days[now.getDay()];
 
-  // 월 셀렉터 초기화 (최근 12개월)
   const nowY = now.getFullYear(), nowM = now.getMonth();
   ['tuition-month-sel','attend-month-sel'].forEach(id => {
     const sel = document.getElementById(id);
@@ -823,14 +789,10 @@ const db   = getFirestore(app);
     }
   });
 
-  // 날짜 입력 기본값
   const todayStr = now.toISOString().split('T')[0];
-  const monthStr = now.toISOString().slice(0,7);
-  ['t-date','c-date','m-date','bs-start','a-date'].forEach(id=>{
+  ['t-paydate','c-date','m-date','bs-start','a-date'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.value = todayStr;
   });
-  const tMonth = document.getElementById('t-month');
-  if(tMonth) tMonth.value = monthStr;
 })();
 
 // ── Auth ──
@@ -864,6 +826,15 @@ async function loadAll(){
 }
 
 // ── 학생 목록 ──
+// 학생 옵션 텍스트: 이름 (학년 / 수강과목) 형태로 표시
+function buildStudentOptionText(s) {
+  const name    = s.name || s.email || s.id;
+  const grade   = s.grade || s.gradeLevel || '';
+  const subject = s.subject || s.subjects || s.course || '';
+  const parts   = [grade, subject].filter(Boolean);
+  return parts.length ? `${name} (${parts.join(' / ')})` : name;
+}
+
 async function loadStudents(){
   try {
     const snap = await getDocs(collection(db,'students'));
@@ -872,18 +843,30 @@ async function loadStudents(){
     studentList.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
   } catch(e){ studentList=[]; }
 
-  const opts = studentList.map(s=>`<option value="${s.id}">${esc(s.name||s.email||s.id)}</option>`).join('');
+  // 모달용 옵션 (이름+학년+수강과목 표시, value는 id)
+  const opts = studentList.map(s =>
+    `<option value="${s.id}">${esc(buildStudentOptionText(s))}</option>`
+  ).join('');
   const fallback = '<option value="">학생 없음</option>';
+
   ['t-student','c-student','m-student','a-student'].forEach(id=>{
     const el = document.getElementById(id);
     if(el) el.innerHTML = studentList.length ? opts : fallback;
   });
 
+  // 출결 탭 학생 선택 (이름+학년+수강과목 표시)
   const attSel = document.getElementById('attend-student-sel');
   if(attSel){
     attSel.innerHTML = '<option value="">-- 학생 선택 --</option>' + opts;
   }
+
   setTxt('qs-total', studentList.length+'명');
+}
+
+// studentId로 실제 이름만 가져오기
+function getStudentName(id) {
+  const s = studentList.find(s => s.id === id);
+  return s ? (s.name || s.email || s.id) : '';
 }
 
 // ── 원비 수납 ──
@@ -902,7 +885,6 @@ window.renderTuition = function(){
   if(tFilter!=='전체') list = list.filter(t=>t.status===tFilter);
   if(search)   list = list.filter(t=>(t.studentName||'').toLowerCase().includes(search));
 
-  // 요약 통계 (해당 월 전체)
   const monthData = monthSel ? tuitionData.filter(t=>t.month===monthSel) : tuitionData;
   const paid    = monthData.filter(t=>t.status==='납부완료').length;
   const unpaid  = monthData.filter(t=>t.status==='미납').length;
@@ -917,7 +899,7 @@ window.renderTuition = function(){
   setTxt('qs-unpaid',unpaid+'명');
 
   const tbody = document.getElementById('tuition-tbody');
-  if(!list.length){ tbody.innerHTML=`<tr><td colspan="8"><div class="empty-hint">수납 기록이 없습니다</div></td></tr>`; return; }
+  if(!list.length){ tbody.innerHTML=`<tr><td colspan="7"><div class="empty-hint">수납 기록이 없습니다</div></td></tr>`; return; }
   tbody.innerHTML = list.map(t=>{
     const sCls = t.status==='납부완료'?'badge-green':t.status==='미납'?'badge-red':'badge-yellow';
     return `<tr>
@@ -925,7 +907,6 @@ window.renderTuition = function(){
       <td>${esc(t.subject||'—')}</td>
       <td>${t.month||'—'}</td>
       <td style="font-weight:700;">${t.amount?Number(t.amount).toLocaleString()+'원':'—'}</td>
-      <td>${t.payDate||'—'}</td>
       <td><span class="badge ${sCls}">${t.status}</span></td>
       <td style="color:#6e6e73;font-size:11px;">${esc(t.note||'')}</td>
       <td><button class="del-btn" onclick="delTuition('${t.id}')">✕</button></td>
@@ -934,36 +915,28 @@ window.renderTuition = function(){
 };
 window.setTFilter=(f,el)=>{ tFilter=f; document.querySelectorAll('#tab-tuition .fchip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); renderTuition(); };
 window.saveTuition = async () => {
-  const studentSel  = document.getElementById('t-student');
-  const studentId   = studentSel.value;
-  const studentName = studentSel.options[studentSel.selectedIndex]?.text || '';
-  const subject     = document.getElementById('t-subject').value;
-  const paydate     = document.getElementById('t-paydate').value;
-  const amountRaw   = document.getElementById('t-amount').value.replace(/[^0-9]/g, '');
-  const amount      = Number(amountRaw);
-  const status      = document.getElementById('t-status').value;
-  const note        = document.getElementById('t-note').value.trim();
+  const studentSel = document.getElementById('t-student');
+  const studentId  = studentSel.value;
+  const studentName = getStudentName(studentId); // 이름만 저장
+  const subject    = document.getElementById('t-subject').value;
+  const paydate    = document.getElementById('t-paydate').value;
+  const amountRaw  = document.getElementById('t-amount').value.replace(/[^0-9]/g, '');
+  const amount     = Number(amountRaw);
+  const status     = document.getElementById('t-status').value;
+  const note       = document.getElementById('t-note').value.trim();
 
   if (!studentId) return alert('학생을 선택하세요');
   if (!paydate)   return alert('납부일을 선택하세요');
   if (!amountRaw) return alert('금액을 입력하세요');
 
-  const month = paydate.slice(0, 7); // YYYY-MM 자동 추출
-
+  const month = paydate.slice(0, 7);
   try {
-    await addDoc(collection(db, 'tuition'), {
-      studentId, studentName, subject,
-      month, payDate: paydate,
-      amount, status, note,
-      createdAt: serverTimestamp()
-    });
+    await addDoc(collection(db,'tuition'), {studentId, studentName, subject, month, payDate: paydate, amount, status, note, createdAt: serverTimestamp()});
     closeModal('tuition-modal');
     showToast('수납 내역이 저장되었습니다 ✓');
     await loadTuition();
     updateStats();
-  } catch(e) {
-    alert('저장 실패: ' + e.message);
-  }
+  } catch(e){ alert('저장 실패: ' + e.message); }
 };
 window.delTuition = async id => {
   if(!confirm('삭제할까요?')) return;
@@ -1015,7 +988,7 @@ window.setCFilter=(f,el)=>{ cFilter=f; document.querySelectorAll('#tab-consult .
 window.saveConsult = async () => {
   const studentSel = document.getElementById('c-student');
   const studentId  = studentSel.value;
-  const studentName= studentSel.options[studentSel.selectedIndex]?.text||'';
+  const studentName= getStudentName(studentId); // 이름만 저장
   const type       = document.getElementById('c-type').value;
   const consultDate= document.getElementById('c-date').value;
   const target     = document.getElementById('c-target').value;
@@ -1049,6 +1022,8 @@ function updateMakeupStats(){
   const upcoming = makeupData.filter(m=>m.makeupDate>=today && m.status!=='완료').length;
   setTxt('qs-makeup', upcoming+'건');
 }
+
+// 보강 카드 - 한 줄 표시
 window.renderMakeup = function(){
   const search = (document.getElementById('makeup-search')?.value||'').trim().toLowerCase();
   let list = makeupData;
@@ -1062,7 +1037,8 @@ window.renderMakeup = function(){
   const today = new Date().toISOString().split('T')[0];
   el.innerHTML = list.map(m=>{
     const done = m.status==='완료';
-    const isOver = !done && m.makeupDate < today;
+
+    // D-Day 계산
     let ddayTxt='', ddayCls='badge-gray';
     if(done){ ddayTxt='완료'; ddayCls='badge-green'; }
     else {
@@ -1071,18 +1047,28 @@ window.renderMakeup = function(){
       else if(diff>0){ ddayTxt=`D-${diff}`; ddayCls=diff<=3?'badge-red':diff<=7?'badge-yellow':'badge-blue'; }
       else{ ddayTxt=`${-diff}일 전`; ddayCls='badge-gray'; }
     }
-    return `<div class="makeup-card ${done?'done':''}">
-      ${done?`<div class="makeup-check-icon">✓</div>`:''}
-      <div class="makeup-left">
-        <div class="makeup-title">${esc(m.studentName||'—')} · ${esc(m.subject||'—')}</div>
-        <div class="makeup-sub">
-          <span>📅 ${m.makeupDate||'—'} ${m.makeupTime||''}</span>
-          ${m.teacher?`<span>👩‍🏫 ${esc(m.teacher)}</span>`:''}
-          <span class="badge ${ddayCls === 'badge-red' && m.reason ? 'badge-pink':'badge-gray'}" style="font-size:9px;">${esc(m.reason||'')}</span>
-          ${m.note?`<span style="color:#aeaeb2;">${esc(m.note)}</span>`:''}
-        </div>
-      </div>
-      <div class="makeup-right">
+
+    // 학생 추가 정보 (학년, 수강과목)
+    const student = studentList.find(s=>s.id===m.studentId);
+    const grade   = student?.grade || student?.gradeLevel || '';
+    const course  = student?.subject || student?.subjects || student?.course || '';
+
+    // 한 줄 구성 요소들
+    const infoParts = [
+      `<span class="makeup-row-name">${esc(m.studentName||'—')}</span>`
+    ];
+    if(grade)  infoParts.push(`<span class="makeup-row-sep">·</span><span>${esc(grade)}</span>`);
+    if(course) infoParts.push(`<span class="makeup-row-sep">·</span><span>${esc(course)}</span>`);
+    infoParts.push(`<span class="makeup-row-sep">·</span><span>${esc(m.subject||'—')}</span>`);
+    infoParts.push(`<span class="makeup-row-sep">·</span><span style="color:#6e6e73;">📅 ${m.makeupDate||'—'}</span>`);
+    if(m.teacher) infoParts.push(`<span class="makeup-row-sep">·</span><span style="color:#6e6e73;">👩‍🏫 ${esc(m.teacher)}</span>`);
+    if(m.reason)  infoParts.push(`<span class="badge badge-pink" style="font-size:9px;">${esc(m.reason)}</span>`);
+    if(m.note)    infoParts.push(`<span style="color:#aeaeb2;font-size:11px;">${esc(m.note)}</span>`);
+
+    return `<div class="makeup-row ${done?'done':''}">
+      ${done?`<span style="color:#16a34a;font-size:14px;flex-shrink:0;">✓</span>`:''}
+      <div class="makeup-row-info">${infoParts.join('')}</div>
+      <div class="makeup-row-right">
         <span class="badge ${ddayCls}">${ddayTxt}</span>
         ${!done?`<button class="makeup-done-btn" onclick="completeMakeup('${m.id}')">완료</button>`:''}
         <button class="makeup-del-btn" onclick="delMakeup('${m.id}')">✕</button>
@@ -1091,19 +1077,20 @@ window.renderMakeup = function(){
   }).join('');
 };
 window.setMFilter=(f,el)=>{ mFilter=f; document.querySelectorAll('#tab-makeup .fchip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); renderMakeup(); };
+
+// 시간 필드 제거된 저장 함수
 window.saveMakeup = async () => {
   const studentSel = document.getElementById('m-student');
   const studentId  = studentSel.value;
-  const studentName= studentSel.options[studentSel.selectedIndex]?.text||'';
+  const studentName= getStudentName(studentId); // 이름만 저장
   const subject    = document.getElementById('m-subject').value;
   const makeupDate = document.getElementById('m-date').value;
-  const makeupTime = document.getElementById('m-time').value;
   const teacher    = document.getElementById('m-teacher').value.trim();
   const reason     = document.getElementById('m-reason').value;
   const note       = document.getElementById('m-note').value.trim();
   if(!studentId||!makeupDate) return alert('학생과 날짜를 입력하세요');
   try {
-    await addDoc(collection(db,'makeupSchedules'),{studentId,studentName,subject,makeupDate,makeupTime,teacher,reason,note,status:'예정',createdAt:serverTimestamp()});
+    await addDoc(collection(db,'makeupSchedules'),{studentId,studentName,subject,makeupDate,teacher,reason,note,status:'예정',createdAt:serverTimestamp()});
     closeModal('makeup-modal');
     showToast('보강 일정이 등록되었습니다 ✓');
     await loadMakeup();
@@ -1201,7 +1188,6 @@ window.renderAttend = function(){
   const monthSel   = document.getElementById('attend-month-sel')?.value||'';
   const studentSel = document.getElementById('attend-student-sel')?.value||'';
 
-  // 출결 달력
   const wrap = document.getElementById('attend-calendar-wrap');
   if(studentSel && monthSel){
     const [y,m] = monthSel.split('-').map(Number);
@@ -1237,31 +1223,30 @@ window.renderAttend = function(){
     if(attStats) attStats.innerHTML='';
   }
 
-  // 테이블
+  // 출결 테이블
   const table = document.getElementById('attend-table');
   const tbody = document.getElementById('attend-tbody');
   let list = attendData;
-  if(monthSel) list = list.filter(a=>(a.attendDate||'').startsWith(monthSel));
+  if(monthSel)   list = list.filter(a=>(a.attendDate||'').startsWith(monthSel));
   if(studentSel) list = list.filter(a=>a.studentId===studentSel);
   if(!list.length){ table.style.display='none'; return; }
   table.style.display='';
-  tbody.innerHTML = list.map(t=>{
-    const sCls = t.status==='납부완료'?'badge-green':t.status==='미납'?'badge-red':'badge-yellow';
+  tbody.innerHTML = list.map(a=>{
+    const sCls = a.status==='출석'?'badge-green':a.status==='결석'?'badge-red':'badge-yellow';
     return `<tr>
-      <td><strong>${esc(t.studentName||'—')}</strong></td>
-      <td>${esc(t.subject||'—')}</td>
-      <td>${t.payDate||t.month||'—'}</td>
-      <td style="font-weight:700;">${t.amount?Number(t.amount).toLocaleString()+'원':'—'}</td>
-      <td><span class="badge ${sCls}">${t.status}</span></td>
-      <td style="color:#6e6e73;font-size:11px;">${esc(t.note||'')}</td>
-      <td><button class="del-btn" onclick="delTuition('${t.id}')">✕</button></td>
+      <td>${a.attendDate||'—'}</td>
+      <td><strong>${esc(a.studentName||'—')}</strong></td>
+      <td>${esc(a.subject||'—')}</td>
+      <td><span class="badge ${sCls}">${a.status}</span></td>
+      <td style="color:#6e6e73;font-size:11px;">${esc(a.note||'')}</td>
+      <td><button class="del-btn" onclick="delAttend('${a.id}')">✕</button></td>
     </tr>`;
   }).join('');
 };
 window.saveAttend = async () => {
   const studentSel  = document.getElementById('a-student');
   const studentId   = studentSel.value;
-  const studentName = studentSel.options[studentSel.selectedIndex]?.text||'';
+  const studentName = getStudentName(studentId); // 이름만 저장
   const subject     = document.getElementById('a-subject').value;
   const attendDate  = document.getElementById('a-date').value;
   const status      = document.getElementById('a-status').value;
@@ -1281,11 +1266,7 @@ window.delAttend = async id => {
 };
 
 // ── 통계 업데이트 ──
-function updateStats(){
-  // qs-paid, qs-unpaid: renderTuition에서 처리
-  // qs-consult: renderConsults에서 처리
-  // qs-makeup: updateMakeupStats에서 처리
-}
+function updateStats(){ /* renderTuition / renderConsults / updateMakeupStats 에서 처리 */ }
 
 // ── 탭 전환 ──
 window.switchTab = (id, el) => {
