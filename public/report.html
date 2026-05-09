@@ -145,8 +145,6 @@ body {
 .p-av { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; flex-shrink: 0; }
 .p-name { font-size: 1.1rem; font-weight: 700; color: #1d1d1f; letter-spacing: -0.02em; }
 .p-meta { font-size: 11px; color: #aeaeb2; margin-top: 3px; }
-.p-badges { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
-.p-badge { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 6px; }
 .p-right { margin-left: auto; text-align: right; flex-shrink: 0; }
 .p-overall-n { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
 .p-overall-l { font-size: 10px; color: #aeaeb2; margin-top: 3px; letter-spacing: 0.05em; }
@@ -349,7 +347,6 @@ body {
       </button>
     </div>
 
-    <!-- ── 기간 탭: 전체 / 1~4주차 / 1~6개월 ── -->
     <div class="period-tabs">
       <button class="ptab on" onclick="setPeriod('all',this)">전체</button>
       <button class="ptab" onclick="setPeriod('1w',this)">1주차</button>
@@ -371,7 +368,8 @@ body {
         <div class="p-meta" id="r-meta"></div>
         <!-- 과목/내용 테이블 -->
         <div id="r-subject-table" style="margin-top:8px;"></div>
-        <div class="p-badges" id="r-badges"></div>
+        <!-- ✅ 뱃지 영역 제거 (r-badges는 유지하되 렌더링 안 함) -->
+        <div id="r-badges"></div>
       </div>
       <div class="p-right">
         <div class="p-overall-n" id="r-overall">—</div>
@@ -567,6 +565,41 @@ function toDate(ts) {
   return new Date(ts);
 }
 
+/* ✅ exams 컬렉션에서 examId로 subject를 가져와 grades 레코드에 연동 */
+async function enrichWithExamSubjects(records) {
+  // examId 또는 testId가 있는 레코드에서 고유 ID 수집
+  const examIds = [...new Set(
+    records.map(r => r.examId || r.testId).filter(Boolean)
+  )];
+  if (!examIds.length) return records;
+
+  // 각 exam 문서 병렬 조회
+  const examDataMap = {};
+  await Promise.all(examIds.map(async (eid) => {
+    try {
+      const eSnap = await getDoc(doc(db, 'exams', eid));
+      if (eSnap.exists()) {
+        examDataMap[eid] = eSnap.data();
+      }
+    } catch(e) {
+      console.warn('exam fetch error:', eid, e);
+    }
+  }));
+
+  // 레코드에 subject가 없으면 exam에서 가져와 채움
+  return records.map(r => {
+    if (r.subject) return r; // 이미 subject가 있으면 그대로
+    const eid = r.examId || r.testId;
+    if (eid && examDataMap[eid]) {
+      const examSubject = examDataMap[eid].subject || '';
+      if (examSubject) {
+        return { ...r, subject: examSubject };
+      }
+    }
+    return r;
+  });
+}
+
 window.openReport = async (studentId, name, grade, uid) => {
   curStu = {studentId, name, grade, uid};
   curPeriod = 'all'; curExam = 'all';
@@ -593,9 +626,14 @@ window.openReport = async (studentId, name, grade, uid) => {
       where('studentId','==',studentId)
     );
     const snap = await getDocs(q);
-    allRecs[uid] = [];
-    snap.forEach(d => allRecs[uid].push({id:d.id,...d.data()}));
-    allRecs[uid].sort((a,b) => toDate(a.timestamp).getTime() - toDate(b.timestamp).getTime());
+    let recs = [];
+    snap.forEach(d => recs.push({id:d.id,...d.data()}));
+    recs.sort((a,b) => toDate(a.timestamp).getTime() - toDate(b.timestamp).getTime());
+
+    // ✅ exams 컬렉션에서 과목 정보 보완
+    recs = await enrichWithExamSubjects(recs);
+
+    allRecs[uid] = recs;
   } catch(e) { console.error('openReport error:', e); allRecs[uid]=[]; }
 
   document.getElementById('v-list').classList.remove('active');
@@ -603,7 +641,7 @@ window.openReport = async (studentId, name, grade, uid) => {
   renderReport();
 };
 
-/* ── 같은 시험의 재시험 감지: testKey 기준으로 첫 번째만 추출 ── */
+/* ── 같은 시험의 재시험 감지 ── */
 function buildAttemptInfo(recs) {
   const groupMap = new Map();
   recs.forEach(r => {
@@ -631,16 +669,17 @@ function renderReport() {
 
   const attemptInfo = buildAttemptInfo(filtered);
 
-  /* ── 첫 번째 시험만 (재시험 제외) ── */
+  /* 첫 번째 시험만 (재시험 제외) */
   const firstOnly = filtered.filter(r => {
     const info = attemptInfo.get(r.id);
     return !info || info.index === 0;
   });
 
-  /* ── 과목/내용 테이블 렌더링 (firstOnly 기준) ── */
+  /* ✅ 과목/내용 테이블 렌더링 */
   const subjectTableEl = document.getElementById('r-subject-table');
-  const subjectMap = new Map(); // subject -> Set<content>
+  const subjectMap = new Map();
   firstOnly.forEach(r => {
+    // subject 필드 우선순위: r.subject > r.testSubject > r.category
     const subject = r.subject || r.testSubject || r.category || '과목미지정';
     const content = r.testName || r.examTitle || '';
     if (content) {
@@ -666,7 +705,6 @@ function renderReport() {
     subjectTableEl.innerHTML = '';
   }
 
-  /* ── 평균은 firstOnly 기준 (OX, 4지선다, 마스터 각각) ── */
   const ox  = firstOnly.filter(r=>(r.testType||'mc')==='ox');
   const mc  = firstOnly.filter(r=>(r.testType||'mc')==='mc');
   const ms  = firstOnly.filter(r=>(r.testType||'mc')==='master');
@@ -679,7 +717,6 @@ function renderReport() {
   setTxt('r-mc',  mcA!==null  ? mcA+'점'  : '—');
   setTxt('r-ms',  msA!==null  ? msA+'점'  : '—');
 
-  /* ── 종합 평가: OX·4지선다·마스터 첫 시험 평균만 (최대 3개) ── */
   const vals = [oxA, mcA, msA].filter(v => v !== null);
   const total = vals.length ? Math.round(vals.reduce((a,v)=>a+v,0)/vals.length) : null;
 
@@ -690,13 +727,9 @@ function renderReport() {
     else               {oel.textContent=`주의 (${total}점)`;oel.className='p-overall-n c-warn';}
   } else { oel.textContent='—'; oel.className='p-overall-n'; }
 
-  document.getElementById('r-badges').innerHTML=[
-    {l:'OX',      v:oxA, bg:'#dbeafe',col:'#1e40af'},
-    {l:'4지선다', v:mcA, bg:'#ede9fe',col:'#5b21b6'},
-    {l:'마스터',  v:msA, bg:'#d1fae5',col:'#065f46'},
-  ].filter(b=>b.v!==null).map(b=>`<span class="p-badge" style="background:${b.bg};color:${b.col};">${b.l} ${b.v}점</span>`).join('');
+  // ✅ 뱃지 렌더링 제거 (빈 문자열로 설정)
+  document.getElementById('r-badges').innerHTML = '';
 
-  /* ── 분석 요약도 firstOnly 기준 ── */
   renderAnalysis(oxA, mcA, msA, total);
   drawRadar(oxA, mcA, msA);
   drawTrend(filtered);
@@ -913,7 +946,6 @@ window.goList=()=>{
   setTxt('bar-hint','학생 이름을 클릭하면 종합 분석을 볼 수 있습니다');
 };
 
-/* ── 기간 필터: 주차 및 월 단위 모두 지원 ── */
 function filterByPeriod(recs, period) {
   if(period==='all') return recs;
   const days = {
