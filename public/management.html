@@ -229,7 +229,7 @@ select option:hover {
   padding: 0 6px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-/* 비율 배분: 이름 1.2 | 학년 1 | 과목 1.2 | 날짜 1.4 | 선생님 1 | 사유 1.2 | 메모 1.5 */
+/* 비율 배분: 학생명 1.2 | 학년 1 | 과목 1.2 | 날짜 1.4 | 선생님 1 | 사유 1.2 | 메모 1.5 */
 .mc-name    { flex: 1.2; font-weight: 700; color: #1d1d1f; padding-left: 0; }
 .mc-grade   { flex: 1;   }
 .mc-subject { flex: 1.2; }
@@ -565,7 +565,7 @@ select option:hover {
         <table class="data-table" id="attend-table" style="display:none;">
           <thead>
             <tr>
-              <th>이름</th>
+              <th>학생명</th>
               <th>학년</th>
               <th>과목</th>
               <th>날짜</th>
@@ -637,7 +637,7 @@ select option:hover {
     <div class="modal-title">📞 상담 기록 추가</div>
     <div class="modal-grid">
       <div class="form-group">
-        <label class="form-label">학생 *</label>
+        <label class="form-label">학생명 *</label>
         <select class="form-select" id="c-student" style="width:100%;"></select>
       </div>
       <div class="form-group">
@@ -683,7 +683,7 @@ select option:hover {
     <div class="modal-title">🔄 보강 스케줄 추가</div>
     <div class="modal-grid">
       <div class="form-group">
-        <label class="form-label">학생 *</label>
+        <label class="form-label">학생명 *</label>
         <select class="form-select" id="m-student" style="width:100%;"></select>
       </div>
       <div class="form-group">
@@ -770,7 +770,7 @@ select option:hover {
     <div class="modal-title">📆 출결 입력</div>
     <div class="modal-grid">
       <div class="form-group">
-        <label class="form-label">학생 *</label>
+        <label class="form-label">학생명 *</label>
         <select class="form-select" id="a-student" style="width:100%;"></select>
       </div>
       <div class="form-group">
@@ -1011,7 +1011,7 @@ window.saveTuition = async () => {
   const status     = document.getElementById('t-status').value;
   const note       = document.getElementById('t-note').value.trim();
 
-  if (!studentId) return alert('학생을 선택하세요');
+  if (!studentId) return alert('학생명을 선택하세요');
   if (!paydate)   return alert('납부일을 선택하세요');
   if (!amountRaw) return alert('금액을 입력하세요');
 
@@ -1081,7 +1081,7 @@ window.saveConsult = async () => {
   const content    = document.getElementById('c-content').value.trim();
   const followup   = document.getElementById('c-followup').value.trim();
   const needFollowup = document.getElementById('c-need-followup').checked;
-  if(!studentId||!consultDate||!content) return alert('학생, 날짜, 내용을 입력하세요');
+  if(!studentId||!consultDate||!content) return alert('학생명, 날짜, 내용을 입력하세요');
   try {
     await addDoc(collection(db,'consultRecords'),{studentId,studentName,type,consultDate,target,content,followup,needFollowup,createdAt:serverTimestamp()});
     closeModal('consult-modal');
@@ -1123,7 +1123,7 @@ window.renderMakeup = function(){
 
   // 컬럼 헤더
   const header = `<div class="makeup-table-header">
-    <div class="mh mh-name">이름</div>
+    <div class="mh mh-name">학생명</div>
     <div class="mh mh-grade">학년</div>
     <div class="mh mh-subject">과목</div>
     <div class="mh mh-date">날짜</div>
@@ -1177,7 +1177,7 @@ window.saveMakeup = async () => {
   const teacher    = document.getElementById('m-teacher').value.trim();
   const reason     = document.getElementById('m-reason').value;
   const note       = document.getElementById('m-note').value.trim();
-  if(!studentId||!makeupDate) return alert('학생과 날짜를 입력하세요');
+  if(!studentId||!makeupDate) return alert('학생명과 날짜를 입력하세요');
   try {
     await addDoc(collection(db,'makeupSchedules'),{studentId,studentName,subject,makeupDate,teacher,reason,note,status:'예정',createdAt:serverTimestamp()});
     closeModal('makeup-modal');
@@ -1307,7 +1307,7 @@ window.renderAttend = function(){
     html+='</div>';
     wrap.innerHTML = html;
   } else {
-    wrap.innerHTML='<div class="empty-hint">학생과 월을 선택하면 출결 달력이 표시됩니다</div>';
+    wrap.innerHTML='<div class="empty-hint">학생명과 월을 선택하면 출결 달력이 표시됩니다</div>';
     const attStats = document.getElementById('attend-stats');
     if(attStats) attStats.innerHTML='';
   }
@@ -1342,7 +1342,7 @@ window.saveAttend = async () => {
   const attendDate  = document.getElementById('a-date').value;
   const status      = document.getElementById('a-status').value;
   const note        = document.getElementById('a-note').value.trim();
-  if(!studentId||!attendDate) return alert('학생과 날짜를 선택하세요');
+  if(!studentId||!attendDate) return alert('학생명과 날짜를 선택하세요');
   try {
     await addDoc(collection(db,'attendRecords'),{studentId,studentName,subject,attendDate,status,note,createdAt:serverTimestamp()});
     closeModal('attend-modal');
