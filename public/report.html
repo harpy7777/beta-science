@@ -120,27 +120,76 @@ body {
   cursor: pointer; font-family: inherit; transition: background 0.15s;
 }
 .print-btn:hover { background: #fce7f3; }
-.period-tabs { display: flex; gap: 6px; margin-bottom: 1.2rem; flex-wrap: wrap; }
+
+/* ── 기간 탭 (스크롤 가능) ── */
+.period-tabs {
+  display: flex; gap: 6px; margin-bottom: 1.2rem;
+  flex-wrap: nowrap; overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.period-tabs::-webkit-scrollbar { display: none; }
+
 .ptab {
   padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
   font-family: inherit; border: 1px solid #fce7f3; background: #ffffff; color: #6e6e73;
-  cursor: pointer; transition: all 0.15s;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
 }
 .ptab.on { background: #db2777; color: #fff; border-color: #db2777; }
 .ptab:hover:not(.on) { background: #fdf2f8; }
+
 .profile-card {
   background: #ffffff; border: 1px solid #fce7f3; border-radius: 16px;
-  padding: 1.2rem 1.4rem; display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;
+  padding: 1.2rem 1.4rem; display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;
 }
 .p-av { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; flex-shrink: 0; }
 .p-name { font-size: 1.1rem; font-weight: 700; color: #1d1d1f; letter-spacing: -0.02em; }
 .p-meta { font-size: 11px; color: #aeaeb2; margin-top: 3px; }
 .p-badges { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
 .p-badge { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 6px; }
-.p-right { margin-left: auto; text-align: right; }
+.p-right { margin-left: auto; text-align: right; flex-shrink: 0; }
 .p-overall-n { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
 .p-overall-l { font-size: 10px; color: #aeaeb2; margin-top: 3px; letter-spacing: 0.05em; }
 .c-good { color: #0369a1; } .c-avg { color: #d97706; } .c-warn { color: #dc2626; }
+
+/* ── 과목/내용 테이블 ── */
+.subject-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  margin-top: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #fce7f3;
+}
+.subject-table thead tr {
+  background: #fdf2f8;
+}
+.subject-table th {
+  padding: 5px 10px;
+  text-align: left;
+  font-weight: 700;
+  color: #db2777;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.subject-table th:first-child { width: 90px; border-right: 1px solid #fce7f3; }
+.subject-table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid #fdf2f8;
+  vertical-align: top;
+  color: #3c3c43;
+  line-height: 1.5;
+}
+.subject-table tr:last-child td { border-bottom: none; }
+.subject-table td:first-child {
+  color: #5b21b6;
+  font-weight: 600;
+  border-right: 1px solid #fdf2f8;
+  white-space: nowrap;
+}
+.subject-table tbody tr:hover td { background: #fffbfe; }
 
 .mini-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1rem; }
 .mini-card { background: #ffffff; border: 1px solid #fce7f3; border-radius: 12px; padding: 0.85rem 0.6rem; text-align: center; }
@@ -300,21 +349,28 @@ body {
       </button>
     </div>
 
+    <!-- ── 기간 탭: 전체 / 1~4주차 / 1~6개월 ── -->
     <div class="period-tabs">
       <button class="ptab on" onclick="setPeriod('all',this)">전체</button>
-      <button class="ptab" onclick="setPeriod('1w',this)">최근 1주</button>
-      <button class="ptab" onclick="setPeriod('1m',this)">최근 1개월</button>
-      <button class="ptab" onclick="setPeriod('3m',this)">최근 3개월</button>
-      <button class="ptab" onclick="setPeriod('6m',this)">최근 6개월</button>
-      <button class="ptab" onclick="setPeriod('1y',this)">최근 1년</button>
+      <button class="ptab" onclick="setPeriod('1w',this)">1주차</button>
+      <button class="ptab" onclick="setPeriod('2w',this)">2주차</button>
+      <button class="ptab" onclick="setPeriod('3w',this)">3주차</button>
+      <button class="ptab" onclick="setPeriod('4w',this)">4주차</button>
+      <button class="ptab" onclick="setPeriod('1m',this)">1개월</button>
+      <button class="ptab" onclick="setPeriod('2m',this)">2개월</button>
+      <button class="ptab" onclick="setPeriod('3m',this)">3개월</button>
+      <button class="ptab" onclick="setPeriod('4m',this)">4개월</button>
+      <button class="ptab" onclick="setPeriod('5m',this)">5개월</button>
+      <button class="ptab" onclick="setPeriod('6m',this)">6개월</button>
     </div>
 
     <div class="profile-card">
       <div class="p-av" id="r-av"></div>
-      <div>
+      <div style="flex:1;min-width:0;">
         <div class="p-name" id="r-name"></div>
         <div class="p-meta" id="r-meta"></div>
-        <div id="r-test-names" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;"></div>
+        <!-- 과목/내용 테이블 -->
+        <div id="r-subject-table" style="margin-top:8px;"></div>
         <div class="p-badges" id="r-badges"></div>
       </div>
       <div class="p-right">
@@ -433,7 +489,6 @@ async function loadStudents() {
   students.forEach(loadCardSummary);
 }
 
-/* ── loadCardSummary: timestamp 조건 제거 → JS에서 필터/정렬 ── */
 async function loadCardSummary(s) {
   const studentId = s.id || s.uid;
   try {
@@ -512,7 +567,6 @@ function toDate(ts) {
   return new Date(ts);
 }
 
-/* ── openReport: orderBy 제거 → JS에서 정렬 ── */
 window.openReport = async (studentId, name, grade, uid) => {
   curStu = {studentId, name, grade, uid};
   curPeriod = 'all'; curExam = 'all';
@@ -549,6 +603,7 @@ window.openReport = async (studentId, name, grade, uid) => {
   renderReport();
 };
 
+/* ── 같은 시험의 재시험 감지: testKey 기준으로 첫 번째만 추출 ── */
 function buildAttemptInfo(recs) {
   const groupMap = new Map();
   recs.forEach(r => {
@@ -574,23 +629,44 @@ function renderReport() {
   const all = allRecs[uid]||[];
   const filtered = filterByPeriod(all, curPeriod);
 
-  const testNamesEl = document.getElementById('r-test-names');
-  const seenTestNames = new Set();
-  const uniqueTestNames = [];
-  filtered.forEach(r => {
-    const n = r.testName||r.examTitle||'';
-    if(n && !seenTestNames.has(n)) { seenTestNames.add(n); uniqueTestNames.push(n); }
-  });
-  testNamesEl.innerHTML = uniqueTestNames.slice(0,4).map(n =>
-    `<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;background:#ede9fe;color:#5b21b6;">${esc2(n)}</span>`
-  ).join('') + (uniqueTestNames.length > 4 ? `<span style="font-size:10px;color:#aeaeb2;">+${uniqueTestNames.length-4}개</span>` : '');
-
   const attemptInfo = buildAttemptInfo(filtered);
+
+  /* ── 첫 번째 시험만 (재시험 제외) ── */
   const firstOnly = filtered.filter(r => {
     const info = attemptInfo.get(r.id);
     return !info || info.index === 0;
   });
 
+  /* ── 과목/내용 테이블 렌더링 (firstOnly 기준) ── */
+  const subjectTableEl = document.getElementById('r-subject-table');
+  const subjectMap = new Map(); // subject -> Set<content>
+  firstOnly.forEach(r => {
+    const subject = r.subject || r.testSubject || r.category || '과목미지정';
+    const content = r.testName || r.examTitle || '';
+    if (content) {
+      if (!subjectMap.has(subject)) subjectMap.set(subject, new Set());
+      subjectMap.get(subject).add(content);
+    }
+  });
+
+  if (subjectMap.size > 0) {
+    const rows = [...subjectMap.entries()].map(([subj, contents]) => {
+      const contentList = [...contents].map(c => esc2(c)).join(', ');
+      return `<tr>
+        <td>${esc2(subj)}</td>
+        <td>${contentList}</td>
+      </tr>`;
+    }).join('');
+    subjectTableEl.innerHTML = `
+      <table class="subject-table">
+        <thead><tr><th>과목</th><th>내용</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  } else {
+    subjectTableEl.innerHTML = '';
+  }
+
+  /* ── 평균은 firstOnly 기준 (OX, 4지선다, 마스터 각각) ── */
   const ox  = firstOnly.filter(r=>(r.testType||'mc')==='ox');
   const mc  = firstOnly.filter(r=>(r.testType||'mc')==='mc');
   const ms  = firstOnly.filter(r=>(r.testType||'mc')==='master');
@@ -603,8 +679,9 @@ function renderReport() {
   setTxt('r-mc',  mcA!==null  ? mcA+'점'  : '—');
   setTxt('r-ms',  msA!==null  ? msA+'점'  : '—');
 
-  const vals=[oxA,mcA,msA].filter(v=>v!==null);
-  const total=vals.length ? Math.round(vals.reduce((a,v)=>a+v,0)/vals.length) : null;
+  /* ── 종합 평가: OX·4지선다·마스터 첫 시험 평균만 (최대 3개) ── */
+  const vals = [oxA, mcA, msA].filter(v => v !== null);
+  const total = vals.length ? Math.round(vals.reduce((a,v)=>a+v,0)/vals.length) : null;
 
   const oel=document.getElementById('r-overall');
   if(total!==null){
@@ -619,6 +696,7 @@ function renderReport() {
     {l:'마스터',  v:msA, bg:'#d1fae5',col:'#065f46'},
   ].filter(b=>b.v!==null).map(b=>`<span class="p-badge" style="background:${b.bg};color:${b.col};">${b.l} ${b.v}점</span>`).join('');
 
+  /* ── 분석 요약도 firstOnly 기준 ── */
   renderAnalysis(oxA, mcA, msA, total);
   drawRadar(oxA, mcA, msA);
   drawTrend(filtered);
@@ -644,7 +722,7 @@ function renderAnalysis(oxA, mcA, msA, total) {
   if(oxA!==null){if(oxA>=80)high.push('OX');else if(oxA<60)low.push('OX');}
   if(mcA!==null){if(mcA>=80)high.push('4지선다');else if(mcA<60)low.push('4지선다');}
   if(msA!==null){if(msA>=80)high.push('마스터');else if(msA<60)low.push('마스터');}
-  let txt=curStu.name+' 학생';
+  let txt = curStu.name + ' 학생';
   if(total>=80)      txt+='은 전반적으로 양호한 수준입니다. ';
   else if(total>=60) txt+='은 보통 수준이며 일부 영역 보완이 필요합니다. ';
   else               txt+='은 전반적인 기초 개념 복습이 필요합니다. ';
@@ -835,16 +913,18 @@ window.goList=()=>{
   setTxt('bar-hint','학생 이름을 클릭하면 종합 분석을 볼 수 있습니다');
 };
 
-function filterByPeriod(recs,period){
+/* ── 기간 필터: 주차 및 월 단위 모두 지원 ── */
+function filterByPeriod(recs, period) {
   if(period==='all') return recs;
-  const days={'1w':7,'1m':30,'3m':90,'6m':180,'1y':365}[period]||0;
+  const days = {
+    '1w':7, '2w':14, '3w':21, '4w':28,
+    '1m':30, '2m':60, '3m':90, '4m':120, '5m':150, '6m':180
+  }[period] || 0;
   if(!days) return recs;
-  const since=new Date(); since.setDate(since.getDate()-days);
-  return recs.filter(r=>{
-    const d=toDate(r.timestamp||0);
-    return d>=since;
-  });
+  const since = new Date(); since.setDate(since.getDate()-days);
+  return recs.filter(r => toDate(r.timestamp||0) >= since);
 }
+
 function scoreOf(r){return typeof r.score==='number'?r.score:(r.percentage||0);}
 function fmtDate(ts){
   if(!ts) return '';
