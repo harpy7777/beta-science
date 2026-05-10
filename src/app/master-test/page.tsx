@@ -176,7 +176,7 @@ export default function MasterTestPage() {
 
       {/* ── Header ── */}
       <header className="bg-white border-b border-pink-100 sticky top-0 z-50">
-        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
+       <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
 
           {/* 로고 */}
           <div
@@ -220,7 +220,7 @@ export default function MasterTestPage() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-6">
+      <main className="max-w-5xl mx-auto px-6 py-6">
 
         {/* Welcome Bar */}
         <div
@@ -540,7 +540,7 @@ export default function MasterTestPage() {
                       {t.grade}
                     </span>
                   </div>
-                  <p className="font-mono text-xs text-gray-400 mt-1 truncate">{t.testId}</p>
+                
                 </div>
                 {/* 오른쪽: 삭제 */}
                 <button
