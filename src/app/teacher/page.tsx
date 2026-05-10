@@ -74,7 +74,7 @@ export default function TeacherPage() {
     );
   }
 
-  // 로그인 화면
+  // ── 로그인 화면 ──────────────────────────────────────────────
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-white flex items-center justify-center p-4">
@@ -130,71 +130,84 @@ export default function TeacherPage() {
     );
   }
 
-  // 대시보드
+  // ── 대시보드 ─────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-50">
+
       {/* Header */}
       <header className="bg-white border-b border-green-100 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex items-center gap-2.5 cursor-pointer"
             onClick={() => router.push('/')}
           >
-            <div className="w-9 h-9 bg-green-600 rounded-xl flex items-center justify-center">
+            <div className="w-9 h-9 bg-green-600 rounded-xl flex items-center justify-center shrink-0">
               <FlaskConical size={18} className="text-white" />
             </div>
             <div>
-              <div className="font-bold text-green-900">베타과학학원</div>
-              <div className="text-xs text-green-600">선생님 대시보드</div>
+              <div className="font-bold text-green-900 text-sm leading-tight">베타과학학원</div>
+              <div className="text-xs text-green-600 leading-tight">선생님 대시보드</div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500 hidden sm:block">{user.email}</span>
+
+          <div className="flex items-center gap-2">
+            {/* 이메일은 sm 이상에서만 표시 */}
+            <span className="text-xs text-gray-400 hidden sm:block truncate max-w-[140px]">
+              {user.email}
+            </span>
             <button
               onClick={() => router.push('/teacher/create')}
-              className="btn-primary text-sm flex items-center gap-1.5"
+              className="btn-primary text-sm flex items-center gap-1.5 px-3 py-2"
             >
-              <Plus size={16} />
-              시험지 만들기
+              <Plus size={15} />
+              <span>시험지 만들기</span>
             </button>
-            <button onClick={handleLogout} className="btn-ghost text-gray-500">
+            <button
+              onClick={handleLogout}
+              className="btn-ghost text-gray-500 p-2"
+              title="로그아웃"
+            >
               <LogOut size={16} />
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 py-6">
+
         {/* 통계 카드 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           {[
             { label: '전체 시험지', value: exams.length, icon: BookOpen, color: 'text-green-600 bg-green-100' },
             { label: '게시된 시험', value: exams.filter(e => e.isPublished).length, icon: CheckCircle, color: 'text-blue-600 bg-blue-100' },
             { label: '임시 저장', value: exams.filter(e => !e.isPublished).length, icon: Clock, color: 'text-amber-600 bg-amber-100' },
             { label: '총 문항 수', value: exams.reduce((a, e) => a + e.questions.length, 0), icon: BarChart3, color: 'text-purple-600 bg-purple-100' },
           ].map(({ label, value, icon: Icon, color }) => (
-            <div key={label} className="card p-5">
-              <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${color}`}>
-                <Icon size={18} />
+            <div key={label} className="card p-4">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center mb-2.5 ${color}`}>
+                <Icon size={16} />
               </div>
-              <div className="text-2xl font-black text-gray-800">{value}</div>
-              <div className="text-sm text-gray-500 mt-0.5">{label}</div>
+              <div className="text-2xl font-black text-gray-800 leading-none">{value}</div>
+              <div className="text-xs text-gray-500 mt-1">{label}</div>
             </div>
           ))}
         </div>
 
-        {/* 시험지 목록 */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-bold text-lg text-gray-800">내 시험지</h2>
+        {/* 시험지 목록 헤더 */}
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-bold text-base text-gray-800">내 시험지</h2>
         </div>
 
+        {/* 로딩 */}
         {examsLoading ? (
           <div className="flex justify-center py-16">
             <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
           </div>
+
+        /* 빈 상태 */
         ) : exams.length === 0 ? (
-          <div className="card p-16 text-center border-dashed border-2 border-green-200 bg-green-50/50">
-            <BookOpen size={48} className="text-green-300 mx-auto mb-4" />
+          <div className="card p-12 text-center border-dashed border-2 border-green-200 bg-green-50/50">
+            <BookOpen size={44} className="text-green-300 mx-auto mb-4" />
             <div className="font-semibold text-gray-600 mb-2">시험지가 없어요</div>
             <p className="text-sm text-gray-400 mb-6">첫 번째 시험지를 만들어보세요!</p>
             <button
@@ -205,76 +218,92 @@ export default function TeacherPage() {
               시험지 만들기
             </button>
           </div>
+
+        /* 시험지 목록 */
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-3">
             {exams.map(exam => (
-              <div key={exam.id} className="card p-5 hover:border-green-300 transition-colors">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-bold text-gray-800 truncate">{exam.title}</h3>
-                      <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
-                        exam.isPublished
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-500'
-                      }`}>
-                        {exam.isPublished ? '게시됨' : '임시저장'}
-                      </span>
-                    </div>
-                   <div className="flex items-center gap-4 text-sm text-gray-400">
-  {(exam.grade || exam.subject) && (
-    <span className="flex items-center gap-1.5">
-      {exam.grade && (
-        <span className="bg-green-100 text-green-700 font-semibold text-xs px-2 py-0.5 rounded-full">
-          {exam.grade}
-        </span>
-      )}
-      {exam.subject && (
-        <span className="bg-blue-100 text-blue-700 font-semibold text-xs px-2 py-0.5 rounded-full">
-          {exam.subject}
-        </span>
-      )}
-    </span>
-  )}
-  <span>{exam.questions.length}문항</span>
-  <span>
-    OX {exam.questions.filter(q => q.type === 'ox').length}개 /
-    4지선다 {exam.questions.filter(q => q.type === 'multiple').length}개
-  </span>
-  {exam.accessCode && (
-    <span className="font-mono font-bold text-green-600">
-      코드: {exam.accessCode}
-    </span>
-  )}
-</div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
+              <div key={exam.id} className="card p-4 hover:border-green-300 transition-colors">
+
+                {/* 1행: 제목 + 상태 뱃지 */}
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-bold text-gray-800 truncate flex-1 text-sm leading-snug">
+                    {exam.title}
+                  </h3>
+                  <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
+                    exam.isPublished
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-gray-100 text-gray-500'
+                  }`}>
+                    {exam.isPublished ? '게시됨' : '임시저장'}
+                  </span>
+                </div>
+
+                {/* 2행: 학년 + 과목 태그 + 문항 수 요약 */}
+                <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                  {exam.grade && (
+                    <span className="bg-green-100 text-green-700 font-semibold text-xs px-2 py-0.5 rounded-full">
+                      {exam.grade}
+                    </span>
+                  )}
+                  {exam.subject && (
+                    <span className="bg-blue-100 text-blue-700 font-semibold text-xs px-2 py-0.5 rounded-full">
+                      {exam.subject}
+                    </span>
+                  )}
+                  <span className="text-xs text-gray-500">{exam.questions.length}문항</span>
+                  <span className="text-xs text-gray-400">·</span>
+                  <span className="text-xs text-gray-500">
+                    OX {exam.questions.filter(q => q.type === 'ox').length}개
+                  </span>
+                  <span className="text-xs text-gray-400">/</span>
+                  <span className="text-xs text-gray-500">
+                    4지선다 {exam.questions.filter(q => q.type === 'multiple').length}개
+                  </span>
+                </div>
+
+                {/* 3행: 접속 코드 + 버튼 */}
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100">
+                  {/* 접속 코드 */}
+                  {exam.accessCode ? (
+                    <span className="font-mono font-bold text-green-600 text-sm tracking-wide">
+                      코드: {exam.accessCode}
+                    </span>
+                  ) : (
+                    <span />
+                  )}
+
+                  {/* 액션 버튼 */}
+                  <div className="flex items-center gap-1.5 shrink-0">
                     {exam.accessCode && (
                       <button
                         onClick={() => copyCode(exam.accessCode!)}
-                        className="btn-ghost text-xs flex items-center gap-1"
-                        title="코드 복사"
+                        className="flex items-center gap-1 text-xs text-gray-500 hover:text-green-600
+                                   bg-gray-100 hover:bg-green-50 px-2.5 py-1.5 rounded-lg transition-colors"
                       >
-                        <Copy size={14} />
+                        <Copy size={13} />
                         복사
                       </button>
                     )}
                     <button
                       onClick={() => router.push(`/teacher/results/${exam.id}`)}
-                      className="btn-ghost text-xs flex items-center gap-1"
+                      className="flex items-center gap-1 text-xs text-gray-500 hover:text-blue-600
+                                 bg-gray-100 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg transition-colors"
                     >
-                      <Users size={14} />
+                      <Users size={13} />
                       결과
                     </button>
                     <button
                       onClick={() => router.push(`/teacher/create?edit=${exam.id}`)}
-                      className="btn-secondary text-xs flex items-center gap-1"
+                      className="flex items-center gap-1 text-xs text-white
+                                 bg-green-600 hover:bg-green-700 px-2.5 py-1.5 rounded-lg transition-colors"
                     >
-                      <Eye size={14} />
+                      <Eye size={13} />
                       수정
                     </button>
                   </div>
                 </div>
+
               </div>
             ))}
           </div>
