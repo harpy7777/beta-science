@@ -272,52 +272,38 @@ export default function TeacherPage() {
         ) : (
           <div className="grid gap-3">
             {exams.map(exam => (
-              <div key={exam.id} className="bg-white border border-pink-100 rounded-2xl p-4 hover:border-pink-200 transition-colors">
-
-                {/* 1행: 제목 + 상태 뱃지 */}
-                <div className="flex flex-wrap items-center gap-1.5 mb-3 pb-3 border-b border-pink-50">
-  <h3 className="font-bold text-gray-900 text-sm mr-1 shrink-0">{exam.title}</h3>
-  <span className={`shrink-0 text-xs px-2.5 py-0.5 rounded-full font-semibold ${exam.isPublished ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-    {exam.isPublished ? '게시됨' : '임시저장'}
-  </span>
-  {exam.grade && (
-    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-pink-100 text-pink-700">
-      {exam.grade}
+             <div key={exam.id} className="bg-white border border-pink-100 rounded-2xl p-4 hover:border-pink-200 transition-colors">
+  <div className="flex items-center gap-3 flex-wrap">
+    <h3 className="font-bold text-gray-900 text-sm shrink-0">{exam.title}</h3>
+    <span className={`shrink-0 text-xs px-2.5 py-0.5 rounded-full font-semibold ${exam.isPublished ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+      {exam.isPublished ? '게시됨' : '임시저장'}
     </span>
-  )}
-  {exam.subject && (
-    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-      {exam.subject}
-    </span>
-  )}
-  <span className="text-xs text-gray-400">{exam.questions.length}문항</span>
-  <span className="text-xs text-gray-300">·</span>
-  <span className="text-xs text-gray-400">OX {exam.questions.filter(q => q.type === 'ox').length}개</span>
-  <span className="text-xs text-gray-300">/</span>
-  <span className="text-xs text-gray-400">4지선다 {exam.questions.filter(q => q.type === 'multiple').length}개</span>
+    {exam.grade && <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-pink-100 text-pink-700 shrink-0">{exam.grade}</span>}
+    {exam.subject && <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 shrink-0">{exam.subject}</span>}
+    <span className="text-xs text-gray-400 shrink-0">{exam.questions.length}문항</span>
+    <span className="text-xs text-gray-300">·</span>
+    <span className="text-xs text-gray-400 shrink-0">OX {exam.questions.filter(q => q.type === 'ox').length}개</span>
+    <span className="text-xs text-gray-300">/</span>
+    <span className="text-xs text-gray-400 shrink-0">4지선다 {exam.questions.filter(q => q.type === 'multiple').length}개</span>
+    <div className="flex items-center gap-2 ml-auto shrink-0">
+      <button
+        onClick={() => router.push(`/teacher/results/${exam.id}`)}
+        className="flex items-center gap-1 text-xs font-semibold text-gray-500 hover:text-blue-600 bg-gray-100 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg transition-colors"
+      >
+        <Users size={13} />
+        결과 보기
+      </button>
+      <button
+        onClick={() => router.push(`/teacher/create?edit=${exam.id}`)}
+        className="flex items-center gap-1 text-xs font-semibold text-white px-2.5 py-1.5 rounded-lg transition-colors"
+        style={{ background:'#db2777' }}
+      >
+        <Eye size={13} />
+        수정
+      </button>
+    </div>
+  </div>
 </div>
-
-                {/* 3행: 액션 버튼만 */}
-                <div className="flex items-center justify-end gap-2 pt-3">
-                  <button
-                    onClick={() => router.push(`/teacher/results/${exam.id}`)}
-                    className="flex items-center gap-1 text-xs font-semibold text-gray-500 hover:text-blue-600
-                               bg-gray-100 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg transition-colors"
-                  >
-                    <Users size={13} />
-                    결과 보기
-                  </button>
-                  <button
-                    onClick={() => router.push(`/teacher/create?edit=${exam.id}`)}
-                    className="flex items-center gap-1 text-xs font-semibold text-white px-2.5 py-1.5 rounded-lg transition-colors"
-                    style={{ background:'#db2777' }}
-                  >
-                    <Eye size={13} />
-                    수정
-                  </button>
-                </div>
-
-              </div>
             ))}
           </div>
         )}
