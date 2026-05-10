@@ -16,10 +16,16 @@ import toast from 'react-hot-toast';
 function formatDate(ts: unknown): string {
   if (!ts) return '—';
   try {
-    const date =
-      typeof (ts as any).toDate === 'function'
-        ? (ts as any).toDate()
-        : new Date(ts as any);
+    let date: Date;
+    if (typeof (ts as any).toDate === 'function') {
+      // 진짜 Firestore Timestamp
+      date = (ts as any).toDate();
+    } else if (typeof (ts as any).seconds === 'number') {
+      // removeUndefined로 JSON 직렬화된 {seconds, nanoseconds} 객체
+      date = new Date((ts as any).seconds * 1000);
+    } else {
+      date = new Date(ts as any);
+    }
     if (isNaN(date.getTime())) return '—';
     return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
   } catch {
