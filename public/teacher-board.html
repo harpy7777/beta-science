@@ -2,21 +2,27 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>베타과학학원 · 관리 시스템</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
   background: #fafafa; color: #1d1d1f; min-height: 100vh;
   -webkit-font-smoothing: antialiased; visibility: hidden;
+  overscroll-behavior: none;
 }
 
 /* ── Header ── */
 .header {
   background: #ffffff; border-bottom: 1px solid #f0e8ed;
-  padding: 0 1.5rem; height: 54px;
+  padding: 0 1rem 0 1rem;
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  height: 54px;
   display: flex; align-items: center; justify-content: space-between;
   position: sticky; top: 0; z-index: 300;
 }
@@ -42,50 +48,60 @@ body {
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
 /* ── Layout ── */
-.wrap { max-width: 1100px; margin: 0 auto; padding: 1.6rem 1rem 3rem; }
+.wrap {
+  max-width: 1100px; margin: 0 auto;
+  padding: 1.2rem 0.9rem 5rem;
+  padding-bottom: max(5rem, calc(4rem + env(safe-area-inset-bottom)));
+  padding-left: max(0.9rem, env(safe-area-inset-left));
+  padding-right: max(0.9rem, env(safe-area-inset-right));
+}
 
 /* ── Welcome ── */
 .welcome-bar {
   background: linear-gradient(135deg, #fff0f7 0%, #fdf2f8 60%, #f0f9ff 100%);
   border: 1px solid #fce7f3; border-radius: 18px;
-  padding: 1.4rem 1.8rem; margin-bottom: 1.6rem;
+  padding: 1.2rem 1.4rem; margin-bottom: 1.4rem;
   display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
 }
-.welcome-left { display: flex; align-items: center; gap: 14px; }
+.welcome-left { display: flex; align-items: center; gap: 12px; }
 .welcome-avatar {
-  width: 48px; height: 48px; border-radius: 50%;
+  width: 46px; height: 46px; border-radius: 50%;
   background: linear-gradient(135deg, #f472b6, #db2777);
   display: flex; align-items: center; justify-content: center;
   font-size: 20px; flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(219,39,119,0.25);
 }
-.welcome-greeting { font-size: 1.15rem; font-weight: 700; color: #1d1d1f; letter-spacing: -0.03em; }
-.welcome-sub { font-size: 12px; color: #6e6e73; margin-top: 3px; }
+.welcome-greeting { font-size: 1.05rem; font-weight: 700; color: #1d1d1f; letter-spacing: -0.03em; }
+.welcome-sub { font-size: 11px; color: #6e6e73; margin-top: 3px; }
 .welcome-date-box { text-align: right; }
-.welcome-date { font-size: 1.05rem; font-weight: 700; color: #db2777; letter-spacing: -0.02em; }
+.welcome-date { font-size: 1rem; font-weight: 700; color: #db2777; letter-spacing: -0.02em; }
 .welcome-day  { font-size: 11px; color: #aeaeb2; margin-top: 3px; font-weight: 500; }
 
 /* ── Section Nav Grid ── */
-.section-heading { font-size: 13px; font-weight: 700; color: #6e6e73; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.9rem; }
-.nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 2rem; }
+.section-heading { font-size: 11px; font-weight: 700; color: #aeaeb2; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.8rem; }
+.nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1.6rem; }
 .nav-card {
   background: #ffffff; border: 1px solid #fce7f3; border-radius: 16px;
-  padding: 1.2rem 1rem; cursor: pointer;
+  padding: 1.1rem 0.9rem; cursor: pointer;
   transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
-  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 7px;
   text-decoration: none; color: inherit; position: relative; overflow: hidden;
+  /* 터치 활성화 */
+  -webkit-user-select: none; user-select: none;
+  min-height: 110px;
 }
 .nav-card::after {
   content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
   border-radius: 0 0 16px 16px; opacity: 0; transition: opacity 0.18s;
 }
+.nav-card:active { transform: scale(0.97); background: #fdf2f8; }
 .nav-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(219,39,119,0.12); border-color: #fbcfe8; }
 .nav-card:hover::after { opacity: 1; }
-.nav-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-.nav-title { font-size: 13px; font-weight: 700; color: #1d1d1f; letter-spacing: -0.02em; }
+.nav-icon { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.nav-title { font-size: 12px; font-weight: 700; color: #1d1d1f; letter-spacing: -0.02em; }
 .nav-desc  { font-size: 10px; color: #aeaeb2; line-height: 1.4; }
-.nav-arrow { position: absolute; top: 50%; right: 14px; transform: translateY(-50%); font-size: 14px; color: #d1d1d6; transition: color 0.15s, right 0.15s; }
-.nav-card:hover .nav-arrow { color: #db2777; right: 10px; }
+.nav-arrow { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); font-size: 13px; color: #d1d1d6; transition: color 0.15s, right 0.15s; }
+.nav-card:hover .nav-arrow { color: #db2777; right: 8px; }
 .nc-notice  .nav-icon { background: #fff0f7; }
 .nc-notice::after     { background: linear-gradient(90deg, #f472b6, #db2777); }
 .nc-task    .nav-icon { background: #eff6ff; }
@@ -102,20 +118,21 @@ body {
 .nc-exam::after       { background: linear-gradient(90deg, #38bdf8, #0284c7); }
 
 /* ── Quick Stats ── */
-.quick-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 2rem; }
-.qs-card { background: #ffffff; border: 1px solid #fce7f3; border-radius: 14px; padding: 1rem 1.1rem; display: flex; align-items: center; gap: 12px; }
-.qs-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-.qs-num  { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+.quick-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 1.6rem; }
+.qs-card { background: #ffffff; border: 1px solid #fce7f3; border-radius: 14px; padding: 0.9rem 1rem; display: flex; align-items: center; gap: 10px; }
+.qs-icon { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+.qs-num  { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
 .qs-lbl  { font-size: 10px; color: #aeaeb2; margin-top: 3px; font-weight: 500; }
 
 /* ── 하단 2단 ── */
 .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.mini-panel { background: #ffffff; border: 1px solid #fce7f3; border-radius: 16px; padding: 1.2rem 1.4rem; }
-.panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.mini-panel { background: #ffffff; border: 1px solid #fce7f3; border-radius: 16px; padding: 1.1rem 1.2rem; }
+.panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.9rem; }
 .panel-title { font-size: 13px; font-weight: 700; color: #1d1d1f; }
-.panel-link { font-size: 11px; font-weight: 600; color: #db2777; cursor: pointer; background: none; border: none; font-family: inherit; transition: opacity 0.15s; }
+.panel-link { font-size: 11px; font-weight: 600; color: #db2777; cursor: pointer; background: none; border: none; font-family: inherit; transition: opacity 0.15s; min-height: 36px; padding: 0 4px; }
 .panel-link:hover { opacity: 0.7; }
-.notice-preview-item { padding: 8px 10px; border-radius: 10px; background: #fafafa; border: 1px solid #f5f5f7; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.15s; }
+.notice-preview-item { padding: 8px 10px; border-radius: 10px; background: #fafafa; border: 1px solid #f5f5f7; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.15s; min-height: 40px; }
+.notice-preview-item:active { background: #fdf2f8; }
 .notice-preview-item:hover { background: #fdf2f8; }
 .notice-tag { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 5px; white-space: nowrap; flex-shrink: 0; }
 .nt-공지  { background: #dbeafe; color: #1e40af; }
@@ -135,66 +152,133 @@ body {
 .empty-hint { font-size: 12px; color: #aeaeb2; padding: 1.5rem; text-align: center; }
 
 /* ── 페이지 오버레이 ── */
-.page-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.35); z-index: 400; backdrop-filter: blur(2px); }
+.page-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.35); z-index: 400; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
 .page-overlay.open { display: block; }
-.page-panel { position: fixed; top: 0; right: 0; bottom: 0; width: min(900px,100vw); background: #fafafa; z-index: 500; overflow-y: auto; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); box-shadow: -8px 0 40px rgba(0,0,0,0.12); }
+.page-panel {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: min(900px, 100vw);
+  background: #fafafa; z-index: 500;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: -8px 0 40px rgba(0,0,0,0.12);
+  /* 홈 인디케이터 영역 */
+  padding-bottom: env(safe-area-inset-bottom);
+}
 .page-panel.open { transform: translateX(0); }
-.panel-bar { background: #ffffff; border-bottom: 1px solid #fce7f3; padding: 0 1.4rem; height: 52px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+.panel-bar {
+  background: #ffffff; border-bottom: 1px solid #fce7f3;
+  padding: 0 1.2rem;
+  padding-left: max(1.2rem, env(safe-area-inset-left));
+  padding-right: max(1.2rem, env(safe-area-inset-right));
+  height: 52px; min-height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 10;
+}
 .panel-bar-title { font-size: 14px; font-weight: 700; color: #1d1d1f; }
-.close-btn { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #f5f5f7; border: none; cursor: pointer; font-size: 14px; color: #3c3c43; transition: background 0.15s; }
+.close-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: #f5f5f7; border: none; cursor: pointer; font-size: 14px; color: #3c3c43;
+  transition: background 0.15s;
+  /* 터치 타겟 확보 */
+  min-width: 44px; min-height: 44px;
+}
 .close-btn:hover { background: #fce7f3; color: #db2777; }
-.panel-body { padding: 1.4rem; }
+.close-btn:active { background: #fce7f3; color: #db2777; }
+.panel-body {
+  padding: 1.2rem;
+  padding-left: max(1.2rem, env(safe-area-inset-left));
+  padding-right: max(1.2rem, env(safe-area-inset-right));
+}
 
 /* ── 폼 공통 ── */
 .form-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-.form-input, .form-select, .form-textarea { border: 1.5px solid #fce7f3; border-radius: 10px; font-size: 12px; font-family: inherit; color: #1d1d1f; padding: 8px 12px; outline: none; background: #fff; transition: border 0.15s; }
+.form-input, .form-select, .form-textarea {
+  border: 1.5px solid #fce7f3; border-radius: 10px;
+  /* iOS에서 16px 미만이면 자동 줌 발생 → 16px 고정 */
+  font-size: 16px; font-family: inherit; color: #1d1d1f;
+  padding: 10px 12px; outline: none; background: #fff;
+  transition: border 0.15s;
+  /* iOS 기본 스타일 제거 */
+  -webkit-appearance: none; appearance: none;
+}
 .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #db2777; }
-.form-input { flex: 1; min-width: 0; }
-.form-select { min-width: 100px; appearance: none; cursor: pointer; }
-.form-textarea { width: 100%; resize: vertical; min-height: 80px; line-height: 1.6; }
-.btn-primary { padding: 8px 20px; background: linear-gradient(135deg, #f472b6, #db2777); border: none; border-radius: 10px; font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; font-family: inherit; white-space: nowrap; transition: opacity 0.15s; box-shadow: 0 2px 8px rgba(219,39,119,0.25); }
+.form-input { flex: 1; min-width: 0; min-height: 44px; }
+.form-select { min-width: 100px; cursor: pointer; min-height: 44px; }
+.form-textarea { width: 100%; resize: vertical; min-height: 80px; line-height: 1.6; font-size: 16px; }
+.btn-primary {
+  padding: 10px 20px; min-height: 44px;
+  background: linear-gradient(135deg, #f472b6, #db2777); border: none; border-radius: 10px;
+  font-size: 14px; font-weight: 600; color: #fff; cursor: pointer; font-family: inherit;
+  white-space: nowrap; transition: opacity 0.15s;
+  box-shadow: 0 2px 8px rgba(219,39,119,0.25);
+}
 .btn-primary:hover { opacity: 0.85; }
-.btn-secondary { padding: 8px 16px; background: #f5f5f7; border: none; border-radius: 10px; font-size: 12px; font-weight: 600; color: #6e6e73; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+.btn-primary:active { opacity: 0.75; transform: scale(0.98); }
+.btn-secondary {
+  padding: 10px 16px; min-height: 44px;
+  background: #f5f5f7; border: none; border-radius: 10px;
+  font-size: 14px; font-weight: 600; color: #6e6e73; cursor: pointer;
+  font-family: inherit; transition: background 0.15s;
+}
 .btn-secondary:hover { background: #ebebec; }
+.btn-secondary:active { background: #ebebec; }
+
+/* ── 필터 칩 — 모바일 가로 스크롤 ── */
+.filter-chips {
+  display: flex; gap: 6px; flex-wrap: nowrap;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  margin-bottom: 8px; padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.filter-chips::-webkit-scrollbar { display: none; }
+.fchip {
+  padding: 7px 14px; border-radius: 20px; min-height: 34px;
+  font-size: 12px; font-weight: 500;
+  border: 1px solid #fce7f3; background: #fff; color: #6e6e73;
+  cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  transition: all 0.15s;
+}
+.fchip:active { transform: scale(0.96); }
+.fchip.on { background: #db2777; color: #fff; border-color: #db2777; }
+.grade-chip-row .fchip.on { background: #5b21b6; border-color: #5b21b6; }
+.grade-chip-row .fchip { border-color: #e0e7ff; }
 
 /* ── 공지사항 ── */
 .notice-list { margin-top: 14px; }
 .notice-item { background: #fff; border: 1px solid #fce7f3; border-radius: 14px; margin-bottom: 8px; overflow: hidden; }
-.notice-head { padding: 12px 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.15s; }
+.notice-head { padding: 12px 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.15s; min-height: 52px; }
 .notice-head:hover { background: #fdf2f8; }
+.notice-head:active { background: #fdf2f8; }
 .notice-content-box { padding: 0 14px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; }
 .notice-content-box.open { max-height: 200px; padding: 0 14px 14px; }
-.notice-content { font-size: 12px; color: #3c3c43; line-height: 1.7; white-space: pre-wrap; }
-.notice-del { margin-left: auto; background: none; border: none; color: #aeaeb2; cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 6px; transition: color 0.15s; }
+.notice-content { font-size: 13px; color: #3c3c43; line-height: 1.7; white-space: pre-wrap; }
+.notice-del { margin-left: auto; background: none; border: none; color: #aeaeb2; cursor: pointer; font-size: 14px; padding: 6px 8px; border-radius: 6px; transition: color 0.15s; min-width: 36px; min-height: 36px; display: flex; align-items: center; justify-content: center; }
 .notice-del:hover { color: #dc2626; }
+.notice-del:active { color: #dc2626; }
 
 /* ── 주간업무 ── */
 .week-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
-.wtab { padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid #fce7f3; background: #fff; color: #6e6e73; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.wtab { padding: 8px 18px; min-height: 40px; border-radius: 20px; font-size: 13px; font-weight: 500; border: 1px solid #fce7f3; background: #fff; color: #6e6e73; cursor: pointer; font-family: inherit; transition: all 0.15s; flex: 1; }
 .wtab.on { background: #db2777; color: #fff; border-color: #db2777; }
 .task-list { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
-.task-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #fff; border: 1px solid #fce7f3; border-radius: 12px; transition: background 0.15s; }
+.task-item { display: flex; align-items: center; gap: 8px; padding: 12px 12px; background: #fff; border: 1px solid #fce7f3; border-radius: 12px; transition: background 0.15s; min-height: 52px; }
 .task-item.done { opacity: 0.55; }
-.task-check { width: 18px; height: 18px; border-radius: 5px; border: 2px solid #fce7f3; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.15s; background: #fff; }
+.task-check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #fce7f3; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.15s; background: #fff; min-width: 44px; min-height: 44px; margin: -11px -11px; padding: 11px; }
 .task-check.checked { background: #db2777; border-color: #db2777; }
-.task-text { font-size: 12px; color: #1d1d1f; flex: 1; }
+.task-text { font-size: 13px; color: #1d1d1f; flex: 1; }
 .task-item.done .task-text { text-decoration: line-through; color: #aeaeb2; }
 .task-pri { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 5px; white-space: nowrap; }
 .tp-high { background: #fee2e2; color: #991b1b; }
 .tp-mid  { background: #fef9c3; color: #854d0e; }
 .tp-low  { background: #d1fae5; color: #065f46; }
-.task-del { background: none; border: none; color: #d1d1d6; cursor: pointer; font-size: 14px; padding: 2px; border-radius: 5px; transition: color 0.15s; }
+.task-del { background: none; border: none; color: #d1d1d6; cursor: pointer; font-size: 14px; padding: 8px; border-radius: 5px; transition: color 0.15s; min-width: 36px; min-height: 36px; display: flex; align-items: center; justify-content: center; }
 .task-del:hover { color: #dc2626; }
-.clear-btn { padding: 6px 14px; background: #f5f5f7; border: none; border-radius: 10px; font-size: 11px; font-weight: 600; color: #6e6e73; cursor: pointer; font-family: inherit; margin-top: 10px; transition: background 0.15s; }
+.clear-btn { padding: 10px 14px; min-height: 44px; background: #f5f5f7; border: none; border-radius: 10px; font-size: 12px; font-weight: 600; color: #6e6e73; cursor: pointer; font-family: inherit; margin-top: 10px; width: 100%; transition: background 0.15s; }
 .clear-btn:hover { background: #ebebec; }
 
 /* ── 문제은행 ── */
-.filter-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-.fchip { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; border: 1px solid #fce7f3; background: #fff; color: #6e6e73; cursor: pointer; transition: all 0.15s; }
-.fchip.on { background: #db2777; color: #fff; border-color: #db2777; }
-/* 학년 칩은 별도 색상 */
-.grade-chip-row .fchip.on { background: #5b21b6; border-color: #5b21b6; }
-.grade-chip-row .fchip { border-color: #e0e7ff; }
 .qbank-form { background: #fff; border: 1px solid #fce7f3; border-radius: 14px; padding: 12px 14px; margin-bottom: 14px; }
 .qbank-list { display: flex; flex-direction: column; gap: 8px; }
 .qbank-card { background: #fff; border: 1px solid #fce7f3; border-radius: 14px; padding: 12px 14px; transition: border-color 0.15s; }
@@ -213,111 +297,113 @@ body {
 .qbc-grade { background: #ede9fe; color: #5b21b6; }
 
 /* ── 학년 뱃지 ── */
-.grade-badge {
-  font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 5px;
-  background: #ede9fe; color: #5b21b6; white-space: nowrap;
-}
+.grade-badge { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 5px; background: #ede9fe; color: #5b21b6; white-space: nowrap; }
 .cc-chip-grade { background: #ede9fe; color: #5b21b6; }
 
 /* ── 개념정리 ── */
-.concept-search { width: 100%; padding: 8px 14px; border: 1.5px solid #fce7f3; border-radius: 12px; font-size: 12px; font-family: inherit; color: #1d1d1f; outline: none; margin-bottom: 10px; transition: border 0.15s; }
+.concept-search {
+  width: 100%; padding: 12px 14px; min-height: 48px;
+  border: 1.5px solid #fce7f3; border-radius: 12px;
+  font-size: 16px; font-family: inherit; color: #1d1d1f;
+  outline: none; margin-bottom: 10px; transition: border 0.15s;
+  -webkit-appearance: none;
+}
 .concept-search:focus { border-color: #db2777; }
 .concept-list { display: flex; flex-direction: column; gap: 8px; }
 .concept-card { background: #fff; border: 1px solid #f0fdf4; border-left: 3px solid #16a34a; border-radius: 12px; overflow: hidden; }
-.concept-head { padding: 10px 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.15s; }
+.concept-head { padding: 12px 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.15s; min-height: 52px; }
 .concept-head:hover { background: #f0fdf4; }
+.concept-head:active { background: #f0fdf4; }
 .concept-title { font-size: 13px; font-weight: 600; color: #1d1d1f; flex: 1; }
 .concept-body { padding: 0 14px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; }
-.concept-body.open { max-height: 300px; padding: 0 14px 14px; }
-.concept-text { font-size: 12px; color: #3c3c43; line-height: 1.8; white-space: pre-wrap; }
+.concept-body.open { max-height: 400px; padding: 0 14px 14px; }
+.concept-text { font-size: 13px; color: #3c3c43; line-height: 1.8; white-space: pre-wrap; }
 
 /* ── 수업카드 패널 ── */
 .cc-filter-bar {
-  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
-  margin-bottom: 14px;
+  display: flex; gap: 6px; align-items: center;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px; margin-bottom: 10px;
+  scrollbar-width: none; flex-wrap: nowrap;
 }
+.cc-filter-bar::-webkit-scrollbar { display: none; }
 .cc-tab {
-  padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  padding: 7px 14px; min-height: 36px; border-radius: 20px; font-size: 12px; font-weight: 600;
   border: 1.5px solid #f3e8ff; background: #fff; color: #6e6e73;
-  cursor: pointer; font-family: inherit; transition: all 0.15s;
+  cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
 }
 .cc-tab.on { background: #a21caf; color: #fff; border-color: #a21caf; }
 .cc-search-inp {
-  flex: 1; min-width: 160px; padding: 7px 12px;
+  flex: 0 0 auto; width: 180px; padding: 8px 12px; min-height: 38px;
   border: 1.5px solid #f3e8ff; border-radius: 10px;
-  font-size: 12px; font-family: inherit; color: #1d1d1f;
+  font-size: 16px; font-family: inherit; color: #1d1d1f;
   outline: none; background: #fff; transition: border 0.15s;
+  -webkit-appearance: none;
 }
 .cc-search-inp:focus { border-color: #a21caf; }
 .cc-write-btn {
-  padding: 8px 18px;
+  padding: 9px 14px; min-height: 40px; flex-shrink: 0;
   background: linear-gradient(135deg, #e879f9, #a21caf);
   border: none; border-radius: 10px; font-size: 12px; font-weight: 700;
   color: #fff; cursor: pointer; font-family: inherit; white-space: nowrap;
   transition: opacity 0.15s; box-shadow: 0 2px 8px rgba(162,28,175,0.25);
 }
 .cc-write-btn:hover { opacity: 0.85; }
+.cc-write-btn:active { opacity: 0.75; }
 
 /* 수업카드 폼 */
 .cc-form-box {
   background: #fff; border: 1.5px solid #f3e8ff; border-radius: 16px;
-  padding: 16px; margin-bottom: 14px;
+  padding: 14px; margin-bottom: 14px;
   animation: slideDown 0.2s ease;
 }
 @keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
 .cc-form-title { font-size: 13px; font-weight: 700; color: #1d1d1f; margin-bottom: 12px; }
 .cc-form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 .cc-form-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-.cc-label { font-size: 10px; font-weight: 700; color: #6e6e73; margin-bottom: 4px; letter-spacing: 0.05em; display: block; }
+.cc-label { font-size: 11px; font-weight: 700; color: #6e6e73; margin-bottom: 4px; letter-spacing: 0.05em; display: block; }
 .cc-inp, .cc-sel {
-  width: 100%; padding: 8px 10px; border: 1.5px solid #f3e8ff;
-  border-radius: 9px; font-size: 12px; font-family: inherit; color: #1d1d1f;
+  width: 100%; padding: 10px 10px; min-height: 44px;
+  border: 1.5px solid #f3e8ff;
+  border-radius: 9px; font-size: 16px; font-family: inherit; color: #1d1d1f;
   outline: none; background: #fff; transition: border 0.15s;
+  -webkit-appearance: none; appearance: none;
 }
 .cc-inp:focus, .cc-sel:focus { border-color: #a21caf; }
-.cc-sel { appearance: none; cursor: pointer; }
+.cc-sel { cursor: pointer; }
 .cc-score-row { display: flex; align-items: center; gap: 8px; }
-.cc-score-row .cc-inp { max-width: 90px; }
-.cc-score-no { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #6e6e73; cursor: pointer; }
-.cc-score-no input { accent-color: #a21caf; }
+.cc-score-row .cc-inp { max-width: 100px; }
+.cc-score-no { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #6e6e73; cursor: pointer; min-height: 44px; }
+.cc-score-no input { accent-color: #a21caf; width: 18px; height: 18px; }
 .cc-textarea {
-  width: 100%; padding: 8px 12px; border: 1.5px solid #f3e8ff;
-  border-radius: 9px; font-size: 12px; font-family: inherit;
-  color: #1d1d1f; line-height: 1.6; resize: vertical; min-height: 70px;
+  width: 100%; padding: 10px 12px; min-height: 44px;
+  border: 1.5px solid #f3e8ff;
+  border-radius: 9px; font-size: 16px; font-family: inherit;
+  color: #1d1d1f; line-height: 1.6; resize: vertical;
   outline: none; background: #fff; transition: border 0.15s;
+  -webkit-appearance: none;
 }
 .cc-textarea:focus { border-color: #a21caf; }
 .cc-form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
 
 /* 학생 선택 학년 표시 박스 */
 .student-grade-info {
-  margin-top: 5px; padding: 5px 9px; border-radius: 8px;
+  margin-top: 5px; padding: 6px 9px; border-radius: 8px;
   background: #fdf4ff; border: 1px solid #f3e8ff;
   font-size: 11px; font-weight: 600; color: #7e22ce;
-  display: flex; align-items: center; gap: 5px; min-height: 26px;
+  display: flex; align-items: center; gap: 5px; min-height: 28px;
 }
 
 /* 수업카드 리스트 */
-.cc-stats-row {
-  display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
-}
-.cc-stat-chip {
-  padding: 6px 14px; border-radius: 10px; font-size: 11px; font-weight: 600;
-  background: #fdf4ff; color: #a21caf; border: 1px solid #f3e8ff;
-  display: flex; align-items: center; gap: 6px;
-}
+.cc-stats-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.cc-stat-chip { padding: 6px 14px; border-radius: 10px; font-size: 11px; font-weight: 600; background: #fdf4ff; color: #a21caf; border: 1px solid #f3e8ff; display: flex; align-items: center; gap: 6px; }
 .cc-stat-chip span { font-size: 14px; font-weight: 700; }
 .cc-list { display: flex; flex-direction: column; gap: 8px; }
-.cc-card {
-  background: #fff; border: 1.5px solid #f3e8ff; border-radius: 14px;
-  overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s;
-}
+.cc-card { background: #fff; border: 1.5px solid #f3e8ff; border-radius: 14px; overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s; }
 .cc-card:hover { border-color: #e879f9; box-shadow: 0 4px 16px rgba(162,28,175,0.08); }
-.cc-card-head {
-  padding: 12px 14px; display: flex; align-items: center; gap: 8px;
-  cursor: pointer; transition: background 0.15s;
-}
+.cc-card-head { padding: 12px 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.15s; min-height: 60px; }
 .cc-card-head:hover { background: #fdf4ff; }
+.cc-card-head:active { background: #fdf4ff; }
 .cc-card-left { flex: 1; min-width: 0; }
 .cc-card-name { font-size: 13px; font-weight: 700; color: #1d1d1f; margin-bottom: 4px; }
 .cc-card-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
@@ -339,15 +425,8 @@ body {
 .cc-att-low    { background: #fdf2f8; color: #be185d; }
 .cc-expand-icon { font-size: 12px; color: #aeaeb2; transition: transform 0.2s; }
 .cc-card.open .cc-expand-icon { transform: rotate(180deg); }
-.cc-card-body {
-  max-height: 0; overflow: hidden;
-  transition: max-height 0.3s ease, padding 0.3s ease;
-  border-top: 0px solid #f3e8ff;
-}
-.cc-card.open .cc-card-body {
-  max-height: 400px; padding: 0 14px 14px;
-  border-top: 1px solid #f3e8ff;
-}
+.cc-card-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; border-top: 0px solid #f3e8ff; }
+.cc-card.open .cc-card-body { max-height: 500px; padding: 0 14px 14px; border-top: 1px solid #f3e8ff; }
 .cc-body-section { margin-top: 10px; }
 .cc-body-label { font-size: 10px; font-weight: 700; color: #a21caf; letter-spacing: 0.05em; margin-bottom: 4px; }
 .cc-body-text { font-size: 12px; color: #3c3c43; line-height: 1.7; white-space: pre-wrap; }
@@ -356,41 +435,42 @@ body {
 .cc-body-item-label { font-size: 10px; color: #aeaeb2; font-weight: 600; }
 .cc-body-item-val { font-size: 13px; font-weight: 700; color: #1d1d1f; }
 .cc-card-actions { display: flex; gap: 6px; justify-content: flex-end; margin-top: 10px; }
-.cc-del-btn { padding: 5px 12px; background: #fff; border: 1.5px solid #fce7f3; border-radius: 8px; font-size: 11px; font-weight: 600; color: #dc2626; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.cc-del-btn { padding: 8px 14px; min-height: 40px; background: #fff; border: 1.5px solid #fce7f3; border-radius: 8px; font-size: 12px; font-weight: 600; color: #dc2626; cursor: pointer; font-family: inherit; transition: all 0.15s; }
 .cc-del-btn:hover { background: #fee2e2; border-color: #fca5a5; }
 
-/* 수업카드 통계 미니 차트 */
-.cc-mini-stats {
-  display: grid; grid-template-columns: repeat(3,1fr); gap: 8px;
-  margin-bottom: 14px;
-}
-.cc-mini-stat {
-  background: #fff; border: 1.5px solid #f3e8ff; border-radius: 12px;
-  padding: 10px 12px; text-align: center;
-}
+/* 수업카드 통계 */
+.cc-mini-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 12px; }
+.cc-mini-stat { background: #fff; border: 1.5px solid #f3e8ff; border-radius: 12px; padding: 10px 12px; text-align: center; }
 .cc-mini-stat-num { font-size: 1.2rem; font-weight: 700; color: #a21caf; letter-spacing: -0.03em; }
 .cc-mini-stat-lbl { font-size: 10px; color: #aeaeb2; font-weight: 500; margin-top: 2px; }
 
 /* ── 시간표 ── */
-.timetable-wrap { overflow-x: auto; }
-.timetable { border-collapse: collapse; width: 100%; min-width: 480px; font-size: 11px; }
+.timetable-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.timetable { border-collapse: collapse; width: 100%; min-width: 400px; font-size: 11px; }
 .timetable th { padding: 6px 4px; text-align: center; font-weight: 700; color: #6e6e73; font-size: 10px; border-bottom: 2px solid #fce7f3; }
-.timetable td { padding: 4px; border: 1px solid #fdf2f8; height: 36px; vertical-align: top; min-width: 60px; }
-.timetable td.time-col { color: #aeaeb2; font-size: 10px; text-align: center; vertical-align: middle; font-weight: 600; min-width: 44px; }
-.tt-cell { min-height: 28px; border-radius: 6px; padding: 3px 6px; font-size: 10px; font-weight: 600; line-height: 1.3; cursor: pointer; transition: opacity 0.15s; position: relative; }
+.timetable td { padding: 4px; border: 1px solid #fdf2f8; height: 40px; vertical-align: top; min-width: 55px; }
+.timetable td.time-col { color: #aeaeb2; font-size: 10px; text-align: center; vertical-align: middle; font-weight: 600; min-width: 40px; }
+.tt-cell { min-height: 32px; border-radius: 6px; padding: 4px 6px; font-size: 10px; font-weight: 600; line-height: 1.3; cursor: pointer; transition: opacity 0.15s; position: relative; }
 .tt-cell:hover { opacity: 0.8; }
 .tt-del { position: absolute; top: 2px; right: 3px; font-size: 9px; opacity: 0.6; }
-.tt-add { width: 100%; height: 28px; background: transparent; border: 1px dashed #fce7f3; border-radius: 6px; cursor: pointer; font-size: 16px; color: #fce7f3; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+.tt-add { width: 100%; height: 32px; background: transparent; border: 1px dashed #fce7f3; border-radius: 6px; cursor: pointer; font-size: 18px; color: #fce7f3; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
 .tt-add:hover { border-color: #db2777; color: #db2777; background: #fdf2f8; }
+.tt-add:active { border-color: #db2777; color: #db2777; background: #fdf2f8; }
 
 /* ── 시험 캘린더 ── */
 .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.cal-nav { background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 8px; font-size: 16px; color: #6e6e73; transition: background 0.15s; }
+.cal-nav { background: none; border: none; cursor: pointer; padding: 8px 12px; min-width: 44px; min-height: 44px; border-radius: 8px; font-size: 18px; color: #6e6e73; transition: background 0.15s; display: flex; align-items: center; justify-content: center; }
 .cal-nav:hover { background: #fdf2f8; }
 .cal-month { font-size: 14px; font-weight: 700; color: #1d1d1f; }
 .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
 .cal-dow { text-align: center; font-size: 10px; font-weight: 700; color: #aeaeb2; padding: 6px 0; }
-.cal-day { aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; cursor: pointer; transition: background 0.15s; position: relative; color: #3c3c43; }
+.cal-day {
+  aspect-ratio: 1; border-radius: 8px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: background 0.15s; position: relative; color: #3c3c43;
+  min-height: 36px;
+}
 .cal-day:hover { background: #fdf2f8; }
 .cal-day.today { background: #db2777; color: #fff !important; font-weight: 700; }
 .cal-day.has-exam::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: #db2777; }
@@ -399,39 +479,121 @@ body {
 .cal-day.sun { color: #dc2626; }
 .cal-day.sat { color: #2563eb; }
 .exam-list-section { margin-top: 14px; }
-.exam-item { background: #fff; border: 1px solid #f0f9ff; border-left: 3px solid #0284c7; border-radius: 12px; padding: 10px 12px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.exam-item { background: #fff; border: 1px solid #f0f9ff; border-left: 3px solid #0284c7; border-radius: 12px; padding: 12px 12px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 56px; }
 .exam-title { font-size: 13px; font-weight: 600; color: #1d1d1f; }
 .exam-date  { font-size: 11px; color: #aeaeb2; margin-top: 2px; }
 
 /* ── 모달 ── */
-.modal-bg { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 600; align-items: center; justify-content: center; }
+.modal-bg { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 600; align-items: flex-end; justify-content: center; }
 .modal-bg.open { display: flex; }
-.modal-box { background: #fff; border-radius: 18px; padding: 1.6rem; width: min(360px, 90vw); box-shadow: 0 20px 60px rgba(0,0,0,0.18); }
+.modal-box {
+  background: #fff; border-radius: 24px 24px 0 0; padding: 1.6rem;
+  width: 100%; max-width: 500px;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.18);
+  padding-bottom: max(1.6rem, calc(1rem + env(safe-area-inset-bottom)));
+}
 .modal-title { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
-.modal-row { display: flex; gap: 8px; flex-wrap: wrap; }
-.color-opts { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
-.color-opt { width: 24px; height: 24px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s; }
+.modal-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.color-opts { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
+.color-opt { width: 30px; height: 30px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s; }
 .color-opt.sel { border-color: #1d1d1f; }
 
 /* ── 반응형 ── */
-@media (max-width: 800px) {
-  .nav-grid { grid-template-columns: repeat(2,1fr); }
-  .quick-stats { grid-template-columns: repeat(2,1fr); }
+@media (max-width: 900px) {
+  .nav-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 700px) {
+  .nav-grid { grid-template-columns: repeat(4, 1fr); gap: 7px; }
+  .quick-stats { grid-template-columns: repeat(2, 1fr); }
   .bottom-row { grid-template-columns: 1fr; }
   .cc-form-grid { grid-template-columns: 1fr 1fr; }
-  .cc-mini-stats { grid-template-columns: repeat(3,1fr); }
 }
-@media (max-width: 500px) {
-  .nav-grid { grid-template-columns: repeat(2,1fr); }
-  .nav-card { padding: 0.9rem 0.8rem; }
+@media (max-width: 520px) {
+  .wrap { padding: 1rem 0.75rem 5rem; }
+
+  /* 헤더 조정 */
+  .brand-name { font-size: 13px; }
+  .header-badge { font-size: 9px; padding: 3px 8px; }
+  .header-badge .dot-green { display: none; }
+
+  /* 환영 바 세로 정렬 */
+  .welcome-bar { flex-direction: column; align-items: flex-start; gap: 8px; padding: 1rem 1.1rem; }
+  .welcome-date-box { text-align: left; }
+  .welcome-date { font-size: 1.2rem; }
+  .welcome-left { gap: 10px; }
+  .welcome-avatar { width: 42px; height: 42px; font-size: 18px; }
+  .welcome-greeting { font-size: 1rem; }
+
+  /* 메뉴 그리드 — 모바일 2열 */
+  .nav-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .nav-card { min-height: 100px; padding: 1rem 0.9rem; }
+  .nav-title { font-size: 13px; }
+  .nav-desc { font-size: 10px; display: none; }  /* 설명 숨김으로 카드 높이 절약 */
+  .nav-icon { width: 36px; height: 36px; font-size: 17px; }
+  .nav-arrow { right: 10px; }
+
+  /* 통계 */
+  .quick-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .qs-num { font-size: 1.1rem; }
+  .qs-card { padding: 0.8rem; gap: 8px; }
+
+  /* 패널 풀스크린 */
+  .page-panel { width: 100vw !important; border-radius: 0; }
+
+  /* 폼 세로 배치 */
   .cc-form-grid { grid-template-columns: 1fr; }
   .cc-form-grid2 { grid-template-columns: 1fr; }
+
+  /* 수업카드 검색 */
+  .cc-search-inp { width: 140px; }
+
+  /* 모달 */
+  .modal-box { border-radius: 20px 20px 0 0; }
+
+  /* 시험 */
+  .form-row { flex-direction: column; }
+  .form-row .form-input,
+  .form-row .form-select,
+  .form-row .btn-primary { width: 100%; }
+
+  /* 수업카드 우측 배지 — 좁은 화면에서 숨김 */
+  .cc-att-badge { display: none; }
+
+  /* 주간업무 */
+  .week-tabs { gap: 4px; }
+  .wtab { font-size: 12px; padding: 8px 12px; }
+
+  /* 미니패널 */
+  .mini-panel { padding: 1rem; }
+  .notice-preview-title { font-size: 11px; }
+
+  /* 통계 칩 */
+  .cc-mini-stats { gap: 6px; }
+  .cc-mini-stat-num { font-size: 1.1rem; }
 }
+
+@media (max-width: 360px) {
+  .nav-grid { gap: 6px; }
+  .nav-card { padding: 0.85rem 0.75rem; min-height: 90px; }
+  .nav-title { font-size: 12px; }
+  .qs-card { flex-direction: column; text-align: center; gap: 4px; padding: 0.7rem 0.5rem; }
+  .qs-num { font-size: 1rem; }
+}
+
+/* 기타 유틸 */
 .divider { height: 1px; background: #fce7f3; margin: 14px 0; }
 .section-label { font-size: 10px; font-weight: 700; color: #aeaeb2; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
-
-/* 로딩 스피너 */
 .cc-loading { text-align: center; padding: 2rem; color: #aeaeb2; font-size: 12px; }
+
+/* 로그아웃 버튼 */
+.logout-btn {
+  padding: 7px 14px; min-height: 36px;
+  background: transparent; border: 1.5px solid #f4c8d4;
+  border-radius: 20px; font-family: inherit; font-size: 12px; font-weight: 600;
+  color: #e8375a; cursor: pointer; white-space: nowrap;
+  transition: background 0.15s;
+}
+.logout-btn:hover, .logout-btn:active { background: #fceef2; }
 </style>
 </head>
 <body>
@@ -446,9 +608,9 @@ body {
     </div>
     <span class="brand-name">베타과학학원</span>
   </a>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <div class="header-badge"><span class="dot-green"></span>SYSTEM ONLINE</div>
-    <button onclick="doLogout()" style="padding:6px 14px;background:transparent;border:1.5px solid #f4c8d4;border-radius:20px;font-family:inherit;font-size:11px;font-weight:600;color:#e8375a;cursor:pointer;" onmouseover="this.style.background='#fceef2'" onmouseout="this.style.background='transparent'">로그아웃</button>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-green"></span>ONLINE</div>
+    <button class="logout-btn" onclick="doLogout()">로그아웃</button>
   </div>
 </header>
 
@@ -590,8 +752,8 @@ body {
     </div>
     <div class="section-label">업무 추가</div>
     <div class="form-row">
-      <input class="form-input" type="text" id="task-inp" placeholder="할 일을 입력하세요" style="min-width:160px;">
-      <select class="form-select" id="task-pri" style="min-width:80px;">
+      <input class="form-input" type="text" id="task-inp" placeholder="할 일을 입력하세요">
+      <select class="form-select" id="task-pri" style="min-width:90px;">
         <option value="높음">🔴 높음</option><option value="보통" selected>🟡 보통</option><option value="낮음">🟢 낮음</option>
       </select>
       <button class="btn-primary" onclick="addTask()">추가</button>
@@ -601,14 +763,10 @@ body {
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     문제은행 패널 (학년 + 내신 추가)
-══════════════════════════════════════ -->
+<!-- 문제은행 패널 -->
 <div class="page-panel" id="panel-qbank">
   <div class="panel-bar"><span class="panel-bar-title">📝 문제은행</span><button class="close-btn" onclick="closePanel()">✕</button></div>
   <div class="panel-body">
-
-    <!-- 과목 필터 -->
     <div class="filter-chips" id="qbank-subj-chips">
       <button class="fchip on" onclick="setQFilter('전체',this)">전체</button>
       <button class="fchip" onclick="setQFilter('통합과학',this)">통합과학</button>
@@ -618,8 +776,6 @@ body {
       <button class="fchip" onclick="setQFilter('지학',this)">지학</button>
       <button class="fchip" onclick="setQFilter('내신',this)">내신</button>
     </div>
-
-    <!-- 학년 필터 -->
     <div class="filter-chips grade-chip-row" id="qbank-grade-chips">
       <button class="fchip on" onclick="setQGradeFilter('전체',this)">학년 전체</button>
       <button class="fchip" onclick="setQGradeFilter('중1',this)">중1</button>
@@ -629,39 +785,34 @@ body {
       <button class="fchip" onclick="setQGradeFilter('고2',this)">고2</button>
       <button class="fchip" onclick="setQGradeFilter('고3',this)">고3</button>
     </div>
-
     <div class="qbank-form">
       <div class="section-label">문제 추가</div>
-      <div class="form-row" style="margin-bottom:8px;">
+      <div class="form-row" style="flex-wrap:wrap;">
         <select class="form-select" id="q-subj">
           <option>통합과학</option><option>화학</option><option>생물</option>
           <option>물리</option><option>지학</option><option>내신</option>
         </select>
-        <select class="form-select" id="q-grade" style="min-width:90px;">
+        <select class="form-select" id="q-grade">
           <option value="">학년선택</option>
           <option>중1</option><option>중2</option><option>중3</option>
           <option>고1</option><option>고2</option><option>고3</option>
         </select>
-        <input class="form-input" type="text" id="q-unit" placeholder="단원명">
+        <input class="form-input" type="text" id="q-unit" placeholder="단원명" style="min-width:120px;">
         <select class="form-select" id="q-diff"><option value="상">난이도 상</option><option value="중" selected>난이도 중</option><option value="하">난이도 하</option></select>
         <select class="form-select" id="q-type"><option>OX</option><option>4지선다</option><option>마스터</option></select>
       </div>
-      <textarea class="form-textarea" id="q-text" placeholder="문제 내용을 입력하세요..." style="min-height:60px;"></textarea>
+      <textarea class="form-textarea" id="q-text" placeholder="문제 내용을 입력하세요..." style="min-height:70px;"></textarea>
       <div style="margin-top:8px;"><button class="btn-primary" onclick="addQBank()">문제 등록</button></div>
     </div>
     <div class="qbank-list" id="qbank-list"></div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     개념정리 패널 (학년 + 내신 추가)
-══════════════════════════════════════ -->
+<!-- 개념정리 패널 -->
 <div class="page-panel" id="panel-concept">
   <div class="panel-bar"><span class="panel-bar-title">📚 개념정리 창고</span><button class="close-btn" onclick="closePanel()">✕</button></div>
   <div class="panel-body">
     <input class="concept-search" type="text" id="concept-search" placeholder="개념 검색..." oninput="filterConcepts()">
-
-    <!-- 과목 필터 -->
     <div class="filter-chips" id="concept-subj-chips">
       <button class="fchip on" onclick="setConceptFilter('전체',this)">전체</button>
       <button class="fchip" onclick="setConceptFilter('통합과학',this)">통합과학</button>
@@ -671,8 +822,6 @@ body {
       <button class="fchip" onclick="setConceptFilter('지학',this)">지학</button>
       <button class="fchip" onclick="setConceptFilter('내신',this)">내신</button>
     </div>
-
-    <!-- 학년 필터 -->
     <div class="filter-chips grade-chip-row" id="concept-grade-chips">
       <button class="fchip on" onclick="setConceptGradeFilter('전체',this)">학년 전체</button>
       <button class="fchip" onclick="setConceptGradeFilter('중1',this)">중1</button>
@@ -682,20 +831,19 @@ body {
       <button class="fchip" onclick="setConceptGradeFilter('고2',this)">고2</button>
       <button class="fchip" onclick="setConceptGradeFilter('고3',this)">고3</button>
     </div>
-
     <div class="qbank-form">
       <div class="section-label">개념 추가</div>
-      <div class="form-row" style="margin-bottom:8px;">
+      <div class="form-row" style="flex-wrap:wrap;">
         <select class="form-select" id="con-subj">
           <option>통합과학</option><option>화학</option><option>생물</option>
           <option>물리</option><option>지학</option><option>내신</option>
         </select>
-        <select class="form-select" id="con-grade" style="min-width:90px;">
+        <select class="form-select" id="con-grade">
           <option value="">학년선택</option>
           <option>중1</option><option>중2</option><option>중3</option>
           <option>고1</option><option>고2</option><option>고3</option>
         </select>
-        <input class="form-input" type="text" id="con-title" placeholder="개념 제목">
+        <input class="form-input" type="text" id="con-title" placeholder="개념 제목" style="min-width:150px;">
       </div>
       <textarea class="form-textarea" id="con-content" placeholder="개념 내용을 입력하세요..."></textarea>
       <div style="margin-top:8px;"><button class="btn-primary" onclick="addConcept()">저장</button></div>
@@ -704,24 +852,18 @@ body {
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     수업카드 패널 (학생 실시간 + 학년 자동표시 + 내신)
-══════════════════════════════════════ -->
+<!-- 수업카드 패널 -->
 <div class="page-panel" id="panel-classcard">
   <div class="panel-bar">
     <span class="panel-bar-title">🗂️ 수업카드</span>
     <button class="close-btn" onclick="closePanel()">✕</button>
   </div>
   <div class="panel-body">
-
-    <!-- 통계 -->
     <div class="cc-mini-stats" id="cc-mini-stats">
       <div class="cc-mini-stat"><div class="cc-mini-stat-num" id="cc-stat-total">—</div><div class="cc-mini-stat-lbl">전체 수업카드</div></div>
       <div class="cc-mini-stat"><div class="cc-mini-stat-num" id="cc-stat-month">—</div><div class="cc-mini-stat-lbl">이번달</div></div>
-      <div class="cc-mini-stat"><div class="cc-mini-stat-num" id="cc-stat-avg">—</div><div class="cc-mini-stat-lbl">평균 테스트 점수</div></div>
+      <div class="cc-mini-stat"><div class="cc-mini-stat-num" id="cc-stat-avg">—</div><div class="cc-mini-stat-lbl">평균 점수</div></div>
     </div>
-
-    <!-- 필터 바 -->
     <div class="cc-filter-bar">
       <button class="cc-tab on" onclick="setCCSubjFilter('전체',this)">전체</button>
       <button class="cc-tab" onclick="setCCSubjFilter('통합과학',this)">통합과학</button>
@@ -730,16 +872,13 @@ body {
       <button class="cc-tab" onclick="setCCSubjFilter('물리',this)">물리</button>
       <button class="cc-tab" onclick="setCCSubjFilter('지학',this)">지학</button>
       <button class="cc-tab" onclick="setCCSubjFilter('내신',this)">내신</button>
-      <input class="cc-search-inp" type="text" id="cc-search" placeholder="학생명 또는 수업 내용 검색..." oninput="renderClassCards()">
-      <button class="cc-write-btn" onclick="toggleCCForm()">+ 수업카드 작성</button>
+      <input class="cc-search-inp" type="text" id="cc-search" placeholder="학생명 검색..." oninput="renderClassCards()">
+      <button class="cc-write-btn" onclick="toggleCCForm()">+ 작성</button>
     </div>
 
-    <!-- 작성 폼 -->
     <div class="cc-form-box" id="cc-form-box" style="display:none;">
       <div class="cc-form-title">📝 수업카드 작성</div>
-
       <div class="cc-form-grid">
-        <!-- 학생 선택 + 학년 자동표시 -->
         <div>
           <span class="cc-label">학생 선택 *</span>
           <select class="cc-sel" id="cc-student" onchange="onStudentChange()">
@@ -747,16 +886,11 @@ body {
           </select>
           <div id="cc-student-grade-display" class="student-grade-info" style="display:none;"></div>
         </div>
-        <!-- 과목 (내신 포함) -->
         <div>
           <span class="cc-label">과목 *</span>
           <select class="cc-sel" id="cc-subj">
-            <option>통합과학</option>
-            <option>화학</option>
-            <option>생물</option>
-            <option>물리</option>
-            <option>지학</option>
-            <option>내신</option>
+            <option>통합과학</option><option>화학</option><option>생물</option>
+            <option>물리</option><option>지학</option><option>내신</option>
           </select>
         </div>
         <div>
@@ -764,7 +898,6 @@ body {
           <input class="cc-inp" type="text" id="cc-teacher" placeholder="선생님 이름">
         </div>
       </div>
-
       <div class="cc-form-grid">
         <div>
           <span class="cc-label">수업 날짜 *</span>
@@ -782,54 +915,41 @@ body {
         <div>
           <span class="cc-label">과제 완성도</span>
           <select class="cc-sel" id="cc-hw">
-            <option value="높음">높음</option>
-            <option value="보통" selected>보통</option>
-            <option value="낮음">낮음</option>
-            <option value="-">-</option>
+            <option value="높음">높음</option><option value="보통" selected>보통</option>
+            <option value="낮음">낮음</option><option value="-">-</option>
           </select>
         </div>
       </div>
-
       <div class="cc-form-grid2">
         <div>
           <span class="cc-label">수업 태도</span>
           <select class="cc-sel" id="cc-attitude">
-            <option value="적극적">적극적</option>
-            <option value="보통" selected>보통</option>
-            <option value="산만">산만</option>
+            <option value="적극적">적극적</option><option value="보통" selected>보통</option><option value="산만">산만</option>
           </select>
         </div>
         <div>
           <span class="cc-label">숙제 완료</span>
           <select class="cc-sel" id="cc-homework-done">
-            <option value="-">-</option>
-            <option value="완료">완료</option>
-            <option value="미완료">미완료</option>
-            <option value="부분완료">부분완료</option>
+            <option value="-">-</option><option value="완료">완료</option>
+            <option value="미완료">미완료</option><option value="부분완료">부분완료</option>
           </select>
         </div>
       </div>
-
       <div style="margin-bottom:8px;">
         <span class="cc-label">수업 내용 *</span>
-        <textarea class="cc-textarea" id="cc-content" placeholder="오늘 진행한 수업 내용을 자세히 작성해주세요..."></textarea>
+        <textarea class="cc-textarea" id="cc-content" placeholder="오늘 진행한 수업 내용을 작성해주세요..."></textarea>
       </div>
-
       <div style="margin-bottom:8px;">
         <span class="cc-label">과제 내용 (선택)</span>
-        <textarea class="cc-textarea" id="cc-homework" placeholder="오늘 부여한 과제 내용을 작성해주세요..." style="min-height:50px;"></textarea>
+        <textarea class="cc-textarea" id="cc-homework" placeholder="오늘 부여한 과제 내용을 작성해주세요..." style="min-height:60px;"></textarea>
       </div>
-
       <div class="cc-form-actions">
         <button class="btn-secondary" onclick="toggleCCForm()">취소</button>
         <button class="cc-write-btn" onclick="saveClassCard()">수업카드 저장</button>
       </div>
     </div>
 
-    <!-- 수업카드 목록 -->
-    <div id="cc-list-wrap">
-      <div class="cc-loading">불러오는 중...</div>
-    </div>
+    <div id="cc-list-wrap"><div class="cc-loading">불러오는 중...</div></div>
   </div>
 </div>
 
@@ -849,7 +969,7 @@ body {
       <div class="section-label">시험 일정 추가</div>
       <div class="form-row">
         <input class="form-input" type="text" id="exam-title-inp" placeholder="시험명 (예: 중간고사 물리)">
-        <input class="form-input" type="date" id="exam-date-inp" style="min-width:140px;">
+        <input class="form-input" type="date" id="exam-date-inp">
       </div>
       <div class="form-row" style="margin-top:6px;">
         <input class="form-input" type="text" id="exam-note-inp" placeholder="메모 (선택)">
@@ -869,17 +989,18 @@ body {
   </div>
 </div>
 
-<!-- 시간표 모달 -->
+<!-- 시간표 모달 (바텀시트 스타일) -->
 <div class="modal-bg" id="tt-modal">
   <div class="modal-box">
     <div class="modal-title">수업 추가</div>
-    <div class="form-row" style="margin-bottom:8px;">
-      <input class="form-input" type="text" id="tt-class-inp" placeholder="수업명 (예: 중2 물리)">
+    <div style="margin-bottom:10px;">
+      <input class="form-input" type="text" id="tt-class-inp" placeholder="수업명 (예: 중2 물리)" style="width:100%;">
     </div>
+    <div class="section-label">색상 선택</div>
     <div class="color-opts" id="tt-color-opts"></div>
-    <div class="modal-row" style="margin-top:12px;">
-      <button class="btn-primary" onclick="saveTTCell()">저장</button>
-      <button class="btn-secondary" onclick="closeTTModal()">취소</button>
+    <div class="modal-row">
+      <button class="btn-primary" style="flex:1;" onclick="saveTTCell()">저장</button>
+      <button class="btn-secondary" style="flex:1;" onclick="closeTTModal()">취소</button>
     </div>
   </div>
 </div>
@@ -971,8 +1092,8 @@ function renderNotices() {
     <div class="notice-item">
       <div class="notice-head" onclick="toggleNotice('${n.id}')">
         <span class="notice-tag nt-${n.type}">${n.type}</span>
-        <span style="font-size:12px;font-weight:600;color:#1d1d1f;flex:1;">${esc(n.title)}</span>
-        <span style="font-size:10px;color:#aeaeb2;margin-right:8px;">${fmtDateStr(n.createdAt)}</span>
+        <span style="font-size:13px;font-weight:600;color:#1d1d1f;flex:1;">${esc(n.title)}</span>
+        <span style="font-size:10px;color:#aeaeb2;margin-right:4px;">${fmtDateStr(n.createdAt)}</span>
         <button class="notice-del" onclick="event.stopPropagation();delNotice('${n.id}')">✕</button>
       </div>
       <div class="notice-content-box" id="nb-${n.id}">
@@ -1058,11 +1179,8 @@ window.clearDoneTasks = async () => {
   catch(e) { alert('오류: '+e.message); }
 };
 
-// ══════════════════════════════════════
-// 문제은행 (학년 필터 추가)
-// ══════════════════════════════════════
+// ── 문제은행 ──
 let qbData=[], qFilter='전체', qGradeFilter='전체';
-
 async function loadQBank() {
   try {
     const snap=await getDocs(query(collection(db,'qbank'),orderBy('createdAt','desc')));
@@ -1070,7 +1188,6 @@ async function loadQBank() {
   } catch { qbData=[]; }
   renderQBank();
 }
-
 function renderQBank() {
   let list = qFilter==='전체' ? qbData : qbData.filter(q=>q.subject===qFilter);
   if (qGradeFilter !== '전체') list = list.filter(q=>(q.grade||'')=== qGradeFilter);
@@ -1089,21 +1206,16 @@ function renderQBank() {
       <div class="qbank-q">${esc(q.text)}</div>
     </div>`).join('');
 }
-
 window.setQFilter = (f, el) => {
   qFilter=f;
   document.querySelectorAll('#qbank-subj-chips .fchip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  renderQBank();
+  el.classList.add('on'); renderQBank();
 };
-
 window.setQGradeFilter = (f, el) => {
   qGradeFilter=f;
   document.querySelectorAll('#qbank-grade-chips .fchip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  renderQBank();
+  el.classList.add('on'); renderQBank();
 };
-
 window.addQBank = async () => {
   const text=document.getElementById('q-text').value.trim();
   if(!text) return alert('문제 내용을 입력하세요');
@@ -1126,11 +1238,8 @@ window.delQ = async id => {
   catch(e) { alert('삭제 실패: '+e.message); }
 };
 
-// ══════════════════════════════════════
-// 개념정리 (학년 필터 추가)
-// ══════════════════════════════════════
+// ── 개념정리 ──
 let conceptData=[], conceptFilter='전체', conceptGradeFilter='전체', conceptSearch='';
-
 async function loadConcepts() {
   try {
     const snap=await getDocs(query(collection(db,'concepts'),orderBy('createdAt','desc')));
@@ -1138,7 +1247,6 @@ async function loadConcepts() {
   } catch { conceptData=[]; }
   renderConcepts();
 }
-
 function renderConcepts() {
   let list=conceptData;
   if(conceptFilter!=='전체') list=list.filter(c=>c.subject===conceptFilter);
@@ -1157,25 +1265,18 @@ function renderConcepts() {
       <div class="concept-body" id="cb-${c.id}"><div class="concept-text">${esc(c.content||'')}</div></div>
     </div>`).join('');
 }
-
 window.toggleConcept=id=>{ const b=document.getElementById('cb-'+id); if(b) b.classList.toggle('open'); };
-
 window.setConceptFilter=(f,el)=>{
   conceptFilter=f;
   document.querySelectorAll('#concept-subj-chips .fchip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  renderConcepts();
+  el.classList.add('on'); renderConcepts();
 };
-
 window.setConceptGradeFilter=(f,el)=>{
   conceptGradeFilter=f;
   document.querySelectorAll('#concept-grade-chips .fchip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  renderConcepts();
+  el.classList.add('on'); renderConcepts();
 };
-
 window.filterConcepts=()=>{ conceptSearch=document.getElementById('concept-search').value; renderConcepts(); };
-
 window.addConcept = async () => {
   const title=document.getElementById('con-title').value.trim();
   if(!title) return alert('제목을 입력하세요');
@@ -1196,18 +1297,13 @@ window.delConcept = async id => {
   catch(e) { alert('삭제 실패: '+e.message); }
 };
 
-// ══════════════════════════════════════
-// 수업카드 (학생 실시간 로드 + 학년 자동표시)
-// ══════════════════════════════════════
+// ── 수업카드 ──
 let ccData = [], ccSubjFilter = '전체', studentList = [];
-
-// students 컬렉션에서 실시간으로 학생 목록 불러오기
 async function loadStudentList() {
   try {
     const snap = await getDocs(query(collection(db,'students'), orderBy('name','asc')));
     studentList = [];
     snap.forEach(d => studentList.push({id:d.id, ...d.data()}));
-
     const sel = document.getElementById('cc-student');
     if (!studentList.length) {
       sel.innerHTML = '<option value="">등록된 학생 없음</option>';
@@ -1220,16 +1316,12 @@ async function loadStudentList() {
       const label = grade ? `${displayName} (${grade})` : displayName;
       return `<option value="${s.id}" data-grade="${esc(grade)}" data-subject="${esc(subject)}" data-name="${esc(displayName)}">${esc(label)}</option>`;
     }).join('');
-
     onStudentChange();
   } catch(e) {
     console.error('학생 목록 로드 실패:', e);
     document.getElementById('cc-student').innerHTML = '<option value="">로드 실패</option>';
   }
 }
-
-// 학생 선택 시 학년 자동표시
-// 학생 선택 시 학년 + 과목 자동표시
 window.onStudentChange = function() {
   const sel = document.getElementById('cc-student');
   const opt = sel.options[sel.selectedIndex];
@@ -1246,7 +1338,6 @@ window.onStudentChange = function() {
     display.style.display = 'none';
   }
 };
-
 async function loadClassCards() {
   document.getElementById('cc-list-wrap').innerHTML = '<div class="cc-loading">불러오는 중...</div>';
   try {
@@ -1260,7 +1351,6 @@ async function loadClassCards() {
   updateCCStats();
   renderClassCards();
 }
-
 function updateCCStats() {
   setTxt('cc-stat-total', ccData.length+'건');
   const now = new Date();
@@ -1275,7 +1365,6 @@ function updateCCStats() {
     setTxt('cc-stat-avg', '—');
   }
 }
-
 window.renderClassCards = function() {
   const search = (document.getElementById('cc-search')?.value || '').trim().toLowerCase();
   let list = ccData;
@@ -1287,7 +1376,6 @@ window.renderClassCards = function() {
   );
   const wrap = document.getElementById('cc-list-wrap');
   if (!list.length) { wrap.innerHTML='<div class="empty-hint">수업카드가 없습니다</div>'; return; }
-
   wrap.innerHTML = `<div class="cc-list">${list.map(c => {
     const scoreNum = typeof c.score === 'number' ? c.score : -1;
     const scoreBadgeCls = c.scoreNone ? 'cc-chip-score-none' : (scoreNum >= 70 ? 'cc-chip-score' : scoreNum >= 0 ? 'cc-chip-score-bad' : 'cc-chip-score-none');
@@ -1326,27 +1414,19 @@ window.renderClassCards = function() {
     </div>`;
   }).join('')}</div>`;
 };
-
-window.toggleCCCard = id => {
-  const card = document.getElementById('cc-'+id);
-  if (card) card.classList.toggle('open');
-};
-
+window.toggleCCCard = id => { const card = document.getElementById('cc-'+id); if (card) card.classList.toggle('open'); };
 window.setCCSubjFilter = (f, el) => {
   ccSubjFilter = f;
   document.querySelectorAll('#panel-classcard .cc-tab').forEach(t => t.classList.remove('on'));
-  el.classList.add('on');
-  renderClassCards();
+  el.classList.add('on'); renderClassCards();
 };
-
 let ccFormOpen = false;
 window.toggleCCForm = () => {
   ccFormOpen = !ccFormOpen;
   const box = document.getElementById('cc-form-box');
   box.style.display = ccFormOpen ? 'block' : 'none';
-  if (ccFormOpen) box.scrollIntoView({behavior:'smooth', block:'nearest'});
+  if (ccFormOpen) setTimeout(() => box.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
 };
-
 window.toggleScoreNone = () => {
   const checked = document.getElementById('cc-score-none').checked;
   const scoreInp = document.getElementById('cc-score');
@@ -1354,12 +1434,10 @@ window.toggleScoreNone = () => {
   scoreInp.style.opacity = checked ? '0.4' : '1';
   if (checked) scoreInp.value = '';
 };
-
 window.saveClassCard = async () => {
   const studentSel = document.getElementById('cc-student');
   const studentId = studentSel.value;
   const selectedOpt = studentSel.options[studentSel.selectedIndex];
-  // 이름은 "(학년)" 부분 제거
   const studentName = selectedOpt ? (selectedOpt.getAttribute('data-name') || selectedOpt.text) : '';
   const studentGrade = selectedOpt ? (selectedOpt.getAttribute('data-grade') || '') : '';
   const subject = document.getElementById('cc-subj').value;
@@ -1373,19 +1451,16 @@ window.saveClassCard = async () => {
   const attitude = document.getElementById('cc-attitude').value;
   const homeworkDone = document.getElementById('cc-homework-done').value;
   const homeworkContent = document.getElementById('cc-homework').value.trim();
-
   if (!studentId) return alert('학생을 선택하세요');
   if (!teacher) return alert('담당 선생님을 입력하세요');
   if (!classDate) return alert('수업 날짜를 선택하세요');
   if (!content) return alert('수업 내용을 입력하세요');
-
   try {
     await addDoc(collection(db,'classCards'), {
       studentId, studentName, studentGrade, subject, teacher, classDate,
       content, score, scoreNone, homework, attitude,
       homeworkDone, homeworkContent, createdAt: serverTimestamp()
     });
-    // 폼 초기화
     document.getElementById('cc-score').value = '';
     document.getElementById('cc-score-none').checked = false;
     document.getElementById('cc-score').disabled = false;
@@ -1393,14 +1468,11 @@ window.saveClassCard = async () => {
     document.getElementById('cc-content').value = '';
     document.getElementById('cc-homework').value = '';
     document.getElementById('cc-teacher').value = '';
-    const now = new Date();
-    document.getElementById('cc-date').value = now.toISOString().split('T')[0];
+    document.getElementById('cc-date').value = new Date().toISOString().split('T')[0];
     toggleCCForm();
-    await loadClassCards();
-    await loadStats();
+    await loadClassCards(); await loadStats();
   } catch(e) { alert('저장 실패: '+e.message); }
 };
-
 window.delClassCard = async id => {
   if (!confirm('이 수업카드를 삭제할까요?')) return;
   try { await deleteDoc(doc(db,'classCards',id)); await loadClassCards(); await loadStats(); }
@@ -1413,7 +1485,6 @@ const DAYS=['월','화','수','목','금','토'];
 const COLORS=['#fce7f3','#dbeafe','#d1fae5','#fef9c3','#ede9fe','#fff7ed','#f0f9ff','#fdf4ff'];
 const COLORS_DARK=['#db2777','#2563eb','#16a34a','#d97706','#7e22ce','#ea580c','#0284c7','#6d28d9'];
 let ttData={}, ttPending=null, selColor=COLORS[0];
-
 async function buildTimetable() {
   try { const snap=await getDocs(collection(db,'timetable')); ttData={}; snap.forEach(d=>{ ttData[d.id]=d.data(); }); }
   catch {}
@@ -1433,7 +1504,13 @@ function renderTimetable() {
   }
   html+='</tbody>'; tbl.innerHTML=html;
 }
-window.openTTModal=(day,hour)=>{ ttPending={day,hour}; selColor=COLORS[0]; const opts=document.getElementById('tt-color-opts'); opts.innerHTML=COLORS.map((c,i)=>`<div class="color-opt ${i===0?'sel':''}" style="background:${c};border:2px solid ${COLORS_DARK[i]};" data-idx="${i}" onclick="selectTTColor(${i},this)"></div>`).join(''); document.getElementById('tt-class-inp').value=''; document.getElementById('tt-modal').classList.add('open'); };
+window.openTTModal=(day,hour)=>{
+  ttPending={day,hour}; selColor=COLORS[0];
+  const opts=document.getElementById('tt-color-opts');
+  opts.innerHTML=COLORS.map((c,i)=>`<div class="color-opt ${i===0?'sel':''}" style="background:${c};border:2px solid ${COLORS_DARK[i]};" data-idx="${i}" onclick="selectTTColor(${i},this)"></div>`).join('');
+  document.getElementById('tt-class-inp').value='';
+  document.getElementById('tt-modal').classList.add('open');
+};
 window.selectTTColor=(idx,el)=>{ selColor=COLORS[idx]; document.querySelectorAll('.color-opt').forEach(c=>c.classList.remove('sel')); el.classList.add('sel'); };
 window.saveTTCell = async () => {
   if(!ttPending) return;
@@ -1442,7 +1519,11 @@ window.saveTTCell = async () => {
   try { await setDoc(doc(db,'timetable',key),{label,bg:selColor,fg}); ttData[key]={label,bg:selColor,fg}; closeTTModal(); renderTimetable(); }
   catch(e) { alert('저장 실패: '+e.message); }
 };
-window.deleteTTCell = async key => { if(!confirm('삭제할까요?')) return; try { await deleteDoc(doc(db,'timetable',key)); delete ttData[key]; renderTimetable(); } catch(e) { alert('삭제 실패: '+e.message); } };
+window.deleteTTCell = async key => {
+  if(!confirm('삭제할까요?')) return;
+  try { await deleteDoc(doc(db,'timetable',key)); delete ttData[key]; renderTimetable(); }
+  catch(e) { alert('삭제 실패: '+e.message); }
+};
 window.closeTTModal=()=>{ document.getElementById('tt-modal').classList.remove('open'); ttPending=null; };
 
 // ── 시험 일정 ──
@@ -1460,8 +1541,11 @@ window.addExam = async () => {
   try { await addDoc(collection(db,'examSchedules'),{title,date,note,createdAt:serverTimestamp()}); document.getElementById('exam-title-inp').value=''; document.getElementById('exam-date-inp').value=''; document.getElementById('exam-note-inp').value=''; await loadExams(); }
   catch(e) { alert('저장 실패: '+e.message); }
 };
-window.delExam = async id => { if(!confirm('삭제할까요?')) return; try { await deleteDoc(doc(db,'examSchedules',id)); await loadExams(); } catch(e) { alert('삭제 실패: '+e.message); } };
-
+window.delExam = async id => {
+  if(!confirm('삭제할까요?')) return;
+  try { await deleteDoc(doc(db,'examSchedules',id)); await loadExams(); }
+  catch(e) { alert('삭제 실패: '+e.message); }
+};
 function renderCal() {
   const DOWS=['일','월','화','수','목','금','토'];
   document.getElementById('cal-month-label').textContent=`${calYear}년 ${calMonth+1}월`;
@@ -1486,7 +1570,6 @@ function renderCal() {
 }
 window.calPrev=()=>{ calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCal(); };
 window.calNext=()=>{ calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCal(); };
-
 function renderExamList() {
   const el=document.getElementById('exam-list');
   if(!examData.length) { el.innerHTML='<div class="empty-hint">등록된 시험 일정이 없습니다</div>'; return; }
@@ -1523,20 +1606,25 @@ function renderHomeExamPreview() {
   }).join('');
 }
 
-// ── 패널 열기/닫기 ──
+// ── 패널 ──
 let curPanel=null;
 window.openPanel = id => {
   closePanel();
   curPanel=id;
   document.getElementById('overlay').classList.add('open');
   document.getElementById('panel-'+id).classList.add('open');
+  // 패널 열 때 스크롤 막기
+  document.body.style.overflow = 'hidden';
   if (id === 'classcard') loadClassCards();
   if (id === 'timetable') setTimeout(renderTimetable, 50);
 };
 window.closePanel = () => {
   if(curPanel){ document.getElementById('panel-'+curPanel)?.classList.remove('open'); curPanel=null; }
   document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
 };
+// ESC 키로 패널 닫기
+document.addEventListener('keydown', e => { if(e.key==='Escape') closePanel(); });
 
 // ── 유틸 ──
 function setTxt(id,txt){ const e=document.getElementById(id); if(e) e.textContent=txt; }
