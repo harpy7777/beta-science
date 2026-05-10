@@ -8,7 +8,7 @@ import {
   getFirestore, collection, addDoc, deleteDoc,
   doc, query, orderBy, onSnapshot, getDoc
 } from 'firebase/firestore';
-import { Plus, LogOut, Save, Trash2, ChevronDown, SlidersHorizontal, X } from 'lucide-react';
+import { Plus, LogOut, Save, Trash2, ChevronDown, SlidersHorizontal, X, BookOpen } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const db = getFirestore();
@@ -125,7 +125,7 @@ export default function MasterTestPage() {
         testId, subject, grade,
         unitName: unitName || '미지정 단원',
         parts,
-        regDate: new Date().toLocaleString(),
+        regDate: new Date().toLocaleString('ko-KR'),
       });
       toast.success('저장되었습니다!');
       setTimeout(() => window.location.reload(), 1200);
@@ -166,7 +166,6 @@ export default function MasterTestPage() {
     );
   }
 
-  /* 공통 input 스타일 */
   const inputCls = "w-full border border-pink-100 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-pink-400 transition-colors bg-white";
   const selectWrap = "relative";
   const selectCls = `${inputCls} appearance-none pr-8 cursor-pointer`;
@@ -176,9 +175,7 @@ export default function MasterTestPage() {
 
       {/* ── Header ── */}
       <header className="bg-white border-b border-pink-100 sticky top-0 z-50">
-      <div className="w-full px-6 h-14 flex items-center justify-between">
-
-          {/* 로고 */}
+        <div className="w-full px-6 h-14 flex items-center justify-between">
           <div
             className="flex items-center gap-2.5 cursor-pointer"
             onClick={() => router.push('/')}
@@ -193,10 +190,7 @@ export default function MasterTestPage() {
                   stroke="rgba(255,255,255,0.9)" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
               </svg>
             </div>
-            <div>
-              <div className="font-bold text-gray-900 text-sm leading-tight">베타과학학원</div>
-             
-            </div>
+            <div className="font-bold text-gray-900 text-sm leading-tight">베타과학학원</div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -254,7 +248,6 @@ export default function MasterTestPage() {
             기본 정보
           </h2>
 
-          {/* 테스트 ID */}
           <div className="mb-3">
             <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">테스트 ID</label>
             <input
@@ -265,18 +258,13 @@ export default function MasterTestPage() {
             />
           </div>
 
-          {/* 과목 & 학년 */}
           <div className="grid grid-cols-2 gap-3 mb-3">
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
                 과목 <span className="text-pink-500">*</span>
               </label>
               <div className={selectWrap}>
-                <select
-                  value={subject}
-                  onChange={e => setSubject(e.target.value)}
-                  className={selectCls}
-                >
+                <select value={subject} onChange={e => setSubject(e.target.value)} className={selectCls}>
                   <option value="">선택</option>
                   {SUBJECTS.map(s => <option key={s}>{s}</option>)}
                 </select>
@@ -288,11 +276,7 @@ export default function MasterTestPage() {
                 학년 <span className="text-pink-500">*</span>
               </label>
               <div className={selectWrap}>
-                <select
-                  value={grade}
-                  onChange={e => setGrade(e.target.value)}
-                  className={selectCls}
-                >
+                <select value={grade} onChange={e => setGrade(e.target.value)} className={selectCls}>
                   <option value="">선택</option>
                   {GRADES.map(g => <option key={g}>{g}</option>)}
                 </select>
@@ -301,7 +285,6 @@ export default function MasterTestPage() {
             </div>
           </div>
 
-          {/* 단원명 */}
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">단원명</label>
             <input
@@ -317,8 +300,6 @@ export default function MasterTestPage() {
         {/* ── 섹션별 문항 ── */}
         {parts.map((part) => (
           <div key={part.id} className="bg-white border border-pink-100 rounded-2xl p-5 mb-4">
-
-            {/* 섹션 헤더 */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <span
@@ -334,13 +315,11 @@ export default function MasterTestPage() {
               <button
                 onClick={() => removePart(part.id)}
                 className="w-8 h-8 flex items-center justify-center rounded-xl text-red-400 hover:bg-red-50 transition-colors"
-                title="섹션 삭제"
               >
                 <Trash2 size={15} />
               </button>
             </div>
 
-            {/* 섹션명 & 핵심내용 */}
             <div className="space-y-3 mb-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">섹션명</label>
@@ -364,7 +343,6 @@ export default function MasterTestPage() {
               </div>
             </div>
 
-            {/* 정답 입력 */}
             <div className="mb-4">
               <p className="text-xs font-bold text-gray-700 mb-3 uppercase tracking-wide">
                 정답 입력 <span className="text-gray-400 font-normal normal-case">({part.range}번)</span>
@@ -389,7 +367,6 @@ export default function MasterTestPage() {
               </div>
             </div>
 
-            {/* 추가 과제 */}
             <div className="border-t border-pink-50 pt-4">
               <p className="text-xs font-bold text-gray-700 mb-3 uppercase tracking-wide">추가 과제 (오답별)</p>
               <div className="space-y-2.5">
@@ -432,7 +409,7 @@ export default function MasterTestPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="w-full py-4 text-white font-bold rounded-2xl text-base transition-opacity mb-8 flex items-center justify-center gap-2 disabled:opacity-50 hover:opacity-85"
+          className="w-full py-4 text-white font-bold rounded-2xl text-base transition-opacity mb-10 flex items-center justify-center gap-2 disabled:opacity-50 hover:opacity-85"
           style={{ background:'linear-gradient(135deg,#f472b6,#db2777)' }}
         >
           <Save size={18} />
@@ -440,15 +417,15 @@ export default function MasterTestPage() {
         </button>
 
         {/* ── 등록된 테스트 목록 ── */}
-        <div className="border-t-2 border-pink-100 pt-6">
+        <div className="border-t-2 border-pink-100 pt-8">
 
           {/* 목록 헤더 */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="text-xs font-bold text-gray-400 tracking-widest uppercase">등록된 테스트</div>
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-3">
+              <h2 className="text-lg font-black text-gray-800 tracking-tight">등록된 테스트</h2>
               <span
-                className="text-xs font-bold px-2 py-0.5 rounded-full text-white"
-                style={{ background:'#db2777' }}
+                className="text-sm font-bold w-7 h-7 rounded-full flex items-center justify-center text-white shadow-sm"
+                style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
               >
                 {tests.length}
               </span>
@@ -464,8 +441,12 @@ export default function MasterTestPage() {
               <SlidersHorizontal size={13} />
               필터
               {hasFilter && (
-                <span className="w-4 h-4 rounded-full text-white text-xs flex items-center justify-center leading-none"
-                  style={{ background:'#db2777' }}>!</span>
+                <span
+                  className="w-4 h-4 rounded-full text-white text-xs flex items-center justify-center leading-none"
+                  style={{ background:'#db2777' }}
+                >
+                  !
+                </span>
               )}
             </button>
           </div>
@@ -477,11 +458,7 @@ export default function MasterTestPage() {
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">학년</label>
                   <div className={selectWrap}>
-                    <select
-                      value={filterGrade}
-                      onChange={e => setFilterGrade(e.target.value)}
-                      className={selectCls}
-                    >
+                    <select value={filterGrade} onChange={e => setFilterGrade(e.target.value)} className={selectCls}>
                       <option value="">전체</option>
                       {GRADES.map(g => <option key={g}>{g}</option>)}
                     </select>
@@ -491,11 +468,7 @@ export default function MasterTestPage() {
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">과목</label>
                   <div className={selectWrap}>
-                    <select
-                      value={filterSubject}
-                      onChange={e => setFilterSubject(e.target.value)}
-                      className={selectCls}
-                    >
+                    <select value={filterSubject} onChange={e => setFilterSubject(e.target.value)} className={selectCls}>
                       <option value="">전체</option>
                       {SUBJECTS.map(s => <option key={s}>{s}</option>)}
                     </select>
@@ -515,45 +488,98 @@ export default function MasterTestPage() {
             </div>
           )}
 
-          {/* 테스트 카드 목록 */}
-          <div className="space-y-2.5">
-            {filtered.length === 0 ? (
-              <div className="bg-white border border-pink-100 rounded-2xl py-10 text-center text-sm text-gray-400">
-                등록된 테스트가 없습니다
-              </div>
-            ) : filtered.map(t => (
-              <div
-                key={t.fireId}
-                className="bg-white border border-pink-100 rounded-2xl px-4 py-3.5 flex items-center justify-between gap-3 hover:border-pink-200 transition-colors"
-              >
-                {/* 왼쪽: 정보 */}
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-sm text-gray-800 truncate">{t.unitName}</p>
-                  <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                    <span className="text-xs border border-pink-100 rounded-full px-2 py-0.5 text-gray-600 leading-none">
-                      {t.subject}
-                    </span>
-                    <span
-                      className="text-xs font-semibold rounded-full px-2 py-0.5 leading-none"
-                      style={{ background:'#fce7f3', color:'#db2777' }}
-                    >
-                      {t.grade}
-                    </span>
-                  </div>
-                
-                </div>
-                {/* 오른쪽: 삭제 */}
-                <button
-                  onClick={() => handleDelete(t.fireId)}
-                  className="w-9 h-9 flex items-center justify-center rounded-xl text-red-400 hover:bg-red-50 transition-colors flex-shrink-0"
-                  title="삭제"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))}
-          </div>
+          {/* 테스트 테이블 */}
+          {filtered.length === 0 ? (
+            <div className="bg-white border-2 border-dashed border-pink-200 rounded-2xl p-12 text-center">
+              <BookOpen size={44} className="mx-auto mb-4" style={{ color:'#f9a8d4' }} />
+              <div className="font-semibold text-gray-600 mb-2">등록된 테스트가 없습니다</div>
+              <p className="text-sm text-gray-400">위에서 테스트를 생성하고 저장해보세요!</p>
+            </div>
+          ) : (
+            <div className="bg-white border border-pink-100 rounded-2xl overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-pink-100" style={{ background: '#fdf2f8' }}>
+                    <th className="text-left   text-xs font-bold text-gray-500 tracking-wide px-6 py-4">단원명</th>
+                    <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-4 py-4">등록일</th>
+                    <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-4 py-4">등록 상태</th>
+                    <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-4 py-4">학년</th>
+                    <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-4 py-4">과목</th>
+                    <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-4 py-4">총 문항</th>
+                    <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-6 py-4">관리</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((t, idx) => {
+                    const totalQ = t.parts.reduce(
+                      (acc, p) => acc + Object.keys(p.answers).length, 0
+                    );
+                    return (
+                      <tr
+                        key={t.fireId}
+                        className="hover:bg-pink-50/40 transition-colors"
+                        style={{ borderBottom: idx === filtered.length - 1 ? 'none' : '1px solid #f9f0f5' }}
+                      >
+                        {/* 단원명 */}
+                        <td className="px-6 py-5">
+                          <span className="font-bold text-gray-900 text-sm">{t.unitName}</span>
+                        </td>
 
+                        {/* 등록일 */}
+                        <td className="px-4 py-5 text-center">
+                          <span className="text-xs text-gray-600 font-medium whitespace-nowrap">
+                            {t.regDate || '—'}
+                          </span>
+                        </td>
+
+                        {/* 등록 상태 */}
+                        <td className="px-4 py-5 text-center">
+                          <span className="inline-block text-xs px-3 py-1 rounded-full font-semibold bg-green-100 text-green-700">
+                            등록됨
+                          </span>
+                        </td>
+
+                        {/* 학년 */}
+                        <td className="px-4 py-5 text-center">
+                          {t.grade
+                            ? <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-pink-100 text-pink-700">{t.grade}</span>
+                            : <span className="text-xs text-gray-300">—</span>
+                          }
+                        </td>
+
+                        {/* 과목 */}
+                        <td className="px-4 py-5 text-center">
+                          {t.subject
+                            ? <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-blue-100 text-blue-700">{t.subject}</span>
+                            : <span className="text-xs text-gray-300">—</span>
+                          }
+                        </td>
+
+                        {/* 총 문항 */}
+                        <td className="px-4 py-5 text-center">
+                          <span className="text-sm font-black" style={{ color:'#db2777' }}>{totalQ}</span>
+                          <span className="text-xs text-gray-400 ml-1">문항</span>
+                        </td>
+
+                        {/* 관리 */}
+                        <td className="px-6 py-5">
+                          <div className="flex items-center justify-center">
+                            <button
+                              onClick={() => handleDelete(t.fireId)}
+                              className="flex items-center gap-1.5 text-xs font-semibold text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
+                            >
+                              <Trash2 size={13} />
+                              삭제
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </main>
     </div>
