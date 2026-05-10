@@ -528,7 +528,7 @@ export default function MasterTestPage() {
                         {/* 등록일 */}
                         <td className="px-4 py-5 text-center">
                           <span className="text-xs text-gray-600 font-medium whitespace-nowrap">
-                            {t.regDate ? t.regDate.replace(/\.$/, '') : '—'}
+                           {t.regDate ? t.regDate.split('.').slice(0, 3).join('.').trim() : '—'}
                           </span>
                         </td>
 
