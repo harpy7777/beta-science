@@ -82,7 +82,11 @@ export default function TeacherPage() {
               className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
               style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
             >
-              <FlaskConical size={20} className="text-white" />
+              <svg width="15" height="15" viewBox="0 0 18 18" fill="none">
+  <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+  <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"
+    stroke="rgba(255,255,255,0.9)" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
+</svg>
             </div>
             <div>
               <div className="font-bold text-gray-900 text-sm">베타과학학원</div>
@@ -271,41 +275,27 @@ export default function TeacherPage() {
               <div key={exam.id} className="bg-white border border-pink-100 rounded-2xl p-4 hover:border-pink-200 transition-colors">
 
                 {/* 1행: 제목 + 상태 뱃지 */}
-                <div className="flex items-center gap-2 mb-3">
-                  <h3 className="font-bold text-gray-900 truncate flex-1 text-sm">
-                    {exam.title}
-                  </h3>
-                  <span className={`shrink-0 text-xs px-2.5 py-0.5 rounded-full font-semibold ${
-                    exam.isPublished
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-100 text-gray-500'
-                  }`}>
-                    {exam.isPublished ? '게시됨' : '임시저장'}
-                  </span>
-                </div>
-
-                {/* 2행: 학년 + 과목 + 문항 수 */}
-                <div className="flex flex-wrap items-center gap-1.5 pb-3 border-b border-pink-50">
-                  {exam.grade && (
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-pink-100 text-pink-700">
-                      {exam.grade}
-                    </span>
-                  )}
-                  {exam.subject && (
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                      {exam.subject}
-                    </span>
-                  )}
-                  <span className="text-xs text-gray-500">{exam.questions.length}문항</span>
-                  <span className="text-xs text-gray-300">·</span>
-                  <span className="text-xs text-gray-500">
-                    OX {exam.questions.filter(q => q.type === 'ox').length}개
-                  </span>
-                  <span className="text-xs text-gray-300">/</span>
-                  <span className="text-xs text-gray-500">
-                    4지선다 {exam.questions.filter(q => q.type === 'multiple').length}개
-                  </span>
-                </div>
+                <div className="flex flex-wrap items-center gap-1.5 mb-3 pb-3 border-b border-pink-50">
+  <h3 className="font-bold text-gray-900 text-sm mr-1 shrink-0">{exam.title}</h3>
+  <span className={`shrink-0 text-xs px-2.5 py-0.5 rounded-full font-semibold ${exam.isPublished ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+    {exam.isPublished ? '게시됨' : '임시저장'}
+  </span>
+  {exam.grade && (
+    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-pink-100 text-pink-700">
+      {exam.grade}
+    </span>
+  )}
+  {exam.subject && (
+    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+      {exam.subject}
+    </span>
+  )}
+  <span className="text-xs text-gray-400">{exam.questions.length}문항</span>
+  <span className="text-xs text-gray-300">·</span>
+  <span className="text-xs text-gray-400">OX {exam.questions.filter(q => q.type === 'ox').length}개</span>
+  <span className="text-xs text-gray-300">/</span>
+  <span className="text-xs text-gray-400">4지선다 {exam.questions.filter(q => q.type === 'multiple').length}개</span>
+</div>
 
                 {/* 3행: 액션 버튼만 */}
                 <div className="flex items-center justify-end gap-2 pt-3">
