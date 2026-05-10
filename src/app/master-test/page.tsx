@@ -176,7 +176,7 @@ export default function MasterTestPage() {
 
       {/* ── Header ── */}
       <header className="bg-white border-b border-pink-100 sticky top-0 z-50">
-       <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+      <div className="w-full px-6 h-14 flex items-center justify-between">
 
           {/* 로고 */}
           <div
@@ -195,7 +195,7 @@ export default function MasterTestPage() {
             </div>
             <div>
               <div className="font-bold text-gray-900 text-sm leading-tight">베타과학학원</div>
-              <div className="text-xs text-pink-500 leading-tight">마스터테스트 출제</div>
+             
             </div>
           </div>
 
