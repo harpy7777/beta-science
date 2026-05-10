@@ -125,7 +125,7 @@ export default function MasterTestPage() {
         testId, subject, grade,
         unitName: unitName || '미지정 단원',
         parts,
-        regDate: new Date().toLocaleString('ko-KR'),
+        regDate: new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }),
       });
       toast.success('저장되었습니다!');
       setTimeout(() => window.location.reload(), 1200);
@@ -528,7 +528,7 @@ export default function MasterTestPage() {
                         {/* 등록일 */}
                         <td className="px-4 py-5 text-center">
                           <span className="text-xs text-gray-600 font-medium whitespace-nowrap">
-                            {t.regDate || '—'}
+                            {t.regDate ? t.regDate.split(' ')[0] : '—'}
                           </span>
                         </td>
 
