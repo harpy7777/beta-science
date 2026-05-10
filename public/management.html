@@ -176,7 +176,7 @@ select option { background-color: #ffffff !important; color: #1d1d1f !important;
 }
 .search-inp:focus { border-color: #db2777; }
 
-/* ── 카드형 수납 목록 (모바일) ── */
+/* ── 카드형 목록 (모바일 공통) ── */
 .tuition-card-list { display: flex; flex-direction: column; gap: 8px; }
 .tuition-card {
   background: #fff; border: 1px solid #fce7f3; border-radius: 12px;
@@ -211,6 +211,7 @@ select option { background-color: #ffffff !important; color: #1d1d1f !important;
 .badge-orange { background: #ffedd5; color: #9a3412; }
 .badge-teal   { background: #ccfbf1; color: #0f766e; }
 .badge-indigo { background: #e0e7ff; color: #3730a3; }
+.badge-rose   { background: #ffe4e6; color: #be123c; }
 
 /* ── 상담 기록 ── */
 .consult-card {
@@ -222,9 +223,9 @@ select option { background-color: #ffffff !important; color: #1d1d1f !important;
 .consult-meta { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 4px; }
 .consult-body { font-size: 12px; color: #3c3c43; line-height: 1.7; white-space: pre-wrap; margin-top: 6px; padding-top: 6px; border-top: 1px solid #fdf2f8; }
 
-/* ── 보강 스케줄 ── */
+/* ══ 보강 스케줄: 모바일 카드 ══ */
 .makeup-card {
-  background: #fff; border: 1.5px solid #fce7f3; border-radius: 12px;
+  background: #fff; border: 1px solid #fce7f3; border-radius: 12px;
   padding: 12px 14px; margin-bottom: 8px;
   transition: border-color 0.15s;
 }
@@ -244,6 +245,10 @@ select option { background-color: #ffffff !important; color: #1d1d1f !important;
   cursor: pointer; font-family: inherit; min-height: 32px;
 }
 .makeup-done-btn:active { background: #d1fae5; }
+
+/* ══ 보강 데스크탑 테이블 행/헤더: 모바일에서 완전 숨김 ══ */
+.makeup-table-header { display: none; }
+.makeup-row          { display: none; }
 
 /* ── 중간기말 시험 ── */
 .exam-big-card {
@@ -333,39 +338,54 @@ select option { background-color: #ffffff !important; color: #1d1d1f !important;
   font-size: 12px; margin-bottom: 12px;
 }
 
-/* ── 데스크탑 보강 테이블 ── */
+/* ══ 데스크탑 (700px+) ══ */
 @media (min-width: 700px) {
+  .wrap { padding: 1.6rem 1rem 3rem; }
+  .modal-bg { align-items: center; }
+  .modal-box { border-radius: 18px; max-width: 480px; padding: 1.6rem; }
+  .modal-handle { display: none; }
+  .quick-stats { grid-template-columns: repeat(5, 1fr); }
+  .welcome-sub { white-space: nowrap; }
+  .tab-nav-wrap { overflow-x: visible; margin: 0 0 1rem; padding: 0; }
+  .tab-nav { width: auto; flex-wrap: wrap; }
+
+  /* 보강: 카드 숨기고 테이블 표시 */
+  .makeup-card { display: none !important; }
   .makeup-table-header {
     display: flex; align-items: center;
     padding: 7px 14px; border-bottom: 2px solid #fce7f3; margin-bottom: 4px;
   }
-  .mh { font-size: 10px; font-weight: 700; color: #aeaeb2; letter-spacing: 0.05em; text-transform: uppercase; padding: 0 6px; white-space: nowrap; text-align: center; }
-  .mh-name { flex: 1.2; padding-left: 6px; }
-  .mh-grade, .mh-teacher { flex: 1; }
-  .mh-subject, .mh-reason { flex: 1.2; }
-  .mh-date { flex: 1.4; }
-  .mh-note { flex: 1.5; }
-  .mh-actions { flex-shrink: 0; width: 130px; }
   .makeup-row {
+    display: flex; align-items: center;
     background: #fff; border: 1.5px solid #fce7f3; border-radius: 10px;
-    padding: 9px 14px; margin-bottom: 5px; display: flex; align-items: center; transition: border-color 0.15s;
+    padding: 9px 14px; margin-bottom: 5px; transition: border-color 0.15s;
   }
   .makeup-row:hover { border-color: #fbcfe8; }
   .makeup-row.done { opacity: 0.5; }
-  .mc { font-size: 12px; color: #3c3c43; padding: 0 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
-  .mc-name    { flex: 1.2; font-weight: 700; color: #1d1d1f; padding-left: 6px; }
-  .mc-grade, .mc-teacher { flex: 1; color: #6e6e73; }
-  .mc-subject, .mc-reason { flex: 1.2; }
-  .mc-date    { flex: 1.4; color: #6e6e73; }
-  .mc-note    { flex: 1.5; color: #aeaeb2; font-size: 11px; }
-  .mc-actions { flex-shrink: 0; display: flex; gap: 6px; align-items: center; padding-left: 8px; }
-  .makeup-card { display: none; }
-  /* 데스크탑에서 테이블형 튜이션 */
+
+  /* 원비: 카드 숨기고 테이블 표시 */
   .tuition-card-list { display: none; }
   .tuition-table-wrap { display: block !important; }
 }
 
-/* ── 데스크탑 테이블 ── */
+/* ── 보강 테이블 컬럼 공통 ── */
+.mh { font-size: 10px; font-weight: 700; color: #aeaeb2; letter-spacing: 0.05em; text-transform: uppercase; padding: 0 6px; white-space: nowrap; text-align: center; }
+.mh-name { flex: 1.2; padding-left: 6px; text-align: left; }
+.mh-grade, .mh-teacher { flex: 1; }
+.mh-subject, .mh-reason { flex: 1.2; }
+.mh-date { flex: 1.4; }
+.mh-note { flex: 1.5; }
+.mh-actions { flex-shrink: 0; width: 130px; }
+
+.mc { font-size: 12px; color: #3c3c43; padding: 0 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+.mc-name    { flex: 1.2; font-weight: 700; color: #1d1d1f; padding-left: 6px; text-align: left; }
+.mc-grade, .mc-teacher { flex: 1; color: #6e6e73; }
+.mc-subject, .mc-reason { flex: 1.2; }
+.mc-date    { flex: 1.4; color: #6e6e73; }
+.mc-note    { flex: 1.5; color: #aeaeb2; font-size: 11px; }
+.mc-actions { flex-shrink: 0; display: flex; gap: 6px; align-items: center; padding-left: 8px; }
+
+/* ── 데스크탑 원비 테이블 ── */
 .tuition-table-wrap { display: none; overflow-x: auto; }
 .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .data-table th {
@@ -376,18 +396,6 @@ select option { background-color: #ffffff !important; color: #1d1d1f !important;
 .data-table td { padding: 10px 10px; border-bottom: 1px solid #f5f5f7; vertical-align: middle; text-align: center; }
 .data-table tr:last-child td { border-bottom: none; }
 .data-table tr:hover td { background: #fdf2f8; }
-
-/* 데스크탑 */
-@media (min-width: 700px) {
-  .wrap { padding: 1.6rem 1rem 3rem; }
-  .modal-bg { align-items: center; }
-  .modal-box { border-radius: 18px; max-width: 480px; padding: 1.6rem; }
-  .modal-handle { display: none; }
-  .quick-stats { grid-template-columns: repeat(5, 1fr); }
-  .welcome-sub { white-space: nowrap; }
-  .tab-nav-wrap { overflow-x: visible; margin: 0 0 1rem; padding: 0; }
-  .tab-nav { width: auto; flex-wrap: wrap; }
-}
 </style>
 </head>
 <body>
@@ -405,7 +413,7 @@ select option { background-color: #ffffff !important; color: #1d1d1f !important;
     <span class="brand-name">베타과학학원</span>
   </a>
   <div style="display:flex;align-items:center;gap:7px;">
-    <div class="header-badge"><span class="dot-green"></span><span class="badge-online-txt">ONLINE</span></div>
+    <div class="header-badge"><span class="dot-green"></span><span>ONLINE</span></div>
     <button class="logout-btn" onclick="doLogout()">로그아웃</button>
   </div>
 </header>
@@ -493,10 +501,8 @@ select option { background-color: #ffffff !important; color: #1d1d1f !important;
         <button class="fchip" onclick="setTFilter('분납',this)">분납</button>
       </div>
       <input class="search-inp" type="text" id="tuition-search" placeholder="🔍 학생명 검색..." oninput="renderTuition()" style="margin-bottom:12px;">
-
       <!-- 모바일: 카드형 -->
       <div class="tuition-card-list" id="tuition-card-list"></div>
-
       <!-- 데스크탑: 테이블형 -->
       <div class="tuition-table-wrap">
         <table class="data-table">
@@ -610,8 +616,14 @@ select option { background-color: #ffffff !important; color: #1d1d1f !important;
       <div class="form-group">
         <label class="form-label">과목</label>
         <select class="form-select" id="t-subject">
-          <option>통합과학</option><option>화학</option><option>생물</option>
-          <option>물리</option><option>지학</option><option>전체</option><option>기타</option>
+          <option>통합과학</option>
+          <option>화학</option>
+          <option>내신</option>
+          <option>생물</option>
+          <option>물리</option>
+          <option>지학</option>
+          <option>전체</option>
+          <option>기타</option>
         </select>
       </div>
     </div>
@@ -704,8 +716,12 @@ select option { background-color: #ffffff !important; color: #1d1d1f !important;
       <div class="form-group">
         <label class="form-label">과목 *</label>
         <select class="form-select" id="m-subject">
-          <option>통합과학</option><option>화학</option><option>생물</option>
-          <option>물리</option><option>지학</option>
+          <option>통합과학</option>
+          <option>화학</option>
+          <option>내신</option>
+          <option>생물</option>
+          <option>물리</option>
+          <option>지학</option>
         </select>
       </div>
       <div class="form-group">
@@ -793,8 +809,12 @@ select option { background-color: #ffffff !important; color: #1d1d1f !important;
       <div class="form-group">
         <label class="form-label">과목</label>
         <select class="form-select" id="a-subject">
-          <option>통합과학</option><option>화학</option><option>생물</option>
-          <option>물리</option><option>지학</option>
+          <option>통합과학</option>
+          <option>화학</option>
+          <option>내신</option>
+          <option>생물</option>
+          <option>물리</option>
+          <option>지학</option>
         </select>
       </div>
       <div class="form-group">
@@ -950,7 +970,16 @@ function getGradeBadge(grade){
 
 function getSubjectBadge(subject){
   if(!subject || subject === '—') return `<span class="badge badge-gray">—</span>`;
-  const map = { '통합과학':'badge-green','화학':'badge-blue','생물':'badge-teal','물리':'badge-orange','지학':'badge-indigo','전체':'badge-pink','기타':'badge-gray' };
+  const map = {
+    '통합과학':'badge-green',
+    '화학':'badge-blue',
+    '내신':'badge-rose',
+    '생물':'badge-teal',
+    '물리':'badge-orange',
+    '지학':'badge-indigo',
+    '전체':'badge-pink',
+    '기타':'badge-gray'
+  };
   return `<span class="badge ${map[subject]||'badge-gray'}">${esc(subject)}</span>`;
 }
 
@@ -1173,7 +1202,7 @@ window.renderMakeup = function(){
     return { txt:`${-diff}일 전`, cls:'badge-gray' };
   }
 
-  /* 모바일 카드형 */
+  /* ── 모바일: 카드형 (원비수납과 동일한 스타일) ── */
   const cards = list.map(m => {
     const done = m.status === '완료';
     const dd = getDdayInfo(m);
@@ -1181,7 +1210,7 @@ window.renderMakeup = function(){
     const grade   = student?.grade || student?.gradeLevel || '—';
     return `<div class="makeup-card ${done?'done':''}">
       <div class="makeup-card-top">
-        <span class="makeup-card-name">${done?'✓ ':''}${esc(m.studentName||'—')}</span>
+        <span class="makeup-card-name">${done ? '✓ ' : ''}${esc(m.studentName||'—')}</span>
         <div style="display:flex;align-items:center;gap:6px;">
           <span class="badge ${dd.cls}">${dd.txt}</span>
           <button class="del-btn" onclick="delMakeup('${m.id}')">✕</button>
@@ -1201,7 +1230,7 @@ window.renderMakeup = function(){
     </div>`;
   }).join('');
 
-  /* 데스크탑 테이블형 (헤더 + rows) */
+  /* ── 데스크탑: 테이블형 ── */
   const header = `<div class="makeup-table-header">
     <div class="mh mh-name">학생명</div>
     <div class="mh mh-grade">학년</div>
@@ -1212,6 +1241,7 @@ window.renderMakeup = function(){
     <div class="mh mh-note">메모</div>
     <div class="mh mh-actions"></div>
   </div>`;
+
   const rows = list.map(m => {
     const done = m.status === '완료';
     const dd = getDdayInfo(m);
@@ -1233,6 +1263,7 @@ window.renderMakeup = function(){
     </div>`;
   }).join('');
 
+  /* 카드 + 테이블 함께 렌더 — CSS로 각 화면에서 숨김/표시 */
   el.innerHTML = cards + header + rows;
 };
 
