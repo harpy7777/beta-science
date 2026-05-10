@@ -13,6 +13,20 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+function formatDate(ts: unknown): string {
+  if (!ts) return '—';
+  try {
+    const date =
+      typeof (ts as any).toDate === 'function'
+        ? (ts as any).toDate()
+        : new Date(ts as any);
+    if (isNaN(date.getTime())) return '—';
+    return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  } catch {
+    return '—';
+  }
+}
+
 export default function TeacherPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
@@ -294,15 +308,9 @@ export default function TeacherPage() {
 
                       {/* 게시일 */}
                       <td className="px-4 py-5 text-center">
-                        {exam.regDate
-                          ? <span className="text-xs text-gray-600 font-medium">
-                              {(typeof (exam.regDate as any).toDate === 'function'
-                                ? (exam.regDate as any).toDate()
-                                : new Date(exam.regDate as any)
-                              ).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })}
-                            </span>
-                          : <span className="text-xs text-gray-300">—</span>
-                        }
+                        <span className="text-xs text-gray-600 font-medium">
+                          {formatDate(exam.regDate)}
+                        </span>
                       </td>
 
                       {/* 게시 상태 */}
