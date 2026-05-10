@@ -9,42 +9,36 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --pink:#ec4899;--pink-lt:#fdf2f8;--pink-dk:#be185d;
-  --mw:1200px;--bg:#fef7fb;--wh:#fff;
-  --tx:#1e293b;--mt:#94a3b8;--bd:#f0e4ec;--r:12px;
-  --ok:#10b981;--ok-lt:#f0fdf4;--ng:#ef4444;--ng-lt:#fef2f2;--wn:#f59e0b;--wn-lt:#fffbeb;
-}
-body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-size:13px;background:var(--bg);color:var(--tx);min-height:100vh;visibility:hidden}
+:root{--pink:#ec4899;--pink-lt:#fdf2f8;--pink-dk:#be185d;--mw:1200px;--bg:#fef7fb;--wh:#fff;--tx:#1e293b;--mt:#94a3b8;--bd:#f0e4ec;--r:12px;--ok:#10b981;--ok-lt:#f0fdf4;--ng:#ef4444;--ng-lt:#fef2f2;--wn:#f59e0b;--wn-lt:#fffbeb}
+body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-size:13px;background:var(--bg);color:var(--tx);min-height:100vh;visibility:hidden;overflow-x:hidden}
 .app-wrapper{max-width:var(--mw);margin:0 auto;display:flex;flex-direction:column;min-height:100vh}
-
-/* ══ 탑바 ══ */
-.topbar{background:var(--wh);border-bottom:1px solid var(--bd);padding:0 16px;display:flex;align-items:center;gap:10px;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(236,72,153,.06)}
+.topbar{background:var(--wh);border-bottom:1px solid var(--bd);padding:0 28px;display:flex;align-items:center;gap:12px;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(236,72,153,.06);flex-wrap:nowrap}
 .logo-area{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0}
 .logo-icon{width:28px;height:28px;background:linear-gradient(135deg,#f472b6 0%,#db2777 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(244,114,182,.35);flex-shrink:0}
 .logo-name{font-size:14px;font-weight:500;color:var(--tx);letter-spacing:-.01em}
 .topbar-divider{width:1px;height:20px;background:var(--bd);flex-shrink:0}
-.topbar nav{flex:1;min-width:0;overflow:hidden}
-.nav-tabs{display:flex;list-style:none;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:2px;padding-bottom:1px}
-.nav-tabs::-webkit-scrollbar{display:none}
-.nav-tabs li{flex:0 0 auto}
-.nav-tabs a{display:block;padding:7px 10px;font-size:12px;font-weight:500;color:var(--mt);text-decoration:none;border-radius:20px;white-space:nowrap;transition:all .15s}
+.topbar nav{flex:1;display:flex;align-items:center;min-width:0;overflow:hidden}
+.nav-tabs{display:flex;list-style:none;width:100%;justify-content:space-evenly;align-items:center}
+.nav-tabs li{flex:1;text-align:center}
+.nav-tabs a{display:block;padding:7px 6px;font-size:12px;font-weight:500;color:var(--mt);text-decoration:none;border-radius:20px;white-space:nowrap;transition:all .15s;text-align:center}
 .nav-tabs a:hover{background:var(--pink-lt);color:var(--tx)}
 .nav-tabs a.active{background:#fce7f3;color:var(--pink);font-weight:700}
 .topbar-right{flex-shrink:0;display:flex;align-items:center;gap:8px}
 .badge-admin{font-size:11px;padding:3px 10px;background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:20px;color:var(--pink);font-weight:700;white-space:nowrap}
-.btn-logout{padding:5px 12px;background:transparent;border:1.5px solid #fbcfe8;border-radius:20px;font-family:inherit;font-size:11px;font-weight:700;color:var(--pink);cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-logout{padding:5px 14px;background:transparent;border:1.5px solid #fbcfe8;border-radius:20px;font-family:inherit;font-size:11px;font-weight:700;color:var(--pink);cursor:pointer;transition:all .15s;white-space:nowrap}
 .btn-logout:hover{background:var(--pink-lt)}
-
-/* ══ 레이아웃 ══ */
-.main-content{padding:16px;flex:1}
+.mobile-nav-bar{display:none;background:var(--wh);border-bottom:1px solid var(--bd);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:50px;z-index:99}
+.mobile-nav-bar::-webkit-scrollbar{display:none}
+.mobile-nav-inner{display:flex;padding:0 8px;gap:2px;min-width:max-content}
+.mobile-nav-bar a{display:block;padding:9px 13px;font-size:12px;font-weight:500;color:var(--mt);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
+.mobile-nav-bar a.active{color:var(--pink);border-bottom-color:var(--pink);font-weight:700}
+.mobile-nav-bar a:hover{color:var(--tx)}
+.main-content{padding:24px 28px;flex:1}
 .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;background:linear-gradient(135deg,#fdf2f8,#fce7f3);border-radius:14px;padding:16px 18px;border:1px solid #fbcfe8;gap:12px}
 .page-header-left h1{font-size:18px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:8px}
 .page-header-left p{font-size:12px;color:var(--mt)}
 .btn-outline{display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #fbcfe8;border-radius:8px;background:var(--wh);font-size:12px;font-weight:700;color:var(--pink);cursor:pointer;transition:background .1s;font-family:inherit;white-space:nowrap;flex-shrink:0}
 .btn-outline:hover{background:var(--pink-lt)}
-
-/* ══ 통계 ══ */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
 .stat-card{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:18px;transition:border-color .15s}
 .stat-card:hover{border-color:#fbcfe8}
@@ -56,8 +50,6 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-si
 .stat-number{font-size:30px;font-weight:700;margin-bottom:4px}
 .stat-number.warning{color:var(--wn)}.stat-number.success{color:var(--ok)}
 .stat-desc{font-size:11px;color:var(--mt)}
-
-/* ══ 섹션 ══ */
 .section-card{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:14px;overflow:hidden;transition:border-color .15s}
 .section-card:hover{border-color:#fbcfe8}
 .section-header{padding:14px 18px;border-bottom:1px solid #fce7f3;display:flex;align-items:center;gap:8px}
@@ -65,8 +57,6 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-si
 .section-body{padding:16px}
 .empty-state{text-align:center;padding:36px 20px}
 .empty-state p{font-size:13px;color:var(--mt);font-weight:500}
-
-/* ══ 학생 리스트 ══ */
 .student-list{display:flex;flex-direction:column;gap:10px}
 .student-item{border:1px solid var(--bd);border-radius:10px;padding:14px;display:flex;align-items:flex-start;gap:12px;background:var(--wh);transition:border-color .15s;flex-wrap:wrap}
 .student-item:hover{border-color:#fbcfe8}
@@ -79,7 +69,6 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-si
 .score-chip{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;align-self:flex-start}
 .score-chip.danger{background:var(--ng)}.score-chip.warning{background:var(--wn)}.score-chip.success{background:var(--ok)}
 .action-area{width:100%;display:flex;flex-direction:column;gap:6px}
-.action-area-inner{display:flex;gap:6px;align-items:center}
 .action-input{flex:1;padding:8px 11px;border:1px solid var(--bd);border-radius:7px;font-size:12px;color:var(--tx);font-family:inherit;outline:none;transition:border .15s;background:var(--wh)}
 .action-input:focus{border-color:var(--pink)}
 .action-input.filled{border-color:var(--ok);background:var(--ok-lt)}
@@ -87,8 +76,6 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-si
 .btn-save-action:hover{background:var(--pink-dk)}
 .btn-complete{padding:8px 14px;background:var(--ok);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
 .btn-complete:hover{background:#059669}
-
-/* ══ 테이블 ══ */
 .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;min-width:480px}
 thead th{font-size:11px;font-weight:700;color:var(--mt);text-align:left;padding:9px 13px;border-bottom:1px solid var(--bd);background:#fdf2f8;white-space:nowrap}
@@ -96,33 +83,27 @@ tbody tr{border-bottom:1px solid var(--bd);transition:background .1s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:#fdf2f8}
 tbody td{font-size:12px;padding:11px 13px}
-
-/* ══ 토스트 ══ */
 .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:#1e293b;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s,transform .3s;z-index:999;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* ══ 반응형 ══ */
-@media(min-width:769px){
-  .main-content{padding:24px 28px}
-  .topbar{padding:0 28px;gap:12px}
-  .page-header{padding:20px 24px}
-  .stats-grid{gap:14px;margin-bottom:22px}
+@media(max-width:600px){
+  .topbar{padding:0 14px;height:50px}
+  .topbar-divider{display:none}
+  .topbar nav{display:none}
+  .badge-admin{display:none}
+  .mobile-nav-bar{display:block;top:50px}
+  .main-content{padding:14px 12px}
+  .page-header{padding:14px 16px;border-radius:10px;flex-direction:column;gap:10px}
+  .btn-outline{width:100%;justify-content:center}
+}
+@media(min-width:601px){
   .student-item{flex-wrap:nowrap;align-items:center}
   .action-area{width:auto;min-width:200px}
-}
-@media(max-width:768px){
-  .badge-admin{display:none}
-  .logo-name{font-size:13px}
-  .page-header{flex-direction:row;flex-wrap:wrap}
-}
-@media(max-width:480px){
-  .page-header{flex-direction:column}
-  .btn-outline{width:100%;justify-content:center}
 }
 </style>
 </head>
 <body>
 <div class="app-wrapper">
+
 <header class="topbar">
   <a href="index.html" class="logo-area">
     <div class="logo-icon">
@@ -150,6 +131,17 @@ tbody td{font-size:12px;padding:11px 13px}
   </div>
 </header>
 
+<div class="mobile-nav-bar">
+  <div class="mobile-nav-inner">
+    <a href="dashboard.html">대시보드</a>
+    <a href="students.html">학생 관리</a>
+    <a href="special.html" class="active">특별관리</a>
+    <a href="sms.html">SMS설정</a>
+    <a href="management.html">학원관리</a>
+    <a href="teacher-board.html">선생님 게시판</a>
+  </div>
+</div>
+
 <main class="main-content">
   <div class="page-header">
     <div class="page-header-left">
@@ -167,54 +159,32 @@ tbody td{font-size:12px;padding:11px 13px}
 
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-card-top">
-        <span class="stat-status warning">대기 중</span>
-        <div class="stat-icon-wrap warning">
-          <svg width="18" height="18" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        </div>
-      </div>
+      <div class="stat-card-top"><span class="stat-status warning">대기 중</span><div class="stat-icon-wrap warning"><svg width="18" height="18" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div></div>
       <div class="stat-number warning" id="pendingCount">0</div>
       <div class="stat-desc">대처방안 미입력 학생</div>
     </div>
     <div class="stat-card">
-      <div class="stat-card-top">
-        <span class="stat-status success">처리 완료</span>
-        <div class="stat-icon-wrap success">
-          <svg width="18" height="18" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-      </div>
+      <div class="stat-card-top"><span class="stat-status success">처리 완료</span><div class="stat-icon-wrap success"><svg width="18" height="18" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
       <div class="stat-number success" id="doneCount">0</div>
       <div class="stat-desc">대처방안 입력 완료</div>
     </div>
   </div>
 
   <div class="section-card">
-    <div class="section-header">
-      <svg width="16" height="16" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <h2>대처방안 입력 필요</h2>
-    </div>
+    <div class="section-header"><svg width="16" height="16" fill="none" stroke="#f59e0b" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><h2>대처방안 입력 필요</h2></div>
     <div class="section-body"><div class="student-list" id="pendingList"></div></div>
   </div>
 
   <div class="section-card">
-    <div class="section-header">
-      <svg width="16" height="16" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-      <h2>처리 완료</h2>
-    </div>
+    <div class="section-header"><svg width="16" height="16" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><h2>처리 완료</h2></div>
     <div class="section-body"><div class="student-list" id="doneList"></div></div>
   </div>
 
   <div class="section-card" id="historySection" style="display:none">
-    <div class="section-header">
-      <svg width="16" height="16" fill="none" stroke="var(--pink)" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.7"/></svg>
-      <h2>전체 관리 이력</h2>
-    </div>
+    <div class="section-header"><svg width="16" height="16" fill="none" stroke="var(--pink)" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.7"/></svg><h2>전체 관리 이력</h2></div>
     <div class="section-body">
       <div class="table-scroll">
-        <table>
-          <thead><tr><th>학생명</th><th>테스트</th><th>점수</th><th>상태</th><th>대처방안</th><th>날짜</th></tr></thead>
-          <tbody id="historyBody"></tbody>
-        </table>
+        <table><thead><tr><th>학생명</th><th>테스트</th><th>점수</th><th>상태</th><th>대처방안</th><th>날짜</th></tr></thead><tbody id="historyBody"></tbody></table>
       </div>
     </div>
   </div>
@@ -231,45 +201,8 @@ const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app);
 onAuthStateChanged(auth,async u=>{if(!u){window.location.replace("/login.html");return;}try{const s=await getDoc(doc(db,"users",u.uid));if(!s.exists()||s.data().status!=="approved"){await signOut(auth);window.location.replace("/login.html");return;}document.body.style.visibility="visible";initPage();}catch(e){window.location.replace("/login.html");}});
 window.doLogout=async function(){await signOut(auth);window.location.replace("/login.html");};
 function initPage(){onSnapshot(collection(db,"specialManagement"),s=>{const all=s.docs.map(d=>({id:d.id,...d.data()}));renderPending(all.filter(x=>!x.done));renderDone(all.filter(x=>x.done));renderHistory(all);});}
-window.renderPending=(data)=>{
-  const l=document.getElementById('pendingList');
-  document.getElementById('pendingCount').textContent=data.length;
-  if(!data.length){l.innerHTML=`<div class="empty-state"><p>모든 학생의 대처방안이 입력되었습니다</p></div>`;return;}
-  l.innerHTML=data.map(s=>`
-    <div class="student-item ${s.score<40?'danger':s.score<60?'warning':''}">
-      <div class="student-avatar">${(s.name||'?')[0]}</div>
-      <div class="student-info">
-        <div class="student-name">${s.name||'-'}</div>
-        <div class="student-meta">${s.grade||''} · ${s.test||''}</div>
-      </div>
-      <span class="score-chip ${s.score<40?'danger':s.score<60?'warning':'success'}">${s.score}점</span>
-      <div class="action-area">
-        <div class="action-area-inner">
-          <input class="action-input" id="input-${s.id}" type="text" placeholder="대처방안 입력" value="${s.action||''}">
-        </div>
-        <div style="display:flex;gap:6px">
-          <button class="btn-save-action" onclick="saveAction('${s.id}')">저장</button>
-          <button class="btn-complete" onclick="markDone('${s.id}')">완료 처리</button>
-        </div>
-      </div>
-    </div>`).join('');
-};
-window.renderDone=(data)=>{
-  const l=document.getElementById('doneList');
-  document.getElementById('doneCount').textContent=data.length;
-  if(!data.length){l.innerHTML=`<div class="empty-state"><p>처리 완료된 항목이 없습니다</p></div>`;return;}
-  l.innerHTML=data.map(s=>`
-    <div class="student-item" style="border-left:4px solid var(--ok)">
-      <div class="student-avatar" style="background:var(--ok-lt);color:var(--ok)">${(s.name||'?')[0]}</div>
-      <div class="student-info">
-        <div class="student-name">${s.name||'-'}</div>
-        <div class="student-meta">${s.test||''}</div>
-      </div>
-      <div class="action-area">
-        <input class="action-input filled" type="text" value="${s.action||''}" readonly>
-      </div>
-    </div>`).join('');
-};
+window.renderPending=(data)=>{const l=document.getElementById('pendingList');document.getElementById('pendingCount').textContent=data.length;if(!data.length){l.innerHTML=`<div class="empty-state"><p>모든 학생의 대처방안이 입력되었습니다</p></div>`;return;}l.innerHTML=data.map(s=>`<div class="student-item ${s.score<40?'danger':s.score<60?'warning':''}"><div class="student-avatar">${(s.name||'?')[0]}</div><div class="student-info"><div class="student-name">${s.name||'-'}</div><div class="student-meta">${s.grade||''} · ${s.test||''}</div></div><span class="score-chip ${s.score<40?'danger':s.score<60?'warning':'success'}">${s.score}점</span><div class="action-area"><div style="display:flex;gap:6px;align-items:center"><input class="action-input" id="input-${s.id}" type="text" placeholder="대처방안 입력" value="${s.action||''}"></div><div style="display:flex;gap:6px"><button class="btn-save-action" onclick="saveAction('${s.id}')">저장</button><button class="btn-complete" onclick="markDone('${s.id}')">완료 처리</button></div></div></div>`).join('');};
+window.renderDone=(data)=>{const l=document.getElementById('doneList');document.getElementById('doneCount').textContent=data.length;if(!data.length){l.innerHTML=`<div class="empty-state"><p>처리 완료된 항목이 없습니다</p></div>`;return;}l.innerHTML=data.map(s=>`<div class="student-item" style="border-left:4px solid var(--ok)"><div class="student-avatar" style="background:var(--ok-lt);color:var(--ok)">${(s.name||'?')[0]}</div><div class="student-info"><div class="student-name">${s.name||'-'}</div><div class="student-meta">${s.test||''}</div></div><div class="action-area"><input class="action-input filled" type="text" value="${s.action||''}" readonly></div></div>`).join('');};
 window.renderHistory=(data)=>{document.getElementById('historyBody').innerHTML=data.map(s=>`<tr><td>${s.name||'-'}</td><td>${s.test||'-'}</td><td>${s.score}점</td><td>${s.done?'<span style="color:var(--ok);font-weight:700">완료</span>':'<span style="color:var(--wn);font-weight:700">대기</span>'}</td><td>${s.action||'-'}</td><td style="color:var(--mt)">${s.date||'-'}</td></tr>`).join('');};
 window.showHistory=()=>{const s=document.getElementById('historySection');s.style.display=s.style.display==='none'?'block':'none';};
 window.saveAction=async(id)=>{const v=document.getElementById(`input-${id}`).value;await updateDoc(doc(db,"specialManagement",id),{action:v});showToast("저장되었습니다!");};
