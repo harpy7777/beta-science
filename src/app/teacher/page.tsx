@@ -109,7 +109,7 @@ export default function TeacherPage() {
               </svg>
             </div>
             <div>
-              <div className="font-bold text-gray-900 text-sm">베타과학학원</div>
+              <div className="font-[500] text-gray-900 text-sm">베타과학학원</div>
               <div className="text-xs text-pink-500">선생님 로그인</div>
             </div>
           </div>
