@@ -423,7 +423,14 @@ function StudentExamInner() {
                           </p>
                           {!isCorrect && (
                             <p className="text-xs text-gray-500 mt-0.5">
-                              정답: {q.type === 'ox' ? q.answer : `${q.answer}번 - ${q.options?.[Number(q.answer) - 1]}`}
+                              정답: {q.type === 'ox' ? q.answer : (() => {
+  const idx = Number(q.answer) - 1;
+  const optText = q.options?.[idx];
+  if (optText) return `${q.answer}번 - ${optText}`;
+  const foundIdx = q.options?.findIndex(opt => opt === q.answer);
+  if (foundIdx !== undefined && foundIdx >= 0) return `${foundIdx + 1}번 - ${q.answer}`;
+  return q.answer;
+})()}
                             </p>
                           )}
                           {q.explanation && (
@@ -499,7 +506,14 @@ function StudentExamInner() {
                           </p>
                           {!isCorrect && (
                             <p className="text-xs text-gray-500 mt-0.5">
-                              정답: {q.type === 'ox' ? q.answer : `${q.answer}번 - ${q.options?.[Number(q.answer) - 1]}`}
+                              정답: {q.type === 'ox' ? q.answer : (() => {
+  const idx = Number(q.answer) - 1;
+  const optText = q.options?.[idx];
+  if (optText) return `${q.answer}번 - ${optText}`;
+  const foundIdx = q.options?.findIndex(opt => opt === q.answer);
+  if (foundIdx !== undefined && foundIdx >= 0) return `${foundIdx + 1}번 - ${q.answer}`;
+  return q.answer;
+})()}
                             </p>
                           )}
                           {q.explanation && (
