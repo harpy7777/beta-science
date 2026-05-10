@@ -9,50 +9,40 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --pink:#ec4899;--pink-lt:#fdf2f8;--pink-dk:#be185d;
-  --mw:1200px;--bg:#fef7fb;--wh:#fff;
-  --tx:#1e293b;--mt:#94a3b8;--bd:#f0e4ec;--r:12px;
-  --ok:#10b981;--ng:#ef4444;--wn:#f59e0b;
-}
-body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-size:13px;background:var(--bg);color:var(--tx);min-height:100vh;visibility:hidden}
+:root{--pink:#ec4899;--pink-lt:#fdf2f8;--pink-dk:#be185d;--mw:1200px;--bg:#fef7fb;--wh:#fff;--tx:#1e293b;--mt:#94a3b8;--bd:#f0e4ec;--r:12px;--ok:#10b981;--ng:#ef4444;--wn:#f59e0b}
+body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-size:13px;background:var(--bg);color:var(--tx);min-height:100vh;visibility:hidden;overflow-x:hidden}
 .app-wrapper{max-width:var(--mw);margin:0 auto;display:flex;flex-direction:column;min-height:100vh}
-
-/* ══ 탑바 ══ */
-.topbar{background:var(--wh);border-bottom:1px solid var(--bd);padding:0 16px;display:flex;align-items:center;gap:10px;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(236,72,153,.06)}
+.topbar{background:var(--wh);border-bottom:1px solid var(--bd);padding:0 28px;display:flex;align-items:center;gap:12px;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(236,72,153,.06);flex-wrap:nowrap}
 .logo-area{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0}
 .logo-icon{width:28px;height:28px;background:linear-gradient(135deg,#f472b6 0%,#db2777 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(244,114,182,.35);flex-shrink:0}
 .logo-name{font-size:14px;font-weight:500;color:var(--tx);letter-spacing:-.01em}
 .topbar-divider{width:1px;height:20px;background:var(--bd);flex-shrink:0}
-.topbar nav{flex:1;min-width:0;overflow:hidden}
-.nav-tabs{display:flex;list-style:none;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:2px;padding-bottom:1px}
-.nav-tabs::-webkit-scrollbar{display:none}
-.nav-tabs li{flex:0 0 auto}
-.nav-tabs a{display:block;padding:7px 10px;font-size:12px;font-weight:500;color:var(--mt);text-decoration:none;border-radius:20px;white-space:nowrap;transition:all .15s}
+.topbar nav{flex:1;display:flex;align-items:center;min-width:0;overflow:hidden}
+.nav-tabs{display:flex;list-style:none;width:100%;justify-content:space-evenly;align-items:center}
+.nav-tabs li{flex:1;text-align:center}
+.nav-tabs a{display:block;padding:7px 6px;font-size:12px;font-weight:500;color:var(--mt);text-decoration:none;border-radius:20px;white-space:nowrap;transition:all .15s;text-align:center}
 .nav-tabs a:hover{background:var(--pink-lt);color:var(--tx)}
 .nav-tabs a.active{background:#fce7f3;color:var(--pink);font-weight:700}
 .topbar-right{flex-shrink:0;display:flex;align-items:center;gap:8px}
 .badge-admin{font-size:11px;padding:3px 10px;background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:20px;color:var(--pink);font-weight:700;white-space:nowrap}
-.btn-logout{padding:5px 12px;background:transparent;border:1.5px solid #fbcfe8;border-radius:20px;font-family:inherit;font-size:11px;font-weight:700;color:var(--pink);cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-logout{padding:5px 14px;background:transparent;border:1.5px solid #fbcfe8;border-radius:20px;font-family:inherit;font-size:11px;font-weight:700;color:var(--pink);cursor:pointer;transition:all .15s;white-space:nowrap}
 .btn-logout:hover{background:var(--pink-lt)}
-
-/* ══ 레이아웃 ══ */
-.main-content{padding:16px;flex:1;padding-bottom:80px}
+.mobile-nav-bar{display:none;background:var(--wh);border-bottom:1px solid var(--bd);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:50px;z-index:99}
+.mobile-nav-bar::-webkit-scrollbar{display:none}
+.mobile-nav-inner{display:flex;padding:0 8px;gap:2px;min-width:max-content}
+.mobile-nav-bar a{display:block;padding:9px 13px;font-size:12px;font-weight:500;color:var(--mt);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
+.mobile-nav-bar a.active{color:var(--pink);border-bottom-color:var(--pink);font-weight:700}
+.mobile-nav-bar a:hover{color:var(--tx)}
+.main-content{padding:24px 28px;flex:1;padding-bottom:80px}
 .page-header{margin-bottom:16px;background:linear-gradient(135deg,#fdf2f8,#fce7f3);border-radius:14px;padding:16px 18px;border:1px solid #fbcfe8}
 .page-header h1{font-size:18px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:9px}
 .page-header p{font-size:12px;color:var(--mt)}
-
-/* 단일 컬럼 레이아웃 (모바일 기본) */
 .layout{display:flex;flex-direction:column;gap:16px}
-
-/* ══ 미리보기 패널 ══ */
-.preview-panel{order:-1}/* 모바일에서 미리보기를 폼 위에 표시 */
+.preview-panel{order:-1}
 .preview-toggle-btn{width:100%;padding:12px;background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:10px;font-size:13px;font-weight:700;color:var(--pink);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}
 .preview-toggle-btn:hover{background:#fce7f3}
 .preview-content{display:none;margin-top:10px}
 .preview-content.show{display:block}
-
-/* ══ 카드 ══ */
 .card{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:14px;overflow:hidden;transition:border-color .15s}
 .card:last-child{margin-bottom:0}
 .card:hover{border-color:#fbcfe8}
@@ -60,63 +50,53 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-si
 .card-header h2{font-size:13px;font-weight:700}
 .card-header p{font-size:11px;color:var(--mt);margin-top:2px}
 .card-body{padding:16px}
-
-/* ══ 폼 ══ */
 .form-group{margin-bottom:16px}
 .form-group:last-child{margin-bottom:0}
 .form-group label{display:block;font-size:12px;font-weight:700;color:var(--tx);margin-bottom:6px}
 .form-group .hint{font-size:11px;color:var(--mt);margin-top:4px}
 .form-input{width:100%;padding:10px 13px;border:1px solid var(--bd);border-radius:8px;font-size:13px;color:var(--tx);background:var(--wh);outline:none;transition:border .15s;font-family:inherit}
 .form-input:focus{border-color:var(--pink)}
-
-/* 점수별 메시지 그리드 */
 .score-msg-grid{display:grid;grid-template-columns:1fr;gap:10px}
 .score-msg-item label{font-size:12px;font-weight:700;color:var(--mt);margin-bottom:5px;display:flex;align-items:center;gap:5px}
 .score-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .score-msg-item textarea{width:100%;padding:9px 11px;border:1px solid var(--bd);border-radius:8px;font-size:12px;color:var(--tx);background:var(--wh);outline:none;resize:vertical;min-height:52px;font-family:inherit;transition:border .15s;line-height:1.5}
 .score-msg-item textarea:focus{border-color:var(--pink)}
-
-/* 피드백 그리드 */
 .feedback-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .feedback-item label{font-size:11px;font-weight:700;color:var(--mt);margin-bottom:4px;display:block;text-align:center}
 .feedback-item input{width:100%;padding:8px 7px;border:1px solid var(--bd);border-radius:8px;font-size:12px;color:var(--tx);text-align:center;background:var(--wh);outline:none;font-family:inherit;transition:border .15s}
 .feedback-item input:focus{border-color:var(--pink)}
-
-/* 과제 유형 그리드 */
 .hw-type-grid{display:grid;grid-template-columns:1fr;gap:10px}
 .hw-type-item label{font-size:12px;font-weight:700;color:var(--tx);margin-bottom:5px;display:block}
 .hw-type-item input{width:100%;padding:9px 11px;border:1px solid var(--bd);border-radius:8px;font-size:12px;color:var(--tx);background:var(--wh);outline:none;font-family:inherit;transition:border .15s}
 .hw-type-item input:focus{border-color:var(--pink)}
-
-/* 기본 과제 */
 .hw-default-item{margin-bottom:12px}
 .hw-default-item:last-child{margin-bottom:0}
 .hw-default-item label{font-size:12px;font-weight:700;color:var(--tx);margin-bottom:5px;display:block}
 .hw-default-item textarea{width:100%;padding:9px 13px;border:1px solid var(--bd);border-radius:8px;font-size:12px;color:var(--tx);background:var(--wh);outline:none;resize:vertical;min-height:60px;font-family:inherit;transition:border .15s;line-height:1.6}
 .hw-default-item textarea:focus{border-color:var(--pink)}
-
-/* ══ 미리보기 카드 ══ */
 .preview-card{background:var(--wh);border:1px solid #fbcfe8;border-radius:var(--r);overflow:hidden}
 .preview-header{padding:12px 16px;border-bottom:1px solid #fce7f3;background:var(--pink-lt);display:flex;align-items:center;gap:8px}
 .preview-header h3{font-size:13px;font-weight:700;color:var(--pink)}
 .preview-body{padding:16px}
 .sms-bubble{background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:10px;padding:14px;font-size:12px;line-height:1.8;color:var(--tx);white-space:pre-wrap;font-family:inherit;min-height:160px}
 .preview-meta{margin-top:8px;font-size:11px;color:var(--mt);text-align:right}
-
-/* ══ 저장 바 ══ */
-.save-bar{position:fixed;bottom:0;left:0;right:0;background:var(--wh);border-top:1px solid #fce7f3;padding:10px 16px;z-index:50;max-width:100%}
+.save-bar{position:fixed;bottom:0;left:0;right:0;background:var(--wh);border-top:1px solid #fce7f3;padding:10px 16px;z-index:50}
 .btn-save{width:100%;padding:13px;background:linear-gradient(135deg,var(--pink),var(--pink-dk));color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s;font-family:inherit;box-shadow:0 4px 14px rgba(236,72,153,.30)}
 .btn-save:hover{opacity:.9}
-
 .toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(20px);background:#1e293b;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s,transform .3s;z-index:999;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* ══ 데스크탑 레이아웃 ══ */
+@media(max-width:600px){
+  .topbar{padding:0 14px;height:50px}
+  .topbar-divider{display:none}
+  .topbar nav{display:none}
+  .badge-admin{display:none}
+  .mobile-nav-bar{display:block;top:50px}
+  .main-content{padding:14px 12px;padding-bottom:80px}
+  .page-header{padding:14px 16px;border-radius:10px}
+  .page-header h1{font-size:16px}
+}
 @media(min-width:901px){
   .main-content{padding:24px 28px;padding-bottom:90px}
-  .topbar{padding:0 28px;gap:12px}
-  .page-header{padding:20px 24px;margin-bottom:22px}
-  .page-header h1{font-size:20px}
   .layout{flex-direction:row;align-items:flex-start}
   .form-col{flex:1;min-width:0}
   .preview-panel{width:360px;flex-shrink:0;position:sticky;top:64px;order:0}
@@ -127,10 +107,6 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-si
   .feedback-grid{grid-template-columns:repeat(5,1fr)}
   .save-bar{left:50%;transform:translateX(-50%);width:100%;max-width:var(--mw);padding:12px 28px}
 }
-@media(max-width:768px){
-  .badge-admin{display:none}
-  .logo-name{font-size:13px}
-}
 @media(min-width:601px) and (max-width:900px){
   .score-msg-grid{grid-template-columns:1fr 1fr}
   .hw-type-grid{grid-template-columns:repeat(3,1fr)}
@@ -140,6 +116,7 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-si
 </head>
 <body>
 <div class="app-wrapper">
+
 <header class="topbar">
   <a href="index.html" class="logo-area">
     <div class="logo-icon">
@@ -167,17 +144,24 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-si
   </div>
 </header>
 
+<div class="mobile-nav-bar">
+  <div class="mobile-nav-inner">
+    <a href="dashboard.html">대시보드</a>
+    <a href="students.html">학생 관리</a>
+    <a href="special.html">특별관리</a>
+    <a href="sms.html" class="active">SMS설정</a>
+    <a href="management.html">학원관리</a>
+    <a href="teacher-board.html">선생님 게시판</a>
+  </div>
+</div>
+
 <main class="main-content">
   <div class="page-header">
-    <h1>
-      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      SMS 문자 설정
-    </h1>
+    <h1><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>SMS 문자 설정</h1>
     <p>학부모에게 발송되는 성적 알림 문자의 내용을 설정하세요</p>
   </div>
 
   <div class="layout">
-    <!-- 폼 컬럼 -->
     <div class="form-col">
       <div class="card">
         <div class="card-header"><h2>학원 정보</h2></div>
@@ -189,7 +173,6 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-si
           </div>
         </div>
       </div>
-
       <div class="card">
         <div class="card-header"><h2>점수별 평가 메시지</h2></div>
         <div class="card-body">
@@ -202,7 +185,6 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-si
           </div>
         </div>
       </div>
-
       <div class="card">
         <div class="card-header"><h2>파트별 점수 피드백</h2></div>
         <div class="card-body">
@@ -215,7 +197,6 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-si
           </div>
         </div>
       </div>
-
       <div class="card">
         <div class="card-header"><h2>과제 유형명</h2></div>
         <div class="card-body">
@@ -226,7 +207,6 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-si
           </div>
         </div>
       </div>
-
       <div class="card">
         <div class="card-header"><h2>기본 과제 내용</h2><p>테스트별 과제가 설정되지 않았을 때 사용됩니다</p></div>
         <div class="card-body">
@@ -237,9 +217,7 @@ body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-si
       </div>
     </div>
 
-    <!-- 미리보기 패널 -->
     <div class="preview-panel">
-      <!-- 모바일: 토글 버튼 -->
       <button class="preview-toggle-btn" onclick="togglePreview()" id="previewToggleBtn">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         <span id="previewToggleText">문자 미리보기 보기</span>
@@ -279,21 +257,8 @@ onAuthStateChanged(auth,async u=>{if(!u){window.location.replace("/login.html");
 window.doLogout=async function(){await signOut(auth);window.location.replace("/login.html");};
 </script>
 <script>
-function updatePreview(){
-  const ac=document.getElementById('academyName').value||'베타과학학원';
-  const msg=document.getElementById('msg70').value||'조금만 더 노력하면 완벽해요!';
-  const hw2=document.getElementById('hw2').value||'수업노트 필기 다시하고 오답문제 정리하기';
-  const fb90=document.getElementById('fb90').value||'우수';
-  const fb70=document.getElementById('fb70').value||'보통';
-  const fb59=document.getElementById('fb59').value||'복습필요';
-  document.getElementById('previewBubble').textContent=`[${ac} 성적알림]\n\n홍길동 학생\n1주차 통합과학 결과\n\n12/31 테스트 결과\n총점: 70점\n정답: 21/30문항\n${msg}\n\n[파트별 성적]\n세포의 구조: 8/10 (${fb90})\n세포 분열: 7/10 (${fb70})\nDNA 구조: 6/10 (${fb59})\n\n[보충 과제]\n세포의 구조(기본): 시험지에 오답문제 정리해오기\n세포 분열(보충): ${hw2}\nDNA 구조(심화): 동영상 수업 내용복습, 수업노트 필기, 오답정리해오기\n\n문의: ${ac}`;
-}
-function togglePreview(){
-  const content=document.getElementById('previewContent');
-  const btn=document.getElementById('previewToggleText');
-  const isShow=content.classList.toggle('show');
-  btn.textContent=isShow?'문자 미리보기 닫기':'문자 미리보기 보기';
-}
+function updatePreview(){const ac=document.getElementById('academyName').value||'베타과학학원';const msg=document.getElementById('msg70').value||'조금만 더 노력하면 완벽해요!';const hw2=document.getElementById('hw2').value||'수업노트 필기 다시하고 오답문제 정리하기';const fb90=document.getElementById('fb90').value||'우수';const fb70=document.getElementById('fb70').value||'보통';const fb59=document.getElementById('fb59').value||'복습필요';document.getElementById('previewBubble').textContent=`[${ac} 성적알림]\n\n홍길동 학생\n1주차 통합과학 결과\n\n12/31 테스트 결과\n총점: 70점\n정답: 21/30문항\n${msg}\n\n[파트별 성적]\n세포의 구조: 8/10 (${fb90})\n세포 분열: 7/10 (${fb70})\nDNA 구조: 6/10 (${fb59})\n\n[보충 과제]\n세포의 구조(기본): 시험지에 오답문제 정리해오기\n세포 분열(보충): ${hw2}\nDNA 구조(심화): 동영상 수업 내용복습, 수업노트 필기, 오답정리해오기\n\n문의: ${ac}`;}
+function togglePreview(){const content=document.getElementById('previewContent');const btn=document.getElementById('previewToggleText');const isShow=content.classList.toggle('show');btn.textContent=isShow?'문자 미리보기 닫기':'문자 미리보기 보기';}
 function saveSettings(){showToast('✓ SMS 설정이 저장되었습니다');}
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 updatePreview();
