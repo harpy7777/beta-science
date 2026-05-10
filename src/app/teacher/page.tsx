@@ -167,7 +167,7 @@ export default function TeacherPage() {
 
           {/* 우측 액션 */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400 hidden sm:block truncate max-w-[160px]">
+          
               {user.email}
             </span>
             <button
