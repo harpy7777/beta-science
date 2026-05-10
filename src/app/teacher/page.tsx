@@ -166,10 +166,7 @@ export default function TeacherPage() {
           </div>
 
           {/* 우측 액션 */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400 hidden sm:block truncate max-w-[160px]">
-              {user.email}
-            </span>
+        
             <button
               onClick={() => router.push('/teacher/create')}
               className="flex items-center gap-1.5 text-sm font-semibold text-white px-3 py-2 rounded-xl transition-opacity hover:opacity-85"
