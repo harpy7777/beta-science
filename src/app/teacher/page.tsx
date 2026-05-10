@@ -296,9 +296,9 @@ export default function TeacherPage() {
                       <td className="px-4 py-5 text-center">
                         {exam.createdAt
                           ? <span className="text-xs text-gray-600 font-medium">
-                              {(exam.createdAt.toDate
-                                ? exam.createdAt.toDate()
-                                : new Date(exam.createdAt)
+                              {(typeof (exam.createdAt as any).toDate === 'function'
+                                ? (exam.createdAt as any).toDate()
+                                : new Date(exam.createdAt as any)
                               ).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })}
                             </span>
                           : <span className="text-xs text-gray-300">—</span>
