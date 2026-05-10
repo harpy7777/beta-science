@@ -161,7 +161,7 @@ export default function TeacherPage() {
             </div>
             <div>
               <div className="font-bold text-gray-900 text-sm leading-tight">베타과학학원</div>
-              <div className="text-xs text-pink-500 leading-tight">선생님 대시보드</div>
+             
             </div>
           </div>
 
