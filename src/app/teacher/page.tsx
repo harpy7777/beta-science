@@ -166,27 +166,24 @@ export default function TeacherPage() {
           </div>
 
           {/* 우측 액션 */}
-          <div className="flex items-center gap-2">
-          
-              {user.email}
-            </span>
-            <button
-              onClick={() => router.push('/teacher/create')}
-              className="flex items-center gap-1.5 text-sm font-semibold text-white px-3 py-2 rounded-xl transition-opacity hover:opacity-85"
-              style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
-            >
-              <Plus size={15} />
-              <span>시험지 만들기</span>
-            </button>
-            <button
-              onClick={handleLogout}
-              className="px-3 py-2 rounded-xl text-xs font-semibold border transition-colors"
-              style={{ borderColor:'#f4c8d4', color:'#e8375a' }}
-              title="로그아웃"
-            >
-              <LogOut size={15} />
-            </button>
-          </div>
+        <div className="flex items-center gap-2">
+  <button
+    onClick={() => router.push('/teacher/create')}
+    className="flex items-center gap-1.5 text-sm font-semibold text-white px-3 py-2 rounded-xl transition-opacity hover:opacity-85"
+    style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
+  >
+    <Plus size={15} />
+    <span>시험지 만들기</span>
+  </button>
+  <button
+    onClick={handleLogout}
+    className="px-3 py-2 rounded-xl text-xs font-semibold border transition-colors"
+    style={{ borderColor:'#f4c8d4', color:'#e8375a' }}
+    title="로그아웃"
+  >
+    <LogOut size={15} />
+  </button>
+</div>
         </div>
       </header>
 
