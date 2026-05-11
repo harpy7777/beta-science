@@ -84,18 +84,92 @@ tbody td{font-size:12px;padding:11px 12px;color:var(--tx);text-align:center;vert
 .teacher-name{font-size:12px;color:var(--mt)}
 .teacher-name.assigned{color:var(--tx);font-weight:500}
 
-/* ══ 모바일 카드 ══ */
+/* ══ 모바일 카드 (완전 재설계) ══ */
 .mobile-card-list{display:none;flex-direction:column;gap:0}
-.m-card{border-bottom:1px solid var(--bd);padding:14px 16px;background:var(--wh);transition:background .1s}
+
+.m-card{
+  border-bottom:1px solid var(--bd);
+  padding:14px 16px;
+  background:var(--wh);
+  transition:background .1s;
+}
 .m-card:last-child{border-bottom:none}
 .m-card:hover{background:#fdf2f8}
-.m-card-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.m-card-info{flex:1;min-width:0}
-.m-card-name{font-size:14px;font-weight:700;margin-bottom:3px}
-.m-card-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.m-card-id{font-size:11px;color:var(--mt);font-family:monospace}
-.m-card-subjects{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px}
-.m-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px}
+
+/* 1행: 이름+학년+ID / 수정삭제 버튼 */
+.m-card-row1{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+}
+.m-card-identity{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+  flex:1;
+  min-width:0;
+}
+.m-card-name{
+  font-size:15px;
+  font-weight:700;
+  color:var(--tx);
+  white-space:nowrap;
+}
+.m-card-id-badge{
+  font-size:11px;
+  color:var(--mt);
+  font-family:monospace;
+  background:#f8f9fa;
+  border:1px solid var(--bd);
+  border-radius:4px;
+  padding:1px 5px;
+  white-space:nowrap;
+}
+
+/* 2행: 과목 태그 */
+.m-card-subjects{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  margin-bottom:10px;
+  min-height:22px;
+}
+
+/* 3행: 담당강사 + 전화 + 수업카드 */
+.m-card-row3{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding-top:8px;
+  border-top:1px solid #f5eef8;
+}
+.m-card-contact{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  flex:1;
+  min-width:0;
+}
+.m-card-teacher{
+  font-size:12px;
+  font-weight:500;
+  color:var(--tx);
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+.m-card-teacher.unassigned{
+  color:var(--mt);
+  font-weight:400;
+}
+.m-card-phone{
+  font-size:11px;
+  color:var(--mt);
+}
 
 /* ══ 페이지네이션 ══ */
 .pagination{display:flex;align-items:center;justify-content:center;gap:4px;padding:16px 0 4px}
@@ -322,19 +396,73 @@ window.doLogout=async()=>{await signOut(auth);window.location.replace("/login.ht
 const IPP=10;let pg=1,eid=null,students=[],filtered=[],ccCache={},s2f={};
 function gBC(g){return{'중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3','고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3'}[g]||'grade-mid1';}
 async function iStudents(){
-  try{const ss=await getDocs(collection(db,"students"));ss.forEach(d=>{const id=d.data().id;if(id)s2f[id]=d.id;});}catch(e){}
-  try{const cc=await getDocs(query(collection(db,"classCards"),orderBy("classDate","desc")));const seen=new Set();cc.forEach(d=>{const c=d.data(),sid=c.studentId;if(!sid)return;const fv=Object.values(s2f).includes(sid),fk=Object.prototype.hasOwnProperty.call(s2f,sid);let rfi=fv?sid:fk?s2f[sid]:sid;if(!rfi)return;if(!ccCache[rfi])ccCache[rfi]={count:0,teacher:''};ccCache[rfi].count++;if(!seen.has(rfi)){ccCache[rfi].teacher=c.teacher||'';seen.add(rfi);}});}catch(e){}
+  try{const ss=await getDocs(collection(db,"students"));ss.forEach(d=>{const id=d.data().id;if(id)s2f[id]=d.id;});}catch(er){}
+  try{const cc=await getDocs(query(collection(db,"classCards"),orderBy("classDate","desc")));const seen=new Set();cc.forEach(d=>{const c=d.data(),sid=c.studentId;if(!sid)return;const fv=Object.values(s2f).includes(sid),fk=Object.prototype.hasOwnProperty.call(s2f,sid);let rfi=fv?sid:fk?s2f[sid]:sid;if(!rfi)return;if(!ccCache[rfi])ccCache[rfi]={count:0,teacher:''};ccCache[rfi].count++;if(!seen.has(rfi)){ccCache[rfi].teacher=c.teacher||'';seen.add(rfi);}});}catch(er){}
   onSnapshot(query(collection(db,"students"),orderBy("regDate","desc")),s=>{s.docs.forEach(d=>{const id=d.data().id;if(id)s2f[id]=d.id;});students=s.docs.map(d=>({fireId:d.id,...d.data()}));filterStudents();},err=>{document.getElementById('studentTableBody').innerHTML=`<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--ng)">오류: ${err.message}</td></tr>`;});
 }
+
 window.renderTable=function(){
   const tb=document.getElementById('studentTableBody'),em=document.getElementById('emptyState'),ml=document.getElementById('mobileCardList'),st=(pg-1)*IPP,pd=filtered.slice(st,st+IPP);
   document.getElementById('countDisplay').textContent=filtered.length;
   if(!filtered.length){tb.innerHTML='';ml.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
-  tb.innerHTML=pd.map(s=>{const subs=s.subject&&s.subject!=='-'?s.subject.split(',').map(x=>`<span class="subject-tag">${x.trim()}</span>`).join(''):'<span style="color:var(--mt)">-</span>';const info=ccCache[s.fireId]||{count:0,teacher:''},hc=info.count>0,tc=info.teacher||'-',sn=(s.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");return`<tr><td class="student-id">${s.id||'-'}</td><td style="font-weight:500">${s.name||'-'}</td><td><span class="grade-badge ${gBC(s.grade)}">${s.grade||'-'}</span></td><td>${subs}</td><td class="teacher-name${tc!=='-'?' assigned':''}">${e(tc)}</td><td>${s.phone||'-'}</td><td style="color:var(--mt);font-size:11px">${s.regDate||'-'}</td><td><button class="card-btn${hc?' has-card':''}" onclick="openClassCardModal('${s.fireId}','${sn}','${(s.id||'').replace(/'/g,"\\'")}')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>${hc?`보기 (${info.count}건)`:'없음'}</button></td><td><div class="action-icons"><button class="action-btn" onclick="openEditModal('${s.fireId}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn del" onclick="deleteStudent('${s.fireId}','${sn}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></td></tr>`;}).join('');
-  ml.innerHTML=pd.map(s=>{const subs=s.subject&&s.subject!=='-'?s.subject.split(',').map(x=>`<span class="subject-tag">${x.trim()}</span>`).join(''):'';const info=ccCache[s.fireId]||{count:0,teacher:''},hc=info.count>0,tc=info.teacher||'-',sn=(s.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");return`<div class="m-card"><div class="m-card-top"><div class="m-card-info"><div class="m-card-name">${s.name||'-'}</div><div class="m-card-meta"><span class="grade-badge ${gBC(s.grade)}" style="font-size:10px;padding:2px 7px">${s.grade||'-'}</span><span class="m-card-id">${s.id||''}</span></div></div><div class="action-icons"><button class="action-btn" onclick="openEditModal('${s.fireId}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn del" onclick="deleteStudent('${s.fireId}','${sn}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></div>${subs?`<div class="m-card-subjects">${subs}</div>`:''}<div class="m-card-bottom"><div><div style="font-size:11px;color:${tc!=='-'?'var(--tx)':'var(--mt)'};font-weight:${tc!=='-'?'500':'400'};margin-bottom:2px">${tc!=='-'?'👤 '+e(tc):'선생님 미배정'}</div><div style="font-size:11px;color:var(--mt)">${s.phone||'-'}</div></div><button class="card-btn${hc?' has-card':''}" onclick="openClassCardModal('${s.fireId}','${sn}','${(s.id||'').replace(/'/g,"\\'")}')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>${hc?`수업카드 (${info.count})`:'수업카드 없음'}</button></div></div>`;}).join('');
+
+  /* ── 데스크탑 테이블 ── */
+  tb.innerHTML=pd.map(s=>{
+    const subs=s.subject&&s.subject!=='-'?s.subject.split(',').map(x=>`<span class="subject-tag">${x.trim()}</span>`).join(''):'<span style="color:var(--mt)">-</span>';
+    const info=ccCache[s.fireId]||{count:0,teacher:''},hc=info.count>0,tc=info.teacher||'-',sn=(s.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return`<tr><td class="student-id">${s.id||'-'}</td><td style="font-weight:500">${s.name||'-'}</td><td><span class="grade-badge ${gBC(s.grade)}">${s.grade||'-'}</span></td><td>${subs}</td><td class="teacher-name${tc!=='-'?' assigned':''}">${e(tc)}</td><td>${s.phone||'-'}</td><td style="color:var(--mt);font-size:11px">${s.regDate||'-'}</td><td><button class="card-btn${hc?' has-card':''}" onclick="openClassCardModal('${s.fireId}','${sn}','${(s.id||'').replace(/'/g,"\\'")}')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>${hc?`보기 (${info.count}건)`:'없음'}</button></td><td><div class="action-icons"><button class="action-btn" onclick="openEditModal('${s.fireId}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn del" onclick="deleteStudent('${s.fireId}','${sn}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></td></tr>`;
+  }).join('');
+
+  /* ── 모바일 카드 (재설계) ── */
+  ml.innerHTML=pd.map(s=>{
+    const subs=s.subject&&s.subject!=='-'
+      ? s.subject.split(',').map(x=>`<span class="subject-tag">${x.trim()}</span>`).join('')
+      : '<span style="font-size:11px;color:var(--mt)">과목 없음</span>';
+    const info=ccCache[s.fireId]||{count:0,teacher:''},hc=info.count>0;
+    const tc=info.teacher||'';
+    const sn=(s.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const sid=(s.id||'').replace(/'/g,"\\'");
+
+    return`<div class="m-card">
+  <!-- 1행: 이름 + 학년뱃지 + ID / 수정·삭제 -->
+  <div class="m-card-row1">
+    <div class="m-card-identity">
+      <span class="m-card-name">${e(s.name||'-')}</span>
+      <span class="grade-badge ${gBC(s.grade)}" style="font-size:10px;padding:2px 7px">${e(s.grade||'-')}</span>
+      <span class="m-card-id-badge">${e(s.id||'')}</span>
+    </div>
+    <div class="action-icons">
+      <button class="action-btn" onclick="openEditModal('${s.fireId}')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <button class="action-btn del" onclick="deleteStudent('${s.fireId}','${sn}')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+      </button>
+    </div>
+  </div>
+  <!-- 2행: 수강 과목 -->
+  <div class="m-card-subjects">${subs}</div>
+  <!-- 3행: 담당강사 + 전화 + 수업카드 -->
+  <div class="m-card-row3">
+    <div class="m-card-contact">
+      <div class="m-card-teacher${tc?'':' unassigned'}">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        ${tc?e(tc):'담당 미배정'}
+      </div>
+      <div class="m-card-phone">${e(s.phone||'-')}</div>
+    </div>
+    <button class="card-btn${hc?' has-card':''}" onclick="openClassCardModal('${s.fireId}','${sn}','${sid}')">
+      <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      ${hc?`수업카드 (${info.count})`:'수업카드 없음'}
+    </button>
+  </div>
+</div>`;
+  }).join('');
+
   renderPagination();
 };
+
 window.filterStudents=function(){const s=document.getElementById('searchInput').value.trim().toLowerCase(),g=document.getElementById('gradeFilter').value;filtered=students.filter(st=>(!s||(st.name&&st.name.toLowerCase().includes(s))||(st.id&&st.id.toLowerCase().includes(s)))&&(!g||st.grade===g));pg=1;renderTable();};
 window.renderPagination=function(){const t=Math.ceil(filtered.length/IPP),pp=document.getElementById('pagination');if(t<=1){pp.innerHTML='';return;}let h=`<button class="page-btn" onclick="goPage(${pg-1})" ${pg===1?'disabled':''}>‹</button>`;for(let i=1;i<=t;i++)h+=`<button class="page-btn ${i===pg?'active':''}" onclick="goPage(${i})">${i}</button>`;h+=`<button class="page-btn" onclick="goPage(${pg+1})" ${pg===t?'disabled':''}>›</button>`;pp.innerHTML=h;};
 window.goPage=function(p){const t=Math.ceil(filtered.length/IPP);if(p<1||p>t)return;pg=p;renderTable();};
