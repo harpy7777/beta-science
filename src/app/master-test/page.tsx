@@ -175,7 +175,7 @@ export default function MasterTestPage() {
 
       {/* ── Header ── */}
       <header className="bg-white border-b border-pink-100 sticky top-0 z-50">
-        <div className="w-full px-6 h-14 flex items-center justify-between">
+        <div className="w-full px-4 sm:px-6 h-14 flex items-center justify-between">
           <div
             className="flex items-center gap-2.5 cursor-pointer"
             onClick={() => router.push('/')}
@@ -201,11 +201,12 @@ export default function MasterTestPage() {
               style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
             >
               <Plus size={15} />
-              <span>{saving ? '저장 중...' : '테스트 저장'}</span>
+              <span className="hidden sm:inline">{saving ? '저장 중...' : '테스트 저장'}</span>
+              <span className="sm:hidden">{saving ? '저장 중...' : '저장'}</span>
             </button>
             <button
               onClick={handleLogout}
-              className="px-3 py-2 rounded-xl text-xs font-semibold border transition-colors"
+              className="px-3 py-2 rounded-xl text-xs font-semibold border transition-colors flex items-center"
               style={{ borderColor:'#f4c8d4', color:'#e8375a' }}
             >
               <LogOut size={15} />
@@ -214,27 +215,27 @@ export default function MasterTestPage() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-6">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
 
         {/* Welcome Bar */}
         <div
-          className="rounded-2xl border border-pink-100 p-5 mb-6 flex items-center justify-between gap-3"
+          className="rounded-2xl border border-pink-100 p-4 sm:p-5 mb-6 flex items-center justify-between gap-3"
           style={{ background: 'linear-gradient(135deg,#fff0f7 0%,#fdf2f8 60%,#f0f9ff 100%)' }}
         >
           <div className="flex items-center gap-3">
             <div
-              className="w-11 h-11 rounded-full flex items-center justify-center text-xl flex-shrink-0"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-xl flex-shrink-0"
               style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)', boxShadow:'0 4px 12px rgba(219,39,119,0.25)' }}
             >
               ✏️
             </div>
             <div>
-              <div className="font-bold text-gray-900 text-base">마스터테스트 생성</div>
+              <div className="font-bold text-gray-900 text-sm sm:text-base">마스터테스트 생성</div>
               <div className="text-xs text-gray-500 mt-0.5">새로운 테스트를 생성하고 문항을 입력하세요</div>
             </div>
           </div>
           <div className="text-right flex-shrink-0">
-            <div className="font-bold text-sm" style={{ color:'#db2777' }}>
+            <div className="font-bold text-xs sm:text-sm" style={{ color:'#db2777' }}>
               {new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' })}
             </div>
           </div>
@@ -488,7 +489,7 @@ export default function MasterTestPage() {
             </div>
           )}
 
-          {/* 테스트 테이블 */}
+          {/* 테스트 목록 */}
           {filtered.length === 0 ? (
             <div className="bg-white border-2 border-dashed border-pink-200 rounded-2xl p-12 text-center">
               <BookOpen size={44} className="mx-auto mb-4" style={{ color:'#f9a8d4' }} />
@@ -496,89 +497,149 @@ export default function MasterTestPage() {
               <p className="text-sm text-gray-400">위에서 테스트를 생성하고 저장해보세요!</p>
             </div>
           ) : (
-            <div className="bg-white border border-pink-100 rounded-2xl overflow-hidden">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-pink-100" style={{ background: '#fdf2f8' }}>
-                    <th className="text-left   text-xs font-bold text-gray-500 tracking-wide px-6 py-4">단원명</th>
-                    <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-4 py-4">등록일</th>
-                    <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-4 py-4">등록 상태</th>
-                    <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-4 py-4">학년</th>
-                    <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-4 py-4">과목</th>
-                    <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-4 py-4">총 문항</th>
-                    <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-6 py-4">관리</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((t, idx) => {
-                    const totalQ = t.parts.reduce(
-                      (acc, p) => acc + Object.keys(p.answers).length, 0
-                    );
-                    return (
-                      <tr
-                        key={t.fireId}
-                        className="hover:bg-pink-50/40 transition-colors"
-                        style={{ borderBottom: idx === filtered.length - 1 ? 'none' : '1px solid #f9f0f5' }}
-                      >
-                        {/* 단원명 */}
-                        <td className="px-6 py-5">
-                          <span className="font-bold text-gray-900 text-sm">{t.unitName}</span>
-                        </td>
-
-                        {/* 등록일 */}
-                        <td className="px-4 py-5 text-center">
-                          <span className="text-xs text-gray-600 font-medium whitespace-nowrap">
-                           {t.regDate ? t.regDate.split('.').slice(0, 3).join('.').trim() : '—'}
-                          </span>
-                        </td>
-
-                        {/* 등록 상태 */}
-                        <td className="px-4 py-5 text-center">
-                          <span className="inline-block text-xs px-3 py-1 rounded-full font-semibold bg-green-100 text-green-700">
-                            등록됨
-                          </span>
-                        </td>
-
-                        {/* 학년 */}
-                        <td className="px-4 py-5 text-center">
-                          {t.grade
-                            ? <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-pink-100 text-pink-700">{t.grade}</span>
-                            : <span className="text-xs text-gray-300">—</span>
-                          }
-                        </td>
-
-                        {/* 과목 */}
-                        <td className="px-4 py-5 text-center">
-                          {t.subject
-                            ? <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-blue-100 text-blue-700">{t.subject}</span>
-                            : <span className="text-xs text-gray-300">—</span>
-                          }
-                        </td>
-
-                        {/* 총 문항 */}
-                        <td className="px-4 py-5 text-center">
-                          <span className="text-sm font-black" style={{ color:'#db2777' }}>{totalQ}</span>
-                          <span className="text-xs text-gray-400 ml-1">문항</span>
-                        </td>
-
-                        {/* 관리 */}
-                        <td className="px-6 py-5">
-                          <div className="flex items-center justify-center">
-                            <button
-                              onClick={() => handleDelete(t.fireId)}
-                              className="flex items-center gap-1.5 text-xs font-semibold text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
-                            >
-                              <Trash2 size={13} />
-                              삭제
-                            </button>
-                          </div>
-                        </td>
+            <>
+              {/* ── 데스크탑 테이블 (md 이상) ── */}
+              <div className="hidden md:block bg-white border border-pink-100 rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full" style={{ minWidth: '680px' }}>
+                    <thead>
+                      <tr className="border-b border-pink-100" style={{ background: '#fdf2f8' }}>
+                        <th className="text-left   text-xs font-bold text-gray-500 tracking-wide px-6 py-4 whitespace-nowrap">단원명</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-4 py-4 whitespace-nowrap">등록일</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-4 py-4 whitespace-nowrap">등록 상태</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-4 py-4 whitespace-nowrap">학년</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-4 py-4 whitespace-nowrap">과목</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-4 py-4 whitespace-nowrap">총 문항</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-6 py-4 whitespace-nowrap">관리</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                    </thead>
+                    <tbody>
+                      {filtered.map((t, idx) => {
+                        const totalQ = t.parts.reduce(
+                          (acc, p) => acc + Object.keys(p.answers).length, 0
+                        );
+                        return (
+                          <tr
+                            key={t.fireId}
+                            className="hover:bg-pink-50/40 transition-colors"
+                            style={{ borderBottom: idx === filtered.length - 1 ? 'none' : '1px solid #f9f0f5' }}
+                          >
+                            <td className="px-6 py-5">
+                              <span className="font-bold text-gray-900 text-sm">{t.unitName}</span>
+                            </td>
+                            <td className="px-4 py-5 text-center">
+                              <span className="text-xs text-gray-600 font-medium whitespace-nowrap">
+                                {t.regDate ? t.regDate.split('.').slice(0, 3).join('.').trim() : '—'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-5 text-center">
+                              <span className="inline-block text-xs px-3 py-1 rounded-full font-semibold bg-green-100 text-green-700 whitespace-nowrap">
+                                등록됨
+                              </span>
+                            </td>
+                            <td className="px-4 py-5 text-center">
+                              {t.grade
+                                ? <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-pink-100 text-pink-700 whitespace-nowrap">{t.grade}</span>
+                                : <span className="text-xs text-gray-300">—</span>
+                              }
+                            </td>
+                            <td className="px-4 py-5 text-center">
+                              {t.subject
+                                ? <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-blue-100 text-blue-700 whitespace-nowrap">{t.subject}</span>
+                                : <span className="text-xs text-gray-300">—</span>
+                              }
+                            </td>
+                            <td className="px-4 py-5 text-center">
+                              <span className="text-sm font-black" style={{ color:'#db2777' }}>{totalQ}</span>
+                              <span className="text-xs text-gray-400 ml-1">문항</span>
+                            </td>
+                            <td className="px-6 py-5">
+                              <div className="flex items-center justify-center">
+                                <button
+                                  onClick={() => handleDelete(t.fireId)}
+                                  className="flex items-center gap-1.5 text-xs font-semibold text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
+                                >
+                                  <Trash2 size={13} />
+                                  삭제
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* ── 모바일 카드 뷰 (md 미만) ── */}
+              <div className="md:hidden flex flex-col gap-3">
+                {filtered.map((t) => {
+                  const totalQ = t.parts.reduce(
+                    (acc, p) => acc + Object.keys(p.answers).length, 0
+                  );
+                  return (
+                    <div
+                      key={t.fireId}
+                      className="bg-white border border-pink-100 rounded-2xl p-4"
+                    >
+                      {/* 상단: 단원명 + 상태 배지 */}
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <span className="font-bold text-gray-900 text-sm leading-snug flex-1">
+                          {t.unitName}
+                        </span>
+                        <span className="flex-shrink-0 inline-block text-xs px-2.5 py-1 rounded-full font-semibold bg-green-100 text-green-700">
+                          등록됨
+                        </span>
+                      </div>
+
+                      {/* 뱃지 행: 학년 + 과목 + 등록일 */}
+                      <div className="flex flex-wrap items-center gap-1.5 mb-3">
+                        {t.grade && (
+                          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-pink-100 text-pink-700">
+                            {t.grade}
+                          </span>
+                        )}
+                        {t.subject && (
+                          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700">
+                            {t.subject}
+                          </span>
+                        )}
+                        <span className="text-xs text-gray-400">
+                          {t.regDate ? t.regDate.split('.').slice(0, 3).join('.').trim() : '—'}
+                        </span>
+                      </div>
+
+                      {/* 문항 + 섹션 수 */}
+                      <div className="flex items-center gap-3 mb-3 py-2.5 px-3 rounded-xl bg-gray-50">
+                        <div className="flex-1 text-center">
+                          <div className="text-xs text-gray-400 mb-0.5">총 문항</div>
+                          <div className="text-sm font-black" style={{ color:'#db2777' }}>
+                            {totalQ}<span className="text-xs font-normal text-gray-400 ml-0.5">문항</span>
+                          </div>
+                        </div>
+                        <div className="w-px h-8 bg-gray-200" />
+                        <div className="flex-1 text-center">
+                          <div className="text-xs text-gray-400 mb-0.5">섹션 수</div>
+                          <div className="text-sm font-black text-gray-700">
+                            {t.parts.length}<span className="text-xs font-normal text-gray-400 ml-0.5">부</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 삭제 버튼 */}
+                      <button
+                        onClick={() => handleDelete(t.fireId)}
+                        className="w-full flex items-center justify-center gap-1.5 text-xs font-semibold text-red-500 bg-red-50 hover:bg-red-100 py-2.5 rounded-xl transition-colors"
+                      >
+                        <Trash2 size={13} />
+                        삭제
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
       </main>
