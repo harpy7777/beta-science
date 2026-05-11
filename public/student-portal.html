@@ -464,18 +464,24 @@ function renderCC(c){
   return`<div class="cc-item"${hasBody?` id="cci-${c.id}"`:''}><div class="cc-head"${hasBody?` onclick="toggleCC('${c.id}')"`:''}><div class="cc-date"><div class="cc-date-m">${mo}</div><div class="cc-date-d">${dy}</div></div><div class="cc-info"><div class="cc-subj">${e(c.subject||'수업')}</div><div class="chips">${c.teacher?`<span class="chip chip-blue">${e(c.teacher)}</span>`:''}<span class="chip ${sCls}">${sTxt}</span>${c.homework&&c.homework!=='-'?`<span class="chip ${hwCls}">과제 ${e(c.homework)}</span>`:''} ${c.attitude?`<span class="chip ${attCls}">${e(c.attitude)}</span>`:''}</div></div>${hasBody?'<span class="cc-arrow">▾</span>':''}</div>${hasBody?`<div class="cc-body"><div class="cc-body-inner">${c.unit?`<div class="cc-body-lbl">학습 단원</div><div class="cc-body-txt">${e(c.unit)}</div>`:''} ${c.content?`<div class="cc-body-lbl">수업 내용</div><div class="cc-body-txt">${e(c.content)}</div>`:''}</div></div>`:''}</div>`;
 }
 
-/* ── OX 퀴즈 ── */
+/* ── OX 퀴즈 ──
+   저장 필드: results 컬렉션, subType:'ox'
+─────────────────────────────── */
 async function loadOxResults(sid){
   try{
     let results=[];
-    try{
-      const s=await getDocs(query(collection(db,'results'),where('studentId','==',sid),where('examType','==','ox'),orderBy('createdAt','desc')));
-      s.forEach(d=>results.push({id:d.id,...d.data()}));
-    }catch(e){
-      // examType 필드 없거나 인덱스 없을 경우 전체에서 필터
-      const s=await getDocs(query(collection(db,'results'),where('studentId','==',sid)));
-      s.forEach(d=>{const data={id:d.id,...d.data()};if((data.examType||'').toLowerCase()==='ox'||data.isOx===true)results.push(data);});
-    }
+    // 전체 results 한 번 조회 후 클라이언트에서 필터 (복합 인덱스 불필요)
+    const s=await getDocs(query(collection(db,'results'),where('studentId','==',sid)));
+    s.forEach(d=>{
+      const data={id:d.id,...d.data()};
+      // subType:'ox' 또는 examType:'ox' 모두 허용
+      const sub=(data.subType||'').toLowerCase();
+      const ext=(data.examType||'').toLowerCase();
+      if(sub==='ox'||ext==='ox') results.push(data);
+    });
+    // 최신순 정렬
+    results.sort((a,b)=>(b.startedAt||'').localeCompare(a.startedAt||''));
+    // 완료된 것만 통계 (score가 null이 아닌 것)
     const completed=results.filter(r=>typeof r.score==='number'&&r.score!==null);
     const pcts=completed.map(r=>r.totalQuestions>0?Math.round((r.score/r.totalQuestions)*100):r.score);
     const avg=pcts.length?Math.round(pcts.reduce((a,v)=>a+v,0)/pcts.length):null;
@@ -490,19 +496,22 @@ async function loadOxResults(sid){
   }catch(err){document.querySelectorAll('#oxResultList').forEach(el=>el.innerHTML='<div class="empty-box">OX 퀴즈 결과를 불러오지 못했습니다.</div>');}
 }
 
-/* ── 4지선다 ── */
+/* ── 4지선다 ──
+   저장 필드: results 컬렉션, subType:'multiple'
+─────────────────────────────── */
 async function loadTestResults(sid){
   try{
     let results=[];
-    try{
-      const s=await getDocs(query(collection(db,'results'),where('studentId','==',sid),where('examType','==','multiple'),orderBy('createdAt','desc')));
-      s.forEach(d=>results.push({id:d.id,...d.data()}));
-    }catch(e){
-      // 폴백: examType 없는 경우 전체에서 ox 제외
-      const s=await getDocs(query(collection(db,'results'),where('studentId','==',sid)));
-      s.forEach(d=>{const data={id:d.id,...d.data()};const t=(data.examType||'').toLowerCase();if(t!=='ox'&&data.isOx!==true)results.push(data);});
-      results.sort((a,b)=>(b.startedAt||'').localeCompare(a.startedAt||''));
-    }
+    const s=await getDocs(query(collection(db,'results'),where('studentId','==',sid)));
+    s.forEach(d=>{
+      const data={id:d.id,...d.data()};
+      const sub=(data.subType||'').toLowerCase();
+      const ext=(data.examType||'').toLowerCase();
+      // subType:'multiple' 또는 examType:'multiple',
+      // 또는 둘 다 없는 경우(ox가 아닌 것)도 4지선다로 분류
+      if(sub==='multiple'||ext==='multiple'||(sub!=='ox'&&ext!=='ox')) results.push(data);
+    });
+    results.sort((a,b)=>(b.startedAt||'').localeCompare(a.startedAt||''));
     const completed=results.filter(r=>typeof r.score==='number'&&r.score!==null);
     const pcts=completed.map(r=>r.totalQuestions>0?Math.round((r.score/r.totalQuestions)*100):r.score);
     const avg=pcts.length?Math.round(pcts.reduce((a,v)=>a+v,0)/pcts.length):null;
@@ -529,23 +538,67 @@ function renderTestItem(r,type){
   return`<div class="test-item"><div class="test-head"><div class="score-circle ${cls}"><div class="sc-pct">${disp}</div>${hasScore&&r.totalQuestions?`<div class="sc-unit">${r.score}/${r.totalQuestions}</div>`:''}</div><div class="test-info"><div class="test-title">${e(r.examTitle||'테스트')}</div><div class="test-meta">${r.subject?`<span>${e(r.subject)}</span>`:''} ${dt?`<span>${dt}</span>`:''} ${wrong!==null?`<span>❌ 오답 ${wrong}개</span>`:''}</div></div></div>${hasScore&&r.totalQuestions>0?`<div class="${barClass}"><div class="${fillClass}" style="width:${pct}%"></div></div><div class="test-bar-info">${r.score}문항 정답 / 전체 ${r.totalQuestions}문항</div>`:''}</div>`;
 }
 
-/* ── 마스터테스트 ── */
+/* ── 마스터테스트 ──
+   저장 컬렉션: 'answers' (student-omr.html이 여기에 저장)
+   score 필드: 이미 퍼센트(0~100) 값
+   필드: testType:'master', studentId, score, total, correct, wrong,
+          examTitle, unitName, subject, submittedAt
+─────────────────────────────── */
 async function loadMasterTests(sid){
   try{
     let tests=[];
-    try{const s=await getDocs(query(collection(db,'master-tests'),where('studentId','==',sid),orderBy('createdAt','desc')));s.forEach(d=>tests.push({id:d.id,...d.data()}));}
-    catch(e){const s=await getDocs(query(collection(db,'master-tests'),where('studentId','==',sid)));s.forEach(d=>tests.push({id:d.id,...d.data()}));}
+    // answers 컬렉션에서 testType:'master' + studentId 필터
+    try{
+      const s=await getDocs(query(
+        collection(db,'answers'),
+        where('studentId','==',sid),
+        where('testType','==','master')
+      ));
+      s.forEach(d=>tests.push({id:d.id,...d.data()}));
+    }catch(e){
+      // 복합 인덱스 없을 경우 전체 조회 후 필터
+      const s=await getDocs(query(collection(db,'answers'),where('studentId','==',sid)));
+      s.forEach(d=>{const data={id:d.id,...d.data()};if(data.testType==='master')tests.push(data);});
+    }
+    // 최신순 (submittedAt 기준)
+    tests.sort((a,b)=>{
+      const ta=a.submittedAt?.seconds||0;
+      const tb=b.submittedAt?.seconds||0;
+      return tb-ta;
+    });
     if(!tests.length)return;
-    const sc=tests.filter(t=>typeof t.score==='number'&&t.score!==null);
-    const pcts=sc.map(t=>t.totalQuestions>0?Math.round((t.score/t.totalQuestions)*100):t.score);
-    const avg=pcts.length?Math.round(pcts.reduce((a,v)=>a+v,0)/pcts.length):null;
-    const best=pcts.length?Math.max(...pcts):null;
+
+    // score는 이미 퍼센트(0~100)
+    const withScore=tests.filter(t=>typeof t.score==='number'&&t.score!==null);
+    const scores=withScore.map(t=>t.score);
+    const avg=scores.length?Math.round(scores.reduce((a,v)=>a+v,0)/scores.length):null;
+    const best=scores.length?Math.max(...scores):null;
     document.querySelectorAll('#ms-total').forEach(el=>el.textContent=tests.length+'회');
     document.querySelectorAll('#ms-avg').forEach(el=>el.textContent=avg!==null?avg+'%':'—');
     document.querySelectorAll('#ms-best').forEach(el=>el.textContent=best!==null?best+'%':'—');
-    const html=`<div class="master-wrap">${tests.map((t,i)=>{const pct=t.totalQuestions>0?Math.round((t.score/t.totalQuestions)*100):(t.score||0);return`<div class="master-item"><div class="master-rank">${i+1}</div><div class="master-name">${e(t.title||t.examTitle||t.subject||'단원테스트')}</div><div class="master-bar-col"><div class="master-bar-bg"><div class="master-bar-fill" style="width:${pct}%"></div></div></div><div class="master-score">${pct}%</div></div>`;}).join('')}</div>`;
+
+    const html=`<div class="master-wrap">${tests.map((t,i)=>{
+      const pct=typeof t.score==='number'?t.score:0;
+      const name=e(t.unitName||t.examTitle||t.subject||'단원테스트');
+      const sub=t.subject?`<span style="font-size:11px;color:var(--mt);font-weight:400"> · ${e(t.subject)}</span>`:'';
+      const wrongTxt=typeof t.wrong==='number'?`<span style="font-size:11px;color:#ef4444;margin-left:8px">❌ ${t.wrong}개</span>`:'';
+      return`<div class="master-item">
+        <div class="master-rank">${i+1}</div>
+        <div class="master-name">${name}${sub}${wrongTxt}</div>
+        <div class="master-bar-col">
+          <div class="master-bar-bg">
+            <div class="master-bar-fill" style="width:${pct}%"></div>
+          </div>
+        </div>
+        <div class="master-score">${pct}%</div>
+      </div>`;
+    }).join('')}</div>`;
     document.querySelectorAll('#masterTestList').forEach(el=>el.innerHTML=html);
-  }catch(err){}
+  }catch(err){
+    document.querySelectorAll('#masterTestList').forEach(el=>
+      el.innerHTML='<div class="empty-box">마스터테스트 결과를 불러오지 못했습니다.</div>'
+    );
+  }
 }
 
 /* ── 유틸 ── */
