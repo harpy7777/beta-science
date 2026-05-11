@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>학생 포털 - 베타과학학원</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --pink:#ec4899;--pink-lt:#fdf2f8;--pink-dk:#be185d;
+  --bg:#fef7fb;--wh:#fff;--tx:#1e293b;--mt:#94a3b8;--bd:#f0e4ec;
+  --r:12px;--ok:#10b981;--ng:#ef4444;
+  --blue:#3b82f6;--blue-lt:#eff6ff;
+  --purple:#8b5cf6;--purple-lt:#f5f3ff;
+  --green:#10b981;--green-lt:#ecfdf5;
+}
+body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-size:13px;background:var(--bg);color:var(--tx);min-height:100vh}
+
+/* ══ 로딩 / 에러 ══ */
+.loading-screen,.error-screen{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:100vh;gap:14px;
+  color:var(--mt);text-align:center;padding:20px;
+}
+.spinner{width:36px;height:36px;border:3px solid var(--bd);border-top-color:var(--pink);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-screen h2{font-size:18px;color:var(--tx);margin-top:4px}
+.error-screen p{font-size:12px;line-height:1.9;color:var(--mt)}
+
+/* ══ 헤더 ══ */
+.portal-header{
+  background:linear-gradient(135deg,#f472b6 0%,#db2777 100%);
+  color:#fff;padding:24px 20px 0;
+  position:relative;overflow:hidden;
+}
+.portal-header::before{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:200px;height:200px;background:rgba(255,255,255,.08);border-radius:50%;
+}
+.portal-header::after{
+  content:'';position:absolute;bottom:-30px;left:25%;
+  width:140px;height:140px;background:rgba(255,255,255,.06);border-radius:50%;
+}
+.hdr-content{position:relative;z-index:1}
+.school-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;opacity:.85;
+  background:rgba(255,255,255,.15);border-radius:20px;
+  padding:4px 10px;margin-bottom:12px;
+}
+.student-name-big{font-size:26px;font-weight:700;margin-bottom:6px;line-height:1.2}
+.student-meta{
+  display:flex;gap:8px;flex-wrap:wrap;
+  font-size:12px;opacity:.85;margin-bottom:20px;
+}
+.meta-chip{
+  background:rgba(255,255,255,.18);border-radius:20px;
+  padding:3px 10px;font-weight:500;
+}
+
+/* ══ 탭 ══ */
+.header-tabs{
+  display:flex;overflow-x:auto;scrollbar-width:none;
+  position:relative;z-index:1;
+}
+.header-tabs::-webkit-scrollbar{display:none}
+.h-tab{
+  padding:12px 16px;font-size:12px;font-weight:700;
+  color:rgba(255,255,255,.6);cursor:pointer;white-space:nowrap;
+  border-bottom:3px solid transparent;border-left:none;border-right:none;border-top:none;
+  background:none;font-family:inherit;transition:all .2s;
+  display:flex;align-items:center;gap:5px;
+}
+.h-tab.active{color:#fff;border-bottom-color:#fff}
+.h-tab:hover{color:rgba(255,255,255,.9)}
+
+/* ══ 바디 ══ */
+.portal-body{max-width:680px;margin:0 auto;padding:20px 16px 60px}
+
+/* ══ 섹션 ══ */
+.section{display:none;animation:fadeIn .25s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ══ 섹션 라벨 ══ */
+.section-label{
+  font-size:11px;font-weight:700;color:var(--mt);
+  letter-spacing:.07em;margin-bottom:12px;margin-top:4px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+/* ══ 통계 행 ══ */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.stat-box{
+  border-radius:12px;padding:14px 8px;text-align:center;
+  border:1px solid #fbcfe8;background:var(--pink-lt);
+}
+.stat-box.blue{background:var(--blue-lt);border-color:#bfdbfe}
+.stat-box.green{background:var(--green-lt);border-color:#6ee7b7}
+.stat-num{font-size:20px;font-weight:700;color:var(--pink)}
+.stat-box.blue .stat-num{color:var(--blue)}
+.stat-box.green .stat-num{color:var(--green)}
+.stat-lbl{font-size:10px;color:var(--mt);margin-top:3px}
+
+/* ══ 학습 도구 ══ */
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tool-btn{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:8px;padding:20px 12px;
+  background:var(--wh);border:1.5px solid var(--bd);
+  border-radius:14px;cursor:pointer;transition:all .2s;
+  text-decoration:none;color:var(--tx);text-align:center;
+}
+.tool-btn:hover{
+  border-color:var(--pink);background:var(--pink-lt);
+  transform:translateY(-2px);
+  box-shadow:0 4px 14px rgba(236,72,153,.12);
+}
+.tool-icon{font-size:30px}
+.tool-label{font-size:12px;font-weight:700}
+.tool-desc{font-size:10px;color:var(--mt)}
+.info-card{
+  background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);
+  padding:16px;margin-top:12px;
+}
+.info-card p{font-size:12px;color:var(--mt);line-height:1.9}
+.info-card strong{color:var(--tx)}
+
+/* ══ 수업 카드 ══ */
+.cc-item{
+  border:1px solid var(--bd);border-radius:12px;
+  margin-bottom:8px;background:var(--wh);overflow:hidden;
+  transition:box-shadow .15s;
+}
+.cc-item:hover{box-shadow:0 2px 10px rgba(236,72,153,.1)}
+.cc-item-head{
+  padding:13px 14px;cursor:pointer;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.cc-item-head:hover{background:#fdf2f8}
+.cc-date-badge{
+  min-width:48px;text-align:center;flex-shrink:0;
+  background:var(--pink-lt);border:1px solid #fbcfe8;
+  border-radius:10px;padding:6px 4px;
+}
+.cc-date-m{font-size:10px;color:var(--pink);font-weight:700}
+.cc-date-d{font-size:17px;font-weight:700;color:var(--pink-dk);line-height:1.1}
+.cc-info{flex:1;min-width:0}
+.cc-subj{font-size:13px;font-weight:700;margin-bottom:5px;color:var(--tx)}
+.cc-chips{display:flex;flex-wrap:wrap;gap:3px}
+.chip{font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap}
+.chip-blue{background:#dbeafe;color:#1e40af}
+.chip-green{background:#d1fae5;color:#065f46}
+.chip-red{background:#fee2e2;color:#991b1b}
+.chip-yellow{background:#fef9c3;color:#854d0e}
+.chip-gray{background:#f5f5f7;color:#aeaeb2}
+.chip-pink{background:var(--pink-lt);color:var(--pink-dk)}
+.cc-arrow{color:var(--mt);font-size:12px;margin-top:2px;transition:transform .25s;flex-shrink:0}
+.cc-item.open .cc-arrow{transform:rotate(180deg)}
+.cc-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.cc-item.open .cc-body{max-height:400px}
+.cc-body-inner{padding:2px 14px 14px;border-top:1px solid #fce7f3}
+.cc-body-label{font-size:10px;font-weight:700;color:#a21caf;letter-spacing:.05em;margin:10px 0 5px}
+.cc-body-text{font-size:12px;color:var(--tx);line-height:1.8;white-space:pre-wrap;word-break:break-word}
+
+/* ══ 테스트 결과 ══ */
+.test-item{
+  background:var(--wh);border:1px solid var(--bd);
+  border-radius:12px;padding:15px;margin-bottom:8px;
+  transition:box-shadow .15s;
+}
+.test-item:hover{box-shadow:0 2px 10px rgba(59,130,246,.1)}
+.test-item-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.score-circle{
+  width:52px;height:52px;border-radius:50%;flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.score-high{background:#d1fae5;color:#065f46}
+.score-mid{background:#fef9c3;color:#854d0e}
+.score-low{background:#fee2e2;color:#991b1b}
+.score-none{background:#f5f5f7;color:#aeaeb2}
+.score-pct{font-size:14px;font-weight:700;line-height:1.1}
+.score-unit{font-size:9px;opacity:.7}
+.test-info{flex:1;min-width:0}
+.test-title{font-size:13px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.test-meta{font-size:11px;color:var(--mt);display:flex;gap:8px;flex-wrap:wrap}
+.test-bar-wrap{background:#eff6ff;border-radius:6px;height:7px;overflow:hidden}
+.test-bar{height:100%;border-radius:6px;background:linear-gradient(90deg,#60a5fa,#2563eb);transition:width .8s ease}
+.test-bar-info{font-size:10px;color:var(--mt);margin-top:4px;text-align:right}
+.wrong-list{margin-top:10px;padding-top:10px;border-top:1px solid #eff6ff}
+.wrong-label{font-size:10px;font-weight:700;color:#1e40af;margin-bottom:6px}
+.wrong-tag{
+  display:inline-block;font-size:10px;
+  background:#eff6ff;border:1px solid #bfdbfe;
+  border-radius:5px;padding:2px 7px;margin:2px;color:#1e40af;
+}
+
+/* ══ 스모테스트 ══ */
+.master-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 0;border-bottom:1px solid #fdf2f8;
+}
+.master-item:last-child{border-bottom:none}
+.master-rank{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--pink-lt);border:1px solid #fbcfe8;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--pink);flex-shrink:0;
+}
+.master-title{flex:1;min-width:0}
+.master-name{font-size:12px;font-weight:700;margin-bottom:3px}
+.master-date{font-size:10px;color:var(--mt)}
+.master-bar-col{flex:2;min-width:0}
+.master-bar-wrap{background:#fdf2f8;border-radius:4px;height:6px;overflow:hidden}
+.master-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,#f472b6,#db2777);transition:width .8s ease}
+.master-score{font-size:13px;font-weight:700;color:var(--pink);min-width:40px;text-align:right;flex-shrink:0}
+
+/* ══ 빈 상태 ══ */
+.empty-box{
+  text-align:center;padding:44px 20px;color:var(--mt);
+  font-size:12px;line-height:1.9;
+}
+.empty-icon{font-size:40px;margin-bottom:10px}
+
+/* ══ 안내 배너 ══ */
+.notice-banner{
+  background:linear-gradient(135deg,#fdf2f8,#fce7f3);
+  border:1px solid #fbcfe8;border-radius:12px;
+  padding:14px 16px;margin-bottom:14px;
+  font-size:12px;color:var(--tx);line-height:1.8;
+}
+.notice-banner strong{color:var(--pink)}
+
+/* ══ 반응형 ══ */
+@media(max-width:480px){
+  .student-name-big{font-size:22px}
+  .portal-header{padding:20px 16px 0}
+  .portal-body{padding:16px 12px 60px}
+  .h-tab{padding:11px 13px;font-size:11px}
+  .tool-grid{gap:8px}
+  .tool-btn{padding:16px 10px;gap:6px}
+  .tool-icon{font-size:26px}
+  .stat-row{gap:6px}
+  .stat-num{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<!-- 로딩 -->
+<div id="loadingScreen" class="loading-screen">
+  <div class="spinner"></div>
+  <p style="font-size:13px">학생 정보를 불러오는 중...</p>
+</div>
+
+<!-- 에러 -->
+<div id="errorScreen" class="error-screen" style="display:none">
+  <div style="font-size:52px">🔍</div>
+  <h2>페이지를 찾을 수 없습니다</h2>
+  <p>학원에서 보내드린 링크를 다시 확인해주세요.<br>문제가 계속되면 학원으로 문의해 주세요.</p>
+</div>
+
+<!-- 메인 앱 -->
+<div id="portalApp" style="display:none">
+  <!-- 헤더 -->
+  <div class="portal-header">
+    <div class="hdr-content">
+      <div class="school-badge">
+        <svg width="13" height="13" viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+          <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        </svg>
+        베타과학학원
+      </div>
+      <div class="student-name-big" id="hName">—</div>
+      <div class="student-meta">
+        <span class="meta-chip" id="hGrade"></span>
+        <span class="meta-chip" id="hSubject"></span>
+      </div>
+    </div>
+    <div class="header-tabs">
+      <button class="h-tab active" onclick="switchTab(0)">📚 학습 도구</button>
+      <button class="h-tab" onclick="switchTab(1)">📖 수업 기록</button>
+      <button class="h-tab" onclick="switchTab(2)">📝 스마트테스트</button>
+      <button class="h-tab" onclick="switchTab(3)">🎯 스모테스트</button>
+    </div>
+  </div>
+
+  <div class="portal-body">
+
+    <!-- ── 섹션 0: 학습 도구 ── -->
+    <div class="section active" id="sec0">
+      <br>
+      <div class="tool-grid">
+        <a href="https://www.classcard.net" target="_blank" rel="noopener" class="tool-btn">
+          <div class="tool-icon">💻</div>
+          <div class="tool-label">온라인 학습</div>
+          <div class="tool-desc">클래스카드</div>
+        </a>
+        <a id="linkExplore" href="#" target="_blank" rel="noopener" class="tool-btn">
+          <div class="tool-icon">🔬</div>
+          <div class="tool-label">탐구활동</div>
+          <div class="tool-desc">수행평가 신청서</div>
+        </a>
+        <a id="linkSchedule" href="#" target="_blank" rel="noopener" class="tool-btn">
+          <div class="tool-icon">📅</div>
+          <div class="tool-label">시험 일정</div>
+          <div class="tool-desc">학원 일정 안내</div>
+        </a>
+        <a href="tel:02-0000-0000" class="tool-btn" id="linkTel">
+          <div class="tool-icon">📞</div>
+          <div class="tool-label">학원 문의</div>
+          <div class="tool-desc">베타과학학원</div>
+        </a>
+      </div>
+      <div class="info-card" style="margin-top:14px">
+        <p>
+          이 페이지는 <strong>보기 전용</strong>으로 열립니다.<br>
+          잘못 건드릴 염려가 없으니 편하게 확인하세요 😊<br><br>
+          궁금한 점이 있으면 언제든지 <strong>학원으로 문의</strong>해 주세요.
+        </p>
+      </div>
+    </div>
+
+    <!-- ── 섹션 1: 수업 기록 ── -->
+    <div class="section" id="sec1">
+      <br>
+      <div class="stat-row">
+        <div class="stat-box"><div class="stat-num" id="cs-total">—</div><div class="stat-lbl">전체 수업</div></div>
+        <div class="stat-box"><div class="stat-num" id="cs-month">—</div><div class="stat-lbl">이번달</div></div>
+        <div class="stat-box"><div class="stat-num" id="cs-avg">—</div><div class="stat-lbl">평균점수</div></div>
+      </div>
+      <div class="section-label">수업 기록</div>
+      <div id="classCardList">
+        <div class="empty-box"><div class="spinner" style="margin:0 auto 12px"></div>불러오는 중...</div>
+      </div>
+    </div>
+
+    <!-- ── 섹션 2: 스마트테스트 ── -->
+    <div class="section" id="sec2">
+      <br>
+      <div class="stat-row">
+        <div class="stat-box blue"><div class="stat-num" id="ts-total">—</div><div class="stat-lbl">응시 횟수</div></div>
+        <div class="stat-box blue"><div class="stat-num" id="ts-avg">—</div><div class="stat-lbl">평균 점수</div></div>
+        <div class="stat-box blue"><div class="stat-num" id="ts-best">—</div><div class="stat-lbl">최고 점수</div></div>
+      </div>
+      <div class="section-label">테스트 결과</div>
+      <div id="testResultList">
+        <div class="empty-box"><div class="spinner" style="margin:0 auto 12px"></div>불러오는 중...</div>
+      </div>
+    </div>
+
+    <!-- ── 섹션 3: 스모테스트 ── -->
+    <div class="section" id="sec3">
+      <br>
+      <div class="stat-row">
+        <div class="stat-box green"><div class="stat-num" id="ms-total">—</div><div class="stat-lbl">응시 횟수</div></div>
+        <div class="stat-box green"><div class="stat-num" id="ms-avg">—</div><div class="stat-lbl">평균 점수</div></div>
+        <div class="stat-box green"><div class="stat-num" id="ms-best">—</div><div class="stat-lbl">최고 점수</div></div>
+      </div>
+      <div class="section-label">단원별 테스트 결과</div>
+      <div id="masterTestList">
+        <div class="empty-box">
+          <div class="empty-icon">🚧</div>
+          <strong style="color:var(--tx);display:block;margin-bottom:6px">준비 중입니다</strong>
+          스모테스트 결과가 곧 추가될 예정입니다.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getFirestore,collection,query,where,getDocs,orderBy}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const fc={
+  apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+  authDomain:"beta-science.firebaseapp.com",
+  projectId:"beta-science",
+  storageBucket:"beta-science.firebasestorage.app",
+  messagingSenderId:"650652155367",
+  appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+};
+const app=initializeApp(fc);
+const db=getFirestore(app);
+
+/* ── URL 파라미터로 학생 ID 추출 ── */
+const params=new URLSearchParams(window.location.search);
+const studentId=params.get('id');
+if(!studentId){showError();}else{loadPortal(studentId);}
+
+/* ────────────────────────────
+   메인 로드
+──────────────────────────── */
+async function loadPortal(sid){
+  try{
+    /* 1. 학생 정보 조회 */
+    const sq=query(collection(db,"students"),where("id","==",sid));
+    const ss=await getDocs(sq);
+    if(ss.empty){showError();return;}
+    const sdoc=ss.docs[0];
+    const student={fireId:sdoc.id,...sdoc.data()};
+
+    /* 2. 헤더 정보 표시 */
+    document.getElementById('hName').textContent=student.name||'학생';
+    document.getElementById('hGrade').textContent=student.grade||'';
+    document.getElementById('hSubject').textContent=
+      student.subject&&student.subject!=='-'?student.subject:'';
+    document.title=`${student.name||'학생'} 포털 - 베타과학학원`;
+
+    /* 3. 빈 meta-chip 숨기기 */
+    ['hGrade','hSubject'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(!el.textContent.trim())el.style.display='none';
+    });
+
+    /* 4. 앱 노출 */
+    document.getElementById('loadingScreen').style.display='none';
+    document.getElementById('portalApp').style.display='block';
+
+    /* 5. 각 섹션 데이터 병렬 로드 */
+    loadClassCards(student.fireId, sid);
+    loadTestResults(sid);
+    loadMasterTests(sid);
+
+  }catch(err){
+    console.error('loadPortal error:',err);
+    showError();
+  }
+}
+
+/* ────────────────────────────
+   수업 기록 (classCards)
+──────────────────────────── */
+async function loadClassCards(fireId, sid){
+  const el=document.getElementById('classCardList');
+  try{
+    let cards=[];
+    /* fireId 로 조회 */
+    try{
+      const s1=await getDocs(
+        query(collection(db,"classCards"),where("studentId","==",fireId),orderBy("classDate","desc"))
+      );
+      s1.forEach(d=>cards.push({id:d.id,...d.data()}));
+    }catch(e1){
+      /* index 없으면 orderBy 없이 재시도 */
+      const s1b=await getDocs(query(collection(db,"classCards"),where("studentId","==",fireId)));
+      s1b.forEach(d=>cards.push({id:d.id,...d.data()}));
+    }
+
+    /* sid(학생ID 문자열)로 추가 조회 (중복 제거) */
+    if(sid!==fireId){
+      try{
+        const existing=new Set(cards.map(c=>c.id));
+        try{
+          const s2=await getDocs(
+            query(collection(db,"classCards"),where("studentId","==",sid),orderBy("classDate","desc"))
+          );
+          s2.forEach(d=>{if(!existing.has(d.id))cards.push({id:d.id,...d.data()});});
+        }catch(e2){
+          const s2b=await getDocs(query(collection(db,"classCards"),where("studentId","==",sid)));
+          s2b.forEach(d=>{if(!existing.has(d.id))cards.push({id:d.id,...d.data()});});
+        }
+      }catch(e){}
+    }
+
+    /* 날짜 내림차순 정렬 */
+    cards.sort((a,b)=>(b.classDate||'').localeCompare(a.classDate||''));
+
+    /* 통계 */
+    const now=new Date();
+    const thisMonth=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const monthCount=cards.filter(c=>(c.classDate||'').startsWith(thisMonth)).length;
+    const scored=cards.filter(c=>typeof c.score==='number'&&c.score>=0&&!c.scoreNone);
+    const avg=scored.length?Math.round(scored.reduce((a,c)=>a+c.score,0)/scored.length):null;
+
+    document.getElementById('cs-total').textContent=cards.length+'건';
+    document.getElementById('cs-month').textContent=monthCount+'건';
+    document.getElementById('cs-avg').textContent=avg!==null?avg+'점':'—';
+
+    /* 렌더링 */
+    if(!cards.length){
+      el.innerHTML='<div class="empty-box"><div class="empty-icon">📭</div>아직 작성된 수업 기록이 없습니다.</div>';
+      return;
+    }
+    el.innerHTML=cards.map(c=>renderClassCard(c)).join('');
+
+  }catch(err){
+    console.error('classCards error:',err);
+    el.innerHTML='<div class="empty-box">수업 기록을 불러오지 못했습니다.</div>';
+  }
+}
+
+function renderClassCard(c){
+  const sc=typeof c.score==='number'?c.score:-1;
+  const sCls=c.scoreNone?'chip-gray':(sc>=70?'chip-green':sc>=0?'chip-red':'chip-gray');
+  const sTxt=c.scoreNone?'테스트없음':(sc>=0?sc+'점':'—');
+  const hwCls=c.homework==='높음'?'chip-green':c.homework==='낮음'?'chip-red':'chip-yellow';
+  const attCls=c.attitude==='적극적'?'chip-blue':c.attitude==='산만'?'chip-pink':'chip-yellow';
+  const [mo,dy]=parseDate(c.classDate);
+  const hasBody=!!(c.content||c.unit);
+  return`<div class="cc-item" id="cci-${c.id}">
+    <div class="cc-item-head" onclick="toggleCC('${c.id}')">
+      <div class="cc-date-badge">
+        <div class="cc-date-m">${mo}</div>
+        <div class="cc-date-d">${dy}</div>
+      </div>
+      <div class="cc-info">
+        <div class="cc-subj">${e(c.subject||'수업')}</div>
+        <div class="cc-chips">
+          ${c.teacher?`<span class="chip chip-blue">${e(c.teacher)}</span>`:''}
+          <span class="chip ${sCls}">${sTxt}</span>
+          ${c.homework&&c.homework!=='-'?`<span class="chip ${hwCls}">과제 ${e(c.homework)}</span>`:''}
+          ${c.attitude?`<span class="chip ${attCls}">${e(c.attitude)}</span>`:''}
+        </div>
+      </div>
+      ${hasBody?`<span class="cc-arrow">▾</span>`:'<span style="width:16px"></span>'}
+    </div>
+    ${hasBody?`<div class="cc-body"><div class="cc-body-inner">
+      ${c.unit?`<div class="cc-body-label">학습 단원</div><div class="cc-body-text">${e(c.unit)}</div>`:''}
+      ${c.content?`<div class="cc-body-label">수업 내용</div><div class="cc-body-text">${e(c.content)}</div>`:''}
+    </div></div>`:''}
+  </div>`;
+}
+
+/* ────────────────────────────
+   스마트테스트 (results)
+──────────────────────────── */
+async function loadTestResults(sid){
+  const el=document.getElementById('testResultList');
+  try{
+    let results=[];
+    try{
+      const snap=await getDocs(
+        query(collection(db,"results"),where("studentId","==",sid),orderBy("createdAt","desc"))
+      );
+      snap.forEach(d=>results.push({id:d.id,...d.data()}));
+    }catch(e1){
+      const snap=await getDocs(query(collection(db,"results"),where("studentId","==",sid)));
+      snap.forEach(d=>results.push({id:d.id,...d.data()}));
+      results.sort((a,b)=>{
+        const ta=a.startedAt||'';const tb=b.startedAt||'';
+        return tb.localeCompare(ta);
+      });
+    }
+
+    /* 통계 */
+    const completed=results.filter(r=>typeof r.score==='number'&&r.score!==null);
+    const pcts=completed.map(r=>{
+      if(r.totalQuestions&&r.totalQuestions>0)
+        return Math.round((r.score/r.totalQuestions)*100);
+      return r.score;
+    });
+    const avg=pcts.length?Math.round(pcts.reduce((a,v)=>a+v,0)/pcts.length):null;
+    const best=pcts.length?Math.max(...pcts):null;
+
+    document.getElementById('ts-total').textContent=results.length+'회';
+    document.getElementById('ts-avg').textContent=avg!==null?avg+'%':'—';
+    document.getElementById('ts-best').textContent=best!==null?best+'%':'—';
+
+    if(!results.length){
+      el.innerHTML='<div class="empty-box"><div class="empty-icon">📝</div>아직 응시한 테스트가 없습니다.</div>';
+      return;
+    }
+    el.innerHTML=results.map(r=>renderTestResult(r)).join('');
+
+  }catch(err){
+    console.error('results error:',err);
+    el.innerHTML='<div class="empty-box">테스트 결과를 불러오지 못했습니다.</div>';
+  }
+}
+
+function renderTestResult(r){
+  const hasScore=typeof r.score==='number'&&r.score!==null;
+  const pct=hasScore&&r.totalQuestions>0
+    ?Math.round((r.score/r.totalQuestions)*100)
+    :(hasScore?r.score:-1);
+  const cls=!hasScore?'score-none':pct>=80?'score-high':pct>=60?'score-mid':'score-low';
+  const disp=!hasScore?'응시중':(pct+'%');
+  const dt=r.startedAt?r.startedAt.substring(0,10):'';
+  const wrong=typeof r.wrongCount==='number'&&r.wrongCount!==null?r.wrongCount:null;
+  return`<div class="test-item">
+    <div class="test-item-head">
+      <div class="score-circle ${cls}">
+        <div class="score-pct">${disp}</div>
+        ${hasScore&&r.totalQuestions?`<div class="score-unit">${r.score}/${r.totalQuestions}</div>`:''}
+      </div>
+      <div class="test-info">
+        <div class="test-title">${e(r.examTitle||'테스트')}</div>
+        <div class="test-meta">
+          ${r.subject?`<span>${e(r.subject)}</span>`:''}
+          ${r.grade?`<span>${e(r.grade)}</span>`:''}
+          ${dt?`<span>${dt}</span>`:''}
+          ${wrong!==null?`<span>❌ 오답 ${wrong}개</span>`:''}
+        </div>
+      </div>
+    </div>
+    ${hasScore&&r.totalQuestions>0?`
+    <div class="test-bar-wrap">
+      <div class="test-bar" style="width:${pct}%"></div>
+    </div>
+    <div class="test-bar-info">${r.score}문항 정답 / 전체 ${r.totalQuestions}문항</div>`:''}
+  </div>`;
+}
+
+/* ────────────────────────────
+   스모테스트 (master-tests)
+──────────────────────────── */
+async function loadMasterTests(sid){
+  try{
+    let tests=[];
+    try{
+      const snap=await getDocs(
+        query(collection(db,"master-tests"),where("studentId","==",sid),orderBy("createdAt","desc"))
+      );
+      snap.forEach(d=>tests.push({id:d.id,...d.data()}));
+    }catch(e){
+      const snap=await getDocs(query(collection(db,"master-tests"),where("studentId","==",sid)));
+      snap.forEach(d=>tests.push({id:d.id,...d.data()}));
+    }
+
+    if(!tests.length){
+      /* 결과 없으면 placeholder 유지 */
+      return;
+    }
+
+    /* 통계 */
+    const scored=tests.filter(t=>typeof t.score==='number'&&t.score!==null);
+    const pcts=scored.map(t=>t.totalQuestions>0?Math.round((t.score/t.totalQuestions)*100):t.score);
+    const avg=pcts.length?Math.round(pcts.reduce((a,v)=>a+v,0)/pcts.length):null;
+    const best=pcts.length?Math.max(...pcts):null;
+
+    document.getElementById('ms-total').textContent=tests.length+'회';
+    document.getElementById('ms-avg').textContent=avg!==null?avg+'%':'—';
+    document.getElementById('ms-best').textContent=best!==null?best+'%':'—';
+
+    const el=document.getElementById('masterTestList');
+    el.innerHTML=`<div style="background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px">
+      ${tests.map((t,i)=>{
+        const pct=t.totalQuestions>0?Math.round((t.score/t.totalQuestions)*100):(t.score||0);
+        const dt=t.startedAt?t.startedAt.substring(0,10):(t.createdAt?'':'');
+        return`<div class="master-item">
+          <div class="master-rank">${i+1}</div>
+          <div class="master-title">
+            <div class="master-name">${e(t.title||t.examTitle||t.subject||'단원테스트')}</div>
+            ${dt?`<div class="master-date">${dt}</div>`:''}
+          </div>
+          <div class="master-bar-col">
+            <div class="master-bar-wrap">
+              <div class="master-bar" style="width:${pct}%"></div>
+            </div>
+          </div>
+          <div class="master-score">${pct}%</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }catch(err){
+    console.error('master-tests error:',err);
+    /* 오류 시에도 placeholder 유지 */
+  }
+}
+
+/* ────────────────────────────
+   유틸
+──────────────────────────── */
+function parseDate(ds){
+  if(!ds)return['—','—'];
+  const p=ds.split('-');
+  if(p.length>=3)return[p[1]+'월',parseInt(p[2])+'일'];
+  return['—','—'];
+}
+
+function showError(){
+  document.getElementById('loadingScreen').style.display='none';
+  document.getElementById('errorScreen').style.display='flex';
+}
+
+function e(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── 탭 전환 ── */
+window.switchTab=function(idx){
+  document.querySelectorAll('.section').forEach((s,i)=>s.classList.toggle('active',i===idx));
+  document.querySelectorAll('.h-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+};
+
+/* ── 수업카드 토글 ── */
+window.toggleCC=function(id){
+  document.getElementById('cci-'+id)?.classList.toggle('open');
+};
+</script>
+</body>
+</html>
