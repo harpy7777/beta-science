@@ -13,7 +13,6 @@ const GRADE_MAP: Record<string, string> = {
 
 type Step = 'login' | 'select';
 
-// 시험을 OX / 4지선다 / 혼합 중 어떤 타입인지 판별
 function getExamType(exam: Exam): 'ox' | 'multiple' | 'mixed' {
   const questions = exam.questions ?? [];
   const hasOX = questions.some((q: any) => q.type === 'ox');
@@ -73,10 +72,10 @@ function getTypeBadge(exam: Exam & { subType?: string }) {
   return { label: '혼합', color: '#f59e0b' };
 }
 
-// ── 공통 상단 헤더 (마스터 테스트와 동일한 스타일) ──
+// ── 공통 상단 헤더 ──
 function TopHeader() {
   return (
-    <div className="bg-white border-b border-green-100 px-5 py-3 flex items-center justify-center gap-3 shadow-sm">
+    <div className="bg-white border-b border-green-100 px-5 py-3 flex items-center justify-center gap-3 shadow-sm sticky top-0 z-10">
       <div className="w-8 h-8 bg-green-600 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
         <FlaskConical size={16} className="text-white" />
       </div>
@@ -98,8 +97,10 @@ export default function StudentTestPage() {
   const [studentInfo, setStudentInfo] = useState<{ id: string; name: string; grade: string } | null>(null);
 
   useEffect(() => {
-    const savedId = localStorage.getItem('studentId') ?? '';
-    if (savedId) setStudentIdInput(savedId);
+    try {
+      const savedId = localStorage.getItem('studentId') ?? '';
+      if (savedId) setStudentIdInput(savedId);
+    } catch {}
   }, []);
 
   async function handleEnter() {
@@ -114,9 +115,11 @@ export default function StudentTestPage() {
         return;
       }
 
-      localStorage.setItem('studentId', student.id);
-      localStorage.setItem('studentName', student.name);
-      localStorage.setItem('studentGrade', selectedGrade);
+      try {
+        localStorage.setItem('studentId', student.id);
+        localStorage.setItem('studentName', student.name);
+        localStorage.setItem('studentGrade', selectedGrade);
+      } catch {}
 
       setStudentInfo({ id: student.id, name: student.name, grade: selectedGrade });
 
@@ -164,15 +167,20 @@ export default function StudentTestPage() {
     }
   }
 
-  // ── 로그인 화면 (마스터 테스트와 동일한 레이아웃) ──
+  // ── 로그인 화면 ──
   if (step === 'login') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
+      // 배경을 페이지 전체에 고정, 스크롤은 내부에서
+      <div
+        className="bg-gradient-to-br from-green-50 via-white to-emerald-50"
+        style={{ minHeight: '100svh', overflowX: 'hidden' }}
+      >
         <TopHeader />
 
-        <div className="flex items-center justify-center min-h-[calc(100vh-52px)] px-4 py-8">
-          <div className="w-full max-w-md">
-            <div className="bg-white rounded-2xl border border-green-100 shadow-lg shadow-green-100/40 p-8">
+        {/* 패딩 기반 레이아웃 - viewport height 의존 제거 */}
+        <div className="px-4 pt-10 pb-16">
+          <div className="w-full max-w-md mx-auto">
+            <div className="bg-white rounded-2xl border border-green-100 shadow-lg shadow-green-100/40 p-6 sm:p-8">
               <h2 className="font-black text-gray-800 text-lg mb-6">🎓 학생 입장</h2>
 
               {/* 학생 ID */}
@@ -180,11 +188,15 @@ export default function StudentTestPage() {
                 <label className="block text-sm font-bold text-green-700 mb-1.5">학생 ID</label>
                 <input
                   type="text"
+                  inputMode="text"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  autoComplete="off"
                   className="w-full border-2 border-green-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-green-500 transition-colors bg-white placeholder-gray-300"
                   placeholder="예: m01001, h01001"
                   value={studentIdInput}
                   onChange={e => setStudentIdInput(e.target.value.toLowerCase())}
-                  autoFocus
+                  onKeyDown={e => e.key === 'Enter' && handleEnter()}
                 />
                 <p className="text-xs text-gray-400 mt-1.5">선생님께 받은 학생 ID를 입력하세요</p>
               </div>
@@ -196,6 +208,7 @@ export default function StudentTestPage() {
                   {Object.keys(GRADE_MAP).map(g => (
                     <button
                       key={g}
+                      type="button"
                       onClick={() => setSelectedGrade(g)}
                       className={`py-2.5 rounded-xl border-2 text-sm font-bold transition-all
                         ${selectedGrade === g
@@ -211,9 +224,10 @@ export default function StudentTestPage() {
 
               {/* 입장하기 */}
               <button
+                type="button"
                 onClick={handleEnter}
                 disabled={loading}
-                className="w-full py-3.5 bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-bold text-base rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm"
+                className="w-full py-3.5 bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:opacity-60 text-white font-bold text-base rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm"
               >
                 {loading
                   ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -222,7 +236,7 @@ export default function StudentTestPage() {
               </button>
             </div>
 
-            <p className="text-center text-xs text-gray-400 mt-4">
+            <p className="text-center text-xs text-gray-400 mt-4 px-2">
               학생 ID는 선생님께 받은 고유 번호입니다 (예: m01001, h01001)
             </p>
           </div>
@@ -231,17 +245,21 @@ export default function StudentTestPage() {
     );
   }
 
-  // ── 시험 선택 화면 (마스터 테스트와 동일한 레이아웃) ──
+  // ── 시험 선택 화면 ──
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
+    <div
+      className="bg-gradient-to-br from-green-50 via-white to-emerald-50"
+      style={{ minHeight: '100svh', overflowX: 'hidden' }}
+    >
       <TopHeader />
 
-      <div className="flex items-start justify-center pt-8 px-4 pb-10">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl border border-green-100 shadow-lg shadow-green-100/40 p-7">
+      <div className="px-4 pt-8 pb-16">
+        <div className="w-full max-w-md mx-auto">
+          <div className="bg-white rounded-2xl border border-green-100 shadow-lg shadow-green-100/40 p-6 sm:p-7">
 
             {/* 뒤로가기 */}
             <button
+              type="button"
               onClick={() => setStep('login')}
               className="text-xs font-bold text-gray-400 hover:text-green-600 mb-5 flex items-center gap-1 transition-colors"
             >
@@ -249,10 +267,10 @@ export default function StudentTestPage() {
             </button>
 
             {/* 타이틀 + 학생 배지 */}
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between mb-5 gap-2">
               <h2 className="font-black text-gray-800 text-lg">📋 테스트 선택</h2>
               {studentInfo && (
-                <span className="bg-green-100 text-green-800 text-xs font-bold px-3 py-1.5 rounded-full">
+                <span className="bg-green-100 text-green-800 text-xs font-bold px-3 py-1.5 rounded-full flex-shrink-0">
                   {studentInfo.name} · {selectedGrade}
                 </span>
               )}
@@ -276,10 +294,11 @@ export default function StudentTestPage() {
                   return (
                     <button
                       key={exam.id}
+                      type="button"
                       onClick={() => handleSelectExam(exam)}
-                      className="w-full text-left p-4 border-2 border-green-100 rounded-xl bg-white hover:bg-green-50 hover:border-green-300 transition-all flex items-center justify-between group"
+                      className="w-full text-left p-4 border-2 border-green-100 rounded-xl bg-white hover:bg-green-50 active:bg-green-100 hover:border-green-300 transition-all flex items-center justify-between group"
                     >
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         {/* 타입 배지 */}
                         <span
                           className="inline-block text-xs font-bold px-2 py-0.5 rounded-full text-white mb-1.5"
