@@ -2,214 +2,176 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>학생 관리 - 베타과학학원</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--pink:#ec4899;--pink-lt:#fdf2f8;--pink-dk:#be185d;--mw:1200px;--bg:#fef7fb;--wh:#fff;--tx:#1e293b;--mt:#94a3b8;--bd:#f0e4ec;--r:12px;--ok:#10b981;--ng:#ef4444}
-body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-weight:400;font-size:13px;background:var(--bg);color:var(--tx);min-height:100vh;visibility:hidden;overflow-x:hidden}
-.app-wrapper{max-width:var(--mw);margin:0 auto;display:flex;flex-direction:column;min-height:100vh}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Arial,sans-serif;background:#fafafa;color:#1d1d1f;min-height:100vh;-webkit-font-smoothing:antialiased;visibility:hidden;overscroll-behavior:none}
 
-/* ══ 탑바 ══ */
-.topbar{background:var(--wh);border-bottom:1px solid var(--bd);padding:0 28px;display:flex;align-items:center;gap:12px;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(236,72,153,.06);flex-wrap:nowrap}
-.logo-area{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0}
-.logo-icon{width:28px;height:28px;background:linear-gradient(135deg,#f472b6 0%,#db2777 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(244,114,182,.35);flex-shrink:0}
-.logo-name{font-size:14px;font-weight:500;color:var(--tx);letter-spacing:-.01em}
-.topbar-divider{width:1px;height:20px;background:var(--bd);flex-shrink:0}
-.topbar nav{flex:1;display:flex;align-items:center;min-width:0;overflow:hidden}
-.nav-tabs{display:flex;list-style:none;width:100%;justify-content:space-evenly;align-items:center}
-.nav-tabs li{flex:1;text-align:center}
-.nav-tabs a{display:block;padding:7px 6px;font-size:12px;font-weight:500;color:var(--mt);text-decoration:none;border-radius:20px;white-space:nowrap;transition:all .15s;text-align:center}
-.nav-tabs a:hover{background:var(--pink-lt);color:var(--tx)}
-.nav-tabs a.active{background:#fce7f3;color:var(--pink);font-weight:700}
-.topbar-right{flex-shrink:0;display:flex;align-items:center;gap:8px}
-.badge-admin{font-size:11px;padding:3px 10px;background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:20px;color:var(--pink);font-weight:700;white-space:nowrap}
-.btn-logout{padding:5px 14px;background:transparent;border:1.5px solid #fbcfe8;border-radius:20px;font-family:inherit;font-size:11px;font-weight:700;color:var(--pink);cursor:pointer;transition:all .15s;white-space:nowrap}
-.btn-logout:hover{background:var(--pink-lt)}
+/* ── Header ── */
+.header{background:#fff;border-bottom:1px solid #f0e8ed;padding:0 1.2rem;padding-left:max(1.2rem,env(safe-area-inset-left));padding-right:max(1.2rem,env(safe-area-inset-right));height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300}
+.header-left{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,#f472b6 0%,#db2777 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:14px;font-weight:600;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{display:flex;align-items:center;gap:5px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;color:#16a34a;white-space:nowrap}
+.dot-green{width:5px;height:5px;background:#22c55e;border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.logout-btn{padding:7px 14px;min-height:36px;background:transparent;border:1.5px solid #f4c8d4;border-radius:20px;font-family:inherit;font-size:12px;font-weight:600;color:#e8375a;cursor:pointer;white-space:nowrap;transition:background .15s}
+.logout-btn:hover,.logout-btn:active{background:#fceef2}
 
-/* ══ 모바일 전용 네비 바 ══ */
-.mobile-nav-bar{display:none;background:var(--wh);border-bottom:1px solid var(--bd);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:50px;z-index:99}
-.mobile-nav-bar::-webkit-scrollbar{display:none}
-.mobile-nav-inner{display:flex;padding:0 8px;gap:2px;min-width:max-content}
-.mobile-nav-bar a{display:block;padding:9px 13px;font-size:12px;font-weight:500;color:var(--mt);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
-.mobile-nav-bar a.active{color:var(--pink);border-bottom-color:var(--pink);font-weight:700}
-.mobile-nav-bar a:hover{color:var(--tx)}
+/* ── Page Nav ── */
+.page-nav{background:#fff;border-bottom:1px solid #f0e8ed;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:54px;z-index:200}
+.page-nav::-webkit-scrollbar{display:none}
+.page-nav-inner{display:flex;padding:0 1.2rem;min-width:max-content}
+.pnav-a{display:block;padding:11px 13px;font-size:13px;font-weight:500;color:#aeaeb2;text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
+.pnav-a:hover{color:#1d1d1f}
+.pnav-a.on{color:#db2777;border-bottom-color:#db2777;font-weight:600}
 
-/* ══ 레이아웃 ══ */
-.main-content{padding:24px 28px;flex:1}
-.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;background:linear-gradient(135deg,#fdf2f8,#fce7f3);border-radius:14px;padding:16px 18px;border:1px solid #fbcfe8;gap:12px}
-.page-header h1{font-size:18px;font-weight:700;margin-bottom:3px}
-.page-header p{font-size:12px;color:var(--mt)}
-.btn-primary{display:flex;align-items:center;gap:6px;padding:9px 16px;background:var(--pink);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s;font-family:inherit;box-shadow:0 2px 8px rgba(236,72,153,.25);flex-shrink:0}
-.btn-primary:hover{background:var(--pink-dk)}
+/* ── Wrap ── */
+.wrap{padding:1.4rem 1.2rem;padding-bottom:max(3rem,calc(2rem + env(safe-area-inset-bottom)));padding-left:max(1.2rem,env(safe-area-inset-left));padding-right:max(1.2rem,env(safe-area-inset-right));flex:1}
 
-/* ══ 검색 ══ */
-.search-filter-row{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+/* ── Page Hero ── */
+.page-hero{background:linear-gradient(135deg,#fff0f7 0%,#fdf2f8 60%,#f0f9ff 100%);border:1px solid #fce7f3;border-radius:18px;padding:1.2rem 1.4rem;margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.hero-left{display:flex;align-items:center;gap:12px}
+.hero-icon{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#f472b6,#db2777);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 12px rgba(219,39,119,.25)}
+.hero-title{font-size:1.05rem;font-weight:700;letter-spacing:-.03em}
+.hero-sub{font-size:11px;color:#aeaeb2;margin-top:3px}
+.btn-primary{display:flex;align-items:center;gap:6px;padding:10px 18px;min-height:40px;background:linear-gradient(135deg,#f472b6,#db2777);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:opacity .15s;font-family:inherit;box-shadow:0 2px 10px rgba(219,39,119,.3);flex-shrink:0}
+.btn-primary:hover{opacity:.88}
+.btn-primary:active{opacity:.75;transform:scale(.98)}
+
+/* ── Search ── */
+.search-row{display:flex;gap:8px;margin-bottom:1rem;align-items:center;flex-wrap:wrap}
 .search-box{position:relative;flex:1;min-width:160px}
-.search-box svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--mt)}
-.search-box input{width:100%;padding:9px 11px 9px 34px;border:1px solid var(--bd);border-radius:8px;font-size:12px;color:var(--tx);background:var(--wh);outline:none;transition:border .15s;font-family:inherit}
-.search-box input:focus{border-color:var(--pink)}
-.search-box input::placeholder{color:var(--mt)}
-.filter-select{padding:8px 11px;border:1px solid var(--bd);border-radius:8px;font-size:12px;color:var(--tx);background:var(--wh);cursor:pointer;min-width:100px;outline:none;font-family:inherit}
-.filter-select:focus{border-color:var(--pink)}
-.student-count{font-size:12px;color:var(--mt);white-space:nowrap}
-.student-count strong{color:var(--tx);font-weight:700}
+.search-box svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:#aeaeb2}
+.search-box input{width:100%;padding:11px 12px 11px 36px;min-height:44px;border:1.5px solid #fce7f3;border-radius:12px;font-size:16px;color:#1d1d1f;background:#fff;outline:none;transition:border .15s;font-family:inherit;-webkit-appearance:none}
+.search-box input:focus{border-color:#db2777}
+.search-box input::placeholder{color:#aeaeb2}
+.filter-select{padding:10px 12px;min-height:44px;border:1.5px solid #fce7f3;border-radius:12px;font-size:15px;color:#1d1d1f;background:#fff;cursor:pointer;min-width:110px;outline:none;font-family:inherit;-webkit-appearance:none;appearance:none}
+.filter-select:focus{border-color:#db2777}
+.student-count{font-size:12px;color:#aeaeb2;white-space:nowrap;font-weight:500}
+.student-count strong{color:#1d1d1f;font-weight:700}
 
-/* ══ 테이블 ══ */
-.table-card{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+/* ── Table Card ── */
+.table-card{background:#fff;border:1px solid #fce7f3;border-radius:16px;overflow:hidden;transition:border-color .15s}
 .table-card:hover{border-color:#fbcfe8}
 .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:collapse;min-width:700px}
-thead th{font-size:11px;font-weight:700;color:var(--mt);text-align:center;padding:10px 12px;border-bottom:1px solid var(--bd);background:#fdf2f8;white-space:nowrap}
-tbody tr{border-bottom:1px solid var(--bd);transition:background .1s}
+.table-scroll::-webkit-scrollbar{height:4px}
+.table-scroll::-webkit-scrollbar-track{background:#fdf2f8}
+.table-scroll::-webkit-scrollbar-thumb{background:#fbcfe8;border-radius:4px}
+table{width:100%;border-collapse:collapse;min-width:760px}
+thead th{font-size:11px;font-weight:700;color:#aeaeb2;text-align:center;padding:10px 12px;border-bottom:1px solid #fce7f3;background:#fafafa;white-space:nowrap}
+tbody tr{border-bottom:1px solid #fce7f3;transition:background .1s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:#fdf2f8}
-tbody td{font-size:12px;padding:11px 12px;color:var(--tx);text-align:center;vertical-align:middle}
-.student-id{font-size:11px;color:var(--mt);font-family:monospace}
+tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertical-align:middle}
+.student-id{font-size:11px;color:#aeaeb2;font-family:monospace}
 .grade-badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
 .grade-mid1{background:#ede9fe;color:#6d28d9}.grade-mid2{background:#dbeafe;color:#1d4ed8}.grade-mid3{background:#d1fae5;color:#065f46}
 .grade-high1{background:#fef3c7;color:#92400e}.grade-high2{background:#fee2e2;color:#991b1b}.grade-high3{background:#fce7f3;color:#9d174d}
-.subject-tag{display:inline-block;padding:2px 7px;background:var(--pink-lt);border-radius:4px;font-size:11px;color:var(--mt);margin:1px}
+.subject-tag{display:inline-block;padding:2px 7px;background:#fff0f7;border-radius:5px;font-size:11px;color:#aeaeb2;margin:1px}
 .action-icons{display:flex;gap:5px;align-items:center;justify-content:center}
-.action-btn{width:30px;height:30px;border-radius:6px;border:1px solid var(--bd);background:var(--wh);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s;color:var(--mt)}
-.action-btn:hover{background:var(--pink-lt);color:var(--tx)}
-.action-btn.del:hover{background:#fef2f2;border-color:#fca5a5;color:var(--ng)}
-.card-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 9px;border-radius:6px;background:var(--pink-lt);border:1px solid #fbcfe8;color:var(--pink);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s;font-family:inherit}
+.action-btn{width:32px;height:32px;border-radius:8px;border:1.5px solid #fce7f3;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;color:#aeaeb2}
+.action-btn:hover{background:#fdf2f8;border-color:#fbcfe8;color:#1d1d1f}
+.action-btn.del:hover{background:#fef2f2;border-color:#fca5a5;color:#dc2626}
+.card-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:8px;background:#fff0f7;border:1.5px solid #fce7f3;color:#db2777;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .15s;font-family:inherit}
 .card-btn:hover{background:#fce7f3}
-.card-btn.has-card{background:#ecfdf5;border-color:#6ee7b7;color:#065f46}
-.card-btn.has-card:hover{background:#d1fae5}
-.teacher-name{font-size:12px;color:var(--mt)}
-.teacher-name.assigned{color:var(--tx);font-weight:500}
+.card-btn.has-card{background:#f0fdf4;border-color:#6ee7b7;color:#16a34a}
+.card-btn.has-card:hover{background:#dcfce7}
 
-/* ══ 모바일 카드 (완전 재설계) ══ */
-.mobile-card-list{display:none;flex-direction:column;gap:0}
+/* ── Avatar ── */
+.name-cell{display:flex;align-items:center;gap:8px;justify-content:center}
+.stu-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;border:1.5px solid #fce7f3;flex-shrink:0;background:#fff0f7}
+.stu-avatar-placeholder{width:32px;height:32px;border-radius:50%;background:#fff0f7;border:1.5px solid #fce7f3;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#db2777;flex-shrink:0}
 
-.m-card{
-  border-bottom:1px solid var(--bd);
-  padding:14px 16px;
-  background:var(--wh);
-  transition:background .1s;
-}
+/* ── Mobile Card ── */
+.mobile-card-list{display:none;flex-direction:column}
+.m-card{border-bottom:1px solid #fce7f3;padding:1rem 1.2rem;background:#fff;transition:background .1s}
 .m-card:last-child{border-bottom:none}
 .m-card:hover{background:#fdf2f8}
+.m-card-row1{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.m-card-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.m-card-avatar{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid #fce7f3;flex-shrink:0;background:#fff0f7}
+.m-card-avatar-placeholder{width:46px;height:46px;border-radius:50%;background:#fff0f7;border:2px solid #fce7f3;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#db2777;flex-shrink:0}
+.m-card-identity{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.m-card-name{font-size:15px;font-weight:700;letter-spacing:-.02em}
+.m-card-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.m-card-id-badge{font-size:11px;color:#aeaeb2;font-family:monospace;background:#f5f5f7;border:1px solid #e8e8ed;border-radius:5px;padding:1px 5px;white-space:nowrap}
+.m-card-subjects{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;min-height:22px}
+.m-card-row3{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:8px;border-top:1px solid #fce7f3}
+.m-card-contact{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.m-card-teacher{font-size:12px;font-weight:500;color:#1d1d1f;display:flex;align-items:center;gap:4px}
+.m-card-teacher.unassigned{color:#aeaeb2;font-weight:400}
+.m-card-phone{font-size:11px;color:#aeaeb2}
 
-/* 1행: 이름+학년+ID / 수정삭제 버튼 */
-.m-card-row1{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-  margin-bottom:8px;
-}
-.m-card-identity{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  flex-wrap:wrap;
-  flex:1;
-  min-width:0;
-}
-.m-card-name{
-  font-size:15px;
-  font-weight:700;
-  color:var(--tx);
-  white-space:nowrap;
-}
-.m-card-id-badge{
-  font-size:11px;
-  color:var(--mt);
-  font-family:monospace;
-  background:#f8f9fa;
-  border:1px solid var(--bd);
-  border-radius:4px;
-  padding:1px 5px;
-  white-space:nowrap;
-}
-
-/* 2행: 과목 태그 */
-.m-card-subjects{
-  display:flex;
-  flex-wrap:wrap;
-  gap:4px;
-  margin-bottom:10px;
-  min-height:22px;
-}
-
-/* 3행: 담당강사 + 전화 + 수업카드 */
-.m-card-row3{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-  padding-top:8px;
-  border-top:1px solid #f5eef8;
-}
-.m-card-contact{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-  flex:1;
-  min-width:0;
-}
-.m-card-teacher{
-  font-size:12px;
-  font-weight:500;
-  color:var(--tx);
-  display:flex;
-  align-items:center;
-  gap:4px;
-}
-.m-card-teacher.unassigned{
-  color:var(--mt);
-  font-weight:400;
-}
-.m-card-phone{
-  font-size:11px;
-  color:var(--mt);
-}
-
-/* ══ 페이지네이션 ══ */
-.pagination{display:flex;align-items:center;justify-content:center;gap:4px;padding:16px 0 4px}
-.page-btn{width:32px;height:32px;border:1px solid var(--bd);border-radius:6px;background:var(--wh);font-size:12px;color:var(--mt);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
-.page-btn:hover{background:var(--pink-lt);color:var(--tx)}
-.page-btn.active{background:var(--pink);color:#fff;border-color:var(--pink);font-weight:700}
-.page-btn:disabled{opacity:.4;cursor:not-allowed}
-.empty-state{text-align:center;padding:48px 20px;color:var(--mt)}
+/* ── Pagination ── */
+.pagination{display:flex;align-items:center;justify-content:center;gap:4px;padding:1rem 0 .25rem}
+.page-btn{width:34px;height:34px;border:1.5px solid #fce7f3;border-radius:8px;background:#fff;font-size:13px;color:#aeaeb2;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:all .1s}
+.page-btn:hover{background:#fdf2f8;border-color:#fbcfe8}
+.page-btn.active{background:#db2777;color:#fff;border-color:#db2777;font-weight:700}
+.page-btn:disabled{opacity:.35;cursor:not-allowed}
+.empty-state{text-align:center;padding:3rem 1.2rem;color:#aeaeb2}
 .empty-state p{font-size:14px;margin-top:10px}
 
-/* ══ 모달 ══ */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
+/* ── Modal ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
 .modal-overlay.open{display:flex}
-.modal{background:var(--wh);border-radius:14px;padding:24px 20px;width:100%;max-width:480px;margin:16px;max-height:90vh;overflow-y:auto}
-.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.modal-header h2{font-size:16px;font-weight:700}
-.modal-close{width:30px;height:30px;border:none;background:var(--pink-lt);border-radius:6px;cursor:pointer;font-size:14px;color:var(--mt);display:flex;align-items:center;justify-content:center}
-.modal-close:hover{background:#fce7f3}
-.form-group{margin-bottom:14px}
-.form-group label{display:block;font-size:12px;font-weight:700;color:var(--tx);margin-bottom:5px}
-.form-group input,.form-group select{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;font-size:13px;color:var(--tx);outline:none;transition:border .15s;background:var(--wh);font-family:inherit}
-.form-group input:focus,.form-group select:focus{border-color:var(--pink)}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid #fce7f3}
-.btn-secondary{padding:8px 16px;border:1px solid var(--bd);border-radius:8px;background:var(--wh);font-size:12px;color:var(--tx);cursor:pointer;font-family:inherit;font-weight:500}
-.btn-secondary:hover{background:var(--pink-lt)}
+.modal{background:#fff;border-radius:20px;padding:1.4rem 1.2rem;width:100%;max-width:500px;margin:1rem;max-height:92vh;overflow-y:auto}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem}
+.modal-header h2{font-size:16px;font-weight:700;letter-spacing:-.02em}
+.modal-close{width:32px;height:32px;border:none;background:#f5f5f7;border-radius:50%;cursor:pointer;font-size:14px;color:#3c3c43;display:flex;align-items:center;justify-content:center;transition:background .15s;min-width:44px;min-height:44px}
+.modal-close:hover{background:#fce7f3;color:#db2777}
+.form-group{margin-bottom:.9rem}
+.form-group label{display:block;font-size:12px;font-weight:700;color:#1d1d1f;margin-bottom:5px}
+.form-group input,.form-group select{width:100%;padding:11px 13px;min-height:44px;border:1.5px solid #fce7f3;border-radius:10px;font-size:16px;color:#1d1d1f;outline:none;transition:border .15s;background:#fff;font-family:inherit;-webkit-appearance:none;appearance:none}
+.form-group input:focus,.form-group select:focus{border-color:#db2777}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:1.2rem;padding-top:1rem;border-top:1px solid #fce7f3}
+.btn-secondary{padding:10px 18px;min-height:40px;border:1.5px solid #fce7f3;border-radius:10px;background:#fff;font-size:13px;color:#1d1d1f;cursor:pointer;font-family:inherit;font-weight:500;transition:background .15s}
+.btn-secondary:hover{background:#fdf2f8}
 
-/* ══ 수업카드 모달 ══ */
-.cc-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
+/* ── Photo Upload ── */
+.photo-upload-row{display:flex;align-items:center;gap:16px;margin-bottom:1.2rem;padding:1rem;background:#fdf2f8;border-radius:14px;border:1px solid #fce7f3}
+.photo-upload-circle{width:76px;height:76px;border-radius:50%;border:2px dashed #fbcfe8;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;position:relative;transition:border-color .15s,box-shadow .15s;flex-shrink:0}
+.photo-upload-circle:hover{border-color:#db2777;box-shadow:0 0 0 4px rgba(219,39,119,.1)}
+.photo-upload-circle img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.photo-upload-placeholder{display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none}
+.photo-upload-placeholder svg{color:#fbcfe8}
+.photo-upload-placeholder span{font-size:10px;color:#aeaeb2}
+.photo-upload-info{flex:1}
+.photo-upload-info p{font-size:13px;font-weight:700;color:#1d1d1f;margin-bottom:3px}
+.photo-upload-info small{font-size:11px;color:#aeaeb2;line-height:1.6;display:block}
+.photo-action-btns{display:flex;gap:6px;margin-top:8px}
+.btn-photo-select{padding:6px 12px;min-height:34px;background:linear-gradient(135deg,#f472b6,#db2777);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.btn-photo-select:hover{opacity:.88}
+.btn-photo-remove{padding:6px 12px;min-height:34px;background:#fff;color:#dc2626;border:1.5px solid #fca5a5;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:none;transition:background .15s}
+.btn-photo-remove:hover{background:#fef2f2}
+
+/* ── Subject Checkboxes ── */
+.subject-checks{display:flex;flex-wrap:wrap;gap:6px}
+.subj-label{display:inline-flex;align-items:center;gap:5px;padding:8px 13px;min-height:38px;border:1.5px solid #fce7f3;border-radius:20px;cursor:pointer;font-size:13px;font-weight:500;color:#aeaeb2;transition:all .15s;user-select:none;line-height:1}
+.subj-label:hover{border-color:#db2777;color:#1d1d1f;background:#fdf2f8}
+.subj-label input[type=checkbox]{display:none}
+.subj-label.checked{background:#db2777;border-color:#db2777;color:#fff;font-weight:600}
+.subj-label .check-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.7);display:none}
+.subj-label.checked .check-dot{display:block}
+
+/* ── Class Card Modal ── */
+.cc-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
 .cc-modal-overlay.open{display:flex}
-.cc-modal{background:var(--wh);border-radius:16px;width:100%;max-width:640px;margin:16px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column}
-.cc-modal-header{padding:18px 18px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.cc-modal{background:#fff;border-radius:20px;width:100%;max-width:640px;margin:1rem;max-height:92vh;overflow:hidden;display:flex;flex-direction:column}
+.cc-modal-header{padding:1.2rem 1.2rem 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .cc-modal-header h2{font-size:15px;font-weight:700}
-.cc-stat-bar{display:flex;gap:8px;padding:12px 18px 0;flex-shrink:0}
-.cc-stat-chip{flex:1;padding:10px 8px;border-radius:10px;border:1px solid #fce7f3;background:var(--pink-lt);text-align:center}
-.cc-stat-chip .num{font-size:18px;font-weight:700;color:var(--pink)}
-.cc-stat-chip .lbl{font-size:10px;color:var(--mt);margin-top:2px}
-.cc-list-scroll{flex:1;overflow-y:auto;padding:10px 18px 8px}
-.cc-item{border:1.5px solid #f3e8ff;border-radius:10px;overflow:hidden;margin-bottom:8px;background:var(--wh)}
-.cc-item-head{padding:11px 13px;display:flex;align-items:center;gap:8px;cursor:pointer}
+.cc-stat-bar{display:flex;gap:8px;padding:12px 1.2rem 0;flex-shrink:0}
+.cc-stat-chip{flex:1;padding:10px 8px;border-radius:12px;border:1px solid #fce7f3;background:#fff0f7;text-align:center}
+.cc-stat-chip .num{font-size:1.1rem;font-weight:700;color:#db2777}
+.cc-stat-chip .lbl{font-size:10px;color:#aeaeb2;margin-top:2px}
+.cc-list-scroll{flex:1;overflow-y:auto;padding:10px 1.2rem 8px;-webkit-overflow-scrolling:touch}
+.cc-item{border:1.5px solid #f3e8ff;border-radius:12px;overflow:hidden;margin-bottom:8px;background:#fff;transition:border-color .15s}
+.cc-item:hover{border-color:#e879f9}
+.cc-item-head{padding:11px 13px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:background .15s;min-height:52px}
 .cc-item-head:hover{background:#fdf4ff}
 .cc-item-meta{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;align-items:center}
 .cc-chip{font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;white-space:nowrap}
@@ -219,40 +181,42 @@ tbody td{font-size:12px;padding:11px 12px;color:var(--tx);text-align:center;vert
 .cc-hw-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;white-space:nowrap}
 .hw-high{background:#d1fae5;color:#065f46}.hw-mid{background:#fef9c3;color:#854d0e}.hw-low{background:#fee2e2;color:#991b1b}
 .att-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;white-space:nowrap}
-.att-active{background:#dbeafe;color:#1e40af}.att-mid{background:#fef9c3;color:#854d0e}.att-low{background:var(--pink-lt);color:var(--pink-dk)}
+.att-active{background:#dbeafe;color:#1e40af}.att-mid{background:#fef9c3;color:#854d0e}.att-low{background:#fff0f7;color:#be185d}
 .cc-expand{font-size:11px;color:#aeaeb2;margin-left:auto;transition:transform .2s;flex-shrink:0}
 .cc-item.open .cc-expand{transform:rotate(180deg)}
 .cc-item-body{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease}
 .cc-item.open .cc-item-body{max-height:400px;padding:0 13px 13px;border-top:1px solid #f3e8ff}
 .cc-body-section{margin-top:10px}
 .cc-body-label{font-size:10px;font-weight:700;color:#a21caf;letter-spacing:.05em;margin-bottom:4px}
-.cc-body-text{font-size:12px;color:var(--tx);line-height:1.7;white-space:pre-wrap;word-break:break-word}
-.cc-empty{text-align:center;padding:36px 20px;color:var(--mt);font-size:12px;line-height:1.8}
-.cc-loading{text-align:center;padding:28px;color:var(--mt);font-size:12px}
-.cc-modal-footer{padding:12px 18px;border-top:1px solid #fce7f3;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;gap:8px}
-.cc-write-link{font-size:12px;color:#a21caf;font-weight:700;cursor:pointer;padding:6px 12px;border:1.5px solid #f3e8ff;border-radius:8px;background:none;font-family:inherit;transition:background .15s;white-space:nowrap}
+.cc-body-text{font-size:12px;color:#3c3c43;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.cc-empty{text-align:center;padding:2.5rem;color:#aeaeb2;font-size:12px;line-height:1.8}
+.cc-loading{text-align:center;padding:1.8rem;color:#aeaeb2;font-size:12px}
+.cc-modal-footer{padding:.8rem 1.2rem;border-top:1px solid #fce7f3;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;gap:8px}
+.cc-write-link{font-size:12px;color:#a21caf;font-weight:700;cursor:pointer;padding:7px 13px;border:1.5px solid #f3e8ff;border-radius:10px;background:none;font-family:inherit;transition:background .15s;white-space:nowrap;min-height:38px}
 .cc-write-link:hover{background:#fdf4ff}
+.btn-modal-close{padding:9px 18px;min-height:38px;border:1.5px solid #fce7f3;border-radius:10px;background:#fff;font-size:13px;color:#1d1d1f;cursor:pointer;font-family:inherit;font-weight:500;transition:background .15s}
+.btn-modal-close:hover{background:#fdf2f8}
 
-/* ══ 모바일 (600px 이하) ══ */
+/* ── Responsive ── */
 @media(max-width:600px){
-  .topbar{padding:0 14px;height:50px}
-  .topbar-divider{display:none}
-  .topbar nav{display:none}
-  .badge-admin{display:none}
-  .mobile-nav-bar{display:block;top:50px}
-  .main-content{padding:14px 12px}
-  .page-header{padding:14px 16px;border-radius:10px}
-  .page-header h1{font-size:16px}
+  .wrap{padding:.9rem .85rem}
+  .header{padding:0 .9rem;height:50px}
+  .page-nav{top:50px}
+  .page-nav-inner{padding:0 .75rem}
+  .brand-name{font-size:13px}
+  .header-badge .dot-green{display:none}
+  .page-hero{padding:.9rem 1rem;border-radius:14px}
   .table-card .table-desktop{display:none}
   .mobile-card-list{display:flex}
-  .search-filter-row{flex-wrap:wrap}
+  .search-row{flex-wrap:wrap}
   .search-box{min-width:100%;order:1}
   .filter-select{flex:1;order:2}
   .student-count{order:3;width:100%;text-align:right}
   .modal-overlay{align-items:flex-end}
-  .modal{border-radius:16px 16px 0 0;margin:0;max-width:100%}
+  .modal{border-radius:20px 20px 0 0;margin:0;max-width:100%}
   .cc-modal-overlay{align-items:flex-end}
-  .cc-modal{border-radius:16px 16px 0 0;margin:0;max-width:100%}
+  .cc-modal{border-radius:20px 20px 0 0;margin:0;max-width:100%}
+  .form-row{grid-template-columns:1fr}
 }
 @media(min-width:601px){
   .table-desktop{display:block}
@@ -261,57 +225,52 @@ tbody td{font-size:12px;padding:11px 12px;color:var(--tx);text-align:center;vert
 </style>
 </head>
 <body>
-<div class="app-wrapper">
 
-<header class="topbar">
-  <a href="index.html" class="logo-area">
-    <div class="logo-icon">
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
       <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
         <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
         <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
       </svg>
     </div>
-    <span class="logo-name">베타과학학원</span>
+    <span class="brand-name">베타과학학원</span>
   </a>
-  <div class="topbar-divider"></div>
-  <nav>
-    <ul class="nav-tabs">
-      <li><a href="dashboard.html">대시보드</a></li>
-      <li><a href="students.html" class="active">학생 관리</a></li>
-      <li><a href="special.html">특별관리</a></li>
-      <li><a href="sms.html">SMS설정</a></li>
-      <li><a href="management.html">학원관리</a></li>
-      <li><a href="teacher-board.html">선생님 게시판</a></li>
-    </ul>
-  </nav>
-  <div class="topbar-right">
-    <span class="badge-admin">관리자 모드</span>
-    <button class="btn-logout" onclick="doLogout()">로그아웃</button>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="header-badge"><span class="dot-green"></span>ONLINE</div>
+    <button class="logout-btn" onclick="doLogout()">로그아웃</button>
   </div>
 </header>
 
-<!-- 모바일 전용 네비 바 -->
-<div class="mobile-nav-bar">
-  <div class="mobile-nav-inner">
-    <a href="dashboard.html">대시보드</a>
-    <a href="students.html" class="active">학생 관리</a>
-    <a href="special.html">특별관리</a>
-    <a href="sms.html">SMS설정</a>
-    <a href="management.html">학원관리</a>
-    <a href="teacher-board.html">선생님 게시판</a>
+<nav class="page-nav">
+  <div class="page-nav-inner">
+    <a href="dashboard.html" class="pnav-a">대시보드</a>
+    <a href="students.html" class="pnav-a on">학생 관리</a>
+    <a href="special.html" class="pnav-a">특별관리</a>
+    <a href="sms.html" class="pnav-a">SMS설정</a>
+    <a href="management.html" class="pnav-a">학원관리</a>
+    <a href="teacher-board.html" class="pnav-a">선생님 게시판</a>
   </div>
-</div>
+</nav>
 
-<main class="main-content">
-  <div class="page-header">
-    <div><h1>학생 관리</h1><p>학생 정보를 추가, 수정, 삭제할 수 있습니다</p></div>
+<div class="wrap">
+  <!-- Page Hero -->
+  <div class="page-hero">
+    <div class="hero-left">
+      <div class="hero-icon">👩‍🎓</div>
+      <div>
+        <div class="hero-title">학생 관리</div>
+        <div class="hero-sub">학생 정보를 추가, 수정, 삭제할 수 있습니다</div>
+      </div>
+    </div>
     <button class="btn-primary" onclick="openAddModal()">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       학생 추가
     </button>
   </div>
 
-  <div class="search-filter-row">
+  <!-- Search -->
+  <div class="search-row">
     <div class="search-box">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="searchInput" placeholder="학생 이름 또는 ID로 검색..." oninput="filterStudents()">
@@ -324,46 +283,84 @@ tbody td{font-size:12px;padding:11px 12px;color:var(--tx);text-align:center;vert
     <span class="student-count">총 <strong id="countDisplay">0</strong>명</span>
   </div>
 
+  <!-- Table -->
   <div class="table-card">
     <div class="table-desktop">
       <div class="table-scroll">
         <table>
           <thead><tr><th>학생 ID</th><th>이름</th><th>학년</th><th>수강 과목</th><th>담당선생님</th><th>학부모 전화번호</th><th>등록일</th><th>수업카드</th><th>수정/삭제</th></tr></thead>
-          <tbody id="studentTableBody"><tr><td colspan="9" style="text-align:center;padding:40px;color:var(--mt)">데이터를 불러오는 중...</td></tr></tbody>
+          <tbody id="studentTableBody"><tr><td colspan="9" style="text-align:center;padding:2.5rem;color:#aeaeb2">데이터를 불러오는 중...</td></tr></tbody>
         </table>
       </div>
     </div>
     <div class="mobile-card-list" id="mobileCardList"></div>
     <div id="emptyState" class="empty-state" style="display:none">
-      <svg width="36" height="36" fill="none" stroke="#cbd5e1" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      <svg width="36" height="36" fill="none" stroke="#d1d1d6" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
       <p>등록된 학생이 없습니다</p>
     </div>
   </div>
   <div class="pagination" id="pagination"></div>
-</main>
 </div>
 
-<!-- 학생 모달 -->
+<!-- 학생 추가/수정 모달 -->
 <div class="modal-overlay" id="studentModal">
   <div class="modal">
-    <div class="modal-header"><h2 id="modalTitle">학생 추가</h2><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-header">
+      <h2 id="modalTitle">학생 추가</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <!-- 사진 -->
+    <div class="photo-upload-row">
+      <div class="photo-upload-circle" id="photoCircle" onclick="document.getElementById('photoFileInput').click()">
+        <img id="photoPreviewImg" alt="학생사진">
+        <div class="photo-upload-placeholder" id="photoPlaceholder">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>사진 선택</span>
+        </div>
+      </div>
+      <input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="onPhotoSelect(event)">
+      <div class="photo-upload-info">
+        <p>학생 프로필 사진</p>
+        <small>JPG, PNG, GIF 형식 지원<br>클릭하여 사진을 업로드하세요</small>
+        <div class="photo-action-btns">
+          <button class="btn-photo-select" onclick="document.getElementById('photoFileInput').click()">사진 선택</button>
+          <button class="btn-photo-remove" id="photoRemoveBtn" onclick="removePhoto()">제거</button>
+        </div>
+      </div>
+    </div>
+    <!-- 학생ID / 이름 -->
     <div class="form-row">
       <div class="form-group"><label>학생 ID</label><input type="text" id="inputId" placeholder="예: m01010"></div>
-      <div class="form-group"><label>이름 <span style="color:var(--ng)">*</span></label><input type="text" id="inputName" placeholder="학생 이름"></div>
+      <div class="form-group"><label>이름 <span style="color:#dc2626">*</span></label><input type="text" id="inputName" placeholder="학생 이름"></div>
     </div>
+    <!-- 학년 / 담당선생님 -->
     <div class="form-row">
-      <div class="form-group"><label>학년 <span style="color:var(--ng)">*</span></label>
-        <select id="inputGrade"><option value="">선택</option>
+      <div class="form-group">
+        <label>학년 <span style="color:#dc2626">*</span></label>
+        <select id="inputGrade">
+          <option value="">선택</option>
           <option value="중등1학년">중등1학년</option><option value="중등2학년">중등2학년</option><option value="중등3학년">중등3학년</option>
           <option value="고등1학년">고등1학년</option><option value="고등2학년">고등2학년</option><option value="고등3학년">고등3학년</option>
         </select>
       </div>
-      <div class="form-group"><label>수강 과목</label><input type="text" id="inputSubject" placeholder="예: 통합과학, 물리"></div>
+      <div class="form-group"><label>담당선생님</label><input type="text" id="inputTeacher" placeholder="선생님 이름"></div>
     </div>
+    <!-- 수강 과목 -->
+    <div class="form-group">
+      <label>수강 과목</label>
+      <div class="subject-checks">
+        <label class="subj-label"><input type="checkbox" class="subj-chk" value="통합과학" onchange="toggleSubjLabel(this)"><span class="check-dot"></span>통합과학</label>
+        <label class="subj-label"><input type="checkbox" class="subj-chk" value="화학1" onchange="toggleSubjLabel(this)"><span class="check-dot"></span>화학1</label>
+        <label class="subj-label"><input type="checkbox" class="subj-chk" value="내신" onchange="toggleSubjLabel(this)"><span class="check-dot"></span>내신</label>
+        <label class="subj-label"><input type="checkbox" class="subj-chk" value="물질과 에너지" onchange="toggleSubjLabel(this)"><span class="check-dot"></span>물질과 에너지</label>
+        <label class="subj-label"><input type="checkbox" class="subj-chk" value="화학 반응의 세계" onchange="toggleSubjLabel(this)"><span class="check-dot"></span>화학 반응의 세계</label>
+      </div>
+    </div>
+    <!-- 전화번호 -->
     <div class="form-group"><label>학부모 전화번호</label><input type="tel" id="inputPhone" placeholder="010-0000-0000"></div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal()">취소</button>
-      <button class="btn-primary" onclick="saveStudent()">저장</button>
+      <button class="btn-primary" id="saveBtn" onclick="saveStudent()">저장</button>
     </div>
   </div>
 </div>
@@ -380,7 +377,7 @@ tbody td{font-size:12px;padding:11px 12px;color:var(--tx);text-align:center;vert
     <div class="cc-list-scroll" id="ccListScroll"><div class="cc-loading">불러오는 중...</div></div>
     <div class="cc-modal-footer">
       <button class="cc-write-link" onclick="window.location.href='teacher-board.html'">🗂️ 수업카드 작성하기 →</button>
-      <button class="btn-secondary" onclick="closeClassCardModal()">닫기</button>
+      <button class="btn-modal-close" onclick="closeClassCardModal()">닫기</button>
     </div>
   </div>
 </div>
@@ -389,96 +386,67 @@ tbody td{font-size:12px;padding:11px 12px;color:var(--tx);text-align:center;vert
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getFirestore,doc,getDoc,collection,addDoc,updateDoc,deleteDoc,query,orderBy,onSnapshot,getDocs,where}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getStorage,ref,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
-const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app);
+const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app);
 onAuthStateChanged(auth,async u=>{if(!u){window.location.replace("/login.html");return;}try{const s=await getDoc(doc(db,"users",u.uid));if(!s.exists()||s.data().status!=="approved"){await signOut(auth);window.location.replace("/login.html");return;}document.body.style.visibility="visible";iStudents();}catch(er){window.location.replace("/login.html");}});
 window.doLogout=async()=>{await signOut(auth);window.location.replace("/login.html");};
-const IPP=10;let pg=1,eid=null,students=[],filtered=[],ccCache={},s2f={};
+const IPP=10;
+let pg=1,eid=null,students=[],filtered=[],ccCache={},s2f={};
+let selectedPhotoFile=null,currentPhotoUrl='';
 function gBC(g){return{'중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3','고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3'}[g]||'grade-mid1';}
 async function iStudents(){
   try{const ss=await getDocs(collection(db,"students"));ss.forEach(d=>{const id=d.data().id;if(id)s2f[id]=d.id;});}catch(er){}
   try{const cc=await getDocs(query(collection(db,"classCards"),orderBy("classDate","desc")));const seen=new Set();cc.forEach(d=>{const c=d.data(),sid=c.studentId;if(!sid)return;const fv=Object.values(s2f).includes(sid),fk=Object.prototype.hasOwnProperty.call(s2f,sid);let rfi=fv?sid:fk?s2f[sid]:sid;if(!rfi)return;if(!ccCache[rfi])ccCache[rfi]={count:0,teacher:''};ccCache[rfi].count++;if(!seen.has(rfi)){ccCache[rfi].teacher=c.teacher||'';seen.add(rfi);}});}catch(er){}
-  onSnapshot(query(collection(db,"students"),orderBy("regDate","desc")),s=>{s.docs.forEach(d=>{const id=d.data().id;if(id)s2f[id]=d.id;});students=s.docs.map(d=>({fireId:d.id,...d.data()}));filterStudents();},err=>{document.getElementById('studentTableBody').innerHTML=`<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--ng)">오류: ${err.message}</td></tr>`;});
+  onSnapshot(query(collection(db,"students"),orderBy("regDate","desc")),s=>{s.docs.forEach(d=>{const id=d.data().id;if(id)s2f[id]=d.id;});students=s.docs.map(d=>({fireId:d.id,...d.data()}));filterStudents();},err=>{document.getElementById('studentTableBody').innerHTML=`<tr><td colspan="9" style="text-align:center;padding:2.5rem;color:#dc2626">오류: ${err.message}</td></tr>`;});
 }
-
+function avatarHtml(photoUrl,name,size='sm'){const isMobile=size==='lg';const cls=isMobile?'m-card-avatar':'stu-avatar';const phCls=isMobile?'m-card-avatar-placeholder':'stu-avatar-placeholder';const sz=isMobile?46:32;if(photoUrl)return`<img class="${cls}" src="${e(photoUrl)}" alt="${e(name)}" width="${sz}" height="${sz}">`;const initial=(name||'?').charAt(0);return`<span class="${phCls}">${e(initial)}</span>`;}
 window.renderTable=function(){
   const tb=document.getElementById('studentTableBody'),em=document.getElementById('emptyState'),ml=document.getElementById('mobileCardList'),st=(pg-1)*IPP,pd=filtered.slice(st,st+IPP);
   document.getElementById('countDisplay').textContent=filtered.length;
   if(!filtered.length){tb.innerHTML='';ml.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
-
-  /* ── 데스크탑 테이블 ── */
   tb.innerHTML=pd.map(s=>{
-    const subs=s.subject&&s.subject!=='-'?s.subject.split(',').map(x=>`<span class="subject-tag">${x.trim()}</span>`).join(''):'<span style="color:var(--mt)">-</span>';
-    const info=ccCache[s.fireId]||{count:0,teacher:''},hc=info.count>0,tc=info.teacher||'-',sn=(s.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    return`<tr><td class="student-id">${s.id||'-'}</td><td style="font-weight:500">${s.name||'-'}</td><td><span class="grade-badge ${gBC(s.grade)}">${s.grade||'-'}</span></td><td>${subs}</td><td class="teacher-name${tc!=='-'?' assigned':''}">${e(tc)}</td><td>${s.phone||'-'}</td><td style="color:var(--mt);font-size:11px">${s.regDate||'-'}</td><td><button class="card-btn${hc?' has-card':''}" onclick="openClassCardModal('${s.fireId}','${sn}','${(s.id||'').replace(/'/g,"\\'")}')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>${hc?`보기 (${info.count}건)`:'없음'}</button></td><td><div class="action-icons"><button class="action-btn" onclick="openEditModal('${s.fireId}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn del" onclick="deleteStudent('${s.fireId}','${sn}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></td></tr>`;
-  }).join('');
-
-  /* ── 모바일 카드 (재설계) ── */
-  ml.innerHTML=pd.map(s=>{
-    const subs=s.subject&&s.subject!=='-'
-      ? s.subject.split(',').map(x=>`<span class="subject-tag">${x.trim()}</span>`).join('')
-      : '<span style="font-size:11px;color:var(--mt)">과목 없음</span>';
+    const subs=s.subject&&s.subject!=='-'?s.subject.split(',').map(x=>`<span class="subject-tag">${e(x.trim())}</span>`).join(''):'<span style="color:#aeaeb2">-</span>';
     const info=ccCache[s.fireId]||{count:0,teacher:''},hc=info.count>0;
-    const tc=info.teacher||'';
+    const dt=s.teacher&&s.teacher!=='-'?s.teacher:(info.teacher||'-');
+    const sn=(s.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const avatar=avatarHtml(s.photoUrl||'',s.name||'');
+    return`<tr><td class="student-id">${e(s.id||'-')}</td><td><div class="name-cell">${avatar}<span style="font-weight:600">${e(s.name||'-')}</span></div></td><td><span class="grade-badge ${gBC(s.grade)}">${e(s.grade||'-')}</span></td><td>${subs}</td><td style="font-size:12px;color:${dt!=='-'?'#1d1d1f':'#aeaeb2'};font-weight:${dt!=='-'?'500':'400'}">${e(dt)}</td><td style="color:#aeaeb2">${e(s.phone||'-')}</td><td style="color:#aeaeb2;font-size:11px">${e(s.regDate||'-')}</td><td><button class="card-btn${hc?' has-card':''}" onclick="openClassCardModal('${s.fireId}','${sn}','${(s.id||'').replace(/'/g,"\\'")}')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>${hc?`보기 (${info.count}건)`:'없음'}</button></td><td><div class="action-icons"><button class="action-btn" onclick="openEditModal('${s.fireId}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn del" onclick="deleteStudent('${s.fireId}','${sn}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></td></tr>`;
+  }).join('');
+  ml.innerHTML=pd.map(s=>{
+    const subs=s.subject&&s.subject!=='-'?s.subject.split(',').map(x=>`<span class="subject-tag">${e(x.trim())}</span>`).join(''):'<span style="font-size:11px;color:#aeaeb2">과목 없음</span>';
+    const info=ccCache[s.fireId]||{count:0,teacher:''},hc=info.count>0;
+    const dt=s.teacher&&s.teacher!=='-'?s.teacher:(info.teacher||'');
     const sn=(s.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     const sid=(s.id||'').replace(/'/g,"\\'");
-
-    return`<div class="m-card">
-  <!-- 1행: 이름 + 학년뱃지 + ID / 수정·삭제 -->
-  <div class="m-card-row1">
-    <div class="m-card-identity">
-      <span class="m-card-name">${e(s.name||'-')}</span>
-      <span class="grade-badge ${gBC(s.grade)}" style="font-size:10px;padding:2px 7px">${e(s.grade||'-')}</span>
-      <span class="m-card-id-badge">${e(s.id||'')}</span>
-    </div>
-    <div class="action-icons">
-      <button class="action-btn" onclick="openEditModal('${s.fireId}')">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      </button>
-      <button class="action-btn del" onclick="deleteStudent('${s.fireId}','${sn}')">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-      </button>
-    </div>
-  </div>
-  <!-- 2행: 수강 과목 -->
-  <div class="m-card-subjects">${subs}</div>
-  <!-- 3행: 담당강사 + 전화 + 수업카드 -->
-  <div class="m-card-row3">
-    <div class="m-card-contact">
-      <div class="m-card-teacher${tc?'':' unassigned'}">
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        ${tc?e(tc):'담당 미배정'}
-      </div>
-      <div class="m-card-phone">${e(s.phone||'-')}</div>
-    </div>
-    <button class="card-btn${hc?' has-card':''}" onclick="openClassCardModal('${s.fireId}','${sn}','${sid}')">
-      <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-      ${hc?`수업카드 (${info.count})`:'수업카드 없음'}
-    </button>
-  </div>
-</div>`;
+    const avatarLg=avatarHtml(s.photoUrl||'',s.name||'','lg');
+    return`<div class="m-card"><div class="m-card-row1"><div class="m-card-left">${avatarLg}<div class="m-card-identity"><span class="m-card-name">${e(s.name||'-')}</span><div class="m-card-meta"><span class="grade-badge ${gBC(s.grade)}" style="font-size:10px;padding:2px 7px">${e(s.grade||'-')}</span><span class="m-card-id-badge">${e(s.id||'')}</span></div></div></div><div class="action-icons"><button class="action-btn" onclick="openEditModal('${s.fireId}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="action-btn del" onclick="deleteStudent('${s.fireId}','${sn}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div></div><div class="m-card-subjects">${subs}</div><div class="m-card-row3"><div class="m-card-contact"><div class="m-card-teacher${dt?'':' unassigned'}"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${dt?e(dt):'담당 미배정'}</div><div class="m-card-phone">${e(s.phone||'-')}</div></div><button class="card-btn${hc?' has-card':''}" onclick="openClassCardModal('${s.fireId}','${sn}','${sid}')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>${hc?`수업카드 (${info.count})`:'수업카드 없음'}</button></div></div>`;
   }).join('');
-
   renderPagination();
 };
-
 window.filterStudents=function(){const s=document.getElementById('searchInput').value.trim().toLowerCase(),g=document.getElementById('gradeFilter').value;filtered=students.filter(st=>(!s||(st.name&&st.name.toLowerCase().includes(s))||(st.id&&st.id.toLowerCase().includes(s)))&&(!g||st.grade===g));pg=1;renderTable();};
 window.renderPagination=function(){const t=Math.ceil(filtered.length/IPP),pp=document.getElementById('pagination');if(t<=1){pp.innerHTML='';return;}let h=`<button class="page-btn" onclick="goPage(${pg-1})" ${pg===1?'disabled':''}>‹</button>`;for(let i=1;i<=t;i++)h+=`<button class="page-btn ${i===pg?'active':''}" onclick="goPage(${i})">${i}</button>`;h+=`<button class="page-btn" onclick="goPage(${pg+1})" ${pg===t?'disabled':''}>›</button>`;pp.innerHTML=h;};
 window.goPage=function(p){const t=Math.ceil(filtered.length/IPP);if(p<1||p>t)return;pg=p;renderTable();};
-window.openAddModal=function(){eid=null;document.getElementById('modalTitle').textContent='학생 추가';['inputId','inputName','inputSubject','inputPhone'].forEach(id=>document.getElementById(id).value='');document.getElementById('inputGrade').value='';document.getElementById('inputId').disabled=false;document.getElementById('studentModal').classList.add('open');};
-window.openEditModal=function(fi){eid=fi;const s=students.find(x=>x.fireId===fi);if(!s)return;document.getElementById('modalTitle').textContent='학생 정보 수정';document.getElementById('inputId').value=s.id||'';document.getElementById('inputId').disabled=true;document.getElementById('inputName').value=s.name||'';document.getElementById('inputGrade').value=s.grade||'';document.getElementById('inputSubject').value=s.subject==='-'?'':(s.subject||'');document.getElementById('inputPhone').value=s.phone||'';document.getElementById('studentModal').classList.add('open');};
-window.closeModal=()=>document.getElementById('studentModal').classList.remove('open');
-window.saveStudent=async function(){const nm=document.getElementById('inputName').value.trim(),gr=document.getElementById('inputGrade').value,id=document.getElementById('inputId').value.trim()||`s${Date.now()}`,sb=document.getElementById('inputSubject').value.trim()||'-',ph=document.getElementById('inputPhone').value.trim()||'-';if(!nm||!gr){alert('이름과 학년을 입력해주세요.');return;}try{if(!eid){const t=new Date();await addDoc(collection(db,"students"),{id,name:nm,grade:gr,subject:sb,phone:ph,regDate:`${t.getFullYear()}. ${t.getMonth()+1}. ${t.getDate()}.`});}else{await updateDoc(doc(db,"students",eid),{name:nm,grade:gr,subject:sb,phone:ph});}closeModal();}catch(er){alert("저장 오류: "+er.message);}};
+function resetPhotoUI(){selectedPhotoFile=null;currentPhotoUrl='';const img=document.getElementById('photoPreviewImg');img.src='';img.style.display='none';document.getElementById('photoPlaceholder').style.display='flex';document.getElementById('photoRemoveBtn').style.display='none';document.getElementById('photoFileInput').value='';}
+function setPhotoPreview(url){const img=document.getElementById('photoPreviewImg');img.src=url;img.style.display='block';document.getElementById('photoPlaceholder').style.display='none';document.getElementById('photoRemoveBtn').style.display='inline-flex';}
+window.onPhotoSelect=function(e){const file=e.target.files[0];if(!file)return;selectedPhotoFile=file;const reader=new FileReader();reader.onload=ev=>setPhotoPreview(ev.target.result);reader.readAsDataURL(file);};
+window.removePhoto=function(){resetPhotoUI();};
+window.toggleSubjLabel=function(cb){cb.closest('.subj-label').classList.toggle('checked',cb.checked);};
+window.openAddModal=function(){eid=null;document.getElementById('modalTitle').textContent='학생 추가';['inputId','inputName','inputTeacher','inputPhone'].forEach(id=>document.getElementById(id).value='');document.getElementById('inputGrade').value='';document.getElementById('inputId').disabled=false;document.querySelectorAll('.subj-chk').forEach(cb=>{cb.checked=false;cb.closest('.subj-label').classList.remove('checked');});resetPhotoUI();document.getElementById('studentModal').classList.add('open');};
+window.openEditModal=function(fi){eid=fi;const s=students.find(x=>x.fireId===fi);if(!s)return;document.getElementById('modalTitle').textContent='학생 정보 수정';document.getElementById('inputId').value=s.id||'';document.getElementById('inputId').disabled=true;document.getElementById('inputName').value=s.name||'';document.getElementById('inputGrade').value=s.grade||'';document.getElementById('inputTeacher').value=s.teacher&&s.teacher!=='-'?(s.teacher||''):'';document.getElementById('inputPhone').value=s.phone||'';const subjects=(s.subject&&s.subject!=='-')?s.subject.split(',').map(x=>x.trim()):[];document.querySelectorAll('.subj-chk').forEach(cb=>{const checked=subjects.includes(cb.value);cb.checked=checked;cb.closest('.subj-label').classList.toggle('checked',checked);});resetPhotoUI();currentPhotoUrl=s.photoUrl||'';if(currentPhotoUrl)setPhotoPreview(currentPhotoUrl);document.getElementById('studentModal').classList.add('open');};
+window.closeModal=function(){document.getElementById('studentModal').classList.remove('open');};
+window.saveStudent=async function(){const nm=document.getElementById('inputName').value.trim(),gr=document.getElementById('inputGrade').value,id=document.getElementById('inputId').value.trim()||`s${Date.now()}`,tc=document.getElementById('inputTeacher').value.trim()||'-',ph=document.getElementById('inputPhone').value.trim()||'-',checked=[...document.querySelectorAll('.subj-chk:checked')].map(c=>c.value),sb=checked.length?checked.join(','):'-';if(!nm||!gr){alert('이름과 학년을 입력해주세요.');return;}const saveBtn=document.getElementById('saveBtn');saveBtn.disabled=true;saveBtn.textContent='저장 중...';try{let photoUrl=currentPhotoUrl;if(selectedPhotoFile){const ext=selectedPhotoFile.name.split('.').pop();const storageRef=ref(storage,`studentPhotos/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`);await uploadBytes(storageRef,selectedPhotoFile);photoUrl=await getDownloadURL(storageRef);}if(!eid){const t=new Date();await addDoc(collection(db,"students"),{id,name:nm,grade:gr,subject:sb,phone:ph,teacher:tc,photoUrl:photoUrl||'',regDate:`${t.getFullYear()}. ${t.getMonth()+1}. ${t.getDate()}.`});}else{await updateDoc(doc(db,"students",eid),{name:nm,grade:gr,subject:sb,phone:ph,teacher:tc,photoUrl:photoUrl||''});}closeModal();}catch(er){alert("저장 오류: "+er.message);}finally{saveBtn.disabled=false;saveBtn.textContent='저장';}};
 window.deleteStudent=async function(fi,nm){if(!confirm(`"${nm}" 학생을 삭제하시겠습니까?`))return;try{await deleteDoc(doc(db,"students",fi));}catch(er){alert("삭제 오류: "+er.message);}};
 window.openClassCardModal=async function(fi,nm,sid){document.getElementById('ccModalTitle').textContent=`${nm} · 수업카드`;['cc-total','cc-month','cc-avg'].forEach(id=>document.getElementById(id).textContent='—');document.getElementById('ccListScroll').innerHTML='<div class="cc-loading">불러오는 중...</div>';document.getElementById('classCardModal').classList.add('open');try{const s1=await getDocs(query(collection(db,"classCards"),where("studentId","==",fi),orderBy("classDate","desc")));let cs=s1.docs.map(d=>({id:d.id,...d.data()}));if(sid&&sid!==fi){try{const s2=await getDocs(query(collection(db,"classCards"),where("studentId","==",sid),orderBy("classDate","desc")));const ex=new Set(cs.map(c=>c.id));s2.docs.forEach(d=>{if(!ex.has(d.id))cs.push({id:d.id,...d.data()});});cs.sort((a,b)=>(b.classDate||'').localeCompare(a.classDate||''));}catch(e2){}}rCCS(cs);rCCL(cs);}catch(er){document.getElementById('ccListScroll').innerHTML=`<div class="cc-empty">로드 실패: ${er.message}</div>`;}};
 function rCCS(cs){document.getElementById('cc-total').textContent=cs.length+'건';const n=new Date(),ms=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`;document.getElementById('cc-month').textContent=cs.filter(c=>(c.classDate||'').startsWith(ms)).length+'건';const sc=cs.filter(c=>typeof c.score==='number'&&c.score>=0&&!c.scoreNone);document.getElementById('cc-avg').textContent=sc.length?Math.round(sc.reduce((a,c)=>a+c.score,0)/sc.length)+'점':'—';}
-function rCCL(cs){const w=document.getElementById('ccListScroll');if(!cs.length){w.innerHTML=`<div class="cc-empty"><p>아직 작성된 수업카드가 없습니다.</p></div>`;return;}w.innerHTML=cs.map(c=>{const sc=typeof c.score==='number'?c.score:-1,sCls=c.scoreNone?'cc-chip-none':(sc>=70?'cc-chip-good':sc>=0?'cc-chip-bad':'cc-chip-none'),sTxt=c.scoreNone?'테스트없음':(sc>=0?sc+'점':'—'),hCls=c.homework==='높음'?'hw-high':c.homework==='낮음'?'hw-low':'hw-mid',aCls=c.attitude==='적극적'?'att-active':c.attitude==='산만'?'att-low':'att-mid';return`<div class="cc-item" id="cci-${c.id}"><div class="cc-item-head" onclick="toggleCC('${c.id}')"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:var(--tx);margin-bottom:3px"><span class="cc-chip cc-chip-subj" style="margin-right:4px">${e(c.subject||'—')}</span>수업</div><div class="cc-item-meta"><span class="cc-chip cc-chip-teacher">${e(c.teacher||'—')}</span><span class="cc-chip cc-chip-date">${c.classDate||'—'}</span><span class="cc-chip ${sCls}">${sTxt}</span></div></div><div style="display:flex;align-items:center;gap:5px;flex-shrink:0">${c.homework&&c.homework!=='-'?`<span class="cc-hw-badge ${hCls}">과제 ${e(c.homework)}</span>`:''} ${c.attitude?`<span class="att-badge ${aCls}">${e(c.attitude)}</span>`:''}<span class="cc-expand">▾</span></div></div><div class="cc-item-body">${c.content?`<div class="cc-body-section"><div class="cc-body-label">수업 내용</div><div class="cc-body-text">${e(c.content)}</div></div>`:''}</div></div>`;}).join('');}
+function rCCL(cs){const w=document.getElementById('ccListScroll');if(!cs.length){w.innerHTML=`<div class="cc-empty"><p>아직 작성된 수업카드가 없습니다.</p></div>`;return;}w.innerHTML=cs.map(c=>{const sc=typeof c.score==='number'?c.score:-1,sCls=c.scoreNone?'cc-chip-none':(sc>=70?'cc-chip-good':sc>=0?'cc-chip-bad':'cc-chip-none'),sTxt=c.scoreNone?'테스트없음':(sc>=0?sc+'점':'—'),hCls=c.homework==='높음'?'hw-high':c.homework==='낮음'?'hw-low':'hw-mid',aCls=c.attitude==='적극적'?'att-active':c.attitude==='산만'?'att-low':'att-mid';return`<div class="cc-item" id="cci-${c.id}"><div class="cc-item-head" onclick="toggleCC('${c.id}')"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#1d1d1f;margin-bottom:3px"><span class="cc-chip cc-chip-subj" style="margin-right:4px">${e(c.subject||'—')}</span>수업</div><div class="cc-item-meta"><span class="cc-chip cc-chip-teacher">${e(c.teacher||'—')}</span><span class="cc-chip cc-chip-date">${e(c.classDate||'—')}</span><span class="cc-chip ${sCls}">${sTxt}</span></div></div><div style="display:flex;align-items:center;gap:5px;flex-shrink:0">${c.homework&&c.homework!=='-'?`<span class="cc-hw-badge ${hCls}">과제 ${e(c.homework)}</span>`:''} ${c.attitude?`<span class="att-badge ${aCls}">${e(c.attitude)}</span>`:''}<span class="cc-expand">▾</span></div></div><div class="cc-item-body">${c.content?`<div class="cc-body-section"><div class="cc-body-label">수업 내용</div><div class="cc-body-text">${e(c.content)}</div></div>`:''}</div></div>`;}).join('');}
 window.toggleCC=id=>{document.getElementById('cci-'+id)?.classList.toggle('open');};
 window.closeClassCardModal=function(){document.getElementById('classCardModal').classList.remove('open');};
 function e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 document.getElementById('studentModal').addEventListener('click',ev=>{if(ev.target===ev.currentTarget)closeModal();});
 document.getElementById('classCardModal').addEventListener('click',ev=>{if(ev.target===ev.currentTarget)closeClassCardModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeClassCardModal();}});
 </script>
 </body>
 </html>
