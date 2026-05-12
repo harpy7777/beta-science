@@ -500,7 +500,7 @@ function sC(s){if(!s)return 's-default';if(s.includes('내신'))return 's-naeshi
 function gC(g){if(!g)return '';return{'중1':'g-mid1','중등1학년':'g-mid1','중2':'g-mid2','중등2학년':'g-mid2','중3':'g-mid3','중등3학년':'g-mid3','고1':'g-high1','고등1학년':'g-high1','고2':'g-high2','고등2학년':'g-high2','고3':'g-high3','고등3학년':'g-high3'}[g]||'';}
 function fD(rd){if(!rd)return '-';const d=pRD(rd);if(!d||isNaN(d))return '-';return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;}
 function mTR(d){const t=d.data();return`<tr>
-  <td><span class="grade-badge ${gC(t.grade)}">${t.grade||'-'}</span></td>
+  <td><span class="grade-badge ${gC(t.grade)}">${(t.grade||'-').replace('등','').replace('학년','')}</span></td>
   <td><span class="subj-badge ${sC(t.subject)}">${t.subject||'-'}</span></td>
   <td style="overflow:hidden;text-overflow:ellipsis" title="${t.title||''}">${t.title||'-'}</td>
   <td style="font-size:11px;color:var(--mt)">${fD(t.regDate)}</td>
@@ -508,7 +508,7 @@ function mTR(d){const t=d.data();return`<tr>
 </tr>`;}
 function iExams(){onSnapshot(collection(db,"tests"),s=>{const ox=s.docs.filter(d=>(d.data().questions||[]).some(q=>q.type==='ox'));const mu=s.docs.filter(d=>(d.data().questions||[]).some(q=>q.type==='multiple'));document.getElementById('cnt-ox').textContent=ox.length;document.getElementById('cnt-multi').textContent=mu.length;document.getElementById('tbody-ox').innerHTML=ox.length===0?'<tr><td colspan="5" style="text-align:center;padding:36px;color:var(--mt)">등록된 테스트가 없습니다.</td></tr>':ox.map(mTR).join('');document.getElementById('tbody-multi').innerHTML=mu.length===0?'<tr><td colspan="5" style="text-align:center;padding:36px;color:var(--mt)">등록된 테스트가 없습니다.</td></tr>':mu.map(mTR).join('');});}
 function iMT(){onSnapshot(query(collection(db,"master-tests"),orderBy("regDate","desc")),s=>{const tb=document.getElementById('tbody-master');document.getElementById('cnt-master').textContent=s.size;if(s.empty){tb.innerHTML='<tr><td colspan="5" style="text-align:center;padding:36px;color:var(--mt)">등록된 테스트가 없습니다.</td></tr>';return;}tb.innerHTML=s.docs.map(d=>{const t=d.data();return`<tr>
-  <td><span class="grade-badge ${gC(t.grade)}">${t.grade||'-'}</span></td>
+  <td><span class="grade-badge ${gC(t.grade)}">${(t.grade||'-').replace('등','').replace('학년','')}</span></td>
   <td><span class="subj-badge ${sC(t.subject)}">${t.subject||'-'}</span></td>
   <td style="overflow:hidden;text-overflow:ellipsis" title="${t.unitName||''}">${t.unitName||'-'}</td>
   <td style="font-size:11px;color:var(--mt)">${fD(t.regDate)}</td>
