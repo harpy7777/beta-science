@@ -502,7 +502,7 @@ function fD(rd){if(!rd)return '-';const d=pRD(rd);if(!d||isNaN(d))return '-';ret
 function mTR(d){const t=d.data();return`<tr>
   <td><span class="grade-badge ${gC(t.grade)}">${t.grade||'-'}</span></td>
   <td><span class="subj-badge ${sC(t.subject)}">${t.subject||'-'}</span></td>
-  <td style="font-weight:700;overflow:hidden;text-overflow:ellipsis" title="${t.title||''}">${t.title||'-'}</td>
+  <td style="overflow:hidden;text-overflow:ellipsis" title="${t.title||''}">${t.title||'-'}</td>
   <td style="font-size:11px;color:var(--mt)">${fD(t.regDate)}</td>
   <td><div class="action-icons"><button class="action-btn" onclick="editExam('${d.id}')">✏️</button><button class="action-btn del" onclick="deleteExam('${d.id}','${(t.title||'').replace(/'/g,"\\'")}','${t.grade||''}')">🗑️</button></div></td>
 </tr>`;}
@@ -510,7 +510,7 @@ function iExams(){onSnapshot(collection(db,"tests"),s=>{const ox=s.docs.filter(d
 function iMT(){onSnapshot(query(collection(db,"master-tests"),orderBy("regDate","desc")),s=>{const tb=document.getElementById('tbody-master');document.getElementById('cnt-master').textContent=s.size;if(s.empty){tb.innerHTML='<tr><td colspan="5" style="text-align:center;padding:36px;color:var(--mt)">등록된 테스트가 없습니다.</td></tr>';return;}tb.innerHTML=s.docs.map(d=>{const t=d.data();return`<tr>
   <td><span class="grade-badge ${gC(t.grade)}">${t.grade||'-'}</span></td>
   <td><span class="subj-badge ${sC(t.subject)}">${t.subject||'-'}</span></td>
-  <td style="font-weight:700;overflow:hidden;text-overflow:ellipsis" title="${t.unitName||''}">${t.unitName||'-'}</td>
+  <td style="overflow:hidden;text-overflow:ellipsis" title="${t.unitName||''}">${t.unitName||'-'}</td>
   <td style="font-size:11px;color:var(--mt)">${fD(t.regDate)}</td>
   <td><div class="action-icons"><button class="action-btn" onclick="editMaster('${d.id}')">✏️</button><button class="action-btn del" onclick="deleteMaster('${d.id}','${(t.unitName||'').replace(/'/g,"\\'")}','${t.grade||''}')">🗑️</button></div></td>
 </tr>`;}).join('');});}
