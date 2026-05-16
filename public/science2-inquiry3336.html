@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>통합과학2 · 탐구활동 33~36 · 생태계와 환경</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --p900:#1e3a8a;--p800:#1e40af;--p700:#2563eb;--p600:#3b82f6;
+  --p500:#60a5fa;--p400:#93c5fd;--p300:#bfdbfe;--p200:#dbeafe;
+  --p100:#eff6ff;--p50:#f0f7ff;
+  --text:#1d1d1f;--muted:#6e6e73;--dim:#aeaeb2;
+  --bg:#f8fafc;--white:#fff;
+  --border:#e2e8f0;--border-p:#bfdbfe;
+  --green:#059669;--green-bg:#ecfdf5;--green-border:#a7f3d0;
+  --teal:#0f766e;--teal-bg:#f0fdfa;--teal-border:#99f6e4;
+  --amber:#d97706;--amber-bg:#fffbeb;--amber-border:#fde68a;
+  --red:#dc2626;--red-bg:#fef2f2;--red-border:#fecaca;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;--purple-border:#ddd6fe;
+  --header-h:54px;--tab-h:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;font-size:16px;overscroll-behavior:none}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+
+.header{background:var(--white);border-bottom:2px solid var(--p200);padding:0 1rem;height:var(--header-h);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:500;gap:8px}
+.header-brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;flex:1;min-width:0}
+.logo-mark{width:32px;height:32px;flex-shrink:0;background:linear-gradient(135deg,var(--p700),var(--p900));border-radius:9px;display:flex;align-items:center;justify-content:center}
+.brand-name{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pub-chip{background:var(--p100);border:1px solid var(--p200);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--p800);white-space:nowrap;flex-shrink:0}
+.back-btn{padding:8px 14px;min-height:36px;background:transparent;border:1.5px solid var(--p200);border-radius:20px;font-size:12px;font-weight:700;color:var(--p800);white-space:nowrap;flex-shrink:0;transition:background .15s}
+.back-btn:active{background:var(--p50)}
+
+.hero{background:linear-gradient(135deg,var(--p900) 0%,var(--p800) 45%,var(--p600) 100%);padding:2rem 1rem 1.8rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,0.06)}
+.hero::after{content:'';position:absolute;left:-40px;bottom:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.04)}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.hero-bc{display:flex;align-items:center;gap:5px;margin-bottom:1rem;flex-wrap:wrap;justify-content:center}
+.bc-a{font-size:11px;color:rgba(255,255,255,0.6);font-weight:500}
+.bc-sep{font-size:11px;color:rgba(255,255,255,0.35)}
+.bc-cur{font-size:11px;color:#fff;font-weight:700}
+.hero-eyebrow{display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.08em;margin-bottom:.8rem}
+.hero-title{font-size:clamp(1.5rem,6vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+.hero-desc{font-size:13px;color:rgba(255,255,255,.82);line-height:1.7;max-width:580px;margin:0 auto 1.5rem}
+.hero-stats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.hero-stat-card{background:rgba(255,255,255,0.14);border:1.5px solid rgba(255,255,255,0.28);border-radius:14px;padding:.8rem 1rem;text-align:center;backdrop-filter:blur(6px);flex:1;min-width:70px;max-width:120px}
+.hs-num{font-size:1.4rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.75);margin-top:4px;font-weight:600}
+
+.tabs-wrap{background:var(--white);border-bottom:2px solid var(--p200);position:sticky;top:var(--header-h);z-index:400}
+.tabs-inner{max-width:1100px;margin:0 auto;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{flex:1;min-width:0;padding:0 6px;height:var(--tab-h);font-size:12px;font-weight:700;color:var(--muted);border:none;background:none;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:4px}
+.tab-btn:active{background:var(--p50)}
+.tab-btn.active{color:var(--p700);border-bottom-color:var(--p700)}
+
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.2rem .9rem 6rem;padding-bottom:calc(6rem + env(safe-area-inset-bottom))}
+.unit-section{display:none}.unit-section.visible{display:block}
+
+.act-banner{border-radius:16px;padding:1.4rem 1.2rem;margin-bottom:1.4rem;display:flex;align-items:flex-start;gap:1rem}
+.ab-blue{background:linear-gradient(135deg,var(--p100),var(--p50));border:2px solid var(--p200)}
+.ab-teal{background:linear-gradient(135deg,var(--teal-bg),#ccfbf1);border:2px solid var(--teal-border)}
+.ab-amber{background:linear-gradient(135deg,var(--amber-bg),#fef3c7);border:2px solid var(--amber-border)}
+.ab-green{background:linear-gradient(135deg,var(--green-bg),#d1fae5);border:2px solid var(--green-border)}
+.ab-emoji{font-size:2.4rem;flex-shrink:0;margin-top:.1rem}
+.ab-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.ab-num-blue{color:var(--p700)}.ab-num-teal{color:var(--teal)}.ab-num-amber{color:var(--amber)}.ab-num-green{color:var(--green)}
+.ab-title{font-size:1.1rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:5px;line-height:1.35}
+.ab-desc{font-size:13px;color:var(--muted);line-height:1.65}
+.ab-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:.8rem}
+.meta-tag{background:rgba(255,255,255,0.75);border:1px solid rgba(0,0,0,0.08);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--text)}
+
+.acc-list{display:flex;flex-direction:column;gap:10px}
+.acc-item{background:var(--white);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s}
+.acc-item.open{border-color:var(--p300);box-shadow:0 4px 20px rgba(37,99,235,.1)}
+.acc-header{display:flex;align-items:center;gap:10px;padding:1rem 1.1rem;cursor:pointer;user-select:none;min-height:64px;transition:background .15s}
+.acc-header:active{background:var(--p50)}
+.acc-num{width:34px;height:34px;flex-shrink:0;border-radius:10px;background:var(--p100);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--p800)}
+.acc-item.open .acc-num{background:var(--p700);color:#fff}
+.acc-head-info{flex:1;min-width:0}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--p700);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-htitle{font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.01em;line-height:1.4}
+.acc-hdesc{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--p700)}
+.acc-body{display:none;padding:0 1.1rem 1.6rem;border-top:1px solid var(--p100)}
+.acc-item.open .acc-body{display:block}
+
+.sec-title{font-size:12px;font-weight:800;color:var(--p800);letter-spacing:.06em;text-transform:uppercase;margin:1.4rem 0 .7rem;display:flex;align-items:center;gap:7px}
+.sec-title::before{content:'';width:4px;height:15px;background:var(--p700);border-radius:2px;flex-shrink:0}
+
+.concept-box,.green-box,.amber-box,.blue-box,.red-box,.purple-box,.teal-box{border-radius:12px;padding:.95rem 1.1rem;margin:.5rem 0;line-height:1.75;font-size:14px}
+.concept-box{background:var(--p50);border:1.5px solid var(--p200);border-left:4px solid var(--p700)}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--green)}
+.amber-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-left:4px solid var(--amber)}
+.blue-box{background:var(--p50);border:1.5px solid var(--p200);border-left:4px solid var(--p600)}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red)}
+.purple-box{background:var(--purple-bg);border:1.5px solid var(--purple-border);border-left:4px solid var(--purple)}
+.teal-box{background:var(--teal-bg);border:1.5px solid var(--teal-border);border-left:4px solid var(--teal)}
+.cb-title{font-weight:800;font-size:14px;margin-bottom:.4rem}
+.concept-box .cb-title,.blue-box .cb-title{color:var(--p800)}
+.green-box .cb-title{color:#065f46}
+.amber-box .cb-title{color:#92400e}
+.red-box .cb-title{color:#991b1b}
+.purple-box .cb-title{color:#4c1d95}
+.teal-box .cb-title{color:#134e4a}
+
+.table-wrap{overflow-x:auto;margin:.7rem 0;border-radius:12px;border:1.5px solid var(--border-p);-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:300px}
+thead th{background:var(--p100);padding:9px 12px;text-align:left;font-weight:800;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--p800)}
+tbody td{padding:9px 12px;border-top:1px solid var(--border);line-height:1.6;vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fbff}
+
+.step-list{display:flex;flex-direction:column;gap:8px;margin:.7rem 0}
+.step-item{display:flex;align-items:flex-start;gap:10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:.95rem 1rem}
+.step-num{width:28px;height:28px;flex-shrink:0;border-radius:8px;background:var(--p700);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;margin-top:1px}
+.step-content{flex:1;font-size:14px;line-height:1.7;color:var(--text)}
+.step-content strong{color:var(--p800)}
+
+.card-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px;margin:.7rem 0}
+.mini-card{background:var(--white);border:1.5px solid var(--border-p);border-radius:12px;padding:.85rem .9rem}
+.mc-label{font-size:10px;font-weight:700;color:var(--p700);letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
+.mc-value{font-size:13px;font-weight:600;line-height:1.55;color:var(--text)}
+
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:.7rem 0}
+.point-card{background:var(--white);border:1.5px solid var(--border-p);border-radius:12px;padding:.9rem;text-align:center}
+.pc-icon{font-size:1.7rem;margin-bottom:5px}
+.pc-title{font-size:13px;font-weight:800;color:var(--p700);margin-bottom:3px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin:.7rem 0;font-size:13px}
+.flow-box{background:var(--white);border:1.5px solid var(--p200);border-radius:8px;padding:6px 10px;font-weight:700;color:var(--p800);text-align:center;font-size:12px}
+.flow-arrow{color:var(--p500);font-size:18px;font-weight:900}
+
+/* 개체군 변동 그래프 */
+.eco-graph{background:var(--white);border:1.5px solid var(--border-p);border-radius:14px;padding:1rem;margin:.7rem 0;overflow-x:auto}
+.eco-graph-title{font-size:12px;font-weight:800;color:var(--p800);margin-bottom:.8rem}
+.graph-lines{display:flex;gap:12px;align-items:flex-end;height:80px;border-bottom:2px solid var(--border);position:relative}
+.graph-bar-sparrow{background:#2563eb;border-radius:2px 2px 0 0;min-width:12px;flex:1;opacity:0.85}
+.graph-bar-grasshopper{background:#16a34a;border-radius:2px 2px 0 0;min-width:12px;flex:1;opacity:0.85}
+.graph-legend{display:flex;gap:16px;margin-top:8px;font-size:11px;font-weight:700}
+.legend-item{display:flex;align-items:center;gap:5px}
+.legend-dot{width:10px;height:10px;border-radius:2px}
+
+/* 에너지 수지 박스 */
+.energy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:.7rem 0}
+.energy-card{border-radius:12px;padding:.9rem;text-align:center}
+.ec-ground{background:#fff7ed;border:2px solid #fed7aa}
+.ec-air{background:#eff6ff;border:2px solid #bfdbfe}
+.ec-space{background:#f5f3ff;border:2px solid #ddd6fe}
+.ec-label{font-size:10px;font-weight:700;letter-spacing:.06em;margin-bottom:6px}
+.ec-val{font-size:1.6rem;font-weight:900;line-height:1}
+.ec-unit{font-size:10px;color:var(--muted);margin-top:3px}
+.ec-detail{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5}
+
+.quiz-wrap{background:linear-gradient(135deg,var(--p100),var(--p50));border:1.5px solid var(--p200);border-radius:14px;padding:1.1rem;margin-top:1.2rem}
+.quiz-label{font-size:11px;font-weight:800;color:var(--p800);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.7rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.6rem}
+.quiz-toggle{background:var(--p700);color:#fff;border:none;border-radius:20px;padding:10px 20px;min-height:44px;font-size:13px;font-weight:700;width:100%;transition:background .15s}
+.quiz-toggle:active{background:var(--p900)}
+.quiz-ans{display:none;margin-top:.8rem;padding:1rem;background:rgba(255,255,255,.8);border-radius:10px;font-size:14px;color:var(--text);line-height:1.8}
+
+/* 뉴스 시나리오 박스 */
+.news-box{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:1rem;margin:.6rem 0}
+.news-head{display:flex;align-items:center;gap:8px;margin-bottom:.6rem}
+.news-badge{background:var(--p700);color:#fff;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:800}
+.news-title{font-size:13px;font-weight:800;color:var(--text)}
+.news-body{font-size:13px;color:var(--muted);line-height:1.7}
+
+/* 탄소중립 실천 카드 */
+.carbon-steps{display:flex;flex-wrap:wrap;gap:6px;margin:.7rem 0}
+.carbon-step{background:var(--p100);border:1.5px solid var(--p200);border-radius:10px;padding:.6rem .9rem;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--p800);flex:1;min-width:140px}
+.cs-num{background:var(--p700);color:#fff;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0}
+
+.hp{color:var(--p800);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--p600);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.ht{color:var(--teal);font-weight:800}
+
+body p{line-height:1.75;font-size:14px;margin:.35rem 0}
+
+@media(max-width:480px){
+  .hero{padding:1.6rem .9rem 1.6rem}
+  .hero-desc{font-size:12.5px}
+  .tab-btn{font-size:11px;padding:0 4px}
+  .content-wrap{padding:1rem .75rem 6rem;padding-bottom:calc(6rem + env(safe-area-inset-bottom))}
+  .act-banner{flex-direction:column;gap:.7rem;padding:1.1rem}
+  .ab-emoji{font-size:2rem}
+  .ab-title{font-size:1rem}
+  .acc-header{padding:.9rem}
+  .acc-body{padding:0 .9rem 1.4rem}
+  .concept-box,.green-box,.amber-box,.blue-box,.red-box,.purple-box,.teal-box{font-size:13px}
+  body p{font-size:13px}
+  .step-content{font-size:13px}
+  .quiz-q{font-size:13px}
+  .quiz-ans{font-size:13px}
+  table{font-size:12px}
+  .energy-grid{grid-template-columns:1fr}
+  .point-box{grid-template-columns:1fr 1fr}
+  .card-row{grid-template-columns:1fr 1fr}
+}
+@media(max-width:360px){
+  .brand-name{display:none}
+  .tab-btn{font-size:10px}
+  .point-box{grid-template-columns:1fr}
+}
+@media(min-width:768px){
+  .hero{padding:2.8rem 1.5rem 2.2rem}
+  .content-wrap{padding:1.8rem 1.5rem 5rem}
+  .tab-btn{font-size:13px;padding:0 20px}
+  .tabs-inner{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="science2-inquiry.html" class="header-brand">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+    <div class="pub-chip">22개정 · 통합과학2</div>
+    <a href="science2-inquiry.html" class="back-btn">← 목록</a>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-bc">
+      <a href="index.html" class="bc-a">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="science2-inquiry.html" class="bc-a">탐구활동</a><span class="bc-sep">›</span>
+      <span class="bc-cur">탐구 33~36</span>
+    </div>
+    <div class="hero-eyebrow">🌍 22개정 · 통합과학2 · 환경과 에너지</div>
+    <div class="hero-title">탐구활동 33 ~ 36<br>생태계와 환경</div>
+    <div class="hero-desc">개체군 변동 모의실험, 지구 열수지 탐구, 기후변화 미래 시나리오 구상, 탄소 중립 실천 홍보물 제작까지 4가지 탐구활동을 완벽하게 정리합니다</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">4</div><div class="hs-lbl">탐구활동</div></div>
+      <div class="hero-stat-card"><div class="hs-num">pp.113~125</div><div class="hs-lbl">교재 쪽수</div></div>
+      <div class="hero-stat-card"><div class="hs-num">모의실험</div><div class="hs-lbl">·탐구·창의</div></div>
+      <div class="hero-stat-card"><div class="hs-num">세특</div><div class="hs-lbl">직결 서술</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">🦗 탐구33 · 개체군변동</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">🌡️ 탐구34 · 열수지변동</button>
+    <button class="tab-btn" onclick="showUnit(3,this)">🔮 탐구35 · 미래시나리오</button>
+    <button class="tab-btn" onclick="showUnit(4,this)">🌱 탐구36 · 탄소중립</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ══ 탐구33 ══ -->
+<div id="unit1" class="unit-section visible">
+  <div class="act-banner ab-blue">
+    <div class="ab-emoji">🦗</div>
+    <div style="flex:1">
+      <div class="ab-num ab-num-blue">탐구활동 33 · pp.113~115</div>
+      <div class="ab-title">생태계평형<br>개체군 변동 모의실험하기</div>
+      <div class="ab-desc">참새(포식자)와 메뚜기(피식자)의 먹이 관계를 클립과 컵을 이용한 모의실험으로 재현하여, 포식자-피식자 개체군의 진동 변동 패턴을 탐구합니다.</div>
+      <div class="ab-meta">
+        <span class="meta-tag">🎯 탐구 능력 · 문제 해결 능력</span>
+        <span class="meta-tag">🔧 탐구 설계 · 수행 · 결론 도출</span>
+        <span class="meta-tag">📎 조회색 클립 50개 · 플라스틱 컵 10개</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-list">
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">탐구 목표 & 실험 설계</div>
+          <div class="acc-htitle">무엇을 어떻게 모의실험하는가?</div>
+          <div class="acc-hdesc">탐구 목표 · 실험 비유 구조 · 준비물 · 역할 분담</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">탐구 목표</div>
+        <div class="concept-box">
+          <div class="cb-title">🎯 이 탐구를 통해 할 수 있는 것</div>
+          <span class="hp">먹이 관계에 따른 개체군의 변동</span>을 설명할 수 있다.<br><br>
+          포식자(참새)와 피식자(메뚜기)의 개체수가 서로 어떤 영향을 주고받는지, 모의실험을 통해 직접 확인하고 실제 자연 생태계와 연결합니다.
+        </div>
+
+        <div class="sec-title">실험 비유 구조</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>실험 요소</th><th>실제 자연에서 의미</th></tr></thead>
+          <tbody>
+            <tr><td>조회색 클립</td><td>메뚜기(피식자) 개체</td></tr>
+            <tr><td>투명 플라스틱 컵</td><td>생태계 서식지(먹이 공간)</td></tr>
+            <tr><td>빈칸(번식)</td><td>메뚜기가 한 세대 동안 번식하는 수</td></tr>
+            <tr><td>투명 플라스틱 컵 투구</td><td>참새가 메뚜기를 포식하는 행동</td></tr>
+            <tr><td>참새 개체수 변화</td><td>포식자가 피식자 수에 따라 증감하는 과정</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">역할 분담 (4명 모둠)</div>
+        <div class="card-row">
+          <div class="mini-card"><div class="mc-label">사냥꾼 역할 ①</div><div class="mc-value">컵 투구 (참새 포식 표현)</div></div>
+          <div class="mini-card"><div class="mc-label">개체군 변동 기록 ②</div><div class="mc-value">클립 개수 세기 및 기록</div></div>
+          <div class="mini-card"><div class="mc-label">참새 번식 역할 ③</div><div class="mc-value">메뚜기 포식 결과에 따른 참새 개체수 계산</div></div>
+          <div class="mini-card"><div class="mc-label">기록 양식 ④</div><div class="mc-value">각 세대별 데이터 기록표 작성</div></div>
+        </div>
+
+        <div class="sec-title">실험 과정</div>
+        <div class="step-list">
+          <div class="step-item"><div class="step-num">❶</div><div class="step-content"><strong>4명이 한 모둠:</strong> 생태계 판, 개체군 변동 규칙 및 기록 양식을 준비한다. 조회색 클립 50개를 생태계 판에 올려놓는다 (메뚜기 초기 개체수 = 50).</div></div>
+          <div class="step-item"><div class="step-num">❷</div><div class="step-content"><strong>모둠원 각자 상태 사냥을 한다:</strong> 개체군 변동 규칙에 따라 투명 플라스틱 컵 투구로 참새 포식 역할 ①을, 참새와 메뚜기의 개체 수 및 번식 양식의 사냥과 변식 역할 ②를, 참새와 메뚜기의 개체 변동 기록 역할 ③으로 나눈다.</div></div>
+          <div class="step-item"><div class="step-num">❸</div><div class="step-content"><strong>모둠원 각자 맡은 역할을 확인</strong>하고 개체군 변동 규칙에 따라 모의실험을 수행한다.</div></div>
+          <div class="step-item"><div class="step-num">❹</div><div class="step-content"><strong>한 세대의 과정이 끝나면:</strong> ①모둠원은 생태계 판 안쪽에 있는 참새 수와 생태계에 관한 메뚜기 수 및 번식 양식을 기록한다.</div></div>
+          <div class="step-item"><div class="step-num">❺</div><div class="step-content"><strong>과정 및 결과 ①~⑤을 반복</strong>하여 참새와 메뚜기의 개체군 변동을 표현한다. (20세대 이상)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">실험 결과 & 분석</div>
+          <div class="acc-htitle">개체군 변동 데이터 해석</div>
+          <div class="acc-hdesc">예시 데이터 표 · 진동 그래프 · 포식자-피식자 관계 해석</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">예시 데이터 (교재 114쪽)</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>세대</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:700;color:#2563eb">참새(개체수)</td><td>3</td><td>3</td><td>4</td><td>6</td><td>8</td><td>7</td><td>5</td><td>3</td><td>2</td><td>4</td></tr>
+            <tr><td style="font-weight:700;color:#16a34a">메뚜기(개체수)</td><td>20</td><td>28</td><td>32</td><td>28</td><td>32</td><td>34</td><td>20</td><td>32</td><td>48</td><td>42</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="eco-graph">
+          <div class="eco-graph-title">📈 참새-메뚜기 개체군 변동 (개념도 — 진동 패턴)</div>
+          <div class="graph-lines" style="align-items:flex-end;height:90px">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+              <div class="graph-bar-grasshopper" style="height:40%"></div>
+              <div class="graph-bar-sparrow" style="height:30%"></div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+              <div class="graph-bar-grasshopper" style="height:55%"></div>
+              <div class="graph-bar-sparrow" style="height:30%"></div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+              <div class="graph-bar-grasshopper" style="height:65%"></div>
+              <div class="graph-bar-sparrow" style="height:40%"></div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+              <div class="graph-bar-grasshopper" style="height:55%"></div>
+              <div class="graph-bar-sparrow" style="height:60%"></div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+              <div class="graph-bar-grasshopper" style="height:65%"></div>
+              <div class="graph-bar-sparrow" style="height:70%"></div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+              <div class="graph-bar-grasshopper" style="height:40%"></div>
+              <div class="graph-bar-sparrow" style="height:68%"></div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+              <div class="graph-bar-grasshopper" style="height:65%"></div>
+              <div class="graph-bar-sparrow" style="height:50%"></div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+              <div class="graph-bar-grasshopper" style="height:96%"></div>
+              <div class="graph-bar-sparrow" style="height:30%"></div>
+            </div>
+          </div>
+          <div class="graph-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>참새(포식자)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div>메뚜기(피식자)</div>
+          </div>
+        </div>
+
+        <div class="blue-box">
+          <div class="cb-title">📌 핵심 해석: 포식자-피식자 관계의 진동</div>
+          <strong>메뚜기(피식자) 증가 → 참새(포식자) 증가 → 메뚜기 감소 → 참새 감소 → 메뚜기 다시 증가</strong>하는 주기적 진동이 나타납니다.<br><br>
+          • 참새 개체수가 증가하면 → 메뚜기를 많이 잡아먹어 메뚜기 <span class="hb">감소</span><br>
+          • 메뚜기 감소 → 참새 먹이 부족 → 참새 <span class="hb">감소</span><br>
+          • 참새 감소 → 메뚜기 포식 압력 감소 → 메뚜기 <span class="hg">증가</span><br>
+          → 이 과정이 반복되어 <span class="hp">주기적 진동</span>이 나타납니다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 예시 답안</div>
+          <div class="quiz-q">참새의 개체수와 메뚜기의 개체수 사이에는 어떤 관계가 있는지 설명하시오.</div>
+          <button class="quiz-toggle">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">메뚜기 개체수가 증가하면 참새 개체수도 증가하고, 참새 개체수가 증가하면 메뚜기 개체수는 감소한다.</strong><br><br>
+            메뚜기 개체수가 많아지면 참새의 먹이가 풍부해져 참새가 살아남아 개체수가 증가한다. 참새 개체수가 증가하면 다시 메뚜기 개체수가 감소하고, 참새 개체수도 감소한다. 다시 메뚜기 개체수가 증가하는 식으로 반복되면서 <strong>참새와 메뚜기의 개체수가 주기적으로 변동하는 경향이 있다.</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">평가 기준 & 성취수준</div>
+          <div class="acc-htitle">탐구활동 33 평가 체계</div>
+          <div class="acc-hdesc">평가 기준 · 최소 성취수준 · 수준별 평가 기록 예시</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">평가 기준</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>평가 요소</th><th>평가 기준</th></tr></thead>
+          <tbody>
+            <tr><td>지식·이해</td><td>먹이 관계에 따른 개체군 변동을 설명할 수 있는가?</td></tr>
+            <tr><td>참여도(과기)</td><td>개체군 변동 규칙에 따라 투명 플라스틱 컵 투구와 초록색 클립을 이용해 참새와 메뚜기의 시냥과 번식, 패턴의 파악과 변식을 표현했는가?</td></tr>
+            <tr><td>참여도(과기)</td><td>참새와 메뚜기의 개체수를 올바르게 기록하고 변동의 관련성을 분석할 수 있는가?</td></tr>
+            <tr><td>가치·태도</td><td>모둠원과 협동하며 자신이 맡은 역할을 성실히 수행했는가?</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">최소 성취수준</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>영역별(E)</th><th>성취기준별(E)</th><th>최소 능력 수행</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>지식·이해: 환경의 변화가 생태계에 영향을 미침을 알 수 있다.</td>
+              <td rowspan="3">환경의 변화가 생태계에 미치는 영향을 줄 수 있다.</td>
+              <td rowspan="3">환경의 변화가 생태계에 미치는 영향을 말할 수 있다.</td>
+            </tr>
+            <tr><td>과정·기능: 환경의 변화가 생태계에 미치는 영향을 조사할 수 있다.</td></tr>
+            <tr><td>가치·태도: 환경 변화가 생태계에 이진 영향을 인식한다.</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">수준별 평가 기록 예시</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th style="width:40px">수준</th><th>평가 기록 특성</th></tr></thead>
+          <tbody>
+            <tr><td style="text-align:center;font-weight:900;color:var(--red)">A</td>
+              <td style="font-size:12.5px;line-height:1.65">생태에는 생물요소와 비생물요소가 구성되어 있는 각 개체 간의 영향을 미치는 방법과 각 관계를 잘 이해하고 있음. 생태계평형을 미치는 요인을 묻는 질문에 자신과 의 두 요소에 생물요소의 에너지에서 정확히 개념을 알고 있으며, 지구 에너지에서 탄소 트림스 배출을 비교하고 탐색하는 것 외 다른 지구 기후변화를 통해 생태계 탐구 활동에 인상적으로 참여함. 생물에 모둠에 사시와의 탐구 결과를 훌륭하게 해결하였으며 특히 메뚜기 탐구 결과 총 생물 변동 기록에서 탐구방법과 각 개체의 탐구에서 홀연히 생기는 탐구를 능력이 있어서 탐구 방향을 통해 잘 개선하였고 지구에 들어오는 진출한 단소 수준의 탐색지를 생물량에 걸친 참여도를 분석하고 있으므로 이 점이 뛰어나고 다른 도의 사시와 생태를 생물하고, 사시와의 내용에 따라 논리적이며 비과학적 사고를 강화함.</td>
+            </tr>
+            <tr><td style="text-align:center;font-weight:900;color:var(--green)">B</td>
+              <td style="font-size:12.5px;line-height:1.65">생태에는 생물요소와 비생물다양성으로 구성되어 있는 각 간의 영향을 막을 수 있다는 것을 잘 이해하고 있음. 먹이 이해하고 잘 알아야 할 것 같음. 특히 인간이 관계의 변화가 생태계에 큰 피해를 줄 수 있는 것을 안식하고 있으며, 많은 탐구 활동을 잘 수행할 수 있도록 도토록 생물 사냥과 번식을 잘 그래프로 나타냈으며. 그 또는 다른 모둠에서 자연의 개체수 변동화 표시를 만들었으며 참새와 메뚜기 수를 올바르게 정확히 성명, 활동, 출석 후 개체군 변동의 그래프들을 코딩과 모의실험 프로그램으로 생물을 하려는 관심을 보임.</td>
+            </tr>
+            <tr><td style="text-align:center;font-weight:900;color:var(--p700)">C</td>
+              <td style="font-size:12.5px;line-height:1.65">녀대에 시나리오로 생태계평형이 영향을 받은 이국의 사례에 대한 학습 내용을 잘 이해하고, 이러부터 생태계에 영향을 미치는 이국의 도를 찾아야 자연 개체 변화 탐이 생태계평형이 범위한다는 것을 효렇게 이반냐라. 그래도 개체 수지 수 있는 지 수가 대당에, 개체로 생물 도 탐구를 잘 알아낼 수 있는 시 중다에 요미한 개체 규 내외 역할을 지독적으로 잘 알아 단 시 이것 있었지요, 가장 싫음을 막 이후는 지 개체는 규 내외 역할을 지독적으로 잘 알아 모의실험은 약간에 어려움이 있었지요. 참새와 메뚜기의 탐구를 잘 요그래프로 탐구 결과를 요그라비로 나타낼 수 있는 지, 생물을 통해 단환 생물들 탐구하고 생태를 위한 무엇 더 노력의 중요함을 느끼게 되었고, 생물을 보호하기 위한 노력의 중요함을 말할 수 있었다.</td>
+            </tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 탐구34 ══ -->
+<div id="unit2" class="unit-section">
+  <div class="act-banner ab-teal">
+    <div class="ab-emoji">🌡️</div>
+    <div style="flex:1">
+      <div class="ab-num ab-num-teal">탐구활동 34 · pp.117~119</div>
+      <div class="ab-title">지구 환경의 변화<br>지구 온난화로 인한 지구 열수지 변동 탐구하기</div>
+      <div class="ab-desc">지구 온난화에 따라 지구 열수지가 어떻게 변동되는지를 추론합니다. 지표·대기·우주의 에너지 유입량과 유출량을 비교·분석하고, 온난화가 심화될 때의 변화를 예측합니다.</div>
+      <div class="ab-meta">
+        <span class="meta-tag">🎯 탐구 능력 · 의사 결정</span>
+        <span class="meta-tag">🔧 자료수집분석 · 의사소통</span>
+        <span class="meta-tag">📱 스마트 기기 · 참고 도서</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-list">
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">핵심 개념</div>
+          <div class="acc-htitle">지구 열수지 구조 이해하기</div>
+          <div class="acc-hdesc">지표·대기·우주 에너지 수지 · 유입·유출 에너지량 · 온난화와의 관계</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">탐구 목표</div>
+        <div class="concept-box">
+          <div class="cb-title">🎯 이 탐구를 통해 할 수 있는 것</div>
+          지구 온난화에 따라 <span class="hp">지구 열수지가 어떻게 변동</span>되는지 추론할 수 있다.<br><br>
+          지표·대기·우주의 에너지 유입량과 유출량을 수치로 비교하고, 이산화 탄소 농도 증가가 어떻게 에너지 수지를 변화시켜 온도를 높이는지 이해합니다.
+        </div>
+
+        <div class="sec-title">지구 에너지 수지 — 현재 상태</div>
+        <div class="energy-grid">
+          <div class="energy-card ec-ground">
+            <div class="ec-label" style="color:#9a3412">🌍 지표</div>
+            <div class="ec-val" style="color:#9a3412">114</div>
+            <div class="ec-unit">유입 에너지량</div>
+            <div class="ec-detail">산출(30)+방출(131)→대기 복사(13)</div>
+          </div>
+          <div class="energy-card ec-air">
+            <div class="ec-label" style="color:#1e40af">💨 대기</div>
+            <div class="ec-val" style="color:#1e40af">152</div>
+            <div class="ec-unit">유입 에너지량</div>
+            <div class="ec-detail">대기가 흡수(131)+구름(13)→지구 복사(58)</div>
+          </div>
+          <div class="energy-card ec-space">
+            <div class="ec-label" style="color:#6d28d9">🌌 우주</div>
+            <div class="ec-val" style="color:#6d28d9">100</div>
+            <div class="ec-unit">유입 에너지량</div>
+            <div class="ec-detail">반사(30)+지구 복사(70)→우주 방출(100)</div>
+          </div>
+        </div>
+
+        <div class="blue-box">
+          <div class="cb-title">⚖️ 열수지 평형의 원리</div>
+          현재 지구는 <span class="hb">열수지 평형 상태</span>를 유지하고 있습니다.<br>
+          <strong>유입 에너지 = 유출 에너지</strong><br><br>
+          • 지표 유입(114) = 지표 유출(114): 태양 에너지 흡수 = 지표에서 방출<br>
+          • 대기 유입(152) = 대기 유출(152): 흡수 = 대기 복사로 방출<br>
+          • 우주 유입(100) = 우주 유출(100): 태양 복사 = 지구 전체 방출
+        </div>
+
+        <div class="sec-title">온난화 심화 시 열수지 변동</div>
+        <div class="flow">
+          <div class="flow-box">CO₂ 농도 ↑<br><small>온실 효과 강화</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">대기가 흡수하는<br>에너지 ↑ (132보다↑)</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">대기가 방출하는<br>에너지 ↑ (94보다↑)</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">지표 다시 흡수<br>에너지 ↑ (↓감소)</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">지표 온도 ↑<br><span style="color:#dc2626">온난화!</span></div>
+        </div>
+
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 핵심 탐구 포인트</div>
+          대기 중 이산화 탄소 농도가 증가하면 → 대기가 흡수하는 에너지가 <span class="ha">132보다 많아지고</span> → 대기가 지표로 방출하는 에너지도 증가 → 지표로 다시 내려오는 에너지가 <span class="ha">증가</span> → 지표 온도 <span class="ha">상승</span><br><br>
+          결론: 지표의 <span class="ha">유입 에너지 &gt; 유출 에너지</span> → 에너지 불균형 → 지구 온난화 심화
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 예시 답안 — 탐구 핵심 질문</div>
+          <div class="quiz-q">지구 온난화가 일어나는 과정을 지구 열수지 변동과 관련지어 설명해 보자.</div>
+          <button class="quiz-toggle">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            대기 중 온실 기체가 증가하면 대기가 흡수하는 에너지가 <strong>132보다 많아진다.</strong> 이 에너지는 주로 지표 방향으로 방출되는 에너지도 증가하기 때문에 지표면 에너지의 기준인 <strong>114보다 지표면이 받는 에너지가 많아지게 된다.</strong> 그러므로 지표면을 기준으로 에너지가 증가하며, 지표면에 저장되는 에너지가 늘어나게 되어 지표면의 온도는 <strong>높아진다.</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">평가 기준 & 성취수준</div>
+          <div class="acc-htitle">탐구활동 34 평가 체계</div>
+          <div class="acc-hdesc">관찰 평가 · 최소 성취수준 · 수준별 평가 기록</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">평가 기준</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>평가 요소</th><th>평가 기준</th></tr></thead>
+          <tbody>
+            <tr><td>지식·이해</td><td>열수지 변동을 논리적으로 설명할 수 있는가?</td></tr>
+            <tr><td>과정·기능</td><td>지구 열수지 자료를 정확하게 분석하여 비교했는가?</td></tr>
+            <tr><td>가치·태도</td><td>자료 분석 및 해석 과정에 적극적으로 참여했는가?</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">최소 성취수준</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>영역별(E)</th><th>성취기준별(E)</th><th>최소 수행</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>지식·이해: 지구 온난화의 발생 원인을 설명할 수 있다.</td>
+              <td rowspan="3">지구 온난화가 지구 환경과 인간 생활에 미치는 영향을 말할 수 있다.</td>
+              <td rowspan="3">지구 온난화가 지구 환경과 인간 생활에 미치는 영향을 말할 수 있다.</td>
+            </tr>
+            <tr><td>과정·기능: 지구 온난화가 지구 환경과 인간 생활에 미치는 영향을 조사할 수 있다.</td></tr>
+            <tr><td>가치·태도: 환경 변화가 생태계에 이진 영향을 인식한다.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 탐구35 ══ -->
+<div id="unit3" class="unit-section">
+  <div class="act-banner ab-amber">
+    <div class="ab-emoji">🔮</div>
+    <div style="flex:1">
+      <div class="ab-num ab-num-amber">탐구활동 35 · pp.120~122</div>
+      <div class="ab-title">지구 환경의 변화<br>기후 변화 미래 시나리오 구상하기</div>
+      <div class="ab-desc">상황 A(고탄소 배출)와 상황 B(저탄소 배출)에 따른 연도별 이산화탄소 배출량 그래프를 분석하고, 2100년의 생태계와 인간 생활이 어떻게 변할지 뉴스 시나리오를 작성합니다.</div>
+      <div class="ab-meta">
+        <span class="meta-tag">🎯 탐구 능력 · 의사 결정</span>
+        <span class="meta-tag">📰 미래 시나리오 작성 · 발표</span>
+        <span class="meta-tag">📱 스마트 기기 · 참고 도서</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-list">
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">핵심 개념 & 탐구 과정</div>
+          <div class="acc-htitle">상황 A·B 비교와 시나리오 설계</div>
+          <div class="acc-hdesc">두 시나리오 비교 · 2100년 변화 예측 · 탐구 흐름</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">탐구 목표</div>
+        <div class="concept-box">
+          <div class="cb-title">🎯 이 탐구를 통해 할 수 있는 것</div>
+          기후 변화에 따라 <span class="ha">생태계와 지구계의 변화를 예측하는 시나리오</span>를 구상할 수 있다.<br><br>
+          두 가지 탄소 배출 시나리오(상황 A·B)를 비교하고, 2100년 미래의 변화를 뉴스 형식으로 상상하여 과학적 근거를 갖춘 미래 예측을 연습합니다.
+        </div>
+
+        <div class="sec-title">상황 A vs 상황 B 비교</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>상황 A</th><th>상황 B</th></tr></thead>
+          <tbody>
+            <tr><td>탄소 배출</td><td><span class="hr">고탄소 배출</span> (현재 추세 지속)</td><td><span class="hg">저탄소 배출</span> (적극적 감축)</td></tr>
+            <tr><td>2100년 기온</td><td>약 +4℃ 이상 상승 예측</td><td>약 +1.5~2℃ 이내 유지 목표</td></tr>
+            <tr><td>해수면</td><td>대폭 상승, 해안 도시 침수 위험</td><td>제한적 상승</td></tr>
+            <tr><td>생태계 영향</td><td>극단적 기상, 생물다양성 대규모 감소</td><td>영향 최소화, 생태계 부분 보전</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">상황 A·B에 따른 2100년 변화 — 예시 답안</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>상황 A에 따른 변화</th><th>상황 B에 따른 변화</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:700">생태계 변화</td>
+              <td>빙하 소멸, 열대화가 많은 동식물들이 이 서식지를 사용하는 경우가 줄어 고온 현상이 늘어나고 이국에서 살아있는 서비스가 사라져 많은 생물종의 멸종이 예상되며, 또 바닷속 수온 상승과 산성화로 많은 대류가 변한다.</td>
+              <td>의 현재 연료 사용량 갑소, 전기차, 수소차 등 의 대폭으로, CO₂ 포집 후 해양 재정을 통해 방출하고 기온 대비한다.</td>
+            </tr>
+            <tr>
+              <td style="font-weight:700">인간 생활 변화</td>
+              <td>밀, 쌀과 같은 식량이 줄고, 그에 따른 식량 부족은 사회 갈등을 야기한다. 지금은 고립 생활이 이중의 하지 못했다. 지금을 위에 어떻게 살고 있는 건 건한 에너지 세원을 이제 필수적이 아님이 됩다. 이러한 변화는 지구 온난화를 해결하기 위해 온실 기체 배출을 극적으로 감축할 것이 매우 필요합니다.</td>
+              <td>미래의 어느 100 년의 도시를 보면 옵니다. 식품을 태양광 발전이 많이 거가 자동화 배가스 배출량이 있다. 전기차가 늘어나고 더 이상 건소를 사용할 수 있습니다. 학생은 사용하는 것은 대체 가능하다. 지금은 취급되어 영향도 유용할 수 없습니다.</td>
+            </tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">뉴스 시나리오 예시 답안</div>
+          <div class="acc-htitle">2100년 미래 뉴스 시나리오 작성법</div>
+          <div class="acc-hdesc">상황 A 시나리오 예시 · 상황 B 시나리오 예시 · 작성 포인트</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">상황 A 뉴스 시나리오 예시</div>
+        <div class="news-box">
+          <div class="news-head">
+            <div class="news-badge">📺 2100년 뉴스</div>
+            <div class="news-title">상황 A — 고탄소 배출 지속</div>
+          </div>
+          <div class="news-body">
+            아나운서: 지구온도가 지금보다 4℃ 이상 높아지면서 강한 현재의 폭발이 이미 여름을 재앙처럼 만들고 있다. 제 기억 어린 시절과 어른이 된 현실의 산이 달리 매우 달랐던 것인지 모르겠습니다. 그런데 어떻게 살아야 할지 많이 걱정됩니다.<br><br>
+            교수: 지금은 2080년보다 평균 기온이 그리 오르지 않습니다. 지구 온난화로 시작합서 결과 외국에서 사회에서 대양이 사람들을 막은 것이 큰 방향이 성공되어 더 사회에서 어떻게 사람이 분리하고 좋지 않는 것으로 말로나다. 그래서 지구 온난화의 문제가 크게 지구환경 문제로 다가왔다는 것입니다.<br><br>
+            아나운서: 지금은 우리에게 지구 온난화 대책이 스스로 어느 대책이 많은 정도로 미만 대책입니다. 마스크 없이 나일 수 있는 날이 얼마도 줄었습니다.
+          </div>
+        </div>
+
+        <div class="sec-title">상황 B 뉴스 시나리오 예시</div>
+        <div class="news-box">
+          <div class="news-head">
+            <div class="news-badge" style="background:#16a34a">📺 2100년 뉴스</div>
+            <div class="news-title">상황 B — 저탄소 적극 감축</div>
+          </div>
+          <div class="news-body">
+            미래의 어느 100 년 도시를 보면 옵니다. 식품을 태양광 발전이 가기가 자동화 배가스 배출량이 나타났을 것을 볼 수 있습니다. 학생은 현재는 사용하기 어렵지만 영역을 활용할 수 없습니다. 지금은 취급되어 보다 빨리 만들어진 것의 경제 프란저리가 현재에는 영역에서 우선순이 수용하는 것이 좋은 현상들이 생활에 대한 부하가 낮은 부분도 있겠지만, 지금의 지적 탄소 노출과 해 현재는 지금도 이 따른 기후 더딘 수소 변화 기체를 극약적으로 감축하려 하며, 이상 오늘의 뉴스를 마칩니다.
+          </div>
+        </div>
+
+        <div class="sec-title">뉴스 시나리오 발표 평가표</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>항목</th><th>평가 기준</th><th style="text-align:center">우수</th><th style="text-align:center">보통</th><th style="text-align:center">미흡</th></tr></thead>
+          <tbody>
+            <tr><td>과학 원리</td><td>과학 원리를 근거로 하여 뉴스 시나리오를 구상했는가?</td><td style="text-align:center">□</td><td style="text-align:center">□</td><td style="text-align:center">□</td></tr>
+            <tr><td>창의성</td><td>시나리오의 내용이 참의적으로 잘성한가?</td><td style="text-align:center">□</td><td style="text-align:center">□</td><td style="text-align:center">□</td></tr>
+            <tr><td>논리성</td><td>시나리오의 내용과 전개가 논리적인가?</td><td style="text-align:center">□</td><td style="text-align:center">□</td><td style="text-align:center">□</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">평가 기준 & 성취수준</div>
+          <div class="acc-htitle">탐구활동 35 평가 체계</div>
+          <div class="acc-hdesc">관찰 평가 · 최소 성취수준 · 수준별 예시</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">평가 기준</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>평가 요소</th><th>평가 기준</th></tr></thead>
+          <tbody>
+            <tr><td>지식·이해</td><td>기후 변화를 이해하고 과학적으로 시나리오를 작성했는가?</td></tr>
+            <tr><td>과정·기능</td><td>상황에 따른 생태계와 지구계의 변화를 정확하게 보면했는가?</td></tr>
+            <tr><td>가치·태도</td><td>모둠원과 협동하여 적극적으로 시나리오 작성에 참여했는가?</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">최소 성취수준</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>영역별(E)</th><th>성취기준별(E)</th><th>최소 수행</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>지식·이해: 환경 변화가 생태계에 영향을 미칠 수 있다.</td>
+              <td rowspan="3">지구 온난화가 지구 환경과 인간 생활에 미치는 영향을 말할 수 있다.</td>
+              <td rowspan="3">지구 온난화가 지구 환경과 인간 생활에 미치는 영향을 말할 수 있다.</td>
+            </tr>
+            <tr><td>과정·기능: 지구 온난화가 인간 생활에 미치는 영향을 조사할 수 있다.</td></tr>
+            <tr><td>가치·태도: 환경 변화가 인간 생활에 이진 영향을 인식한다.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 탐구36 ══ -->
+<div id="unit4" class="unit-section">
+  <div class="act-banner ab-green">
+    <div class="ab-emoji">🌱</div>
+    <div style="flex:1">
+      <div class="ab-num ab-num-green">탐구활동 36 · pp.123~125</div>
+      <div class="ab-title">생태계와 환경<br>일상생활에서 탄소 중립 실천하기</div>
+      <div class="ab-desc">일상생활 속에서 탄소 중립을 위해 개인이 실천할 수 있는 방안을 조사하고, 탄소 중립 실천 수칙 홍보물을 창의적으로 제작합니다. (창의력 기름 활동)</div>
+      <div class="ab-meta">
+        <span class="meta-tag">🎨 창의력 기름 활동</span>
+        <span class="meta-tag">📢 홍보물 제작 · 발표</span>
+        <span class="meta-tag">🌐 인터넷 자료 조사</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-list">
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">탐구 목표 & 과정</div>
+          <div class="acc-htitle">탄소 중립 실천 수칙 홍보물 만들기</div>
+          <div class="acc-hdesc">탐구 목표 · 실천 수칙 조사 · 홍보물 제작 과정</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">탐구 목표</div>
+        <div class="concept-box">
+          <div class="cb-title">🎯 이 탐구를 통해 할 수 있는 것</div>
+          일상생활 속에서 탄소 중립을 위해 <span class="hg">개인이 실천할 수 있는 방안</span>을 조사하고, 이 중 할 수 있는 것들을 선정하여 <span class="hg">탄소 중립 실천 수칙을 만들 수 있다.</span>
+        </div>
+
+        <div class="sec-title">탐구 과정</div>
+        <div class="step-list">
+          <div class="step-item"><div class="step-num">❶</div><div class="step-content"><strong>모둠별로 탄소 중립을 위해 우리가 할 수 있는 실천 수칙을 생각해 보자.</strong><br><span style="font-size:12px;color:var(--muted)">💡 인터넷에서 '탄소 중립 생활 실천 방안', '탄소 중립 실천 운동' 등을 검색하여 자료, 기사 등을 찾아본다.</span></div></div>
+          <div class="step-item"><div class="step-num">❷</div><div class="step-content"><strong>실천 수칙을 공유하여 그중 5가지를 선정하고 우리 모둠의 탄소 중립 실천 수칙 홍보물을 만들어 보자.</strong><br>포스터, 카드뉴스, 리플릿, 영상 등 다양한 형식으로 제작 가능</div></div>
+          <div class="step-item"><div class="step-num">❸</div><div class="step-content"><strong>실천 수칙을 공유하여 다른 모둠의 발표를 평가해 보자.</strong><br>과학 원리·창의성·논리성 기준으로 상호 평가</div></div>
+          <div class="step-item"><div class="step-num">❹</div><div class="step-content"><strong>탄소 중립 실천 수칙 홍보물을 만들면서 기후 변화에 대응하기 위한 다양한 방법을 생각해 보자.</strong></div></div>
+        </div>
+
+        <div class="sec-title">실천 수칙 예시 (교재 123쪽)</div>
+        <div class="carbon-steps">
+          <div class="carbon-step"><div class="cs-num">1</div>일회용품 사용 및 다회용품 사용</div>
+          <div class="carbon-step"><div class="cs-num">2</div>재활용을 위한 분리배출</div>
+          <div class="carbon-step"><div class="cs-num">3</div>숲 만들기, 조식 자연 친화적인 음식수수 사용하기</div>
+          <div class="carbon-step"><div class="cs-num">4</div>냉장고 이상 상품으로 비냐 사용 줄이기</div>
+          <div class="carbon-step"><div class="cs-num">5</div>가전제품 플러그 뽑아 두기</div>
+          <div class="carbon-step"><div class="cs-num">6</div>쓰레기 시간을 줄이고 제활는 공연에서 하기</div>
+        </div>
+
+        <div class="teal-box">
+          <div class="cb-title">🏆 홍보물 제작 예시 — 탄소 중립 실천 방안!</div>
+          교재 124쪽의 홍보물 예시처럼 <strong>5단계 실천 방안</strong>을 시각적으로 표현합니다:<br><br>
+          STEP01: 대중교통을 이용하고 짧은 거리는 도보나 자전거 이용<br>
+          STEP02: 음식은 남기지 않기 (음식 쓰레기 줄이기)<br>
+          STEP03: 냉난방 절약하기 (에너지 소비 감소)<br>
+          STEP04: 텀블러 사용하기 (일회용 컵 줄이기)<br>
+          STEP05: 쓸모없는 조명 끄기 (전기 절약)
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">평가 기준 & 성취수준</div>
+          <div class="acc-htitle">탐구활동 36 평가 체계</div>
+          <div class="acc-hdesc">관찰·포트폴리오 평가 · 최소 성취수준 · 수준별 예시</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">평가 기준</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>평가 요소</th><th>평가 기준</th></tr></thead>
+          <tbody>
+            <tr><td>지식·이해 (관찰)</td><td>실천 수칙이 일상생활에서 실천할 수 있는 방법인가?</td></tr>
+            <tr><td>과정·기능 (관찰)</td><td>실천 수칙 홍보물이 알기 쉽게 제작되었는가?</td></tr>
+            <tr><td>가치·태도 (관찰)</td><td>홍보물이 창의적이고 기후 문제 해결에 도움이 되는가?</td></tr>
+            <tr><td>포트폴리오</td><td>모둠원과 협력하여 적극적으로 수칙을 정하고 홍보물을 만드는 데 활동에 참여했는가?</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">최소 성취수준</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>영역별(E)</th><th>성취기준별(E)</th><th>최소 수행</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>지식·이해: 환경의 변화가 생태계에 영향을 미칠 수 있다.</td>
+              <td rowspan="3">지구 온난화가 지구 환경과 인간 생활에 미치는 영향을 말할 수 있다.</td>
+              <td rowspan="3">지구 온난화가 지구 환경과 인간 생활에 미치는 영향을 말할 수 있다.</td>
+            </tr>
+            <tr><td>과정·기능: 지구 온난화가 인간 생활에 미치는 영향을 조사할 수 있다.</td></tr>
+            <tr><td>가치·태도: 환경 변화에 인간 생활에 이진 영향을 인식하며, 탄소 중립 실천 의지를 가진다.</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">수준별 평가 기록 예시</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th style="width:40px">수준</th><th>평가 기록 특성</th></tr></thead>
+          <tbody>
+            <tr><td style="text-align:center;font-weight:900;color:var(--red)">A</td>
+              <td style="font-size:12.5px;line-height:1.65">일상생활에서 탄소 중립 실천을 위한 행동 수칙을 제작하는 조별 활동에서 조별 분동의 어떠한 측면의 수칙과 에너지 절약 등의 탄소 발생량 공유하고, 과학적 문제 해결력을 발현하며 탄소 중립 실천 방법에 탄소 발생을 감소하고, 과학적으로 제시된 탄소 절약 방법의 기준 탄소 에너지 절약 방법의 방법을 개선 발로하여 과학적 사고를 통해 결론을 도출하며, 자료 조사 중심의 수학적 분석을 통해 잘 실시하며 단소 중립 실천을 지구하고 있고 탄소 감소를 위한 행동과 방법 측의 노력 수칙을 찾아내어 탐구에 정성스럽게 참여하는 노력이 탁월합니다.</td>
+            </tr>
+            <tr><td style="text-align:center;font-weight:900;color:var(--green)">B</td>
+              <td style="font-size:12.5px;line-height:1.65">탄소 중립 실천을 위한 홍보물을 제작하는 활동에서 수행 역할을 수행하여 있고 성능 탄소 중립 활동의 현락을 통해 탄소 중립 실천방법을 잘 알고 있으며, 탄소 활동의 경제적 방법의 대한 방법적을 탄소를 통해 자료 조사를 단소 조사 수칙들 규에 적절하게 설정, 공유하는 과학적 사고를 수행할 수 있는 탄소 중립 실천 방법을 홍보하는 활동을 통해 현란 변화 환경 관심과 심화감을 높이게 되었으며, 자직적 문제 탄소 발생을 강조하고, 다른 조의 시나리오와 생물들을 생성하고, 시나리오의 내용에 따른 논리적이며 비과학적 사고를 강화함.</td>
+            </tr>
+            <tr><td style="text-align:center;font-weight:900;color:var(--p700)">C</td>
+              <td style="font-size:12.5px;line-height:1.65">일상생활에 속 탄소 중립 실천 방법을 제작하고 홍보하는 활동에 어려움이 있었으며, 이산화 탄소를 탄소 중립 실천의 기준 탄소 배출을 감소하기 위한 방법의 제작하는 것이 어려웠고, 지구 온난화 실천 수칙 정보를 탐색을 해보지 못했음. 탄소 중립 실천 수칙들 규에 적절하게 설정하고 공유하는 과학적 사고가 어려움이 있었으며, 지구 온난화에 생태계에 미치는 영향을 알아야 하는지를 이해하여 지구 온난화에 따른 탄소 중립의 관심을 갖음.</td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">탐구활동 33~36 총정리</div>
+        <div class="point-box">
+          <div class="point-card"><div class="pc-icon">🦗</div><div class="pc-title">탐구 33 핵심</div><div class="pc-desc">포식자↑→피식자↓→포식자↓→피식자↑ 주기적 진동 반복 = 생태계 평형</div></div>
+          <div class="point-card"><div class="pc-icon">🌡️</div><div class="pc-title">탐구 34 핵심</div><div class="pc-desc">CO₂↑→대기 흡수 에너지↑→지표 에너지↑→지표 온도↑ = 열수지 불균형</div></div>
+          <div class="point-card"><div class="pc-icon">🔮</div><div class="pc-title">탐구 35 핵심</div><div class="pc-desc">상황A(고탄소)=심각한 생태계 붕괴, 상황B(저탄소)=영향 최소화. 우리의 선택이 2100년을 결정</div></div>
+          <div class="point-card"><div class="pc-icon">🌱</div><div class="pc-title">탐구 36 핵심</div><div class="pc-desc">탄소 중립은 개인 실천부터. 대중교통·에너지 절약·일회용품 감소가 모여 기후 변화를 막는다</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function showUnit(n,btn){
+  ['unit1','unit2','unit3','unit4'].forEach(id=>document.getElementById(id).classList.remove('visible'));
+  document.getElementById('unit'+n).classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  const top=document.querySelector('.content-wrap').offsetTop-54-52;
+  window.scrollTo({top:top,behavior:'smooth'});
+}
+function toggleAcc(header){
+  const item=header.parentElement;
+  const isOpen=item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el=>el.classList.remove('open'));
+  if(!isOpen){
+    item.classList.add('open');
+    setTimeout(()=>{
+      const rect=item.getBoundingClientRect();
+      if(rect.top<110)window.scrollTo({top:window.scrollY+rect.top-110,behavior:'smooth'});
+    },60);
+  }
+}
+document.querySelectorAll('.quiz-toggle').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    const ans=this.nextElementSibling;
+    const open=ans.style.display==='block';
+    ans.style.display=open?'none':'block';
+    this.textContent=open?'예시 답안 ▼':'답안 닫기 ▲';
+  });
+});
+(function(){
+  const t=parseInt(new URLSearchParams(location.search).get('tab'));
+  if(t>=1&&t<=4){const btn=document.querySelectorAll('.tab-btn')[t-1];if(btn)showUnit(t,btn);}
+})();
+</script>
+</body>
+</html>
