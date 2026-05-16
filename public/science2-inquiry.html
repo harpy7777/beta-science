@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>베타과학학원 · 통합과학 2 탐구활동 보고서</title>
+<style>
+:root {
+  --navy:#1e3a8a;--royal:#2563eb;--blue-mid:#3b82f6;--blue-light:#60a5fa;
+  --bg-tint:#eff6ff;--bg-tint2:#dbeafe;--border:#bfdbfe;--border-soft:#e0eaff;
+
+  /* Unit 1 – 변화와 다양성: teal/emerald */
+  --u1:#0f766e;--u1-bg:#f0fdfa;--u1-border:#99f6e4;--u1-tint:#ccfbf1;
+  --u1-grad-a:#22c55e;--u1-grad-b:#0f766e;
+
+  /* Unit 2 – 환경과 에너지: royal blue */
+  --u2:#1e40af;--u2-bg:#eff6ff;--u2-border:#bfdbfe;--u2-tint:#dbeafe;
+  --u2-grad-a:#3b82f6;--u2-grad-b:#1e3a8a;
+
+  /* Unit 3 – 과학과 미래 사회: violet */
+  --u3:#7c3aed;--u3-bg:#faf5ff;--u3-border:#ddd6fe;--u3-tint:#ede9fe;
+  --u3-grad-a:#a78bfa;--u3-grad-b:#6d28d9;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif;background:#fafafa;color:#1d1d1f;min-height:100vh;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+
+/* ── Header ── */
+.header{background:#fff;border-bottom:1px solid var(--border-soft);padding:0 1.5rem;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300}
+.header-left{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--blue-mid),var(--navy));border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:14px;font-weight:600;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{display:flex;align-items:center;gap:5px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;color:#16a34a;white-space:nowrap}
+.dot-green{width:5px;height:5px;background:#22c55e;border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{padding:7px 14px;background:transparent;border:1.5px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap}
+.back-btn:hover{background:var(--bg-tint)}
+
+/* ── Layout ── */
+.wrap{max-width:1100px;margin:0 auto;padding:1.4rem 1.2rem 5rem;padding-bottom:max(5rem,calc(4rem + env(safe-area-inset-bottom)))}
+
+/* ── Breadcrumb ── */
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap}
+.bc-item{font-size:12px;color:#aeaeb2;font-weight:500;text-decoration:none;cursor:pointer;transition:color .15s}
+.bc-item:hover{color:var(--royal)}
+.bc-sep{font-size:12px;color:#d1d1d6}
+.bc-current{font-size:12px;color:#1d1d1f;font-weight:700}
+
+/* ── Welcome Bar ── */
+.welcome-bar{background:linear-gradient(135deg,var(--bg-tint) 0%,#eef4ff 60%,#f0f7ff 100%);border:1px solid var(--border);border-radius:18px;padding:1.3rem 1.6rem;margin-bottom:1.6rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.welcome-left{display:flex;align-items:center;gap:14px}
+.welcome-avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--blue-mid),var(--navy));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 4px 14px rgba(30,58,138,.25)}
+.welcome-title{font-size:1.1rem;font-weight:800;color:#1d1d1f;letter-spacing:-.03em}
+.welcome-sub{font-size:12px;color:#6e6e73;margin-top:4px;line-height:1.5}
+.welcome-right{text-align:right}
+.welcome-tag{display:inline-flex;align-items:center;gap:6px;background:var(--bg-tint2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--navy)}
+
+/* ── Stats Row ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.8rem}
+.stat-card{background:#fff;border:1px solid var(--border-soft);border-radius:14px;padding:.9rem 1rem;display:flex;align-items:center;gap:10px}
+.stat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.stat-num{font-size:1.2rem;font-weight:800;letter-spacing:-.03em;line-height:1}
+.stat-lbl{font-size:10px;color:#aeaeb2;margin-top:3px;font-weight:500}
+
+/* ── Section Heading ── */
+.section-heading{font-size:11px;font-weight:700;color:#aeaeb2;letter-spacing:.09em;text-transform:uppercase;margin-bottom:.9rem}
+
+/* ── Quick Jump Tabs ── */
+.jump-tabs{display:flex;gap:8px;margin-bottom:1.8rem;flex-wrap:wrap}
+.jump-tab{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:14px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid transparent;transition:all .18s;text-decoration:none}
+.jump-tab:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.jt-1{background:var(--u1-bg);color:var(--u1);border-color:var(--u1-border)}
+.jt-2{background:var(--u2-bg);color:var(--u2);border-color:var(--u2-border)}
+.jt-3{background:var(--u3-bg);color:var(--u3);border-color:var(--u3-border)}
+
+/* ── Unit Block ── */
+.unit-block{margin-bottom:2.8rem}
+
+/* Unit Header Banner */
+.unit-header-banner{border-radius:18px;padding:1.5rem 1.8rem;margin-bottom:16px;position:relative;overflow:hidden;display:flex;align-items:center;gap:18px}
+.unit-header-banner::before{content:'';position:absolute;right:-30px;bottom:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.1)}
+.unit-header-banner::after{content:'';position:absolute;right:40px;top:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.06)}
+.uhb-1{background:linear-gradient(135deg,var(--u1-grad-a),var(--u1-grad-b))}
+.uhb-2{background:linear-gradient(135deg,var(--u2-grad-a),var(--u2-grad-b))}
+.uhb-3{background:linear-gradient(135deg,var(--u3-grad-a),var(--u3-grad-b))}
+.uhb-icon-wrap{width:56px;height:56px;border-radius:15px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;position:relative;z-index:1}
+.uhb-info{position:relative;z-index:1;flex:1;min-width:0}
+.uhb-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.75);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px}
+.uhb-title{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.03em}
+.uhb-sub{font-size:12px;color:rgba(255,255,255,.8);margin-top:4px;line-height:1.5}
+.uhb-badge{position:relative;z-index:1;flex-shrink:0;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:6px 16px;font-size:12px;font-weight:700;color:#fff;white-space:nowrap}
+
+/* ── Sub-section divider ── */
+.sub-divider{display:flex;align-items:center;gap:10px;margin:1.4rem 0 .9rem}
+.sub-line-1{flex:1;height:1px;background:var(--u1-border)}
+.sub-label-1{font-size:10px;font-weight:700;color:var(--u1);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;padding:4px 12px;background:var(--u1-bg);border:1px solid var(--u1-border);border-radius:20px}
+.sub-line-2{flex:1;height:1px;background:var(--u2-border)}
+.sub-label-2{font-size:10px;font-weight:700;color:var(--u2);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;padding:4px 12px;background:var(--u2-bg);border:1px solid var(--u2-border);border-radius:20px}
+.sub-line-3{flex:1;height:1px;background:var(--u3-border)}
+.sub-label-3{font-size:10px;font-weight:700;color:var(--u3);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;padding:4px 12px;background:var(--u3-bg);border:1px solid var(--u3-border);border-radius:20px}
+
+/* ── Activity Card Grid ── */
+.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+
+/* ── Activity Card ── */
+.act-card{background:#fff;border:1px solid var(--border-soft);border-radius:16px;padding:1.2rem;display:flex;flex-direction:column;gap:9px;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;position:relative;overflow:hidden;text-decoration:none;color:inherit}
+.act-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(30,58,138,.12);border-color:var(--border)}
+.act-card:active{transform:scale(.98)}
+
+/* Colored bottom bar on hover */
+.act-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 16px 16px;opacity:0;transition:opacity .18s}
+.act-card:hover::after{opacity:1}
+.unit-1 .act-card::after{background:linear-gradient(90deg,#4ade80,#0f766e)}
+.unit-2 .act-card::after{background:linear-gradient(90deg,#60a5fa,#1e3a8a)}
+.unit-3 .act-card::after{background:linear-gradient(90deg,#c4b5fd,#7c3aed)}
+
+/* Card top row: number badge + icon */
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.card-num-icon{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.act-num{display:inline-flex;align-items:center;justify-content:center;border-radius:8px;padding:3px 10px;font-size:11px;font-weight:800;white-space:nowrap;letter-spacing:.02em;flex-shrink:0}
+.an-1{background:var(--u1-tint);color:var(--u1);border:1px solid var(--u1-border)}
+.an-2{background:var(--u2-tint);color:var(--u2);border:1px solid var(--u2-border)}
+.an-3{background:var(--u3-tint);color:var(--u3);border:1px solid var(--u3-border)}
+
+.card-icon-box{width:38px;height:38px;border-radius:10px;background:var(--bg-tint);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+
+/* Page badge top-right */
+.page-badge{font-size:9px;font-weight:700;color:#aeaeb2;background:#f5f5f7;border-radius:6px;padding:2px 7px;white-space:nowrap;flex-shrink:0}
+
+/* Card title */
+.card-title{font-size:13px;font-weight:700;color:#1d1d1f;line-height:1.45;letter-spacing:-.01em}
+.card-sub{font-size:11px;color:#6e6e73;line-height:1.5;margin-top:-2px}
+
+/* Tags */
+.card-tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:6px;letter-spacing:.02em;white-space:nowrap}
+.tag-explore{background:#fef9c3;color:#854d0e}
+.tag-sim{background:#dcfce7;color:#166534}
+.tag-report{background:#eff6ff;color:var(--royal)}
+.tag-proj{background:#fce7f3;color:#9d174d}
+.tag-debate{background:#f5f3ff;color:#6d28d9}
+.tag-design{background:#fff7ed;color:#c2410c}
+.tag-map{background:#ecfdf5;color:#065f46}
+
+/* Card link */
+.card-link{display:flex;align-items:center;justify-content:flex-end;gap:5px;font-size:12px;font-weight:700;margin-top:auto;padding-top:2px;transition:gap .15s}
+.act-card:hover .card-link{gap:8px}
+.unit-1 .card-link{color:var(--u1)}
+.unit-2 .card-link{color:var(--u2)}
+.unit-3 .card-link{color:var(--u3)}
+
+/* ── Feature Strip ── */
+.feature-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1.8rem}
+.feature-card{background:#fff;border:1px solid var(--border-soft);border-radius:14px;padding:1rem .8rem;text-align:center;transition:border-color .15s,transform .15s}
+.feature-card:hover{border-color:var(--border);transform:translateY(-2px)}
+.feature-emoji{font-size:1.5rem;margin-bottom:5px}
+.feature-name{font-size:12px;font-weight:700;color:#1d1d1f;margin-bottom:2px}
+.feature-sub{font-size:10px;color:#aeaeb2}
+
+/* ── Footer ── */
+.page-footer{background:#fff;border-top:1px solid var(--border-soft);padding:2rem 1.5rem;margin-top:2rem}
+.footer-inner{max-width:1100px;margin:0 auto;text-align:center}
+.footer-logo{font-size:15px;font-weight:800;color:#1d1d1f;letter-spacing:-.02em;margin-bottom:6px}
+.footer-logo span{color:var(--royal)}
+.footer-desc{font-size:12px;color:#6e6e73;margin-bottom:14px;line-height:1.7}
+.footer-chips{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.footer-chip{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--bg-tint2);color:var(--navy);border:1px solid var(--border)}
+.footer-copy{font-size:11px;color:#aeaeb2}
+
+/* ── Responsive ── */
+@media(max-width:900px){.card-grid{grid-template-columns:repeat(2,1fr)}.feature-strip{grid-template-columns:repeat(3,1fr)}.stats-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.wrap{padding:1rem .8rem 4rem}.card-grid{grid-template-columns:1fr}.feature-strip{grid-template-columns:repeat(2,1fr)}.welcome-bar{flex-direction:column;align-items:flex-start}.jump-tabs{gap:6px}.jump-tab{padding:8px 13px;font-size:12px}.uhb-title{font-size:17px}.uhb-badge{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="header-badge"><span class="dot-green"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- 브레드크럼 -->
+  <div class="breadcrumb">
+    <a href="index.html" class="bc-item">🏠 홈</a>
+    <span class="bc-sep">›</span>
+    <a href="science-performance.html" class="bc-item">통합과학 수행평가</a>
+    <span class="bc-sep">›</span>
+    <a href="science2.html" class="bc-item">통합과학 2</a>
+    <span class="bc-sep">›</span>
+    <span class="bc-current">🧪 탐구활동 보고서</span>
+  </div>
+
+  <!-- 환영 바 -->
+  <div class="welcome-bar">
+    <div class="welcome-left">
+      <div class="welcome-avatar">🧪</div>
+      <div>
+        <div class="welcome-title">통합과학 2 · 탐구활동 보고서</div>
+        <div class="welcome-sub">활동 25 ~ 활동 46 · 3개 단원 22개 탐구활동 완벽 수록<br>실험·모의실험·프로젝트·토론 모든 유형 대응</div>
+      </div>
+    </div>
+    <div class="welcome-right">
+      <div class="welcome-tag">📗 고등 1학년 · 2학기</div>
+    </div>
+  </div>
+
+  <!-- 통계 카드 -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--u1-tint)">📚</div>
+      <div><div class="stat-num" style="color:var(--u1)">3</div><div class="stat-lbl">단원</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--bg-tint2)">🧪</div>
+      <div><div class="stat-num" style="color:var(--navy)">22</div><div class="stat-lbl">탐구활동</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#dcfce7">✏️</div>
+      <div><div class="stat-num" style="color:#16a34a">100%</div><div class="stat-lbl">보고서 대응</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--u3-tint)">🏆</div>
+      <div><div class="stat-num" style="color:var(--u3)">세특</div><div class="stat-lbl">서술 코칭</div></div>
+    </div>
+  </div>
+
+  <!-- 빠른 이동 -->
+  <div class="section-heading">QUICK JUMP</div>
+  <div class="jump-tabs">
+    <a href="#unit-1" class="jump-tab jt-1">🦋 Ⅰ. 변화와 다양성 · 활동 25–32</a>
+    <a href="#unit-2" class="jump-tab jt-2">🌍 Ⅱ. 환경과 에너지 · 활동 33–40</a>
+    <a href="#unit-3" class="jump-tab jt-3">🤖 Ⅲ. 과학과 미래 사회 · 활동 41–46</a>
+  </div>
+
+  <!-- 특징 -->
+  <div class="section-heading">FEATURES</div>
+  <div class="feature-strip">
+    <div class="feature-card"><div class="feature-emoji">🔬</div><div class="feature-name">탐구 실험</div><div class="feature-sub">단계별 보고서</div></div>
+    <div class="feature-card"><div class="feature-emoji">🎲</div><div class="feature-name">모의실험</div><div class="feature-sub">과정 완벽 정리</div></div>
+    <div class="feature-card"><div class="feature-emoji">📊</div><div class="feature-name">데이터 분석</div><div class="feature-sub">그래프·시각화</div></div>
+    <div class="feature-card"><div class="feature-emoji">💬</div><div class="feature-name">토론·논술</div><div class="feature-sub">세특 직결 서술</div></div>
+    <div class="feature-card"><div class="feature-emoji">🗺️</div><div class="feature-name">프로젝트</div><div class="feature-sub">설계·제작·발표</div></div>
+  </div>
+
+  <div class="section-heading">ACTIVITIES</div>
+
+  <!-- ══════════════════════════════════════════
+       UNIT Ⅰ — 변화와 다양성
+  ══════════════════════════════════════════ -->
+  <div class="unit-block unit-1" id="unit-1">
+
+    <div class="unit-header-banner uhb-1">
+      <div class="uhb-icon-wrap">🦋</div>
+      <div class="uhb-info">
+        <div class="uhb-label">Unit Ⅰ · Activities 25–32</div>
+        <div class="uhb-title">변화와 다양성</div>
+        <div class="uhb-sub">생물 대멸종·자연선택·생물다양성보전부터 산염기 반응·산화칼슘·해양 산성화까지</div>
+      </div>
+      <div class="uhb-badge">8개 탐구활동</div>
+    </div>
+
+    <!-- 소섹션: 환경 변화와 생물다양성 -->
+    <div class="sub-divider">
+      <div class="sub-line-1"></div>
+      <span class="sub-label-1">🪨 환경 변화와 생물다양성 · 활동 25–28</span>
+      <div class="sub-line-1"></div>
+    </div>
+
+    <div class="card-grid">
+
+      <!-- 활동 25 -->
+      <a href="inquiry-25.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-1">활동 25</span>
+            <div class="card-icon-box">☄️</div>
+          </div>
+          <span class="page-badge">p.84</span>
+        </div>
+        <div class="card-title">생물 대멸종의 원인과 그 이후의 변화를 설명하는 여러 가설의 타당성 평가하기</div>
+        <div class="card-sub">소행성 충돌설 · 화산 폭발설 · 기후 변화설 · 타당성 기준 비교</div>
+        <div class="card-tags">
+          <span class="tag tag-explore">탐구활동</span>
+          <span class="tag tag-debate">논증평가</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 26 -->
+      <a href="inquiry-26.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-1">활동 26</span>
+            <div class="card-icon-box">🦒</div>
+          </div>
+          <span class="page-badge">p.87</span>
+        </div>
+        <div class="card-title">자연선택 과정에 대한 모의실험하기</div>
+        <div class="card-sub">변이 · 생존경쟁 · 자연선택 · 뻥튀기 과자 모의실험 해석</div>
+        <div class="card-tags">
+          <span class="tag tag-sim">모의실험</span>
+          <span class="tag tag-explore">탐구활동</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 27 -->
+      <a href="inquiry-27.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-1">활동 27</span>
+            <div class="card-icon-box">🌿</div>
+          </div>
+          <span class="page-badge">p.91</span>
+        </div>
+        <div class="card-title">생물다양성보전 사례와 실천 방안 탐색하기</div>
+        <div class="card-sub">생물다양성협약 · 생태 통로 · 멸종위기종 복원 · 실천 방안</div>
+        <div class="card-tags">
+          <span class="tag tag-explore">탐구활동</span>
+          <span class="tag tag-report">보고서</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 28 -->
+      <a href="inquiry-28.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-1">활동 28</span>
+            <div class="card-icon-box">🗺️</div>
+          </div>
+          <span class="page-badge">p.96</span>
+        </div>
+        <div class="card-title">한반도 멸종 위기 야생 생물 서식 지도 만들기</div>
+        <div class="card-sub">멸종위기 1·2급 · 서식지 현황 · GIS 지도 · 보전 제안</div>
+        <div class="card-tags">
+          <span class="tag tag-map">지도 제작</span>
+          <span class="tag tag-proj">프로젝트</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+    </div><!-- /card-grid -->
+
+    <!-- 소섹션: 화학 변화 -->
+    <div class="sub-divider" style="margin-top:1.6rem">
+      <div class="sub-line-1"></div>
+      <span class="sub-label-1">⚗️ 화학 변화 · 활동 29–32</span>
+      <div class="sub-line-1"></div>
+    </div>
+
+    <div class="card-grid">
+
+      <!-- 활동 29 -->
+      <a href="inquiry-29.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-1">활동 29</span>
+            <div class="card-icon-box">🧪</div>
+          </div>
+          <span class="page-badge">p.100</span>
+        </div>
+        <div class="card-title">산과 염기를 혼합할 때 용액의 온도를 측정해 그래프로 나타내기</div>
+        <div class="card-sub">중화 반응 · 중화열 측정 · 온도-부피 그래프 해석</div>
+        <div class="card-tags">
+          <span class="tag tag-explore">탐구실험</span>
+          <span class="tag tag-report">보고서</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 30 -->
+      <a href="inquiry-30.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-1">활동 30</span>
+            <div class="card-icon-box">🍜</div>
+          </div>
+          <span class="page-badge">p.104</span>
+        </div>
+        <div class="card-title">물과 산화 칼슘을 이용한 음식 조리 방법 설계하고 실험하기</div>
+        <div class="card-sub">발열 반응 · CaO + H₂O → Ca(OH)₂ · 조리 설계 · 결론 도출</div>
+        <div class="card-tags">
+          <span class="tag tag-explore">탐구실험</span>
+          <span class="tag tag-design">설계실험</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 31 -->
+      <a href="inquiry-31.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-1">활동 31</span>
+            <div class="card-icon-box">🏺</div>
+          </div>
+          <span class="page-badge">p.108</span>
+        </div>
+        <div class="card-title">우리 도자기의 과학적 우수함 홍보하기</div>
+        <div class="card-sub">청자·백자 유약 성분 · 산화환원 원리 · 홍보물 제작</div>
+        <div class="card-tags">
+          <span class="tag tag-proj">프로젝트</span>
+          <span class="tag tag-report">보고서</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 32 -->
+      <a href="inquiry-32.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-1">활동 32</span>
+            <div class="card-icon-box">🌊</div>
+          </div>
+          <span class="page-badge">p.111</span>
+        </div>
+        <div class="card-title">해양 산성화를 막기 위한 방법은 무엇일까</div>
+        <div class="card-sub">CO₂ + H₂O → H₂CO₃ · 산호초 피해 · 해결 방안 논증</div>
+        <div class="card-tags">
+          <span class="tag tag-debate">논증·토론</span>
+          <span class="tag tag-report">보고서</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+    </div><!-- /card-grid -->
+  </div><!-- /unit-1 -->
+
+
+  <!-- ══════════════════════════════════════════
+       UNIT Ⅱ — 환경과 에너지
+  ══════════════════════════════════════════ -->
+  <div class="unit-block unit-2" id="unit-2">
+
+    <div class="unit-header-banner uhb-2">
+      <div class="uhb-icon-wrap">🌍</div>
+      <div class="uhb-info">
+        <div class="uhb-label">Unit Ⅱ · Activities 33–40</div>
+        <div class="uhb-title">환경과 에너지</div>
+        <div class="uhb-sub">개체군 변동·온난화·탄소 중립부터 전자기 유도·신재생 에너지 설계까지</div>
+      </div>
+      <div class="uhb-badge">8개 탐구활동</div>
+    </div>
+
+    <!-- 소섹션: 생태계와 환경 -->
+    <div class="sub-divider">
+      <div class="sub-line-2"></div>
+      <span class="sub-label-2">🌱 생태계와 지구 환경 · 활동 33–36</span>
+      <div class="sub-line-2"></div>
+    </div>
+
+    <div class="card-grid">
+
+      <!-- 활동 33 -->
+      <a href="inquiry-33.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-2">활동 33</span>
+            <div class="card-icon-box">📈</div>
+          </div>
+          <span class="page-badge">p.113</span>
+        </div>
+        <div class="card-title">개체군 변동 모의실험하기</div>
+        <div class="card-sub">포식자-피식자 진동 · 로트카-볼테라 · 개체수 그래프 해석</div>
+        <div class="card-tags">
+          <span class="tag tag-sim">모의실험</span>
+          <span class="tag tag-explore">탐구활동</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 34 -->
+      <a href="inquiry-34.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-2">활동 34</span>
+            <div class="card-icon-box">🌡️</div>
+          </div>
+          <span class="page-badge">p.117</span>
+        </div>
+        <div class="card-title">지구 온난화로 인한 지구 열수지 변동 탐구하기</div>
+        <div class="card-sub">복사 평형 · 온실 효과 · CO₂ 농도 그래프 · 열수지 변화 분석</div>
+        <div class="card-tags">
+          <span class="tag tag-explore">탐구활동</span>
+          <span class="tag tag-report">보고서</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 35 -->
+      <a href="inquiry-35.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-2">활동 35</span>
+            <div class="card-icon-box">🔮</div>
+          </div>
+          <span class="page-badge">p.120</span>
+        </div>
+        <div class="card-title">기후 변화로 인한 생태계와 지구계의 미래 시나리오 구상하기</div>
+        <div class="card-sub">IPCC 시나리오 · SSP · 생태계 영향 예측 · 미래 시나리오 작성</div>
+        <div class="card-tags">
+          <span class="tag tag-proj">프로젝트</span>
+          <span class="tag tag-debate">논증·서술</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 36 -->
+      <a href="inquiry-36.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-2">활동 36</span>
+            <div class="card-icon-box">🌿</div>
+          </div>
+          <span class="page-badge">p.123</span>
+        </div>
+        <div class="card-title">일상생활에서 탄소 중립 실천하기</div>
+        <div class="card-sub">탄소 발자국 계산 · 탄소 중립 실천 방안 · 캠페인 설계</div>
+        <div class="card-tags">
+          <span class="tag tag-proj">프로젝트</span>
+          <span class="tag tag-report">보고서</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+    </div><!-- /card-grid -->
+
+    <!-- 소섹션: 에너지 전환과 활용 -->
+    <div class="sub-divider" style="margin-top:1.6rem">
+      <div class="sub-line-2"></div>
+      <span class="sub-label-2">⚡ 에너지 전환과 활용 · 활동 37–40</span>
+      <div class="sub-line-2"></div>
+    </div>
+
+    <div class="card-grid">
+
+      <!-- 활동 37 -->
+      <a href="inquiry-37.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-2">활동 37</span>
+            <div class="card-icon-box">🧲</div>
+          </div>
+          <span class="page-badge">p.126</span>
+        </div>
+        <div class="card-title">자석과 코일의 상대 운동에 의해 운동 에너지가 전기 에너지로 전환되는 과정 탐구하기</div>
+        <div class="card-sub">전자기 유도 · 패러데이 법칙 · 유도전류 방향·세기 실험</div>
+        <div class="card-tags">
+          <span class="tag tag-explore">탐구실험</span>
+          <span class="tag tag-report">보고서</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 38 -->
+      <a href="inquiry-38.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-2">활동 38</span>
+            <div class="card-icon-box">🏫</div>
+          </div>
+          <span class="page-badge">p.130</span>
+        </div>
+        <div class="card-title">신재생 에너지 기술 탐색으로 자가발전 학교 설계하기</div>
+        <div class="card-sub">태양광·풍력·지열 · 에너지 수요 계산 · 자가발전 학교 설계안</div>
+        <div class="card-tags">
+          <span class="tag tag-design">설계프로젝트</span>
+          <span class="tag tag-proj">프로젝트</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 39 -->
+      <a href="inquiry-39.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-2">활동 39</span>
+            <div class="card-icon-box">📣</div>
+          </div>
+          <span class="page-badge">p.134</span>
+        </div>
+        <div class="card-title">미래 세대를 위한 지속가능한 발전 홍보 문구 만들기</div>
+        <div class="card-sub">지속가능발전목표(SDGs) · 에너지 전환 · 홍보 문구 창작</div>
+        <div class="card-tags">
+          <span class="tag tag-proj">창작활동</span>
+          <span class="tag tag-debate">논증·서술</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 40 -->
+      <a href="inquiry-40.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-2">활동 40</span>
+            <div class="card-icon-box">⚡</div>
+          </div>
+          <span class="page-badge">p.137</span>
+        </div>
+        <div class="card-title">30년 뒤에 우리나라를 이끌 에너지원은 무엇일까</div>
+        <div class="card-sub">에너지원 비교 · 장단점 분석 · 미래 에너지 정책 제안</div>
+        <div class="card-tags">
+          <span class="tag tag-debate">토론·논술</span>
+          <span class="tag tag-report">보고서</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+    </div><!-- /card-grid -->
+  </div><!-- /unit-2 -->
+
+
+  <!-- ══════════════════════════════════════════
+       UNIT Ⅲ — 과학과 미래 사회
+  ══════════════════════════════════════════ -->
+  <div class="unit-block unit-3" id="unit-3">
+
+    <div class="unit-header-banner uhb-3">
+      <div class="uhb-icon-wrap">🤖</div>
+      <div class="uhb-info">
+        <div class="uhb-label">Unit Ⅲ · Activities 41–46</div>
+        <div class="uhb-title">과학과 미래 사회</div>
+        <div class="uhb-sub">감염병 진단·빅데이터·IoT·AI 로봇·인공지능 윤리까지 미래 과학 완성</div>
+      </div>
+      <div class="uhb-badge">6개 탐구활동</div>
+    </div>
+
+    <!-- 소섹션: 과학 기술의 활용 -->
+    <div class="sub-divider">
+      <div class="sub-line-3"></div>
+      <span class="sub-label-3">🔬 과학 기술의 활용 · 활동 41–43</span>
+      <div class="sub-line-3"></div>
+    </div>
+
+    <div class="card-grid">
+
+      <!-- 활동 41 -->
+      <a href="inquiry-41.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-3">활동 41</span>
+            <div class="card-icon-box">🦠</div>
+          </div>
+          <span class="page-badge">p.140</span>
+        </div>
+        <div class="card-title">단백질과 핵산을 이용한 감염병 진단 기술 체험하기</div>
+        <div class="card-sub">신속항원검사 · PCR · 항원항체 반응 · 진단 기술 비교</div>
+        <div class="card-tags">
+          <span class="tag tag-explore">탐구활동</span>
+          <span class="tag tag-report">보고서</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 42 -->
+      <a href="inquiry-42.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-3">활동 42</span>
+            <div class="card-icon-box">📡</div>
+          </div>
+          <span class="page-badge">p.144</span>
+        </div>
+        <div class="card-title">디지털 탐구 도구를 활용한 실시간 생활 데이터 측정하기</div>
+        <div class="card-sub">MCU · 센서 · IoT · 실시간 데이터 수집 · 분석·시각화</div>
+        <div class="card-tags">
+          <span class="tag tag-explore">탐구실험</span>
+          <span class="tag tag-proj">프로젝트</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 43 -->
+      <a href="inquiry-43.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-3">활동 43</span>
+            <div class="card-icon-box">📊</div>
+          </div>
+          <span class="page-badge">p.148</span>
+        </div>
+        <div class="card-title">데이터 시각화를 활용해 빅데이터 표현하기</div>
+        <div class="card-sub">공공데이터 · 그래프·인포그래픽 제작 · 빅데이터 분석</div>
+        <div class="card-tags">
+          <span class="tag tag-proj">프로젝트</span>
+          <span class="tag tag-report">보고서</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+    </div><!-- /card-grid -->
+
+    <!-- 소섹션: 과학 기술의 발전과 쟁점 -->
+    <div class="sub-divider" style="margin-top:1.6rem">
+      <div class="sub-line-3"></div>
+      <span class="sub-label-3">🤖 과학 기술의 발전과 쟁점 · 활동 44–46</span>
+      <div class="sub-line-3"></div>
+    </div>
+
+    <div class="card-grid">
+
+      <!-- 활동 44 -->
+      <a href="inquiry-44.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-3">활동 44</span>
+            <div class="card-icon-box">🦾</div>
+          </div>
+          <span class="page-badge">p.151</span>
+        </div>
+        <div class="card-title">일상생활에 활용되는 로봇의 특징을 분석하고 개선 방안 고안하기</div>
+        <div class="card-sub">산업·의료·서비스 로봇 · 특징 분석 · 개선 방안 제시</div>
+        <div class="card-tags">
+          <span class="tag tag-explore">탐구활동</span>
+          <span class="tag tag-proj">프로젝트</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 45 -->
+      <a href="inquiry-45.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-3">활동 45</span>
+            <div class="card-icon-box">🌐</div>
+          </div>
+          <span class="page-badge">p.154</span>
+        </div>
+        <div class="card-title">세상을 연결하는 사물 인터넷 전문가 되어 보기</div>
+        <div class="card-sub">IoT 개념 · 스마트홈·스마트팜 · IoT 시스템 설계 체험</div>
+        <div class="card-tags">
+          <span class="tag tag-proj">설계프로젝트</span>
+          <span class="tag tag-report">보고서</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+      <!-- 활동 46 -->
+      <a href="inquiry-46.html" class="act-card">
+        <div class="card-top">
+          <div class="card-num-icon">
+            <span class="act-num an-3">활동 46</span>
+            <div class="card-icon-box">⚖️</div>
+          </div>
+          <span class="page-badge">p.157</span>
+        </div>
+        <div class="card-title">지구 환경 측면에서 인공지능 기술의 발전은 바람직한가</div>
+        <div class="card-sub">AI 에너지 소비 · 환경 부담 · 찬반 논증 · 과학 윤리 토론</div>
+        <div class="card-tags">
+          <span class="tag tag-debate">토론·논술</span>
+          <span class="tag tag-report">세특 서술</span>
+        </div>
+        <div class="card-link">보고서 내용 →</div>
+      </a>
+
+    </div><!-- /card-grid -->
+  </div><!-- /unit-3 -->
+
+</div><!-- /wrap -->
+
+<!-- ── Footer ── -->
+<footer class="page-footer">
+  <div class="footer-inner">
+    <div class="footer-logo">베타과학학원 · <span>Beta Science Academy</span></div>
+    <div class="footer-desc">목동 경력 20년 이상의 과학전문학원<br>통합과학 · 내신 · 수능 · 수행평가 · 탐구 보고서 · 세특</div>
+    <div class="footer-chips">
+      <span class="footer-chip">탐구활동 25–46</span>
+      <span class="footer-chip">3개 단원 완벽 수록</span>
+      <span class="footer-chip">실험·모의실험·프로젝트</span>
+      <span class="footer-chip">세특 서술 코칭</span>
+    </div>
+    <div class="footer-copy">© 2026 베타과학학원. All rights reserved.</div>
+  </div>
+</footer>
+
+</body>
+</html>
