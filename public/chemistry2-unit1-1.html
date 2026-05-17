@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>베타과학학원 · 물질과 에너지 Ⅰ · 물질의 세 가지 상태</title>
+<style>
+:root {
+  --navy:        #1e3a8a;
+  --royal:       #2563eb;
+  --blue-mid:    #3b82f6;
+  --blue-light:  #60a5fa;
+  --bg-tint:     #eff6ff;
+  --bg-tint2:    #dbeafe;
+  --border:      #bfdbfe;
+  --border-soft: #e0eaff;
+  --chem:        #059669;
+  --chem-dark:   #064e3b;
+  --chem-mid:    #10b981;
+  --chem-light:  #34d399;
+  --chem-tint:   #f0fdf4;
+  --chem-tint2:  #dcfce7;
+  --chem-border: #a7f3d0;
+  --chem-border2:#6ee7b7;
+  --text: #1d1d1f; --muted: #6e6e73; --dim: #aeaeb2;
+  --bg: #fafafa; --white: #fff;
+  --green:#059669;--green-bg:#ecfdf5;--green-border:#a7f3d0;
+  --blue2:#2563eb;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
+  --amber:#d97706;--amber-bg:#fffbeb;--amber-border:#fde68a;
+  --red:#dc2626;--red-bg:#fef2f2;--red-border:#fecaca;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* ── Header (동일) ── */
+.header{background:#ffffff;border-bottom:1px solid var(--border-soft);padding:0 1rem;padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right));height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:500}
+.header-left{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--chem-mid) 0%,var(--chem-dark) 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:14px;font-weight:600;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{display:flex;align-items:center;gap:5px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;color:#16a34a;white-space:nowrap}
+.dot-green{width:5px;height:5px;background:#22c55e;border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{padding:7px 14px;min-height:36px;background:transparent;border:1.5px solid var(--chem-border);border-radius:20px;font-family:inherit;font-size:12px;font-weight:600;color:var(--chem-dark);cursor:pointer;white-space:nowrap;transition:background .15s}
+.back-btn:hover{background:var(--chem-tint)}
+.back-btn:active{background:var(--chem-tint2)}
+
+/* ── Hero ── */
+.hero{background:linear-gradient(135deg,var(--chem-dark) 0%,var(--chem) 50%,var(--chem-mid) 100%);padding:2.8rem 1.5rem 2.2rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero::after{content:'';position:absolute;left:-50px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;text-decoration:none;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+.hero-eyebrow{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+.hero-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem}
+.hero-desc{font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.7;max-width:580px;margin:0 auto 1.8rem}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:14px;padding:.9rem 1.4rem;text-align:center;backdrop-filter:blur(6px);min-width:80px;transition:background .2s}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+/* ── Tabs ── */
+.tabs-wrap{background:var(--white);border-bottom:2px solid var(--chem-border);position:sticky;top:54px;z-index:400}
+.tabs-inner{max-width:1100px;margin:0 auto;padding:0 1.5rem;display:flex;overflow-x:auto;justify-content:center;gap:6px}
+.tab-btn{padding:13px 28px;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;margin-bottom:-2px;border-radius:8px 8px 0 0}
+.tab-btn:hover{color:var(--chem);background:var(--chem-tint)}
+.tab-btn.active{color:var(--chem);border-bottom-color:var(--chem)}
+
+/* ── Content ── */
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}.unit-section.visible{display:block}
+
+/* ── Unit Banner ── */
+.unit-banner{border-radius:16px;padding:1.4rem 1.8rem;margin-bottom:1.8rem;display:flex;align-items:center;gap:1.2rem}
+.ub-green{background:linear-gradient(135deg,var(--chem-tint),var(--chem-tint2));border:2px solid var(--chem-border)}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--chem);margin-bottom:4px}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── Accordion ── */
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{background:var(--white);border:1.5px solid #e5e7eb;border-radius:16px;overflow:hidden;transition:border-color .2s}
+.acc-item.open{border-color:var(--chem-border);box-shadow:0 4px 20px rgba(5,150,105,.1)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:1.2rem 1.5rem;cursor:pointer;user-select:none;transition:background .15s}
+.acc-header:hover{background:var(--chem-tint)}
+.acc-num{width:32px;height:32px;border-radius:10px;background:var(--chem-tint2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--chem-dark);flex-shrink:0}
+.acc-item.open .acc-num{background:var(--chem);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--chem-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-item.open .acc-subtitle{color:var(--chem)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--chem)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--chem-tint2)}
+.acc-item.open .acc-body{display:block}
+
+/* ── Section Title ── */
+.sec-title{font-size:12px;font-weight:800;color:var(--chem-dark);letter-spacing:.06em;text-transform:uppercase;margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--chem);border-radius:2px;display:block;flex-shrink:0}
+
+/* ── Content Boxes ── */
+.concept-box{background:var(--chem-tint);border:1.5px solid var(--chem-border);border-left:4px solid var(--chem);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.concept-box .cb-title{font-weight:800;color:var(--chem-dark);font-size:14px;margin-bottom:.4rem}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--green);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+.amber-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-left:4px solid var(--amber);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+.blue-box{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-left:4px solid var(--blue2);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.blue-box .cb-title{font-weight:800;color:#1e40af;font-size:14px;margin-bottom:.4rem}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+
+/* ── Table ── */
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:12px;border:1.5px solid var(--chem-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--chem-tint2);padding:10px 14px;text-align:left;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--chem-dark)}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6}
+tbody tr:hover td{background:var(--chem-tint)}
+
+/* ── Formula Box ── */
+.formula-box{background:linear-gradient(135deg,var(--chem-tint),var(--chem-tint2));border:2px solid var(--chem-border);border-radius:14px;padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--chem-dark);letter-spacing:-.01em;font-style:italic}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* ── Flow ── */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0;font-size:13px}
+.flow-box{background:var(--white);border:1.5px solid var(--chem-border);border-radius:8px;padding:7px 12px;font-weight:700;color:var(--chem-dark);text-align:center;font-size:12px;line-height:1.4}
+.flow-arrow{color:var(--chem);font-size:18px;font-weight:900}
+
+/* ── Point Cards ── */
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin:.8rem 0}
+.point-card{background:var(--white);border:1.5px solid var(--chem-border);border-radius:12px;padding:1rem;text-align:center}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--chem);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ── Highlight ── */
+.hp{color:var(--chem-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--blue2);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+
+/* ── Quiz ── */
+.quiz-wrap{background:linear-gradient(135deg,var(--chem-tint2),var(--chem-tint));border:1.5px solid var(--chem-border);border-radius:14px;padding:1.2rem 1.4rem;margin-top:1.6rem}
+.quiz-label{font-size:11px;font-weight:800;color:var(--chem-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-choices{display:flex;flex-direction:column;gap:5px;margin-bottom:.8rem}
+.choice{font-size:13px;color:var(--muted);padding:4px 0;line-height:1.55}
+.quiz-toggle{background:var(--chem);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.quiz-toggle:hover{background:var(--chem-dark)}
+.quiz-ans{display:none;margin-top:.8rem;padding:.9rem 1rem;background:rgba(255,255,255,.8);border-radius:10px;font-size:13.5px;color:var(--text);line-height:1.75}
+body p{line-height:1.75;font-size:13.5px;margin:.4rem 0}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.5rem}
+  .tabs-inner{justify-content:flex-start;gap:0}
+  .tab-btn{padding:11px 16px;font-size:12px}
+  .content-wrap{padding:1.2rem .9rem 4rem}
+  .unit-banner{flex-direction:column;gap:.8rem;padding:1.2rem}
+  .acc-header{padding:1rem}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .hero-stats{gap:8px}
+  .hero-stat-card{min-width:70px;padding:.8rem 1rem}
+  .hs-num{font-size:1.5rem}
+}
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .header-badge .dot-green{display:none}
+  .point-box{grid-template-columns:1fr}
+  .formula-text{font-size:1.1rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Header (원본 완전 동일) ── -->
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"
+          stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-green"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="science-inquiry-performance.html" class="bc-item">탐구활동 보고서</a><span class="bc-sep">›</span>
+      <a href="chemistry1-summary.html" class="bc-item">화학 1 핵심 정리</a><span class="bc-sep">›</span>
+      <span class="bc-current">⚗️ Ⅰ. 물질의 세 가지 상태</span>
+    </div>
+    <div class="hero-eyebrow">🌿 PART 01 · 물질과 에너지 · UNIT 01</div>
+    <div class="hero-title">Ⅰ. 물질의 세 가지 상태<br>완벽 상세 학습 가이드</div>
+    <div class="hero-desc">기체·액체·고체의 성질, 이상 기체 방정식, 분자 간 힘, 결정 구조까지<br>동아출판 교과서 기반 핵심 개념을 완벽하게 학습합니다</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">4</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">15+</div><div class="hs-lbl">핵심 법칙</div></div>
+      <div class="hero-stat-card"><div class="hs-num">12</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tabs ── -->
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">💨 소단원1 · 기체의 성질</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">🌫️ 소단원2 · 혼합 기체</button>
+    <button class="tab-btn" onclick="showUnit(3,this)">💧 소단원3 · 액체</button>
+    <button class="tab-btn" onclick="showUnit(4,this)">🔷 소단원4 · 고체</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ══════════════════════════════════════
+     소단원 1: 기체의 성질
+══════════════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner ub-green">
+    <div class="ub-emoji">💨</div>
+    <div>
+      <div class="ub-num">소단원 01 · Gas Properties</div>
+      <div class="ub-title">기체의 성질</div>
+      <div class="ub-desc">보일 법칙, 샤를 법칙, 아보가드로 법칙을 바탕으로 이상 기체 방정식을 이해하고, 일상생활에서의 활용 사례를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 보일 법칙 -->
+    <div class="acc-item" id="acc-boyle">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Boyle's Law · 온도 일정</div>
+          <div class="acc-htitle">보일 법칙 — 압력과 부피의 관계</div>
+          <div class="acc-hdesc">일정 온도에서 기체의 압력과 부피는 반비례 · PV = 일정</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">기체의 압력이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🔵 기체의 압력 (Gas Pressure)</div>
+          <span class="hp">기체의 압력</span>: 기체 분자들이 자유롭게 운동하면서 물체의 표면에 충돌할 때 <strong>단위 면적에 작용하는 힘</strong>.<br><br>
+          기체는 분자 간 거리가 멀고 분자 운동이 매우 활발하여 <span class="hp">온도와 압력에 따라 부피가 쉽게 변합니다</span>. 고체나 액체와 가장 크게 다른 특성입니다.<br><br>
+          <strong>압력 단위:</strong> 기압(atm), mmHg (1기압 = 760 mmHg)
+        </div>
+
+        <div class="sec-title">보일 법칙 (Boyle's Law)</div>
+        <div class="concept-box">
+          <div class="cb-title">📐 일정한 온도에서 기체의 압력과 부피 관계</div>
+          <span class="hp">보일 법칙</span>: 일정한 온도에서 일정량의 기체의 <strong>압력(P)과 부피(V)는 반비례</strong> 관계에 있다. 즉, 기체의 압력과 부피의 곱은 항상 일정하다.
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">PV = k (상수)</div>
+          <div class="formula-sub">일정한 온도에서 P₁V₁ = P₂V₂</div>
+        </div>
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 분자 운동으로 이해하기</div>
+          외부 압력이 증가 → 용기 부피 감소 → 분자 간 거리 가까워짐 → <span class="ha">단위 면적당 충돌 횟수 증가</span> → 기체 내부 압력 증가 (외부 압력과 평형)<br><br>
+          반대로 부피가 늘어나면 → 분자 간 거리 멀어짐 → 단위 면적당 충돌 감소 → 압력 감소
+        </div>
+
+        <div class="sec-title">보일 법칙 그래프 해석</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>그래프 종류</th><th>x축</th><th>y축</th><th>그래프 모양</th></tr></thead>
+          <tbody>
+            <tr><td>P-V 그래프</td><td>압력(P)</td><td>부피(V)</td><td><span class="hp">반비례 곡선</span> (쌍곡선)</td></tr>
+            <tr><td>P-1/V 그래프</td><td>1/V</td><td>압력(P)</td><td><span class="hg">원점 지나는 직선</span></td></tr>
+            <tr><td>PV-P 그래프</td><td>압력(P)</td><td>PV</td><td><span class="hp">수평선</span> (PV = 일정)</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">20℃, 1기압에서 실린더에 산소 기체가 10 L 들어 있다. 이 실린더에 압력을 가해 산소 기체의 부피가 5 L로 줄어들었을 때, 실린더 속 산소 기체의 압력은 몇 기압인가? (단, 온도는 일정하다.)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 2기압</strong><br><br>
+            보일 법칙 적용: P₁V₁ = P₂V₂<br>
+            1기압 × 10 L = P₂ × 5 L<br>
+            P₂ = 10 ÷ 5 = <strong>2기압</strong>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 창의·사고</div>
+          <div class="quiz-q">잠수부가 물속에서 내뿜는 공기 방울은 수면으로 올라갈수록 크기가 점점 커지는데, 그 까닭을 설명해 보자. (단, 수온은 일정하다.)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            수면으로 올라갈수록 <strong>수압(외부 압력)이 감소</strong>합니다. 온도가 일정하므로 보일 법칙에 의해 압력이 감소하면 부피가 증가합니다. 따라서 공기 방울의 크기가 점점 커집니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 샤를 법칙 -->
+    <div class="acc-item" id="acc-charles">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Charles's Law · 압력 일정</div>
+          <div class="acc-htitle">샤를 법칙 — 온도와 부피의 관계</div>
+          <div class="acc-hdesc">일정 압력에서 기체의 부피는 절대 온도에 비례 · V/T = 일정</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">절대 온도 (Kelvin Scale)</div>
+        <div class="concept-box">
+          <div class="cb-title">🌡️ 절대 온도란?</div>
+          <span class="hp">절대 온도(T)</span>: 섭씨온도(t)에 273을 더하여 구하며, 단위는 <strong>K(켈빈)</strong>을 사용합니다.<br><br>
+          이론적으로 기체의 부피가 0이 되는 온도(−273℃)를 기준으로 설정합니다.
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">T(K) = t(℃) + 273</div>
+          <div class="formula-sub">예) 0℃ = 273K, 27℃ = 300K, −73℃ = 200K</div>
+        </div>
+
+        <div class="sec-title">샤를 법칙 (Charles's Law)</div>
+        <div class="concept-box">
+          <div class="cb-title">📈 일정한 압력에서 기체의 온도와 부피 관계</div>
+          <span class="hp">샤를 법칙</span>: 일정한 압력에서 일정량의 기체의 <strong>부피(V)는 절대 온도(T)에 비례</strong>한다.<br><br>
+          섭씨온도로 표현: 온도가 1℃ 높아질 때마다 0℃일 때 부피의 1/273씩 늘어난다.
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">V/T = k (상수)</div>
+          <div class="formula-sub">일정한 압력에서 V₁/T₁ = V₂/T₂</div>
+        </div>
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 분자 운동으로 이해하기</div>
+          온도 높아짐 → 기체 분자 운동 활발해짐 → 기체 분자가 용기 벽에 충돌하는 힘 증가 → <span class="ha">부피 팽창</span>하여 압력 일정 유지<br><br>
+          반대로 온도 낮아짐 → 분자 운동 느려짐 → 부피 감소
+        </div>
+
+        <div class="sec-title">V-T 그래프 특징</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>축 종류</th><th>그래프 모양</th><th>특징</th></tr></thead>
+          <tbody>
+            <tr><td>섭씨온도(℃) vs 부피</td><td>직선 (원점 통과 ✗)</td><td>−273℃에서 부피 = 0으로 외삽</td></tr>
+            <tr><td>절대 온도(K) vs 부피</td><td><span class="hp">원점 통과 직선</span></td><td>V ∝ T 정비례 관계 명확</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">0℃, 1기압에서 기체 1몰의 부피는 22.4 L이다. 1기압에서 기체 1몰의 부피가 44.8 L일 때 온도 t를 구해 보자.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 273℃ (546K)</strong><br><br>
+            샤를 법칙 적용: V₁/T₁ = V₂/T₂<br>
+            22.4 L / 273 K = 44.8 L / T₂<br>
+            T₂ = 44.8 × 273 / 22.4 = <strong>546 K = 273℃</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03: 아보가드로 법칙 -->
+    <div class="acc-item" id="acc-avogadro">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Avogadro's Law · 온도·압력 일정</div>
+          <div class="acc-htitle">아보가드로 법칙 — 기체의 양과 부피</div>
+          <div class="acc-hdesc">같은 온도·압력에서 기체의 부피는 분자 수(mol)에 비례 · 0℃, 1기압에서 1몰 = 22.4 L</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">아보가드로 법칙 (Avogadro's Law)</div>
+        <div class="concept-box">
+          <div class="cb-title">⚖️ 기체의 양(mol)과 부피 관계</div>
+          <span class="hp">아보가드로 법칙</span> (1811년): "기체는 온도와 압력이 같을 때 기체의 <strong>종류와 관계없이</strong> 같은 부피 속에 같은 수의 분자가 들어 있다."<br><br>
+          따라서 일정한 온도와 압력에서 기체의 <strong>부피(V)는 기체의 양(n, 단위: mol)에 비례</strong>합니다.
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">V = kn (상수 k)</div>
+          <div class="formula-sub">0℃, 1기압에서 기체 1 mol의 부피 = 22.4 L (모든 기체 동일)</div>
+        </div>
+
+        <div class="blue-box">
+          <div class="cb-title">📌 0℃, 1기압에서 기체 1 mol의 부피</div>
+          수소(H₂) 1 mol = <span class="hb">22.4 L</span> &nbsp;&nbsp; 산소(O₂) 1 mol = <span class="hb">22.4 L</span><br><br>
+          기체의 종류(분자의 크기, 질량)와 무관하게 <strong>같은 온도·압력이면 같은 부피</strong>에 같은 분자 수가 존재합니다. 이는 기체 분자 사이의 거리가 매우 멀어 분자 자체의 크기는 무시할 수 있기 때문입니다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">0℃, 1기압에서 질소 기체 1몰의 부피는 22.4 L이다. 같은 온도와 압력에서 산소 기체 2몰의 부피는 몇 L인가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 44.8 L</strong><br><br>
+            아보가드로 법칙에 따라 기체의 종류에 관계없이 같은 온도·압력에서 1 mol = 22.4 L입니다.<br>
+            산소 2 mol = 22.4 L × 2 = <strong>44.8 L</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04: 이상 기체 방정식 -->
+    <div class="acc-item" id="acc-ideal">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">04</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Ideal Gas Equation · 3개 법칙 통합</div>
+          <div class="acc-htitle">이상 기체 방정식 — PV = nRT</div>
+          <div class="acc-hdesc">보일·샤를·아보가드로 법칙 종합 · 기체 상수 R ≈ 0.082 atm·L/(mol·K) · 분자량 계산 활용</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">이상 기체 방정식 유도</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>법칙</th><th>고정 조건</th><th>관계</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">보일 법칙</span></td><td>T, n 일정</td><td>V ∝ 1/P</td></tr>
+            <tr><td><span class="hp">샤를 법칙</span></td><td>P, n 일정</td><td>V ∝ T</td></tr>
+            <tr><td><span class="hp">아보가드로 법칙</span></td><td>T, P 일정</td><td>V ∝ n</td></tr>
+            <tr><td><span class="hg">통합</span></td><td>—</td><td>V ∝ nT/P</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="formula-box">
+          <div class="formula-text">PV = nRT</div>
+          <div class="formula-sub">P: 압력(기압) · V: 부피(L) · n: 몰수(mol) · R ≈ 0.082 기압·L/(mol·K) · T: 절대온도(K)</div>
+        </div>
+
+        <div class="concept-box">
+          <div class="cb-title">🔢 기체 상수 R 계산</div>
+          0℃(273K), 1기압에서 기체 1 mol의 부피 = 22.4 L를 대입:<br><br>
+          R = PV/nT = (1기압 × 22.4 L) / (1 mol × 273 K) ≈ <span class="hp">0.082 기압·L/(mol·K)</span><br><br>
+          <strong>이상 기체(Ideal Gas)</strong>: 분자의 크기를 무시할 수 있으며, 분자 간 인력과 반발력이 존재하지 않는 가상의 기체. 실제 기체는 압력이 낮고 온도가 높을수록 이상 기체에 가까워집니다.
+        </div>
+
+        <div class="sec-title">이상 기체 방정식으로 분자량 구하기</div>
+        <div class="green-box">
+          <div class="cb-title">🧪 분자량 계산 공식</div>
+          기체의 몰수 n = w/M (w: 질량, M: 몰질량)<br>
+          이를 이상 기체 방정식에 대입하면:
+          <div style="text-align:center;margin:8px 0;font-size:1.1rem;font-weight:900;color:#065f46;">M = wRT / PV</div>
+          질량(w, g), 온도(T, K), 압력(P, 기압), 부피(V, L)를 측정하면 기체의 분자량을 구할 수 있습니다.
+        </div>
+
+        <div class="sec-title">이상 기체 방정식 활용 사례</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🏐</div>
+            <div class="pc-title">운동 경기 공</div>
+            <div class="pc-desc">PV = nRT로 필요한 공기 양(mol) 계산하여 정확한 내부 압력 유지</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🚗</div>
+            <div class="pc-title">자동차 에어백</div>
+            <div class="pc-desc">아자이드화 나트륨(NaN₃) 질량으로 에어백 부피 조절 계산</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🚌</div>
+            <div class="pc-title">압축 천연가스(CNG)</div>
+            <div class="pc-desc">고압으로 압축 시 부피 감소 계산하여 운반 편의성 향상</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🌡️</div>
+            <div class="pc-title">겨울철 타이어</div>
+            <div class="pc-desc">온도 하강 시 부피 5~10% 감소 → 추가 공기 주입 필요량 계산</div>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">25℃, 1기압에서 부피가 2 L인 강철 용기에 들어 있는 기체 X의 질량이 3.6 g이다. 이때 기체 X의 분자량을 구해 보자. (단, R = 0.082 기압·L/(mol·K))</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 분자량 = 44</strong><br><br>
+            T = 25℃ + 273 = 298 K<br>
+            M = wRT/PV = (3.6 g × 0.082 × 298) / (1 × 2)<br>
+            M = 88.0 / 2 = <strong>44 g/mol → 분자량 44</strong><br><br>
+            분자량이 44인 기체 → CO₂(이산화 탄소) 또는 C₃H₈(프로페인) 등
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">273℃, 1기압에서 어떤 기체 11.2 L의 질량이 4 g일 때, 이 기체의 분자량을 구해 보자. (단, R = 0.082 기압·L/(mol·K))</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 분자량 = 16</strong><br><br>
+            T = 273℃ + 273 = 546 K<br>
+            M = wRT/PV = (4 × 0.082 × 546) / (1 × 11.2)<br>
+            M = 179.1 / 11.2 ≈ <strong>16 g/mol → 분자량 16 (CH₄, 메테인)</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ══════════════════════════════════════
+     소단원 2: 혼합 기체
+══════════════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner ub-green">
+    <div class="ub-emoji">🌫️</div>
+    <div>
+      <div class="ub-num">소단원 02 · Mixed Gases</div>
+      <div class="ub-title">혼합 기체</div>
+      <div class="ub-desc">부분 압력(분압) 법칙과 몰분율의 관계를 이해하고, 생활 속 혼합 기체 활용 사례를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 부분 압력 법칙 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Dalton's Law · 부분 압력</div>
+          <div class="acc-htitle">돌턴의 부분 압력 법칙</div>
+          <div class="acc-hdesc">혼합 기체의 전체 압력 = 각 성분 기체 분압의 합 · Pₜ = PA + PB + ···</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">부분 압력(분압)이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🔵 부분 압력 (Partial Pressure)</div>
+          서로 반응하지 않는 두 종류 이상의 기체가 혼합되어 있을 때, <strong>각 성분 기체가 단독으로 나타내는 압력</strong>을 <span class="hp">부분 압력</span> 또는 <span class="hp">분압</span>이라고 합니다.<br><br>
+          <strong>핵심 근거:</strong> 일정한 온도와 부피에서 기체의 압력은 기체의 양(mol)에 비례하고, 기체의 <span class="hp">종류에는 영향을 받지 않습니다</span>.
+        </div>
+
+        <div class="sec-title">돌턴의 부분 압력 법칙</div>
+        <div class="concept-box">
+          <div class="cb-title">⚖️ Dalton's Law of Partial Pressure (1811년)</div>
+          <span class="hp">돌턴의 부분 압력 법칙</span>: 혼합 기체의 <strong>전체 압력은 각 성분 기체의 부분 압력의 합</strong>과 같다.
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">Pₜ = PA + PB + PC + ···</div>
+          <div class="formula-sub">Pₜ: 혼합 기체 전체 압력 / PA, PB···: 각 성분 기체의 분압</div>
+        </div>
+
+        <div class="sec-title">분압 계산 — 이상 기체 방정식 활용</div>
+        <div class="green-box">
+          <div class="cb-title">🧮 성분 기체의 분압 공식 유도</div>
+          온도 T에서 nA mol의 기체 A와 nB mol의 기체 B가 부피 V인 용기에 혼합될 때:<br><br>
+          PA = nART/V &nbsp;&nbsp;&nbsp; PB = nBRT/V<br><br>
+          전체 압력: Pₜ = PA + PB = (nA + nB)RT/V<br><br>
+          → RT/V = Pₜ/(nA + nB) 를 대입하면:<br>
+          <strong>PA = Pₜ × nA/(nA + nB) &nbsp;&nbsp; PB = Pₜ × nB/(nA + nB)</strong>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">20℃에서 24 L의 강철 용기에 수소 기체 1 mol을 넣었을 때 기체의 압력이 1기압이었다. 이 강철 용기에 산소 기체 2 mol을 추가로 넣었을 때 산소 기체의 분압과 전체 기체의 압력을 각각 구해 보자. (단, 온도는 일정하고, 수소와 산소는 반응하지 않는다.)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            수소 1 mol → 1기압 (주어짐)<br>
+            같은 온도·부피에서 압력은 mol 수에 비례:<br>
+            산소 분압: 1기압 × (2 mol / 1 mol) = <strong>2기압</strong><br>
+            전체 압력: 1기압 + 2기압 = <strong>3기압</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 몰분율 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Mole Fraction · 몰분율</div>
+          <div class="acc-htitle">몰분율과 분압의 관계</div>
+          <div class="acc-hdesc">몰분율 = 성분 기체의 mol / 전체 mol · 분압 = 전체 압력 × 몰분율</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">몰분율 (Mole Fraction)</div>
+        <div class="concept-box">
+          <div class="cb-title">🔢 몰분율이란?</div>
+          <span class="hp">몰분율(X)</span>: 혼합 기체에서 <strong>각 성분 기체의 양을 전체 기체의 양으로 나눈 값</strong>.<br><br>
+          XA = nA / (nA + nB) &nbsp;&nbsp;&nbsp; XB = nB / (nA + nB)<br><br>
+          <strong>특징:</strong> 모든 성분 기체의 몰분율의 합 = 1
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">PA = Pₜ × XA</div>
+          <div class="formula-sub">분압 = 전체 압력 × 몰분율 (각 성분 기체의 분압은 몰분율에 비례)</div>
+        </div>
+
+        <div class="sec-title">생활 속 혼합 기체 사례</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>사례</th><th>주요 성분</th><th>혼합 이유</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">공기 (대기)</span></td><td>질소 78%, 산소 21%, 아르곤 1% 등</td><td>지구 생명체가 숨쉬는 자연 혼합 기체</td></tr>
+            <tr><td><span class="hp">잠수부·소방관 공기통</span></td><td>공기와 유사한 혼합 기체</td><td>순수 산소 → 산소 분압 높아 산소 중독 위험</td></tr>
+            <tr><td><span class="hp">LPG (액화 석유 가스)</span></td><td>프로페인(C₃H₈), 뷰테인(C₄H₁₀)</td><td>계절별 혼합 비율 조절 (겨울: 프로페인↑)</td></tr>
+            <tr><td><span class="hp">의료용 마취 기체</span></td><td>산화이질소(N₂O) + 산소(O₂)</td><td>일정 비율로 혼합하여 안전한 마취 효과</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="amber-box">
+          <div class="cb-title">🔔 LPG 겨울철 혼합 비율 조절</div>
+          프로페인(C₃H₈) 끓는점: −42℃ &nbsp;/&nbsp; 뷰테인(C₄H₁₀) 끓는점: −0.5℃<br><br>
+          겨울철에는 기온이 낮아 끓는점이 높은 뷰테인이 기화하기 어렵습니다. 따라서 <span class="ha">끓는점이 낮은 프로페인의 혼합 비율을 높여</span> 낮은 기온에서도 잘 기화되도록 합니다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 7</div>
+          <div class="quiz-q">꼭지로 연결된 두 용기에 He 기체(3기압, 2L)와 Ne 기체(1기압, 3L)를 각각 넣었다. 꼭지를 열었을 때 각 기체의 분압과 전체 압력을 구하고, He의 몰분율을 구하시오. (단, 온도는 일정하고 연결관의 부피는 무시한다.)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            꼭지를 열면 전체 부피 = 2 L + 3 L = 5 L<br><br>
+            <strong>He 분압:</strong> 보일 법칙 적용 → 3기압 × 2L = PHe × 5L → PHe = 1.2기압<br>
+            <strong>Ne 분압:</strong> 1기압 × 3L = PNe × 5L → PNe = 0.6기압<br>
+            <strong>전체 압력:</strong> Pₜ = 1.2 + 0.6 = <strong>1.8기압</strong><br><br>
+            <strong>He 몰분율:</strong> XHe = PHe/Pₜ = 1.2/1.8 = <strong>2/3 ≈ 0.667</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+<!-- ══════════════════════════════════════
+     소단원 3: 액체
+══════════════════════════════════════ -->
+<div id="unit3" class="unit-section">
+  <div class="unit-banner ub-green">
+    <div class="ub-emoji">💧</div>
+    <div>
+      <div class="ub-num">소단원 03 · Liquids</div>
+      <div class="ub-title">액체</div>
+      <div class="ub-desc">쌍극자·쌍극자 힘, 분산력, 수소 결합 등 분자 간 힘의 종류와 특성, 그리고 증기 압력과 끓는점의 관계를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 분자 간 힘 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Intermolecular Forces · 분자 간 힘</div>
+          <div class="acc-htitle">분자 간 힘의 종류</div>
+          <div class="acc-hdesc">쌍극자·쌍극자 힘 · 분산력 · 수소 결합 — 끓는점과의 관계</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">분자 간 힘과 물질의 상태</div>
+        <div class="concept-box">
+          <div class="cb-title">🔵 분자 간 힘 (Intermolecular Force)</div>
+          물질을 이루는 분자 사이의 상호작용을 <span class="hp">분자 간 힘</span>이라고 합니다.<br><br>
+          <strong>분자 간 힘 클수록:</strong><br>
+          • 분자 사이의 거리가 멀어지기 어려움<br>
+          • 고체 → 액체, 액체 → 기체 변화에 더 많은 에너지 필요<br>
+          • <span class="hp">녹는점·끓는점이 높아집니다</span><br><br>
+          ∴ <strong>끓는점 차이</strong>로 분자 간 힘의 크기를 비교할 수 있습니다.
+        </div>
+
+        <div class="sec-title">① 쌍극자·쌍극자 힘 (Dipole-Dipole Force)</div>
+        <div class="concept-box">
+          <div class="cb-title">⚡ 극성 분자 사이에 작용하는 힘</div>
+          <span class="hp">쌍극자</span>: 크기가 같고 부호가 반대인 양전하(δ+)와 음전하(δ−)가 분리된 것.<br><br>
+          <strong>형성 조건:</strong> 극성 공유 결합 → 전기음성도 차이 → 전자 분포 불균일 → 부분적인 전하 발생<br><br>
+          예) HCl: Cl(δ−) — H(δ+) (Cl의 전기음성도 > H의 전기음성도)<br><br>
+          극성 분자들이 가까워지면 <span class="hp">한 분자의 δ+ 와 이웃 분자의 δ− 사이에 정전기적 인력</span>이 작용합니다.
+        </div>
+        <div class="blue-box">
+          <div class="cb-title">📊 쌍극자 모멘트와 끓는점</div>
+          분자량이 비슷한 극성 분자의 경우 <span class="hb">쌍극자 모멘트가 클수록 끓는점이 높습니다</span>.<br><br>
+          예) CH₃CHO (분자량 44, 쌍극자 모멘트 2.75D, 끓는점 21℃) vs CH₃OCH₃ (분자량 46, 1.30D, 끓는점 −25℃)
+        </div>
+
+        <div class="sec-title">② 분산력 (London Dispersion Force)</div>
+        <div class="concept-box">
+          <div class="cb-title">🌀 무극성 분자 사이에도 작용하는 힘</div>
+          <span class="hp">분산력</span>: 무극성 분자에서도 <strong>순간 쌍극자</strong>로 인해 발생하는 힘.<br><br>
+          <strong>발생 과정:</strong><br>
+          전자가 원자핵 주위 이동 → 순간적으로 한쪽으로 치우쳐 <span class="hp">편극</span> → <strong>순간 쌍극자 형성</strong> → 이웃 분자에도 쌍극자 유발 → 두 순간 쌍극자 사이 인력<br><br>
+          <strong>분산력의 크기:</strong> 분자량이 클수록 (전자 수 많고 크기 클수록) 편극 잘 일어남 → <span class="hp">분산력 증가</span>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>할로젠 원소</th><th>분자량</th><th>끓는점(℃)</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td>F₂</td><td>38</td><td>−188</td><td rowspan="4"><span class="hp">주기 증가 → 분자량 증가 → 분산력 증가 → 끓는점 상승</span></td></tr>
+            <tr><td>Cl₂</td><td>71</td><td>−34</td></tr>
+            <tr><td>Br₂</td><td>160</td><td>59</td></tr>
+            <tr><td>I₂</td><td>254</td><td>184</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">③ 수소 결합 (Hydrogen Bond)</div>
+        <div class="concept-box">
+          <div class="cb-title">🔗 가장 강한 분자 간 힘</div>
+          <span class="hp">수소 결합</span>: 전기음성도가 크고 크기가 작은 <strong>O, N, F 원자</strong>에 결합한 H 원자와 다른 분자의 O, N, F 원자 사이에 작용하는 강한 정전기적 인력.<br><br>
+          <strong>수소 결합이 가능한 분자:</strong> H₂O, NH₃, HF<br><br>
+          <strong>전기음성도 크기:</strong> F(4.0) > O(3.4) > N(3.0) > H(2.2) > C(2.6)
+        </div>
+        <div class="red-box">
+          <div class="cb-title">⚠️ 물(H₂O)이 H₂S보다 끓는점이 높은 이유</div>
+          H₂O (분자량 18, 끓는점 100℃) vs H₂S (분자량 34, 끓는점 −59.6℃)<br><br>
+          분자량만 보면 H₂S의 끓는점이 더 높아야 하지만, <span class="hr">H₂O는 O-H 사이에 수소 결합이 형성</span>됩니다. 수소 결합은 쌍극자·쌍극자 힘이나 분산력보다 훨씬 강하므로 H₂O의 끓는점이 훨씬 높습니다.
+        </div>
+
+        <div class="sec-title">분자 간 힘 크기 비교</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>종류</th><th>작용 분자</th><th>크기</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">수소 결합</span></td><td>H₂O, NH₃, HF</td><td><strong>가장 강함</strong></td><td>O, N, F와 결합한 H가 있을 때</td></tr>
+            <tr><td><span class="hg">쌍극자·쌍극자 힘</span></td><td>극성 분자</td><td>중간</td><td>쌍극자 모멘트 클수록 강함</td></tr>
+            <tr><td><span class="hb">분산력</span></td><td>모든 분자</td><td>보통 가장 약함</td><td>분자량 클수록 강해져 수소 결합 능가 가능</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 8</div>
+          <div class="quiz-q">암모니아(NH₃)는 포스핀(PH₃)보다 끓는점이 높은 까닭을 분자 간 힘으로 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            NH₃는 전기음성도가 큰 질소(N) 원자에 결합한 수소(H) 원자가 있어 <strong>수소 결합</strong>이 형성됩니다. PH₃는 P 원자의 전기음성도가 작아 수소 결합이 형성되지 않으며, 분자 사이에는 <strong>분산력과 쌍극자·쌍극자 힘</strong>만 작용합니다. 수소 결합이 분산력보다 강하므로 NH₃의 끓는점이 PH₃보다 높습니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 증기 압력과 끓는점 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Vapor Pressure & Boiling Point</div>
+          <div class="acc-htitle">증기 압력과 끓는점</div>
+          <div class="acc-hdesc">동적 평형 · 증기 압력 곡선 · 끓는점과 외부 압력의 관계 · 상평형 그림</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">동적 평형과 증기 압력</div>
+        <div class="concept-box">
+          <div class="cb-title">⚖️ 동적 평형 (Dynamic Equilibrium)</div>
+          밀폐된 용기에 액체를 넣으면:<br>
+          ① 초기: 증발하는 분자 수 > 응축하는 분자 수<br>
+          ② 시간 경과: 증발 속도 = 응축 속도 → <span class="hp">동적 평형 상태</span> 도달<br>
+          ③ 겉으로는 아무 변화 없어 보이지만 실제로는 계속 증발과 응축이 동시에 진행<br><br>
+          <span class="hp">증기 압력 (Vapor Pressure)</span>: 동적 평형 상태에서 증기(기체)가 나타내는 압력.
+        </div>
+
+        <div class="sec-title">증기 압력의 특징</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>조건</th><th>증기 압력 변화</th><th>이유</th></tr></thead>
+          <tbody>
+            <tr><td>온도 높아짐 ↑</td><td>증기 압력 <span class="hr">증가 ↑</span></td><td>분자 운동 활발 → 증발 잘 일어남</td></tr>
+            <tr><td>분자 간 힘 강함</td><td>증기 압력 <span class="hb">작음</span></td><td>증발하기 어려움</td></tr>
+            <tr><td>분자 간 힘 약함</td><td>증기 압력 <span class="hr">큼</span></td><td>증발 잘 일어남 → 끓는점 낮음</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">끓는점 (Boiling Point)</div>
+        <div class="concept-box">
+          <div class="cb-title">🌡️ 끓는점과 외부 압력</div>
+          <span class="hp">끓는점</span>: 액체의 증기 압력이 외부 압력과 같아지는 온도.<br>
+          <span class="hp">기준 끓는점</span>: 외부 압력이 1기압일 때의 끓는점.<br><br>
+          <strong>증기 압력 곡선 해석:</strong><br>
+          • 곡선 위: 증기 압력 = 외부 압력 → 끓는점<br>
+          • 외부 압력 낮아지면 → 끓는점 낮아짐<br>
+          • 외부 압력 높아지면 → 끓는점 높아짐<br><br>
+          <strong>증기 압력 크기:</strong> 다이에틸 에터 > 에탄올 > 물 (분자 간 힘: 물 > 에탄올 > 다이에틸 에터)
+        </div>
+        <div class="amber-box">
+          <div class="cb-title">⛰️ 높은 산에서 밥이 설익는 이유</div>
+          높은 산에서는 외부 압력이 1기압보다 낮습니다. 따라서 물의 증기 압력이 외부 압력과 더 낮은 온도에서 같아집니다. 즉, <span class="ha">100℃보다 낮은 온도에서 물이 끓습니다</span>. 낮은 온도의 물로는 쌀이 완전히 익지 않아 설익게 됩니다.<br><br>
+          반대로 압력밥솥은 내부 압력을 높여 물의 끓는점을 100℃ 이상으로 높여 빠르게 익힙니다.
+        </div>
+
+        <div class="sec-title">상평형 그림 (Phase Diagram)</div>
+        <div class="concept-box">
+          <div class="cb-title">📈 물과 이산화 탄소의 상평형 그림 비교</div>
+          <span class="hp">상평형 그림</span>: 온도와 압력에 따라 물질의 안정한 상태를 나타낸 그림.<br><br>
+          <strong>주요 지점:</strong><br>
+          • <span class="hp">삼중점(T점)</span>: 고체·액체·기체가 모두 공존하는 온도와 압력<br>
+          &nbsp;&nbsp;물: 0.006기압, 0.01℃ / 이산화 탄소: 5.1기압, −57℃<br>
+          • AT 곡선: 액체-기체 공존 (증기 압력 곡선)<br>
+          • BT 곡선: 고체-액체 공존 (융해 곡선)<br>
+          • CT 곡선: 고체-기체 공존 (승화 곡선)<br><br>
+          <strong>물 vs 이산화 탄소 차이:</strong><br>
+          • 1기압에서 CO₂는 삼중점 압력(5.1기압) 이하이므로 <span class="hp">액체 상태 존재 불가</span> → 드라이아이스가 바로 승화<br>
+          • 물의 BT 곡선은 <span class="hp">음의 기울기</span> (물은 액체 밀도 > 고체 밀도로 특이)
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit3 -->
+
+<!-- ══════════════════════════════════════
+     소단원 4: 고체
+══════════════════════════════════════ -->
+<div id="unit4" class="unit-section">
+  <div class="unit-banner ub-green">
+    <div class="ub-emoji">🔷</div>
+    <div>
+      <div class="ub-num">소단원 04 · Solids</div>
+      <div class="ub-title">고체</div>
+      <div class="ub-desc">결정성·비결정성 고체의 구분, 이온 결정·분자 결정·공유 결정·금속 결정의 구조와 성질 차이를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 결정성·비결정성 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Crystalline vs Amorphous</div>
+          <div class="acc-htitle">결정성 고체와 비결정성 고체</div>
+          <div class="acc-hdesc">입자 배열의 규칙성에 따라 두 종류로 분류 · 결정성 고체는 녹는점이 일정</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">고체의 분류</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>입자 배열</th><th>녹는점</th><th>예시</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hp">결정성 고체</span></td>
+              <td>입자가 <strong>규칙적</strong>으로 배열</td>
+              <td>일정 (sharp)</td>
+              <td>석영, NaCl, 철(Fe), 얼음</td>
+            </tr>
+            <tr>
+              <td><span class="hb">비결정성 고체</span></td>
+              <td>입자가 <strong>불규칙적</strong>으로 배열</td>
+              <td>일정하지 않음 (점점 연해짐)</td>
+              <td>유리, 고무, 플라스틱</td>
+            </tr>
+          </tbody>
+        </table></div>
+        <div class="blue-box">
+          <div class="cb-title">💡 석영 vs 유리 — 같은 SiO₂인데 다른 이유</div>
+          석영과 유리는 모두 <span class="hb">이산화 규소(SiO₂)</span>로 이루어져 있습니다. 그러나 석영은 SiO₂가 규칙적으로 배열된 <strong>결정성 고체</strong>이고, 유리는 불규칙적으로 배열된 <strong>비결정성 고체</strong>입니다. 같은 화학 성분이라도 입자 배열에 따라 성질이 크게 달라집니다.
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 4가지 결정 유형 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">4 Types of Crystals · 결정의 분류</div>
+          <div class="acc-htitle">결정성 고체의 4가지 종류</div>
+          <div class="acc-hdesc">이온 결정 · 분자 결정 · 공유 결정 · 금속 결정 — 구조와 성질 완벽 비교</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">① 이온 결정 (Ionic Crystal)</div>
+        <div class="concept-box">
+          <div class="cb-title">🧂 이온 결합으로 이루어진 결정</div>
+          <span class="hp">이온 결정</span>: 양이온과 음이온이 정전기적 인력(이온 결합)으로 규칙적으로 배열되어 있는 결정.<br><br>
+          <strong>성질:</strong><br>
+          • 비교적 단단하며 <span class="hp">녹는점이 높음</span> (이온 간 결합이 강함)<br>
+          • <span class="hr">고체 상태에서 전기 전도성 없음</span> (이온이 이동 불가)<br>
+          • <span class="hg">액체 상태·수용액 상태에서 전기 전도성 있음</span> (이온이 자유롭게 이동)<br>
+          • 외부 힘 → 이온 층 밀림 → 같은 전하끼리 마주보게 됨 → 반발력 → <span class="hp">쉽게 쪼개짐</span><br><br>
+          <strong>예시:</strong> NaCl (염화 나트륨), CaO (산화 칼슘)
+        </div>
+
+        <div class="sec-title">② 분자 결정 (Molecular Crystal)</div>
+        <div class="concept-box">
+          <div class="cb-title">🧊 분자 간 힘으로 이루어진 결정</div>
+          <span class="hp">분자 결정</span>: 공유 결합으로 이루어진 분자들이 분자 간 힘으로 규칙적으로 배열된 결정.<br><br>
+          <strong>성질:</strong><br>
+          • 분자 간 힘이 다른 결합보다 약함 → <span class="hp">녹는점 낮음</span><br>
+          • <span class="ha">쉽게 승화</span>하는 성질 있음<br>
+          • 이온이나 자유 전자 없음 → <span class="hr">전기 전도성 없음</span><br><br>
+          <strong>예시:</strong> 얼음(H₂O), 드라이아이스(CO₂), 아이오딘(I₂), 나프탈렌(C₁₀H₈)
+        </div>
+
+        <div class="sec-title">③ 공유 결정 (Covalent Crystal / Network Solid)</div>
+        <div class="concept-box">
+          <div class="cb-title">💎 공유 결합 그물 구조</div>
+          <span class="hp">공유 결정</span>: 원자들이 공유 결합으로 그물처럼 연결되어 이루어진 결정.<br><br>
+          <strong>성질:</strong><br>
+          • 공유 결합으로 매우 강하게 연결 → <span class="hp">녹는점 매우 높음</span><br>
+          • 매우 단단함<br>
+          • <span class="hr">대부분 전기 전도성 없음</span> (예외: 흑연은 전기 전도성 있음)<br><br>
+          <strong>예시:</strong><br>
+          • 다이아몬드(C): 탄소 원자 1개가 4개와 정사면체로 결합 → 3D 구조<br>
+          • 흑연(C): 탄소 원자 1개가 3개와 정육각형으로 결합 → 층상 구조 (흑연만 전기 전도성 있음)<br>
+          • 탄화 규소(SiC), 이산화 규소(SiO₂)
+        </div>
+
+        <div class="sec-title">④ 금속 결정 (Metallic Crystal)</div>
+        <div class="concept-box">
+          <div class="cb-title">🔩 자유 전자와 금속 결합</div>
+          금속 원자가 전자를 잃어 양이온이 되고, 이탈한 전자는 금속 양이온 사이를 <span class="hp">자유롭게 이동</span>.<br>
+          <span class="hp">금속 결합</span>: 자유 전자와 금속 양이온 사이의 정전기적 인력으로 이루어진 결합.<br>
+          <span class="hp">금속 결정</span>: 금속 결합으로 원자들이 규칙적으로 배열된 결정.<br><br>
+          <strong>성질 (자유 전자 때문에):</strong><br>
+          • 녹는점이 대체로 높음<br>
+          • <span class="hg">열전도성·전기 전도성 있음</span> (자유 전자가 에너지·전하 전달)<br>
+          • <span class="hg">광택 있음</span> (자유 전자가 빛 반사)<br>
+          • 외부 힘 → 층이 밀려도 자유 전자가 따라 이동 → <span class="hp">부서지지 않고 변형</span> (연성·전성)<br><br>
+          <strong>예시:</strong> 리튬(Li), 금(Au), 철(Fe), 구리(Cu)
+        </div>
+
+        <div class="sec-title">4가지 결정 성질 비교표</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>종류</th><th>결합 입자</th><th>결합 종류</th><th>녹는점</th><th>전기 전도성</th><th>특징</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hp">이온 결정</span></td>
+              <td>양이온·음이온</td>
+              <td>이온 결합</td>
+              <td>높음</td>
+              <td>고체✗ / 액체·수용액✅</td>
+              <td>단단, 힘 가하면 쪼개짐</td>
+            </tr>
+            <tr>
+              <td><span class="hb">분자 결정</span></td>
+              <td>분자</td>
+              <td>분자 간 힘</td>
+              <td>낮음</td>
+              <td>없음✗</td>
+              <td>승화 가능, 무름</td>
+            </tr>
+            <tr>
+              <td><span class="hp">공유 결정</span></td>
+              <td>원자</td>
+              <td>공유 결합</td>
+              <td>매우 높음</td>
+              <td>대부분✗ (흑연✅ 예외)</td>
+              <td>매우 단단함</td>
+            </tr>
+            <tr>
+              <td><span class="hg">금속 결정</span></td>
+              <td>금속 양이온</td>
+              <td>금속 결합</td>
+              <td>높음 (다양)</td>
+              <td>있음✅</td>
+              <td>광택, 연성·전성</td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 9</div>
+          <div class="quiz-q">다음 4가지 고체를 분류 기준에 따라 알맞게 분류하시오.<br>드라이아이스(CO₂), 금(Au), 다이아몬드(C), 염화 나트륨(NaCl)<br><br>
+          [분류 기준 1] 액체 상태에서 전류가 흐르는가?<br>
+          [분류 기준 2] 외부에서 힘을 가할 때 쪼개지는가?<br>
+          [분류 기준 3] 녹는점이 매우 높은가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            <strong>[기준 1] 액체 상태에서 전류가 흐르는가?</strong><br>
+            &nbsp;예: NaCl(이온 결정), Au(금속 결정) → 다음 분류 진행<br>
+            &nbsp;아니오: C(공유 결정), CO₂(분자 결정)<br><br>
+            <strong>[기준 2] 외부 힘에 쪼개지는가?</strong><br>
+            &nbsp;예: NaCl → <strong>이온 결정</strong> (이온 층 밀림 → 반발)<br>
+            &nbsp;아니오: Au → <strong>금속 결정</strong> (자유 전자로 인해 변형)<br><br>
+            <strong>[기준 3] 녹는점이 매우 높은가?</strong><br>
+            &nbsp;예: C → <strong>공유 결정</strong> (다이아몬드 녹는점 3550℃)<br>
+            &nbsp;아니오: CO₂ → <strong>분자 결정</strong> (드라이아이스 −78℃에서 승화)
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 10</div>
+          <div class="quiz-q">고체 상태에서 이온 결정과 금속 결정의 전기 전도성을 비교하고, 그 이유를 각각 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            <strong>이온 결정 (예: NaCl):</strong> 고체 상태에서 <span class="hr">전기 전도성 없음</span>.<br>
+            → 이온 결정에서 이온들은 고정된 위치에서 진동 운동만 하므로 이온이 자유롭게 이동하지 못함.<br><br>
+            <strong>금속 결정 (예: Cu):</strong> 고체 상태에서도 <span class="hg">전기 전도성 있음</span>.<br>
+            → 금속 결정에는 금속 양이온 사이를 자유롭게 이동하는 <strong>자유 전자</strong>가 존재하여 전기를 전도함.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit4 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  ['unit1','unit2','unit3','unit4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('visible');
+  });
+  const target = document.getElementById('unit'+n);
+  if (target) target.classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Close all accordions when switching tabs
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  // Close all open accordions in current tab
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => {
+      item.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }, 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+// Hash-based navigation
+const hashMap = {
+  '#unit1':1, '#acc-boyle':1, '#acc-charles':1, '#acc-avogadro':1, '#acc-ideal':1,
+  '#unit2':2, '#unit3':3, '#unit4':4
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n-1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  }
+});
+</script>
+</body>
+</html>
