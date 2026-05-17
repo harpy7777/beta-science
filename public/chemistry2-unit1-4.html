@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>베타과학학원 · 물질과 에너지 Ⅳ · 반응 속도</title>
+<style>
+:root {
+  --chem:        #059669;
+  --chem-dark:   #064e3b;
+  --chem-mid:    #10b981;
+  --chem-tint:   #f0fdf4;
+  --chem-tint2:  #dcfce7;
+  --chem-border: #a7f3d0;
+  --chem-border2:#6ee7b7;
+  --border-soft: #e0eaff;
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#fafafa; --white:#fff;
+  --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --blue2:#2563eb; --blue-bg:#eff6ff; --blue-border:#bfdbfe;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626; --red-bg:#fef2f2; --red-border:#fecaca;
+  --teal:#0d9488; --teal-bg:#f0fdfa; --teal-border:#99f6e4;
+  --orange:#ea580c; --orange-bg:#fff7ed; --orange-border:#fed7aa;
+  --purple:#7c3aed; --purple-bg:#f5f3ff; --purple-border:#ddd6fe;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text',
+              'Helvetica Neue',Arial,sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* ── Header ── */
+.header{background:#fff;border-bottom:1px solid var(--border-soft);padding:0 1rem;padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right));height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:500;}
+.header-left{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit;cursor:pointer;transition:opacity .15s;}
+.header-left:hover{opacity:.75}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--chem-mid) 0%,var(--chem-dark) 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.brand-name{font-size:14px;font-weight:600;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{display:flex;align-items:center;gap:5px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;color:#16a34a;white-space:nowrap;}
+.dot-green{width:5px;height:5px;background:#22c55e;border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{padding:7px 14px;min-height:36px;background:transparent;border:1.5px solid var(--chem-border);border-radius:20px;font-family:inherit;font-size:12px;font-weight:600;color:var(--chem-dark);cursor:pointer;white-space:nowrap;transition:background .15s;}
+.back-btn:hover{background:var(--chem-tint)}
+.back-btn:active{background:var(--chem-tint2)}
+
+/* ── Hero ── */
+.hero{background:linear-gradient(135deg,#3b0764 0%,#6d28d9 45%,#0d9488 100%);padding:2.8rem 1.5rem 2.2rem;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06);}
+.hero::after{content:'';position:absolute;left:-50px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center;}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;text-decoration:none;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+.hero-eyebrow{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;}
+.hero-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem;}
+.hero-desc{font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.7;max-width:580px;margin:0 auto 1.8rem;}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:14px;padding:.9rem 1.4rem;text-align:center;backdrop-filter:blur(6px);min-width:80px;transition:background .2s;}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+/* ── Tabs ── */
+.tabs-wrap{background:var(--white);border-bottom:2px solid var(--chem-border);position:sticky;top:54px;z-index:400;}
+.tabs-inner{max-width:1100px;margin:0 auto;padding:0 1rem;display:flex;overflow-x:auto;justify-content:center;gap:4px;}
+.tab-btn{padding:13px 20px;font-size:12.5px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;margin-bottom:-2px;border-radius:8px 8px 0 0;}
+.tab-btn:hover{color:var(--chem);background:var(--chem-tint)}
+.tab-btn.active{color:var(--chem);border-bottom-color:var(--chem)}
+
+/* ── Content ── */
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}.unit-section.visible{display:block}
+
+/* ── Unit Banner ── */
+.unit-banner{border-radius:16px;padding:1.4rem 1.8rem;margin-bottom:1.8rem;display:flex;align-items:center;gap:1.2rem;}
+.ub-green{background:linear-gradient(135deg,var(--chem-tint),var(--chem-tint2));border:2px solid var(--chem-border);}
+.ub-teal{background:linear-gradient(135deg,var(--teal-bg),#ccfbf1);border:2px solid var(--teal-border);}
+.ub-orange{background:linear-gradient(135deg,var(--orange-bg),#ffedd5);border:2px solid var(--orange-border);}
+.ub-purple{background:linear-gradient(135deg,var(--purple-bg),#ede9fe);border:2px solid var(--purple-border);}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--chem);margin-bottom:4px}
+.ub-num-t{color:var(--teal)} .ub-num-o{color:var(--orange)} .ub-num-p{color:var(--purple)}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── Accordion ── */
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{background:var(--white);border:1.5px solid #e5e7eb;border-radius:16px;overflow:hidden;transition:border-color .2s;}
+.acc-item.open{border-color:var(--chem-border);box-shadow:0 4px 20px rgba(5,150,105,.1)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:1.2rem 1.5rem;cursor:pointer;user-select:none;transition:background .15s;}
+.acc-header:hover{background:var(--chem-tint)}
+.acc-num{width:32px;height:32px;border-radius:10px;background:var(--chem-tint2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--chem-dark);flex-shrink:0;}
+.acc-item.open .acc-num{background:var(--chem);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--chem-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px;}
+.acc-item.open .acc-subtitle{color:var(--chem)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--chem)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--chem-tint2)}
+.acc-item.open .acc-body{display:block}
+
+/* ── Section Title ── */
+.sec-title{font-size:12px;font-weight:800;color:var(--chem-dark);letter-spacing:.06em;text-transform:uppercase;margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px;}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--chem);border-radius:2px;display:block;flex-shrink:0;}
+
+/* ── Content Boxes ── */
+.concept-box{background:var(--chem-tint);border:1.5px solid var(--chem-border);border-left:4px solid var(--chem);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.concept-box .cb-title{font-weight:800;color:var(--chem-dark);font-size:14px;margin-bottom:.4rem}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--chem);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+.amber-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-left:4px solid var(--amber);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+.blue-box{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-left:4px solid var(--blue2);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.blue-box .cb-title{font-weight:800;color:#1e40af;font-size:14px;margin-bottom:.4rem}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+.teal-box{background:var(--teal-bg);border:1.5px solid var(--teal-border);border-left:4px solid var(--teal);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.teal-box .cb-title{font-weight:800;color:#134e4a;font-size:14px;margin-bottom:.4rem}
+.orange-box{background:var(--orange-bg);border:1.5px solid var(--orange-border);border-left:4px solid var(--orange);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.orange-box .cb-title{font-weight:800;color:#9a3412;font-size:14px;margin-bottom:.4rem}
+.purple-box{background:var(--purple-bg);border:1.5px solid var(--purple-border);border-left:4px solid var(--purple);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.purple-box .cb-title{font-weight:800;color:#4c1d95;font-size:14px;margin-bottom:.4rem}
+
+/* ── Formula ── */
+.formula-box{background:linear-gradient(135deg,var(--chem-tint),var(--chem-tint2));border:2px solid var(--chem-border);border-radius:14px;padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center;}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--chem-dark);letter-spacing:-.01em;}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
+
+/* ── Table ── */
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:12px;border:1.5px solid var(--chem-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--chem-tint2);padding:10px 14px;text-align:left;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--chem-dark);}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6}
+tbody tr:hover td{background:var(--chem-tint)}
+
+/* ── Point Cards ── */
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin:.8rem 0}
+.point-card{background:var(--white);border:1.5px solid var(--chem-border);border-radius:12px;padding:1rem;text-align:center}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--chem);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ── Flow ── */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0;font-size:13px}
+.flow-box{background:var(--white);border:1.5px solid var(--chem-border);border-radius:8px;padding:7px 12px;font-weight:700;color:var(--chem-dark);text-align:center;font-size:12px;line-height:1.4;}
+.flow-arrow{color:var(--chem);font-size:18px;font-weight:900}
+
+/* ── Half-life Visual ── */
+.halflife-visual{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:.8rem 0;padding:1rem;background:var(--chem-tint);border-radius:12px;border:1.5px solid var(--chem-border);}
+.hl-box{text-align:center;flex:1;min-width:80px;padding:.6rem;background:var(--white);border-radius:10px;border:1px solid var(--chem-border);}
+.hl-num{font-size:1.2rem;font-weight:900;color:var(--chem-dark)}
+.hl-lbl{font-size:10px;color:var(--muted);margin-top:2px}
+.hl-arrow{color:var(--chem);font-size:20px;font-weight:900;flex-shrink:0}
+
+/* ── Highlight ── */
+.hp{color:var(--chem-dark);font-weight:800}
+.hg{color:#059669;font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--blue2);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.ht{color:var(--teal);font-weight:800}
+.ho{color:var(--orange);font-weight:800}
+.hpu{color:var(--purple);font-weight:800}
+
+/* ── Quiz ── */
+.quiz-wrap{background:linear-gradient(135deg,var(--chem-tint2),var(--chem-tint));border:1.5px solid var(--chem-border);border-radius:14px;padding:1.2rem 1.4rem;margin-top:1.6rem;}
+.quiz-label{font-size:11px;font-weight:800;color:var(--chem-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{background:var(--chem);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;}
+.quiz-toggle:hover{background:var(--chem-dark)}
+.quiz-ans{display:none;margin-top:.8rem;padding:.9rem 1rem;background:rgba(255,255,255,.8);border-radius:10px;font-size:13.5px;color:var(--text);line-height:1.75;}
+body p{line-height:1.75;font-size:13.5px;margin:.4rem 0}
+
+/* ── Rate Law Table ── */
+.rate-example{background:var(--white);border:1.5px solid var(--chem-border);border-radius:12px;overflow:hidden;margin:.8rem 0;}
+.re-head{display:grid;grid-template-columns:auto 1fr 1fr 1fr 1fr;background:var(--chem-tint2);padding:8px 12px;font-size:11px;font-weight:800;color:var(--chem-dark);letter-spacing:.05em;text-transform:uppercase;gap:6px;}
+.re-row{display:grid;grid-template-columns:auto 1fr 1fr 1fr 1fr;padding:9px 12px;gap:6px;border-top:1px solid #e5e7eb;font-size:12.5px;align-items:center;}
+.re-row:hover{background:var(--chem-tint)}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.5rem}
+  .tabs-inner{justify-content:flex-start;gap:0}
+  .tab-btn{padding:10px 10px;font-size:11.5px}
+  .content-wrap{padding:1.2rem .9rem 4rem}
+  .unit-banner{flex-direction:column;gap:.8rem;padding:1.2rem}
+  .acc-header{padding:1rem}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .hero-stats{gap:8px}
+  .hero-stat-card{min-width:70px;padding:.8rem 1rem}
+  .hs-num{font-size:1.5rem}
+  .formula-text{font-size:1.05rem}
+  .re-head,.re-row{grid-template-columns:auto 1fr 1fr;font-size:11.5px}
+}
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .header-badge .dot-green{display:none}
+  .point-box{grid-template-columns:1fr}
+  .tab-btn{padding:9px 8px;font-size:11px}
+  .halflife-visual{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Header (완전 동일) ── -->
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"
+          stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-green"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="science-inquiry-performance.html" class="bc-item">탐구활동 보고서</a><span class="bc-sep">›</span>
+      <a href="chemistry1-summary.html" class="bc-item">화학 1 핵심 정리</a><span class="bc-sep">›</span>
+      <span class="bc-current">🚀 Ⅳ. 반응 속도</span>
+    </div>
+    <div class="hero-eyebrow">🌿 PART 01 · 물질과 에너지 · UNIT 04</div>
+    <div class="hero-title">Ⅳ. 반응 속도<br>완벽 상세 학습 가이드</div>
+    <div class="hero-desc">반응 속도식·반응 차수, 일차 반응과 반감기, 활성화 에너지,<br>농도·온도·촉매가 반응 속도에 미치는 영향까지 동아출판 교과서 기반으로 완벽하게 학습합니다</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">4</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">14+</div><div class="hs-lbl">핵심 개념</div></div>
+      <div class="hero-stat-card"><div class="hs-num">12</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tabs ── -->
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">📈 소단원1 · 화학 반응 속도</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">⏳ 소단원2 · 일차 반응과 반감기</button>
+    <button class="tab-btn" onclick="showUnit(3,this)">⚡ 소단원3 · 반응의 조건</button>
+    <button class="tab-btn" onclick="showUnit(4,this)">🔬 소단원4 · 농도·온도·촉매</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ══════════════════════════════════════════
+     소단원 1: 화학 반응 속도
+══════════════════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner ub-green">
+    <div class="ub-emoji">📈</div>
+    <div>
+      <div class="ub-num">소단원 01 · Reaction Rate</div>
+      <div class="ub-title">화학 반응 속도</div>
+      <div class="ub-desc">반응 속도의 정의와 측정 방법, 평균·순간·초기 반응 속도의 개념, 반응 속도식(v = k[A]ᵐ[B]ⁿ)과 반응 차수를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 반응 속도의 정의 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Reaction Rate · 정의와 표현</div>
+          <div class="acc-htitle">반응 속도의 정의와 표현</div>
+          <div class="acc-hdesc">농도 변화량 / 시간 변화량 · 반응 계수로 나누어 통일 · mol/(L·s)</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">반응 속도란?</div>
+        <div class="concept-box">
+          <div class="cb-title">📊 반응 속도 (Reaction Rate)</div>
+          <span class="hp">반응 속도</span>: 화학 반응이 빠르게 또는 느리게 일어나는 정도.<br><br>
+          일반적으로 <strong>일정 시간 동안 반응물이나 생성물의 농도 변화량</strong>으로 나타냅니다.<br>
+          단위: mol/(L·s), mol/(L·min) 등
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">v = −Δ[반응물]/Δt = +Δ[생성물]/Δt</div>
+          <div class="formula-sub">반응물은 농도 감소(−부호), 생성물은 농도 증가(+부호) / 반응 계수로 나눠 동일한 속도로 표현</div>
+        </div>
+
+        <div class="sec-title">반응식의 계수와 반응 속도 표현</div>
+        <div class="concept-box">
+          <div class="cb-title">⚖️ 2A(g) + B(g) → C(g) 반응에서</div>
+          A는 같은 시간 동안 B와 C의 <strong>2배</strong>만큼 농도가 변합니다. 따라서 반응 계수로 나눠 동일한 속도 값으로 통일합니다.<br><br>
+          v = −<sup>1</sup>/<sub>2</sub>·(Δ[A]/Δt) = −(Δ[B]/Δt) = +(Δ[C]/Δt)
+        </div>
+
+        <div class="sec-title">반응 속도 측정 방법</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>반응 종류</th><th>측정 방법</th><th>예시</th></tr></thead>
+          <tbody>
+            <tr><td>기체 발생 반응</td><td>기체의 부피 또는 압력 측정 / 반응물 질량 감소 측정</td><td>CaCO₃ + HCl → CO₂↑</td></tr>
+            <tr><td>앙금 생성 반응</td><td>×표가 보이지 않을 때까지 걸린 시간 측정</td><td>Na₂S₂O₃ + HCl → S(앙금)</td></tr>
+            <tr><td>색 변화 반응</td><td>색이 변할 때까지 걸린 시간 측정</td><td>KIO₃ + NaHSO₃ → I₂(청람색)</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">평균·순간·초기 반응 속도</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>종류</th><th>정의</th><th>그래프에서</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">평균 반응 속도</span></td><td>특정 시간 구간 동안의 반응 속도</td><td>두 점을 잇는 직선의 기울기</td></tr>
+            <tr><td><span class="hp">순간 반응 속도</span></td><td>특정 순간 t에서의 반응 속도</td><td>t일 때 <strong>접선의 기울기</strong></td></tr>
+            <tr><td><span class="hp">초기 반응 속도</span></td><td>t=0에서의 순간 반응 속도</td><td>t=0 에서 접선의 기울기</td></tr>
+          </tbody>
+        </table></div>
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 시간이 지날수록 반응 속도가 감소하는 이유</div>
+          반응이 진행될수록 <span class="ha">반응물의 농도가 감소</span>합니다. 반응물의 농도가 낮아지면 입자 간 충돌 횟수가 줄어들어 반응 속도가 느려집니다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">오산화 이질소(N₂O₅)의 분해 반응에서 시간에 따라 순간 반응 속도가 감소하는 까닭을 설명해 보자.<br>2N₂O₅(g) → 4NO₂(g) + O₂(g)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            반응이 진행될수록 반응물인 N₂O₅의 <strong>농도가 점점 감소</strong>합니다. 반응물의 농도가 감소하면 단위 시간당 입자의 충돌수가 줄어들어 반응할 수 있는 입자 수도 감소하므로, 시간이 지날수록 순간 반응 속도가 감소합니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 반응 속도식 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Rate Law · 반응 속도식</div>
+          <div class="acc-htitle">반응 속도식과 반응 차수</div>
+          <div class="acc-hdesc">v = k[A]ᵐ[B]ⁿ · 반응 속도 상수(k) · 반응 차수는 실험으로만 결정</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">반응 속도식 (Rate Law)</div>
+        <div class="concept-box">
+          <div class="cb-title">📐 반응 속도식의 구성 요소</div>
+          aA + bB → cC + dD 반응에서:
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">v = k[A]ᵐ[B]ⁿ</div>
+          <div class="formula-sub">k: 반응 속도 상수 (온도에 의해서만 변함) / m, n: 반응 차수 (실험으로만 결정, 계수와 무관)</div>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>용어</th><th>의미</th><th>특징</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">반응 속도 상수(k)</span></td><td>반응에 고유한 비례 상수</td><td>온도에 의해서만 변함. 농도·압력 무관</td></tr>
+            <tr><td><span class="hp">반응 차수(m, n)</span></td><td>농도 변화가 속도에 미치는 지수</td><td><span class="hr">화학 반응식 계수와 무관</span>. 실험 데이터로만 결정</td></tr>
+            <tr><td><span class="hp">전체 반응 차수</span></td><td>m + n</td><td>0차, 1차, 2차, 3차 반응 등</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">반응 속도 상수(k)의 단위</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>전체 반응 차수</th><th>k의 단위</th></tr></thead>
+          <tbody>
+            <tr><td>0차</td><td>M/s (mol/(L·s))</td></tr>
+            <tr><td>1차</td><td>1/s (s⁻¹)</td></tr>
+            <tr><td>2차</td><td>1/(M·s) (L/(mol·s))</td></tr>
+            <tr><td>3차</td><td>1/(M²·s) (L²/(mol²·s))</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">반응 속도식 구하기 — 단계별 풀이</div>
+        <div class="green-box">
+          <div class="cb-title">🔢 3단계 풀이법</div>
+          <strong>1단계:</strong> v = k[A]ᵐ[B]ⁿ 으로 식 세우기<br><br>
+          <strong>2단계:</strong> 한 반응물 농도를 고정하고 다른 것 변화시켰을 때 속도 변화 비교<br>
+          &nbsp;→ 농도 a배 변화 시 속도 b배 변화: b = aᵐ → m = log(b)/log(a)<br><br>
+          <strong>3단계:</strong> 실험값을 v = k[A]ᵐ[B]ⁿ에 대입하여 k 계산
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">2NO(g) + Br₂(g) → 2NOBr(g) 반응에서 초기 반응 속도 데이터이다. 반응 속도식과 k를 구해 보자.<br>
+          실험Ⅰ: [NO]=0.1M, [Br₂]=0.2M, v=20 mol/(L·s)<br>
+          실험Ⅱ: [NO]=0.2M, [Br₂]=0.2M, v=80 mol/(L·s)<br>
+          실험Ⅲ: [NO]=0.1M, [Br₂]=0.4M, v=40 mol/(L·s)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: v = k[NO]²[Br₂], k = 1×10⁴ L²/(mol²·s)</strong><br><br>
+            <strong>NO에 대한 차수:</strong> 실험Ⅰ→Ⅱ: [NO] 2배 → v 4배 → 2ᵐ = 4 → m = 2<br>
+            <strong>Br₂에 대한 차수:</strong> 실험Ⅰ→Ⅲ: [Br₂] 2배 → v 2배 → 2ⁿ = 2 → n = 1<br><br>
+            반응 속도식: v = k[NO]²[Br₂]<br>
+            실험Ⅰ 대입: 20 = k × (0.1)² × 0.2 = k × 0.002<br>
+            k = 20 ÷ 0.002 = <strong>1×10⁴ L²/(mol²·s)</strong>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">CH₃CHO(g) → CH₄(g) + CO(g) 반응에서 다음 데이터를 이용해 반응 속도식을 구하고 ㉠을 구하시오.<br>
+          실험Ⅰ: [CH₃CHO]=0.10M, v=0.02M/s<br>
+          실험Ⅱ: [CH₃CHO]=0.20M, v=0.08M/s<br>
+          실험Ⅲ: [CH₃CHO]=0.30M, v=0.18M/s<br>
+          실험Ⅳ: [CH₃CHO]=0.40M, v=㉠</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: v = k[CH₃CHO]², ㉠ = 0.32 M/s</strong><br><br>
+            실험Ⅰ→Ⅱ: 농도 2배 → 속도 4배 → 2ᵐ = 4 → m = 2 (이차 반응)<br>
+            k 계산: 0.02 = k × (0.10)² → k = 0.02/0.01 = 2 M⁻¹s⁻¹<br><br>
+            실험Ⅳ: v = 2 × (0.40)² = 2 × 0.16 = <strong>0.32 M/s</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ══════════════════════════════════════
+     소단원 2: 일차 반응과 반감기
+══════════════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner ub-teal">
+    <div class="ub-emoji">⏳</div>
+    <div>
+      <div class="ub-num ub-num-t">소단원 02 · First-Order Reactions & Half-Life</div>
+      <div class="ub-title">일차 반응과 반감기</div>
+      <div class="ub-desc">일차 반응(v = k[A])의 특성, 반감기(t₁/₂)가 초기 농도와 무관한 이유, 그리고 방사성 동위 원소 연대 측정 등 반감기의 활용 사례를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 일차 반응 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">First-Order Reaction · 일차 반응</div>
+          <div class="acc-htitle">일차 반응의 특성</div>
+          <div class="acc-hdesc">v = k[A] · 반응 속도가 반응물 농도에 비례 · 농도-속도 그래프: 원점 지나는 직선</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">일차 반응 (First-Order Reaction)</div>
+        <div class="concept-box">
+          <div class="cb-title">📏 일차 반응의 정의와 특성</div>
+          <span class="hp">일차 반응</span>: 반응 속도가 반응물의 농도에 <strong>비례</strong>하는 반응.<br>
+          반응 속도식: <strong>v = k[A]</strong><br><br>
+          <strong>농도-속도 그래프:</strong> 원점을 지나는 직선 (기울기 = k)<br><br>
+          <strong>예시:</strong><br>
+          • 방사성 동위 원소의 붕괴: ¹⁴C → ¹⁴N + e⁻<br>
+          • 오산화 이질소 분해: 2N₂O₅ → 4NO₂ + O₂
+        </div>
+        <div class="green-box">
+          <div class="cb-title">📊 N₂O₅ 분해 반응 예시</div>
+          [N₂O₅] = 0.9 M일 때 반응 속도 = 5.4×10⁻⁴ mol/(L·s)<br>
+          [N₂O₅] = 0.45 M일 때 반응 속도 = 2.7×10⁻⁴ mol/(L·s)<br><br>
+          → 농도가 <strong>절반(0.9→0.45)</strong>으로 줄면 반응 속도도 <span class="hg">절반</span>으로 줄어듦 = 일차 반응
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 반감기 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Half-Life · 반감기</div>
+          <div class="acc-htitle">반감기 — 일차 반응만의 특징</div>
+          <div class="acc-hdesc">t₁/₂: 농도가 절반으로 줄어드는 데 걸리는 시간 · 일차 반응에서 반감기 일정 · 초기 농도와 무관</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">반감기의 정의</div>
+        <div class="concept-box">
+          <div class="cb-title">⏱️ 반감기 (Half-Life, t₁/₂)</div>
+          <span class="hp">반감기</span>: 반응물의 농도가 <strong>절반으로 줄어드는 데 걸리는 시간</strong><br><br>
+          일차 반응에서 반응물의 농도가 절반으로 감소하면 반응 속도도 절반으로 감소합니다. 따라서 다음 번 반감기도 동일한 시간이 걸립니다.
+        </div>
+
+        <div class="sec-title">일차 반응 반감기의 핵심 특성</div>
+        <div class="teal-box">
+          <div class="cb-title">⭐ 일차 반응 반감기는 초기 농도와 무관하게 항상 일정!</div>
+          이것이 <span class="ht">일차 반응만의 특징</span>입니다. 이차 반응 이상에서는 반감기가 농도에 따라 달라집니다.
+        </div>
+        <div class="halflife-visual">
+          <div class="hl-box"><div class="hl-num">[A]₀</div><div class="hl-lbl">초기 농도</div></div>
+          <div class="hl-arrow">→</div>
+          <div class="hl-box"><div class="hl-num">[A]₀/2</div><div class="hl-lbl">1 반감기 후</div></div>
+          <div class="hl-arrow">→</div>
+          <div class="hl-box"><div class="hl-num">[A]₀/4</div><div class="hl-lbl">2 반감기 후</div></div>
+          <div class="hl-arrow">→</div>
+          <div class="hl-box"><div class="hl-num">[A]₀/8</div><div class="hl-lbl">3 반감기 후</div></div>
+          <div class="hl-arrow">→</div>
+          <div class="hl-box"><div class="hl-num">[A]₀/2ⁿ</div><div class="hl-lbl">n 반감기 후</div></div>
+        </div>
+
+        <div class="sec-title">반감기 경과에 따른 농도 계산</div>
+        <div class="formula-box">
+          <div class="formula-text">[A]ₙ = [A]₀ × (1/2)ⁿ</div>
+          <div class="formula-sub">n: 반감기 횟수 / [A]₀: 초기 농도 / [A]ₙ: n번 반감기 후 농도</div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">반응물 A가 분해되는 반응에서 반감기가 2초로 일정하다. 1 M의 A를 반응시켰을 때, A의 몰농도가 1/32 M로 될 때의 시간을 구해 보자.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 10초</strong><br><br>
+            1 M × (1/2)ⁿ = 1/32 M<br>
+            (1/2)ⁿ = 1/32 = (1/2)⁵<br>
+            n = 5 반감기<br><br>
+            5 반감기 × 2초/반감기 = <strong>10초</strong>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">표는 반응물 A가 분해되는 반응에서 시간에 따른 A의 농도 데이터이다. 반응 속도식과 반감기를 구해 보자.<br>
+          시간(s): 0, t, 2t, 3t, 4t<br>
+          [A](M): 0.40, 0.28, 0.20, 0.14, 0.10</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: v = k[A], 반감기 = 2t s</strong><br><br>
+            0.40 → 0.20 → 0.10 M으로 <strong>절반씩 감소</strong>하는 데 걸리는 시간이 각각 2t초로 일정합니다.<br>
+            반감기가 일정 → <strong>일차 반응</strong> → 반응 속도식: v = k[A]<br>
+            반감기: 2t s
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03: 반감기 활용 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Applications · 반감기 활용</div>
+          <div class="acc-htitle">반감기의 다양한 활용</div>
+          <div class="acc-hdesc">탄소-14 연대 측정 · 방사성 동위 원소 의료 활용 · 약물 투여 간격 결정</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">반감기를 이용한 연대 측정</div>
+        <div class="teal-box">
+          <div class="cb-title">🦕 탄소-14 연대 측정법 (방사성 탄소 연대 측정)</div>
+          <strong>원리:</strong> 공기 중 ¹⁴C(질량수 14인 탄소)는 불안정한 동위 원소로, 시간이 지나면 ¹⁴N으로 변합니다.<br>
+          반응식: ¹⁴C → ¹⁴N + e⁻ (일차 반응)<br><br>
+          <strong>반감기:</strong> 5730년<br>
+          <strong>활용 범위:</strong> 약 5만 년 이내 유물의 연대 측정<br><br>
+          <strong>방법:</strong> 살아있는 생물은 계속 ¹⁴C 보충 → 사망 후 ¹⁴C 감소 시작 → 현재 ¹⁴C/¹²C 비율로 사망 시기 계산
+        </div>
+
+        <div class="sec-title">반감기 활용 사례</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">⚗️</div>
+            <div class="pc-title">¹⁴C 연대 측정</div>
+            <div class="pc-desc">반감기 5730년. 5만년 내 고대 유물, 화석의 연대 측정에 사용</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🏥</div>
+            <div class="pc-title">의료 방사성 동위 원소</div>
+            <div class="pc-desc">¹³¹I(갑상샘 치료), ⁹⁹Tc(신체 기능 진단). 적절한 반감기를 가진 원소 선택</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">💊</div>
+            <div class="pc-title">약물 투여 간격</div>
+            <div class="pc-desc">약물이 일차 반응 따를 시, 반감기 기반으로 혈액 내 약물 농도 계산 → 투여 횟수 결정</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">💧</div>
+            <div class="pc-title">수돗물 소독</div>
+            <div class="pc-desc">염소의 분해 반응이 일차 반응 → 반감기를 고려해 염소 투입량·횟수 조절</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+<!-- ══════════════════════════════════════
+     소단원 3: 반응이 일어나기 위한 조건
+══════════════════════════════════════ -->
+<div id="unit3" class="unit-section">
+  <div class="unit-banner ub-orange">
+    <div class="ub-emoji">⚡</div>
+    <div>
+      <div class="ub-num ub-num-o">소단원 03 · Conditions for Reactions</div>
+      <div class="ub-title">반응이 일어나기 위한 조건</div>
+      <div class="ub-desc">유효 충돌(적합한 방향 + 충분한 에너지), 활성화 에너지의 개념과 에너지 다이어그램, 활성화물의 역할을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 유효 충돌 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Effective Collision · 유효 충돌</div>
+          <div class="acc-htitle">유효 충돌</div>
+          <div class="acc-hdesc">반응이 일어나려면 ① 적합한 방향 + ② 활성화 에너지 이상의 에너지 필요</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">유효 충돌이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">💥 유효 충돌 (Effective Collision)</div>
+          화학 반응이 일어나려면 반응물 입자들이 충돌해야 합니다. 그러나 모든 충돌이 반응으로 이어지지는 않습니다.<br><br>
+          <span class="hp">유효 충돌</span>: 반응이 실제로 일어나는 충돌. 두 가지 조건이 동시에 충족되어야 합니다.
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>충돌 종류</th><th>방향</th><th>에너지</th><th>반응 여부</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hr">비유효 충돌 (가)</span></td><td>적합하지 않음</td><td>—</td><td>반응 없음 ✗</td></tr>
+            <tr><td><span class="hr">비유효 충돌 (나)</span></td><td>적합함</td><td>활성화 에너지 미만</td><td>반응 없음 ✗</td></tr>
+            <tr><td><span class="hg">유효 충돌 (다)</span></td><td>적합함</td><td>활성화 에너지 이상</td><td><span class="hg">반응 일어남 ✅</span></td></tr>
+          </tbody>
+        </table></div>
+        <div class="amber-box">
+          <div class="cb-title">🔑 핵심 정리</div>
+          유효 충돌의 2가지 필요 조건:<br>
+          1. <span class="ha">반응에 적합한 방향</span>으로 충돌<br>
+          2. <span class="ha">활성화 에너지(Eₐ) 이상의 운동 에너지</span>를 가진 입자가 충돌
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 활성화 에너지 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Activation Energy · 활성화 에너지</div>
+          <div class="acc-htitle">활성화 에너지와 에너지 다이어그램</div>
+          <div class="acc-hdesc">Eₐ = 화학 반응이 일어나기 위한 최소 에너지 · 활성화물 · ΔH와 Eₐ는 무관</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">활성화 에너지 (Activation Energy, Eₐ)</div>
+        <div class="concept-box">
+          <div class="cb-title">🏔️ 활성화 에너지란?</div>
+          <span class="hp">활성화 에너지(Eₐ)</span>: 화학 반응이 일어나기 위해 필요한 <strong>최소한의 에너지</strong>.<br><br>
+          반응물이 생성물로 변환되려면 먼저 결합이 느슨해지고 새 결합이 형성되어야 합니다. 이 과정에서 필요한 에너지 장벽이 활성화 에너지입니다.<br><br>
+          <strong>활성화 에너지가 클수록:</strong> 반응하기 어려움 → 반응 속도 느림<br>
+          <strong>활성화 에너지가 작을수록:</strong> 반응하기 쉬움 → 반응 속도 빠름
+        </div>
+
+        <div class="sec-title">활성화물과 활성화 상태</div>
+        <div class="blue-box">
+          <div class="cb-title">💡 활성화물이란?</div>
+          반응물이 유효 충돌할 때 결합이 끊어지기 직전의 <span class="hb">불안정한 상태</span>에 있는 물질.<br><br>
+          반응 경로: 반응물 → <span class="hb">활성화물(전이 상태)</span> → 생성물<br><br>
+          에너지 다이어그램에서 활성화물은 <strong>에너지 곡선의 최고점</strong>에 위치합니다.
+        </div>
+
+        <div class="sec-title">반응 엔탈피(ΔH)와 활성화 에너지(Eₐ)의 관계</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>발열 반응 (ΔH &lt; 0)</th><th>흡열 반응 (ΔH &gt; 0)</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>정반응 Eₐ</td>
+              <td>Eₐ(정) 값 가짐</td>
+              <td>Eₐ(정) 값 가짐</td>
+            </tr>
+            <tr>
+              <td>역반응 Eₐ′</td>
+              <td>Eₐ′ = Eₐ + |ΔH| (역 Eₐ 더 큼)</td>
+              <td>Eₐ′ = Eₐ − |ΔH| (역 Eₐ 더 작음)</td>
+            </tr>
+            <tr>
+              <td>ΔH와 Eₐ</td>
+              <td colspan="2"><span class="hr">ΔH는 Eₐ와 무관</span>. ΔH = 반응물-생성물 에너지 차이 / Eₐ = 반응물-활성화물 에너지 차이</td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">반응 2HI(g) ⇌ H₂(g) + I₂(g)의 정반응과 역반응의 활성화 에너지가 각각 185 kJ, 170 kJ일 때 반응 엔탈피(ΔH)를 구해 보자.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ΔH = +15 kJ (흡열 반응)</strong><br><br>
+            발열 반응이면: Eₐ(역) = Eₐ(정) + |ΔH|<br>
+            흡열 반응이면: Eₐ(정) > Eₐ(역) → 이 경우 정반응 Eₐ(185) > 역반응 Eₐ(170) → 흡열 반응<br><br>
+            ΔH = Eₐ(정) − Eₐ(역) = 185 − 170 = <strong>+15 kJ</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit3 -->
+
+<!-- ══════════════════════════════════════
+     소단원 4: 농도, 온도, 촉매와 반응 속도
+══════════════════════════════════════ -->
+<div id="unit4" class="unit-section">
+  <div class="unit-banner ub-purple">
+    <div class="ub-emoji">🔬</div>
+    <div>
+      <div class="ub-num ub-num-p">소단원 04 · Concentration, Temperature & Catalyst</div>
+      <div class="ub-title">농도, 온도, 촉매와 반응 속도</div>
+      <div class="ub-desc">반응물의 농도·표면적, 온도, 정촉매·부촉매·효소가 반응 속도에 미치는 영향을 분자 수준에서 이해하고 생활 속 사례와 연결합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 농도와 반응 속도 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Concentration & Reaction Rate</div>
+          <div class="acc-htitle">농도와 반응 속도</div>
+          <div class="acc-hdesc">농도↑ → 충돌수↑ → 반응 속도↑ · 기체: 압력↑ · 고체: 입자 크기↓ → 표면적↑</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">농도와 반응 속도의 관계</div>
+        <div class="concept-box">
+          <div class="cb-title">🧪 반응물의 농도가 반응 속도에 미치는 영향</div>
+          <span class="hp">농도 증가 → 반응 속도 증가</span>의 분자적 이유:<br><br>
+          1. 농도 증가 → 단위 부피당 입자 수 증가<br>
+          2. → 단위 시간당 충돌수 증가<br>
+          3. → 활성화 에너지 이상을 갖는 분자 수 증가<br>
+          4. → 유효 충돌 횟수 증가 → <span class="hp">반응 속도 증가</span>
+        </div>
+
+        <div class="sec-title">기체와 고체 반응물에서의 특수한 경우</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>반응물 상태</th><th>농도 증가 방법</th><th>효과</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hp">기체</span></td>
+              <td>압력 증가 → 부피 감소 → 농도 증가</td>
+              <td>단위 부피당 분자 수 증가 → 충돌수 증가 → 속도↑</td>
+            </tr>
+            <tr>
+              <td><span class="hp">고체</span></td>
+              <td>입자 크기 작게 → 표면적 증가</td>
+              <td>반응이 표면에서만 일어남 → 표면적↑ → 접촉 면적↑ → 속도↑</td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">생활 속 농도·표면적 관련 사례</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🔥</div>
+            <div class="pc-title">풀무로 불 피우기</div>
+            <div class="pc-desc">산소 농도 증가 → 연소 반응 속도 빨라짐</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">💊</div>
+            <div class="pc-title">알약 → 가루약</div>
+            <div class="pc-desc">표면적 증가 → 위장에서 약 흡수 속도 빨라짐</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🍖</div>
+            <div class="pc-title">재료 잘게 썰기</div>
+            <div class="pc-desc">표면적 증가 → 양념이나 열이 침투하는 속도 빨라짐</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🚀</div>
+            <div class="pc-title">로켓 연료</div>
+            <div class="pc-desc">산화제(고농도) + 연료의 빠른 반응 → 높은 추진력</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 온도와 반응 속도 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Temperature & Reaction Rate</div>
+          <div class="acc-htitle">온도와 반응 속도</div>
+          <div class="acc-hdesc">온도↑ → 분자 운동 에너지 증가 → Eₐ 이상 분자 수 증가 → 속도↑ · 10℃ 상승 시 약 2배 증가</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">온도와 반응 속도의 관계</div>
+        <div class="concept-box">
+          <div class="cb-title">🌡️ 온도가 높아지면 왜 반응 속도가 빨라지는가?</div>
+          <strong>표면적인 이유 (충돌수 증가):</strong> 온도↑ → 분자 운동 속력↑ → 충돌수 약 2% 증가<br>
+          (충돌수 증가만으로는 반응 속도 증가를 완전히 설명할 수 없음)<br><br>
+          <strong>핵심 이유 (활성화 에너지 이상 분자 수 증가):</strong><br>
+          온도↑ → 운동 에너지 분포 곡선 변화 → <span class="hp">활성화 에너지(Eₐ) 이상의 에너지를 가진 분자 수 급격히 증가</span> → 유효 충돌 횟수 증가 → 반응 속도 증가
+        </div>
+
+        <div class="teal-box">
+          <div class="cb-title">📊 운동 에너지 분포 곡선의 온도 변화</div>
+          온도 T₁ &lt; T₂일 때:<br>
+          • T₂에서 분포 곡선: T₁보다 넓고 낮게 펴짐<br>
+          • <span class="ht">Eₐ 이상의 에너지를 가진 분자 수: T₂ &gt;&gt; T₁</span><br><br>
+          → 온도가 약간만 높아져도 반응할 수 있는 분자 수는 크게 증가합니다.<br>
+          → 일반적으로 온도가 <strong>10℃ 높아지면 반응 속도는 약 2배</strong> 증가합니다.
+        </div>
+
+        <div class="sec-title">반응 속도식 관점에서의 온도 효과</div>
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 온도 변화 시 반응 속도식에서 무엇이 달라지는가?</div>
+          v = k[A]ᵐ[B]ⁿ 에서 농도 [A], [B]는 변하지 않고 <span class="ha">반응 속도 상수(k)가 커집니다</span>.<br><br>
+          k는 온도에 의해서만 변하는 상수이기 때문입니다. (아레니우스 방정식 원리)
+        </div>
+
+        <div class="sec-title">생활 속 온도와 반응 속도 사례</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">❄️</div>
+            <div class="pc-title">냉장고 보관</div>
+            <div class="pc-desc">온도 낮춤 → 음식 부패 반응 속도 느림 → 식품 오래 보존</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🍳</div>
+            <div class="pc-title">기름으로 조리</div>
+            <div class="pc-desc">기름의 끓는점이 물보다 높음 → 더 높은 온도에서 조리 → 빠른 속도</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🌱</div>
+            <div class="pc-title">비닐하우스 재배</div>
+            <div class="pc-desc">온도 높임 → 식물 생육 반응 빨라짐 → 작물 빠르게 자람</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">📦</div>
+            <div class="pc-title">택배 아이스팩</div>
+            <div class="pc-desc">온도 낮춤 → 음식 부패·변질 반응 속도 늦춤</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03: 촉매와 반응 속도 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Catalyst & Reaction Rate</div>
+          <div class="acc-htitle">촉매와 반응 속도</div>
+          <div class="acc-hdesc">촉매 = 소모되지 않고 속도 변화 · 정촉매(Eₐ↓) · 부촉매(Eₐ↑) · 효소(생체 촉매)</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">촉매란?</div>
+        <div class="concept-box">
+          <div class="cb-title">⚗️ 촉매 (Catalyst)</div>
+          <span class="hp">촉매</span>: 화학 반응이 일어날 때 <strong>소모되지 않으면서 반응 속도를 변화시키는 물질</strong><br><br>
+          촉매는 반응 경로를 바꿔 활성화 에너지를 변화시킵니다. ΔH(반응 엔탈피)는 변하지 않습니다.
+        </div>
+
+        <div class="sec-title">정촉매와 부촉매 비교</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>종류</th><th>활성화 에너지</th><th>반응 속도</th><th>분자 운동 에너지 분포</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hg">정촉매 (Positive Catalyst)</span></td>
+              <td>Eₐ <span class="hg">감소</span></td>
+              <td><span class="hg">빨라짐 ↑</span></td>
+              <td>Eₐ 이상 분자 수 증가</td>
+            </tr>
+            <tr>
+              <td><span class="hr">부촉매 (Negative Catalyst / 억제제)</span></td>
+              <td>Eₐ <span class="hr">증가</span></td>
+              <td><span class="hr">느려짐 ↓</span></td>
+              <td>Eₐ 이상 분자 수 감소</td>
+            </tr>
+          </tbody>
+        </table></div>
+        <div class="purple-box">
+          <div class="cb-title">💡 촉매의 핵심 원리 — 터널 비유</div>
+          정촉매에 의해 반응 속도가 빨라지는 것은 <span class="hpu">높은 언덕을 넘어야 하는 자동차가 터널을 통과해 빠르게 목적지로 가는 것</span>과 같습니다.<br><br>
+          활성화 에너지 감소 → 더 낮은 에너지 장벽을 통과 → 더 많은 분자가 반응 가능
+        </div>
+
+        <div class="sec-title">효소 (Enzyme) — 생체 촉매</div>
+        <div class="green-box">
+          <div class="cb-title">🧬 효소의 작용 원리</div>
+          <span class="hg">효소</span>: 생명 활동에서 작용하는 생체 촉매. 단백질로 구성.<br><br>
+          <strong>작용 과정:</strong><br>
+          ① 기질(반응물)이 효소의 <span class="hg">활성 자리(active site)</span>에 결합<br>
+          ② 효소-기질 복합체 형성 → 활성화 에너지 낮아짐<br>
+          ③ 반응이 빠르게 일어나 생성물 생성<br>
+          ④ 효소는 생성물과 분리 → 다시 촉매 작용 반복 (소모되지 않음)
+        </div>
+
+        <div class="sec-title">과산화 수소 분해 실험 — 촉매 비교</div>
+        <div class="teal-box">
+          <div class="cb-title">🧪 2H₂O₂(aq) → 2H₂O(l) + O₂(g)</div>
+          • 아무것도 넣지 않음(A): 실온에서 매우 느린 분해<br>
+          • <span class="ht">KI(아이오딘화 칼륨) 또는 카탈레이스 추가(B)</span>: 반응 속도 급격히 빨라짐 (정촉매)<br>
+          • <span class="hr">묽은 인산(H₃PO₄) 추가(C)</span>: 반응 속도 느려짐 (부촉매)
+        </div>
+
+        <div class="sec-title">생활 속 촉매 활용 사례</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🚗</div>
+            <div class="pc-title">SCR 자동차 촉매</div>
+            <div class="pc-desc">경유 차량 배기가스의 NOx를 촉매로 분해하여 대기오염 감소</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">☀️</div>
+            <div class="pc-title">광촉매(TiO₂)</div>
+            <div class="pc-desc">빛을 받으면 살균·냄새 제거·공기 정화 기능. 페인트·타일에 적용</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🍺</div>
+            <div class="pc-title">발효 효소</div>
+            <div class="pc-desc">포도당 → 에탄올 발효에 효소(생체 촉매) 이용. 빵·맥주·막걸리</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🏭</div>
+            <div class="pc-title">반도체 폐수 처리</div>
+            <div class="pc-desc">광촉매 또는 미생물 촉매로 폐수 속 오염 물질 분해</div>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 7</div>
+          <div class="quiz-q">농도가 증가하면 반응 속도가 빨라지는 까닭을 분자 충돌 관점에서 설명해 보자.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            반응물의 농도가 증가하면 단위 부피 속에 존재하는 입자 수가 많아지고, 단위 시간당 입자의 충돌수도 증가합니다. 충돌수가 증가함에 따라 <strong>활성화 에너지 이상의 에너지를 가진 분자들의 충돌수(유효 충돌수)도 증가</strong>하므로 반응 속도가 빨라집니다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 8</div>
+          <div class="quiz-q">온도를 높이면 반응 속도가 빨라지는 까닭을 설명해 보자.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            온도가 높아지면 분자들의 운동 에너지가 증가합니다. 운동 에너지 분포 곡선에서 고온으로 갈수록 <strong>활성화 에너지(Eₐ) 이상의 에너지를 가진 분자 수가 크게 증가</strong>합니다. 따라서 유효 충돌 횟수가 많아져 반응 속도가 빨라집니다.<br><br>
+            ∴ 반응 속도식 v = k[A]ᵐ[B]ⁿ에서 <strong>반응 속도 상수(k)가 커지는 것</strong>으로 설명됩니다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 9</div>
+          <div class="quiz-q">정촉매를 사용하였을 때 반응 속도가 빨라지는 까닭을 활성화 에너지와 관련지어 설명해 보자.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            정촉매는 반응의 <strong>활성화 에너지를 낮추는 방향으로 반응 경로를 바꿉니다</strong>. 활성화 에너지가 낮아지면 활성화 에너지 이상의 에너지를 가진 분자 수가 증가하고, 유효 충돌 횟수가 많아지므로 반응 속도가 빨라집니다.<br><br>
+            단, 정촉매를 사용해도 반응 엔탈피(ΔH)는 변하지 않습니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit4 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  ['unit1','unit2','unit3','unit4'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('visible');
+  });
+  const target = document.getElementById('unit' + n);
+  if (target) target.classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => item.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+const hashMap = {'#unit1':1,'#unit2':2,'#unit3':3,'#unit4':4};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n - 1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape')
+    document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
