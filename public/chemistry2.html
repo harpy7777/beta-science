@@ -320,12 +320,26 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 
 /* ── 반응형 ── */
+
+/* 터치 영역 보강 */
+.topic-item { min-height: 38px; }
+.unit-go-btn { min-height: 36px; }
+
 @media (max-width: 900px) {
+  /* three-col → 2열, 마지막 홀수 카드는 전체 너비로 */
   .unit-grid.three-col { grid-template-columns: 1fr 1fr; }
+  .unit-grid.three-col .unit-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
 }
 @media (max-width: 700px) {
   .unit-grid, .unit-grid.three-col { grid-template-columns: 1fr; }
+  /* 고아 카드 전체너비 해제 (1열에선 불필요) */
+  .unit-grid.three-col .unit-card:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
   .bottom-row { grid-template-columns: 1fr; }
+  .part-badge { font-size: 11.5px; padding: 5px 14px; }
 }
 @media (max-width: 520px) {
   .wrap { padding: 1rem 0.75rem 5rem; }
@@ -337,7 +351,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   .brand-name { font-size: 13px; }
   .header-badge { font-size: 9px; padding: 3px 8px; }
   .header-badge .dot-green { display: none; }
-  .part-badge { font-size: 11px; padding: 5px 13px; }
+  .part-badge { font-size: 10.5px; padding: 5px 11px; }
+  .part-num { display: none; } /* 아주 좁은 화면에서 PART 01 텍스트 숨김 */
+  .topic-item { font-size: 11px; }
+  .unit-card-desc { font-size: 11px; }
 }
 </style>
 </head>
