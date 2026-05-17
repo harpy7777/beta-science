@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>베타과학학원 · 화학 반응의 세계 Ⅱ · 산화·환원 반응</title>
+<style>
+:root {
+  /* ── 블루 테마 (산화·환원) ── */
+  --chem:        #2563eb;
+  --chem-dark:   #1e3a8a;
+  --chem-mid:    #3b82f6;
+  --chem-light:  #60a5fa;
+  --chem-tint:   #eff6ff;
+  --chem-tint2:  #dbeafe;
+  --chem-border: #bfdbfe;
+  --chem-border2:#93c5fd;
+  --border-soft: #dbeafe;
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#fafafa; --white:#fff;
+  /* 보조 컬러 */
+  --blue:#2563eb;  --blue-bg:#eff6ff;  --blue-border:#bfdbfe;
+  --green:#059669; --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --red:#dc2626;   --red-bg:#fef2f2;   --red-border:#fecaca;
+  --teal:#0d9488;  --teal-bg:#f0fdfa;  --teal-border:#99f6e4;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;--purple-border:#ddd6fe;
+  --indigo:#4f46e5;--indigo-bg:#eef2ff;--indigo-border:#c7d2fe;
+  --orange:#ea580c;--orange-bg:#fff7ed;--orange-border:#fed7aa;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text',
+              'Helvetica Neue',Arial,sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* ── Header ── */
+.header{
+  background:#ffffff;border-bottom:1px solid #dbeafe;
+  padding:0 1rem;
+  padding-left:max(1rem,env(safe-area-inset-left));
+  padding-right:max(1rem,env(safe-area-inset-right));
+  height:54px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:500;
+}
+.header-left{
+  display:flex;align-items:center;gap:9px;
+  text-decoration:none;color:inherit;cursor:pointer;transition:opacity .15s;
+}
+.header-left:hover{opacity:.75}
+.logo-mark{
+  width:30px;height:30px;
+  background:linear-gradient(135deg,#3b82f6 0%,#1e3a8a 100%);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.brand-name{font-size:14px;font-weight:600;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{
+  display:flex;align-items:center;gap:5px;
+  background:#f0fdf4;border:1px solid #bbf7d0;
+  border-radius:20px;padding:4px 10px;
+  font-size:10px;font-weight:600;color:#16a34a;white-space:nowrap;
+}
+.dot-green{width:5px;height:5px;background:#22c55e;border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{
+  padding:7px 14px;min-height:36px;background:transparent;
+  border:1.5px solid var(--chem-border);border-radius:20px;
+  font-family:inherit;font-size:12px;font-weight:600;
+  color:var(--chem-dark);cursor:pointer;white-space:nowrap;transition:background .15s;
+}
+.back-btn:hover{background:var(--chem-tint)}
+.back-btn:active{background:var(--chem-tint2)}
+
+/* ── Hero ── */
+.hero{
+  background:linear-gradient(135deg,#0c1c50 0%,#1e40af 45%,#1d4ed8 100%);
+  padding:2.8rem 1.5rem 2.2rem;position:relative;overflow:hidden;
+}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06);}
+.hero::after{content:'';position:absolute;left:-50px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center;}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;text-decoration:none;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+.hero-eyebrow{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;}
+.hero-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem;}
+.hero-desc{font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.7;max-width:640px;margin:0 auto 1.8rem;}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:14px;padding:.9rem 1.4rem;text-align:center;backdrop-filter:blur(6px);min-width:80px;transition:background .2s;}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+/* ── Tabs ── */
+.tabs-wrap{background:var(--white);border-bottom:2px solid var(--chem-border);position:sticky;top:54px;z-index:400;}
+.tabs-inner{max-width:1100px;margin:0 auto;padding:0 1.5rem;display:flex;overflow-x:auto;justify-content:center;gap:6px;}
+.tab-btn{padding:13px 18px;font-size:12.5px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;margin-bottom:-2px;border-radius:8px 8px 0 0;}
+.tab-btn:hover{color:var(--chem);background:var(--chem-tint)}
+.tab-btn.active{color:var(--chem);border-bottom-color:var(--chem)}
+
+/* ── Content ── */
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}.unit-section.visible{display:block}
+
+/* ── Unit Banner ── */
+.unit-banner{border-radius:16px;padding:1.4rem 1.8rem;margin-bottom:1.8rem;display:flex;align-items:center;gap:1.2rem;}
+.ub-amber{background:linear-gradient(135deg,var(--chem-tint),var(--chem-tint2));border:2px solid var(--chem-border);}
+.ub-orange{background:linear-gradient(135deg,#eff6ff,#dbeafe);border:2px solid #bfdbfe;}
+.ub-blue{background:linear-gradient(135deg,var(--blue-bg),#dbeafe);border:2px solid var(--blue-border);}
+.ub-green{background:linear-gradient(135deg,var(--green-bg),#dcfce7);border:2px solid var(--green-border);}
+.ub-purple{background:linear-gradient(135deg,var(--purple-bg),#ede9fe);border:2px solid var(--purple-border);}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--chem);margin-bottom:4px}
+.ub-num-o{color:var(--blue)}
+.ub-num-b{color:var(--blue)}
+.ub-num-g{color:var(--green)}
+.ub-num-p{color:var(--purple)}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── Accordion ── */
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{background:var(--white);border:1.5px solid #e5e7eb;border-radius:16px;overflow:hidden;transition:border-color .2s;}
+.acc-item.open{border-color:var(--chem-border);box-shadow:0 4px 20px rgba(37,99,235,.12)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:1.2rem 1.5rem;cursor:pointer;user-select:none;transition:background .15s;}
+.acc-header:hover{background:var(--chem-tint)}
+.acc-num{width:32px;height:32px;border-radius:10px;background:var(--chem-tint2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--chem-dark);flex-shrink:0;}
+.acc-item.open .acc-num{background:var(--chem);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--chem-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px;}
+.acc-item.open .acc-subtitle{color:var(--chem)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--chem)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--chem-tint2)}
+.acc-item.open .acc-body{display:block}
+
+/* ── Section Title ── */
+.sec-title{font-size:12px;font-weight:800;color:var(--chem-dark);letter-spacing:.06em;text-transform:uppercase;margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px;}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--chem);border-radius:2px;display:block;flex-shrink:0;}
+
+/* ── Content Boxes ── */
+.concept-box{background:var(--chem-tint);border:1.5px solid var(--chem-border);border-left:4px solid var(--chem);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.concept-box .cb-title{font-weight:800;color:var(--chem-dark);font-size:14px;margin-bottom:.4rem}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--green);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+.blue-box{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-left:4px solid var(--blue);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.blue-box .cb-title{font-weight:800;color:#1e40af;font-size:14px;margin-bottom:.4rem}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+.teal-box{background:var(--teal-bg);border:1.5px solid var(--teal-border);border-left:4px solid var(--teal);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.teal-box .cb-title{font-weight:800;color:#134e4a;font-size:14px;margin-bottom:.4rem}
+.purple-box{background:var(--purple-bg);border:1.5px solid var(--purple-border);border-left:4px solid var(--purple);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.purple-box .cb-title{font-weight:800;color:#4c1d95;font-size:14px;margin-bottom:.4rem}
+.orange-box{background:var(--indigo-bg);border:1.5px solid var(--indigo-border);border-left:4px solid var(--indigo);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.orange-box .cb-title{font-weight:800;color:#312e81;font-size:14px;margin-bottom:.4rem}
+.amber-box{background:var(--chem-tint);border:1.5px solid var(--chem-border);border-left:4px solid var(--chem);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.amber-box .cb-title{font-weight:800;color:var(--chem-dark);font-size:14px;margin-bottom:.4rem}
+
+/* ── Formula ── */
+.formula-box{background:linear-gradient(135deg,var(--chem-tint),var(--chem-tint2));border:2px solid var(--chem-border);border-radius:14px;padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center;}
+.formula-text{font-size:1.25rem;font-weight:900;color:var(--chem-dark);letter-spacing:-.01em;}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
+.formula-box-blue{background:linear-gradient(135deg,var(--blue-bg),#dbeafe);border:2px solid var(--blue-border);border-radius:14px;padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center;}
+.formula-box-blue .formula-text{color:#1e3a8a}
+
+/* ── Table ── */
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:12px;border:1.5px solid var(--chem-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--chem-tint2);padding:10px 14px;text-align:left;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--chem-dark);}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6}
+tbody tr:hover td{background:var(--chem-tint)}
+
+/* ── Point Cards ── */
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:.8rem 0}
+.point-card{background:var(--white);border:1.5px solid var(--chem-border);border-radius:12px;padding:1rem;text-align:center}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--chem);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ── 산화수 흐름 ── */
+.oxnum-flow{display:flex;align-items:center;gap:8px;padding:1rem 1.2rem;background:var(--chem-tint2);border-radius:12px;margin:.6rem 0;font-size:13.5px;flex-wrap:wrap;}
+.oxnum-box{font-weight:900;color:var(--chem-dark);background:#fff;border:1.5px solid var(--chem-border);border-radius:8px;padding:4px 10px;white-space:nowrap;}
+.oxnum-arrow{color:var(--chem);font-size:18px;font-weight:900}
+.ox-up{color:var(--red);font-weight:800}
+.ox-down{color:var(--blue);font-weight:800}
+
+/* ── 전위표 ── */
+.potential-row{display:grid;grid-template-columns:3fr 1fr;padding:8px 12px;font-size:13px;border-top:1px solid #e5e7eb;align-items:center;gap:8px;}
+.potential-row:hover{background:var(--chem-tint)}
+.potential-head{display:grid;grid-template-columns:3fr 1fr;padding:8px 12px;background:var(--chem-tint2);font-size:11px;font-weight:800;color:var(--chem-dark);letter-spacing:.06em;gap:8px;}
+.pt-val-high{color:var(--red);font-weight:800}
+.pt-val-low{color:var(--blue);font-weight:800}
+.pt-val-zero{color:var(--green);font-weight:800}
+
+/* ── 전지 구조 박스 ── */
+.battery-box{background:var(--white);border:2px solid var(--chem-border);border-radius:14px;padding:1.2rem;margin:.8rem 0;}
+.battery-row{display:flex;align-items:center;gap:12px;padding:.7rem 1rem;margin:.4rem 0;border-radius:10px;}
+.br-neg{background:#eff6ff;border:1px solid #bfdbfe;}
+.br-pos{background:var(--red-bg);border:1px solid var(--red-border);}
+.br-label{font-size:11px;font-weight:900;letter-spacing:.06em;width:50px;flex-shrink:0;}
+.br-neg .br-label{color:var(--blue)}
+.br-pos .br-label{color:var(--red)}
+.br-text{font-size:13px;line-height:1.6;color:var(--text)}
+
+/* ── Flow ── */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0;font-size:13px}
+.flow-box{background:var(--white);border:1.5px solid var(--chem-border);border-radius:8px;padding:7px 12px;font-weight:700;color:var(--chem-dark);text-align:center;font-size:12px;line-height:1.4;}
+.flow-arrow{color:var(--chem);font-size:18px;font-weight:900}
+
+/* ── 하이라이트 ── */
+.hp{color:var(--chem-dark);font-weight:800}
+.hb{color:var(--blue);font-weight:800}
+.ha{color:var(--chem);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.ht{color:var(--teal);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.hpu{color:var(--purple);font-weight:800}
+.ho{color:var(--indigo);font-weight:800}
+
+/* ── Quiz ── */
+.quiz-wrap{background:linear-gradient(135deg,var(--chem-tint2),var(--chem-tint));border:1.5px solid var(--chem-border);border-radius:14px;padding:1.2rem 1.4rem;margin-top:1.6rem;}
+.quiz-label{font-size:11px;font-weight:800;color:var(--chem-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{background:var(--chem);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;}
+.quiz-toggle:hover{background:var(--chem-dark)}
+.quiz-ans{display:none;margin-top:.8rem;padding:.9rem 1rem;background:rgba(255,255,255,.85);border-radius:10px;font-size:13.5px;color:var(--text);line-height:1.75;}
+body p{line-height:1.75;font-size:13.5px;margin:.4rem 0}
+
+/* ── 반응형 ── */
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.5rem}
+  .tabs-inner{justify-content:flex-start;gap:0}
+  .tab-btn{padding:10px 8px;font-size:11.5px}
+  .content-wrap{padding:1.2rem .9rem 4rem}
+  .unit-banner{flex-direction:column;gap:.8rem;padding:1.2rem}
+  .acc-header{padding:1rem}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .hero-stats{gap:8px}
+  .hero-stat-card{min-width:70px;padding:.8rem 1rem}
+  .hs-num{font-size:1.5rem}
+  .formula-text{font-size:1rem}
+  .potential-head,.potential-row{grid-template-columns:2fr 1fr}
+}
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .header-badge .dot-green{display:none}
+  .point-box{grid-template-columns:1fr}
+  .tab-btn{padding:9px 7px;font-size:11px}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"
+          stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-green"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="science-inquiry-performance.html" class="bc-item">탐구활동 보고서</a><span class="bc-sep">›</span>
+      <a href="chemistry1-summary.html" class="bc-item">화학 1 핵심 정리</a><span class="bc-sep">›</span>
+      <span class="bc-current">⚡ Ⅱ. 산화·환원 반응</span>
+    </div>
+    <div class="hero-eyebrow">⚡ PART 02 · 화학 반응의 세계 · UNIT 02</div>
+    <div class="hero-title">Ⅱ. 산화·환원 반응<br>완벽 상세 학습 가이드</div>
+    <div class="hero-desc">산화수와 산화·환원 반응, 화학 전지와 볼타·다니엘 전지,<br>표준 환원 전위와 전지 전위, 전기 분해와 도금, 연료 전지까지 동아출판 교과서 기반으로 완벽하게 학습합니다</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">5</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">20+</div><div class="hs-lbl">핵심 개념</div></div>
+      <div class="hero-stat-card"><div class="hs-num">15</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tabs ── -->
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">⚡ 소단원1 · 산화·환원 반응</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">🔋 소단원2 · 화학 전지</button>
+    <button class="tab-btn" onclick="showUnit(3,this)">📊 소단원3 · 표준 환원 전위</button>
+    <button class="tab-btn" onclick="showUnit(4,this)">⚙️ 소단원4 · 전기 분해</button>
+    <button class="tab-btn" onclick="showUnit(5,this)">🌿 소단원5 · 우리 주변의 산화·환원</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ══════════════════════════════════════════════
+     소단원 1: 산화·환원 반응
+══════════════════════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner ub-amber">
+    <div class="ub-emoji">⚡</div>
+    <div>
+      <div class="ub-num">소단원 01 · Oxidation–Reduction Reaction</div>
+      <div class="ub-title">산화·환원 반응</div>
+      <div class="ub-desc">전자의 이동과 산화수 개념, 산화수 변화로 산화·환원 판단, 산화제·환원제 구분, 반쪽 반응식을 이용한 산화·환원 반응식 완성법을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 산화·환원 기본 개념 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Oxidation &amp; Reduction · 전자 이동</div>
+          <div class="acc-htitle">산화·환원 반응과 전자의 이동</div>
+          <div class="acc-hdesc">산화 = 전자 잃음 · 환원 = 전자 얻음 · 산화와 환원은 항상 동시에 발생</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">산화·환원의 정의</div>
+        <div class="concept-box">
+          <div class="cb-title">⚡ 산화·환원이란?</div>
+          반응물 사이에 <strong>전자를 주고받는 반응</strong>을 산화·환원 반응이라고 합니다.<br><br>
+          • <span class="hr">산화 (Oxidation)</span>: 전자를 <strong>잃는</strong> 것 → 산화수 <strong>증가</strong><br>
+          • <span class="hb">환원 (Reduction)</span>: 전자를 <strong>얻는</strong> 것 → 산화수 <strong>감소</strong><br><br>
+          <strong>핵심 원칙:</strong> 산화와 환원은 <span class="hp">항상 동시에</span> 일어납니다. (전자를 잃는 반응이 있으면 전자를 얻는 반응도 반드시 존재)
+        </div>
+
+        <div class="sec-title">Mg 연소 반응 예시</div>
+        <div class="orange-box">
+          <div class="cb-title">🔥 2Mg(s) + O₂(g) → 2MgO(s)</div>
+          • Mg: 전자 <strong>2개를 잃음</strong> → Mg²⁺로 산화됨 → <span class="hr">산화</span><br>
+          • O₂: 전자 <strong>2개를 얻음</strong> → O²⁻로 환원됨 → <span class="hb">환원</span><br><br>
+          이온 결합 물질에서는 전자의 이동이 명확하게 드러납니다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">다음 반응에서 산화된 물질과 환원된 물질을 전자의 이동으로 각각 설명해 보자.<br>
+          Zn(s) + CuSO₄(aq) → ZnSO₄(aq) + Cu(s)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            <span class="hr">산화된 물질: Zn</span><br>
+            Zn → Zn²⁺ + 2e⁻ : 아연이 전자 2개를 잃고 아연 이온으로 산화됨<br><br>
+            <span class="hb">환원된 물질: Cu²⁺ (CuSO₄ 속 구리 이온)</span><br>
+            Cu²⁺ + 2e⁻ → Cu : 구리 이온이 전자 2개를 얻어 구리로 환원됨
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 산화수 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Oxidation Number · 산화수 규칙 7가지</div>
+          <div class="acc-htitle">산화수의 정의와 결정 규칙</div>
+          <div class="acc-hdesc">전기음성도 큰 원자가 공유 전자쌍 독점 가정 · 7가지 규칙 · 화합물 합=0</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">산화수(Oxidation Number)란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🔢 산화수의 정의</div>
+          화합물을 구성하는 원자 중 <strong>전기음성도가 큰 원자가 공유 전자쌍을 모두 가진다고 가정할 때</strong> 각 원자가 가지는 전하입니다.<br><br>
+          → 공유 결합 물질에서도 산화·환원을 명확히 설명할 수 있게 해 주는 개념
+        </div>
+
+        <div class="sec-title">산화수 결정 규칙 7가지</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>규칙</th><th>내용</th><th>예시</th></tr></thead>
+          <tbody>
+            <tr><td><strong>규칙 1</strong></td><td>원소(단체)를 구성하는 원자의 산화수 = <span class="hg">0</span></td><td>H₂, O₂, Cu, Zn → 각 원자 산화수 0</td></tr>
+            <tr><td><strong>규칙 2</strong></td><td>단원자 이온의 산화수 = 이온의 전하</td><td>Na⁺: +1, Mg²⁺: +2, Cl⁻: −1</td></tr>
+            <tr><td><strong>규칙 3</strong></td><td>화합물에서 F의 산화수 = <span class="hr">−1</span> (항상)</td><td>HF: F = −1</td></tr>
+            <tr><td><strong>규칙 4</strong></td><td>화합물에서 H의 산화수 = <span class="hb">+1</span> (금속 수소화물 제외: −1)</td><td>HCl: H = +1, NaH: H = −1</td></tr>
+            <tr><td><strong>규칙 5</strong></td><td>화합물에서 O의 산화수 = <span class="hr">−2</span> (과산화물 제외: −1)</td><td>H₂O: O = −2, H₂O₂: O = −1</td></tr>
+            <tr><td><strong>규칙 6</strong></td><td>화합물 구성 원자의 산화수 합 = <span class="hg">0</span></td><td>CO₂: (+4)×1 + (−2)×2 = 0</td></tr>
+            <tr><td><strong>규칙 7</strong></td><td>다원자 이온 원자들의 산화수 합 = 이온의 전하</td><td>SO₄²⁻: (+6) + (−2)×4 = −2</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">산화수 계산 예제</div>
+        <div class="blue-box">
+          <div class="cb-title">🧮 HNO₃에서 N의 산화수</div>
+          H = +1, O = −2 (규칙 4, 5)<br>
+          화합물 전체 합 = 0 (규칙 6)<br>
+          (+1) + N + (−2)×3 = 0<br>
+          N − 5 = −1 → N = +5 → N의 산화수: <strong>+5</strong>
+        </div>
+        <div class="blue-box">
+          <div class="cb-title">🧮 CH₄에서 C의 산화수</div>
+          H = +1 (규칙 4)<br>
+          C + (+1)×4 = 0 → C = <strong>−4</strong><br>
+          (탄소가 수소보다 전기음성도 크므로 공유 전자쌍을 모두 가짐)
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">다음 물질에서 각 원자 또는 이온의 산화수를 구해 보자.<br>
+          (1) Ag &nbsp;&nbsp; (2) Ca²⁺ &nbsp;&nbsp; (3) HNO₃ &nbsp;&nbsp; (4) MnO₄⁻</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            (1) <strong>Ag: 0</strong> — 원소(단체)이므로 산화수 = 0<br><br>
+            (2) <strong>Ca²⁺: +2</strong> — 단원자 이온의 산화수 = 이온의 전하<br><br>
+            (3) <strong>N: +5</strong> — H = +1, O = −2이므로 (+1) + N + (−2)×3 = 0 → N = +5<br><br>
+            (4) <strong>Mn: +7</strong> — O = −2, 이온 전하 = −1<br>
+            Mn + (−2)×4 = −1 → Mn = −1 + 8 = +7
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03: 산화제·환원제·반쪽 반응식 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Oxidizing/Reducing Agent · Half-Reaction</div>
+          <div class="acc-htitle">산화제·환원제와 반쪽 반응식</div>
+          <div class="acc-hdesc">산화제=자신은 환원 · 환원제=자신은 산화 · 반쪽 반응식 4단계 완성법</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">산화제와 환원제</div>
+        <div class="concept-box">
+          <div class="cb-title">⚗️ 산화제 vs 환원제</div>
+          <span class="hr">산화제 (Oxidizing Agent)</span>: 자신은 <strong>환원</strong>되면서 다른 물질을 <strong>산화</strong>시키는 물질<br>
+          &nbsp;&nbsp;→ 산화수가 감소하는 원자를 포함<br><br>
+          <span class="hb">환원제 (Reducing Agent)</span>: 자신은 <strong>산화</strong>되면서 다른 물질을 <strong>환원</strong>시키는 물질<br>
+          &nbsp;&nbsp;→ 산화수가 증가하는 원자를 포함
+        </div>
+
+        <div class="sec-title">Fe₂O₃ + CO 반응에서 산화제·환원제</div>
+        <div class="orange-box">
+          <div class="cb-title">🏭 Fe₂O₃(s) + 3CO(g) → 2Fe(s) + 3CO₂(g)</div>
+          Fe의 산화수: <strong>+3 → 0</strong> (감소) → Fe₂O₃ = <span class="hr">산화제</span><br>
+          C의 산화수: <strong>+2 → +4</strong> (증가) → CO = <span class="hb">환원제</span><br><br>
+          ※ 같은 물질(SO₂ 등)도 반응에 따라 산화제/환원제 모두로 작용 가능
+        </div>
+
+        <div class="sec-title">반쪽 반응식 4단계 완성법</div>
+        <div class="green-box">
+          <div class="cb-title">📋 반쪽 반응식 완성 4단계</div>
+          <strong>1단계:</strong> 산화 반응식과 환원 반응식으로 분리<br>
+          <strong>2단계:</strong> 각 반쪽 반응식에서 반응 전후 원자 수 맞추기<br>
+          <strong>3단계:</strong> 각 반쪽 반응식에서 잃거나 얻은 전자 수 표기<br>
+          <strong>4단계:</strong> 산화에서 잃은 전자 수 = 환원에서 얻은 전자 수가 되도록 계수 맞추고, 두 식 더하기
+        </div>
+
+        <div class="sec-title">KI + Cl₂ → KCl + I₂ 반응식 완성 예제</div>
+        <div class="teal-box">
+          <div class="cb-title">🔬 반쪽 반응식 완성 과정</div>
+          <strong>산화 반응식:</strong> 2I⁻(aq) → I₂(s) + 2e⁻ &nbsp; (I: −1 → 0, 산화수 증가)<br>
+          <strong>환원 반응식:</strong> Cl₂(g) + 2e⁻ → 2Cl⁻(aq) &nbsp; (Cl: 0 → −1, 산화수 감소)<br><br>
+          두 식의 전자 수가 같으므로 그대로 더하면:<br>
+          <strong>전체: 2KI(aq) + Cl₂(g) → 2KCl(aq) + I₂(s)</strong>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">다음 산화·환원 반응에서 산화제와 환원제로 작용한 물질을 찾아보자.<br>
+          2Fe₂O₃(s) + 3C(s) → 4Fe(s) + 3CO₂(g)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            Fe의 산화수: +3 → 0 (감소) → Fe₂O₃이 환원됨 → <span class="hr">Fe₂O₃ = 산화제</span><br>
+            C의 산화수: 0 → +4 (증가) → C가 산화됨 → <span class="hb">C = 환원제</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ══════════════════════════════════════
+     소단원 2: 화학 전지
+══════════════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner ub-orange">
+    <div class="ub-emoji">🔋</div>
+    <div>
+      <div class="ub-num ub-num-o">소단원 02 · Chemical Cells & Batteries</div>
+      <div class="ub-title">화학 전지</div>
+      <div class="ub-desc">화학 에너지를 전기 에너지로 전환하는 화학 전지의 원리, 볼타 전지와 다니엘 전지, 일차 전지와 이차 전지, 다양한 실용 전지의 특징을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 화학 전지 기본 원리 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Chemical Cell Principle · 볼타·다니엘</div>
+          <div class="acc-htitle">화학 전지의 원리 — 볼타 전지와 다니엘 전지</div>
+          <div class="acc-hdesc">화학 에너지 → 전기 에너지 · (−)극=산화·전자 방출 · (+)극=환원·전자 수용</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">화학 전지의 정의</div>
+        <div class="concept-box">
+          <div class="cb-title">🔋 화학 전지 (Chemical Cell)</div>
+          <span class="hp">화학 전지</span>: 산화·환원 반응을 이용하여 <strong>화학 에너지를 전기 에너지로 전환</strong>하는 장치<br><br>
+          구성 요소 3가지:<br>
+          ① <span class="hr">(−)극 — 산화 전극</span>: 전자를 잃는 산화 반응 발생<br>
+          ② <span class="hb">(+)극 — 환원 전극</span>: 전자를 얻는 환원 반응 발생<br>
+          ③ <span class="hp">전해질</span>: 이온이 이동할 수 있는 용액 (전기 회로 완성)
+        </div>
+
+        <div class="sec-title">볼타 전지 (Voltaic Cell)</div>
+        <div class="battery-box">
+          <div style="font-size:12px;font-weight:800;color:var(--chem-dark);margin-bottom:8px;">⚡ 볼타 전지 구조 — Zn판 + Cu판 + H₂SO₄(aq)</div>
+          <div class="battery-row br-neg">
+            <div class="br-label">(−)극</div>
+            <div class="br-text"><strong>Zn판 (아연)</strong>: Zn(s) → Zn²⁺(aq) + 2e⁻ &nbsp; <span class="hr">산화</span><br>
+            아연이 전자를 잃고 이온화 → 전자가 도선을 통해 (+)극으로 이동</div>
+          </div>
+          <div class="battery-row br-pos">
+            <div class="br-label">(+)극</div>
+            <div class="br-text"><strong>Cu판 (구리)</strong>: 2H⁺(aq) + 2e⁻ → H₂(g) &nbsp; <span class="hb">환원</span><br>
+            수소 이온이 전자를 받아 H₂ 기체 발생</div>
+          </div>
+        </div>
+        <div class="red-box">
+          <div class="cb-title">⚠️ 볼타 전지의 단점 — 분극 현상</div>
+          <span class="hr">분극 (Polarization)</span>: (+)극(구리판)에서 발생한 H₂ 기체가 전극 표면을 덮어 환원 반응을 방해 → 전압 저하<br><br>
+          → 이 문제를 해결한 것이 <strong>다니엘 전지</strong>
+        </div>
+
+        <div class="sec-title">다니엘 전지 (Daniell Cell)</div>
+        <div class="battery-box">
+          <div style="font-size:12px;font-weight:800;color:var(--chem-dark);margin-bottom:8px;">🔋 다니엘 전지 구조 — Zn|ZnSO₄(aq) ∥ CuSO₄(aq)|Cu</div>
+          <div class="battery-row br-neg">
+            <div class="br-label">(−)극</div>
+            <div class="br-text"><strong>Zn판</strong>: Zn(s) → Zn²⁺(aq) + 2e⁻ &nbsp; <span class="hr">산화</span><br>
+            아연판 질량 감소, ZnSO₄(aq)에 담금</div>
+          </div>
+          <div class="battery-row br-pos">
+            <div class="br-label">(+)극</div>
+            <div class="br-text"><strong>Cu판</strong>: Cu²⁺(aq) + 2e⁻ → Cu(s) &nbsp; <span class="hb">환원</span><br>
+            구리판 질량 증가, CuSO₄(aq)에 담금</div>
+          </div>
+          <div style="margin-top:8px;padding:.7rem 1rem;background:var(--chem-tint);border-radius:8px;font-size:13px;">
+            <strong>전체 반응:</strong> Zn(s) + Cu²⁺(aq) → Zn²⁺(aq) + Cu(s)<br>
+            <strong>염다리 역할:</strong> 두 수용액 연결, 이온 이동으로 전하 균형 유지 (음이온→(−)극, 양이온→(+)극)
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">다니엘 전지에서 전류가 흐를 때 아연판과 구리판의 질량은 각각 어떻게 변하는지 설명해 보자.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            <strong>아연판 (−)극:</strong> Zn → Zn²⁺ + 2e⁻ 산화 반응 → 아연 원자가 이온으로 용해 → <span class="hr">아연판 질량 감소</span><br><br>
+            <strong>구리판 (+)극:</strong> Cu²⁺ + 2e⁻ → Cu 환원 반응 → 구리 이온이 금속으로 석출 → <span class="hb">구리판 질량 증가</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 실용 전지 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Primary &amp; Secondary Batteries · 실용 전지</div>
+          <div class="acc-htitle">실용 전지 — 일차 전지와 이차 전지</div>
+          <div class="acc-hdesc">일차 전지(건전지) = 재충전 불가 · 이차 전지(리튬 이온) = 충전 가능</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">실용 전지의 분류</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>충전 여부</th><th>종류</th><th>특징</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hr">일차 전지</span></td>
+              <td>불가 (1회용)</td>
+              <td>망가니즈 건전지, 알칼리 건전지, 단추형 전지</td>
+              <td>구조 간단, 휴대 편리, 수명 한정</td>
+            </tr>
+            <tr>
+              <td><span class="hb">이차 전지</span></td>
+              <td>가능 (충전 재사용)</td>
+              <td>납축전지, 리튬 이온 전지, 니켈·카드뮴 전지</td>
+              <td>반복 사용 가능, 경제적</td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">주요 실용 전지 특징 비교</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🔦</div>
+            <div class="pc-title">망가니즈 건전지</div>
+            <div class="pc-desc">전해질: NH₄Cl (반죽형)<br>MnO₂ + 흑연 가루<br>아연통 부식 단점<br>일차 전지</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🔋</div>
+            <div class="pc-title">알칼리 건전지</div>
+            <div class="pc-desc">전해질: KOH (염기성)<br>아연과 반응 없음<br>망가니즈보다 수명 길다<br>일차 전지</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🚗</div>
+            <div class="pc-title">납축전지</div>
+            <div class="pc-desc">Pb판 + PbO₂판 + H₂SO₄<br>직렬 연결 → 고전압<br>충전 가능, 무거움<br>자동차용 이차 전지</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">📱</div>
+            <div class="pc-title">리튬 이온 전지</div>
+            <div class="pc-desc">Li⁺이 양극재↔음극재 이동<br>가볍고 에너지 밀도 높음<br>충전 가능, 수명 길다<br>스마트폰·전기차용</div>
+          </div>
+        </div>
+
+        <div class="green-box">
+          <div class="cb-title">💡 실용 전지의 구조적 공통점</div>
+          ① <strong>산화 전극과 환원 전극이 분리</strong>되어 있다<br>
+          ② 두 전극 사이에 <strong>전해질</strong>이 존재한다<br>
+          ③ 전자는 도선을 통해 (−)극 → (+)극으로 이동한다
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">볼타 전지에서 일어나는 산화 반응과 환원 반응을 반쪽 반응식으로 나타내 보자.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            볼타 전지: Zn판 + Cu판 + H₂SO₄(aq)<br><br>
+            <strong>산화 반응 [(−)극]:</strong> Zn(s) → Zn²⁺(aq) + 2e⁻<br>
+            <strong>환원 반응 [(+)극]:</strong> 2H⁺(aq) + 2e⁻ → H₂(g)<br><br>
+            <strong>전체 반응:</strong> Zn(s) + 2H⁺(aq) → Zn²⁺(aq) + H₂(g)
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+<!-- ══════════════════════════════════════
+     소단원 3: 표준 환원 전위
+══════════════════════════════════════ -->
+<div id="unit3" class="unit-section">
+  <div class="unit-banner ub-blue">
+    <div class="ub-emoji">📊</div>
+    <div>
+      <div class="ub-num ub-num-b">소단원 03 · Standard Reduction Potential</div>
+      <div class="ub-title">표준 환원 전위</div>
+      <div class="ub-desc">반쪽 전지의 표준 환원 전위(E°) 개념, 표준 수소 전극 기준, 표준 전지 전위 계산법(E°전지 = E°환원 − E°산화)을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 표준 환원 전위 개념 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Standard Reduction Potential · E° 개념</div>
+          <div class="acc-htitle">표준 환원 전위와 표준 수소 전극</div>
+          <div class="acc-hdesc">E° 크면 환원 잘 됨 · 표준 수소 전극 E° = 0.00 V · 기준으로 측정</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">표준 환원 전위(E°)란?</div>
+        <div class="concept-box">
+          <div class="cb-title">📊 표준 환원 전위 (Standard Reduction Potential, E°)</div>
+          서로 다른 반쪽 전지를 연결할 때 <strong>산화·환원 반응의 경향성</strong>을 비교하는 척도입니다.<br><br>
+          • <span class="hr">E° 클수록</span>: 환원되기 쉬움 → (+)극(환원 전극)이 됨<br>
+          • <span class="hb">E° 작을수록</span>: 산화되기 쉬움 → (−)극(산화 전극)이 됨<br><br>
+          <strong>측정 기준 — 표준 수소 전극:</strong><br>
+          25℃, H⁺ 농도 1 M, H₂ 기체 압력 1 atm, 백금(Pt) 전극 → E° = <span class="hg">0.00 V</span>
+        </div>
+
+        <div class="sec-title">Cu 반쪽 전지와 Zn 반쪽 전지 측정</div>
+        <div class="blue-box">
+          <div class="cb-title">🔬 표준 수소 전극과 Cu 반쪽 전지 연결 (전위차 = 0.34 V)</div>
+          표준 수소 전극에서 산화 (H₂→2H⁺+2e⁻): E° = 0.00 V<br>
+          구리 반쪽 전지에서 환원 (Cu²⁺+2e⁻→Cu): E° = ?<br><br>
+          측정 전위차 = 0.34 V → Cu 반쪽 전지 E° = <strong>+0.34 V</strong>
+        </div>
+        <div class="blue-box">
+          <div class="cb-title">🔬 표준 수소 전극과 Zn 반쪽 전지 연결 (전위차 = 0.76 V)</div>
+          아연 반쪽 전지에서 산화 (Zn→Zn²⁺+2e⁻): E° = ?<br>
+          표준 수소 전극에서 환원 (2H⁺+2e⁻→H₂): E° = 0.00 V<br><br>
+          측정 전위차 = 0.76 V → Zn 반쪽 전지 E° = <strong>−0.76 V</strong>
+        </div>
+
+        <div class="sec-title">주요 반쪽 반응의 표준 환원 전위 (25℃)</div>
+        <div class="table-wrap">
+          <div class="potential-head">
+            <div>반쪽 반응</div>
+            <div>E° (V)</div>
+          </div>
+          <div class="potential-row"><div>F₂(g) + 2e⁻ → 2F⁻(aq)</div><div class="pt-val-high">+2.87</div></div>
+          <div class="potential-row"><div>Cl₂(g) + 2e⁻ → 2Cl⁻(aq)</div><div class="pt-val-high">+1.36</div></div>
+          <div class="potential-row"><div>O₂(g) + 4H⁺(aq) + 4e⁻ → 2H₂O(l)</div><div class="pt-val-high">+1.23</div></div>
+          <div class="potential-row"><div>Ag⁺(aq) + e⁻ → Ag(s)</div><div class="pt-val-high">+0.80</div></div>
+          <div class="potential-row"><div>Cu²⁺(aq) + 2e⁻ → Cu(s)</div><div class="pt-val-high">+0.34</div></div>
+          <div class="potential-row"><div>2H⁺(aq) + 2e⁻ → H₂(g)</div><div class="pt-val-zero">0.00</div></div>
+          <div class="potential-row"><div>Pb²⁺(aq) + 2e⁻ → Pb(s)</div><div class="pt-val-low">−0.13</div></div>
+          <div class="potential-row"><div>Ni²⁺(aq) + 2e⁻ → Ni(s)</div><div class="pt-val-low">−0.26</div></div>
+          <div class="potential-row"><div>Fe²⁺(aq) + 2e⁻ → Fe(s)</div><div class="pt-val-low">−0.45</div></div>
+          <div class="potential-row"><div>Zn²⁺(aq) + 2e⁻ → Zn(s)</div><div class="pt-val-low">−0.76</div></div>
+          <div class="potential-row"><div>Al³⁺(aq) + 3e⁻ → Al(s)</div><div class="pt-val-low">−1.68</div></div>
+          <div class="potential-row"><div>Li⁺(aq) + e⁻ → Li(s)</div><div class="pt-val-low">−3.04</div></div>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:4px;">↑ E° 클수록 환원 잘 됨 (위쪽) &nbsp;·&nbsp; E° 작을수록 산화 잘 됨 (아래쪽)</p>
+      </div>
+    </div>
+
+    <!-- 02: 표준 전지 전위 계산 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Cell Potential · 전지 전위 계산</div>
+          <div class="acc-htitle">표준 전지 전위 계산</div>
+          <div class="acc-hdesc">E°전지 = E°환원 전극 − E°산화 전극 · 전지 표기법 · 전압 높이려면 E° 차이 크게</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">표준 전지 전위 계산 공식</div>
+        <div class="formula-box-blue">
+          <div class="formula-text">E°전지 = E°환원 전극 − E°산화 전극</div>
+          <div class="formula-sub">환원 전극 = (+)극 &nbsp;&nbsp;&nbsp; 산화 전극 = (−)극</div>
+        </div>
+
+        <div class="sec-title">다니엘 전지 표준 전지 전위 계산</div>
+        <div class="teal-box">
+          <div class="cb-title">🧮 Zn | Zn²⁺(aq) ∥ Cu²⁺(aq) | Cu 전지</div>
+          환원 전극 (+)극: Cu²⁺ + 2e⁻ → Cu &nbsp; E° = +0.34 V<br>
+          산화 전극 (−)극: Zn → Zn²⁺ + 2e⁻ &nbsp; E° = −0.76 V<br><br>
+          <strong>E°전지 = 0.34 − (−0.76) = 0.34 + 0.76 = 1.10 V</strong>
+        </div>
+
+        <div class="sec-title">전지 표기법</div>
+        <div class="concept-box">
+          <div class="cb-title">📝 전지 표기 규칙</div>
+          <strong>왼쪽</strong>: 산화 전극 구성 물질 &nbsp;&nbsp; | : 서로 다른 상 경계<br>
+          <strong>오른쪽</strong>: 환원 전극 구성 물질 &nbsp;&nbsp; ∥: 염다리<br><br>
+          예) 다니엘 전지: <strong>Zn(s) | Zn²⁺(aq) ∥ Cu²⁺(aq) | Cu(s)</strong>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">산화 전극에서 Ni(s)→Ni²⁺(aq)+2e⁻, 환원 전극에서 Cu²⁺(aq)+2e⁻→Cu(s) 반응이 일어나는 전지의 표준 전지 전위를 구해 보자.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: E°전지 = 0.60 V</strong><br><br>
+            E°(Cu²⁺/Cu) = +0.34 V (환원 전극)<br>
+            E°(Ni²⁺/Ni) = −0.26 V (산화 전극)<br><br>
+            E°전지 = E°환원 − E°산화 = 0.34 − (−0.26) = <strong>0.60 V</strong>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 7</div>
+          <div class="quiz-q">다니엘 전지에서 구리 반쪽 전지(Cu|CuSO₄(aq)) 대신 사용했을 때 표준 전지 전위를 높일 수 있는 반쪽 전지를 표에서 모두 찾아보자.<br>
+          (가) Fe(s)|FeSO₄(aq) &nbsp; (나) Ag(s)|Ag₂SO₄(aq) &nbsp; (다) Ni(s)|NiSO₄(aq)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: (나) Ag 반쪽 전지</strong><br><br>
+            기존 다니엘 전지 E° = 1.10 V (Zn|Cu 조합)<br><br>
+            Zn|Ag 조합: E° = 0.80 − (−0.76) = <strong>1.56 V</strong> ↑ 더 높음 ✅<br>
+            Zn|Fe 조합: E° = −0.45 − (−0.76) = 0.31 V ↓ 더 낮음 ❌<br>
+            Zn|Ni 조합: E° = −0.26 − (−0.76) = 0.50 V ↓ 더 낮음 ❌
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit3 -->
+
+<!-- ══════════════════════════════════════
+     소단원 4: 전기 분해
+══════════════════════════════════════ -->
+<div id="unit4" class="unit-section">
+  <div class="unit-banner ub-green">
+    <div class="ub-emoji">⚙️</div>
+    <div>
+      <div class="ub-num ub-num-g">소단원 04 · Electrolysis</div>
+      <div class="ub-title">전기 분해</div>
+      <div class="ub-desc">전기 에너지로 비자발적 산화·환원 반응을 일으키는 전기 분해의 원리, 용융액과 수용액의 전기 분해, 도금 원리와 산업적 활용을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 전기 분해 원리 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Electrolysis Principle · 전기 분해 원리</div>
+          <div class="acc-htitle">전기 분해의 원리 — 용융액과 수용액</div>
+          <div class="acc-hdesc">(+)극=산화 전극 · (−)극=환원 전극 · 비자발적 산화·환원 반응 유도</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">전기 분해(Electrolysis)란?</div>
+        <div class="concept-box">
+          <div class="cb-title">⚡ 전기 분해</div>
+          물질에 <strong>전기 에너지를 가하여 비자발적인 산화·환원 반응을 일으키는 것</strong><br><br>
+          화학 전지와 반대 방향:<br>
+          • 화학 전지: 화학 에너지 → 전기 에너지 (자발적 반응)<br>
+          • 전기 분해: 전기 에너지 → 화학 에너지 (비자발적 반응)<br><br>
+          <strong>전기 분해 장치에서 극의 역할:</strong><br>
+          <span class="hr">(+)극 = 산화 전극</span>: 음이온·물이 전자 잃음 → 산화<br>
+          <span class="hb">(−)극 = 환원 전극</span>: 양이온·물이 전자 얻음 → 환원
+        </div>
+
+        <div class="sec-title">NaCl 용융액의 전기 분해</div>
+        <div class="battery-box">
+          <div style="font-size:12px;font-weight:800;color:var(--chem-dark);margin-bottom:8px;">🧪 NaCl(l) 전기 분해 (다운스 전지)</div>
+          <div class="battery-row br-pos">
+            <div class="br-label">(+)극</div>
+            <div class="br-text">2Cl⁻(l) → Cl₂(g) + 2e⁻ &nbsp; <span class="hr">산화</span><br>염화 이온이 전자를 잃어 Cl₂ 기체 발생</div>
+          </div>
+          <div class="battery-row br-neg">
+            <div class="br-label">(−)극</div>
+            <div class="br-text">2Na⁺(l) + 2e⁻ → 2Na(l) &nbsp; <span class="hb">환원</span><br>나트륨 이온이 전자를 얻어 나트륨 금속 생성</div>
+          </div>
+          <div style="margin-top:8px;padding:.7rem 1rem;background:var(--chem-tint);border-radius:8px;font-size:13px;">
+            <strong>전체:</strong> 2Na⁺(l) + 2Cl⁻(l) → 2Na(l) + Cl₂(g)
+          </div>
+        </div>
+
+        <div class="sec-title">CuSO₄ 수용액의 전기 분해</div>
+        <div class="blue-box">
+          <div class="cb-title">🔵 수용액 전기 분해 — 이온과 H₂O 모두 참여 가능</div>
+          수용액 전기 분해 시 전해질의 이온과 H₂O 중 <strong>더 쉽게 산화·환원되는 물질이 반응</strong>합니다.<br><br>
+          <strong>(+)극:</strong> 2H₂O(l) → O₂(g) + 4H⁺(aq) + 4e⁻ &nbsp; (H₂O 산화, SO₄²⁻보다 쉽게 산화)<br>
+          <strong>(−)극:</strong> 2Cu²⁺(aq) + 4e⁻ → 2Cu(s) &nbsp; (Cu²⁺ 환원, H₂O보다 쉽게 환원)<br><br>
+          <strong>전체:</strong> 2Cu²⁺(aq) + 2H₂O(l) → 2Cu(s) + O₂(g) + 4H⁺(aq)
+        </div>
+
+        <div class="sec-title">물의 전기 분해</div>
+        <div class="teal-box">
+          <div class="cb-title">💧 2H₂O(l) → 2H₂(g) + O₂(g)</div>
+          순수한 물은 전류 흐름 없음 → <strong>소량의 KNO₃ 등 전해질 첨가</strong>하여 전기 분해<br><br>
+          <strong>(+)극(산화):</strong> 2H₂O(l) → O₂(g) + 4H⁺(aq) + 4e⁻<br>
+          <strong>(−)극(환원):</strong> 4H₂O(l) + 4e⁻ → 2H₂(g) + 4OH⁻(aq)<br><br>
+          → H₂와 O₂가 <span class="ht">2:1 부피비</span>로 발생
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 8</div>
+          <div class="quiz-q">물에 황산 나트륨(Na₂SO₄)을 녹여 전기 분해했을 때 (+)극과 (−)극에서 각각 생성되는 물질은 무엇인가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            Na₂SO₄ 수용액에서 Na⁺, SO₄²⁻, H₂O 존재<br><br>
+            <strong>(+)극:</strong> SO₄²⁻보다 H₂O가 산화되기 쉬움<br>
+            2H₂O → O₂(g) + 4H⁺ + 4e⁻ → <span class="hr">O₂ 기체 발생</span><br><br>
+            <strong>(−)극:</strong> Na⁺보다 H₂O가 환원되기 쉬움<br>
+            4H₂O + 4e⁻ → 2H₂(g) + 4OH⁻ → <span class="hb">H₂ 기체 발생</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 전기 분해 활용 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Electroplating &amp; Refining · 도금과 정제</div>
+          <div class="acc-htitle">전기 분해의 활용 — 도금과 구리 정제</div>
+          <div class="acc-hdesc">도금: 물체=(−)극, 도금 금속=(+)극 · 구리 정제: 불순물 포함 구리=(+)극</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">금속 도금 (Electroplating)</div>
+        <div class="concept-box">
+          <div class="cb-title">✨ 도금이란?</div>
+          물체 표면에 금속을 얇게 입히는 것. 부식 방지, 심미적 가치 향상에 활용<br><br>
+          <strong>도금 설치 방법:</strong><br>
+          • 도금할 <span class="hb">물체 → (−)극 연결</span> (금속이 환원되어 석출)<br>
+          • 도금시킬 <span class="hr">금속판 → (+)극 연결</span> (금속이 산화되어 이온 공급)
+        </div>
+        <div class="battery-box">
+          <div style="font-size:12px;font-weight:800;color:var(--chem-dark);margin-bottom:8px;">🥈 은도금 예시 — K[Ag(CN)₂](aq) 용액</div>
+          <div class="battery-row br-pos">
+            <div class="br-label">(+)극</div>
+            <div class="br-text">Ag(s) → Ag⁺(aq) + e⁻ &nbsp; <span class="hr">산화</span><br>은판에서 은이 이온으로 용해</div>
+          </div>
+          <div class="battery-row br-neg">
+            <div class="br-label">(−)극</div>
+            <div class="br-text">Ag⁺(aq) + e⁻ → Ag(s) &nbsp; <span class="hb">환원</span><br>은 이온이 환원되어 물체 표면에 석출</div>
+          </div>
+        </div>
+
+        <div class="sec-title">구리 정제 (Copper Refining)</div>
+        <div class="orange-box">
+          <div class="cb-title">🏭 전기 분해로 구리 정제</div>
+          불순물(Zn, Fe, Ni 등)을 포함한 구리에서 순수한 구리를 분리<br><br>
+          <strong>설치:</strong><br>
+          • <span class="hr">불순물 포함 구리 → (+)극</span><br>
+          • <span class="hb">순수한 구리 → (−)극</span><br>
+          • CuSO₄(aq) 전해질<br><br>
+          <strong>원리:</strong> (+)극에서 불순물과 Cu 모두 산화되어 이온화되지만,<br>
+          (−)극에서는 표준 환원 전위가 <strong>큰 Cu²⁺만 환원</strong>되어 석출<br>
+          Zn, Fe, Ni → Cu보다 E° 작음 → 이온 상태 유지 → 제거됨<br>
+          Ag, Au, Pt → Cu보다 E° 크고 산화 안됨 → (+)극 아래 침전
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 9</div>
+          <div class="quiz-q">물체의 표면에 금속을 도금할 때 물체를 전원 장치의 (−)극에 연결하는 까닭은 무엇인가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            (−)극은 <strong>환원 전극</strong>이므로 금속 이온이 전자를 얻어 금속으로 환원됩니다.<br><br>
+            도금할 물체를 (−)극에 연결하면 용액 속 금속 이온(예: Ag⁺)이 물체 표면에서 환원되어 <strong>금속 상태로 석출</strong>되기 때문입니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit4 -->
+
+<!-- ══════════════════════════════════════
+     소단원 5: 우리 주변의 산화·환원 반응
+══════════════════════════════════════ -->
+<div id="unit5" class="unit-section">
+  <div class="unit-banner ub-purple">
+    <div class="ub-emoji">🌿</div>
+    <div>
+      <div class="ub-num ub-num-p">소단원 05 · Redox in Everyday Life</div>
+      <div class="ub-title">우리 주변의 산화·환원 반응</div>
+      <div class="ub-desc">세포호흡과 광합성, 바이타민 C의 항산화 작용, 질소 고정, 연료 전지, 리튬 이온 전지와 미래 전지 개발 방향을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 생명 현상과 산화·환원 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Life Phenomena &amp; Redox · 생명 현상</div>
+          <div class="acc-htitle">생명 현상과 화학 반응 — 세포호흡·광합성·질소 고정</div>
+          <div class="acc-hdesc">세포호흡: 포도당 산화 · 광합성: CO₂ 환원 · 바이타민 C: 항산화</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">세포호흡과 광합성</div>
+        <div class="concept-box">
+          <div class="cb-title">🌱 세포호흡 (Cell Respiration)</div>
+          C₆H₁₂O₆(aq) + 6O₂(g) → 6CO₂(g) + 6H₂O(l)<br><br>
+          • 포도당(C₆H₁₂O₆): 탄소의 산화수 증가 → <span class="hr">환원제로 작용, 산화됨</span><br>
+          • O₂: 산소의 산화수 0 → −2 (감소) → <span class="hb">산화제로 작용, 환원됨</span>
+        </div>
+        <div class="green-box">
+          <div class="cb-title">☀️ 광합성 (Photosynthesis)</div>
+          식물은 빛에너지를 이용하여 CO₂와 H₂O로부터 포도당 합성<br><br>
+          • CO₂: 탄소의 산화수 감소 → <span class="hb">산화제로 작용, 환원됨</span><br>
+          • H₂O: 산소의 산화수 증가 → <span class="hr">환원제로 작용, 산화됨</span><br><br>
+          ∴ 광합성은 세포호흡의 역반응
+        </div>
+
+        <div class="sec-title">바이타민 C의 항산화 작용</div>
+        <div class="blue-box">
+          <div class="cb-title">💊 바이타민 C (Vitamin C) — 항산화제</div>
+          우리 몸에서 생성되는 <strong>활성 산소</strong>는 세포를 손상시키는 산화제입니다.<br><br>
+          바이타민 C는:<br>
+          • 전자를 내어주는 특성 → <strong>쉽게 산화됨</strong><br>
+          • 활성 산소와 결합하여 빠르게 제거 → <span class="hg">산화 반응 억제 (항산화 작용)</span><br>
+          • 즉, 바이타민 C = 환원제로 작용
+        </div>
+
+        <div class="sec-title">질소 고정과 암모니아 합성</div>
+        <div class="amber-box">
+          <div class="cb-title">🌾 질소 고정 (Nitrogen Fixation)</div>
+          공기 중 N₂를 NH₃ 등의 질소 화합물로 변환하는 과정<br><br>
+          N₂(g) + 3H₂(g) → 2NH₃(g)<br><br>
+          • N₂: 질소의 산화수 0 → −3 (감소) → <span class="hb">산화제로 작용, 환원됨</span><br>
+          • 뿌리혹세균이 자연적으로, 하버-보쉬법으로 산업적으로 실시
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 10</div>
+          <div class="quiz-q">세포호흡이 일어날 때 산화제로 작용하는 물질은 무엇인가? 또한 질소(N₂)로부터 암모니아(NH₃)가 생성되는 과정에서 질소는 무엇으로 작용하는가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            <strong>세포호흡에서 산화제:</strong> <span class="hr">O₂ (산소)</span><br>
+            C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O에서<br>
+            O₂의 산소 산화수: 0 → −2 (감소, 환원됨) → O₂가 산화제로 작용<br><br>
+            <strong>질소 고정에서 N₂의 역할:</strong> <span class="hb">산화제</span><br>
+            N의 산화수: 0 → −3 (감소, 환원됨) → N₂가 산화제로 작용
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 연료 전지와 미래 전지 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Fuel Cell &amp; Future Batteries · 연료 전지</div>
+          <div class="acc-htitle">연료 전지와 미래 화학 전지</div>
+          <div class="acc-hdesc">수소 연료 전지: H₂+O₂→H₂O · 리튬 이온 전지 문제점 · 지속가능한 미래 전지</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">연료 전지(Fuel Cell)란?</div>
+        <div class="concept-box">
+          <div class="cb-title">⛽ 연료 전지</div>
+          기존 화학 전지와 달리 <strong>외부에서 연료를 계속 공급받아 지속적으로 작동</strong>하는 전지<br><br>
+          화학 전지: 저장된 물질 소모 후 폐기 또는 충전<br>
+          연료 전지: 연료 공급 계속하면 지속 작동 가능
+        </div>
+
+        <div class="sec-title">수소 연료 전지</div>
+        <div class="battery-box">
+          <div style="font-size:12px;font-weight:800;color:var(--chem-dark);margin-bottom:8px;">🚀 수소 연료 전지 — H₂ 연료 + O₂ 산화제</div>
+          <div class="battery-row br-neg">
+            <div class="br-label">(−)극</div>
+            <div class="br-text">2H₂(g) → 4H⁺(aq) + 4e⁻ &nbsp; <span class="hr">산화</span><br>수소가 산화되어 H⁺와 전자 생성</div>
+          </div>
+          <div class="battery-row br-pos">
+            <div class="br-label">(+)극</div>
+            <div class="br-text">O₂(g) + 4H⁺(aq) + 4e⁻ → 2H₂O(l) &nbsp; <span class="hb">환원</span><br>산소가 환원되어 물 생성</div>
+          </div>
+          <div style="margin-top:8px;padding:.7rem 1rem;background:var(--chem-tint);border-radius:8px;font-size:13px;">
+            <strong>전체 반응:</strong> 2H₂(g) + O₂(g) → 2H₂O(l)
+          </div>
+        </div>
+
+        <div class="sec-title">수소 연료 전지의 장·단점</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>장점</th><th>단점</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>부산물이 물(H₂O)뿐 → 친환경</td>
+              <td>수소 생산에 많은 에너지 필요</td>
+            </tr>
+            <tr>
+              <td>에너지 효율 높음</td>
+              <td>수소 저장·운반 비용 高</td>
+            </tr>
+            <tr>
+              <td>지속적 작동 가능</td>
+              <td>수소 폭발 위험성</td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">리튬 이온 전지와 미래 전지</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">📱</div>
+            <div class="pc-title">리튬 이온 전지 장점</div>
+            <div class="pc-desc">가볍고 에너지 용량 큼<br>수명 길고 충전 가능<br>스마트폰·전기차·ESS 활용</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">⚠️</div>
+            <div class="pc-title">리튬 이온 전지 단점</div>
+            <div class="pc-desc">열에 약함 (화재 위험)<br>리튬·코발트 채굴 환경 오염<br>폐전지 처리 문제</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🌱</div>
+            <div class="pc-title">미래 전지 조건</div>
+            <div class="pc-desc">친환경 소재 사용<br>안전하고 경제적<br>폐전지 재활용 가능</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🔬</div>
+            <div class="pc-title">차세대 전지 연구</div>
+            <div class="pc-desc">나트륨 이온 전지<br>전고체 전지 (안전성↑)<br>폐수로부터 암모니아 추출</div>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 11</div>
+          <div class="quiz-q">수소 연료 전지의 (+)극과 (−)극에서 일어나는 반응을 각각 반쪽 반응식으로 나타내 보자.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            <strong>(−)극 (산화 전극):</strong> 2H₂(g) → 4H⁺(aq) + 4e⁻<br>
+            수소 기체가 산화되어 수소 이온과 전자 생성<br><br>
+            <strong>(+)극 (환원 전극):</strong> O₂(g) + 4H⁺(aq) + 4e⁻ → 2H₂O(l)<br>
+            산소 기체가 수소 이온·전자와 반응하여 물 생성
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03: Ⅱ단원 종합 정리 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Ⅱ단원 종합 · 핵심 개념 정리</div>
+          <div class="acc-htitle">산화·환원 반응 단원 핵심 요약</div>
+          <div class="acc-hdesc">산화수 규칙 → 화학 전지 → 표준 전지 전위 → 전기 분해 연결 정리</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">단원 핵심 흐름도</div>
+        <div class="flow">
+          <div class="flow-box">산화수 규칙<br>7가지</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">산화제·환원제<br>반쪽 반응식</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">화학 전지<br>볼타·다니엘</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">표준 환원 전위<br>E°전지 계산</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">전기 분해<br>도금·정제</div>
+        </div>
+
+        <div class="sec-title">화학 전지 vs 전기 분해 비교</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>비교 항목</th><th>화학 전지</th><th>전기 분해</th></tr></thead>
+          <tbody>
+            <tr><td>에너지 전환</td><td>화학 → 전기</td><td>전기 → 화학</td></tr>
+            <tr><td>반응 방향</td><td>자발적</td><td>비자발적</td></tr>
+            <tr><td>(+)극</td><td>환원 전극</td><td>산화 전극</td></tr>
+            <tr><td>(−)극</td><td>산화 전극</td><td>환원 전극</td></tr>
+            <tr><td>전자 이동</td><td>(−)극 → (+)극</td><td>전원장치 → (+)극 → 용액 → (−)극</td></tr>
+            <tr><td>예시</td><td>다니엘 전지, 건전지</td><td>NaCl 전기 분해, 도금</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">산화수로 보는 주요 공식</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>공식·법칙</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td>산화수 증가</td><td>산화됨 → 환원제로 작용</td></tr>
+            <tr><td>산화수 감소</td><td>환원됨 → 산화제로 작용</td></tr>
+            <tr><td>E°전지 = E°환원 − E°산화</td><td>표준 전지 전위 계산</td></tr>
+            <tr><td>전지 전위 > 0</td><td>자발적 반응 → 화학 전지 가능</td></tr>
+            <tr><td>도금: 물체 → (−)극</td><td>금속 이온이 환원되어 물체 표면에 석출</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 12 (단원 종합)</div>
+          <div class="quiz-q">다음 설명 중 옳은 것을 모두 골라보자.<br>
+          ㄱ. 화학 전지의 (−)극에서는 산화 반응이 일어난다.<br>
+          ㄴ. 전기 분해 장치의 (+)극에서는 환원 반응이 일어난다.<br>
+          ㄷ. 표준 전지 전위 = 환원 전극 E° + 산화 전극 E°이다.<br>
+          ㄹ. 다니엘 전지에서 전류가 흐를 때 아연판의 질량은 감소한다.<br>
+          ㅁ. 수소 연료 전지의 최종 부산물은 물(H₂O)이다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ㄱ, ㄹ, ㅁ</strong><br><br>
+            ㄱ. ✅ 옳음 — 화학 전지 (−)극 = 산화 전극 (전자를 잃음)<br><br>
+            ㄴ. ❌ 틀림 — 전기 분해 (+)극 = <strong>산화 전극</strong> (화학 전지와 반대)<br><br>
+            ㄷ. ❌ 틀림 — E°전지 = E°환원 전극 <strong>−</strong> E°산화 전극 (빼기, 더하기 아님)<br><br>
+            ㄹ. ✅ 옳음 — 아연판: Zn → Zn²⁺ + 2e⁻ 산화 → 질량 감소<br><br>
+            ㅁ. ✅ 옳음 — 2H₂ + O₂ → 2H₂O, 물만 생성되는 친환경 전지
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit5 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  ['unit1','unit2','unit3','unit4','unit5'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('visible');
+  });
+  const target = document.getElementById('unit' + n);
+  if (target) target.classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => item.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+const hashMap = {
+  '#unit1':1,'#unit2':2,'#unit3':3,'#unit4':4,'#unit5':5
+};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n - 1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape')
+    document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
