@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>베타과학학원 · 물질과 에너지 Ⅲ · 화학 변화의 자발성</title>
+<style>
+:root {
+  --chem:        #059669;
+  --chem-dark:   #064e3b;
+  --chem-mid:    #10b981;
+  --chem-light:  #34d399;
+  --chem-tint:   #f0fdf4;
+  --chem-tint2:  #dcfce7;
+  --chem-border: #a7f3d0;
+  --chem-border2:#6ee7b7;
+  --border-soft: #e0eaff;
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#fafafa; --white:#fff;
+  --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --blue2:#2563eb; --blue-bg:#eff6ff; --blue-border:#bfdbfe;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626; --red-bg:#fef2f2; --red-border:#fecaca;
+  --teal:#0d9488; --teal-bg:#f0fdfa; --teal-border:#99f6e4;
+  --purple:#7c3aed; --purple-bg:#f5f3ff; --purple-border:#ddd6fe;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text',
+              'Helvetica Neue',Arial,sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* ── Header (완전 동일) ── */
+.header{
+  background:#ffffff;border-bottom:1px solid var(--border-soft);
+  padding:0 1rem;
+  padding-left:max(1rem,env(safe-area-inset-left));
+  padding-right:max(1rem,env(safe-area-inset-right));
+  height:54px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:500;
+}
+.header-left{
+  display:flex;align-items:center;gap:9px;
+  text-decoration:none;color:inherit;cursor:pointer;transition:opacity .15s;
+}
+.header-left:hover{opacity:.75}
+.logo-mark{
+  width:30px;height:30px;
+  background:linear-gradient(135deg,var(--chem-mid) 0%,var(--chem-dark) 100%);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.brand-name{font-size:14px;font-weight:600;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{
+  display:flex;align-items:center;gap:5px;
+  background:#f0fdf4;border:1px solid #bbf7d0;
+  border-radius:20px;padding:4px 10px;
+  font-size:10px;font-weight:600;color:#16a34a;white-space:nowrap;
+}
+.dot-green{width:5px;height:5px;background:#22c55e;border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{
+  padding:7px 14px;min-height:36px;background:transparent;
+  border:1.5px solid var(--chem-border);border-radius:20px;
+  font-family:inherit;font-size:12px;font-weight:600;
+  color:var(--chem-dark);cursor:pointer;white-space:nowrap;transition:background .15s;
+}
+.back-btn:hover{background:var(--chem-tint)}
+.back-btn:active{background:var(--chem-tint2)}
+
+/* ── Hero ── */
+.hero{
+  background:linear-gradient(135deg,#1e3a5f 0%,#1e40af 45%,#0d9488 100%);
+  padding:2.8rem 1.5rem 2.2rem;position:relative;overflow:hidden;
+}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06);}
+.hero::after{content:'';position:absolute;left:-50px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center;}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;text-decoration:none;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+.hero-eyebrow{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;}
+.hero-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem;}
+.hero-desc{font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.7;max-width:580px;margin:0 auto 1.8rem;}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:14px;padding:.9rem 1.4rem;text-align:center;backdrop-filter:blur(6px);min-width:80px;transition:background .2s;}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+/* ── Tabs ── */
+.tabs-wrap{background:var(--white);border-bottom:2px solid var(--chem-border);position:sticky;top:54px;z-index:400;}
+.tabs-inner{max-width:1100px;margin:0 auto;padding:0 1.5rem;display:flex;overflow-x:auto;justify-content:center;gap:6px;}
+.tab-btn{padding:13px 24px;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;margin-bottom:-2px;border-radius:8px 8px 0 0;}
+.tab-btn:hover{color:var(--chem);background:var(--chem-tint)}
+.tab-btn.active{color:var(--chem);border-bottom-color:var(--chem)}
+
+/* ── Content ── */
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}.unit-section.visible{display:block}
+
+/* ── Unit Banner ── */
+.unit-banner{border-radius:16px;padding:1.4rem 1.8rem;margin-bottom:1.8rem;display:flex;align-items:center;gap:1.2rem;}
+.ub-green{background:linear-gradient(135deg,var(--chem-tint),var(--chem-tint2));border:2px solid var(--chem-border);}
+.ub-blue{background:linear-gradient(135deg,var(--blue-bg),#dbeafe);border:2px solid var(--blue-border);}
+.ub-purple{background:linear-gradient(135deg,var(--purple-bg),#ede9fe);border:2px solid var(--purple-border);}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--chem);margin-bottom:4px}
+.ub-num-b{color:var(--blue2)}
+.ub-num-p{color:var(--purple)}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── Accordion ── */
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{background:var(--white);border:1.5px solid #e5e7eb;border-radius:16px;overflow:hidden;transition:border-color .2s;}
+.acc-item.open{border-color:var(--chem-border);box-shadow:0 4px 20px rgba(5,150,105,.1)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:1.2rem 1.5rem;cursor:pointer;user-select:none;transition:background .15s;}
+.acc-header:hover{background:var(--chem-tint)}
+.acc-num{width:32px;height:32px;border-radius:10px;background:var(--chem-tint2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--chem-dark);flex-shrink:0;}
+.acc-item.open .acc-num{background:var(--chem);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--chem-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px;}
+.acc-item.open .acc-subtitle{color:var(--chem)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--chem)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--chem-tint2)}
+.acc-item.open .acc-body{display:block}
+
+/* ── Section Title ── */
+.sec-title{font-size:12px;font-weight:800;color:var(--chem-dark);letter-spacing:.06em;text-transform:uppercase;margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px;}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--chem);border-radius:2px;display:block;flex-shrink:0;}
+
+/* ── Content Boxes ── */
+.concept-box{background:var(--chem-tint);border:1.5px solid var(--chem-border);border-left:4px solid var(--chem);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.concept-box .cb-title{font-weight:800;color:var(--chem-dark);font-size:14px;margin-bottom:.4rem}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--chem);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+.amber-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-left:4px solid var(--amber);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+.blue-box{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-left:4px solid var(--blue2);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.blue-box .cb-title{font-weight:800;color:#1e40af;font-size:14px;margin-bottom:.4rem}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+.teal-box{background:var(--teal-bg);border:1.5px solid var(--teal-border);border-left:4px solid var(--teal);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.teal-box .cb-title{font-weight:800;color:#134e4a;font-size:14px;margin-bottom:.4rem}
+.purple-box{background:var(--purple-bg);border:1.5px solid var(--purple-border);border-left:4px solid var(--purple);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;}
+.purple-box .cb-title{font-weight:800;color:#4c1d95;font-size:14px;margin-bottom:.4rem}
+
+/* ── Formula ── */
+.formula-box{background:linear-gradient(135deg,var(--chem-tint),var(--chem-tint2));border:2px solid var(--chem-border);border-radius:14px;padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center;}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--chem-dark);letter-spacing:-.01em;}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
+.formula-box-b{background:linear-gradient(135deg,var(--blue-bg),#dbeafe);border:2px solid var(--blue-border);border-radius:14px;padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center;}
+.formula-box-b .formula-text{color:#1e3a8a}
+
+/* ── Table ── */
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:12px;border:1.5px solid var(--chem-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--chem-tint2);padding:10px 14px;text-align:left;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--chem-dark);}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6}
+tbody tr:hover td{background:var(--chem-tint)}
+
+/* ── Point Cards ── */
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin:.8rem 0}
+.point-card{background:var(--white);border:1.5px solid var(--chem-border);border-radius:12px;padding:1rem;text-align:center}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--chem);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ── Flow ── */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0;font-size:13px}
+.flow-box{background:var(--white);border:1.5px solid var(--chem-border);border-radius:8px;padding:7px 12px;font-weight:700;color:var(--chem-dark);text-align:center;font-size:12px;line-height:1.4;}
+.flow-arrow{color:var(--chem);font-size:18px;font-weight:900}
+
+/* ── Enthalpy Diagram ── */
+.enthalpy-diagram{background:var(--white);border:1.5px solid var(--chem-border);border-radius:14px;padding:1.2rem;margin:.8rem 0;overflow-x:auto;}
+.ed-title{font-size:11px;font-weight:800;color:var(--chem-dark);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+
+/* ── Highlight ── */
+.hp{color:var(--chem-dark);font-weight:800}
+.hg{color:#059669;font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--blue2);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.ht{color:var(--teal);font-weight:800}
+.hpu{color:var(--purple);font-weight:800}
+
+/* ── Quiz ── */
+.quiz-wrap{background:linear-gradient(135deg,var(--chem-tint2),var(--chem-tint));border:1.5px solid var(--chem-border);border-radius:14px;padding:1.2rem 1.4rem;margin-top:1.6rem;}
+.quiz-label{font-size:11px;font-weight:800;color:var(--chem-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{background:var(--chem);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;}
+.quiz-toggle:hover{background:var(--chem-dark)}
+.quiz-ans{display:none;margin-top:.8rem;padding:.9rem 1rem;background:rgba(255,255,255,.8);border-radius:10px;font-size:13.5px;color:var(--text);line-height:1.75;}
+body p{line-height:1.75;font-size:13.5px;margin:.4rem 0}
+
+/* ── 반응 자발성 표 ── */
+.spontaneity-table{width:100%;border-radius:12px;overflow:hidden;border:1.5px solid var(--chem-border);margin:.8rem 0}
+.spon-head{display:grid;grid-template-columns:1fr 1fr 1fr 2fr;background:var(--chem-tint2);padding:8px 12px;font-size:11px;font-weight:800;color:var(--chem-dark);letter-spacing:.06em;text-transform:uppercase;gap:8px;}
+.spon-row{display:grid;grid-template-columns:1fr 1fr 1fr 2fr;padding:10px 12px;gap:8px;border-top:1px solid #e5e7eb;font-size:12.5px;line-height:1.5;align-items:center;}
+.spon-row:hover{background:var(--chem-tint)}
+.spon-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-auto{background:#dcfce7;color:#166534}
+.badge-never{background:var(--red-bg);color:#991b1b}
+.badge-cond{background:var(--amber-bg);color:#92400e}
+
+/* ── 반응형 ── */
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.5rem}
+  .tabs-inner{justify-content:flex-start;gap:0}
+  .tab-btn{padding:11px 12px;font-size:12px}
+  .content-wrap{padding:1.2rem .9rem 4rem}
+  .unit-banner{flex-direction:column;gap:.8rem;padding:1.2rem}
+  .acc-header{padding:1rem}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .hero-stats{gap:8px}
+  .hero-stat-card{min-width:70px;padding:.8rem 1rem}
+  .hs-num{font-size:1.5rem}
+  .formula-text{font-size:1.05rem}
+  .spon-head,.spon-row{grid-template-columns:1fr 1fr;font-size:11.5px;}
+}
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .header-badge .dot-green{display:none}
+  .point-box{grid-template-columns:1fr}
+  .tab-btn{padding:10px 10px;font-size:11px}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Header (원본 완전 동일) ── -->
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"
+          stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-green"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="science-inquiry-performance.html" class="bc-item">탐구활동 보고서</a><span class="bc-sep">›</span>
+      <a href="chemistry1-summary.html" class="bc-item">화학 1 핵심 정리</a><span class="bc-sep">›</span>
+      <span class="bc-current">⚡ Ⅲ. 화학 변화의 자발성</span>
+    </div>
+    <div class="hero-eyebrow">🌿 PART 01 · 물질과 에너지 · UNIT 03</div>
+    <div class="hero-title">Ⅲ. 화학 변화의 자발성<br>완벽 상세 학습 가이드</div>
+    <div class="hero-desc">엔탈피와 열화학 반응식, 헤스 법칙과 생성 엔탈피,<br>엔트로피와 화학 변화의 자발성까지 동아출판 교과서 기반으로 완벽하게 학습합니다</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">3</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">14+</div><div class="hs-lbl">핵심 개념</div></div>
+      <div class="hero-stat-card"><div class="hs-num">12</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tabs ── -->
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">🔥 소단원1 · 엔탈피와 열화학 반응식</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">🔗 소단원2 · 헤스 법칙</button>
+    <button class="tab-btn" onclick="showUnit(3,this)">♻️ 소단원3 · 화학 변화의 자발성</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ══════════════════════════════════════════════
+     소단원 1: 엔탈피와 열화학 반응식
+══════════════════════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner ub-green">
+    <div class="ub-emoji">🔥</div>
+    <div>
+      <div class="ub-num">소단원 01 · Enthalpy & Thermochemical Equations</div>
+      <div class="ub-title">엔탈피와 열화학 반응식</div>
+      <div class="ub-desc">반응열·엔탈피·반응 엔탈피의 개념을 이해하고, 열화학 반응식 작성 규칙과 열량계를 이용한 반응 엔탈피 측정법을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 반응열과 엔탈피 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Enthalpy · 엔탈피와 반응열</div>
+          <div class="acc-htitle">반응열·엔탈피·반응 엔탈피</div>
+          <div class="acc-hdesc">발열 반응(ΔH&lt;0) · 흡열 반응(ΔH&gt;0) · ΔH = 생성물 엔탈피 합 − 반응물 엔탈피 합</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">반응열과 발열·흡열 반응</div>
+        <div class="concept-box">
+          <div class="cb-title">🌡️ 반응열이란?</div>
+          <span class="hp">반응열</span>: 화학 반응에서 반응물과 생성물 사이에 출입하는 열에너지<br><br>
+          • <span class="hp">발열 반응 (Exothermic)</span>: 열에너지를 <strong>방출</strong>하는 반응 → 주위 온도 상승<br>
+          &nbsp;&nbsp;예) 연소 반응, 손난로(철의 산화), 산화칼슘 + 물, 중화 반응<br><br>
+          • <span class="hp">흡열 반응 (Endothermic)</span>: 열에너지를 <strong>흡수</strong>하는 반응 → 주위 온도 하강<br>
+          &nbsp;&nbsp;예) 광합성, 질산 암모늄 용해, 탄산수소 나트륨 분해(베이킹파우더)
+        </div>
+
+        <div class="sec-title">엔탈피(H)와 반응 엔탈피(ΔH)</div>
+        <div class="concept-box">
+          <div class="cb-title">⚡ 엔탈피와 반응 엔탈피의 정의</div>
+          <span class="hp">엔탈피(H)</span>: 어떤 물질이 특정 온도와 압력에서 가지는 <strong>고유한 에너지</strong>. 직접 측정 불가.<br><br>
+          <span class="hp">반응 엔탈피(ΔH)</span>: 일정한 압력에서 화학 반응이 일어날 때의 <strong>엔탈피 변화</strong><br>
+          = 생성물의 엔탈피 합 − 반응물의 엔탈피 합
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">ΔH = H생성물 − H반응물</div>
+          <div class="formula-sub">발열 반응: H반응물 &gt; H생성물 → ΔH &lt; 0 &nbsp;&nbsp; 흡열 반응: H반응물 &lt; H생성물 → ΔH &gt; 0</div>
+        </div>
+
+        <div class="sec-title">발열·흡열 반응과 ΔH 부호</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>엔탈피 변화</th><th>ΔH 부호</th><th>열에너지 방향</th><th>주위 온도</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hr">발열 반응</span></td>
+              <td>반응물 &gt; 생성물 (엔탈피 감소)</td>
+              <td><span class="hr">ΔH &lt; 0</span> (음수)</td>
+              <td>계 → 주위 방출</td>
+              <td>↑ 상승</td>
+            </tr>
+            <tr>
+              <td><span class="hb">흡열 반응</span></td>
+              <td>반응물 &lt; 생성물 (엔탈피 증가)</td>
+              <td><span class="hb">ΔH &gt; 0</span> (양수)</td>
+              <td>주위 → 계 흡수</td>
+              <td>↓ 하강</td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">다음 반응을 발열 반응과 흡열 반응으로 구분하고 ΔH의 부호를 써 보자.<br>
+          (가) CH₄(g) + 2O₂(g) → CO₂(g) + 2H₂O(l) (메테인 연소)<br>
+          (나) 2NaHCO₃(s) → Na₂CO₃(s) + H₂O(g) + CO₂(g) (탄산수소나트륨 분해)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            (가) <span class="hr">발열 반응</span> — ΔH &lt; 0 (연소 반응은 열에너지 방출)<br>
+            (나) <span class="hb">흡열 반응</span> — ΔH &gt; 0 (가열해야 반응이 일어나므로 열에너지 흡수, 빵을 부풀리는 원리)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 열화학 반응식 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Thermochemical Equations · 작성 규칙</div>
+          <div class="acc-htitle">열화학 반응식 작성법</div>
+          <div class="acc-hdesc">반응 엔탈피를 함께 표기 · 물질 상태 표기 필수 · 계수 비례 · 역반응 시 부호 반전</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">열화학 반응식 작성 규칙</div>
+        <div class="concept-box">
+          <div class="cb-title">📝 열화학 반응식이란?</div>
+          화학 반응식에 <span class="hp">반응 엔탈피(ΔH)를 함께 나타낸 것</span>. 열화학 반응식을 통해 반응 시 출입하는 열에너지의 양을 알 수 있습니다.
+        </div>
+        <div class="green-box">
+          <div class="cb-title">📌 열화학 반응식 작성 시 주의 사항 3가지</div>
+          <strong>① 물질의 상태 표기 필수:</strong> 같은 물질이라도 상태에 따라 엔탈피가 다릅니다.<br>
+          &nbsp;&nbsp;→ (s) 고체, (l) 액체, (g) 기체, (aq) 수용액<br><br>
+          <strong>② 온도·압력 조건 표기:</strong> ΔH는 온도·압력에 따라 달라지므로 명시. (기본값: 25℃, 1기압)<br><br>
+          <strong>③ 계수 변화 시 ΔH도 비례해서 변함:</strong><br>
+          &nbsp;&nbsp;N₂(g) + O₂(g) → 2NO(g) &nbsp; ΔH = 180.6 kJ<br>
+          &nbsp;&nbsp;½N₂(g) + ½O₂(g) → NO(g) &nbsp; ΔH = <span class="hp">90.3 kJ</span> (계수 ½배 → ΔH도 ½배)<br><br>
+          <strong>④ 역반응 시 ΔH 부호 반전:</strong><br>
+          &nbsp;&nbsp;H₂(g) + ½O₂(g) → H₂O(l) &nbsp; ΔH = −285.8 kJ<br>
+          &nbsp;&nbsp;H₂O(l) → H₂(g) + ½O₂(g) &nbsp; ΔH = <span class="hp">+285.8 kJ</span>
+        </div>
+
+        <div class="sec-title">물질 상태에 따른 엔탈피 차이</div>
+        <div class="blue-box">
+          <div class="cb-title">💧 상태별 엔탈피: 고체 &lt; 액체 &lt; 기체</div>
+          같은 종류의 물질이라도 고체 → 액체 → 기체로 될수록 엔탈피가 증가합니다.<br><br>
+          따라서 고체→액체, 액체→기체는 모두 <span class="hb">흡열 반응(ΔH &gt; 0)</span>입니다.<br><br>
+          <strong>물의 열화학 반응식 비교:</strong><br>
+          H₂(g) + ½O₂(g) → H₂O(s) &nbsp; ΔH = −291.5 kJ<br>
+          H₂(g) + ½O₂(g) → H₂O(l) &nbsp; ΔH = −285.8 kJ<br>
+          H₂(g) + ½O₂(g) → H₂O(g) &nbsp; ΔH = −241.8 kJ<br><br>
+          → 생성물 상태: 고체 &lt; 액체 &lt; 기체 순으로 엔탈피 높음 → |ΔH|: 고체 &gt; 액체 &gt; 기체
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">고체 탄산 칼슘(CaCO₃) 1몰이 고체 산화 칼슘(CaO)과 이산화 탄소(CO₂) 기체로 분해될 때 179.2 kJ의 열에너지를 흡수한다. 이 반응을 열화학 반응식으로 나타내 보자.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            CaCO₃(s) → CaO(s) + CO₂(g) &nbsp; <strong>ΔH = +179.2 kJ</strong><br><br>
+            흡열 반응이므로 ΔH = <span class="hb">양수(+)</span>. 물질의 상태(s, g)를 반드시 표기해야 합니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03: 열량계 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Calorimetry · 열량계</div>
+          <div class="acc-htitle">반응 엔탈피 측정 — 열량계</div>
+          <div class="acc-hdesc">Q = c×m×Δt · 간이 열량계 · 통열량계 · 발열 반응 Q&gt;0, ΔH&lt;0</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">열량 계산 공식</div>
+        <div class="formula-box">
+          <div class="formula-text">Q = c × m × Δt</div>
+          <div class="formula-sub">Q: 열량(J) · c: 용액의 비열(J/(g·℃)) · m: 용액의 질량(g) · Δt: 온도 변화(℃)</div>
+        </div>
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 반응열(Q)과 반응 엔탈피(ΔH)의 부호 관계</div>
+          <strong>발열 반응:</strong> 온도 상승 → Δt &gt; 0 → Q &gt; 0 → 열화학 반응식에서 <span class="ha">ΔH &lt; 0</span><br>
+          <strong>흡열 반응:</strong> 온도 하강 → Δt &lt; 0 → Q &lt; 0 → 열화학 반응식에서 <span class="hb">ΔH &gt; 0</span><br><br>
+          ∴ ΔH의 부호 = Q의 부호와 <span class="ha">반대</span>
+        </div>
+
+        <div class="sec-title">열량계의 종류</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>종류</th><th>구조</th><th>적합한 반응</th><th>특징</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hp">간이 열량계</span></td>
+              <td>스타이로폼 컵 용기에 반응물 투입</td>
+              <td>중화 반응, 고체 용해 반응</td>
+              <td>구조 간단, 열 손실 커서 정밀도 낮음</td>
+            </tr>
+            <tr>
+              <td><span class="hp">통열량계</span></td>
+              <td>단열 용기 내 강철 용기에 시료 태움 + 물 온도 측정</td>
+              <td>연소 반응 (고체·액체 연료)</td>
+              <td>열 손실 최소화, 정밀한 측정 가능</td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">간이 열량계에 25℃의 1 M 염산(HCl(aq)) 50 mL와 25℃의 1 M 수산화 나트륨(NaOH) 수용액 50 mL를 넣어 반응시켰더니 수용액의 온도는 31.5℃가 되었다. HCl 1몰과 NaOH 1몰이 반응할 때의 반응 엔탈피(ΔH)를 구해 보자. (단, 수용액의 비열은 4.2 J/(g·℃)이고, 밀도는 1 g/mL이다.)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ΔH = −54.6 kJ</strong><br><br>
+            <strong>1단계:</strong> HCl 0.05 mol + NaOH 0.05 mol이 반응 시 발생한 열량(Q) 계산<br>
+            혼합 후 용액 질량 = 50 + 50 = 100 g<br>
+            Q = 4.2 × 100 × (31.5 − 25) = 4.2 × 100 × 6.5 = 2730 J = 2.73 kJ<br><br>
+            <strong>2단계:</strong> 발열 반응이므로 ΔH &lt; 0<br>
+            0.05 mol : −2.73 kJ = 1 mol : x<br>
+            x = −2.73 ÷ 0.05 = <strong>−54.6 kJ</strong>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">H₂O(g) 18 g이 분해되어 H₂(g)와 O₂(g)가 생성될 때 241.8 kJ의 열을 흡수한다. 이 반응을 열화학 반응식으로 나타내 보자. (단, H, O의 원자량은 각각 1, 16이다.)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            H₂O(g) 18 g = 1 mol (분자량: 18)<br>
+            흡열 반응이므로 ΔH &gt; 0<br><br>
+            <strong>H₂O(g) → H₂(g) + ½O₂(g) &nbsp; ΔH = +241.8 kJ</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ══════════════════════════════════════
+     소단원 2: 헤스 법칙
+══════════════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner ub-blue">
+    <div class="ub-emoji">🔗</div>
+    <div>
+      <div class="ub-num ub-num-b">소단원 02 · Hess's Law</div>
+      <div class="ub-title">헤스 법칙</div>
+      <div class="ub-desc">반응 경로에 무관하게 반응 엔탈피 총합이 일정한 헤스 법칙, 표준 생성 엔탈피, 결합 에너지를 이용한 반응 엔탈피 계산을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 헤스 법칙 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Hess's Law · 경로 무관 원칙</div>
+          <div class="acc-htitle">헤스 법칙 (Hess's Law)</div>
+          <div class="acc-hdesc">반응물·생성물 같으면 반응 경로 무관 · 반응 엔탈피 총합 일정 · 측정 불가 반응에 응용</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">헤스 법칙이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🛝 헤스 법칙 (1840년, 헤스 제안)</div>
+          <span class="hp">헤스 법칙</span>: 화학 반응이 일어날 때 <strong>반응물의 종류와 상태, 생성물의 종류와 상태가 같으면 반응 경로에 관계없이 반응 엔탈피의 총합은 일정</strong>하다.<br><br>
+          엔탈피는 물질의 상태 함수이므로 경로가 아닌 <span class="hp">처음 상태와 나중 상태에만 의존</span>합니다.
+        </div>
+        <div class="formula-box-b">
+          <div class="formula-text">ΔH전체 = ΔH₁ + ΔH₂ + ΔH₃ + ···</div>
+          <div class="formula-sub">반응 경로를 여러 단계로 나눠도 각 단계 ΔH의 합은 전체 ΔH와 같다</div>
+        </div>
+
+        <div class="sec-title">헤스 법칙 적용 — NaOH와 HCl 반응</div>
+        <div class="teal-box">
+          <div class="cb-title">📊 두 가지 경로로 같은 결과</div>
+          <strong>경로 1 (2단계):</strong><br>
+          ① NaOH(s) → NaOH(aq) &nbsp; ΔH₁ = −44.5 kJ<br>
+          ② NaOH(aq) + HCl(aq) → NaCl(aq) + H₂O(l) &nbsp; ΔH₂ = −55.8 kJ<br>
+          합: ΔH₁ + ΔH₂ = −100.3 kJ<br><br>
+          <strong>경로 2 (1단계):</strong><br>
+          NaOH(s) + HCl(aq) → NaCl(aq) + H₂O(l) &nbsp; ΔH₃ = −100.3 kJ<br><br>
+          → ΔH₁ + ΔH₂ = ΔH₃ = −100.3 kJ ✅ <span class="ht">헤스 법칙 성립</span>
+        </div>
+
+        <div class="sec-title">헤스 법칙으로 측정 어려운 반응 엔탈피 계산</div>
+        <div class="concept-box">
+          <div class="cb-title">🏭 CO 생성 반응 엔탈피 계산 (직접 측정 불가)</div>
+          C(s, 흑연) + ½O₂(g) → CO(g) 의 ΔH를 직접 측정하기 어려운 이유: 탄소 연소 시 대부분 CO₂가 생성됨<br><br>
+          <strong>헤스 법칙 적용:</strong><br>
+          경로 1: C(s) + O₂(g) → CO₂(g) &nbsp; ΔH₁ = −393.5 kJ<br>
+          경로 2: ① C(s) + ½O₂(g) → CO(g) &nbsp; ΔH₂ = ?<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ② CO(g) + ½O₂(g) → CO₂(g) &nbsp; ΔH₃ = −283.0 kJ<br><br>
+          헤스 법칙: ΔH₁ = ΔH₂ + ΔH₃<br>
+          ΔH₂ = ΔH₁ − ΔH₃ = −393.5 − (−283.0) = <span class="hp">−110.5 kJ</span>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">다음 열화학 반응식을 이용하여 H₂O(l) → H₂O(g) 반응의 반응 엔탈피(ΔH)를 구해 보자.<br>
+          • 2H₂(g) + O₂(g) → 2H₂O(l) &nbsp; ΔH = −571.6 kJ<br>
+          • 2H₂(g) + O₂(g) → 2H₂O(g) &nbsp; ΔH = −483.6 kJ</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ΔH = +44.0 kJ</strong><br><br>
+            헤스 법칙 적용: 목표 반응 = H₂O(l) → H₂O(g)<br><br>
+            2H₂O(g) → 2H₂(g) + O₂(g) &nbsp; ΔH = +483.6 kJ (역반응)<br>
+            2H₂(g) + O₂(g) → 2H₂O(l) &nbsp; ΔH = −571.6 kJ<br>
+            더하면: 2H₂O(g) → 2H₂O(l) &nbsp; ΔH = −88.0 kJ<br>
+            ½배하면: H₂O(g) → H₂O(l) &nbsp; ΔH = −44.0 kJ<br><br>
+            역반응: <strong>H₂O(l) → H₂O(g) &nbsp; ΔH = +44.0 kJ</strong>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">다음 열화학 반응식을 이용하여 N₂(g) + 2H₂(g) → N₂H₄(g) 반응의 반응 엔탈피(ΔH)를 구해 보자.<br>
+          ① N₂(g) + 3H₂(g) → 2NH₃(g) &nbsp; ΔH₁ = −91.8 kJ<br>
+          ② N₂H₄(g) + H₂(g) → 2NH₃(g) &nbsp; ΔH₂ = −187.6 kJ</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ΔH = +95.8 kJ</strong><br><br>
+            식 ①을 그대로 사용:<br>
+            N₂(g) + 3H₂(g) → 2NH₃(g) &nbsp; ΔH₁ = −91.8 kJ<br><br>
+            식 ②의 역반응 사용:<br>
+            2NH₃(g) → N₂H₄(g) + H₂(g) &nbsp; −ΔH₂ = +187.6 kJ<br><br>
+            두 식을 더하면:<br>
+            N₂(g) + 3H₂(g) + 2NH₃(g) → 2NH₃(g) + N₂H₄(g) + H₂(g)<br>
+            약분: N₂(g) + 2H₂(g) → N₂H₄(g)<br>
+            <strong>ΔH = −91.8 + 187.6 = +95.8 kJ</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 표준 생성 엔탈피 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Standard Enthalpy of Formation · ΔHf°</div>
+          <div class="acc-htitle">표준 생성 엔탈피와 반응 엔탈피</div>
+          <div class="acc-hdesc">ΔHf°: 성분 원소 → 물질 1 mol 생성 · 원소 단체의 ΔHf° = 0 · ΔH = Σ생성물 ΔHf° − Σ반응물 ΔHf°</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">표준 생성 엔탈피(ΔHf°)</div>
+        <div class="concept-box">
+          <div class="cb-title">🌡️ 표준 생성 엔탈피란?</div>
+          <span class="hp">생성 엔탈피</span>: 어떤 물질 1 mol이 <strong>성분 원소의 가장 안정한 원소 물질로부터 생성</strong>될 때의 엔탈피 변화. 단위: kJ/mol<br><br>
+          <span class="hp">표준 생성 엔탈피(ΔHf°)</span>: <strong>표준 상태(25℃, 1기압)</strong>에서의 생성 엔탈피<br><br>
+          <strong>핵심:</strong> 탄소(흑연), H₂(g), O₂(g) 등 <span class="hp">가장 안정한 원소 단체의 ΔHf° = 0</span>
+        </div>
+
+        <div class="sec-title">주요 물질의 표준 생성 엔탈피</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>물질</th><th>ΔHf° (kJ/mol)</th><th>물질</th><th>ΔHf° (kJ/mol)</th></tr></thead>
+          <tbody>
+            <tr><td>C(s, 흑연)</td><td>0</td><td>CO(g)</td><td>−110.5</td></tr>
+            <tr><td>O₂(g)</td><td>0</td><td>CO₂(g)</td><td>−393.5</td></tr>
+            <tr><td>H₂(g)</td><td>0</td><td>CH₄(g)</td><td>−74.6</td></tr>
+            <tr><td>H₂O(g)</td><td>−241.8</td><td>NH₃(g)</td><td>−45.9</td></tr>
+            <tr><td>H₂O(l)</td><td>−285.8</td><td>C(s, 다이아몬드)</td><td>+1.9</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">표준 생성 엔탈피로 반응 엔탈피 계산</div>
+        <div class="formula-box-b">
+          <div class="formula-text">ΔH = Σ(생성물의 ΔHf°) − Σ(반응물의 ΔHf°)</div>
+          <div class="formula-sub">각 물질의 ΔHf°에 반응식의 계수를 곱하여 더한다</div>
+        </div>
+        <div class="blue-box">
+          <div class="cb-title">📊 메테인 연소 반응 엔탈피 계산 예제</div>
+          CH₄(g) + 2O₂(g) → CO₂(g) + 2H₂O(l) &nbsp; ΔH = ?<br><br>
+          ΔH = [ΔHf°(CO₂) + 2×ΔHf°(H₂O(l))] − [ΔHf°(CH₄) + 2×ΔHf°(O₂)]<br>
+          = [−393.5 + 2×(−285.8)] − [(−74.6) + 2×0]<br>
+          = (−393.5 − 571.6) − (−74.6)<br>
+          = −965.1 + 74.6 = <span class="hb">−890.5 kJ</span>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 7</div>
+          <div class="quiz-q">다음 표준 생성 엔탈피를 이용하여 포도당(C₆H₁₂O₆(s)) 1 mol로부터 에탄올(C₂H₅OH(l))을 얻는 발효 반응의 반응 엔탈피(ΔH)를 구해 보자.<br>
+          C₆H₁₂O₆(s) → 2C₂H₅OH(l) + 2CO₂(g)<br>
+          ΔHf°: 포도당 −1260 kJ/mol, 에탄올 −277.7 kJ/mol, CO₂ −393.5 kJ/mol</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ΔH = −72.4 kJ</strong><br><br>
+            ΔH = [2×ΔHf°(C₂H₅OH) + 2×ΔHf°(CO₂)] − [ΔHf°(C₆H₁₂O₆)]<br>
+            = [2×(−277.7) + 2×(−393.5)] − (−1260)<br>
+            = (−555.4 − 787.0) + 1260<br>
+            = −1342.4 + 1260 = <strong>−82.4 kJ</strong><br><br>
+            ※ 교과서 수치에 따라 −72.4 kJ ~ −82.4 kJ 범위일 수 있음
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03: 결합 에너지 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Bond Energy · 결합 에너지</div>
+          <div class="acc-htitle">결합 에너지와 반응 엔탈피</div>
+          <div class="acc-hdesc">결합 끊기 = 흡열 · 결합 형성 = 발열 · ΔH = 반응물 결합 에너지 합 − 생성물 결합 에너지 합</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">결합 에너지란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🔗 결합 에너지 (Bond Energy)</div>
+          기체 상태의 분자를 구성하는 두 원자 사이의 <strong>공유 결합 1 mol을 끊는 데 필요한 에너지</strong>. 단위: kJ/mol<br><br>
+          • 결합을 끊는 것 = 에너지 <span class="hb">흡수</span> (흡열) &nbsp; → ΔH &gt; 0<br>
+          • 결합이 형성되는 것 = 에너지 <span class="hr">방출</span> (발열) → ΔH &lt; 0<br><br>
+          예) H₂(g) → H(g) + H(g) &nbsp; ΔH = 436 kJ/mol (H-H 결합 에너지 = 436 kJ/mol)
+        </div>
+
+        <div class="sec-title">주요 결합 에너지 값</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>결합</th><th>결합 에너지 (kJ/mol)</th><th>결합</th><th>결합 에너지 (kJ/mol)</th></tr></thead>
+          <tbody>
+            <tr><td>H-H</td><td>436</td><td>C=C</td><td>614</td></tr>
+            <tr><td>Cl-Cl</td><td>243</td><td>C≡C</td><td>839</td></tr>
+            <tr><td>H-Cl</td><td>432</td><td>C-H</td><td>413</td></tr>
+            <tr><td>O=O (O₂)</td><td>498</td><td>O-H</td><td>463</td></tr>
+            <tr><td>N≡N (N₂)</td><td>945</td><td>C=O (CO₂)</td><td>799</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">결합 에너지로 반응 엔탈피 계산</div>
+        <div class="formula-box-b">
+          <div class="formula-text">ΔH = Σ(반응물의 결합 에너지) − Σ(생성물의 결합 에너지)</div>
+          <div class="formula-sub">반응물의 결합 끊기(흡열) + 생성물의 결합 형성(발열) = 전체 반응 엔탈피</div>
+        </div>
+        <div class="green-box">
+          <div class="cb-title">📊 H₂ + Cl₂ → 2HCl 반응 엔탈피 계산</div>
+          <strong>과정 1 (결합 끊기):</strong> H-H 1 mol + Cl-Cl 1 mol 끊기<br>
+          ΔH₁ = 436 + 243 = +679 kJ (흡열)<br><br>
+          <strong>과정 2 (결합 형성):</strong> H-Cl 2 mol 형성<br>
+          ΔH₂ = −(2 × 432) = −864 kJ (발열)<br><br>
+          <strong>전체:</strong> ΔH = 679 + (−864) = <span class="hg">−185 kJ</span> (발열 반응)
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 8</div>
+          <div class="quiz-q">다음 결합 에너지를 이용하여 N₂(g) + 3H₂(g) → 2NH₃(g) 반응의 반응 엔탈피를 구해 보자.<br>
+          N≡N = 945 kJ/mol, H-H = 436 kJ/mol, N-H = 391 kJ/mol</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ΔH = −87 kJ</strong><br><br>
+            <strong>반응물 결합 에너지 (끊기):</strong><br>
+            N≡N 1 mol = 945 kJ<br>
+            H-H 3 mol = 3 × 436 = 1308 kJ<br>
+            합계 = 2253 kJ<br><br>
+            <strong>생성물 결합 에너지 (형성):</strong><br>
+            N-H 결합: NH₃ 1분자당 3개, 2 mol NH₃ → N-H 6 mol<br>
+            6 × 391 = 2346 kJ<br><br>
+            <strong>ΔH = 2253 − 2346 = −93 kJ</strong><br>
+            (※ 교과서 수치에 따라 약간의 차이 있음)
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+<!-- ══════════════════════════════════════
+     소단원 3: 화학 변화의 자발성
+══════════════════════════════════════ -->
+<div id="unit3" class="unit-section">
+  <div class="unit-banner ub-purple">
+    <div class="ub-emoji">♻️</div>
+    <div>
+      <div class="ub-num ub-num-p">소단원 03 · Spontaneity of Chemical Change</div>
+      <div class="ub-title">화학 변화의 자발성</div>
+      <div class="ub-desc">자발적 변화의 특징과 엔트로피(S)의 개념, 계와 주위의 엔트로피 변화, 그리고 엔탈피·엔트로피를 통합한 반응 자발성 판단법을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 엔트로피 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Entropy · 엔트로피</div>
+          <div class="acc-htitle">자발적 변화와 엔트로피</div>
+          <div class="acc-hdesc">자발적 변화 = 무질서도 증가 · 엔트로피(S) = 무질서한 정도 · S: 고체&lt;액체≪기체</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">자발적 변화란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🌊 자발적 변화 (Spontaneous Change)</div>
+          <span class="hp">자발적 변화</span>: 외부의 영향(에너지 공급) 없이 <strong>스스로 일어나는 변화</strong><br><br>
+          <strong>자발적 변화의 특징 — 무질서도 증가:</strong><br>
+          • 물에 잉크를 떨어뜨리면 → 잉크가 물 전체로 퍼짐 (자발) / 다시 뭉치지 않음 (비자발)<br>
+          • 향수 뿌리면 → 분자들이 공기 중으로 퍼짐 (자발)<br>
+          • 드라이아이스가 기체로 승화 (자발) / 기체가 다시 고체가 되지 않음 (비자발)<br><br>
+          공통점: <span class="hp">질서 있는 상태 → 무질서한 상태</span>로 변화
+        </div>
+
+        <div class="sec-title">엔트로피(S)와 엔트로피 변화(ΔS)</div>
+        <div class="concept-box">
+          <div class="cb-title">🌀 엔트로피 (Entropy, S)</div>
+          <span class="hp">엔트로피(S)</span>: 분자의 <strong>무질서한 정도</strong>를 나타내는 물리량<br><br>
+          대부분의 자발적인 과정은 <span class="hp">엔트로피가 낮은(질서 있는) 상태에서 높은(무질서한) 상태</span>로 진행됩니다.
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">ΔS = S최종 − S초기</div>
+          <div class="formula-sub">ΔS &gt; 0: 무질서도 증가 (엔트로피 증가) &nbsp;&nbsp; ΔS &lt; 0: 무질서도 감소 (엔트로피 감소)</div>
+        </div>
+
+        <div class="sec-title">물질의 상태와 엔트로피</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>상태</th><th>분자 배열</th><th>엔트로피 크기</th><th>상태 변화 시 ΔS</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hp">고체</span></td>
+              <td>규칙적, 고정 위치</td>
+              <td>가장 작음</td>
+              <td>고체→액체: ΔS &gt; 0 (엔트로피 증가)</td>
+            </tr>
+            <tr>
+              <td><span class="hp">액체</span></td>
+              <td>어느 정도 이동 가능, 불규칙</td>
+              <td>중간</td>
+              <td>액체→기체: ΔS &gt; 0 (엔트로피 증가)</td>
+            </tr>
+            <tr>
+              <td><span class="hp">기체</span></td>
+              <td>자유롭게 운동, 매우 무질서</td>
+              <td>가장 큼</td>
+              <td>기체→액체: ΔS &lt; 0 (엔트로피 감소)</td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">화학 반응에서 엔트로피 변화 예측</div>
+        <div class="green-box">
+          <div class="cb-title">📊 기체 분자 수 변화로 ΔS 예측 (반응물·생성물 모두 기체인 경우)</div>
+          <strong>기체 분자 수 증가 → ΔS &gt; 0:</strong><br>
+          N₂O₄(g) → 2NO₂(g) &nbsp; 반응 전 1 mol → 반응 후 2 mol<br><br>
+          <strong>기체 분자 수 감소 → ΔS &lt; 0:</strong><br>
+          N₂(g) + 3H₂(g) → 2NH₃(g) &nbsp; 반응 전 4 mol → 반응 후 2 mol<br><br>
+          <strong>고체/액체가 기체로 변하는 반응:</strong><br>
+          CaCO₃(s) → CaO(s) + CO₂(g) &nbsp; 기체 생성 → ΔS &gt; 0
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 9</div>
+          <div class="quiz-q">다음 변화에서 엔트로피 변화(ΔS)의 부호를 예측하고 이유를 설명해 보자.<br>
+          (1) H₂O(l) → H₂O(g) &nbsp;&nbsp; (2) 2SO₂(g) + O₂(g) → 2SO₃(g)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            (1) <span class="hg">ΔS &gt; 0</span> — 액체가 기체로 상태 변화. 기체는 액체보다 분자가 훨씬 무질서하게 배열되므로 엔트로피 증가<br><br>
+            (2) <span class="hr">ΔS &lt; 0</span> — 반응 전 기체 분자 수: SO₂ 2 mol + O₂ 1 mol = 3 mol / 반응 후: SO₃ 2 mol. 기체 분자 수 감소(3→2) → 무질서도 감소 → 엔트로피 감소
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 계와 주위, 자발성 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">System & Surroundings · 자발성 판단</div>
+          <div class="acc-htitle">계와 주위의 엔트로피 변화와 자발성</div>
+          <div class="acc-hdesc">계·주위·우주 개념 · ΔS전체 = ΔS계 + ΔS주위 · ΔS전체&gt;0: 자발 · 열역학 제2법칙</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">계·주위·우주의 정의</div>
+        <div class="concept-box">
+          <div class="cb-title">🌍 계(System)와 주위(Surroundings)</div>
+          <span class="hp">계 (System)</span>: 우리가 관심을 갖는 대상 = 반응물과 생성물<br>
+          <span class="hp">주위 (Surroundings)</span>: 계를 제외한 모든 것 = 반응 용기, 주변 공간 등<br>
+          <span class="hp">우주 (Universe)</span>: 계 + 주위<br><br>
+          <strong>계의 종류:</strong><br>
+          • 열린계: 주위와 물질·에너지 모두 교환 가능<br>
+          • 닫힌계: 주위와 에너지는 교환 가능, 물질은 불가<br>
+          • 고립계: 주위와 물질·에너지 모두 교환 불가
+        </div>
+
+        <div class="sec-title">전체 엔트로피 변화와 자발성</div>
+        <div class="formula-box">
+          <div class="formula-text">ΔS전체 = ΔS계 + ΔS주위</div>
+          <div class="formula-sub">열역학 제2법칙: ΔS전체 &gt; 0 → 자발적 반응 / ΔS전체 &lt; 0 → 비자발적 반응</div>
+        </div>
+
+        <div class="sec-title">계의 엔탈피 변화와 주위의 엔트로피 변화</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>반응 종류</th><th>계의 ΔH계</th><th>열 이동 방향</th><th>주위 온도</th><th>ΔS주위</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hr">발열 반응</span></td>
+              <td>ΔH계 &lt; 0</td>
+              <td>계 → 주위 (열 방출)</td>
+              <td>↑ 상승</td>
+              <td><span class="hg">ΔS주위 &gt; 0</span> (증가)</td>
+            </tr>
+            <tr>
+              <td><span class="hb">흡열 반응</span></td>
+              <td>ΔH계 &gt; 0</td>
+              <td>주위 → 계 (열 흡수)</td>
+              <td>↓ 하강</td>
+              <td><span class="hr">ΔS주위 &lt; 0</span> (감소)</td>
+            </tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- 03: 자발성 종합 판단 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Spontaneity Summary · 4가지 경우</div>
+          <div class="acc-htitle">엔탈피·엔트로피로 자발성 종합 판단</div>
+          <div class="acc-hdesc">ΔH계와 ΔS계 조합 4가지 경우 · 항상 자발 · 항상 비자발 · 조건부 자발</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">4가지 경우의 자발성 판단</div>
+        <div class="spontaneity-table">
+          <div class="spon-head">
+            <div>ΔH계 (엔탈피)</div>
+            <div>ΔS계 (엔트로피)</div>
+            <div>자발성</div>
+            <div>설명</div>
+          </div>
+          <div class="spon-row">
+            <div><span class="hr">음수 (발열)</span></div>
+            <div><span class="hg">양수 (증가)</span></div>
+            <div><span class="spon-badge badge-auto">항상 자발</span></div>
+            <div>ΔS계&gt;0, ΔS주위&gt;0 → ΔS전체&gt;0 확정</div>
+          </div>
+          <div class="spon-row">
+            <div><span class="hb">양수 (흡열)</span></div>
+            <div><span class="hr">음수 (감소)</span></div>
+            <div><span class="spon-badge badge-never">항상 비자발</span></div>
+            <div>ΔS계&lt;0, ΔS주위&lt;0 → ΔS전체&lt;0 확정</div>
+          </div>
+          <div class="spon-row">
+            <div><span class="hr">음수 (발열)</span></div>
+            <div><span class="hr">음수 (감소)</span></div>
+            <div><span class="spon-badge badge-cond">조건부 자발</span></div>
+            <div>|ΔS계| vs |ΔS주위| 크기 비교로 결정</div>
+          </div>
+          <div class="spon-row">
+            <div><span class="hb">양수 (흡열)</span></div>
+            <div><span class="hg">양수 (증가)</span></div>
+            <div><span class="spon-badge badge-cond">조건부 자발</span></div>
+            <div>|ΔS계| vs |ΔS주위| 크기 비교로 결정</div>
+          </div>
+        </div>
+
+        <div class="sec-title">다양한 반응의 자발성 사례 분석</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🔥</div>
+            <div class="pc-title">메테인 연소 — 자발</div>
+            <div class="pc-desc">CH₄ + 2O₂ → CO₂ + 2H₂O(l)<br>발열(ΔS주위&gt;0) + 기체→액체 포함(ΔS계&lt;0)이지만 |ΔS주위|&gt;|ΔS계| → ΔS전체&gt;0 → 자발</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🧊</div>
+            <div class="pc-title">얼음 녹음 — 자발</div>
+            <div class="pc-desc">H₂O(s) → H₂O(l) (실온)<br>흡열(ΔS주위&lt;0) + 고체→액체(ΔS계&gt;0). |ΔS계|&gt;|ΔS주위| → ΔS전체&gt;0 → 자발</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">💨</div>
+            <div class="pc-title">드라이아이스 승화 — 자발</div>
+            <div class="pc-desc">CO₂(s) → CO₂(g) (실온)<br>고체→기체로 ΔS계&gt;0 (큰 증가). 흡열이지만 엔트로피 이득이 더 큼 → 자발</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">⚡</div>
+            <div class="pc-title">물 전기분해 — 비자발</div>
+            <div class="pc-desc">2H₂O(l) → 2H₂(g) + O₂(g)<br>흡열(ΔS주위&lt;0) + 기체 생성(ΔS계&gt;0). 단, |ΔS주위|&gt;|ΔS계| → ΔS전체&lt;0 → 비자발 (전기 에너지 필요)</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🌫️</div>
+            <div class="pc-title">수증기 응결 — 자발</div>
+            <div class="pc-desc">H₂O(g) → H₂O(l)<br>ΔS계&lt;0 (기체→액체) 이지만 발열로 ΔS주위가 더 크게 증가 → ΔS전체&gt;0 → 자발</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🏭</div>
+            <div class="pc-title">석회석 분해 — 비자발(실온)</div>
+            <div class="pc-desc">CaCO₃(s) → CaO(s) + CO₂(g)<br>흡열 + ΔS계&gt;0. 700℃ 이상 필요. 실온에서는 |ΔS주위|&gt;|ΔS계| → 비자발</div>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 10</div>
+          <div class="quiz-q">다음 반응은 발열 반응(ΔH = −91.8 kJ)이고 고온에서 자발적으로 일어난다. 고온에서 자발적으로 일어나는 이유를 계와 주위의 엔트로피 변화로 설명해 보자.<br>
+          N₂(g) + 3H₂(g) → 2NH₃(g) &nbsp; ΔH = −91.8 kJ</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            이 반응은 기체 분자 수가 4 mol → 2 mol로 <span class="hr">감소</span>하므로 <strong>ΔS계 &lt; 0</strong>입니다. 발열 반응이므로 <strong>ΔS주위 &gt; 0</strong>입니다.<br><br>
+            고온에서 자발적으로 일어나는 이유: 고온에서는 발열 반응으로 방출되는 열에너지가 주위에 미치는 영향이 더 크기 때문에 <span class="hg">ΔS주위의 크기가 ΔS계의 크기보다 더 커집니다</span>. 따라서 ΔS전체 = ΔS계 + ΔS주위 &gt; 0이 되어 반응이 자발적으로 일어납니다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 11</div>
+          <div class="quiz-q">다음 반응이 실온에서 자발적으로 일어나는 까닭을 계와 주위의 엔트로피 변화로 설명해 보자.<br>
+          CO₂(s) → CO₂(g) (드라이아이스의 승화)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            CO₂(s) → CO₂(g)는 고체가 기체로 승화하는 상태 변화로 <span class="hg">ΔS계 &gt; 0</span>(엔트로피 크게 증가)입니다. 승화는 흡열 과정이므로 <span class="hr">ΔS주위 &lt; 0</span>입니다.<br><br>
+            그러나 고체→기체의 상태 변화는 엔트로피가 매우 크게 증가하므로 <strong>|ΔS계| &gt; |ΔS주위|</strong>가 됩니다. 따라서 ΔS전체 = ΔS계 + ΔS주위 &gt; 0이 되어 실온에서도 자발적으로 일어납니다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 12</div>
+          <div class="quiz-q">다음 (가), (나) 반응의 계의 엔트로피 변화(ΔS계)를 예측하고, 자발성 여부를 엔탈피와 엔트로피 변화로 설명해 보자.<br>
+          (가) CH₄(g) + 2O₂(g) → CO₂(g) + 2H₂O(l) &nbsp; ΔH = −890.8 kJ (자발)<br>
+          (나) 2H₂O(l) → 2H₂(g) + O₂(g) &nbsp; ΔH = +571.6 kJ (비자발)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            <strong>(가) CH₄ 연소:</strong><br>
+            ΔS계: 반응 전 기체 3 mol(CH₄ 1 + O₂ 2) → 반응 후 CO₂(g) 1 mol + H₂O(l) 2 mol. 기체 분자 수 감소 → <span class="hr">ΔS계 &lt; 0</span><br>
+            ΔS주위: 강한 발열 반응 → <span class="hg">ΔS주위 &gt; 0 (크게 증가)</span><br>
+            ∴ |ΔS주위| &gt; |ΔS계| → ΔS전체 &gt; 0 → <strong>자발적</strong><br><br>
+            <strong>(나) 물 전기 분해:</strong><br>
+            ΔS계: 액체 → 기체 분자 수 증가(기체 3 mol 생성) → <span class="hg">ΔS계 &gt; 0</span><br>
+            ΔS주위: 강한 흡열 반응 → <span class="hr">ΔS주위 &lt; 0 (크게 감소)</span><br>
+            ∴ |ΔS주위| &gt; |ΔS계| → ΔS전체 &lt; 0 → <strong>비자발적</strong> (전기 에너지 공급 필요)
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit3 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  ['unit1','unit2','unit3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('visible');
+  });
+  const target = document.getElementById('unit' + n);
+  if (target) target.classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => item.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+const hashMap = {'#unit1':1,'#unit2':2,'#unit3':3};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n - 1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape')
+    document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
