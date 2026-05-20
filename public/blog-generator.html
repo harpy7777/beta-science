@@ -530,13 +530,22 @@ function applyInline(t){
 }
 
 async function copyHTML(){
-  const html=buildHTML();
   const btn=document.getElementById('btn-copy');
+  const preview=document.getElementById('preview');
   try {
-    await navigator.clipboard.writeText(html);
-  } catch {
+    // 미리보기 DOM을 그대로 선택해서 복사 (서식 포함)
+    const range=document.createRange();
+    range.selectNodeContents(preview);
+    const sel=window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand('copy');
+    sel.removeAllRanges();
+  } catch(e) {
+    // 폴백: HTML 텍스트로 복사
     const ta=document.createElement('textarea');
-    ta.value=html; ta.style.cssText='position:fixed;opacity:0;';
+    ta.value=preview.innerText;
+    ta.style.cssText='position:fixed;opacity:0;';
     document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
   }
   btn.textContent='✅ 복사 완료!'; btn.className='act-btn btn-copied';
