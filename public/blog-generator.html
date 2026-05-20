@@ -39,7 +39,7 @@ body {
 .dot-green { width: 5px; height: 5px; background: #22c55e; border-radius: 50%; flex-shrink: 0; animation: blink 2s ease-in-out infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 /* ── 레이아웃 ── */
-.wrap { max-width: 720px; margin: 0 auto; padding: 1.4rem 1rem; padding-left: max(1rem, var(--safe-left)); padding-right: max(1rem, var(--safe-right)); }
+.wrap { max-width: 1000px; margin: 0 auto; padding: 1.4rem 1rem; padding-left: max(1rem, var(--safe-left)); padding-right: max(1rem, var(--safe-right)); }
 /* ── 웰컴바 ── */
 .welcome-bar { background: linear-gradient(135deg,#fff0f7,#fdf2f8 60%,#f0f9ff); border: 1px solid var(--pink-pale); border-radius: 18px; padding: 1.2rem 1.4rem; margin-bottom: 1.4rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
 .welcome-left { display: flex; align-items: center; gap: 12px; }
@@ -116,6 +116,10 @@ body {
 .preview ul { margin: 0 0 1rem 1.4rem; }
 .preview li { margin-bottom: 4px; }
 .preview strong { color: var(--pink); font-weight: 700; }
+.preview table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 14px; }
+.preview th { background: var(--pink-soft); color: var(--pink); font-weight: 700; padding: 10px 14px; border: 1px solid var(--pink-pale); text-align: left; }
+.preview td { padding: 9px 14px; border: 1px solid var(--pink-pale); color: #3c3c43; line-height: 1.6; }
+.preview tr:nth-child(even) td { background: #fffbfe; }
 .edit-area { width: 100%; min-height: 500px; padding: 1.6rem; font-size: 15px; line-height: 1.9; font-family: inherit; color: #1d1d1f; border: none; border-top: 1px solid var(--pink-pale); outline: none; resize: vertical; background: #fffbfe; -webkit-appearance: none; display: none; }
 /* ── 가이드 ── */
 .guide-card { margin-top: 12px; background: #f0f4ff; border: 1px solid #c5d0ea; border-radius: 12px; padding: 14px 16px; }
@@ -313,6 +317,7 @@ function buildPrompt(){
   rules.push('제목(# ), 소제목(## ), 본문 단락 구조의 마크다운으로 작성');
   rules.push('학생과 학부모를 대상으로 친근하고 유익한 톤');
   rules.push('구체적 사례, 팁, 설명을 풍부하게 포함');
+  rules.push('비교, 정리, 요약이 필요한 내용은 마크다운 표(| 컬럼1 | 컬럼2 |)를 적극 활용할 것');
   return `당신은 베타과학 학원의 전문 블로그 작가입니다.\n\n작성 규칙:\n${rules.map((r,i)=>`${i+1}. ${r}`).join('\n')}`;
 }
 
@@ -362,6 +367,20 @@ async function generate(){
 }
 
 function parseMd(s){
+  // 표 파싱
+  s = s.replace(/((?:^\|.+\|\s*\n)+)/gm, tableBlock => {
+    const rows = tableBlock.trim().split('\n').filter(r => r.trim());
+    const isHeader = rows.length > 1 && /^\|[-| :]+\|/.test(rows[1]);
+    let html = '<table>';
+    rows.forEach((row, i) => {
+      if(isHeader && i === 1) return;
+      const cells = row.split('|').filter((c,idx,arr) => idx > 0 && idx < arr.length-1);
+      const tag = (isHeader && i === 0) ? 'th' : 'td';
+      html += '<tr>' + cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join('') + '</tr>';
+    });
+    html += '</table>';
+    return html;
+  });
   return s.split('\n').map(line=>{
     if(/^# (.+)/.test(line)) return `<h1>${line.slice(2).trim()}</h1>`;
     if(/^## (.+)/.test(line)) return `<h2>${line.slice(3).trim()}</h2>`;
@@ -372,6 +391,7 @@ function parseMd(s){
   .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
   .replace(/(<li>.*<\/li>\n?)+/gs,m=>`<ul>${m}</ul>`)
   .split('\n').map(line=>{
+    if(line.startsWith('<table>')) return line;
     if(!line.startsWith('<') && line.trim()) return `<p>${line.trim()}</p>`;
     return line;
   }).join('');
@@ -424,7 +444,7 @@ function onEditChange(){
 }
 
 function buildHTML(){
-  return `<div style="font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;max-width:740px;margin:0 auto;padding:24px 20px;color:#1d1d1f;line-height:1.9;font-size:16px;">\n${parseMd(md)}\n</div>`;
+  return `<div style="font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;max-width:100%;margin:0 auto;padding:24px 20px;color:#1d1d1f;line-height:1.9;font-size:16px;">\n${parseMd(md)}\n</div>`;
 }
 
 async function copyHTML(){
