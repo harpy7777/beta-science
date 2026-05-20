@@ -290,6 +290,28 @@ body {
 
   <!-- 입력 섹션 (결과 없을 때) -->
   <div id="section-input">
+
+    <!-- API 키 입력 -->
+    <div id="api-key-section" style="margin-bottom:1.2rem;">
+      <div class="section-heading">API KEY</div>
+      <div class="input-card" style="padding:1.2rem 1.4rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <label class="input-label" style="margin:0;">🔑 OpenRouter API Key</label>
+          <span id="key-status" style="font-size:11px;font-weight:600;"></span>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <input class="input-field" id="api-key-input" type="password"
+            placeholder="sk-or-v1-..."
+            style="flex:1;"
+            oninput="onKeyInput()" />
+          <button onclick="saveKey()" style="padding:10px 16px;background:linear-gradient(135deg,#f472b6,#db2777);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;">저장</button>
+        </div>
+        <p style="font-size:11px;color:#aeaeb2;margin-top:8px;">
+          <a href="https://openrouter.ai/settings/keys" target="_blank" style="color:#db2777;text-decoration:none;">openrouter.ai</a>에서 무료 발급 · 이 기기에만 저장됩니다
+        </p>
+      </div>
+    </div>
+
     <div class="section-heading">CONTENT SOURCE</div>
 
     <div class="input-card">
@@ -397,11 +419,42 @@ body {
   document.getElementById('today-day').textContent=days[now.getDay()];
 })();
 
-const OPENROUTER_API_KEY = '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'; // ← openrouter.ai 에서 발급한 키 입력
+const OPENROUTER_API_KEY = 'YOUR_OPENROUTER_API_KEY_HERE'; // ← openrouter.ai 에서 발급한 키 입력
 
 let currentMarkdown = '';
 let isEditMode = false;
 let activeOptions = { len1500: true, seo: true, beta: true, norepeat: true };
+
+// API 키 관련
+(function initKey(){
+  const saved = localStorage.getItem('openrouter_key');
+  if(saved){
+    OPENROUTER_API_KEY = saved;
+    document.getElementById('api-key-section') && (document.getElementById('api-key-section').style.display='none');
+    const st = document.getElementById('key-status');
+    if(st){ st.textContent='✓ 저장됨'; st.style.color='#15803d'; }
+  }
+})();
+
+function onKeyInput(){
+  const val = document.getElementById('api-key-input').value.trim();
+  const st = document.getElementById('key-status');
+  if(val.startsWith('sk-or-')){ st.textContent='형식 확인 ✓'; st.style.color='#15803d'; }
+  else if(val){ st.textContent='sk-or- 로 시작해야 해요'; st.style.color='#e11d48'; }
+  else { st.textContent=''; }
+}
+
+function saveKey(){
+  const val = document.getElementById('api-key-input').value.trim();
+  if(!val){ alert('키를 입력해주세요.'); return; }
+  if(!val.startsWith('sk-or-')){ alert('올바른 OpenRouter 키는 sk-or- 로 시작해요.'); return; }
+  localStorage.setItem('openrouter_key', val);
+  OPENROUTER_API_KEY = val;
+  document.getElementById('api-key-section').style.display='none';
+  const st = document.getElementById('key-status');
+  if(st){ st.textContent='✓ 저장됨'; st.style.color='#15803d'; }
+  alert('✅ API 키가 저장되었습니다!');
+}
 
 function toggleChip(el, key) {
   activeOptions[key] = !activeOptions[key];
@@ -433,6 +486,7 @@ async function generate() {
   const url = document.getElementById('input-url').value.trim();
   const topic = document.getElementById('input-topic').value.trim();
   if (!url && !topic) { showError('URL 또는 주제를 입력해주세요.'); return; }
+  if (!OPENROUTER_API_KEY) { showError('API 키를 먼저 입력해주세요.'); document.getElementById('api-key-section').style.display='block'; return; }
 
   const userMsg = url
     ? `다음 URL을 참고하여 베타과학 학원 블로그 글을 작성해주세요.\nURL: ${url}\n\n(URL에서 직접 크롤링이 불가하더라도 URL 경로와 도메인에서 주제를 유추하여 블로그 글을 완성해주세요.)`
