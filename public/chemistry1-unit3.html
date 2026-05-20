@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>베타과학학원 · 화학 평형 · Ⅲ. 화학 평형 & 화학 평형 이동</title>
+<style>
+:root {
+  --chem:        #2563eb;
+  --chem-dark:   #1e3a8a;
+  --chem-mid:    #3b82f6;
+  --chem-light:  #60a5fa;
+  --chem-tint:   #eff6ff;
+  --chem-tint2:  #dbeafe;
+  --chem-border: #bfdbfe;
+  --chem-border2:#93c5fd;
+
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#f4f6fb; --white:#fff;
+  --border-soft:#e0eaff;
+
+  --green:#059669;--green-bg:#ecfdf5;--green-border:#a7f3d0;
+  --blue2:#2563eb;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
+  --amber:#d97706;--amber-bg:#fffbeb;--amber-border:#fde68a;
+  --red:#dc2626;--red-bg:#fef2f2;--red-border:#fecaca;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;--purple-border:#ddd6fe;
+
+  --header-h: 52px;
+  --tabs-h:   46px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* ── Header ── */
+.header{
+  background:#fff;border-bottom:1px solid var(--border-soft);
+  padding:0 max(1rem,env(safe-area-inset-left));
+  padding-right:max(1rem,env(safe-area-inset-right));
+  height:var(--header-h);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:500;
+}
+.header-left{display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;cursor:pointer;transition:opacity .15s;min-width:0}
+.header-left:hover{opacity:.75}
+.logo-mark{width:28px;height:28px;min-width:28px;background:linear-gradient(135deg,var(--chem-mid),var(--chem-dark));border-radius:8px;display:flex;align-items:center;justify-content:center}
+.brand-name{font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.header-badge{display:flex;align-items:center;gap:4px;background:var(--chem-tint);border:1px solid var(--chem-border);border-radius:20px;padding:4px 9px;font-size:10px;font-weight:700;color:var(--chem-dark);white-space:nowrap}
+.dot-blue{width:5px;height:5px;background:var(--chem-mid);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{padding:0 13px;height:34px;min-width:34px;background:transparent;border:1.5px solid var(--chem-border);border-radius:20px;font-size:12px;font-weight:700;color:var(--chem-dark);white-space:nowrap;transition:background .15s;display:flex;align-items:center;gap:4px}
+.back-btn:hover{background:var(--chem-tint)}
+.back-btn:active{background:var(--chem-tint2);transform:scale(.97)}
+
+/* ── Hero ── */
+.hero{
+  background:linear-gradient(135deg,var(--chem-dark) 0%,var(--chem) 55%,var(--chem-mid) 100%);
+  padding:clamp(1.6rem,5vw,2.8rem) clamp(1rem,4vw,1.5rem) clamp(1.4rem,4vw,2.2rem);
+  position:relative;overflow:hidden;
+}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero::after{content:'';position:absolute;left:-50px;bottom:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.breadcrumb{display:flex;align-items:center;gap:5px;margin-bottom:1rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:11.5px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;text-decoration:none;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:11px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:11.5px;color:#fff;font-weight:700}
+.hero-eyebrow{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 13px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.9rem}
+.hero-title{font-size:clamp(1.4rem,5vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem}
+.hero-desc{font-size:clamp(12.5px,3vw,13.5px);color:rgba(255,255,255,.85);line-height:1.7;max-width:560px;margin:0 auto 1.5rem}
+.hero-stats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.hero-stat-card{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:12px;padding:.75rem 1rem;text-align:center;backdrop-filter:blur(6px);min-width:72px;flex:1 1 72px;max-width:100px;transition:background .2s}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:clamp(1.3rem,4vw,1.8rem);font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:3px;font-weight:600;letter-spacing:.04em}
+
+/* ── Tabs ── */
+.tabs-wrap{background:var(--white);border-bottom:2px solid var(--chem-border);position:sticky;top:var(--header-h);z-index:400}
+.tabs-inner{max-width:1100px;margin:0 auto;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:0 max(.75rem,env(safe-area-inset-left));padding-right:max(.75rem,env(safe-area-inset-right))}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{flex:1 1 auto;min-width:0;padding:0 16px;height:var(--tabs-h);min-height:44px;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;margin-bottom:-2px;border-radius:8px 8px 0 0}
+.tab-btn:hover{color:var(--chem);background:var(--chem-tint)}
+.tab-btn.active{color:var(--chem);border-bottom-color:var(--chem)}
+.tab-btn:active{transform:scale(.97)}
+
+/* ── Content ── */
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.4rem max(1rem,env(safe-area-inset-left)) max(5rem,calc(5rem + env(safe-area-inset-bottom)));padding-right:max(1rem,env(safe-area-inset-right))}
+.unit-section{display:none}.unit-section.visible{display:block}
+
+/* ── Unit Banner ── */
+.unit-banner{border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:1.5rem;display:flex;align-items:flex-start;gap:1rem}
+.ub-blue{background:linear-gradient(135deg,var(--chem-tint),var(--chem-tint2));border:2px solid var(--chem-border)}
+.ub-emoji{font-size:2.2rem;flex-shrink:0;line-height:1;margin-top:2px}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--chem);margin-bottom:4px}
+.ub-title{font-size:clamp(1.05rem,4vw,1.25rem);font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+/* ── Accordion ── */
+.acc-list{display:flex;flex-direction:column;gap:10px}
+.acc-item{background:var(--white);border:1.5px solid #e5e7eb;border-radius:14px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.acc-item.open{border-color:var(--chem-border);box-shadow:0 4px 20px rgba(37,99,235,.1)}
+.acc-header{display:flex;align-items:center;gap:11px;padding:1rem 1.1rem;cursor:pointer;user-select:none;-webkit-user-select:none;transition:background .15s}
+.acc-header:hover{background:var(--chem-tint)}
+.acc-header:active{background:var(--chem-tint2)}
+.acc-num{width:30px;height:30px;min-width:30px;border-radius:9px;background:var(--chem-tint2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:var(--chem-dark);transition:background .2s,color .2s}
+.acc-item.open .acc-num{background:var(--chem);color:#fff}
+.acc-head-info{flex:1;min-width:0}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--chem-border2);letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .2s}
+.acc-item.open .acc-subtitle{color:var(--chem)}
+.acc-htitle{font-size:14.5px;font-weight:800;color:var(--text);letter-spacing:-.02em;line-height:1.35}
+.acc-hdesc{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.acc-chevron{font-size:14px;color:var(--dim);transition:transform .25s,color .2s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--chem)}
+.acc-body{display:none;padding:0 1.1rem 1.5rem;border-top:1px solid var(--chem-tint2)}
+.acc-item.open .acc-body{display:block}
+
+/* ── Section Title ── */
+.sec-title{font-size:11.5px;font-weight:800;color:var(--chem-dark);letter-spacing:.06em;text-transform:uppercase;margin:1.3rem 0 .65rem;display:flex;align-items:center;gap:7px}
+.sec-title::before{content:'';width:4px;height:14px;background:var(--chem);border-radius:2px;display:block;flex-shrink:0}
+
+/* ── Content Boxes ── */
+.concept-box,.green-box,.amber-box,.blue-box,.red-box,.purple-box{
+  border-radius:11px;padding:.9rem 1rem;margin:.55rem 0;line-height:1.75;font-size:13px;
+  word-break:keep-all;overflow-wrap:break-word;
+}
+.concept-box{background:var(--chem-tint);border:1.5px solid var(--chem-border);border-left:4px solid var(--chem)}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--green)}
+.amber-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-left:4px solid var(--amber)}
+.blue-box{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-left:4px solid var(--blue2)}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red)}
+.purple-box{background:var(--purple-bg);border:1.5px solid var(--purple-border);border-left:4px solid var(--purple)}
+.cb-title{font-weight:800;font-size:13.5px;margin-bottom:.4rem}
+.concept-box .cb-title{color:var(--chem-dark)}
+.green-box .cb-title{color:#065f46}
+.amber-box .cb-title{color:#92400e}
+.blue-box .cb-title{color:#1e40af}
+.red-box .cb-title{color:#991b1b}
+.purple-box .cb-title{color:#5b21b6}
+
+/* ── Table ── */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:.75rem 0;border-radius:11px;border:1.5px solid var(--chem-border)}
+.table-wrap table{width:100%;min-width:420px;border-collapse:collapse;font-size:12.5px}
+.table-wrap thead th{background:var(--chem-tint2);padding:9px 12px;text-align:left;font-weight:800;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--chem-dark);white-space:nowrap}
+.table-wrap tbody td{padding:9px 12px;border-top:1px solid #e5e7eb;line-height:1.6;word-break:keep-all;vertical-align:top}
+.table-wrap tbody tr:hover td{background:var(--chem-tint)}
+
+/* ── Formula Box ── */
+.formula-box{background:linear-gradient(135deg,var(--chem-tint),var(--chem-tint2));border:2px solid var(--chem-border);border-radius:13px;padding:1.1rem 1.2rem;margin:.75rem 0;text-align:center;overflow:hidden}
+.formula-text{font-size:clamp(.95rem,3.5vw,1.3rem);font-weight:900;color:var(--chem-dark);letter-spacing:-.01em;font-style:italic;word-break:break-all;overflow-wrap:break-word;line-height:1.5}
+.formula-sub{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.5;word-break:keep-all}
+
+/* ── Flow ── */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.75rem 0;font-size:13px}
+.flow-box{background:var(--white);border:1.5px solid var(--chem-border);border-radius:8px;padding:7px 11px;font-weight:700;color:var(--chem-dark);text-align:center;font-size:12px;line-height:1.4}
+.flow-arrow{color:var(--chem);font-size:16px;font-weight:900;flex-shrink:0}
+@media(max-width:480px){
+  .flow{flex-direction:column;align-items:stretch}
+  .flow-arrow{text-align:center;transform:rotate(90deg);display:block;font-size:18px}
+}
+
+/* ── Point Cards ── */
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(160px,100%),1fr));gap:8px;margin:.75rem 0}
+.point-card{background:var(--white);border:1.5px solid var(--chem-border);border-radius:11px;padding:.9rem;text-align:center}
+.pc-icon{font-size:1.6rem;margin-bottom:5px}
+.pc-title{font-size:12.5px;font-weight:800;color:var(--chem);margin-bottom:3px}
+.pc-desc{font-size:11.5px;color:var(--muted);line-height:1.55}
+
+/* ── Highlight ── */
+.hp{color:var(--chem-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--blue2);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.hv{color:var(--purple);font-weight:800}
+
+/* ── Quiz ── */
+.quiz-wrap{background:linear-gradient(135deg,var(--chem-tint2),var(--chem-tint));border:1.5px solid var(--chem-border);border-radius:13px;padding:1.1rem 1.1rem;margin-top:1.4rem}
+.quiz-label{font-size:11px;font-weight:800;color:var(--chem-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.7rem}
+.quiz-q{font-size:13.5px;font-weight:700;color:var(--text);line-height:1.7;margin-bottom:.65rem;word-break:keep-all}
+.quiz-toggle{background:var(--chem);color:#fff;border:none;border-radius:20px;padding:9px 20px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s,transform .1s;display:inline-block;min-height:40px}
+.quiz-toggle:hover{background:var(--chem-dark)}
+.quiz-toggle:active{transform:scale(.97)}
+.quiz-ans{display:none;margin-top:.75rem;padding:.9rem 1rem;background:rgba(255,255,255,.85);border-radius:9px;font-size:13px;color:var(--text);line-height:1.8;word-break:keep-all}
+
+/* Body text */
+body p{line-height:1.75;font-size:13px;margin:.4rem 0;word-break:keep-all}
+
+/* ═══════════════════ RESPONSIVE ═══════════════════ */
+@media(min-width:769px){
+  .acc-header{padding:1.2rem 1.5rem}
+  .acc-body{padding:0 1.5rem 1.8rem}
+  .acc-num{width:32px;height:32px;font-size:13px}
+  .acc-htitle{font-size:15px}
+  .tab-btn{padding:0 28px}
+}
+@media(max-width:768px){
+  .hero{padding:1.8rem 1rem 1.5rem}
+  .content-wrap{padding:1.1rem .85rem max(4.5rem,calc(4.5rem + env(safe-area-inset-bottom)))}
+  .unit-banner{flex-direction:row;gap:.9rem;padding:1rem 1.1rem}
+  .ub-emoji{font-size:1.9rem}
+  .header-badge{display:none}
+}
+@media(max-width:480px){
+  :root{--header-h:50px;--tabs-h:44px}
+  .brand-name{font-size:13px}
+  .back-btn span.txt{display:none}
+  .back-btn{padding:0 10px;font-size:14px}
+  .unit-banner{padding:.9rem 1rem}
+  .ub-title{font-size:1rem}
+  .acc-header{padding:.9rem 1rem}
+  .acc-body{padding:0 .9rem 1.3rem}
+  .acc-htitle{font-size:13.5px}
+  .acc-hdesc{font-size:11px}
+  .quiz-q{font-size:13px}
+  .quiz-ans{font-size:12.5px}
+  .formula-text{font-size:.88rem}
+  .table-wrap table{font-size:12px}
+  .table-wrap thead th{font-size:10px;padding:8px 10px}
+  .table-wrap tbody td{padding:8px 10px}
+  .point-box{grid-template-columns:1fr 1fr}
+  .hero-desc{font-size:12px}
+  .breadcrumb{gap:4px}
+  .bc-item,.bc-current{font-size:11px}
+}
+@media(max-width:360px){
+  .point-box{grid-template-columns:1fr}
+  .hero-title{font-size:1.25rem}
+  .acc-htitle{font-size:13px}
+  .formula-text{font-size:.82rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="15" height="15" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div class="header-right">
+    <div class="header-badge"><span class="dot-blue"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">
+      <span>←</span><span class="txt"> 뒤로</span>
+    </button>
+  </div>
+</header>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="chemistry1-summary.html" class="bc-item">화학 1 핵심 정리</a><span class="bc-sep">›</span>
+      <span class="bc-current">⚗️ Ⅲ. 화학 평형</span>
+    </div>
+    <div class="hero-eyebrow">⚗️ PART 03 · 화학 평형 · UNIT 03</div>
+    <div class="hero-title">Ⅲ. 화학 평형<br>완벽 상세 학습 가이드</div>
+    <div class="hero-desc">가역 반응·화학 평형·평형 상수·반응 지수, 르샤틀리에 원리와<br>농도·압력·온도에 따른 평형 이동까지 미래엔 교과서 완벽 정리</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">2</div><div class="hs-lbl">중단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">6</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">20+</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tabs ── -->
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">⚖️ 중단원1 · 화학 평형</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">🔄 중단원2 · 화학 평형 이동</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ══════════════════════════════════════
+     중단원 1: 화학 평형
+══════════════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner ub-blue">
+    <div class="ub-emoji">⚖️</div>
+    <div>
+      <div class="ub-num">중단원 01 · Chemical Equilibrium</div>
+      <div class="ub-title">화학 평형</div>
+      <div class="ub-desc">가역 반응과 비가역 반응의 차이를 이해하고, 화학 평형 상태의 특징과 평형 상수의 의미, 반응 지수로 반응 진행 방향을 예측하는 방법을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 소단원 01: 가역 반응과 화학 평형 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Reversible Reaction · 가역 반응과 화학 평형</div>
+          <div class="acc-htitle">가역 반응과 화학 평형</div>
+          <div class="acc-hdesc">정반응↔역반응 · 비가역 반응 · 동적 평형 · 정반응 속도 = 역반응 속도</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">가역 반응과 비가역 반응</div>
+        <div class="concept-box">
+          <div class="cb-title">🔵 가역 반응 (Reversible Reaction)</div>
+          반응 조건에 따라 <span class="hp">정반응</span>(반응물 → 생성물)과 <span class="hp">역반응</span>(생성물 → 반응물)이 모두 일어날 수 있는 반응.<br><br>
+          화학 반응식에서 가역 반응은 <strong>⇌</strong> 기호로 나타냅니다.<br><br>
+          예) <strong>황산 구리(II) 오수화물:</strong><br>
+          CuSO₄·5H₂O(s) ⇌ CuSO₄(s) + 5H₂O(l)<br>
+          (파란색) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (흰색)
+        </div>
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 비가역 반응 (Irreversible Reaction)</div>
+          한 방향으로만 일어나는 반응. 생성물이 다시 반응물로 되돌아가기 매우 어렵습니다.<br><br>
+          예)<br>
+          • 메테인 연소: CH₄(g) + 2O₂(g) → CO₂(g) + 2H₂O(l)<br>
+          • 마그네슘과 염산 반응: Mg(s) + 2HCl(aq) → MgCl₂(aq) + H₂(g)
+        </div>
+
+        <div class="sec-title">가역 반응과 비가역 반응 비교</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>가역 반응</th><th>비가역 반응</th></tr></thead>
+          <tbody>
+            <tr><td><strong>정의</strong></td><td>정반응·역반응 모두 가능</td><td>한 방향으로만 진행</td></tr>
+            <tr><td><strong>화학 반응식 기호</strong></td><td>⇌</td><td>→</td></tr>
+            <tr><td><strong>예시</strong></td><td>암모니아 합성, 석회 동굴 생성, CuSO₄·5H₂O 분해</td><td>메테인 연소, 마그네슘+염산 반응</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">화학 평형 (Chemical Equilibrium)</div>
+        <div class="concept-box">
+          <div class="cb-title">⚖️ 화학 평형이란?</div>
+          가역 반응에서 <span class="hp">정반응 속도 = 역반응 속도</span>가 되어 반응물과 생성물의 농도가 변하지 않고 일정하게 유지되는 상태.<br><br>
+          이는 반응이 멈춘 것이 아니라 <span class="hp">동적 평형(dynamic equilibrium)</span> 상태입니다.
+        </div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">⚡</div>
+            <div class="pc-title">동적 평형</div>
+            <div class="pc-desc">정반응·역반응이 같은 속도로 지속적으로 진행 중</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">📊</div>
+            <div class="pc-title">농도 일정</div>
+            <div class="pc-desc">반응물·생성물의 농도가 변하지 않고 일정하게 유지</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">👁️</div>
+            <div class="pc-title">겉보기 정지</div>
+            <div class="pc-desc">겉으로는 변화가 없는 것처럼 보이지만 반응은 진행 중</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🌡️</div>
+            <div class="pc-title">온도에 의존</div>
+            <div class="pc-desc">온도가 일정하면 평형 농도(평형 상수)도 일정</div>
+          </div>
+        </div>
+
+        <div class="sec-title">NO₂ ⇌ N₂O₄ 실험으로 이해하는 화학 평형</div>
+        <div class="blue-box">
+          <div class="cb-title">🧪 2NO₂(g) ⇌ N₂O₄(g) &nbsp; (적갈색 ⇌ 무색)</div>
+          <strong>NO₂만 넣은 경우:</strong> 처음엔 적갈색이 진하다가 점점 옅어지고 일정해짐<br>
+          → 정반응(NO₂→N₂O₄)이 우세하다가 평형 도달<br><br>
+          <strong>N₂O₄만 넣은 경우:</strong> 처음엔 무색이었다가 점점 적갈색이 진해지고 일정해짐<br>
+          → 역반응(N₂O₄→NO₂)이 우세하다가 평형 도달<br><br>
+          두 경우 모두 충분한 시간이 지나면 <span class="hb">같은 평형 상태</span>에 도달합니다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">반응물이 생성물로 되는 반응을 ( )이라 하고, 생성물이 반응물로 되는 반응을 ( )이라고 한다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 정반응, 역반응</strong></div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">가역 반응에서 반응물과 생성물의 농도가 변하지 않고 일정하게 유지되는 상태를 ( )(이)라고 한다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 화학 평형</strong><br><br>화학 평형 상태에서 정반응 속도와 역반응 속도가 같으며, 겉으로는 변화가 없는 것처럼 보이는 동적 평형 상태입니다.</div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">화학 평형 상태에서 정반응 속도와 역반응 속도가 같다. (○, ×)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: ○ (맞음)</strong><br><br>화학 평형은 정반응과 역반응이 같은 속도로 진행되는 동적 평형 상태입니다.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 소단원 02: 화학 평형과 평형 상수 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Equilibrium Constant · 평형 상수</div>
+          <div class="acc-htitle">화학 평형과 평형 상수</div>
+          <div class="acc-hdesc">K = [생성물]계수 / [반응물]계수 · 온도만의 함수 · K 크기로 생성물 비교</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">평형 상수 (Equilibrium Constant, K)</div>
+        <div class="concept-box">
+          <div class="cb-title">📐 평형 상수란?</div>
+          일정한 온도에서 화학 반응이 평형에 도달했을 때 <span class="hp">반응물의 농도 곱에 대한 생성물의 농도 곱의 비</span>는 처음 농도와 관계없이 항상 일정합니다. 이 값을 <strong>평형 상수(K)</strong>라고 합니다.
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">aA + bB ⇌ cC + dD &nbsp;→&nbsp; K = [C]ᶜ[D]ᵈ / [A]ᵃ[B]ᵇ</div>
+          <div class="formula-sub">[A],[B],[C],[D]는 각 물질의 평형 농도(mol/L) · 계수가 지수로 사용됨</div>
+        </div>
+
+        <div class="sec-title">평형 상수의 특징</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>특징</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">온도에만 의존</span></td><td>일정한 온도에서는 처음 농도와 무관하게 항상 일정한 값</td></tr>
+            <tr><td><span class="hp">농도·압력 무관</span></td><td>농도나 압력이 변해도 평형 상수는 변하지 않음 (온도가 같다면)</td></tr>
+            <tr><td><span class="hp">순수 고체·액체 제외</span></td><td>순수한 고체(s)나 액체(l)는 농도가 일정하므로 평형 상수 식에 포함하지 않음</td></tr>
+            <tr><td><span class="hp">단위 생략</span></td><td>평형 상수는 몰농도로 계산하지만 단위는 표기하지 않음</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">평형 상수로 알 수 있는 정보</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>평형 상수(K) 크기</th><th>의미</th><th>평형 상태</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">K ≫ 1</span></td><td>생성물이 반응물보다 많음</td><td>정반응 방향으로 많이 진행</td></tr>
+            <tr><td><span class="hp">K ≈ 1</span></td><td>반응물과 생성물이 비슷</td><td>중간 정도 진행</td></tr>
+            <tr><td><span class="hp">K ≪ 1</span></td><td>반응물이 생성물보다 많음</td><td>역반응 방향으로 많이 치우침</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">평형 상수 계산 예시</div>
+        <div class="green-box">
+          <div class="cb-title">🧮 H₂(g) + I₂(g) ⇌ 2HI(g) — 평형 상수 계산</div>
+          어떤 온도에서 1 L 용기에 H₂ 1 mol, I₂ 1 mol 넣어 반응 후 HI 1.6 mol 생성됨<br><br>
+          <strong>반응표:</strong><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;H₂ &nbsp;&nbsp; + &nbsp;&nbsp; I₂ &nbsp;&nbsp; ⇌ &nbsp;&nbsp; 2HI<br>
+          초기(mol): 1.0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1.0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0<br>
+          반응(mol): -0.8 &nbsp;&nbsp;&nbsp;&nbsp; -0.8 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +1.6<br>
+          평형(mol): 0.2 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0.2 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1.6<br><br>
+          <strong>평형 농도(1 L 기준):</strong> [H₂]=0.2 M, [I₂]=0.2 M, [HI]=1.6 M<br>
+          <strong>K = [HI]² / ([H₂][I₂]) = 1.6² / (0.2 × 0.2) = 2.56 / 0.04 = <span class="hp">64</span></strong>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">화학 반응이 평형에 도달했을 때 반응물의 농도 곱에 대한 생성물의 농도 곱의 비를 ( )(이)라고 한다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 평형 상수(K)</strong></div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">반응 HNO₃(aq) ⇌ H⁺(aq) + NO₃⁻(aq)의 평형 상수식을 써 보자.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: K = [H⁺][NO₃⁻] / [HNO₃]</strong><br><br>
+            분자: 생성물의 농도를 각 계수의 거듭제곱으로 곱함 → [H⁺]¹ × [NO₃⁻]¹<br>
+            분모: 반응물의 농도를 각 계수의 거듭제곱으로 곱함 → [HNO₃]¹
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">평형 상수에 대한 설명으로 옳지 않은 것은?<br>① 온도가 일정할 때 일정한 값을 갖는다.<br>② 평형 상수는 온도 외에도 농도와 압력의 영향을 받는다.<br>③ 순수한 고체나 액체의 농도는 평형 상수 계산 시 생략한다.<br>④ K가 크면 생성물이 반응물보다 많은 상태에서 평형에 도달한다.<br>⑤ 처음 농도에 관계없이 같은 온도에서는 항상 일정한 K값을 갖는다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ②</strong><br><br>
+            평형 상수(K)는 <strong>온도에만 의존</strong>합니다. 농도나 압력이 변해도 온도가 동일하다면 평형 상수는 변하지 않습니다. 농도나 압력은 반응 지수(Q)를 변화시켜 평형의 이동 방향만 바꿀 뿐입니다.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 소단원 03: 화학 반응의 진행 방향 예측 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Reaction Quotient · 반응 지수</div>
+          <div class="acc-htitle">화학 반응의 진행 방향 예측</div>
+          <div class="acc-hdesc">반응 지수(Q) vs 평형 상수(K) 비교 · Q&lt;K → 정반응 · Q&gt;K → 역반응</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">반응 지수 (Reaction Quotient, Q)</div>
+        <div class="concept-box">
+          <div class="cb-title">📊 반응 지수(Q)란?</div>
+          <span class="hp">반응 지수(Q)</span>: 화학 반응을 <strong>관찰하는 시점</strong>의 반응물과 생성물의 농도를 평형 상수식에 넣어 계산한 값.<br><br>
+          평형 상수(K)와 형태는 동일하지만, <strong>평형 농도가 아닌 현재 농도</strong>를 사용합니다.
+        </div>
+
+        <div class="sec-title">Q와 K의 비교로 반응 진행 방향 예측</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>조건</th><th>반응 진행 방향</th><th>이유</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hr">Q &lt; K</span></td><td>→ <strong>정반응</strong> 우세</td><td>생성물을 더 만들어야 평형 도달 (Q를 K까지 증가시켜야 함)</td></tr>
+            <tr><td><span class="hg">Q = K</span></td><td>→ <strong>평형 상태</strong></td><td>이미 평형 도달, 정반응·역반응 속도 동일</td></tr>
+            <tr><td><span class="hp">Q &gt; K</span></td><td>→ <strong>역반응</strong> 우세</td><td>생성물을 줄여야 평형 도달 (Q를 K까지 감소시켜야 함)</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="formula-box">
+          <div class="formula-text">Q &lt; K → 정반응 &nbsp;|&nbsp; Q = K → 평형 &nbsp;|&nbsp; Q &gt; K → 역반응</div>
+          <div class="formula-sub">반응은 Q = K 가 될 때까지 진행하여 평형에 도달합니다</div>
+        </div>
+
+        <div class="sec-title">계산 예시</div>
+        <div class="green-box">
+          <div class="cb-title">🧮 N₂(g) + 3H₂(g) ⇌ 2NH₃(g), K=200</div>
+          1 L 용기에 N₂, H₂, NH₃를 각각 0.1 mol 넣었을 때 반응 방향은?<br><br>
+          Q = [NH₃]² / ([N₂][H₂]³) = (0.1)² / (0.1 × (0.1)³) = 0.01 / 0.0001 = <strong>100</strong><br><br>
+          Q(100) &lt; K(200) → <span class="hb">정반응이 우세하게 진행</span>하여 NH₃가 더 생성됩니다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 7</div>
+          <div class="quiz-q">반응물과 생성물의 현재 농도를 평형 상수식에 넣어 계산한 값을 ( )(이)라고 한다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 반응 지수(Q)</strong></div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 8</div>
+          <div class="quiz-q">어떤 온도에서 A(g) ⇌ B(g) 반응의 평형 상수(K)가 1일 때, 처음 농도가 [A]=1 mol/L, [B]=2 mol/L이면 어느 방향으로 반응이 진행하는가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 역반응이 우세하게 진행</strong><br><br>
+            Q = [B]/[A] = 2/1 = 2<br>
+            Q(2) &gt; K(1) → 역반응이 우세하게 진행하여 [B]는 감소하고 [A]는 증가합니다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">🚀 심화 문제</div>
+          <div class="quiz-q">어떤 온도에서 PCl₃(g) + Cl₂(g) ⇌ PCl₅(g) 반응의 K=50 이다. 같은 온도에서 [PCl₃]=0.31, [Cl₂]=0.68, [PCl₅]=5.21 mol/L 일 때 반응의 진행 방향을 구하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 이미 평형 상태</strong><br><br>
+            Q = [PCl₅] / ([PCl₃][Cl₂]) = 5.21 / (0.31 × 0.68) = 5.21 / 0.2108 ≈ <strong>24.7 ≠ 50</strong><br><br>
+            ※ 실제 계산 시 Q ≈ 24.7로 K=50보다 작으므로 <span class="hb">정반응이 우세</span>합니다.<br>
+            만약 Q=K=50이 나왔다면 이미 평형 상태입니다. 반응 지수를 통해 반응 방향을 판단합니다.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ══════════════════════════════════════
+     중단원 2: 화학 평형 이동
+══════════════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner ub-blue">
+    <div class="ub-emoji">🔄</div>
+    <div>
+      <div class="ub-num">중단원 02 · Le Chatelier's Principle</div>
+      <div class="ub-title">화학 평형 이동</div>
+      <div class="ub-desc">르샤틀리에 원리를 이해하고 농도·압력·온도 변화에 따른 화학 평형 이동 방향을 예측하며, 생명 현상과 산업 현장에서의 적용 사례를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 소단원 01: 화학 평형 이동 개요 + 농도 변화 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Concentration Change · 농도 변화와 평형 이동</div>
+          <div class="acc-htitle">화학 평형 이동과 농도 변화</div>
+          <div class="acc-hdesc">조건 변화 → 평형 깨짐 → 새로운 평형 · 반응물↑ → 정반응 우세 · 생성물↑ → 역반응 우세</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">화학 평형 이동 (Equilibrium Shift)</div>
+        <div class="concept-box">
+          <div class="cb-title">🔵 화학 평형 이동이란?</div>
+          화학 반응이 평형 상태일 때 <span class="hp">농도·압력·온도</span> 같은 조건이 달라지면 평형이 깨집니다. 이에 따라 조건의 변화를 감소시키는 쪽으로 정반응 또는 역반응이 우세하게 진행해 <strong>새로운 평형</strong>을 이루는 것을 <span class="hp">화학 평형 이동</span>이라고 합니다.
+        </div>
+
+        <div class="flow">
+          <div class="flow-box">평형 상태</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">조건 변화<br>(농도·압력·온도)</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">평형 깨짐</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">평형 이동<br>(정반응 or 역반응)</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">새로운<br>평형 상태</div>
+        </div>
+
+        <div class="sec-title">농도 변화와 화학 평형 이동</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>변화</th><th>평형 이동 방향</th><th>이유</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">반응물 농도 증가</span></td><td>→ <strong>정반응</strong> 우세</td><td>반응물 농도가 감소하는 방향으로 이동</td></tr>
+            <tr><td><span class="hp">반응물 농도 감소</span></td><td>→ <strong>역반응</strong> 우세</td><td>반응물 농도가 증가하는 방향으로 이동</td></tr>
+            <tr><td><span class="hp">생성물 농도 증가</span></td><td>→ <strong>역반응</strong> 우세</td><td>생성물 농도가 감소하는 방향으로 이동</td></tr>
+            <tr><td><span class="hp">생성물 농도 감소</span></td><td>→ <strong>정반응</strong> 우세</td><td>생성물 농도가 증가하는 방향으로 이동</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">다이크로뮴산 칼륨 실험 예시</div>
+        <div class="blue-box">
+          <div class="cb-title">🧪 Cr₂O₇²⁻(aq) + H₂O(l) ⇌ 2CrO₄²⁻(aq) + 2H⁺(aq)</div>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(주황색) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (노란색)<br><br>
+          • <strong>NaOH(aq) 첨가</strong>: OH⁻가 H⁺와 반응 → [H⁺] 감소 → <span class="hb">정반응 우세</span> → 노란색으로 변화<br>
+          • <strong>HCl(aq) 첨가</strong>: H⁺ 증가 → [H⁺] 증가 → <span class="hr">역반응 우세</span> → 주황색으로 변화
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 9</div>
+          <div class="quiz-q">화학 반응이 평형 상태일 때 조건이 달라지면 정반응이나 역반응이 우세하게 일어나 새로운 평형에 도달하는데, 이를 ( )(이)라고 한다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 화학 평형 이동</strong></div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 10</div>
+          <div class="quiz-q">화학 평형 상태에서 반응물을 첨가하면 어느 반응이 우세하게 진행하여 새로운 평형에 도달하는가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 정반응이 우세하게 진행</strong><br><br>반응물 농도가 증가하면 이를 감소시키는 방향(정반응)이 우세하게 진행하여 새로운 평형에 도달합니다.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 소단원 02: 압력 변화와 평형 이동 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Pressure Change · 압력 변화와 평형 이동</div>
+          <div class="acc-htitle">압력 변화와 화학 평형 이동</div>
+          <div class="acc-hdesc">압력↑ → 기체 분자 수 감소 방향 · 반응 전후 기체 분자 수 동일 → 압력 무관</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">압력 변화와 화학 평형 이동</div>
+        <div class="concept-box">
+          <div class="cb-title">💨 기체 반응에서 압력 변화의 효과</div>
+          기체는 압력이 변하면 부피(농도)가 달라집니다. 기체의 화학 반응이 평형 상태일 때:<br><br>
+          • <span class="hp">압력 증가</span>: 압력을 낮추는 방향, 즉 <strong>전체 기체 분자 수가 감소하는 방향</strong>으로 평형 이동<br>
+          • <span class="hp">압력 감소</span>: 압력을 높이는 방향, 즉 <strong>전체 기체 분자 수가 증가하는 방향</strong>으로 평형 이동
+        </div>
+
+        <div class="sec-title">기체 분자 수 변화에 따른 압력 영향 정리</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>반응</th><th>압력 증가 시</th><th>압력 감소 시</th></tr></thead>
+          <tbody>
+            <tr><td>반응물 기체 분자 수 &gt; 생성물<br>(예: N₂+3H₂ ⇌ 2NH₃)</td><td>→ <strong>정반응</strong> 우세 (기체 수 감소)</td><td>→ <strong>역반응</strong> 우세 (기체 수 증가)</td></tr>
+            <tr><td>반응물 기체 분자 수 &lt; 생성물<br>(예: 2NO ⇌ N₂+O₂)</td><td>→ <strong>역반응</strong> 우세 (기체 수 감소)</td><td>→ <strong>정반응</strong> 우세 (기체 수 증가)</td></tr>
+            <tr><td>반응 전후 기체 분자 수 동일<br>(예: H₂+I₂ ⇌ 2HI)</td><td>→ <strong>평형 이동 없음</strong></td><td>→ <strong>평형 이동 없음</strong></td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 주의사항 — 불활성 기체 첨가</div>
+          밀폐 용기(부피 고정)에 He 등 <span class="ha">불활성 기체</span>를 넣으면 전체 압력은 증가하지만 <strong>각 기체의 분압(농도)은 변하지 않습니다.</strong><br>
+          → 반응물·생성물의 농도가 변하지 않으므로 <span class="ha">평형 이동 없음</span>
+        </div>
+
+        <div class="sec-title">2NO₂(g) ⇌ N₂O₄(g) 실험으로 이해하기</div>
+        <div class="blue-box">
+          <div class="cb-title">🧪 주사기 압축 실험</div>
+          NO₂(g)(적갈색)와 N₂O₄(g)(무색) 혼합 기체를 주사기에 넣고 피스톤을 누를 때:<br><br>
+          <strong>(가) 처음:</strong> 적갈색<br>
+          <strong>(나) 피스톤 누른 직후:</strong> 부피 감소 → 농도 증가 → 색이 더 진한 적갈색<br>
+          <strong>(다) 시간 충분히 경과 후:</strong> 압력 증가 → 기체 분자 수 감소(N₂O₄ 더 생성) → 무색에 가까워짐<br><br>
+          2NO₂ → N₂O₄: 기체 2몰 → 1몰 (기체 분자 수 감소) → <span class="hb">정반응 우세</span>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 11</div>
+          <div class="quiz-q">기체의 반응이 화학 평형 상태일 때 압력이 증가하면 전체 기체 분자 수가 ( ) 방향으로 평형이 이동해 새로운 평형을 이룬다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 감소하는</strong><br><br>압력이 증가하면 압력을 낮추기 위해 전체 기체 분자 수가 감소하는 방향으로 평형이 이동합니다.</div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 12</div>
+          <div class="quiz-q">다음 기체의 반응이 평형에 도달했을 때 압력이 증가하면 화학 평형이 어느 방향으로 이동하는지 써 보자.<br>(1) N₂(g) + O₂(g) ⇌ 2NO(g) &nbsp;&nbsp; (2) 2NO(g) + Cl₂(g) ⇌ 2NOCl(g)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            (1) N₂+O₂ ⇌ 2NO: 반응물 2몰 → 생성물 2몰 (기체 분자 수 동일)<br>
+            → <strong>평형 이동 없음</strong><br><br>
+            (2) 2NO+Cl₂ ⇌ 2NOCl: 반응물 3몰 → 생성물 2몰 (감소)<br>
+            → 압력 증가 → <strong>정반응 우세</strong> (기체 분자 수 2몰로 감소하는 방향)
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 소단원 03: 온도 변화와 르샤틀리에 원리 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Temperature Change · 온도 변화와 르샤틀리에 원리</div>
+          <div class="acc-htitle">온도 변화와 화학 평형 이동 / 르샤틀리에 원리</div>
+          <div class="acc-hdesc">온도↑ → 흡열 반응 우세 · 발열 반응 → 온도↑시 K 감소 · 르샤틀리에 원리 정리</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">온도 변화와 화학 평형 이동</div>
+        <div class="concept-box">
+          <div class="cb-title">🌡️ 온도와 화학 평형</div>
+          화학 반응이 평형 상태일 때 온도를 변화시키면 그 <span class="hp">온도 변화가 감소하는 방향</span>으로 반응이 진행하여 새로운 평형을 이룹니다.<br><br>
+          • <span class="hp">온도 증가</span>: 온도를 낮추는 방향, 즉 <strong>흡열 반응(에너지 흡수)</strong> 쪽으로 평형 이동<br>
+          • <span class="hp">온도 감소</span>: 온도를 높이는 방향, 즉 <strong>발열 반응(에너지 방출)</strong> 쪽으로 평형 이동
+        </div>
+
+        <div class="sec-title">온도 변화에 따른 평형 상수 변화</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>정반응 종류</th><th>온도 증가</th><th>온도 감소</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">정반응이 발열 반응</span><br>(역반응이 흡열)</td><td>역반응 우세<br>→ <strong>K 감소</strong></td><td>정반응 우세<br>→ <strong>K 증가</strong></td></tr>
+            <tr><td><span class="hp">정반응이 흡열 반응</span><br>(역반응이 발열)</td><td>정반응 우세<br>→ <strong>K 증가</strong></td><td>역반응 우세<br>→ <strong>K 감소</strong></td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 온도 변화만 평형 상수를 바꾼다!</div>
+          농도와 압력의 변화는 <span class="ha">반응 지수(Q)만 바꾸고</span> 평형 상수(K)는 그대로 유지됩니다.<br>
+          그러나 <span class="ha">온도 변화</span>는 평형 상수(K) 자체가 달라집니다. 이것이 온도 변화가 나머지 변화들과 결정적으로 다른 점입니다.
+        </div>
+
+        <div class="sec-title">CoB 실험 — 온도 변화와 평형 이동</div>
+        <div class="blue-box">
+          <div class="cb-title">🧪 [Co(H₂O)₆]²⁺(aq) + 4Cl⁻(aq) ⇌ [CoCl₄]²⁻(aq) + 6H₂O(l)</div>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(붉은색) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (파란색)<br>
+          <strong>정반응 = 흡열 반응</strong><br><br>
+          • <strong>얼음물(온도 낮춤)</strong>: 온도 높이는 방향 = 발열 반응(역반응) 우세 → <span class="hp">붉은색</span>으로 변화<br>
+          • <strong>뜨거운 물(온도 높임)</strong>: 온도 낮추는 방향 = 흡열 반응(정반응) 우세 → <span class="hb">파란색</span>으로 변화
+        </div>
+
+        <div class="sec-title">르샤틀리에 원리 (Le Chatelier's Principle)</div>
+        <div class="concept-box">
+          <div class="cb-title">📋 르샤틀리에 원리 (1884년 발표)</div>
+          <strong>"화학 반응이 평형 상태일 때 외부 조건(농도·압력·온도)이 변하면, 그 변화의 영향을 줄이는 방향으로 반응이 진행하여 새로운 평형을 이룬다."</strong><br><br>
+          • 농도 증가 → 그 물질의 농도를 <span class="hp">감소</span>시키는 방향으로 이동<br>
+          • 압력 증가 → 기체 분자 수를 <span class="hp">감소</span>시키는 방향으로 이동<br>
+          • 온도 증가 → 온도를 <span class="hp">낮추는</span>(흡열 반응 방향으로) 이동
+        </div>
+
+        <div class="sec-title">농도·압력·온도 변화 종합 정리</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>변화 요인</th><th>변화 내용</th><th>평형 이동 방향</th><th>K 변화</th></tr></thead>
+          <tbody>
+            <tr><td rowspan="2"><span class="hp">농도</span></td><td>반응물 첨가 / 생성물 제거</td><td>정반응 우세</td><td>변화 없음</td></tr>
+            <tr><td>반응물 제거 / 생성물 첨가</td><td>역반응 우세</td><td>변화 없음</td></tr>
+            <tr><td rowspan="2"><span class="hp">압력</span></td><td>압력 증가 (기체 분자 수 ≠)</td><td>기체 분자 수 감소 방향</td><td>변화 없음</td></tr>
+            <tr><td>압력 감소 (기체 분자 수 ≠)</td><td>기체 분자 수 증가 방향</td><td>변화 없음</td></tr>
+            <tr><td rowspan="2"><span class="hp">온도</span></td><td>온도 증가</td><td>흡열 반응 방향</td><td><strong>변화 있음</strong></td></tr>
+            <tr><td>온도 감소</td><td>발열 반응 방향</td><td><strong>변화 있음</strong></td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 13</div>
+          <div class="quiz-q">정반응이 발열 반응인 경우, 온도를 낮추면 어느 반응이 우세하게 진행하는가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 정반응이 우세하게 진행</strong><br><br>온도를 낮추면 온도를 높이는(열을 방출하는) 방향 = 발열 반응인 정반응이 우세하게 진행합니다.</div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 14</div>
+          <div class="quiz-q">다음 화학 반응이 평형에 도달했을 때 온도를 높이면 평형 상수(K)는 어떻게 변하는가?<br><br>2NO₂(g) ⇌ N₂O₄(g) &nbsp; (정반응: 발열 반응)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: K가 감소한다</strong><br><br>
+            온도 증가 → 흡열 반응인 역반응(N₂O₄ → 2NO₂) 우세 → 생성물(N₂O₄) 감소, 반응물(NO₂) 증가<br>
+            → K = [N₂O₄]/[NO₂]² 값이 <strong>감소</strong>합니다.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 소단원 04: 일상생활 속 화학 평형 이동 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">04</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Real-life Applications · 일상생활 속의 화학 평형 이동</div>
+          <div class="acc-htitle">일상생활 속의 화학 평형 이동</div>
+          <div class="acc-hdesc">헤모글로빈과 산소 운반 · 고산병 · 암모니아 합성 공정 · 르샤틀리에 원리 적용</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+
+        <div class="sec-title">생명 현상 — 혈액의 산소 운반</div>
+        <div class="concept-box">
+          <div class="cb-title">🩸 헤모글로빈(Hb)과 산소 결합</div>
+          Hb(aq) + 4O₂(g) ⇌ Hb(O₂)₄(aq)<br><br>
+          • <strong>폐(산소 농도 높음)</strong>: [O₂] 높음 → <span class="hb">정반응 우세</span> → 산화 헤모글로빈 생성 → 산소 흡수<br>
+          • <strong>조직(산소 농도 낮음)</strong>: [O₂] 낮음 → <span class="hr">역반응 우세</span> → 산소 방출 → 조직에 산소 공급<br><br>
+          이는 농도 변화에 따른 화학 평형 이동 원리입니다.
+        </div>
+
+        <div class="blue-box">
+          <div class="cb-title">🏔️ 고산병과 적응</div>
+          고지대는 산소 농도가 낮으므로 폐에서 정반응이 잘 일어나지 않아 조직에 산소 공급 부족 → 구토·현기증(고산병)<br><br>
+          <strong>고지대에서 3주 이상 체류 시:</strong> 체내 헤모글로빈 양이 늘어나 정반응이 다시 활성화됨<br>
+          → 우리 몸의 <span class="hb">항상성</span>: 외부 환경 변화에 대응해 자신의 상태를 일정하게 유지하려는 성질<br><br>
+          <strong>고압 산소 치료:</strong> 압력 증가 → O₂ 분압 증가 → 정반응 우세 → 더 많은 산화 헤모글로빈 생성 → 산소 공급↑
+        </div>
+
+        <div class="sec-title">산업 현장 — 암모니아 합성 (하버-보슈법)</div>
+        <div class="concept-box">
+          <div class="cb-title">🏭 N₂(g) + 3H₂(g) ⇌ 2NH₃(g) &nbsp; (정반응: 발열 반응)</div>
+          수득률을 높이려면 르샤틀리에 원리를 적용합니다.
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>조건 변화</th><th>평형 이동</th><th>실제 문제</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">압력 증가</span></td><td>정반응 우세 (기체 4몰→2몰)<br>→ NH₃ 수득률 ↑</td><td>높은 압력을 견디는 설비 필요, 비용 증가</td></tr>
+            <tr><td><span class="hp">온도 감소</span></td><td>정반응 우세 (발열 반응)<br>→ NH₃ 수득률 ↑</td><td>온도가 낮으면 반응 속도 느려져 효율 저하</td></tr>
+            <tr><td><span class="hp">NH₃ 제거</span></td><td>정반응 우세<br>→ NH₃ 계속 생성</td><td>냉각해 NH₃ 액화 제거 → 평형 계속 우측 이동</td></tr>
+            <tr><td><span class="hp">촉매 사용</span></td><td>반응 속도↑ (평형 이동 ×)</td><td>적정 온도에서 빠르게 반응 → 생산 효율↑</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="green-box">
+          <div class="cb-title">✅ 실제 암모니아 합성 조건</div>
+          <strong>온도:</strong> 400~500℃ (낮으면 느리고, 높으면 수득률 저하 → 적정값 선택)<br>
+          <strong>압력:</strong> 150~300기압 (높을수록 수득률 높지만 설비 비용↑ → 경제적 적정값)<br>
+          <strong>촉매:</strong> 산화철(Fe₃O₄) 계열 촉매 사용 → 낮은 온도에서도 반응 속도 확보<br>
+          <strong>NH₃ 제거:</strong> 생성된 암모니아를 냉각해 액화 분리 → 평형을 계속 정반응 방향으로 유도
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 15</div>
+          <div class="quiz-q">혈액이 체내에 산소를 공급하는 과정에서 화학 평형 이동이 관여한다. (○, ×)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: ○ (맞음)</strong><br><br>폐(O₂ 농도 높음)에서는 정반응이 우세하여 산화 헤모글로빈이 생성되고, 산소 농도가 낮은 조직에서는 역반응이 우세하여 산소를 방출합니다. 이는 농도 변화에 따른 화학 평형 이동의 대표적 예입니다.</div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 16</div>
+          <div class="quiz-q">암모니아 합성 과정은 전체 기체 분자 수가 감소하는 반응이므로 수득률을 높이려면 기체의 압력을 어떻게 해야 하는가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 압력을 높여야 한다</strong><br><br>N₂+3H₂ → 2NH₃: 반응물 4몰 → 생성물 2몰 (기체 분자 수 감소)<br>압력을 높이면 기체 분자 수를 감소시키는 방향(정반응)이 우세하여 NH₃ 수득률이 증가합니다.</div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">🔥 심화 문제 — 르샤틀리에 종합</div>
+          <div class="quiz-q">다음은 PCl₅(g)이 분해되어 PCl₃(g)와 Cl₂(g)가 생성되는 반응의 화학 반응식이다.<br><br>PCl₅(g) ⇌ PCl₃(g) + Cl₂(g) &nbsp; (정반응: 흡열 반응)<br><br>이 반응이 평형을 이룰 때, 정반응이 우세하게 진행되게 하는 조건을 모두 고르시오.<br><br>ㄱ. 온도를 낮춘다. &nbsp; ㄴ. Cl₂(g)를 첨가한다. &nbsp; ㄷ. PCl₅(g)을 첨가한다. &nbsp; ㄹ. 기체의 압력을 낮춘다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ㄷ, ㄹ</strong><br><br>
+            <strong>ㄱ. 틀림</strong> — 정반응이 흡열 반응이므로, 온도를 낮추면 <strong>역반응</strong>(발열)이 우세<br>
+            <strong>ㄴ. 틀림</strong> — Cl₂(생성물) 첨가 → 생성물 농도 증가 → <strong>역반응</strong> 우세<br>
+            <strong>ㄷ. 옳음</strong> — PCl₅(반응물) 첨가 → 반응물 농도 증가 → <strong>정반응</strong> 우세 ✓<br>
+            <strong>ㄹ. 옳음</strong> — PCl₅(1몰) → PCl₃+Cl₂(2몰): 반응 전후 기체 1몰→2몰 (증가)<br>
+            압력을 낮추면 기체 분자 수가 증가하는 방향(정반응) 우세 ✓
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  ['unit1','unit2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('visible');
+  });
+  const target = document.getElementById('unit'+n);
+  if (target) target.classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  const tabsTop = document.querySelector('.tabs-wrap').offsetTop;
+  window.scrollTo({top: tabsTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => {
+      const rect = item.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const headerH = document.querySelector('.header').offsetHeight + document.querySelector('.tabs-wrap').offsetHeight;
+      if (rect.top < headerH + 10) {
+        window.scrollTo({top: scrollTop + rect.top - headerH - 10, behavior:'smooth'});
+      }
+    }, 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  }
+});
+</script>
+</body>
+</html>
