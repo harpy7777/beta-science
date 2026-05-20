@@ -3,254 +3,135 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>베타과학학원 · 블로그 생성기</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --pink: #db2777; --pink-light: #ec4899;
+  --pink-pale: #fce7f3; --pink-soft: #fdf2f8;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+html { -webkit-text-size-adjust: 100%; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
   background: #fafafa; color: #1d1d1f; min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  padding-bottom: env(safe-area-inset-bottom);
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  padding-bottom: calc(2rem + var(--safe-bottom));
 }
-
-/* ── Header ── */
+/* ── 헤더 ── */
 .header {
-  background: #ffffff; border-bottom: 1px solid #f0e8ed;
-  padding: 0 1.5rem;
-  padding-left: calc(1.5rem + env(safe-area-inset-left));
-  padding-right: calc(1.5rem + env(safe-area-inset-right));
-  height: 54px;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #f0e8ed; height: calc(54px + var(--safe-top));
+  padding: 0 1.2rem; padding-top: var(--safe-top);
+  padding-left: max(1.2rem, var(--safe-left)); padding-right: max(1.2rem, var(--safe-right));
   display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; z-index: 300;
+  position: sticky; top: 0; z-index: 100;
 }
-.header-left {
-  display: flex; align-items: center; gap: 9px;
-  text-decoration: none; color: inherit; cursor: pointer;
-  transition: opacity 0.15s; border-radius: 10px; padding: 4px 8px;
-  min-height: 44px;
-}
-.header-left:hover { opacity: 0.75; background: #fdf2f8; }
-.logo-mark {
-  width: 30px; height: 30px;
-  background: linear-gradient(135deg, #f472b6 0%, #db2777 100%);
-  border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
+.header-left { display: flex; align-items: center; gap: 9px; text-decoration: none; color: inherit; min-height: 44px; }
+.logo-mark { width: 30px; height: 30px; background: linear-gradient(135deg,#f472b6,#db2777); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .brand-name { font-size: 14px; font-weight: 600; color: #1d1d1f; letter-spacing: -0.3px; }
-.header-badge {
-  display: flex; align-items: center; gap: 5px;
-  background: #f0fdf4; border: 1px solid #bbf7d0;
-  border-radius: 20px; padding: 4px 10px;
-  font-size: 10px; font-weight: 600; color: #16a34a; white-space: nowrap;
-}
-.dot-green { width: 5px; height: 5px; background: #22c55e; border-radius: 50%; animation: blink 2s ease-in-out infinite; flex-shrink: 0; }
+.header-badge { display: flex; align-items: center; gap: 5px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 20px; padding: 4px 10px; font-size: 10px; font-weight: 600; color: #16a34a; white-space: nowrap; }
+.dot-green { width: 5px; height: 5px; background: #22c55e; border-radius: 50%; flex-shrink: 0; animation: blink 2s ease-in-out infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-/* ── Layout ── */
-.wrap {
-  max-width: 1100px; margin: 0 auto;
-  padding: 1.4rem 1rem 3rem;
-  padding-left: max(1rem, env(safe-area-inset-left));
-  padding-right: max(1rem, env(safe-area-inset-right));
-}
-
-/* ── Welcome bar ── */
-.welcome-bar {
-  background: linear-gradient(135deg, #fff0f7 0%, #fdf2f8 60%, #f0f9ff 100%);
-  border: 1px solid #fce7f3; border-radius: 18px;
-  padding: 1.2rem 1.4rem; margin-bottom: 1.4rem;
-  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
-}
+/* ── 레이아웃 ── */
+.wrap { max-width: 720px; margin: 0 auto; padding: 1.4rem 1rem; padding-left: max(1rem, var(--safe-left)); padding-right: max(1rem, var(--safe-right)); }
+/* ── 웰컴바 ── */
+.welcome-bar { background: linear-gradient(135deg,#fff0f7,#fdf2f8 60%,#f0f9ff); border: 1px solid var(--pink-pale); border-radius: 18px; padding: 1.2rem 1.4rem; margin-bottom: 1.4rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
 .welcome-left { display: flex; align-items: center; gap: 12px; }
-.welcome-avatar {
-  width: 44px; height: 44px; border-radius: 50%;
-  background: linear-gradient(135deg, #f472b6, #db2777);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(219,39,119,0.25);
-}
+.welcome-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg,#f472b6,#db2777); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; box-shadow: 0 4px 12px rgba(219,39,119,0.25); }
 .welcome-greeting { font-size: 1.05rem; font-weight: 700; color: #1d1d1f; letter-spacing: -0.03em; }
 .welcome-sub { font-size: 11px; color: #6e6e73; margin-top: 3px; }
-.welcome-date-box { text-align: right; }
-.welcome-date { font-size: 1rem; font-weight: 700; color: #db2777; letter-spacing: -0.02em; }
-.welcome-day  { font-size: 11px; color: #aeaeb2; margin-top: 3px; font-weight: 500; }
-
-.section-heading { font-size: 12px; font-weight: 700; color: #6e6e73; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.8rem; }
-
-/* ── 입력 카드 ── */
-.input-card {
-  background: #fff; border: 1px solid #fce7f3; border-radius: 18px;
-  padding: 1.6rem; margin-bottom: 1.2rem;
-  box-shadow: 0 2px 16px rgba(219,39,119,0.04);
-}
-.input-label {
-  font-size: 12px; font-weight: 700; color: #6e6e73;
-  letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; display: block;
-}
-.input-field {
-  width: 100%; padding: 12px 14px;
-  border: 1.5px solid #fce7f3; border-radius: 12px;
-  font-size: 14px; font-family: inherit; color: #1d1d1f;
-  background: #fffbfe; outline: none;
-  transition: border-color 0.18s, box-shadow 0.18s;
-}
+.welcome-date { font-size: 1rem; font-weight: 700; color: var(--pink); letter-spacing: -0.02em; text-align: right; }
+.welcome-day { font-size: 11px; color: #aeaeb2; margin-top: 3px; font-weight: 500; text-align: right; }
+/* ── 섹션 ── */
+.section-heading { font-size: 11px; font-weight: 700; color: #6e6e73; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.8rem; }
+/* ── 카드 ── */
+.card { background: #fff; border: 1px solid var(--pink-pale); border-radius: 18px; padding: 1.4rem; margin-bottom: 1.2rem; box-shadow: 0 2px 12px rgba(219,39,119,0.04); }
+/* ── API 키 섹션 ── */
+.key-row { display: flex; gap: 8px; align-items: stretch; }
+.key-input { flex: 1; padding: 12px 14px; border: 1.5px solid var(--pink-pale); border-radius: 12px; font-size: 16px; font-family: inherit; color: #1d1d1f; background: #fffbfe; outline: none; -webkit-appearance: none; min-width: 0; }
+.key-input:focus { border-color: #f472b6; box-shadow: 0 0 0 3px rgba(244,114,182,0.12); }
+.key-input::placeholder { color: #c9a8bc; }
+.key-save-btn { padding: 12px 18px; background: linear-gradient(135deg,#f472b6,#db2777); color: #fff; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; min-height: 48px; min-width: 64px; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
+.key-save-btn:active { opacity: 0.85; transform: scale(0.97); }
+.key-status { font-size: 11px; font-weight: 600; margin-top: 6px; min-height: 16px; }
+.key-hint { font-size: 11px; color: #aeaeb2; margin-top: 6px; line-height: 1.5; }
+/* ── 입력 ── */
+.input-label { font-size: 11px; font-weight: 700; color: #6e6e73; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 7px; display: block; }
+.input-field { width: 100%; padding: 12px 14px; border: 1.5px solid var(--pink-pale); border-radius: 12px; font-size: 16px; font-family: inherit; color: #1d1d1f; background: #fffbfe; outline: none; -webkit-appearance: none; transition: border-color 0.18s; }
 .input-field:focus { border-color: #f472b6; box-shadow: 0 0 0 3px rgba(244,114,182,0.12); }
 .input-field::placeholder { color: #c9a8bc; }
-.divider-or {
-  display: flex; align-items: center; gap: 12px; margin: 1rem 0;
-}
-.divider-or::before, .divider-or::after { content:''; flex:1; height:1px; background:#fce7f3; }
+.divider-or { display: flex; align-items: center; gap: 12px; margin: 1rem 0; }
+.divider-or::before, .divider-or::after { content:''; flex:1; height:1px; background:var(--pink-pale); }
 .divider-or span { font-size: 11px; color: #c9a8bc; font-weight: 600; }
-
-/* ── 옵션 바 ── */
-.options-row {
-  display: flex; gap: 8px; margin-bottom: 1.2rem; flex-wrap: wrap;
-}
-.option-chip {
-  display: flex; align-items: center; gap: 6px;
-  padding: 8px 14px; border-radius: 20px;
-  border: 1.5px solid #fce7f3; background: #fff;
-  font-size: 12px; font-weight: 500; color: #6e6e73;
-  cursor: pointer; transition: all 0.15s; font-family: inherit; white-space: nowrap;
-}
-.option-chip.on { background: #fdf2f8; border-color: #f9a8d4; color: #db2777; }
-.option-chip .chip-dot { width: 6px; height: 6px; border-radius: 50%; background: #d1d1d6; transition: background 0.15s; }
-.option-chip.on .chip-dot { background: #db2777; }
-
-/* ── 생성 버튼 ── */
-.gen-btn {
-  width: 100%; padding: 15px;
-  background: linear-gradient(135deg, #f472b6 0%, #db2777 100%);
-  border: none; border-radius: 14px;
-  font-size: 15px; font-weight: 700; color: #fff;
-  cursor: pointer; font-family: inherit; letter-spacing: -0.2px;
-  transition: opacity 0.18s, transform 0.12s;
-  box-shadow: 0 4px 16px rgba(219,39,119,0.3);
-}
-.gen-btn:hover { opacity: 0.92; transform: translateY(-1px); }
-.gen-btn:active { transform: scale(0.99); }
-.gen-btn:disabled { background: linear-gradient(135deg,#fce7f3,#fbcfe8); color: #f9a8d4; cursor: not-allowed; box-shadow: none; transform: none; }
-
+/* ── 옵션 칩 ── */
+.chips-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.2rem; }
+.chip { display: flex; align-items: center; gap: 5px; padding: 9px 14px; border-radius: 20px; border: 1.5px solid var(--pink-pale); background: #fff; font-size: 12px; font-weight: 500; color: #6e6e73; cursor: pointer; font-family: inherit; white-space: nowrap; min-height: 40px; -webkit-tap-highlight-color: transparent; transition: all 0.15s; }
+.chip.on { background: var(--pink-soft); border-color: #f9a8d4; color: var(--pink); }
+.chip-dot { width: 6px; height: 6px; border-radius: 50%; background: #d1d1d6; flex-shrink: 0; }
+.chip.on .chip-dot { background: var(--pink); }
 /* ── 에러 ── */
-.error-bar {
-  background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px;
-  padding: 10px 14px; font-size: 13px; color: #e11d48; margin-bottom: 1rem;
-  display: flex; align-items: center; gap: 8px;
-}
-
+.error-bar { background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #e11d48; margin-bottom: 1rem; display: none; align-items: center; gap: 8px; line-height: 1.5; }
+/* ── 생성 버튼 ── */
+.gen-btn { width: 100%; padding: 16px; background: linear-gradient(135deg,#f472b6,#db2777); border: none; border-radius: 14px; font-size: 16px; font-weight: 700; color: #fff; cursor: pointer; font-family: inherit; min-height: 56px; box-shadow: 0 4px 16px rgba(219,39,119,0.3); -webkit-tap-highlight-color: transparent; transition: opacity 0.18s, transform 0.12s; }
+.gen-btn:active { transform: scale(0.98); opacity: 0.9; }
+.gen-btn:disabled { background: linear-gradient(135deg,#fce7f3,#fbcfe8); color: #f9a8d4; cursor: not-allowed; box-shadow: none; transform: none; }
 /* ── 로딩 ── */
-.loading-card {
-  background: #fff; border: 1px solid #fce7f3; border-radius: 18px;
-  padding: 3rem; text-align: center;
-  box-shadow: 0 2px 16px rgba(219,39,119,0.04);
-}
-.loading-spinner {
-  width: 42px; height: 42px; margin: 0 auto 1.2rem;
-  border: 3px solid #fce7f3;
-  border-top-color: #db2777;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
+.loading-card { background: #fff; border: 1px solid var(--pink-pale); border-radius: 18px; padding: 3rem 1.5rem; text-align: center; }
+.spinner { width: 40px; height: 40px; margin: 0 auto 1.2rem; border: 3px solid var(--pink-pale); border-top-color: var(--pink); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-title { font-size: 15px; font-weight: 700; color: #1d1d1f; margin-bottom: 6px; }
 .loading-sub { font-size: 12px; color: #aeaeb2; line-height: 1.6; }
-.loading-progress { display: flex; gap: 6px; justify-content: center; margin-top: 1rem; }
-.prog-dot { width: 6px; height: 6px; border-radius: 50%; background: #fce7f3; animation: prog 1.2s ease-in-out infinite; }
+.prog-dots { display: flex; gap: 6px; justify-content: center; margin-top: 1rem; }
+.prog-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pink-pale); animation: prog 1.2s ease-in-out infinite; }
 .prog-dot:nth-child(2) { animation-delay: 0.2s; }
 .prog-dot:nth-child(3) { animation-delay: 0.4s; }
-@keyframes prog { 0%,80%,100%{background:#fce7f3;transform:scale(1)} 40%{background:#db2777;transform:scale(1.3)} }
-
-/* ── 결과 영역 ── */
-.result-topbar {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
-}
+@keyframes prog { 0%,80%,100%{background:var(--pink-pale);transform:scale(1)} 40%{background:var(--pink);transform:scale(1.3)} }
+/* ── 결과 ── */
+.result-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
 .result-meta { display: flex; align-items: center; gap: 8px; }
-.result-title { font-size: 14px; font-weight: 700; color: #1d1d1f; }
-.char-badge {
-  font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
-}
+.result-label { font-size: 14px; font-weight: 700; color: #1d1d1f; }
+.char-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
 .char-ok { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
 .char-warn { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
-.action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
-.act-btn {
-  display: flex; align-items: center; gap: 5px;
-  padding: 8px 14px; border-radius: 10px;
-  font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer;
-  transition: all 0.15s; white-space: nowrap; min-height: 36px;
-}
-.act-edit { background: #f0f4ff; color: #3b5bdb; border: 1px solid #c5d0ea; }
-.act-edit:hover { background: #e8efff; }
-.act-copy { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
-.act-copy:hover { background: #dcfce7; }
-.act-copied { background: #15803d; color: #fff; border-color: #15803d; }
-.act-reset { background: #fff; color: #8e8e93; border: 1px solid #e5e5ea; }
-.act-reset:hover { background: #f5f5f7; }
-
-/* ── 단어 경고 ── */
-.word-warn {
-  background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px;
-  padding: 10px 14px; font-size: 12px; color: #92400e;
-  display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; line-height: 1.6;
-}
-
+.act-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.act-btn { display: flex; align-items: center; gap: 5px; padding: 9px 14px; border-radius: 10px; font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; min-height: 40px; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: all 0.15s; }
+.btn-edit { background: #f0f4ff; color: #3b5bdb; border: 1px solid #c5d0ea; }
+.btn-copy { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.btn-copied { background: #15803d; color: #fff; border-color: #15803d; }
+.btn-reset { background: #fff; color: #8e8e93; border: 1px solid #e5e5ea; }
+.word-warn { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 10px 14px; font-size: 12px; color: #92400e; display: none; align-items: flex-start; gap: 8px; margin-bottom: 10px; line-height: 1.6; }
 /* ── 결과 카드 ── */
-.result-card {
-  background: #fff; border: 1px solid #fce7f3; border-radius: 18px;
-  overflow: hidden; box-shadow: 0 2px 16px rgba(219,39,119,0.04);
-}
-.result-preview {
-  padding: 2rem 2.2rem;
-  font-size: 15.5px; line-height: 1.9; color: #1d1d1f;
-}
-.result-preview h1 {
-  font-size: 24px; font-weight: 800; color: #1d1d1f;
-  margin: 0 0 1.2rem; letter-spacing: -0.04em; line-height: 1.3;
-}
-.result-preview h2 {
-  font-size: 18px; font-weight: 700; color: #1d1d1f;
-  margin: 2rem 0 0.8rem; padding-left: 12px;
-  border-left: 3px solid #db2777;
-  letter-spacing: -0.02em;
-}
-.result-preview h3 {
-  font-size: 16px; font-weight: 700; color: #3c3c43; margin: 1.4rem 0 0.6rem;
-}
-.result-preview p { margin: 0 0 1rem; }
-.result-preview ul { margin: 0 0 1rem 1.4rem; }
-.result-preview li { margin-bottom: 4px; }
-.result-preview strong { color: #db2777; font-weight: 700; }
-.result-edit-area {
-  width: 100%; min-height: 600px; padding: 2rem 2.2rem;
-  font-size: 15px; line-height: 1.9; font-family: inherit; color: #1d1d1f;
-  border: none; outline: none; resize: vertical; background: #fffbfe;
-  border-top: 1px solid #fce7f3;
-}
-
-/* ── 사용 안내 ── */
-.guide-card {
-  margin-top: 12px; background: #f0f4ff;
-  border: 1px solid #c5d0ea; border-radius: 12px;
-  padding: 14px 16px;
-}
-.guide-title { font-size: 12px; font-weight: 700; color: #3b5bdb; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-.guide-steps { display: flex; flex-direction: column; gap: 6px; }
-.guide-step { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: #3c3c43; line-height: 1.5; }
-.guide-step-num {
-  width: 20px; height: 20px; border-radius: 50%;
-  background: #3b5bdb; color: #fff; font-size: 10px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
-}
-
-/* 반응형 */
+.result-card { background: #fff; border: 1px solid var(--pink-pale); border-radius: 18px; overflow: hidden; }
+.preview { padding: 1.6rem; font-size: 15px; line-height: 1.9; color: #1d1d1f; }
+.preview h1 { font-size: 22px; font-weight: 800; margin: 0 0 1.2rem; letter-spacing: -0.04em; line-height: 1.3; }
+.preview h2 { font-size: 17px; font-weight: 700; margin: 2rem 0 0.8rem; padding-left: 10px; border-left: 3px solid var(--pink); }
+.preview h3 { font-size: 15px; font-weight: 700; color: #3c3c43; margin: 1.4rem 0 0.6rem; }
+.preview p { margin: 0 0 1rem; }
+.preview ul { margin: 0 0 1rem 1.4rem; }
+.preview li { margin-bottom: 4px; }
+.preview strong { color: var(--pink); font-weight: 700; }
+.edit-area { width: 100%; min-height: 500px; padding: 1.6rem; font-size: 15px; line-height: 1.9; font-family: inherit; color: #1d1d1f; border: none; border-top: 1px solid var(--pink-pale); outline: none; resize: vertical; background: #fffbfe; -webkit-appearance: none; display: none; }
+/* ── 가이드 ── */
+.guide-card { margin-top: 12px; background: #f0f4ff; border: 1px solid #c5d0ea; border-radius: 12px; padding: 14px 16px; }
+.guide-title { font-size: 12px; font-weight: 700; color: #3b5bdb; margin-bottom: 8px; }
+.guide-step { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: #3c3c43; margin-bottom: 6px; line-height: 1.5; }
+.guide-num { width: 20px; height: 20px; border-radius: 50%; background: #3b5bdb; color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+/* ── 모바일 ── */
 @media (max-width: 600px) {
   .header-badge { display: none; }
-  .welcome-bar { border-radius: 14px; }
-  .result-preview { padding: 1.4rem 1.2rem; font-size: 14.5px; }
-  .result-preview h1 { font-size: 20px; }
-  .result-preview h2 { font-size: 16px; }
-  .result-edit-area { padding: 1.4rem 1.2rem; }
-  .action-btns { width: 100%; }
+  .welcome-bar { border-radius: 14px; padding: 1rem 1.2rem; }
+  .card { border-radius: 14px; padding: 1.2rem; }
+  .preview { padding: 1.2rem; font-size: 14.5px; }
+  .preview h1 { font-size: 19px; }
+  .act-btns { width: 100%; }
   .act-btn { flex: 1; justify-content: center; }
+  .edit-area { padding: 1.2rem; }
 }
 </style>
 </head>
@@ -266,250 +147,202 @@ body {
     </div>
     <span class="brand-name">베타과학학원</span>
   </a>
-  <div style="display:flex;align-items:center;gap:8px;">
-    <div class="header-badge"><span class="dot-green"></span>블로그 생성기</div>
-  </div>
+  <div class="header-badge"><span class="dot-green"></span>블로그 생성기</div>
 </header>
 
 <div class="wrap">
 
-  <!-- 환영 바 -->
   <div class="welcome-bar">
     <div class="welcome-left">
       <div class="welcome-avatar">✍️</div>
       <div>
         <div class="welcome-greeting">블로그 생성기</div>
-        <div class="welcome-sub">URL 또는 주제 입력 → AI가 1500자+ 블로그 글 자동 작성</div>
+        <div class="welcome-sub">URL 또는 주제 → AI가 1500자+ 블로그 자동 작성</div>
       </div>
     </div>
-    <div class="welcome-date-box">
+    <div>
       <div class="welcome-date" id="today-date">—</div>
       <div class="welcome-day" id="today-day">—</div>
     </div>
   </div>
 
-  <!-- 입력 섹션 (결과 없을 때) -->
-  <div id="section-input">
+  <!-- 입력 섹션 -->
+  <div id="sec-input">
 
-    <!-- API 키 입력 -->
-    <div id="api-key-section" style="margin-bottom:1.2rem;">
+    <!-- API 키 -->
+    <div id="key-section">
       <div class="section-heading">API KEY</div>
-      <div class="input-card" style="padding:1.2rem 1.4rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <label class="input-label" style="margin:0;">🔑 OpenRouter API Key</label>
-          <span id="key-status" style="font-size:11px;font-weight:600;"></span>
+      <div class="card">
+        <label class="input-label">🔑 OpenRouter API Key</label>
+        <div class="key-row">
+          <input class="key-input" id="key-input" type="password" placeholder="sk-or-v1-..." oninput="onKeyInput()">
+          <button class="key-save-btn" onclick="saveKey()">저장</button>
         </div>
-        <div style="display:flex;gap:8px;">
-          <input class="input-field" id="api-key-input" type="password"
-            placeholder="sk-or-v1-..."
-            style="flex:1;"
-            oninput="onKeyInput()" />
-          <button onclick="saveKey()" style="padding:10px 16px;background:linear-gradient(135deg,#f472b6,#db2777);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;">저장</button>
+        <div class="key-status" id="key-status"></div>
+        <div class="key-hint">
+          <a href="https://openrouter.ai/settings/keys" target="_blank" style="color:var(--pink);text-decoration:none;font-weight:600;">openrouter.ai</a> 에서 무료 발급 · 이 기기 브라우저에만 저장돼요
         </div>
-        <p style="font-size:11px;color:#aeaeb2;margin-top:8px;">
-          <a href="https://openrouter.ai/settings/keys" target="_blank" style="color:#db2777;text-decoration:none;">openrouter.ai</a>에서 무료 발급 · 이 기기에만 저장됩니다
-        </p>
       </div>
     </div>
 
+    <!-- 내용 입력 -->
     <div class="section-heading">CONTENT SOURCE</div>
-
-    <div class="input-card">
+    <div class="card">
       <label class="input-label">🔗 참고 URL</label>
-      <input class="input-field" id="input-url" type="url"
-        placeholder="https://참고할-사이트.com/기사-제목"
-        oninput="clearError()" />
-
+      <input class="input-field" id="input-url" type="url" placeholder="https://참고할-사이트.com/기사제목" oninput="clearErr()">
       <div class="divider-or"><span>또는</span></div>
-
       <label class="input-label">📝 주제 직접 입력</label>
-      <input class="input-field" id="input-topic" type="text"
-        placeholder="예: 고등 물리 공부법, 수능 화학 대비 전략..."
-        oninput="clearError()"
-        onkeydown="if(event.key==='Enter') generate()" />
+      <input class="input-field" id="input-topic" type="text" placeholder="예: 고등 물리 공부법, 수능 화학 대비 전략..." oninput="clearErr()" onkeydown="if(event.key==='Enter')generate()">
     </div>
 
+    <!-- 옵션 -->
     <div class="section-heading">OPTIONS</div>
-    <div class="options-row">
-      <button class="option-chip on" id="chip-1500" onclick="toggleChip(this,'len1500')">
-        <span class="chip-dot"></span> 1500자 이상
-      </button>
-      <button class="option-chip on" id="chip-seo" onclick="toggleChip(this,'seo')">
-        <span class="chip-dot"></span> SEO 최적화
-      </button>
-      <button class="option-chip on" id="chip-beta" onclick="toggleChip(this,'beta')">
-        <span class="chip-dot"></span> 베타과학 홍보 포함
-      </button>
-      <button class="option-chip on" id="chip-norepeat" onclick="toggleChip(this,'norepeat')">
-        <span class="chip-dot"></span> 동일단어 15회 이상 반복 금지
-      </button>
+    <div class="chips-row">
+      <button class="chip on" onclick="toggleChip(this,'len1500')"><span class="chip-dot"></span>1500자 이상</button>
+      <button class="chip on" onclick="toggleChip(this,'seo')"><span class="chip-dot"></span>SEO 최적화</button>
+      <button class="chip on" onclick="toggleChip(this,'beta')"><span class="chip-dot"></span>베타과학 홍보 포함</button>
+      <button class="chip on" onclick="toggleChip(this,'norepeat')"><span class="chip-dot"></span>동일단어 15회 이상 반복 금지</button>
     </div>
 
-    <div id="error-bar" class="error-bar" style="display:none;">
-      <span>⚠</span><span id="error-msg"></span>
-    </div>
+    <div class="error-bar" id="error-bar"><span>⚠</span><span id="error-msg"></span></div>
 
-    <button class="gen-btn" id="gen-btn" onclick="generate()">
-      ✨ 블로그 글 생성하기
-    </button>
+    <button class="gen-btn" onclick="generate()">✨ 블로그 글 생성하기</button>
   </div>
 
   <!-- 로딩 -->
-  <div id="section-loading" style="display:none;">
+  <div id="sec-loading" style="display:none;">
     <div class="loading-card">
-      <div class="loading-spinner"></div>
+      <div class="spinner"></div>
       <div class="loading-title">AI가 블로그 글을 작성 중입니다...</div>
-      <div class="loading-sub">
-        1500자 이상 · 단어 반복 최소화 · SEO 최적화<br>
-        베타과학 학원 스타일로 정성껏 작성 중이에요
-      </div>
-      <div class="loading-progress">
-        <div class="prog-dot"></div>
-        <div class="prog-dot"></div>
-        <div class="prog-dot"></div>
+      <div class="loading-sub">1500자 이상 · 단어 반복 최소화 · SEO 최적화<br>베타과학 학원 스타일로 작성 중이에요</div>
+      <div class="prog-dots">
+        <div class="prog-dot"></div><div class="prog-dot"></div><div class="prog-dot"></div>
       </div>
     </div>
   </div>
 
   <!-- 결과 -->
-  <div id="section-result" style="display:none;">
+  <div id="sec-result" style="display:none;">
     <div class="result-topbar">
       <div class="result-meta">
-        <span class="result-title">📄 완성된 블로그 글</span>
+        <span class="result-label">📄 완성된 블로그 글</span>
         <span class="char-badge char-ok" id="char-badge">0자</span>
       </div>
-      <div class="action-btns">
-        <button class="act-btn act-edit" id="btn-edit" onclick="toggleEdit()">✏️ 수정</button>
-        <button class="act-btn act-copy" id="btn-copy" onclick="copyHTML()">📋 복사</button>
-        <button class="act-btn act-reset" onclick="reset()">🔄 새로 작성</button>
+      <div class="act-btns">
+        <button class="act-btn btn-edit" id="btn-edit" onclick="toggleEdit()">✏️ 수정</button>
+        <button class="act-btn btn-copy" id="btn-copy" onclick="copyHTML()">📋 복사</button>
+        <button class="act-btn btn-reset" onclick="resetAll()">🔄 새로 작성</button>
       </div>
     </div>
-
-    <div id="word-warn" class="word-warn" style="display:none;">
-      <span>⚠</span><span id="word-warn-text"></span>
-    </div>
-
+    <div class="word-warn" id="word-warn"><span>⚠</span><span id="word-warn-txt"></span></div>
     <div class="result-card">
-      <div class="result-preview" id="result-preview"></div>
-      <textarea class="result-edit-area" id="result-edit"
-        style="display:none;" oninput="onEditChange()"
-        placeholder="블로그 글을 직접 수정하세요..."></textarea>
+      <div class="preview" id="preview"></div>
+      <textarea class="edit-area" id="edit-area" oninput="onEditChange()" placeholder="직접 수정하세요..."></textarea>
     </div>
-
     <div class="guide-card">
       <div class="guide-title">💡 네이버 블로그 붙여넣기 방법</div>
-      <div class="guide-steps">
-        <div class="guide-step"><div class="guide-step-num">1</div><span>위 <strong>📋 복사</strong> 버튼을 클릭하세요</span></div>
-        <div class="guide-step"><div class="guide-step-num">2</div><span>네이버 블로그 에디터 열기 → 우측 상단 <strong>HTML</strong> 버튼 클릭</span></div>
-        <div class="guide-step"><div class="guide-step-num">3</div><span>HTML 편집창에 붙여넣기 (Ctrl+V / Cmd+V) 후 확인</span></div>
-        <div class="guide-step"><div class="guide-step-num">4</div><span>미리보기로 확인 후 발행하세요 🎉</span></div>
-      </div>
+      <div class="guide-step"><div class="guide-num">1</div><span>위 <strong>📋 복사</strong> 버튼 클릭</span></div>
+      <div class="guide-step"><div class="guide-num">2</div><span>네이버 블로그 에디터 → 우측 상단 <strong>HTML</strong> 버튼 클릭</span></div>
+      <div class="guide-step"><div class="guide-num">3</div><span>HTML 편집창에 붙여넣기 (Ctrl+V / Cmd+V) 후 확인</span></div>
+      <div class="guide-step"><div class="guide-num">4</div><span>미리보기 확인 후 발행 🎉</span></div>
     </div>
   </div>
 
 </div>
 
 <script>
-// 날짜 초기화
+// 날짜
 (function(){
-  const now=new Date();
-  const days=['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
-  document.getElementById('today-date').textContent=
-    `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일`;
-  document.getElementById('today-day').textContent=days[now.getDay()];
+  const d=new Date(), days=['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+  document.getElementById('today-date').textContent=`${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
+  document.getElementById('today-day').textContent=days[d.getDay()];
 })();
 
-let OPENROUTER_API_KEY = localStorage.getItem('openrouter_key') || '';
+let API_KEY = '';
+let md = '';
+let isEdit = false;
+const opts = { len1500:true, seo:true, beta:true, norepeat:true };
 
-let currentMarkdown = '';
-let isEditMode = false;
-let activeOptions = { len1500: true, seo: true, beta: true, norepeat: true };
-
-// API 키 관련
-(function initKey(){
-  const saved = localStorage.getItem('openrouter_key');
+// 키 초기화 - 저장된 키 있으면 불러오기
+(function(){
+  const saved = localStorage.getItem('or_key');
   if(saved){
-    OPENROUTER_API_KEY = saved;
-    document.getElementById('api-key-input').value = saved;
-    const st = document.getElementById('key-status');
-    if(st){ st.textContent='✓ 저장됨'; st.style.color='#15803d'; }
+    API_KEY = saved;
+    document.getElementById('key-input').value = saved;
+    setKeyStatus('✓ 저장된 키 있음', '#15803d');
   }
 })();
 
 function onKeyInput(){
-  const val = document.getElementById('api-key-input').value.trim();
-  const st = document.getElementById('key-status');
-  if(val.startsWith('sk-or-')){ st.textContent='형식 확인 ✓'; st.style.color='#15803d'; }
-  else if(val){ st.textContent='sk-or- 로 시작해야 해요'; st.style.color='#e11d48'; }
-  else { st.textContent=''; }
+  const v = document.getElementById('key-input').value.trim();
+  if(v.startsWith('sk-or-')) setKeyStatus('형식 확인 ✓', '#15803d');
+  else if(v) setKeyStatus('sk-or- 로 시작해야 해요', '#e11d48');
+  else setKeyStatus('', '');
+}
+
+function setKeyStatus(txt, color){
+  const el = document.getElementById('key-status');
+  el.textContent = txt; el.style.color = color;
 }
 
 function saveKey(){
-  const val = document.getElementById('api-key-input').value.trim();
-  if(!val){ alert('키를 입력해주세요.'); return; }
-  if(!val.startsWith('sk-or-')){ alert('올바른 OpenRouter 키는 sk-or- 로 시작해요.'); return; }
-  localStorage.setItem('openrouter_key', val);
-  OPENROUTER_API_KEY = val;
-  document.getElementById('api-key-section').style.display='none';
-  const st = document.getElementById('key-status');
-  if(st){ st.textContent='✓ 저장됨'; st.style.color='#15803d'; }
-  alert('✅ API 키가 저장되었습니다!');
+  const v = document.getElementById('key-input').value.trim();
+  if(!v){ alert('키를 입력해주세요.'); return; }
+  if(!v.startsWith('sk-or-')){ alert('OpenRouter 키는 sk-or- 로 시작해요.'); return; }
+  localStorage.setItem('or_key', v);
+  API_KEY = v;
+  setKeyStatus('✅ 저장 완료!', '#15803d');
+  setTimeout(()=> setKeyStatus('✓ 저장됨', '#15803d'), 1500);
 }
 
-function toggleChip(el, key) {
-  activeOptions[key] = !activeOptions[key];
-  el.classList.toggle('on', activeOptions[key]);
+function toggleChip(el, key){
+  opts[key] = !opts[key];
+  el.classList.toggle('on', opts[key]);
+  el.querySelector('.chip-dot').style.background = opts[key] ? 'var(--pink)' : '#d1d1d6';
 }
 
-function clearError() {
-  document.getElementById('error-bar').style.display = 'none';
-}
+function clearErr(){ document.getElementById('error-bar').style.display='none'; }
+function showErr(msg){ const b=document.getElementById('error-bar'); b.style.display='flex'; document.getElementById('error-msg').textContent=msg; }
 
-function showError(msg) {
-  document.getElementById('error-bar').style.display = 'flex';
-  document.getElementById('error-msg').textContent = msg;
-}
-
-function buildSystemPrompt() {
-  const rules = [];
-  if (activeOptions.len1500) rules.push('반드시 1500자 이상 작성할 것 (마크다운 기호 제외 순수 텍스트 기준)');
-  if (activeOptions.norepeat) rules.push('글 전체에서 동일한 단어가 15회 이상 등장하지 않도록 엄격히 제한할 것. 반복이 불가피한 경우 유의어·동의어·다양한 표현으로 반드시 대체할 것');
-  if (activeOptions.seo) rules.push('검색엔진 최적화를 위한 자연스러운 핵심 키워드 배치');
-  if (activeOptions.beta) rules.push('마지막 단락에 베타과학 학원 소개 및 홍보 문구 2-3줄 포함');
+function buildPrompt(){
+  const rules=[];
+  if(opts.len1500) rules.push('반드시 1500자 이상 작성 (마크다운 기호 제외 순수 텍스트 기준)');
+  if(opts.norepeat) rules.push('글 전체에서 동일한 단어가 15회 이상 등장하지 않도록 엄격히 제한. 반복 불가피한 경우 유의어·동의어로 대체');
+  if(opts.seo) rules.push('검색엔진 최적화를 위한 자연스러운 핵심 키워드 배치');
+  if(opts.beta) rules.push('마지막 단락에 베타과학 학원 소개 및 홍보 문구 2-3줄 포함');
   rules.push('제목(# ), 소제목(## ), 본문 단락 구조의 마크다운으로 작성');
-  rules.push('학생과 학부모를 대상으로 친근하고 유익한 톤으로 작성');
-  rules.push('단순 나열보다 구체적인 사례, 팁, 설명을 풍부하게 담을 것');
+  rules.push('학생과 학부모를 대상으로 친근하고 유익한 톤');
+  rules.push('구체적 사례, 팁, 설명을 풍부하게 포함');
   return `당신은 베타과학 학원의 전문 블로그 작가입니다.\n\n작성 규칙:\n${rules.map((r,i)=>`${i+1}. ${r}`).join('\n')}`;
 }
 
-async function generate() {
-  const url = document.getElementById('input-url').value.trim();
-  const topic = document.getElementById('input-topic').value.trim();
-  if (!url && !topic) { showError('URL 또는 주제를 입력해주세요.'); return; }
-  if (!OPENROUTER_API_KEY) { showError('API 키를 먼저 입력해주세요.'); document.getElementById('api-key-section').style.display='block'; return; }
+async function generate(){
+  const url=document.getElementById('input-url').value.trim();
+  const topic=document.getElementById('input-topic').value.trim();
+  if(!url && !topic){ showErr('URL 또는 주제를 입력해주세요.'); return; }
+  if(!API_KEY){ showErr('먼저 API 키를 입력하고 저장해주세요.'); document.getElementById('key-input').focus(); return; }
 
   const userMsg = url
-    ? `다음 URL을 참고하여 베타과학 학원 블로그 글을 작성해주세요.\nURL: ${url}\n\n(URL에서 직접 크롤링이 불가하더라도 URL 경로와 도메인에서 주제를 유추하여 블로그 글을 완성해주세요.)`
+    ? `다음 URL을 참고해 베타과학 학원 블로그 글을 작성해주세요.\nURL: ${url}\n\n(직접 크롤링 불가시 URL 경로에서 주제를 유추해 작성해주세요.)`
     : `다음 주제로 베타과학 학원 블로그 글을 작성해주세요.\n주제: ${topic}`;
 
-  document.getElementById('section-input').style.display = 'none';
-  document.getElementById('section-loading').style.display = 'block';
-  document.getElementById('section-result').style.display = 'none';
+  document.getElementById('sec-input').style.display='none';
+  document.getElementById('sec-loading').style.display='block';
+  document.getElementById('sec-result').style.display='none';
 
   try {
-    const systemPrompt = buildSystemPrompt();
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'Authorization': `Bearer ${API_KEY}`,
         'HTTP-Referer': 'https://beta-science.vercel.app',
         'X-Title': 'Beta Science Blog Generator'
       },
       body: JSON.stringify({
-        model: 'meta-llama/llama-4-maverick:free',
+        model: 'openrouter/auto',
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: buildPrompt() },
           { role: 'user', content: userMsg }
         ],
         max_tokens: 4096,
@@ -517,130 +350,105 @@ async function generate() {
       })
     });
     const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    currentMarkdown = data.choices?.[0]?.message?.content || '';
-    if (!currentMarkdown) throw new Error('응답이 비어있습니다. API 키를 확인해주세요.');
+    if(data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    md = data.choices?.[0]?.message?.content || '';
+    if(!md) throw new Error('응답이 비어있어요. 잠시 후 다시 시도해주세요.');
     showResult();
-  } catch (e) {
-    document.getElementById('section-loading').style.display = 'none';
-    document.getElementById('section-input').style.display = 'block';
-    showError('생성 실패: ' + e.message);
+  } catch(e) {
+    document.getElementById('sec-loading').style.display='none';
+    document.getElementById('sec-input').style.display='block';
+    showErr('생성 실패: ' + e.message);
   }
 }
 
-function parseMarkdown(md) {
-  return md
-    .split('\n').map(line => {
-      if (/^# (.+)/.test(line)) return `<h1>${line.slice(2).trim()}</h1>`;
-      if (/^## (.+)/.test(line)) return `<h2>${line.slice(3).trim()}</h2>`;
-      if (/^### (.+)/.test(line)) return `<h3>${line.slice(4).trim()}</h3>`;
-      if (/^- (.+)/.test(line)) return `<li>${line.slice(2).trim()}</li>`;
-      return line;
-    })
-    .join('\n')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/(<li>.*<\/li>\n?)+/gs, m => `<ul>${m}</ul>`)
-    .split('\n').map(line => {
-      if (!line.startsWith('<') && line.trim()) return `<p>${line.trim()}</p>`;
-      return line;
-    }).join('');
+function parseMd(s){
+  return s.split('\n').map(line=>{
+    if(/^# (.+)/.test(line)) return `<h1>${line.slice(2).trim()}</h1>`;
+    if(/^## (.+)/.test(line)) return `<h2>${line.slice(3).trim()}</h2>`;
+    if(/^### (.+)/.test(line)) return `<h3>${line.slice(4).trim()}</h3>`;
+    if(/^- (.+)/.test(line)) return `<li>${line.slice(2).trim()}</li>`;
+    return line;
+  }).join('\n')
+  .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+  .replace(/(<li>.*<\/li>\n?)+/gs,m=>`<ul>${m}</ul>`)
+  .split('\n').map(line=>{
+    if(!line.startsWith('<') && line.trim()) return `<p>${line.trim()}</p>`;
+    return line;
+  }).join('');
 }
 
-function countChars(md) {
-  return md.replace(/[#*`\n]/g, '').trim().length;
+function countChars(s){ return s.replace(/[#*`\n]/g,'').trim().length; }
+
+function checkRepeat(s){
+  const words=s.replace(/[#*\n.,!?]/g,' ').split(/\s+/).filter(w=>w.length>=2);
+  const f={};
+  words.forEach(w=>{ f[w]=(f[w]||0)+1; });
+  return Object.entries(f).filter(([,c])=>c>=15).sort((a,b)=>b[1]-a[1]).slice(0,5);
 }
 
-function checkWordRepeat(md) {
-  const words = md.replace(/[#*\n.,!?]/g, ' ').split(/\s+/).filter(w => w.length >= 2);
-  const freq = {};
-  words.forEach(w => { freq[w] = (freq[w] || 0) + 1; });
-  return Object.entries(freq).filter(([,c]) => c >= 15).sort((a,b) => b[1]-a[1]).slice(0, 6);
+function showResult(){
+  document.getElementById('sec-loading').style.display='none';
+  document.getElementById('sec-result').style.display='block';
+  const chars=countChars(md);
+  const badge=document.getElementById('char-badge');
+  badge.textContent=chars.toLocaleString()+'자';
+  badge.className='char-badge '+(chars>=1500?'char-ok':'char-warn');
+  const warns=checkRepeat(md);
+  const ww=document.getElementById('word-warn');
+  if(warns.length){
+    ww.style.display='flex';
+    document.getElementById('word-warn-txt').textContent='반복 주의: '+warns.map(([w,c])=>`"${w}" ${c}회`).join(' · ');
+  } else { ww.style.display='none'; }
+  document.getElementById('preview').innerHTML=parseMd(md);
+  document.getElementById('edit-area').value=md;
+  isEdit=false;
+  document.getElementById('preview').style.display='block';
+  document.getElementById('edit-area').style.display='none';
+  document.getElementById('btn-edit').textContent='✏️ 수정';
 }
 
-function showResult() {
-  document.getElementById('section-loading').style.display = 'none';
-  document.getElementById('section-result').style.display = 'block';
-
-  const chars = countChars(currentMarkdown);
-  const badge = document.getElementById('char-badge');
-  badge.textContent = chars.toLocaleString() + '자';
-  badge.className = 'char-badge ' + (chars >= 1500 ? 'char-ok' : 'char-warn');
-
-  const warns = checkWordRepeat(currentMarkdown);
-  if (warns.length) {
-    document.getElementById('word-warn').style.display = 'flex';
-    document.getElementById('word-warn-text').textContent =
-      '반복 주의: ' + warns.map(([w,c]) => `"${w}" ${c}회`).join(' · ');
-  } else {
-    document.getElementById('word-warn').style.display = 'none';
-  }
-
-  document.getElementById('result-preview').innerHTML = parseMarkdown(currentMarkdown);
-  document.getElementById('result-edit').value = currentMarkdown;
-  isEditMode = false;
-  document.getElementById('result-preview').style.display = 'block';
-  document.getElementById('result-edit').style.display = 'none';
-  document.getElementById('btn-edit').textContent = '✏️ 수정';
+function toggleEdit(){
+  isEdit=!isEdit;
+  document.getElementById('preview').style.display=isEdit?'none':'block';
+  document.getElementById('edit-area').style.display=isEdit?'block':'none';
+  document.getElementById('btn-edit').textContent=isEdit?'👁 미리보기':'✏️ 수정';
+  if(!isEdit){ md=document.getElementById('edit-area').value; showResult(); }
 }
 
-function toggleEdit() {
-  isEditMode = !isEditMode;
-  document.getElementById('result-preview').style.display = isEditMode ? 'none' : 'block';
-  document.getElementById('result-edit').style.display = isEditMode ? 'block' : 'none';
-  document.getElementById('btn-edit').textContent = isEditMode ? '👁 미리보기' : '✏️ 수정';
-  if (!isEditMode) {
-    currentMarkdown = document.getElementById('result-edit').value;
-    showResult();
-  }
+function onEditChange(){
+  md=document.getElementById('edit-area').value;
+  const chars=countChars(md);
+  const badge=document.getElementById('char-badge');
+  badge.textContent=chars.toLocaleString()+'자';
+  badge.className='char-badge '+(chars>=1500?'char-ok':'char-warn');
 }
 
-function onEditChange() {
-  currentMarkdown = document.getElementById('result-edit').value;
-  const chars = countChars(currentMarkdown);
-  const badge = document.getElementById('char-badge');
-  badge.textContent = chars.toLocaleString() + '자';
-  badge.className = 'char-badge ' + (chars >= 1500 ? 'char-ok' : 'char-warn');
+function buildHTML(){
+  return `<div style="font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;max-width:740px;margin:0 auto;padding:24px 20px;color:#1d1d1f;line-height:1.9;font-size:16px;">\n${parseMd(md)}\n</div>`;
 }
 
-function buildHTML() {
-  const inner = parseMarkdown(currentMarkdown);
-  return `<div style="font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;max-width:740px;margin:0 auto;padding:24px 20px;color:#1d1d1f;line-height:1.9;font-size:16px;">
-${inner}
-</div>`;
-}
-
-async function copyHTML() {
-  const html = buildHTML();
+async function copyHTML(){
+  const html=buildHTML();
+  const btn=document.getElementById('btn-copy');
   try {
     await navigator.clipboard.writeText(html);
-    const btn = document.getElementById('btn-copy');
-    btn.textContent = '✅ 복사 완료!';
-    btn.className = 'act-btn act-copied';
-    setTimeout(() => {
-      btn.textContent = '📋 복사';
-      btn.className = 'act-btn act-copy';
-    }, 2500);
   } catch {
-    const ta = document.createElement('textarea');
-    ta.value = html; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-    document.body.removeChild(ta);
-    const btn = document.getElementById('btn-copy');
-    btn.textContent = '✅ 복사 완료!'; btn.className = 'act-btn act-copied';
-    setTimeout(() => { btn.textContent = '📋 복사'; btn.className = 'act-btn act-copy'; }, 2500);
+    const ta=document.createElement('textarea');
+    ta.value=html; ta.style.cssText='position:fixed;opacity:0;';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
   }
+  btn.textContent='✅ 복사 완료!'; btn.className='act-btn btn-copied';
+  setTimeout(()=>{ btn.textContent='📋 복사'; btn.className='act-btn btn-copy'; }, 2500);
 }
 
-function reset() {
-  currentMarkdown = '';
-  isEditMode = false;
-  document.getElementById('section-result').style.display = 'none';
-  document.getElementById('section-input').style.display = 'block';
-  document.getElementById('input-url').value = '';
-  document.getElementById('input-topic').value = '';
-  clearError();
+function resetAll(){
+  md=''; isEdit=false;
+  document.getElementById('sec-result').style.display='none';
+  document.getElementById('sec-input').style.display='block';
+  document.getElementById('input-url').value='';
+  document.getElementById('input-topic').value='';
+  clearErr();
 }
 </script>
-
 </body>
 </html>
