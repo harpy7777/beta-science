@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>베타과학학원 · 물질의 구조와 성질 · Ⅱ</title>
+<style>
+:root {
+  --chem:        #2563eb;
+  --chem-dark:   #1e3a8a;
+  --chem-mid:    #3b82f6;
+  --chem-light:  #60a5fa;
+  --chem-tint:   #eff6ff;
+  --chem-tint2:  #dbeafe;
+  --chem-border: #bfdbfe;
+  --chem-border2:#93c5fd;
+  --text:#1d1d1f;--muted:#6e6e73;--dim:#aeaeb2;
+  --bg:#fafafa;--white:#fff;
+  --border-soft:#e0eaff;
+  --green:#059669;--green-bg:#ecfdf5;--green-border:#a7f3d0;
+  --blue2:#2563eb;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
+  --amber:#d97706;--amber-bg:#fffbeb;--amber-border:#fde68a;
+  --red:#dc2626;--red-bg:#fef2f2;--red-border:#fecaca;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;--purple-border:#ddd6fe;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* ── Header ── */
+.header{background:#fff;border-bottom:1px solid var(--border-soft);padding:0 1rem;padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right));height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:500}
+.header-left{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--chem-mid) 0%,var(--chem-dark) 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:14px;font-weight:600;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{display:flex;align-items:center;gap:5px;background:var(--chem-tint);border:1px solid var(--chem-border);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;color:var(--chem-dark);white-space:nowrap}
+.dot-blue{width:5px;height:5px;background:var(--chem-mid);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{padding:7px 14px;min-height:36px;background:transparent;border:1.5px solid var(--chem-border);border-radius:20px;font-family:inherit;font-size:12px;font-weight:600;color:var(--chem-dark);cursor:pointer;white-space:nowrap;transition:background .15s}
+.back-btn:hover{background:var(--chem-tint)}
+.back-btn:active{background:var(--chem-tint2)}
+
+/* ── Hero ── */
+.hero{background:linear-gradient(135deg,var(--chem-dark) 0%,var(--chem) 50%,var(--chem-mid) 100%);padding:2.8rem 1.5rem 2.2rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero::after{content:'';position:absolute;left:-50px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;text-decoration:none;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+.hero-eyebrow{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+.hero-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem}
+.hero-desc{font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.7;max-width:580px;margin:0 auto 1.8rem}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:14px;padding:.9rem 1.4rem;text-align:center;backdrop-filter:blur(6px);min-width:80px;transition:background .2s}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+/* ── Tabs ── */
+.tabs-wrap{background:var(--white);border-bottom:2px solid var(--chem-border);position:sticky;top:54px;z-index:400}
+.tabs-inner{max-width:1100px;margin:0 auto;padding:0 1.5rem;display:flex;overflow-x:auto;justify-content:center;gap:6px;-webkit-overflow-scrolling:touch}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{padding:13px 24px;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;margin-bottom:-2px;border-radius:8px 8px 0 0;flex-shrink:0}
+.tab-btn:hover{color:var(--chem);background:var(--chem-tint)}
+.tab-btn.active{color:var(--chem);border-bottom-color:var(--chem)}
+
+/* ── Content ── */
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}.unit-section.visible{display:block}
+
+/* ── Unit Banner ── */
+.unit-banner{border-radius:16px;padding:1.4rem 1.8rem;margin-bottom:1.8rem;display:flex;align-items:center;gap:1.2rem}
+.ub-blue{background:linear-gradient(135deg,var(--chem-tint),var(--chem-tint2));border:2px solid var(--chem-border)}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--chem);margin-bottom:4px}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── Accordion ── */
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{background:var(--white);border:1.5px solid #e5e7eb;border-radius:16px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.acc-item.open{border-color:var(--chem-border);box-shadow:0 4px 20px rgba(37,99,235,.1)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:1.2rem 1.5rem;cursor:pointer;user-select:none;transition:background .15s}
+.acc-header:hover{background:var(--chem-tint)}
+.acc-num{width:32px;height:32px;border-radius:10px;background:var(--chem-tint2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--chem-dark);flex-shrink:0;transition:background .2s,color .2s}
+.acc-item.open .acc-num{background:var(--chem);color:#fff}
+.acc-head-info{flex:1;min-width:0}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--chem-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px;transition:color .2s}
+.acc-item.open .acc-subtitle{color:var(--chem)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s,color .2s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--chem)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--chem-tint2)}
+.acc-item.open .acc-body{display:block}
+
+/* ── Section Title ── */
+.sec-title{font-size:12px;font-weight:800;color:var(--chem-dark);letter-spacing:.06em;text-transform:uppercase;margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--chem);border-radius:2px;display:block;flex-shrink:0}
+
+/* ── Content Boxes ── */
+.concept-box{background:var(--chem-tint);border:1.5px solid var(--chem-border);border-left:4px solid var(--chem);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.concept-box .cb-title{font-weight:800;color:var(--chem-dark);font-size:14px;margin-bottom:.4rem}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--green);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+.amber-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-left:4px solid var(--amber);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+.blue-box{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-left:4px solid var(--blue2);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.blue-box .cb-title{font-weight:800;color:#1e40af;font-size:14px;margin-bottom:.4rem}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+.purple-box{background:var(--purple-bg);border:1.5px solid var(--purple-border);border-left:4px solid var(--purple);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.purple-box .cb-title{font-weight:800;color:#5b21b6;font-size:14px;margin-bottom:.4rem}
+
+/* ── Table ── */
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:12px;border:1.5px solid var(--chem-border);-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:400px}
+thead th{background:var(--chem-tint2);padding:10px 14px;text-align:left;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--chem-dark)}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6;vertical-align:top}
+tbody tr:hover td{background:var(--chem-tint)}
+
+/* ── Formula Box ── */
+.formula-box{background:linear-gradient(135deg,var(--chem-tint),var(--chem-tint2));border:2px solid var(--chem-border);border-radius:14px;padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--chem-dark);letter-spacing:-.01em;font-style:italic}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* ── Flow ── */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0;font-size:13px}
+.flow-box{background:var(--white);border:1.5px solid var(--chem-border);border-radius:8px;padding:7px 12px;font-weight:700;color:var(--chem-dark);text-align:center;font-size:12px;line-height:1.4}
+.flow-arrow{color:var(--chem);font-size:18px;font-weight:900}
+
+/* ── Point Cards ── */
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin:.8rem 0}
+.point-card{background:var(--white);border:1.5px solid var(--chem-border);border-radius:12px;padding:1rem;text-align:center}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--chem);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ── Molecule Structure Cards ── */
+.mol-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin:.8rem 0}
+.mol-card{background:var(--white);border:1.5px solid var(--chem-border);border-radius:14px;padding:1.1rem;text-align:center;transition:box-shadow .2s}
+.mol-card:hover{box-shadow:0 4px 16px rgba(37,99,235,.12)}
+.mol-name{font-size:13px;font-weight:800;color:var(--chem-dark);margin-bottom:4px}
+.mol-formula{font-size:11px;color:var(--muted);margin-bottom:8px}
+.mol-shape{font-size:11px;font-weight:700;background:var(--chem-tint2);color:var(--chem);border-radius:20px;padding:3px 10px;display:inline-block;margin-bottom:6px}
+.mol-angle{font-size:11px;color:var(--muted)}
+.mol-icon{font-size:2rem;margin-bottom:6px}
+
+/* ── Electronegativity Table ── */
+.en-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:.8rem 0;font-size:11px}
+.en-cell{background:var(--chem-tint2);border:1px solid var(--chem-border);border-radius:6px;padding:6px 4px;text-align:center}
+.en-cell .el{font-weight:800;color:var(--chem-dark);font-size:12px}
+.en-cell .val{color:var(--muted);font-size:10px;margin-top:2px}
+.en-cell.high{background:#dbeafe;border-color:#93c5fd}
+.en-cell.highest{background:#1e3a8a;border-color:#1e3a8a}
+.en-cell.highest .el,.en-cell.highest .val{color:#fff}
+
+/* ── Highlight ── */
+.hp{color:var(--chem-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--blue2);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.hv{color:var(--purple);font-weight:800}
+
+/* ── Quiz ── */
+.quiz-wrap{background:linear-gradient(135deg,var(--chem-tint2),var(--chem-tint));border:1.5px solid var(--chem-border);border-radius:14px;padding:1.2rem 1.4rem;margin-top:1.6rem}
+.quiz-label{font-size:11px;font-weight:800;color:var(--chem-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{background:var(--chem);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.quiz-toggle:hover{background:var(--chem-dark)}
+.quiz-ans{display:none;margin-top:.8rem;padding:.9rem 1rem;background:rgba(255,255,255,.8);border-radius:10px;font-size:13.5px;color:var(--text);line-height:1.75}
+p{line-height:1.75;font-size:13.5px;margin:.4rem 0}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.5rem}
+  .tabs-inner{justify-content:flex-start;gap:0;padding:0 .5rem}
+  .tab-btn{padding:11px 14px;font-size:12px}
+  .content-wrap{padding:1.2rem .9rem 4rem}
+  .unit-banner{flex-direction:column;gap:.8rem;padding:1.2rem;text-align:center}
+  .ub-emoji{font-size:2rem}
+  .ub-title{font-size:1.1rem}
+  .acc-header{padding:1rem}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .mol-grid{grid-template-columns:1fr 1fr}
+  .hero-stats{gap:8px}
+  .hero-stat-card{min-width:70px;padding:.8rem 1rem}
+  .hs-num{font-size:1.5rem}
+  .en-grid{grid-template-columns:repeat(4,1fr)}
+  table{min-width:320px}
+}
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .header-badge .dot-blue{display:none}
+  .point-box{grid-template-columns:1fr}
+  .mol-grid{grid-template-columns:1fr 1fr}
+  .formula-text{font-size:1.1rem}
+  .acc-htitle{font-size:13px}
+  .acc-hdesc{display:none}
+  .hero-desc{font-size:12.5px}
+  .en-grid{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"
+          stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-blue"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="chemistry1-summary.html" class="bc-item">화학 1 핵심 정리</a><span class="bc-sep">›</span>
+      <span class="bc-current">⚛️ Ⅱ. 물질의 구조와 성질</span>
+    </div>
+    <div class="hero-eyebrow">⚛️ PART 02 · 물질의 구조와 성질 · UNIT 02</div>
+    <div class="hero-title">Ⅱ. 물질의 구조와 성질<br>완벽 상세 학습 가이드</div>
+    <div class="hero-desc">화학 결합의 전기적 성질, 전기음성도, 결합의 극성, 루이스 전자점식,<br>전자쌍 반발 이론, 분자 구조와 극성까지 완벽하게 학습합니다</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">2</div><div class="hs-lbl">중단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">6</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">18+</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tabs ── -->
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">🔗 중단원1 · 화학 결합과 결합의 극성</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">🔷 중단원2 · 분자의 구조와 성질</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ══════════════════════════════════════
+     중단원 1: 화학 결합과 결합의 극성
+══════════════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner ub-blue">
+    <div class="ub-emoji">🔗</div>
+    <div>
+      <div class="ub-num">중단원 01 · Chemical Bond & Polarity</div>
+      <div class="ub-title">화학 결합과 결합의 극성</div>
+      <div class="ub-desc">화학 결합의 전기적 성질을 이해하고, 전기음성도와 쌍극자 모멘트로 결합의 극성을 판단하는 방법을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 화학 결합의 전기적 성질 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Electrical Nature · 전기적 성질</div>
+          <div class="acc-htitle">화학 결합의 전기적 성질</div>
+          <div class="acc-hdesc">공유 결합·이온 결합 모두 전자가 관여 · 물 전기분해 · 염화나트륨 전기분해</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">화학 결합이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🔵 화학 결합 (Chemical Bond)</div>
+          세상에는 셀 수 없이 많은 물질이 존재하지만, 물질을 구성하는 원소는 <strong>90여 종</strong>에 불과합니다. 이 원소들이 결합을 형성해 다양한 물질을 만듭니다.<br><br>
+          • <span class="hp">비금속 원자끼리</span>: 전자쌍을 공유 → <strong>공유 결합</strong><br>
+          • <span class="hp">금속 + 비금속</span>: 금속 원자가 전자를 줌 → 이온화 → <strong>이온 결합</strong>
+        </div>
+
+        <div class="sec-title">물의 전기 분해 — 공유 결합의 전기적 성질</div>
+        <div class="concept-box">
+          <div class="cb-title">💧 2H₂O(l) → 2H₂(g) + O₂(g)</div>
+          물(H₂O)에 전류를 흘려 주면 각 전극에서 기포가 발생합니다.<br><br>
+          • <span class="hp">(+)극</span>: 산소(O₂) 기체 발생<br>
+          • <span class="hp">(−)극</span>: 수소(H₂) 기체 발생<br>
+          • 부피비: <strong>산소(O₂) : 수소(H₂) = 1 : 2</strong><br><br>
+          전기 에너지를 가하면 수소 원자와 산소 원자 사이의 결합이 끊어집니다. 이는 <span class="hp">화학 결합이 형성될 때 전자가 관여</span>하며 결합에 전기적 성질이 있기 때문입니다.
+        </div>
+
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 황산 나트륨(Na₂SO₄)을 넣는 이유</div>
+          순수한 증류수는 전기 전도성이 거의 없어 전기 분해가 잘 일어나지 않습니다. 황산 나트륨을 소량 녹이면 이온이 생겨 <span class="ha">전기 전도성이 증가</span>해 전기 분해가 원활하게 일어납니다.
+        </div>
+
+        <div class="sec-title">염화 나트륨 전기 분해 — 이온 결합의 전기적 성질</div>
+        <div class="blue-box">
+          <div class="cb-title">🧂 2NaCl(l) → 2Na(l) + Cl₂(g)</div>
+          이온 결합 물질인 염화 나트륨(NaCl):<br><br>
+          • <span class="hb">고체 상태</span>: 이온이 고정 → 전류 흐르지 않음<br>
+          • <span class="hb">액체 상태(용융액)</span>: 이온이 자유롭게 이동 → 전류 흐름 → 전기 분해 가능<br>
+          • (−)극: Na(나트륨) 생성 / (+)극: Cl₂(염소 기체) 생성<br><br>
+          이를 통해 이온 결합에도 <span class="hb">전자가 관여</span>함을 알 수 있습니다.
+        </div>
+
+        <div class="concept-box">
+          <div class="cb-title">📌 핵심 결론</div>
+          화학 결합이 형성될 때는 <span class="hp">전기적 성질을 띠는 전자가 관여</span>하며, 공유 결합과 이온 결합 모두 <strong>화학 결합에는 전기적 성질이 있습니다.</strong>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">물의 전기 분해 실험에서 (+)극과 (−)극에서 발생하는 기체의 종류와 부피비를 각각 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            (+)극: <strong>산소(O₂)</strong><br>
+            (−)극: <strong>수소(H₂)</strong><br>
+            부피비: <strong>산소 : 수소 = 1 : 2</strong><br><br>
+            2H₂O → 2H₂ + O₂에서 H₂ : O₂ = 2 : 1이므로 (−)극의 수소가 (+)극의 산소보다 2배 더 발생합니다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">물에 전류를 흘려 주었을 때 수소와 산소로 분해되는 까닭은 화학 결합이 형성될 때 ( )이/가 관여하기 때문이다. 괄호 안에 알맞은 말을 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 전자</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 전기음성도 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Electronegativity · 전기음성도</div>
+          <div class="acc-htitle">전기음성도와 주기적 변화</div>
+          <div class="acc-hdesc">공유 전자쌍을 끌어당기는 정도 · 폴링 척도 · 같은 주기↑ 같은 족↓</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">전기음성도란?</div>
+        <div class="concept-box">
+          <div class="cb-title">⚡ 전기음성도 (Electronegativity)</div>
+          <span class="hp">전기음성도</span>: 공유 결합을 이루는 각 원자가 <strong>공유 전자쌍을 끌어당기는 정도</strong>를 상대적인 수치로 나타낸 것.<br><br>
+          <strong>폴링(Pauling) 척도</strong>: 공유 전자쌍을 끌어당기는 정도가 가장 큰 플루오린(F)의 전기음성도를 <strong>4.0</strong>으로 정하고 상대적 수치 사용.<br><br>
+          <strong>18족 원소</strong>는 다른 원자와 결합 형성이 어려워 전기음성도를 보통 다루지 않습니다.
+        </div>
+
+        <div class="sec-title">주요 원소의 전기음성도</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>원소</th><th>H</th><th>C</th><th>N</th><th>O</th><th>F</th><th>Na</th><th>Mg</th><th>P</th><th>S</th><th>Cl</th></tr></thead>
+          <tbody>
+            <tr><td><strong>전기음성도</strong></td><td>2.2</td><td>2.6</td><td>3.0</td><td>3.4</td><td class="hp">4.0</td><td>0.9</td><td>1.3</td><td>2.2</td><td>2.6</td><td>3.2</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">전기음성도의 주기적 경향성</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>경향</th><th>변화</th><th>이유</th><th>예시</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">같은 주기, 원자번호↑</span></td><td>전기음성도 <strong>증가</strong> ↑</td><td>핵전하 증가 → 공유전자 인력↑</td><td>Li(1.0) &lt; C(2.6) &lt; F(4.0)</td></tr>
+            <tr><td><span class="hp">같은 족, 원자번호↑</span></td><td>전기음성도 <strong>감소</strong> ↓</td><td>전자 껍질 증가 → 차폐 효과↑</td><td>F(4.0) &gt; Cl(3.2) &gt; Br(3.0)</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="blue-box">
+          <div class="cb-title">💡 기억법</div>
+          주기율표에서 <span class="hb">플루오린(F)에 가까워지는 방향</span>으로 갈수록 전기음성도가 대체로 증가합니다.<br>
+          → 오른쪽 위 방향(F 방향)으로 갈수록 전기음성도 증가!
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">공유 결합을 이루는 각 원자가 공유 전자쌍을 끌어당기는 정도를 상대적인 수치로 나타낸 것을 ( )(이)라고 한다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 전기음성도</strong></div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">같은 주기에서 원자 번호가 커질수록 전기음성도가 대체로 어떻게 변하는지 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 증가한다</strong><br><br>같은 주기에서 원자 번호가 커질수록 핵전하가 증가하여 공유 전자쌍을 끌어당기는 힘이 커지므로 전기음성도가 증가합니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03: 결합의 극성 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Bond Polarity · 결합의 극성</div>
+          <div class="acc-htitle">결합의 극성과 쌍극자 모멘트</div>
+          <div class="acc-hdesc">무극성 공유 결합 vs 극성 공유 결합 · δ+, δ− 부분 전하 · 쌍극자 모멘트 화살표</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">무극성 공유 결합 vs 극성 공유 결합</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>무극성 공유 결합</th><th>극성 공유 결합</th></tr></thead>
+          <tbody>
+            <tr><td><strong>정의</strong></td><td>같은 종류의 원자 사이 결합<br>→ 공유 전자쌍 치우침 없음</td><td>다른 종류의 원자 사이 결합<br>→ 공유 전자쌍이 한쪽으로 치우침</td></tr>
+            <tr><td><strong>부분 전하</strong></td><td>원자가 부분 전하 안 띰</td><td>전기음성도 큰 원자: δ−<br>전기음성도 작은 원자: δ+</td></tr>
+            <tr><td><strong>예시</strong></td><td>H₂, O₂, N₂, Cl₂, F₂</td><td>HCl, HF, H₂O, NH₃</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">극성의 크기와 전기음성도 차이</div>
+        <div class="concept-box">
+          <div class="cb-title">📊 전기음성도 차이 → 극성 크기</div>
+          화학 결합을 형성하는 두 원자의 <span class="hp">전기음성도 차이가 커질수록</span> 결합의 극성이 대체로 커집니다.<br><br>
+          H−F: 전기음성도 차이 = 4.0 − 2.2 = <strong>1.8</strong> (치우침 큼)<br>
+          H−Cl: 전기음성도 차이 = 3.2 − 2.2 = <strong>1.0</strong> (치우침 작음)<br><br>
+          따라서 <span class="hp">H−F 결합이 H−Cl 결합보다 극성이 더 큽니다.</span>
+        </div>
+
+        <div class="green-box">
+          <div class="cb-title">⬅ 결합과 이온 결합의 연속성</div>
+          전기음성도 차이 0 → <strong>무극성 공유 결합</strong><br>
+          전기음성도 차이 증가 → <strong>극성 공유 결합</strong><br>
+          전기음성도 차이 매우 큼 → 전자가 완전 이동 → <strong>이온 결합</strong><br><br>
+          무극성 공유 결합과 이온 결합은 <span class="hg">화학 결합의 양 끝</span>이며, 대부분의 결합은 그 사이에 위치합니다.
+        </div>
+
+        <div class="sec-title">쌍극자 모멘트 (Dipole Moment)</div>
+        <div class="concept-box">
+          <div class="cb-title">→ 쌍극자 모멘트</div>
+          <span class="hp">쌍극자</span>: 크기가 같고 부호가 반대인 두 전하가 일정한 거리를 두고 분리된 것.<br><br>
+          <span class="hp">쌍극자 모멘트</span>: 공유 결합에서 극성의 크기를 나타내는 척도.<br>
+          화살표로 나타낼 때 → <strong>전기음성도가 작은 원자에서 큰 원자 방향</strong>으로 표시 (+ → −)<br><br>
+          무극성 공유 결합: 쌍극자 모멘트 = 0<br>
+          극성 공유 결합: 쌍극자 모멘트 ≠ 0
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">공유 결합은 결합하는 두 원자의 전기음성도의 차이에 따라 ( ) 공유 결합과 ( ) 공유 결합으로 나눌 수 있다. 괄호에 알맞은 말을 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 무극성, 극성</strong></div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">다음 세 가지 결합을 무극성 공유 결합과 극성 공유 결합으로 구분하시오.<br><br>N−H &nbsp;&nbsp; N≡N &nbsp;&nbsp; C−F</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            <strong>무극성 공유 결합:</strong> N≡N (같은 종류의 원자 간 결합)<br>
+            <strong>극성 공유 결합:</strong> N−H, C−F (서로 다른 종류의 원자 간 결합)<br><br>
+            N−H: N(3.0) ≠ H(2.2) → 극성<br>
+            C−F: C(2.6) ≠ F(4.0) → 극성
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 7</div>
+          <div class="quiz-q">대체로 결합을 이루는 원자의 전기음성도 차이가 커질수록 결합의 쌍극자 모멘트가 ( 커지고, 작아지고 ) 결합의 극성이 ( 커진다, 작아진다 ).</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 커지고, 커진다</strong><br><br>전기음성도 차이가 클수록 공유 전자쌍의 치우침이 커지고 부분 전하의 크기가 증가하므로 쌍극자 모멘트와 결합의 극성이 대체로 커집니다.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ══════════════════════════════════════
+     중단원 2: 분자의 구조와 성질
+══════════════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner ub-blue">
+    <div class="ub-emoji">🔷</div>
+    <div>
+      <div class="ub-num">중단원 02 · Molecular Structure & Properties</div>
+      <div class="ub-title">분자의 구조와 성질</div>
+      <div class="ub-desc">루이스 전자점식으로 분자를 표현하고, 전자쌍 반발 이론으로 분자 구조를 예측하며, 분자 구조에 따른 극성과 물질의 성질을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01: 루이스 전자점식 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Lewis Dot Structure · 루이스 구조</div>
+          <div class="acc-htitle">루이스 전자점식과 루이스 구조</div>
+          <div class="acc-hdesc">원자가 전자를 점으로 표시 · 공유 전자쌍·비공유 전자쌍 · 단일·이중·삼중 결합</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">루이스 전자점식이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🔵 루이스 전자점식 (Lewis Electron Dot Structure)</div>
+          <span class="hp">루이스 전자점식</span>: 원자가 전자를 원소 기호 주위에 점으로 표시해 공유 결합을 나타내는 방법.<br><br>
+          <strong>그리는 규칙:</strong><br>
+          ① 원자가 전자를 나타내는 점을 원소 기호의 <span class="hp">상하좌우에 하나씩</span> 배치<br>
+          ② 원자가 전자가 5개 이상이면 다섯 번째부터 다시 상하좌우에 하나씩 그려 쌍을 이루게 함<br>
+          ③ 상하좌우에 점을 찍는 순서는 상관 없음
+        </div>
+
+        <div class="sec-title">공유 전자쌍과 비공유 전자쌍</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>용어</th><th>정의</th><th>루이스 구조 표시</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">공유 전자쌍</span></td><td>결합에 참여하는 전자쌍</td><td>결합선(—)으로 표시</td></tr>
+            <tr><td><span class="hp">비공유 전자쌍</span></td><td>결합에 참여하지 않는 전자쌍</td><td>점 2개(:..)로 표시하거나 생략</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">결합의 종류</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>결합 종류</th><th>공유 전자쌍 수</th><th>결합선 수</th><th>예시</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">단일 결합</span></td><td>1개</td><td>1개 (−)</td><td>H₂, HF, HCl, H₂O</td></tr>
+            <tr><td><span class="hp">이중 결합</span></td><td>2개</td><td>2개 (=)</td><td>O₂, CO₂, C₂H₄</td></tr>
+            <tr><td><span class="hp">삼중 결합</span></td><td>3개</td><td>3개 (≡)</td><td>N₂, HCN, C₂H₂</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">주요 분자의 루이스 구조 및 전자쌍 수</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>분자</th><th>공유 전자쌍</th><th>비공유 전자쌍</th><th>특징</th></tr></thead>
+          <tbody>
+            <tr><td><strong>HF</strong></td><td>1개</td><td>3개</td><td>단일 결합, F에 비공유 전자쌍 3개</td></tr>
+            <tr><td><strong>H₂O</strong></td><td>2개</td><td>2개</td><td>단일 결합 2개, O에 비공유 전자쌍 2개</td></tr>
+            <tr><td><strong>NH₃</strong></td><td>3개</td><td>1개</td><td>단일 결합 3개, N에 비공유 전자쌍 1개</td></tr>
+            <tr><td><strong>CH₄</strong></td><td>4개</td><td>0개</td><td>단일 결합 4개, 비공유 전자쌍 없음</td></tr>
+            <tr><td><strong>CO₂</strong></td><td>4개(이중×2)</td><td>4개</td><td>이중 결합 2개, O 각각 비공유 전자쌍 2개</td></tr>
+            <tr><td><strong>N₂</strong></td><td>3개(삼중)</td><td>2개</td><td>삼중 결합 1개, N 각각 비공유 전자쌍 1개</td></tr>
+            <tr><td><strong>O₂</strong></td><td>2개(이중)</td><td>4개</td><td>이중 결합 1개, O 각각 비공유 전자쌍 2개</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 옥텟 규칙 (Octet Rule)</div>
+          원자가 전자를 잃거나 얻거나 공유하면서 가장 바깥 전자 껍질의 전자 배치를 <span class="ha">18족 원소처럼(8개)</span> 만들려는 경향성.<br><br>
+          분자를 루이스 전자점식으로 나타낼 때 <strong>모든 원자가 옥텟 규칙을 만족</strong>하도록 전자쌍을 배치해야 합니다. (단, H는 2개)
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 8</div>
+          <div class="quiz-q">( )을/를 원소 기호 주위에 점으로 표시해 공유 결합을 나타내는 방법을 루이스 전자점식이라고 한다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 원자가 전자</strong></div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 9</div>
+          <div class="quiz-q">사염화 탄소(CCl₄)의 루이스 구조에서 분자 내 공유 전자쌍 수와 비공유 전자쌍 수를 각각 구하시오. (단, Cl의 원자가 전자 수는 7)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 공유 전자쌍 4개, 비공유 전자쌍 12개</strong><br><br>
+            C는 원자가 전자 4개 → Cl 4개와 각각 단일 결합<br>
+            공유 전자쌍: C−Cl 결합 4개<br>
+            비공유 전자쌍: Cl 각각 3쌍 × 4개 = <strong>12쌍</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02: 전자쌍 반발 이론과 분자 구조 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">VSEPR Theory · 전자쌍 반발 이론</div>
+          <div class="acc-htitle">전자쌍 반발 이론과 분자 구조</div>
+          <div class="acc-hdesc">전자쌍들이 최대한 서로 멀리 배치 · 선형·평면삼각형·정사면체·삼각뿔·굽은형</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">전자쌍 반발 이론 (VSEPR Theory)</div>
+        <div class="concept-box">
+          <div class="cb-title">⚡ 전자쌍 반발 이론</div>
+          분자의 중심 원자의 전자쌍들은 서로 같은 전하를 띠므로 <span class="hp">정전기적 반발력</span>이 작용합니다. 전자쌍들은 <strong>반발력을 최소화하기 위해 가능한 한 서로 멀리 떨어져</strong> 배치됩니다.<br><br>
+          이를 근거로 분자 구조를 예측하는 이론을 <span class="hp">전자쌍 반발 이론</span>이라고 합니다.
+        </div>
+
+        <div class="sec-title">공유 전자쌍만 있을 때의 분자 구조</div>
+        <div class="mol-grid">
+          <div class="mol-card">
+            <div class="mol-icon">↔</div>
+            <div class="mol-name">선형 (Linear)</div>
+            <div class="mol-formula">공유 전자쌍 2개</div>
+            <div class="mol-shape">결합각 180°</div>
+            <div class="mol-angle">예: BeCl₂, CO₂, HCN</div>
+          </div>
+          <div class="mol-card">
+            <div class="mol-icon">△</div>
+            <div class="mol-name">평면 삼각형</div>
+            <div class="mol-formula">공유 전자쌍 3개</div>
+            <div class="mol-shape">결합각 120°</div>
+            <div class="mol-angle">예: BCl₃, BF₃</div>
+          </div>
+          <div class="mol-card">
+            <div class="mol-icon">⬡</div>
+            <div class="mol-name">정사면체</div>
+            <div class="mol-formula">공유 전자쌍 4개</div>
+            <div class="mol-shape">결합각 109.5°</div>
+            <div class="mol-angle">예: CH₄, CCl₄, SiH₄</div>
+          </div>
+        </div>
+
+        <div class="sec-title">비공유 전자쌍이 있을 때의 분자 구조</div>
+        <div class="concept-box">
+          <div class="cb-title">📌 비공유 전자쌍과 결합각</div>
+          중심 원자에 비공유 전자쌍이 있으면 분자 구조와 결합각이 달라집니다.<br><br>
+          <span class="hp">비공유 전자쌍과 공유 전자쌍 사이의 반발력</span> &gt; 공유 전자쌍 사이의 반발력<br><br>
+          → 비공유 전자쌍 수가 많을수록 <strong>결합각이 작아집니다.</strong>
+        </div>
+        <div class="mol-grid">
+          <div class="mol-card">
+            <div class="mol-icon">⬡</div>
+            <div class="mol-name">정사면체</div>
+            <div class="mol-formula">CH₄ (공유4, 비공유0)</div>
+            <div class="mol-shape">결합각 109.5°</div>
+            <div class="mol-angle">비공유 전자쌍 없음</div>
+          </div>
+          <div class="mol-card">
+            <div class="mol-icon">🔺</div>
+            <div class="mol-name">삼각뿔</div>
+            <div class="mol-formula">NH₃ (공유3, 비공유1)</div>
+            <div class="mol-shape">결합각 107°</div>
+            <div class="mol-angle">비공유 전자쌍 1개</div>
+          </div>
+          <div class="mol-card">
+            <div class="mol-icon">〜</div>
+            <div class="mol-name">굽은 형 (V자형)</div>
+            <div class="mol-formula">H₂O (공유2, 비공유2)</div>
+            <div class="mol-shape">결합각 104.5°</div>
+            <div class="mol-angle">비공유 전자쌍 2개</div>
+          </div>
+        </div>
+
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 결합각 비교: CH₄ &gt; NH₃ &gt; H₂O</div>
+          중심 원자의 전자쌍이 모두 4개로 같지만:<br>
+          CH₄(109.5°) &gt; NH₃(107°) &gt; H₂O(104.5°)<br><br>
+          비공유 전자쌍이 많을수록 공유 전자쌍을 더 세게 밀어내므로 <span class="ha">결합각이 감소</span>합니다.
+        </div>
+
+        <div class="sec-title">이중·삼중 결합의 취급</div>
+        <div class="blue-box">
+          <div class="cb-title">📌 다중 결합은 하나의 결합으로 취급</div>
+          전자쌍 반발 이론으로 분자 구조를 결정할 때 <span class="hb">이중 결합이나 삼중 결합은 하나의 결합으로 취급</span>합니다.<br><br>
+          예) CO₂: C와 O 사이 이중 결합 2개 → 공유 전자쌍 2개로 취급 → <strong>선형(180°)</strong>
+        </div>
+
+        <div class="sec-title">분자 구조 총정리</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>분자 구조</th><th>공유 전자쌍</th><th>비공유 전자쌍</th><th>결합각</th><th>예시</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">선형</span></td><td>2</td><td>0</td><td>180°</td><td>BeCl₂, CO₂, HCN, CS₂</td></tr>
+            <tr><td><span class="hp">평면 삼각형</span></td><td>3</td><td>0</td><td>120°</td><td>BCl₃, BF₃, SO₃</td></tr>
+            <tr><td><span class="hp">정사면체</span></td><td>4</td><td>0</td><td>109.5°</td><td>CH₄, CCl₄, SiH₄</td></tr>
+            <tr><td><span class="hp">삼각뿔</span></td><td>3</td><td>1</td><td>107°</td><td>NH₃, NF₃, NCl₃</td></tr>
+            <tr><td><span class="hp">굽은 형</span></td><td>2</td><td>2</td><td>104.5°</td><td>H₂O, H₂S, OF₂</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 10</div>
+          <div class="quiz-q">분자에서 중심 원자의 전자쌍은 ( )을/를 최소화하도록 배치된다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 반발력(정전기적 반발력)</strong></div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 11</div>
+          <div class="quiz-q">사염화 탄소(CCl₄)와 삼염화 질소(NCl₃) 중 결합각이 더 큰 분자를 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: CCl₄</strong><br><br>
+            CCl₄: 중심 원자(C)에 공유 전자쌍 4개, 비공유 전자쌍 0개 → 정사면체 → <strong>109.5°</strong><br>
+            NCl₃: 중심 원자(N)에 공유 전자쌍 3개, 비공유 전자쌍 1개 → 삼각뿔 → <strong>약 107°</strong><br><br>
+            비공유 전자쌍이 없는 CCl₄의 결합각이 더 큽니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03: 분자의 극성과 물질의 성질 -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Molecular Polarity · 분자의 극성</div>
+          <div class="acc-htitle">분자 구조에 따른 물질의 성질</div>
+          <div class="acc-hdesc">극성 분자 vs 무극성 분자 · 쌍극자 모멘트 상쇄 · 전기장 배열 · 용해성</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">무극성 분자 vs 극성 분자</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>무극성 분자</th><th>극성 분자</th></tr></thead>
+          <tbody>
+            <tr><td><strong>정의</strong></td><td>분자의 쌍극자 모멘트 = 0</td><td>분자의 쌍극자 모멘트 ≠ 0</td></tr>
+            <tr><td><strong>조건</strong></td><td>결합의 쌍극자 모멘트 벡터 합 = 0<br>(상쇄됨)</td><td>결합의 쌍극자 모멘트 벡터 합 ≠ 0<br>(상쇄 안 됨)</td></tr>
+            <tr><td><strong>예시</strong></td><td>H₂, O₂, N₂, CO₂, CH₄, BCl₃</td><td>HF, HCl, H₂O, NH₃, CH₃Cl</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">이원자 분자의 극성 판단</div>
+        <div class="concept-box">
+          <div class="cb-title">🔵 이원자 분자</div>
+          • 무극성 공유 결합으로 이루어진 분자 → <span class="hp">무극성 분자</span> (예: H₂, O₂, N₂)<br>
+          • 극성 공유 결합으로 이루어진 분자 → <span class="hp">극성 분자</span> (예: HF, HCl, HBr)
+        </div>
+
+        <div class="sec-title">다원자 분자의 극성 판단</div>
+        <div class="concept-box">
+          <div class="cb-title">📊 3개 이상 원자 분자: 결합의 극성 + 분자 구조 모두 고려!</div>
+          <strong>무극성 분자가 되는 조건:</strong> 극성 공유 결합으로 이루어져 있더라도 <span class="hp">분자 구조가 대칭</span>이면 쌍극자 모멘트가 상쇄 → 무극성 분자
+        </div>
+
+        <div class="table-wrap"><table>
+          <thead><tr><th>분자</th><th>결합의 극성</th><th>분자 구조</th><th>극성 판단</th><th>이유</th></tr></thead>
+          <tbody>
+            <tr><td><strong>CO₂</strong></td><td>극성 (C=O)</td><td>선형 (대칭)</td><td><span class="hb">무극성</span></td><td>쌍극자 모멘트 서로 상쇄</td></tr>
+            <tr><td><strong>H₂O</strong></td><td>극성 (O−H)</td><td>굽은 형 (비대칭)</td><td><span class="hr">극성</span></td><td>쌍극자 모멘트 상쇄 안 됨</td></tr>
+            <tr><td><strong>NH₃</strong></td><td>극성 (N−H)</td><td>삼각뿔 (비대칭)</td><td><span class="hr">극성</span></td><td>쌍극자 모멘트 상쇄 안 됨</td></tr>
+            <tr><td><strong>CH₄</strong></td><td>극성 (C−H)</td><td>정사면체 (대칭)</td><td><span class="hb">무극성</span></td><td>쌍극자 모멘트 모두 상쇄</td></tr>
+            <tr><td><strong>BCl₃</strong></td><td>극성 (B−Cl)</td><td>평면삼각형 (대칭)</td><td><span class="hb">무극성</span></td><td>쌍극자 모멘트 모두 상쇄</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="red-box">
+          <div class="cb-title">⚠️ 오개념 바로잡기</div>
+          <span class="hr">"극성 공유 결합이 있으면 무조건 극성 분자이다."</span> → <strong>틀린 말!</strong><br><br>
+          CO₂, CH₄, BCl₃처럼 극성 공유 결합으로 이루어져 있어도 <strong>분자 구조가 대칭이면 무극성 분자</strong>가 될 수 있습니다.
+        </div>
+
+        <div class="sec-title">극성 분자와 무극성 분자의 성질 비교</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>성질</th><th>극성 분자</th><th>무극성 분자</th></tr></thead>
+          <tbody>
+            <tr><td><strong>전기장 속 배열</strong></td><td>일정한 방향으로 배열<br>(부분 전하 때문)</td><td>무질서하게 배열<br>(전기장 영향 없음)</td></tr>
+            <tr><td><strong>대전체 반응</strong></td><td>대전체 종류 상관없이 끌림<br>(δ+ 또는 δ− 끌림)</td><td>잘 끌리지 않음</td></tr>
+            <tr><td><strong>용해성</strong></td><td>극성 용매에 잘 녹음</td><td>무극성 용매에 잘 녹음</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🧲</div>
+            <div class="pc-title">전기장 배열</div>
+            <div class="pc-desc">극성 분자: 전기장 방향으로 일정하게 정렬됨. 무극성 분자: 방향성 없음</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">💧</div>
+            <div class="pc-title">물줄기 실험</div>
+            <div class="pc-desc">물(극성 분자): 음/양 대전체 모두에 끌림. 무극성 물질: 잘 끌리지 않음</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🧪</div>
+            <div class="pc-title">용해성 (Like dissolves like)</div>
+            <div class="pc-desc">이온·극성 물질 → 극성 용매(물). 무극성 물질(아이오딘) → 무극성 용매(헥세인)</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">📡</div>
+            <div class="pc-title">전자레인지 원리</div>
+            <div class="pc-desc">마이크로파가 극성인 물 분자를 회전시켜 발열 → 음식물 가열</div>
+          </div>
+        </div>
+
+        <div class="green-box">
+          <div class="cb-title">🛢 기름과 물이 섞이지 않는 이유</div>
+          기름은 <span class="hg">무극성 물질</span>, 물은 <span class="hg">극성 물질</span>이므로 서로 섞이지 않습니다.<br><br>
+          <strong>비누(계면 활성제)</strong>는 극성 부분(머리)과 무극성 부분(꼬리)을 모두 가지고 있어 기름때와 물 사이를 연결해 세탁이 가능하게 합니다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 12</div>
+          <div class="quiz-q">분자 내에 극성 공유 결합을 갖는 분자는 모두 극성 분자이다. (○, ×)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: × (틀림)</strong><br><br>
+            극성 공유 결합으로 이루어진 분자라도 <strong>분자 구조가 대칭</strong>이면 결합의 쌍극자 모멘트가 상쇄되어 무극성 분자가 됩니다.<br>
+            예) CO₂(선형), CH₄(정사면체), BCl₃(평면삼각형): 모두 극성 결합이지만 무극성 분자
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 13</div>
+          <div class="quiz-q">다음 분자가 극성 분자인지 무극성 분자인지 쓰시오.<br>(1) HCN &nbsp;&nbsp; (2) CH₃Cl &nbsp;&nbsp; (3) BCl₃</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            (1) <strong>HCN</strong>: 선형이지만 양쪽에 다른 원자(H와 N) → 쌍극자 모멘트 상쇄 안 됨 → <span class="hr">극성 분자</span><br><br>
+            (2) <strong>CH₃Cl</strong>: 정사면체형이지만 한쪽에만 Cl → 비대칭 → <span class="hr">극성 분자</span><br><br>
+            (3) <strong>BCl₃</strong>: 평면 삼각형(대칭) → 쌍극자 모멘트 상쇄 → <span class="hb">무극성 분자</span>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 14</div>
+          <div class="quiz-q">물에 잘 녹을 것으로 예상되는 물질을 있는 대로 고르시오.<br><br>에탄올(C₂H₅OH) &nbsp;&nbsp; 흑연(C) &nbsp;&nbsp; 산소(O₂) &nbsp;&nbsp; 염화 수소(HCl)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 에탄올(C₂H₅OH), 염화 수소(HCl)</strong><br><br>
+            물(H₂O)은 극성 용매이므로 <strong>극성 물질이나 이온 결합 물질</strong>이 잘 용해됩니다.<br><br>
+            에탄올(C₂H₅OH): OH기로 인해 극성 → 물에 잘 녹음<br>
+            HCl: 극성 분자 → 물에 잘 녹음<br>
+            흑연(C): 무극성 → 잘 안 녹음<br>
+            O₂: 무극성 분자 → 잘 안 녹음
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">🔥 심화 문제</div>
+          <div class="quiz-q">다음은 세 가지 분자의 분자식이다.<br><br>(가) HCN &nbsp;&nbsp; (나) BCl₃ &nbsp;&nbsp; (다) H₂S<br><br>이에 대한 설명으로 옳은 것은?<br>① 극성 분자는 세 가지이다.<br>② (가)~(다) 중에서 구조가 같은 분자가 존재한다.<br>③ 분자의 쌍극자 모멘트가 0인 분자는 한 가지이다.<br>④ 극성 공유 결합으로 이루어진 분자는 두 가지이다.<br>⑤ 모든 원자가 같은 평면에 위치하는 분자는 두 가지이다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ③</strong><br><br>
+            (가) HCN: 선형, 극성 분자, 모든 원자 같은 직선에 위치<br>
+            (나) BCl₃: 평면 삼각형, <span class="hb">무극성 분자</span> (대칭), 모든 원자 같은 평면에 위치<br>
+            (다) H₂S: 굽은 형, 극성 분자<br><br>
+            ① 극성 분자: HCN, H₂S → 2가지 (틀림)<br>
+            ② 구조가 같은 분자: HCN(선형), BCl₃(평면삼각형), H₂S(굽은형) → 없음 (틀림)<br>
+            ③ 쌍극자 모멘트=0: BCl₃만 → <strong>1가지 (옳음)</strong><br>
+            ④ 극성 공유 결합: 세 가지 모두 다른 원자간 결합 → 3가지 (틀림)<br>
+            ⑤ 같은 평면: HCN(직선=평면), BCl₃(평면) → 2가지인데 H₂S는 굽은 형으로 모든 원자가 같은 평면에 있음 → 세 가지 모두 (틀림)
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  ['unit1','unit2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('visible');
+  });
+  const target = document.getElementById('unit'+n);
+  if (target) target.classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  const tabsTop = document.querySelector('.tabs-wrap').offsetTop;
+  window.scrollTo({top: tabsTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => {
+      const rect = item.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const headerH = 54 + document.querySelector('.tabs-wrap').offsetHeight;
+      if (rect.top < headerH + 10) {
+        window.scrollTo({top: scrollTop + rect.top - headerH - 10, behavior:'smooth'});
+      }
+    }, 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  }
+});
+</script>
+</body>
+</html>
