@@ -397,7 +397,7 @@ body {
   document.getElementById('today-day').textContent=days[now.getDay()];
 })();
 
-const ANTHROPIC_API_KEY = 'YOUR_API_KEY_HERE'; // ← 실제 키로 교체 또는 서버 프록시 사용
+const GEMINI_API_KEY = 'AIzaSyB1hqbNBrjHq2S9xY5HvQOyi3S1EyVo-Uw'; // ← aistudio.google.com 에서 발급한 키 입력
 
 let currentMarkdown = '';
 let isEditMode = false;
@@ -443,24 +443,23 @@ async function generate() {
   document.getElementById('section-result').style.display = 'none';
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-calls': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
-        system: buildSystemPrompt(),
-        messages: [{ role: 'user', content: userMsg }]
-      })
-    });
+    const systemPrompt = buildSystemPrompt();
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: 'user', parts: [{ text: userMsg }] }],
+          generationConfig: { maxOutputTokens: 4096, temperature: 0.8 }
+        })
+      }
+    );
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
-    currentMarkdown = data.content?.[0]?.text || '';
+    currentMarkdown = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!currentMarkdown) throw new Error('응답이 비어있습니다. API 키를 확인해주세요.');
     showResult();
   } catch (e) {
     document.getElementById('section-loading').style.display = 'none';
