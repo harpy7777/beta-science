@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>베타과학학원 · 중학 과학1 핵심 정리</title>
+<style>
+:root {
+  /* 보라색 계열 메인 팔레트 */
+  --pur-dark:    #3b0764;
+  --pur-deep:    #6b21a8;
+  --pur-mid:     #9333ea;
+  --pur-light:   #a855f7;
+  --pur-bright:  #c084fc;
+  --pur-tint:    #faf5ff;
+  --pur-tint2:   #f3e8ff;
+  --pur-border:  #e9d5ff;
+  --pur-border2: #d8b4fe;
+
+  /* 단원별 색상 */
+  --unit1-from:  #7c3aed;
+  --unit1-to:    #3b0764;
+  --unit2-from:  #9333ea;
+  --unit2-to:    #581c87;
+  --unit3-from:  #a855f7;
+  --unit3-to:    #6b21a8;
+  --unit4-from:  #c026d3;
+  --unit4-to:    #701a75;
+  --unit5-from:  #7c3aed;
+  --unit5-to:    #4c1d95;
+  --unit6-from:  #8b5cf6;
+  --unit6-to:    #3730a3;
+  --unit7-from:  #a855f7;
+  --unit7-to:    #4a044e;
+
+  --text:   #1d1d1f;
+  --muted:  #6e6e73;
+  --dim:    #aeaeb2;
+  --bg:     #fafafa;
+  --white:  #ffffff;
+
+  --border-soft: #ede9fe;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+               'Helvetica Neue', Arial, 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+/* ── Header ── */
+.header {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-soft);
+  padding: 0 1rem;
+  padding-left:  max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  height: 54px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 300;
+  box-shadow: 0 1px 12px rgba(109,40,217,0.06);
+}
+.header-left {
+  display: flex; align-items: center; gap: 9px;
+  text-decoration: none; color: inherit; cursor: pointer;
+  transition: opacity 0.15s;
+}
+.header-left:hover { opacity: 0.75; }
+.logo-mark {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--pur-mid) 0%, var(--pur-dark) 100%);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(147,51,234,0.3);
+}
+.brand-name { font-size: 14px; font-weight: 700; color: #1d1d1f; letter-spacing: -0.3px; }
+.header-badge {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--pur-tint2);
+  border: 1px solid var(--pur-border);
+  border-radius: 20px; padding: 4px 10px;
+  font-size: 10px; font-weight: 700; color: var(--pur-deep); white-space: nowrap;
+}
+.dot-purple {
+  width: 5px; height: 5px; background: var(--pur-mid); border-radius: 50%;
+  animation: blink 2s ease-in-out infinite; flex-shrink: 0;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.back-btn {
+  padding: 7px 14px; min-height: 36px;
+  background: transparent;
+  border: 1.5px solid var(--pur-border2);
+  border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+  color: var(--pur-deep); cursor: pointer; white-space: nowrap;
+  transition: background 0.15s;
+}
+.back-btn:hover  { background: var(--pur-tint); }
+.back-btn:active { background: var(--pur-tint2); }
+
+/* ── Layout ── */
+.wrap {
+  max-width: 1100px; margin: 0 auto;
+  padding: 1.2rem 0.9rem 5rem;
+  padding-bottom: max(5rem, calc(4rem + env(safe-area-inset-bottom)));
+  padding-left:  max(0.9rem, env(safe-area-inset-left));
+  padding-right: max(0.9rem, env(safe-area-inset-right));
+}
+
+/* ── Breadcrumb ── */
+.breadcrumb {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 1.2rem; flex-wrap: wrap;
+}
+.bc-item {
+  font-size: 12px; color: #aeaeb2; font-weight: 500;
+  cursor: pointer; text-decoration: none; transition: color 0.15s;
+}
+.bc-item:hover { color: var(--pur-mid); }
+.bc-sep { font-size: 12px; color: #d1d1d6; }
+.bc-current { font-size: 12px; color: #1d1d1f; font-weight: 700; }
+
+/* ── Welcome Bar ── */
+.welcome-bar {
+  background: linear-gradient(135deg, var(--pur-tint) 0%, #f5f0ff 60%, #fdf4ff 100%);
+  border: 1px solid var(--pur-border);
+  border-radius: 18px;
+  padding: 1.2rem 1.4rem; margin-bottom: 1.4rem;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 10px;
+}
+.welcome-left { display: flex; align-items: center; gap: 12px; }
+.welcome-avatar {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--pur-mid), var(--pur-dark));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(147,51,234,0.3);
+}
+.welcome-greeting { font-size: 1.05rem; font-weight: 700; color: #1d1d1f; letter-spacing: -0.03em; }
+.welcome-sub      { font-size: 11px; color: #6e6e73; margin-top: 3px; }
+.welcome-date-box { text-align: right; }
+.welcome-date { font-size: 1rem; font-weight: 700; color: var(--pur-deep); letter-spacing: -0.02em; }
+.welcome-day  { font-size: 11px; color: #aeaeb2; margin-top: 3px; font-weight: 500; }
+
+/* ── Section Heading ── */
+.section-heading {
+  font-size: 11px; font-weight: 700; color: #aeaeb2;
+  letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.8rem;
+}
+
+/* ── 단원 카드 그리드 ── */
+.unit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 1.8rem;
+}
+
+.unit-card {
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  border: 1px solid var(--pur-border);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+.unit-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(147,51,234,0.14);
+}
+.unit-card:active { transform: scale(0.98); }
+
+.unit-card-banner {
+  height: 80px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1.4rem;
+  position: relative; overflow: hidden;
+}
+.ucb-1 { background: linear-gradient(135deg, var(--unit1-from) 0%, var(--unit1-to) 100%); }
+.ucb-2 { background: linear-gradient(135deg, var(--unit2-from) 0%, var(--unit2-to) 100%); }
+.ucb-3 { background: linear-gradient(135deg, var(--unit3-from) 0%, var(--unit3-to) 100%); }
+.ucb-4 { background: linear-gradient(135deg, var(--unit4-from) 0%, var(--unit4-to) 100%); }
+.ucb-5 { background: linear-gradient(135deg, var(--unit5-from) 0%, var(--unit5-to) 100%); }
+.ucb-6 { background: linear-gradient(135deg, var(--unit6-from) 0%, var(--unit6-to) 100%); }
+.ucb-7 { background: linear-gradient(135deg, var(--unit7-from) 0%, var(--unit7-to) 100%); }
+
+.unit-card-banner::before {
+  content: '';
+  position: absolute; right: -20px; bottom: -20px;
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+}
+.ucb-num {
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.ucb-title {
+  font-size: 17px; font-weight: 800;
+  color: #fff; letter-spacing: -0.03em; margin-top: 2px;
+}
+.ucb-icon { font-size: 30px; opacity: 0.85; }
+
+.unit-card-body { padding: 1rem 1.2rem; flex: 1; }
+.unit-card-desc {
+  font-size: 11.5px; color: var(--muted);
+  line-height: 1.65; margin-bottom: 10px;
+}
+.topic-list { display: flex; flex-direction: column; gap: 4px; }
+.topic-item {
+  display: flex; align-items: center; gap: 7px;
+  padding: 6px 9px; border-radius: 9px;
+  background: var(--pur-tint);
+  border: 1px solid var(--pur-border);
+  font-size: 11.5px; font-weight: 500;
+  color: var(--pur-deep);
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+.topic-item:hover {
+  background: var(--pur-tint2);
+  border-color: var(--pur-border2);
+}
+.topic-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%; background: var(--pur-mid); flex-shrink: 0;
+}
+
+.unit-card-footer {
+  padding: 0.7rem 1.2rem;
+  border-top: 1px solid var(--pur-border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.unit-badge {
+  font-size: 9px; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px;
+  background: var(--pur-tint2);
+  color: var(--pur-deep);
+  white-space: nowrap;
+}
+.unit-go-btn {
+  font-size: 12px; font-weight: 700;
+  color: var(--pur-deep);
+  background: none; border: none; cursor: pointer;
+  font-family: inherit;
+  display: flex; align-items: center; gap: 5px; padding: 5px 0;
+  transition: gap 0.15s;
+}
+.unit-go-btn:hover { gap: 8px; }
+
+/* ── Bottom 2-col ── */
+.bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mini-panel {
+  background: #ffffff;
+  border: 1px solid var(--border-soft);
+  border-radius: 16px; padding: 1.1rem 1.2rem;
+}
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 0.9rem;
+}
+.panel-title { font-size: 13px; font-weight: 700; color: #1d1d1f; }
+
+.info-item {
+  padding: 9px 10px; border-radius: 10px;
+  background: var(--pur-tint);
+  border: 1px solid var(--pur-border);
+  margin-bottom: 6px;
+  display: flex; align-items: flex-start; gap: 9px;
+}
+.info-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.info-dot-1 { background: var(--pur-mid); }
+.info-dot-2 { background: var(--pur-deep); }
+.info-dot-3 { background: #a855f7; }
+.info-dot-4 { background: #c026d3; }
+.info-text  { font-size: 12px; color: #1d1d1f; font-weight: 600; }
+.info-sub   { font-size: 10px; color: #aeaeb2; margin-top: 1px; }
+
+.tag-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0.8rem; }
+.tag { border-radius: 20px; padding: 4px 10px; font-size: 11px; font-weight: 700; }
+.tag-purple { background: var(--pur-tint2); color: var(--pur-deep); border: 1px solid var(--pur-border); }
+.tag-violet { background: #ede9fe; color: #5b21b6; border: 1px solid #ddd6fe; }
+.tag-pink   { background: #fdf2f8; color: #9d174d; border: 1px solid #fbcfe8; }
+.tag-amber  { background: #fef9c3; color: #854d0e; border: 1px solid #fde68a; }
+.tag-blue   { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+
+/* ── 단원 번호 배지 ── */
+.unit-num-badge {
+  font-size: 10px; font-weight: 800;
+  background: var(--pur-tint2);
+  color: var(--pur-deep);
+  border-radius: 5px; padding: 2px 7px;
+  flex-shrink: 0;
+}
+
+/* ── 반응형 ── */
+@media (max-width: 700px) {
+  .unit-grid  { grid-template-columns: 1fr; }
+  .bottom-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .wrap { padding: 1rem 0.75rem 5rem; }
+  .unit-card-banner { height: 70px; }
+  .ucb-title { font-size: 15px; }
+  .ucb-icon  { font-size: 24px; }
+  .welcome-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .welcome-date-box { text-align: left; }
+  .brand-name { font-size: 13px; }
+  .header-badge { font-size: 9px; padding: 3px 8px; }
+  .header-badge .dot-purple { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"
+          stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-purple"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="breadcrumb">
+    <a href="index.html" class="bc-item">🏠 홈</a>
+    <span class="bc-sep">›</span>
+    <span class="bc-current">🔬 중학 과학1 핵심 정리</span>
+  </div>
+
+  <div class="welcome-bar">
+    <div class="welcome-left">
+      <div class="welcome-avatar">🔬</div>
+      <div>
+        <div class="welcome-greeting">중학 과학1 핵심 정리</div>
+        <div class="welcome-sub">2022 개정 교육과정 기반 단원별 핵심 개념을 정리하세요</div>
+      </div>
+    </div>
+    <div class="welcome-date-box">
+      <div class="welcome-date" id="today-date">—</div>
+      <div class="welcome-day"  id="today-day">—</div>
+    </div>
+  </div>
+
+  <div class="section-heading">UNIT SELECT · 단원 선택</div>
+  <div class="unit-grid">
+
+    <!-- 단원 1 -->
+    <div class="unit-card" onclick="location.href='science1-unit1.html'">
+      <div class="unit-card-banner ucb-1">
+        <div>
+          <div class="ucb-num">UNIT 01</div>
+          <div class="ucb-title">과학과 인류의<br>지속가능한 삶</div>
+        </div>
+        <div class="ucb-icon">🌍</div>
+      </div>
+      <div class="unit-card-body">
+        <div class="unit-card-desc">과학적 탐구 방법과 과학기술이 인류 문명에 미친 영향을 살펴보고 지속가능한 삶을 학습합니다.</div>
+        <div class="topic-list">
+          <a href="science1-unit1.html" class="topic-item"><span class="topic-dot"></span>과학적 탐구 방법</a>
+          <a href="science1-unit1.html" class="topic-item"><span class="topic-dot"></span>탐구 계획서 작성</a>
+          <a href="science1-unit1.html" class="topic-item"><span class="topic-dot"></span>과학과 인류 문명</a>
+          <a href="science1-unit1.html" class="topic-item"><span class="topic-dot"></span>지속가능한 삶과 과학기술</a>
+        </div>
+      </div>
+      <div class="unit-card-footer">
+        <span class="unit-badge">핵심 정리</span>
+        <button class="unit-go-btn">학습하기 →</button>
+      </div>
+    </div>
+
+    <!-- 단원 2 -->
+    <div class="unit-card" onclick="location.href='science1-unit2.html'">
+      <div class="unit-card-banner ucb-2">
+        <div>
+          <div class="ucb-num">UNIT 02</div>
+          <div class="ucb-title">생물의 구성과<br>다양성</div>
+        </div>
+        <div class="ucb-icon">🧬</div>
+      </div>
+      <div class="unit-card-body">
+        <div class="unit-card-desc">세포의 구조와 기능, 생물의 유기적 구성 단계, 생물다양성과 분류, 생물다양성 보전을 학습합니다.</div>
+        <div class="topic-list">
+          <a href="science1-unit2.html" class="topic-item"><span class="topic-dot"></span>세포의 구조와 기능</a>
+          <a href="science1-unit2.html" class="topic-item"><span class="topic-dot"></span>생물의 유기적 구성</a>
+          <a href="science1-unit2.html" class="topic-item"><span class="topic-dot"></span>생물의 다양성과 분류</a>
+          <a href="science1-unit2.html" class="topic-item"><span class="topic-dot"></span>생물다양성 보전</a>
+        </div>
+      </div>
+      <div class="unit-card-footer">
+        <span class="unit-badge">핵심 정리</span>
+        <button class="unit-go-btn">학습하기 →</button>
+      </div>
+    </div>
+
+    <!-- 단원 3 -->
+    <div class="unit-card" onclick="location.href='science1-unit3.html'">
+      <div class="unit-card-banner ucb-3">
+        <div>
+          <div class="ucb-num">UNIT 03</div>
+          <div class="ucb-title">지구 시스템</div>
+        </div>
+        <div class="ucb-icon">🌏</div>
+      </div>
+      <div class="unit-card-body">
+        <div class="unit-card-desc">지권, 수권, 기권, 생물권의 구성과 상호작용, 탄소 순환과 기후 변화를 학습합니다.</div>
+        <div class="topic-list">
+          <a href="science1-unit3.html" class="topic-item"><span class="topic-dot"></span>지구 시스템의 구성</a>
+          <a href="science1-unit3.html" class="topic-item"><span class="topic-dot"></span>지권과 판 구조론</a>
+          <a href="science1-unit3.html" class="topic-item"><span class="topic-dot"></span>수권과 기권</a>
+          <a href="science1-unit3.html" class="topic-item"><span class="topic-dot"></span>탄소 순환과 기후 변화</a>
+        </div>
+      </div>
+      <div class="unit-card-footer">
+        <span class="unit-badge">핵심 정리</span>
+        <button class="unit-go-btn">학습하기 →</button>
+      </div>
+    </div>
+
+    <!-- 단원 4 -->
+    <div class="unit-card" onclick="location.href='science1-unit4.html'">
+      <div class="unit-card-banner ucb-4">
+        <div>
+          <div class="ucb-num">UNIT 04</div>
+          <div class="ucb-title">물질의 구성</div>
+        </div>
+        <div class="ucb-icon">⚛️</div>
+      </div>
+      <div class="unit-card-body">
+        <div class="unit-card-desc">원소와 원자, 분자의 개념, 이온과 전해질, 물질의 구성 원리를 학습합니다.</div>
+        <div class="topic-list">
+          <a href="science1-unit4.html" class="topic-item"><span class="topic-dot"></span>원소와 원자</a>
+          <a href="science1-unit4.html" class="topic-item"><span class="topic-dot"></span>분자와 이온</a>
+          <a href="science1-unit4.html" class="topic-item"><span class="topic-dot"></span>전해질과 비전해질</a>
+          <a href="science1-unit4.html" class="topic-item"><span class="topic-dot"></span>원소의 확인 방법</a>
+        </div>
+      </div>
+      <div class="unit-card-footer">
+        <span class="unit-badge">핵심 정리</span>
+        <button class="unit-go-btn">학습하기 →</button>
+      </div>
+    </div>
+
+    <!-- 단원 5 -->
+    <div class="unit-card" onclick="location.href='science1-unit5.html'">
+      <div class="unit-card-banner ucb-5">
+        <div>
+          <div class="ucb-num">UNIT 05</div>
+          <div class="ucb-title">힘과 운동</div>
+        </div>
+        <div class="ucb-icon">🚀</div>
+      </div>
+      <div class="unit-card-body">
+        <div class="unit-card-desc">힘의 종류와 합력, 속력과 가속도, 자유낙하운동과 뉴턴 운동법칙을 학습합니다.</div>
+        <div class="topic-list">
+          <a href="science1-unit5.html" class="topic-item"><span class="topic-dot"></span>힘의 종류와 표현</a>
+          <a href="science1-unit5.html" class="topic-item"><span class="topic-dot"></span>속력과 속도</a>
+          <a href="science1-unit5.html" class="topic-item"><span class="topic-dot"></span>자유낙하운동</a>
+          <a href="science1-unit5.html" class="topic-item"><span class="topic-dot"></span>뉴턴 운동법칙</a>
+        </div>
+      </div>
+      <div class="unit-card-footer">
+        <span class="unit-badge">핵심 정리</span>
+        <button class="unit-go-btn">학습하기 →</button>
+      </div>
+    </div>
+
+    <!-- 단원 6 -->
+    <div class="unit-card" onclick="location.href='science1-unit6.html'">
+      <div class="unit-card-banner ucb-6">
+        <div>
+          <div class="ucb-num">UNIT 06</div>
+          <div class="ucb-title">빛과 파동</div>
+        </div>
+        <div class="ucb-icon">🌈</div>
+      </div>
+      <div class="unit-card-body">
+        <div class="unit-card-desc">빛의 반사와 굴절, 거울과 렌즈, 파동의 성질과 소리를 학습합니다.</div>
+        <div class="topic-list">
+          <a href="science1-unit6.html" class="topic-item"><span class="topic-dot"></span>빛의 직진·반사·굴절</a>
+          <a href="science1-unit6.html" class="topic-item"><span class="topic-dot"></span>거울과 렌즈</a>
+          <a href="science1-unit6.html" class="topic-item"><span class="topic-dot"></span>파동의 성질</a>
+          <a href="science1-unit6.html" class="topic-item"><span class="topic-dot"></span>소리의 발생과 전달</a>
+        </div>
+      </div>
+      <div class="unit-card-footer">
+        <span class="unit-badge">핵심 정리</span>
+        <button class="unit-go-btn">학습하기 →</button>
+      </div>
+    </div>
+
+    <!-- 단원 7 -->
+    <div class="unit-card" onclick="location.href='science1-unit7.html'">
+      <div class="unit-card-banner ucb-7">
+        <div>
+          <div class="ucb-num">UNIT 07</div>
+          <div class="ucb-title">과학과 나의 미래</div>
+        </div>
+        <div class="ucb-icon">🔭</div>
+      </div>
+      <div class="unit-card-body">
+        <div class="unit-card-desc">과학 관련 직업과 진로, 과학기술의 미래, 첨단 과학기술과 사회 변화를 학습합니다.</div>
+        <div class="topic-list">
+          <a href="science1-unit7.html" class="topic-item"><span class="topic-dot"></span>과학 관련 직업 탐색</a>
+          <a href="science1-unit7.html" class="topic-item"><span class="topic-dot"></span>첨단 과학기술의 발전</a>
+          <a href="science1-unit7.html" class="topic-item"><span class="topic-dot"></span>미래 사회와 과학</a>
+          <a href="science1-unit7.html" class="topic-item"><span class="topic-dot"></span>과학 윤리와 책임</a>
+        </div>
+      </div>
+      <div class="unit-card-footer">
+        <span class="unit-badge">핵심 정리</span>
+        <button class="unit-go-btn">학습하기 →</button>
+      </div>
+    </div>
+
+  </div><!-- /unit-grid -->
+
+  <!-- 하단 2단 -->
+  <div class="section-heading">OVERVIEW</div>
+  <div class="bottom-row">
+
+    <div class="mini-panel">
+      <div class="panel-head"><span class="panel-title">📌 학습 안내</span></div>
+      <div class="info-item">
+        <div class="info-dot info-dot-1"></div>
+        <div>
+          <div class="info-text">2022 개정 교육과정 기반</div>
+          <div class="info-sub">최신 교육과정 기준 핵심 개념 정리</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="info-dot info-dot-2"></div>
+        <div>
+          <div class="info-text">단원별 핵심 요약</div>
+          <div class="info-sub">시험 대비 핵심 내용만 엄선 정리</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="info-dot info-dot-3"></div>
+        <div>
+          <div class="info-text">탐구 문제 &amp; 예제 풀이</div>
+          <div class="info-sub">개념 확인 문제 및 단계별 풀이 제공</div>
+        </div>
+      </div>
+      <div class="tag-wrap">
+        <span class="tag tag-purple">2022 개정</span>
+        <span class="tag tag-violet">핵심 정리</span>
+        <span class="tag tag-blue">탐구 문제</span>
+      </div>
+    </div>
+
+    <div class="mini-panel">
+      <div class="panel-head"><span class="panel-title">📊 단원 구성 요약</span></div>
+      <div style="font-size:10px;font-weight:700;color:var(--pur-mid);letter-spacing:0.08em;margin-bottom:8px;">중학 과학1 · 7개 단원</div>
+
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:var(--pur-tint);border:1px solid var(--pur-border);">
+          <span class="unit-num-badge">01</span>
+          <span style="font-size:11.5px;font-weight:600;color:#1d1d1f;">과학과 인류의 지속가능한 삶</span>
+          <span style="margin-left:auto;font-size:9px;font-weight:700;background:#dcfce7;color:#166534;border-radius:20px;padding:2px 7px;">기초</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:var(--pur-tint);border:1px solid var(--pur-border);">
+          <span class="unit-num-badge">02</span>
+          <span style="font-size:11.5px;font-weight:600;color:#1d1d1f;">생물의 구성과 다양성</span>
+          <span style="margin-left:auto;font-size:9px;font-weight:700;background:#ede9fe;color:#5b21b6;border-radius:20px;padding:2px 7px;">핵심</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:var(--pur-tint);border:1px solid var(--pur-border);">
+          <span class="unit-num-badge">03</span>
+          <span style="font-size:11.5px;font-weight:600;color:#1d1d1f;">지구 시스템</span>
+          <span style="margin-left:auto;font-size:9px;font-weight:700;background:#fef9c3;color:#854d0e;border-radius:20px;padding:2px 7px;">중요</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:var(--pur-tint);border:1px solid var(--pur-border);">
+          <span class="unit-num-badge">04</span>
+          <span style="font-size:11.5px;font-weight:600;color:#1d1d1f;">물질의 구성</span>
+          <span style="margin-left:auto;font-size:9px;font-weight:700;background:#ede9fe;color:#5b21b6;border-radius:20px;padding:2px 7px;">핵심</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:var(--pur-tint);border:1px solid var(--pur-border);">
+          <span class="unit-num-badge">05</span>
+          <span style="font-size:11.5px;font-weight:600;color:#1d1d1f;">힘과 운동</span>
+          <span style="margin-left:auto;font-size:9px;font-weight:700;background:#fef9c3;color:#854d0e;border-radius:20px;padding:2px 7px;">중요</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:var(--pur-tint);border:1px solid var(--pur-border);">
+          <span class="unit-num-badge">06</span>
+          <span style="font-size:11.5px;font-weight:600;color:#1d1d1f;">빛과 파동</span>
+          <span style="margin-left:auto;font-size:9px;font-weight:700;background:#f3e8ff;color:#6b21a8;border-radius:20px;padding:2px 7px;">심화</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:var(--pur-tint);border:1px solid var(--pur-border);">
+          <span class="unit-num-badge">07</span>
+          <span style="font-size:11.5px;font-weight:600;color:#1d1d1f;">과학과 나의 미래</span>
+          <span style="margin-left:auto;font-size:9px;font-weight:700;background:#dcfce7;color:#166534;border-radius:20px;padding:2px 7px;">탐구</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /bottom-row -->
+
+</div><!-- /wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const cfg = {
+    apiKey:            "AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:        "beta-science.firebaseapp.com",
+    projectId:         "beta-science",
+    storageBucket:     "beta-science.firebasestorage.app",
+    messagingSenderId: "650652155367",
+    appId:             "1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+
+  (function initDate() {
+    const now  = new Date();
+    const days = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+    document.getElementById('today-date').textContent =
+      `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일`;
+    document.getElementById('today-day').textContent = days[now.getDay()];
+  })();
+
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+</body>
+</html>
