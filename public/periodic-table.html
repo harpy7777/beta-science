@@ -100,24 +100,142 @@ body{
 .welcome-score-lbl{font-size:11px;color:var(--muted);margin-top:2px;font-weight:500;}
 
 /* ── 로그인 ── */
-.login-wrap{
-  width:100%;max-width:420px;margin:16px auto 0;
-  background:#fff;border:1px solid var(--border);
-  border-radius:22px;padding:32px 28px 28px;
-  box-shadow:0 6px 30px rgba(35,85,195,.1);
+/* ── 로그인 전체 ── */
+.login-page{
+  min-height:calc(100vh - 54px);
+  background:#f0f4ff;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px 16px 40px;
 }
-.login-title{font-size:19px;font-weight:800;color:var(--royal-deep);margin-bottom:6px;letter-spacing:-.04em;}
-.login-sub{font-size:13px;color:var(--muted);margin-bottom:26px;line-height:1.5;}
-.login-label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:7px;display:block;text-transform:uppercase;}
-.login-inp{
-  width:100%;padding:15px 18px;min-height:56px;
-  border:2px solid var(--border);border-radius:14px;
-  font-size:17px;font-family:inherit;color:#1d1d1f;
-  outline:none;background:#fff;transition:border .15s,box-shadow .15s;
-  -webkit-appearance:none;margin-bottom:14px;
-  box-shadow:0 1px 4px rgba(35,85,195,.04);
+.login-card{
+  width:100%;max-width:420px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow:0 8px 40px rgba(35,85,195,.12),0 2px 8px rgba(35,85,195,.06);
 }
-.login-inp:focus{border-color:var(--royal);box-shadow:0 0 0 3px rgba(35,85,195,.1);}
+/* 상단 배너 */
+.login-banner{
+  background:linear-gradient(135deg,#2355c3 0%,#1a3e96 100%);
+  padding:28px 28px 24px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.login-banner::before{
+  content:'';position:absolute;top:-30px;right:-30px;
+  width:140px;height:140px;border-radius:50%;
+  background:rgba(255,255,255,.07);
+}
+.login-banner::after{
+  content:'';position:absolute;bottom:-40px;left:-20px;
+  width:100px;height:100px;border-radius:50%;
+  background:rgba(255,255,255,.05);
+}
+.login-banner-emoji{font-size:40px;margin-bottom:10px;position:relative;z-index:1;}
+.login-banner-tag{
+  display:inline-block;font-size:10px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:rgba(255,255,255,.75);
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);
+  border-radius:20px;padding:3px 12px;margin-bottom:10px;
+  position:relative;z-index:1;
+}
+.login-banner-title{
+  font-size:22px;font-weight:900;color:#fff;
+  letter-spacing:-.04em;line-height:1.15;
+  margin-bottom:6px;position:relative;z-index:1;
+}
+.login-banner-sub{
+  font-size:12px;color:rgba(255,255,255,.75);
+  line-height:1.5;position:relative;z-index:1;
+}
+/* 기능 뱃지 행 */
+.login-badges{
+  display:flex;justify-content:center;gap:6px;flex-wrap:wrap;
+  padding:14px 20px;background:var(--royal-light);
+  border-bottom:1px solid var(--border);
+}
+.login-badge-item{
+  display:flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;color:var(--royal);
+  background:#fff;border:1px solid var(--royal-mid);
+  border-radius:20px;padding:5px 10px;white-space:nowrap;
+}
+/* 폼 영역 */
+.login-form-body{padding:24px 24px 20px;}
+.login-field{margin-bottom:14px;}
+.login-field-label{
+  display:block;font-size:11px;font-weight:700;
+  color:var(--muted);letter-spacing:.08em;
+  text-transform:uppercase;margin-bottom:7px;
+}
+.login-field-wrap{
+  display:flex;align-items:center;
+  border:2px solid var(--border);border-radius:13px;
+  background:#fff;overflow:hidden;
+  transition:border .15s,box-shadow .15s;
+}
+.login-field-wrap:focus-within{
+  border-color:var(--royal);
+  box-shadow:0 0 0 4px rgba(35,85,195,.1);
+}
+.login-field-icon{
+  width:48px;text-align:center;font-size:17px;flex-shrink:0;
+  border-right:1.5px solid var(--border-light);padding:15px 0;
+}
+.login-field-inp{
+  flex:1;padding:15px 15px;min-height:54px;
+  border:none;outline:none;
+  font-size:16px;font-family:inherit;color:#1d1d1f;
+  background:transparent;-webkit-appearance:none;cursor:pointer;
+}
+/* 학년 그리드 */
+.login-grade-label{
+  display:block;font-size:11px;font-weight:700;
+  color:var(--muted);letter-spacing:.08em;
+  text-transform:uppercase;margin-bottom:9px;
+}
+.login-grade-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  margin-bottom:18px;
+}
+.login-grade-btn{
+  padding:12px 8px;border:2px solid var(--border);border-radius:12px;
+  background:#fff;font-size:14px;font-weight:700;color:var(--muted);
+  cursor:pointer;font-family:inherit;transition:all .15s;text-align:center;
+  min-height:48px;
+}
+.login-grade-btn:hover:not(.on){border-color:var(--royal-mid);color:var(--royal);background:var(--royal-light);}
+.login-grade-btn.on{background:var(--royal);color:#fff;border-color:var(--royal);box-shadow:0 2px 8px rgba(35,85,195,.25);}
+/* 에러 */
+.login-error{margin-bottom:14px;padding:13px 16px;background:var(--red-bg);border:2px solid #fca5a5;border-radius:12px;font-size:13px;font-weight:600;color:var(--red);line-height:1.4;}
+/* 제출 버튼 */
+.login-submit-btn{
+  width:100%;padding:16px 20px;min-height:56px;
+  background:linear-gradient(135deg,#3b6fd4,#1a3e96);
+  border:none;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  font-size:16px;font-weight:800;color:#fff;
+  cursor:pointer;font-family:inherit;
+  box-shadow:0 6px 20px rgba(35,85,195,.3);
+  transition:opacity .15s,transform .15s;
+  letter-spacing:-.02em;
+}
+.login-submit-btn:hover{opacity:.9;}
+.login-submit-btn:active{opacity:.8;transform:scale(.98);}
+.login-submit-arrow{font-size:20px;}
+.login-notice{
+  text-align:center;font-size:12px;color:var(--muted);
+  margin-top:14px;
+}
+@media(max-width:480px){
+  .login-page{padding:16px 14px 32px;align-items:flex-start;padding-top:20px;}
+  .login-card{border-radius:20px;}
+  .login-banner{padding:24px 22px 20px;}
+  .login-banner-title{font-size:20px;}
+  .login-form-body{padding:20px 18px 18px;}
+}
 
 /* ── Buttons ── */
 .btn-primary{
@@ -571,36 +689,56 @@ body{
 </header>
 
 <!-- ── 로그인 화면 ── -->
-<div class="wrap" id="loginWrap">
-  <div style="margin-top:12px;">
-    <div class="welcome-bar" style="background:linear-gradient(135deg,#e8eefb,#dce7f9);padding:1.3rem 1.4rem;">
-      <div class="welcome-left">
-        <div class="welcome-avatar" style="width:50px;height:50px;font-size:22px;">⚗️</div>
-        <div>
-          <div class="welcome-greeting" style="font-size:1.1rem;">주기율표 암기 챌린지</div>
-          <div class="welcome-sub" style="font-size:12px;margin-top:4px;">플래시카드 · 타자게임 · 빈칸채우기 · 시험</div>
-        </div>
+<div id="loginWrap">
+  <div class="login-page">
+    <div class="login-card">
+
+      <!-- 상단 배너 -->
+      <div class="login-banner">
+        <div class="login-banner-emoji">⚗️</div>
+        <div class="login-banner-tag">베타과학학원 · 원소 암기</div>
+        <div class="login-banner-title">주기율표<br>정복 챌린지!</div>
+        <div class="login-banner-sub">게임으로 외우면 절대 안 잊어버려 💪</div>
       </div>
-    </div>
-    <div class="login-wrap">
-      <div class="login-title">⚗️ 주기율표 챌린지</div>
-      <div class="login-sub">이름과 학년을 입력하면 바로 시작!</div>
-      <label class="login-label">이름</label>
-      <input class="login-inp" type="text" id="loginName" placeholder="홍길동" maxlength="10"
-             onkeydown="if(event.key==='Enter')document.getElementById('loginGrade').focus()"/>
-      <label class="login-label">학년</label>
-      <select class="login-inp" id="loginGrade" style="cursor:pointer;"
-              onkeydown="if(event.key==='Enter')doLogin()">
-        <option value="">학년 선택</option>
-        <option value="중1">중1</option>
-        <option value="중2">중2</option>
-        <option value="중3">중3</option>
-        <option value="고1">고1</option>
-        <option value="고2">고2</option>
-        <option value="고3">고3</option>
-      </select>
-      <div class="login-error hidden" id="loginError"></div>
-      <button class="btn-primary" onclick="doLogin()">시작하기 →</button>
+
+      <!-- 기능 뱃지 -->
+      <div class="login-badges">
+        <div class="login-badge-item">🃏 플래시카드</div>
+        <div class="login-badge-item">⌨️ 타자게임</div>
+        <div class="login-badge-item">📋 빈칸채우기</div>
+        <div class="login-badge-item">📝 실전시험</div>
+      </div>
+
+      <!-- 폼 -->
+      <div class="login-form-body">
+        <div class="login-field">
+          <label class="login-field-label">이름</label>
+          <div class="login-field-wrap">
+            <span class="login-field-icon">👤</span>
+            <input class="login-field-inp" type="text" id="loginName" placeholder="홍길동" maxlength="10"
+                   onkeydown="if(event.key==='Enter')document.getElementById('loginGrade').focus()"/>
+          </div>
+        </div>
+
+        <label class="login-grade-label">학년</label>
+        <div class="login-grade-grid">
+          <button class="login-grade-btn" onclick="setGrade('중1',this)">중1</button>
+          <button class="login-grade-btn" onclick="setGrade('중2',this)">중2</button>
+          <button class="login-grade-btn" onclick="setGrade('중3',this)">중3</button>
+          <button class="login-grade-btn" onclick="setGrade('고1',this)">고1</button>
+          <button class="login-grade-btn" onclick="setGrade('고2',this)">고2</button>
+          <button class="login-grade-btn" onclick="setGrade('고3',this)">고3</button>
+        </div>
+
+        <div class="login-error hidden" id="loginError"></div>
+
+        <button class="login-submit-btn" onclick="doLogin()">
+          <span>🚀 지금 바로 시작!</span>
+          <span class="login-submit-arrow">→</span>
+        </button>
+        <div class="login-notice">🏆 학습 기록과 랭킹이 자동 저장됩니다</div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -896,15 +1034,21 @@ function GU(){return CU?DB()[CU]:null}
 function SU(u){const d=DB();d[CU]=u;saveDB(d);}
 function addScore(pts,ok,tot){const u=GU();u.totalScore+=pts;u.totalCorrect+=ok;u.totalAttempts+=tot;SU(u);updStats();}
 
+let _selectedGrade='';
+function setGrade(g,el){
+  _selectedGrade=g;
+  document.querySelectorAll('.login-grade-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+}
 function showLoginError(msg){const el=$('loginError');if(!el)return;el.textContent='⚠️ '+msg;el.classList.remove('hidden');}
 function hideLoginError(){const el=$('loginError');if(el)el.classList.add('hidden');}
 
 function doLogin(){
   hideLoginError();
   const name=document.getElementById('loginName').value.trim();
-  const grade=document.getElementById('loginGrade').value;
+  const grade=_selectedGrade;
   if(!name){showLoginError('이름을 입력하세요');document.getElementById('loginName').focus();return;}
-  if(!grade){showLoginError('학년을 선택하세요');document.getElementById('loginGrade').focus();return;}
+  if(!grade){showLoginError('학년을 선택하세요');return;}
   CU=grade+'__'+name;
   const d=DB();
   if(!d[CU])d[CU]={name,cls:grade,totalScore:0,totalCorrect:0,totalAttempts:0,flashCorrect:0,flashTotal:0,typeScore:0,typeCorrect:0,typeTotal:0,quizScore:0,quizCorrect:0,quizTotal:0,wrongElem:{},lastActive:Date.now()};
