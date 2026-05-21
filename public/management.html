@@ -100,6 +100,11 @@ select option { background-color: #fff !important; color: #1d1d1f !important; }
 .btn-sm { padding: 8px 16px; font-size: 12px; min-height: 36px; }
 .btn-secondary { padding: 10px 16px; background: #f5f5f7; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; color: #6e6e73; cursor: pointer; font-family: inherit; min-height: 40px; }
 
+/* ── Amount Input with comma display ── */
+.amount-wrap { position: relative; }
+.amount-wrap .form-input { padding-right: 30px; }
+.amount-unit { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #aeaeb2; font-weight: 500; pointer-events: none; }
+
 /* ── Filters ── */
 .filters-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
 .fchip { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid #fce7f3; background: #fff; color: #6e6e73; cursor: pointer; transition: all 0.15s; min-height: 32px; }
@@ -225,17 +230,47 @@ select option { background-color: #fff !important; color: #1d1d1f !important; }
   .consult-grid { grid-template-columns: 1fr; gap: 8px; }
   .exam-grid { grid-template-columns: 1fr; gap: 8px; }
   .attend-layout { grid-template-columns: 1fr; gap: 12px; }
+
+  /* 모달 모바일 최적화 */
   .modal-bg { align-items: flex-end; }
-  .modal-box { border-radius: 22px 22px 0 0; padding: 1.2rem 1.2rem 2rem; max-width: 100%; animation: slideUp 0.25s ease; }
+  .modal-box {
+    border-radius: 22px 22px 0 0;
+    padding: 1.2rem 1.2rem 0;
+    max-width: 100%;
+    max-height: 92vh;
+    overflow-y: auto;
+    animation: slideUp 0.25s ease;
+    /* 키보드 올라올 때 스크롤 되도록 */
+    -webkit-overflow-scrolling: touch;
+  }
+  /* 모달 내부 하단 여백 (iOS 홈 인디케이터 + 버튼 여유) */
+  .modal-actions {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding: 12px 0 max(1.2rem, env(safe-area-inset-bottom));
+    margin-top: 12px;
+    border-top: 1px solid #f5f5f7;
+  }
   @keyframes slideUp { from{transform:translateY(60px);opacity:0} to{transform:translateY(0);opacity:1} }
   .modal-handle { display: block; width: 40px; height: 4px; background: #e5e5ea; border-radius: 2px; margin: 0 auto 1rem; }
   .modal-title { font-size: 16px; }
-  .modal-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  /* 모바일에서 modal-grid 1열로 */
+  .modal-grid { grid-template-columns: 1fr; gap: 0; }
+  /* form-input 모바일 최적화 */
+  .form-input, .form-select, .form-textarea {
+    font-size: 16px; /* iOS 자동 줌 방지 */
+    min-height: 48px;
+    padding: 12px 14px;
+  }
+  .form-select { padding-right: 34px; }
+  .form-label { font-size: 12px; margin-bottom: 6px; }
+  .form-group { margin-bottom: 12px; }
+  .btn-primary, .btn-secondary { min-height: 48px; font-size: 15px; border-radius: 12px; }
 }
 @media (max-width: 380px) {
   .quick-stats { grid-template-columns: repeat(3,1fr); }
   .qs-lbl { display: none; }
-  .modal-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -439,16 +474,143 @@ select option { background-color: #fff !important; color: #1d1d1f !important; }
   </div>
 </div>
 
-<!-- Modals -->
-<div class="modal-bg" id="tuition-modal"><div class="modal-box"><span class="modal-handle"></span><div class="modal-title">💰 원비 수납 등록</div><div class="modal-grid"><div class="form-group"><label class="form-label">학생 선택 *</label><select class="form-select" id="t-student"></select></div><div class="form-group"><label class="form-label">과목</label><select class="form-select" id="t-subject"><option>통합과학</option><option>화학</option><option>내신</option><option>생물</option><option>물리</option><option>지학</option><option>전체</option><option>기타</option></select></div></div><div class="form-group"><label class="form-label">납부일 *</label><input class="form-input" type="date" id="t-paydate"></div><div class="modal-grid"><div class="form-group"><label class="form-label">금액 (원) *</label><input class="form-input" type="text" id="t-amount" placeholder="예: 280000" inputmode="numeric"></div><div class="form-group"><label class="form-label">납부 상태 *</label><select class="form-select" id="t-status"><option value="납부완료">납부완료</option><option value="미납">미납</option><option value="분납">분납</option></select></div></div><div class="form-group"><label class="form-label">메모</label><input class="form-input" type="text" id="t-note" placeholder="메모 (선택)"></div><div class="modal-actions"><button class="btn-secondary" onclick="closeModal('tuition-modal')">취소</button><button class="btn-primary" onclick="saveTuition()">저장</button></div></div></div>
+<!-- ─── Modals ─── -->
 
-<div class="modal-bg" id="consult-modal"><div class="modal-box"><span class="modal-handle"></span><div class="modal-title">📞 상담 기록 추가</div><div class="modal-grid"><div class="form-group"><label class="form-label">학생명 *</label><select class="form-select" id="c-student"></select></div><div class="form-group"><label class="form-label">상담 유형 *</label><select class="form-select" id="c-type"><option>전화상담</option><option>대면상담</option><option>온라인</option><option>문자/카톡</option></select></div><div class="form-group"><label class="form-label">상담 날짜 *</label><input class="form-input" type="date" id="c-date"></div><div class="form-group"><label class="form-label">상담 대상</label><select class="form-select" id="c-target"><option>학생본인</option><option>학부모</option><option>학생+학부모</option></select></div></div><div class="form-group"><label class="form-label">상담 내용 *</label><textarea class="form-textarea" id="c-content" placeholder="상담 내용을 입력하세요..."></textarea></div><div class="form-group"><label class="form-label">후속 조치</label><input class="form-input" type="text" id="c-followup" placeholder="후속 조치 내용 (선택)"></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;"><input type="checkbox" id="c-need-followup" style="width:18px;height:18px;accent-color:#db2777;"><label for="c-need-followup" style="font-size:13px;color:#3c3c43;cursor:pointer;">후속 상담 필요</label></div><div class="modal-actions"><button class="btn-secondary" onclick="closeModal('consult-modal')">취소</button><button class="btn-primary" onclick="saveConsult()">저장</button></div></div></div>
+<!-- 원비 수납 모달 -->
+<div class="modal-bg" id="tuition-modal">
+  <div class="modal-box">
+    <span class="modal-handle"></span>
+    <div class="modal-title">💰 원비 수납 등록</div>
+    <div class="modal-grid">
+      <div class="form-group">
+        <label class="form-label">학생 선택 *</label>
+        <select class="form-select" id="t-student"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">과목</label>
+        <select class="form-select" id="t-subject">
+          <option>통합과학</option><option>화학</option><option>내신</option>
+          <option>생물</option><option>물리</option><option>지학</option>
+          <option>전체</option><option>기타</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">납부일 *</label>
+      <input class="form-input" type="date" id="t-paydate">
+    </div>
+    <div class="modal-grid">
+      <div class="form-group">
+        <label class="form-label">금액 (원) *</label>
+        <!-- ★ 천단위 쉼표: type=text + inputmode=numeric -->
+        <div class="amount-wrap">
+          <input class="form-input" type="text" id="t-amount"
+                 placeholder="예: 280,000"
+                 inputmode="numeric"
+                 autocomplete="off">
+          <span class="amount-unit">원</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">납부 상태 *</label>
+        <select class="form-select" id="t-status">
+          <option value="납부완료">납부완료</option>
+          <option value="미납">미납</option>
+          <option value="분납">분납</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">메모</label>
+      <input class="form-input" type="text" id="t-note" placeholder="메모 (선택)">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('tuition-modal')">취소</button>
+      <button class="btn-primary" onclick="saveTuition()">저장</button>
+    </div>
+  </div>
+</div>
 
-<div class="modal-bg" id="makeup-modal"><div class="modal-box"><span class="modal-handle"></span><div class="modal-title">🔄 보강 스케줄 추가</div><div class="modal-grid"><div class="form-group"><label class="form-label">학생명 *</label><select class="form-select" id="m-student"></select></div><div class="form-group"><label class="form-label">과목 *</label><select class="form-select" id="m-subject"><option>통합과학</option><option>화학</option><option>내신</option><option>생물</option><option>물리</option><option>지학</option></select></div><div class="form-group"><label class="form-label">보강 날짜 *</label><input class="form-input" type="date" id="m-date"></div><div class="form-group"><label class="form-label">담당 선생님</label><input class="form-input" type="text" id="m-teacher" placeholder="선생님 이름"></div><div class="form-group"><label class="form-label">보강 사유</label><select class="form-select" id="m-reason"><option>결석보강</option><option>학습보충</option><option>시험대비</option><option>기타</option></select></div><div class="form-group"><label class="form-label">메모</label><input class="form-input" type="text" id="m-note" placeholder="메모 (선택)"></div></div><div class="modal-actions"><button class="btn-secondary" onclick="closeModal('makeup-modal')">취소</button><button class="btn-primary" onclick="saveMakeup()">저장</button></div></div></div>
+<!-- 상담 모달 -->
+<div class="modal-bg" id="consult-modal">
+  <div class="modal-box">
+    <span class="modal-handle"></span>
+    <div class="modal-title">📞 상담 기록 추가</div>
+    <div class="modal-grid">
+      <div class="form-group"><label class="form-label">학생명 *</label><select class="form-select" id="c-student"></select></div>
+      <div class="form-group"><label class="form-label">상담 유형 *</label><select class="form-select" id="c-type"><option>전화상담</option><option>대면상담</option><option>온라인</option><option>문자/카톡</option></select></div>
+      <div class="form-group"><label class="form-label">상담 날짜 *</label><input class="form-input" type="date" id="c-date"></div>
+      <div class="form-group"><label class="form-label">상담 대상</label><select class="form-select" id="c-target"><option>학생본인</option><option>학부모</option><option>학생+학부모</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">상담 내용 *</label><textarea class="form-textarea" id="c-content" placeholder="상담 내용을 입력하세요..."></textarea></div>
+    <div class="form-group"><label class="form-label">후속 조치</label><input class="form-input" type="text" id="c-followup" placeholder="후속 조치 내용 (선택)"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;"><input type="checkbox" id="c-need-followup" style="width:18px;height:18px;accent-color:#db2777;"><label for="c-need-followup" style="font-size:13px;color:#3c3c43;cursor:pointer;">후속 상담 필요</label></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('consult-modal')">취소</button>
+      <button class="btn-primary" onclick="saveConsult()">저장</button>
+    </div>
+  </div>
+</div>
 
-<div class="modal-bg" id="bigsched-modal"><div class="modal-box"><span class="modal-handle"></span><div class="modal-title">📋 시험 일정 추가</div><div class="modal-grid"><div class="form-group"><label class="form-label">시험명 *</label><input class="form-input" type="text" id="bs-title" placeholder="예: 1학기 중간고사"></div><div class="form-group"><label class="form-label">구분 *</label><select class="form-select" id="bs-type"><option>중간고사</option><option>기말고사</option><option>모의고사</option><option>수능</option><option>기타</option></select></div><div class="form-group"><label class="form-label">시험 시작일 *</label><input class="form-input" type="date" id="bs-start"></div><div class="form-group"><label class="form-label">시험 종료일</label><input class="form-input" type="date" id="bs-end"></div><div class="form-group"><label class="form-label">학교/대상</label><input class="form-input" type="text" id="bs-school" placeholder="예: ○○중학교 2학년"></div><div class="form-group"><label class="form-label">담당 과목들</label><input class="form-input" type="text" id="bs-subjects" placeholder="예: 물리, 화학"></div></div><div class="form-group"><label class="form-label">시험 범위 / 메모</label><textarea class="form-textarea" id="bs-note" placeholder="시험 범위나 준비사항을 입력하세요..."></textarea></div><div class="modal-actions"><button class="btn-secondary" onclick="closeModal('bigsched-modal')">취소</button><button class="btn-primary" onclick="saveBigSched()">저장</button></div></div></div>
+<!-- 보강 모달 -->
+<div class="modal-bg" id="makeup-modal">
+  <div class="modal-box">
+    <span class="modal-handle"></span>
+    <div class="modal-title">🔄 보강 스케줄 추가</div>
+    <div class="modal-grid">
+      <div class="form-group"><label class="form-label">학생명 *</label><select class="form-select" id="m-student"></select></div>
+      <div class="form-group"><label class="form-label">과목 *</label><select class="form-select" id="m-subject"><option>통합과학</option><option>화학</option><option>내신</option><option>생물</option><option>물리</option><option>지학</option></select></div>
+      <div class="form-group"><label class="form-label">보강 날짜 *</label><input class="form-input" type="date" id="m-date"></div>
+      <div class="form-group"><label class="form-label">담당 선생님</label><input class="form-input" type="text" id="m-teacher" placeholder="선생님 이름"></div>
+      <div class="form-group"><label class="form-label">보강 사유</label><select class="form-select" id="m-reason"><option>결석보강</option><option>학습보충</option><option>시험대비</option><option>기타</option></select></div>
+      <div class="form-group"><label class="form-label">메모</label><input class="form-input" type="text" id="m-note" placeholder="메모 (선택)"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('makeup-modal')">취소</button>
+      <button class="btn-primary" onclick="saveMakeup()">저장</button>
+    </div>
+  </div>
+</div>
 
-<div class="modal-bg" id="attend-modal"><div class="modal-box"><span class="modal-handle"></span><div class="modal-title">📆 출결 입력</div><div class="modal-grid"><div class="form-group"><label class="form-label">학생명 *</label><select class="form-select" id="a-student"></select></div><div class="form-group"><label class="form-label">과목</label><select class="form-select" id="a-subject"><option>통합과학</option><option>화학</option><option>내신</option><option>생물</option><option>물리</option><option>지학</option></select></div><div class="form-group"><label class="form-label">날짜 *</label><input class="form-input" type="date" id="a-date"></div><div class="form-group"><label class="form-label">출결 상태 *</label><select class="form-select" id="a-status"><option value="출석">출석</option><option value="결석">결석</option><option value="지각">지각</option><option value="조퇴">조퇴</option></select></div></div><div class="form-group"><label class="form-label">메모</label><input class="form-input" type="text" id="a-note" placeholder="메모 (선택)"></div><div class="modal-actions"><button class="btn-secondary" onclick="closeModal('attend-modal')">취소</button><button class="btn-primary" onclick="saveAttend()">저장</button></div></div></div>
+<!-- 시험 일정 모달 -->
+<div class="modal-bg" id="bigsched-modal">
+  <div class="modal-box">
+    <span class="modal-handle"></span>
+    <div class="modal-title">📋 시험 일정 추가</div>
+    <div class="modal-grid">
+      <div class="form-group"><label class="form-label">시험명 *</label><input class="form-input" type="text" id="bs-title" placeholder="예: 1학기 중간고사"></div>
+      <div class="form-group"><label class="form-label">구분 *</label><select class="form-select" id="bs-type"><option>중간고사</option><option>기말고사</option><option>모의고사</option><option>수능</option><option>기타</option></select></div>
+      <div class="form-group"><label class="form-label">시험 시작일 *</label><input class="form-input" type="date" id="bs-start"></div>
+      <div class="form-group"><label class="form-label">시험 종료일</label><input class="form-input" type="date" id="bs-end"></div>
+      <div class="form-group"><label class="form-label">학교/대상</label><input class="form-input" type="text" id="bs-school" placeholder="예: ○○중학교 2학년"></div>
+      <div class="form-group"><label class="form-label">담당 과목들</label><input class="form-input" type="text" id="bs-subjects" placeholder="예: 물리, 화학"></div>
+    </div>
+    <div class="form-group"><label class="form-label">시험 범위 / 메모</label><textarea class="form-textarea" id="bs-note" placeholder="시험 범위나 준비사항을 입력하세요..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('bigsched-modal')">취소</button>
+      <button class="btn-primary" onclick="saveBigSched()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 출결 모달 -->
+<div class="modal-bg" id="attend-modal">
+  <div class="modal-box">
+    <span class="modal-handle"></span>
+    <div class="modal-title">📆 출결 입력</div>
+    <div class="modal-grid">
+      <div class="form-group"><label class="form-label">학생명 *</label><select class="form-select" id="a-student"></select></div>
+      <div class="form-group"><label class="form-label">과목</label><select class="form-select" id="a-subject"><option>통합과학</option><option>화학</option><option>내신</option><option>생물</option><option>물리</option><option>지학</option></select></div>
+      <div class="form-group"><label class="form-label">날짜 *</label><input class="form-input" type="date" id="a-date"></div>
+      <div class="form-group"><label class="form-label">출결 상태 *</label><select class="form-select" id="a-status"><option value="출석">출석</option><option value="결석">결석</option><option value="지각">지각</option><option value="조퇴">조퇴</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">메모</label><input class="form-input" type="text" id="a-note" placeholder="메모 (선택)"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('attend-modal')">취소</button>
+      <button class="btn-primary" onclick="saveAttend()">저장</button>
+    </div>
+  </div>
+</div>
 
 <script type="module">
 import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -458,6 +620,7 @@ import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, order
 const cfg={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
 const app=initializeApp(cfg), auth=getAuth(app), db=getFirestore(app);
 
+/* ── 날짜·초기화 ── */
 (function(){
   const now=new Date(), days=['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
   document.getElementById('today-date').textContent=`${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일`;
@@ -471,6 +634,41 @@ const app=initializeApp(cfg), auth=getAuth(app), db=getFirestore(app);
   ['t-paydate','c-date','m-date','bs-start','a-date'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=ts;});
 })();
 
+/* ── ★ 금액 입력 천단위 쉼표 처리 ── */
+(function(){
+  const amountInput = document.getElementById('t-amount');
+  if(!amountInput) return;
+
+  amountInput.addEventListener('input', function(){
+    // 커서 위치 저장
+    const selStart = this.selectionStart;
+    const prevLen  = this.value.length;
+
+    // 숫자만 추출
+    const raw = this.value.replace(/[^0-9]/g, '');
+    if(raw === ''){ this.value = ''; return; }
+
+    // 천단위 쉼표 포맷
+    const formatted = Number(raw).toLocaleString('ko-KR');
+    this.value = formatted;
+
+    // 커서 보정 (쉼표 추가로 길이 변화 반영)
+    const diff = formatted.length - prevLen;
+    const newPos = Math.max(0, selStart + diff);
+    try{ this.setSelectionRange(newPos, newPos); } catch(e){}
+  });
+
+  // 붙여넣기도 처리
+  amountInput.addEventListener('paste', function(e){
+    e.preventDefault();
+    const pasted = (e.clipboardData || window.clipboardData).getData('text');
+    const raw = pasted.replace(/[^0-9]/g, '');
+    if(raw) this.value = Number(raw).toLocaleString('ko-KR');
+    this.dispatchEvent(new Event('input'));
+  });
+})();
+
+/* ── Auth ── */
 onAuthStateChanged(auth, async user=>{
   if(!user){location.replace('/login.html');return;}
   try{
@@ -482,6 +680,7 @@ onAuthStateChanged(auth, async user=>{
 });
 window.doLogout=async()=>{await auth.signOut();location.replace('/login.html');};
 
+/* ── Panel ── */
 let curPanel=null;
 window.openPanel=id=>{
   if(curPanel) document.getElementById('panel-'+curPanel)?.classList.remove('open');
@@ -496,6 +695,7 @@ window.closePanel=()=>{
   document.body.style.overflow='';
 };
 
+/* ── Data ── */
 let studentList=[],tuitionData=[],consultData=[],makeupData=[],bigSchedData=[],attendData=[];
 let tFilter='전체',cFilter='전체',mFilter='전체',bFilter='전체';
 
@@ -513,6 +713,7 @@ function getStudentName(id){const s=studentList.find(s=>s.id===id);return s?(s.n
 function getGradeBadge(g){if(!g||g==='—')return`<span class="badge badge-gray">${esc(g||'—')}</span>`;const gl=g.toLowerCase();let c='badge-gray';if(gl.includes('고3')||gl.includes('고등3'))c='badge-red';else if(gl.includes('고2')||gl.includes('고등2'))c='badge-orange';else if(gl.includes('고1')||gl.includes('고등1'))c='badge-yellow';else if(gl.includes('중3'))c='badge-purple';else if(gl.includes('중2'))c='badge-blue';else if(gl.includes('중1'))c='badge-teal';return`<span class="badge ${c}">${esc(g)}</span>`;}
 function getSubjectBadge(s){if(!s||s==='—')return`<span class="badge badge-gray">—</span>`;const m={'통합과학':'badge-green','화학':'badge-blue','내신':'badge-rose','생물':'badge-teal','물리':'badge-orange','지학':'badge-indigo','전체':'badge-pink','기타':'badge-gray'};return`<span class="badge ${m[s]||'badge-gray'}">${esc(s)}</span>`;}
 
+/* ── 원비 ── */
 async function loadTuition(){try{const snap=await getDocs(query(collection(db,'tuition'),orderBy('createdAt','desc')));tuitionData=[];snap.forEach(d=>tuitionData.push({id:d.id,...d.data()}));}catch{tuitionData=[];}renderTuition();}
 window.renderTuition=function(){
   const ms=document.getElementById('tuition-month-sel')?.value||'', sr=(document.getElementById('tuition-search')?.value||'').trim().toLowerCase();
@@ -526,9 +727,57 @@ window.renderTuition=function(){
   document.getElementById('tuition-tbody').innerHTML=!list.length?`<tr><td colspan="8"><div class="empty-hint">수납 기록이 없습니다</div></td></tr>`:list.map(t=>{const st=studentList.find(s=>s.id===t.studentId),gr=st?.grade||st?.gradeLevel||'—';return`<tr><td><strong>${esc(t.studentName||'—')}</strong></td><td>${getGradeBadge(gr)}</td><td>${getSubjectBadge(t.subject)}</td><td>${t.payDate||t.month||'—'}</td><td style="font-weight:700;">${t.amount?Number(t.amount).toLocaleString()+'원':'—'}</td><td><span class="badge ${sb(t.status)}">${t.status}</span></td><td style="color:#6e6e73;font-size:12px;">${esc(t.note||'')}</td><td><button class="del-btn" onclick="delTuition('${t.id}')">✕</button></td></tr>`;}).join('');
 };
 window.setTFilter=(f,el)=>{tFilter=f;document.querySelectorAll('#panel-tuition .fchip').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderTuition();};
-window.saveTuition=async()=>{const sid=document.getElementById('t-student').value,sn=getStudentName(sid),sub=document.getElementById('t-subject').value,pd=document.getElementById('t-paydate').value,ar=document.getElementById('t-amount').value.replace(/[^0-9]/g,''),amount=Number(ar),st=document.getElementById('t-status').value,note=document.getElementById('t-note').value.trim();if(!sid)return alert('학생명을 선택하세요');if(!pd)return alert('납부일을 선택하세요');if(!ar)return alert('금액을 입력하세요');try{await addDoc(collection(db,'tuition'),{studentId:sid,studentName:sn,subject:sub,month:pd.slice(0,7),payDate:pd,amount,status:st,note,createdAt:serverTimestamp()});closeModal('tuition-modal');showToast('수납 내역이 저장되었습니다 ✓');await loadTuition();}catch(e){alert('저장 실패: '+e.message);}};
+
+/* ★ saveTuition: 저장 후 필드 초기화 포함 */
+window.saveTuition=async()=>{
+  const sid=document.getElementById('t-student').value;
+  const sn=getStudentName(sid);
+  const sub=document.getElementById('t-subject').value;
+  const pd=document.getElementById('t-paydate').value;
+  // 쉼표 제거 후 숫자 추출
+  const ar=document.getElementById('t-amount').value.replace(/[^0-9]/g,'');
+  const amount=Number(ar);
+  const st=document.getElementById('t-status').value;
+  const note=document.getElementById('t-note').value.trim();
+  if(!sid) return alert('학생명을 선택하세요');
+  if(!pd)  return alert('납부일을 선택하세요');
+  if(!ar)  return alert('금액을 입력하세요');
+  try{
+    await addDoc(collection(db,'tuition'),{studentId:sid,studentName:sn,subject:sub,month:pd.slice(0,7),payDate:pd,amount,status:st,note,createdAt:serverTimestamp()});
+    closeModal('tuition-modal');
+    // ★ 필드 초기화
+    resetTuitionForm();
+    showToast('수납 내역이 저장되었습니다 ✓');
+    await loadTuition();
+  }catch(e){alert('저장 실패: '+e.message);}
+};
+
+/* ★ 원비 모달 필드 초기화 함수 */
+function resetTuitionForm(){
+  const today = new Date().toISOString().split('T')[0];
+  // 학생 선택: 첫 번째 옵션으로 reset
+  const tStu = document.getElementById('t-student');
+  if(tStu) tStu.selectedIndex = 0;
+  // 과목: 첫 번째로
+  const tSub = document.getElementById('t-subject');
+  if(tSub) tSub.selectedIndex = 0;
+  // 날짜: 오늘
+  const tPd = document.getElementById('t-paydate');
+  if(tPd) tPd.value = today;
+  // 금액: 비우기
+  const tAmt = document.getElementById('t-amount');
+  if(tAmt) tAmt.value = '';
+  // 상태: 납부완료
+  const tSt = document.getElementById('t-status');
+  if(tSt) tSt.value = '납부완료';
+  // 메모: 비우기
+  const tNote = document.getElementById('t-note');
+  if(tNote) tNote.value = '';
+}
+
 window.delTuition=async id=>{if(!confirm('삭제할까요?'))return;try{await deleteDoc(doc(db,'tuition',id));await loadTuition();showToast('삭제되었습니다');}catch(e){alert('삭제 실패: '+e.message);}};
 
+/* ── 상담 ── */
 async function loadConsults(){try{const snap=await getDocs(query(collection(db,'consultRecords'),orderBy('createdAt','desc')));consultData=[];snap.forEach(d=>consultData.push({id:d.id,...d.data()}));}catch{consultData=[];}renderConsults();}
 window.renderConsults=function(){
   const sr=(document.getElementById('consult-search')?.value||'').trim().toLowerCase();let list=consultData;
@@ -539,9 +788,27 @@ window.renderConsults=function(){
   el.innerHTML=`<div class="consult-grid">${list.map(c=>`<div class="consult-card"><div class="consult-head"><span class="consult-name">${esc(c.studentName||'—')}</span><div style="display:flex;gap:6px;align-items:center;">${c.needFollowup?'<span class="badge badge-red">후속필요</span>':''}<button class="del-btn" onclick="delConsult('${c.id}')">✕</button></div></div><div class="consult-meta"><span class="badge badge-blue">${esc(c.type||'—')}</span><span class="badge badge-gray">${esc(c.target||'—')}</span><span class="badge badge-gray">${c.consultDate||'—'}</span></div><div class="consult-body">${esc(c.content||'')}</div>${c.followup?`<div style="margin-top:8px;padding:8px 10px;background:#f0fdf4;border-radius:8px;font-size:12px;color:#16a34a;font-weight:600;">📌 후속: ${esc(c.followup)}</div>`:''}</div>`).join('')}</div>`;
 };
 window.setCFilter=(f,el)=>{cFilter=f;document.querySelectorAll('#panel-consult .fchip').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderConsults();};
-window.saveConsult=async()=>{const sid=document.getElementById('c-student').value,sn=getStudentName(sid),type=document.getElementById('c-type').value,cd=document.getElementById('c-date').value,target=document.getElementById('c-target').value,content=document.getElementById('c-content').value.trim(),followup=document.getElementById('c-followup').value.trim(),nf=document.getElementById('c-need-followup').checked;if(!sid||!cd||!content)return alert('학생명, 날짜, 내용을 입력하세요');try{await addDoc(collection(db,'consultRecords'),{studentId:sid,studentName:sn,type,consultDate:cd,target,content,followup,needFollowup:nf,createdAt:serverTimestamp()});closeModal('consult-modal');showToast('상담 기록이 저장되었습니다 ✓');await loadConsults();}catch(e){alert('저장 실패: '+e.message);}};
+window.saveConsult=async()=>{
+  const sid=document.getElementById('c-student').value,sn=getStudentName(sid),type=document.getElementById('c-type').value,cd=document.getElementById('c-date').value,target=document.getElementById('c-target').value,content=document.getElementById('c-content').value.trim(),followup=document.getElementById('c-followup').value.trim(),nf=document.getElementById('c-need-followup').checked;
+  if(!sid||!cd||!content)return alert('학생명, 날짜, 내용을 입력하세요');
+  try{
+    await addDoc(collection(db,'consultRecords'),{studentId:sid,studentName:sn,type,consultDate:cd,target,content,followup,needFollowup:nf,createdAt:serverTimestamp()});
+    closeModal('consult-modal');
+    // 상담 필드 초기화
+    document.getElementById('c-student').selectedIndex=0;
+    document.getElementById('c-type').selectedIndex=0;
+    document.getElementById('c-date').value=new Date().toISOString().split('T')[0];
+    document.getElementById('c-target').selectedIndex=0;
+    document.getElementById('c-content').value='';
+    document.getElementById('c-followup').value='';
+    document.getElementById('c-need-followup').checked=false;
+    showToast('상담 기록이 저장되었습니다 ✓');
+    await loadConsults();
+  }catch(e){alert('저장 실패: '+e.message);}
+};
 window.delConsult=async id=>{if(!confirm('삭제할까요?'))return;try{await deleteDoc(doc(db,'consultRecords',id));await loadConsults();showToast('삭제되었습니다');}catch(e){alert('삭제 실패: '+e.message);}};
 
+/* ── 보강 ── */
 async function loadMakeup(){try{const snap=await getDocs(query(collection(db,'makeupSchedules'),orderBy('makeupDate','asc')));makeupData=[];snap.forEach(d=>makeupData.push({id:d.id,...d.data()}));}catch{makeupData=[];}renderMakeup();updateMakeupStats();}
 function updateMakeupStats(){const t=new Date().toISOString().split('T')[0];setTxt('qs-makeup',makeupData.filter(m=>m.makeupDate>=t&&m.status!=='완료').length+'건');}
 function getDdayInfo(m){const t=new Date().toISOString().split('T')[0];if(m.status==='완료')return{txt:'완료',cls:'badge-green'};const d=Math.round((new Date(m.makeupDate)-new Date(t))/86400000);if(d===0)return{txt:'오늘',cls:'badge-red'};if(d>0)return{txt:`D-${d}`,cls:d<=3?'badge-red':d<=7?'badge-yellow':'badge-blue'};return{txt:`${-d}일 전`,cls:'badge-gray'};}
@@ -553,10 +820,27 @@ window.renderMakeup=function(){
   document.getElementById('makeup-tbody').innerHTML=!list.length?`<tr><td colspan="9"><div class="empty-hint">보강 스케줄이 없습니다</div></td></tr>`:list.map(m=>{const done=m.status==='완료',dd=getDdayInfo(m),st=studentList.find(s=>s.id===m.studentId),gr=st?.grade||st?.gradeLevel||'—';return`<tr style="${done?'opacity:0.55':''}"><td><strong>${done?'✓ ':''}${esc(m.studentName||'—')}</strong></td><td>${getGradeBadge(gr)}</td><td>${getSubjectBadge(m.subject)}</td><td>${m.makeupDate||'—'}</td><td>${esc(m.teacher||'—')}</td><td>${m.reason?`<span class="badge badge-pink">${esc(m.reason)}</span>`:'-'}</td><td style="color:#aeaeb2;font-size:12px;">${esc(m.note||'')}</td><td><span class="badge ${dd.cls}">${dd.txt}</span></td><td><div style="display:flex;gap:6px;justify-content:center;">${!done?`<button class="makeup-done-btn" onclick="completeMakeup('${m.id}')">완료</button>`:''}<button class="del-btn" onclick="delMakeup('${m.id}')">✕</button></div></td></tr>`;}).join('');
 };
 window.setMFilter=(f,el)=>{mFilter=f;document.querySelectorAll('#panel-makeup .fchip').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderMakeup();};
-window.saveMakeup=async()=>{const sid=document.getElementById('m-student').value,sn=getStudentName(sid),sub=document.getElementById('m-subject').value,md=document.getElementById('m-date').value,tc=document.getElementById('m-teacher').value.trim(),rs=document.getElementById('m-reason').value,note=document.getElementById('m-note').value.trim();if(!sid||!md)return alert('학생명과 날짜를 입력하세요');try{await addDoc(collection(db,'makeupSchedules'),{studentId:sid,studentName:sn,subject:sub,makeupDate:md,teacher:tc,reason:rs,note,status:'예정',createdAt:serverTimestamp()});closeModal('makeup-modal');showToast('보강 일정이 등록되었습니다 ✓');await loadMakeup();}catch(e){alert('저장 실패: '+e.message);}};
+window.saveMakeup=async()=>{
+  const sid=document.getElementById('m-student').value,sn=getStudentName(sid),sub=document.getElementById('m-subject').value,md=document.getElementById('m-date').value,tc=document.getElementById('m-teacher').value.trim(),rs=document.getElementById('m-reason').value,note=document.getElementById('m-note').value.trim();
+  if(!sid||!md)return alert('학생명과 날짜를 입력하세요');
+  try{
+    await addDoc(collection(db,'makeupSchedules'),{studentId:sid,studentName:sn,subject:sub,makeupDate:md,teacher:tc,reason:rs,note,status:'예정',createdAt:serverTimestamp()});
+    closeModal('makeup-modal');
+    // 보강 필드 초기화
+    document.getElementById('m-student').selectedIndex=0;
+    document.getElementById('m-subject').selectedIndex=0;
+    document.getElementById('m-date').value=new Date().toISOString().split('T')[0];
+    document.getElementById('m-teacher').value='';
+    document.getElementById('m-reason').selectedIndex=0;
+    document.getElementById('m-note').value='';
+    showToast('보강 일정이 등록되었습니다 ✓');
+    await loadMakeup();
+  }catch(e){alert('저장 실패: '+e.message);}
+};
 window.completeMakeup=async id=>{try{await updateDoc(doc(db,'makeupSchedules',id),{status:'완료'});await loadMakeup();showToast('보강 완료 처리되었습니다 ✓');}catch(e){alert('오류: '+e.message);}};
 window.delMakeup=async id=>{if(!confirm('삭제할까요?'))return;try{await deleteDoc(doc(db,'makeupSchedules',id));await loadMakeup();showToast('삭제되었습니다');}catch(e){alert('삭제 실패: '+e.message);}};
 
+/* ── 시험 일정 ── */
 async function loadBigSched(){try{const snap=await getDocs(query(collection(db,'bigExamSchedules'),orderBy('startDate','asc')));bigSchedData=[];snap.forEach(d=>bigSchedData.push({id:d.id,...d.data()}));}catch{bigSchedData=[];}renderBigSched();}
 window.renderBigSched=function(){
   let list=bigSchedData;if(bFilter!=='전체')list=list.filter(b=>b.examType===bFilter);
@@ -565,9 +849,27 @@ window.renderBigSched=function(){
   el.innerHTML=`<div class="exam-grid">${list.map(b=>{const dt=new Date(b.startDate);dt.setHours(0,0,0,0);const diff=Math.round((dt-today)/86400000);let ddt='',ddc='badge-gray';if(diff<0){ddt='종료';}else if(diff===0){ddt='D-DAY';ddc='badge-red';}else if(diff<=7){ddt=`D-${diff}`;ddc='badge-red';}else if(diff<=30){ddt=`D-${diff}`;ddc='badge-yellow';}else{ddt=`D-${diff}`;ddc='badge-blue';}const tc=b.examType==='중간고사'?'badge-blue':b.examType==='기말고사'?'badge-purple':b.examType==='모의고사'?'badge-orange':'badge-pink';return`<div class="exam-big-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;"><div style="flex:1;min-width:0;"><div style="font-size:15px;font-weight:700;color:#1d1d1f;">${esc(b.title||'—')}</div><div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;"><span class="badge ${tc}">${esc(b.examType||'—')}</span>${b.school?`<span class="badge badge-gray">${esc(b.school)}</span>`:''}<span class="badge badge-gray">📅 ${b.startDate||'—'}${b.endDate&&b.endDate!==b.startDate?` ~ ${b.endDate}`:''}</span></div></div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0;"><span class="badge ${ddc}" style="font-size:12px;font-weight:700;">${ddt}</span><button class="del-btn" onclick="delBigSched('${b.id}')">✕</button></div></div>${b.subjects||b.note?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid #f0f9ff;">${b.subjects?`<div style="font-size:12px;color:#0284c7;font-weight:700;margin-bottom:4px;">📘 담당 과목: ${esc(b.subjects)}</div>`:''}${b.note?`<div style="font-size:13px;color:#3c3c43;line-height:1.6;white-space:pre-wrap;">${esc(b.note)}</div>`:''}</div>`:''}</div>`;}).join('')}</div>`;
 };
 window.setBFilter=(f,el)=>{bFilter=f;document.querySelectorAll('#panel-exam .fchip').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderBigSched();};
-window.saveBigSched=async()=>{const title=document.getElementById('bs-title').value.trim(),et=document.getElementById('bs-type').value,sd=document.getElementById('bs-start').value,ed=document.getElementById('bs-end').value,sc=document.getElementById('bs-school').value.trim(),sj=document.getElementById('bs-subjects').value.trim(),note=document.getElementById('bs-note').value.trim();if(!title||!sd)return alert('시험명과 시작일을 입력하세요');try{await addDoc(collection(db,'bigExamSchedules'),{title,examType:et,startDate:sd,endDate:ed,school:sc,subjects:sj,note,createdAt:serverTimestamp()});closeModal('bigsched-modal');showToast('시험 일정이 등록되었습니다 ✓');await loadBigSched();}catch(e){alert('저장 실패: '+e.message);}};
+window.saveBigSched=async()=>{
+  const title=document.getElementById('bs-title').value.trim(),et=document.getElementById('bs-type').value,sd=document.getElementById('bs-start').value,ed=document.getElementById('bs-end').value,sc=document.getElementById('bs-school').value.trim(),sj=document.getElementById('bs-subjects').value.trim(),note=document.getElementById('bs-note').value.trim();
+  if(!title||!sd)return alert('시험명과 시작일을 입력하세요');
+  try{
+    await addDoc(collection(db,'bigExamSchedules'),{title,examType:et,startDate:sd,endDate:ed,school:sc,subjects:sj,note,createdAt:serverTimestamp()});
+    closeModal('bigsched-modal');
+    // 시험 필드 초기화
+    document.getElementById('bs-title').value='';
+    document.getElementById('bs-type').selectedIndex=0;
+    document.getElementById('bs-start').value=new Date().toISOString().split('T')[0];
+    document.getElementById('bs-end').value='';
+    document.getElementById('bs-school').value='';
+    document.getElementById('bs-subjects').value='';
+    document.getElementById('bs-note').value='';
+    showToast('시험 일정이 등록되었습니다 ✓');
+    await loadBigSched();
+  }catch(e){alert('저장 실패: '+e.message);}
+};
 window.delBigSched=async id=>{if(!confirm('삭제할까요?'))return;try{await deleteDoc(doc(db,'bigExamSchedules',id));await loadBigSched();showToast('삭제되었습니다');}catch(e){alert('삭제 실패: '+e.message);}};
 
+/* ── 출결 ── */
 async function loadAttend(){try{const snap=await getDocs(query(collection(db,'attendRecords'),orderBy('attendDate','desc')));attendData=[];snap.forEach(d=>attendData.push({id:d.id,...d.data()}));}catch{attendData=[];}renderAttend();}
 window.renderAttend=function(){
   const ms=document.getElementById('attend-month-sel')?.value||'',ss=document.getElementById('attend-student-sel')?.value||'';
@@ -590,12 +892,34 @@ window.renderAttend=function(){
   const cl=document.getElementById('attend-card-list');if(!list.length){cl.innerHTML='';return;}
   cl.innerHTML=list.map(a=>{const sc=a.status==='출석'?'badge-green':a.status==='결석'?'badge-red':'badge-yellow',st=studentList.find(s=>s.id===a.studentId),gr=st?.grade||st?.gradeLevel||'—';return`<div class="attend-card"><div class="attend-card-main"><div class="attend-card-name">${esc(a.studentName||'—')}</div><div class="attend-card-sub">${a.attendDate||'—'} · ${a.subject||'—'}${a.note?' · '+esc(a.note):''}</div></div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">${getGradeBadge(gr)}<span class="badge ${sc}">${a.status}</span><button class="del-btn" onclick="delAttend('${a.id}')">✕</button></div></div>`;}).join('');
 };
-window.saveAttend=async()=>{const sid=document.getElementById('a-student').value,sn=getStudentName(sid),sub=document.getElementById('a-subject').value,ad=document.getElementById('a-date').value,st=document.getElementById('a-status').value,note=document.getElementById('a-note').value.trim();if(!sid||!ad)return alert('학생명과 날짜를 선택하세요');try{await addDoc(collection(db,'attendRecords'),{studentId:sid,studentName:sn,subject:sub,attendDate:ad,status:st,note,createdAt:serverTimestamp()});closeModal('attend-modal');showToast('출결이 기록되었습니다 ✓');await loadAttend();}catch(e){alert('저장 실패: '+e.message);}};
+window.saveAttend=async()=>{
+  const sid=document.getElementById('a-student').value,sn=getStudentName(sid),sub=document.getElementById('a-subject').value,ad=document.getElementById('a-date').value,st=document.getElementById('a-status').value,note=document.getElementById('a-note').value.trim();
+  if(!sid||!ad)return alert('학생명과 날짜를 선택하세요');
+  try{
+    await addDoc(collection(db,'attendRecords'),{studentId:sid,studentName:sn,subject:sub,attendDate:ad,status:st,note,createdAt:serverTimestamp()});
+    closeModal('attend-modal');
+    // 출결 필드 초기화
+    document.getElementById('a-student').selectedIndex=0;
+    document.getElementById('a-subject').selectedIndex=0;
+    document.getElementById('a-date').value=new Date().toISOString().split('T')[0];
+    document.getElementById('a-status').value='출석';
+    document.getElementById('a-note').value='';
+    showToast('출결이 기록되었습니다 ✓');
+    await loadAttend();
+  }catch(e){alert('저장 실패: '+e.message);}
+};
 window.delAttend=async id=>{if(!confirm('삭제할까요?'))return;try{await deleteDoc(doc(db,'attendRecords',id));await loadAttend();showToast('삭제되었습니다');}catch(e){alert('삭제 실패: '+e.message);}};
 
+/* ── Modal ── */
 window.openModal=id=>document.getElementById(id).classList.add('open');
-window.closeModal=id=>document.getElementById(id).classList.remove('open');
-document.querySelectorAll('.modal-bg').forEach(bg=>{bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open');});});
+window.closeModal=id=>{
+  document.getElementById(id).classList.remove('open');
+  // 원비 모달 닫을 때도 초기화
+  if(id==='tuition-modal') resetTuitionForm();
+};
+document.querySelectorAll('.modal-bg').forEach(bg=>{bg.addEventListener('click',e=>{if(e.target===bg){const id=bg.id;bg.classList.remove('open');if(id==='tuition-modal')resetTuitionForm();}});});
+
+/* ── Toast / Util ── */
 window.showToast=msg=>{const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);};
 function setTxt(id,txt){const e=document.getElementById(id);if(e)e.textContent=txt;}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
