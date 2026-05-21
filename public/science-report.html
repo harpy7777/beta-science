@@ -6,6 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>베타과학학원 · 통합과학 실험탐구 보고서</title>
 <style>
+/* ══════════════════════════════════════════
+   디자인 토큰
+══════════════════════════════════════════ */
 :root{
   --navy:#1e3a8a;--royal:#2563eb;--blue-mid:#3b82f6;
   --bg-tint:#eff6ff;--bg-tint2:#dbeafe;--border:#bfdbfe;--border-soft:#e0eaff;
@@ -14,224 +17,562 @@
   --amber:#854F0B;--amber-light:#FAEEDA;
   --green:#3B6D11;--green-light:#EAF3DE;
   --red:#A32D2D;--red-light:#FCEBEB;
+  --radius-card:14px;
+  --gap:12px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --safe-left:env(safe-area-inset-left,0px);
+  --safe-right:env(safe-area-inset-right,0px);
 }
+
+/* ══════════════════════════════════════════
+   리셋 & 기본 — 모바일 퍼스트
+══════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{-webkit-text-size-adjust:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR','Helvetica Neue',Arial,sans-serif;background:#f0f4f8;color:#1d1d1f;min-height:100vh;-webkit-font-smoothing:antialiased;font-size:16px;overscroll-behavior:none}
+html{
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  scroll-behavior:smooth;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR','Helvetica Neue',Arial,sans-serif;
+  background:#f0f4f8;
+  color:#1d1d1f;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  font-size:15px; /* 모바일 기본 15px */
+  line-height:1.55;
+  overscroll-behavior:none;
+  overflow-x:hidden; /* 가로 스크롤 완전 차단 */
+  word-break:keep-all; /* 한글 단어 중간 줄바꿈 방지 */
+}
 
-/* ── 헤더 ── */
-.header{background:#fff;border-bottom:1px solid var(--border-soft);padding:0 1.2rem;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300;gap:8px}
-.header-left{display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;flex:1;min-width:0}
-.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--blue-mid),var(--navy));border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.brand-name{font-size:14px;font-weight:700;color:#1d1d1f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.header-badge{display:flex;align-items:center;gap:5px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:#16a34a;white-space:nowrap;flex-shrink:0}
-.dot{width:5px;height:5px;background:#22c55e;border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+/* 터치 영역: 모든 클릭 가능 요소 최소 44px */
+button,a,[role=button]{touch-action:manipulation;}
+button{-webkit-appearance:none;appearance:none;}
+
+/* ══════════════════════════════════════════
+   헤더 (sticky)
+══════════════════════════════════════════ */
+.header{
+  background:#fff;
+  border-bottom:1px solid var(--border-soft);
+  padding:0 calc(1rem + var(--safe-right)) 0 calc(1rem + var(--safe-left));
+  height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:300;gap:8px;
+}
+.header-left{display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;flex:1;min-width:0;}
+.logo-mark{
+  width:32px;height:32px;
+  background:linear-gradient(135deg,var(--blue-mid),var(--navy));
+  border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.brand-name{font-size:13px;font-weight:700;color:#1d1d1f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.header-badge{
+  display:flex;align-items:center;gap:4px;
+  background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;
+  padding:4px 9px;font-size:10px;font-weight:700;color:#16a34a;white-space:nowrap;flex-shrink:0;
+}
+.dot{width:5px;height:5px;background:#22c55e;border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.back-btn{padding:7px 14px;min-height:36px;background:transparent;border:1.5px solid var(--border);border-radius:20px;font-size:12px;font-weight:700;color:var(--navy);cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:inherit}
 
-/* ── 레이아웃: 화면 꽉 차게 ── */
-.wrap{width:100%;max-width:100%;margin:0;padding:1.2rem 1.4rem 6rem;padding-bottom:calc(6rem + env(safe-area-inset-bottom))}
-.inner{max-width:900px;margin:0 auto}
+/* 뒤로 버튼 — 터치 44px 확보 */
+.back-btn{
+  min-height:44px;min-width:44px;
+  padding:6px 12px;
+  background:transparent;border:1.5px solid var(--border);border-radius:20px;
+  font-size:12px;font-weight:700;color:var(--navy);cursor:pointer;
+  white-space:nowrap;flex-shrink:0;font-family:inherit;
+  display:flex;align-items:center;
+}
 
-.breadcrumb{display:flex;align-items:center;gap:5px;margin-bottom:1rem;flex-wrap:wrap}
-.bc-item{font-size:12px;color:#aeaeb2;font-weight:500;text-decoration:none}
-.bc-sep{font-size:12px;color:#d1d1d6}
-.bc-current{font-size:12px;color:#1d1d1f;font-weight:700}
+/* ══════════════════════════════════════════
+   레이아웃 — 모바일 기본값
+══════════════════════════════════════════ */
+.wrap{
+  width:100%;
+  padding:1rem 1rem calc(5rem + var(--safe-bottom));
+  padding-left:calc(1rem + var(--safe-left));
+  padding-right:calc(1rem + var(--safe-right));
+}
+.inner{max-width:900px;margin:0 auto;}
 
-.auto-banner{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0;border-radius:14px;padding:1rem 1.2rem;margin-bottom:1.2rem;display:none;align-items:center;gap:12px}
-.auto-banner.show{display:flex}
-.auto-banner-icon{font-size:22px;flex-shrink:0}
-.auto-banner-title{font-size:13px;font-weight:800;color:#15803d;display:block;margin-bottom:2px}
-.auto-banner-sub{font-size:12px;color:#16a34a;line-height:1.5}
+/* ══════════════════════════════════════════
+   브레드크럼
+══════════════════════════════════════════ */
+.breadcrumb{display:flex;align-items:center;gap:4px;margin-bottom:.9rem;flex-wrap:wrap;}
+.bc-item{font-size:11px;color:#aeaeb2;font-weight:500;text-decoration:none;}
+.bc-sep{font-size:11px;color:#d1d1d6;}
+.bc-current{font-size:11px;color:#1d1d1f;font-weight:700;}
 
-.welcome-bar{background:linear-gradient(135deg,var(--bg-tint),#eef4ff,#f0f7ff);border:1px solid var(--border);border-radius:16px;padding:1.2rem 1.4rem;margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.welcome-left{display:flex;align-items:center;gap:14px}
-.welcome-avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--blue-mid),var(--navy));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 4px 14px rgba(30,58,138,.2)}
-.welcome-title{font-size:1.05rem;font-weight:800;color:#1d1d1f}
-.welcome-sub{font-size:12px;color:#6e6e73;margin-top:3px;line-height:1.5}
-.welcome-tag{display:inline-flex;align-items:center;background:var(--bg-tint2);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:var(--navy)}
+/* ══════════════════════════════════════════
+   자동입력 배너
+══════════════════════════════════════════ */
+.auto-banner{
+  background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0;
+  border-radius:12px;padding:.9rem 1rem;margin-bottom:1rem;
+  display:none;align-items:flex-start;gap:10px;
+}
+.auto-banner.show{display:flex;}
+.auto-banner-icon{font-size:20px;flex-shrink:0;line-height:1.4;}
+.auto-banner-title{font-size:12px;font-weight:800;color:#15803d;display:block;margin-bottom:2px;}
+.auto-banner-sub{font-size:11px;color:#16a34a;line-height:1.5;}
 
-.prog-wrap{background:#fff;border:1px solid var(--border-soft);border-radius:12px;padding:.85rem 1.2rem;margin-bottom:1.2rem}
-.prog-row{display:flex;align-items:center;gap:12px}
-.prog-track{flex:1;height:6px;background:#f1f5f9;border-radius:99px;overflow:hidden}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--blue-mid),var(--navy));border-radius:99px;transition:width .3s ease;width:0%}
-.prog-label{font-size:11px;color:#aeaeb2;white-space:nowrap;font-weight:600;min-width:70px;text-align:right}
+/* ══════════════════════════════════════════
+   웰컴 바
+══════════════════════════════════════════ */
+.welcome-bar{
+  background:linear-gradient(135deg,var(--bg-tint),#eef4ff,#f0f7ff);
+  border:1px solid var(--border);border-radius:14px;
+  padding:1rem;margin-bottom:1rem;
+  display:flex;flex-direction:column;gap:8px; /* 모바일: 세로 */
+}
+.welcome-left{display:flex;align-items:center;gap:12px;}
+.welcome-avatar{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue-mid),var(--navy));
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+  box-shadow:0 3px 10px rgba(30,58,138,.2);
+}
+.welcome-title{font-size:.95rem;font-weight:800;color:#1d1d1f;line-height:1.3;}
+.welcome-sub{font-size:11px;color:#6e6e73;margin-top:2px;line-height:1.5;}
+.welcome-tag{
+  display:inline-flex;align-items:center;
+  background:var(--bg-tint2);border:1px solid var(--border);border-radius:20px;
+  padding:4px 12px;font-size:11px;font-weight:700;color:var(--navy);
+  align-self:flex-start;
+}
 
-.section-heading{font-size:11px;font-weight:700;color:#aeaeb2;letter-spacing:.09em;text-transform:uppercase;margin-bottom:.8rem;margin-top:1.4rem}
+/* ══════════════════════════════════════════
+   진행률
+══════════════════════════════════════════ */
+.prog-wrap{
+  background:#fff;border:1px solid var(--border-soft);
+  border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem;
+}
+.prog-row{display:flex;align-items:center;gap:10px;}
+.prog-track{flex:1;height:7px;background:#f1f5f9;border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--blue-mid),var(--navy));border-radius:99px;transition:width .35s ease;width:0%;}
+.prog-label{font-size:11px;color:#aeaeb2;white-space:nowrap;font-weight:600;min-width:64px;text-align:right;}
 
-/* ── 활동 선택기 ── */
-.act-selector-card{background:#fff;border:1px solid var(--border-soft);border-radius:16px;padding:1.2rem 1.4rem;margin-bottom:1.2rem}
-.act-selector-top{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
-.act-selector-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--blue-mid),var(--navy));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.act-selector-title{font-size:14px;font-weight:800;color:#1d1d1f}
-.act-selector-sub{font-size:11px;color:#6e6e73;margin-top:1px}
+/* ══════════════════════════════════════════
+   섹션 타이틀
+══════════════════════════════════════════ */
+.section-heading{
+  font-size:10px;font-weight:700;color:#aeaeb2;
+  letter-spacing:.09em;text-transform:uppercase;
+  margin-bottom:.7rem;margin-top:1.2rem;
+}
 
-/* 단원별 탭 */
-.act-unit-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
-.act-unit-tab{padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid transparent;background:#f1f5f9;color:#6e6e73;transition:all .15s;font-family:inherit}
-.act-unit-tab.active-u1{background:#f0fdfa;color:#0f766e;border-color:#99f6e4}
-.act-unit-tab.active-u2{background:#eff6ff;color:#1e40af;border-color:#bfdbfe}
-.act-unit-tab.active-u3{background:#faf5ff;color:#7c3aed;border-color:#ddd6fe}
+/* ══════════════════════════════════════════
+   활동 선택기
+══════════════════════════════════════════ */
+.act-selector-card{
+  background:#fff;border:1px solid var(--border-soft);
+  border-radius:var(--radius-card);padding:1rem;margin-bottom:1rem;
+}
+.act-selector-top{display:flex;align-items:center;gap:10px;margin-bottom:.9rem;}
+.act-selector-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--blue-mid),var(--navy));
+  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;
+}
+.act-selector-title{font-size:13px;font-weight:800;color:#1d1d1f;}
+.act-selector-sub{font-size:11px;color:#6e6e73;margin-top:1px;line-height:1.4;}
 
-/* 활동 그리드 */
-.act-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
-.act-btn{padding:9px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid transparent;background:#f8fafc;color:#374151;transition:all .15s;font-family:inherit;text-align:left;line-height:1.35;display:flex;flex-direction:column;gap:2px}
-.act-btn:hover{background:var(--bg-tint);border-color:var(--border)}
-.act-btn.selected{background:var(--bg-tint2);border-color:var(--blue-mid);color:var(--navy)}
-.act-btn-num{font-size:10px;font-weight:800;color:var(--blue-mid);margin-bottom:1px}
-.act-btn.selected .act-btn-num{color:var(--navy)}
-.act-btn-title{font-size:11px;color:#374151;font-weight:600;line-height:1.35}
-.act-btn.selected .act-btn-title{color:var(--navy)}
+/* 단원 탭 — 가로 스크롤 허용 */
+.act-unit-tabs{
+  display:flex;gap:6px;margin-bottom:10px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;padding-bottom:2px;
+  flex-wrap:nowrap; /* 모바일: 한 줄 스크롤 */
+}
+.act-unit-tabs::-webkit-scrollbar{display:none;}
+.act-unit-tab{
+  padding:7px 13px;border-radius:20px;font-size:11px;font-weight:700;
+  cursor:pointer;border:1.5px solid transparent;
+  background:#f1f5f9;color:#6e6e73;
+  transition:all .15s;font-family:inherit;
+  white-space:nowrap;flex-shrink:0;
+  min-height:36px;
+}
+.act-unit-tab.active-u1{background:#f0fdfa;color:#0f766e;border-color:#99f6e4;}
+.act-unit-tab.active-u2{background:#eff6ff;color:#1e40af;border-color:#bfdbfe;}
+.act-unit-tab.active-u3{background:#faf5ff;color:#7c3aed;border-color:#ddd6fe;}
+
+/* 활동 그리드 — 모바일 2열 기본 */
+.act-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+.act-btn{
+  padding:10px 9px;border-radius:10px;
+  cursor:pointer;border:1.5px solid transparent;
+  background:#f8fafc;color:#374151;
+  transition:background .12s,border-color .12s;
+  font-family:inherit;text-align:left;line-height:1.35;
+  display:flex;flex-direction:column;gap:2px;
+  min-height:56px; /* 터치 44px+ 확보 */
+  -webkit-tap-highlight-color:transparent;
+}
+.act-btn:active{background:var(--bg-tint);border-color:var(--border);transform:scale(.98);}
+.act-btn.selected{background:var(--bg-tint2);border-color:var(--blue-mid);color:var(--navy);}
+.act-btn-num{font-size:10px;font-weight:800;color:var(--blue-mid);margin-bottom:1px;}
+.act-btn.selected .act-btn-num{color:var(--navy);}
+.act-btn-title{font-size:11px;color:#374151;font-weight:600;line-height:1.35;}
+.act-btn.selected .act-btn-title{color:var(--navy);}
 
 /* 선택된 활동 표시 */
-.selected-act-info{margin-top:10px;padding:10px 14px;background:linear-gradient(135deg,var(--bg-tint),#e8f0ff);border:1.5px solid var(--blue-mid);border-radius:10px;display:none;align-items:center;gap:10px}
-.selected-act-info.show{display:flex}
-.selected-act-badge{background:var(--navy);color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
-.selected-act-text{font-size:12px;font-weight:700;color:var(--navy);flex:1}
+.selected-act-info{
+  margin-top:10px;padding:10px 12px;
+  background:linear-gradient(135deg,var(--bg-tint),#e8f0ff);
+  border:1.5px solid var(--blue-mid);border-radius:10px;
+  display:none;flex-wrap:wrap;align-items:center;gap:8px;
+}
+.selected-act-info.show{display:flex;}
+.selected-act-badge{
+  background:var(--navy);color:#fff;font-size:11px;font-weight:800;
+  padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0;
+}
+.selected-act-text{font-size:12px;font-weight:700;color:var(--navy);flex:1;min-width:120px;}
 
-/* ── 기본정보 카드 ── */
-.info-card{background:#fff;border:1px solid var(--border-soft);border-radius:14px;padding:1.3rem 1.4rem;margin-bottom:1.2rem}
-.info-card-top{display:flex;align-items:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
-.info-badge{background:var(--bg-tint2);color:var(--navy);font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid var(--border)}
-.act-num-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:#dcfce7;color:#15803d;border:1px solid #86efac;display:none}
-.act-num-badge.show{display:inline-flex}
-.info-title{font-size:15px;font-weight:800;color:#1d1d1f}
-.meta-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.meta-field label{display:block;font-size:10px;font-weight:700;color:#aeaeb2;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
-.meta-field input{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;font-family:inherit;background:#f8fafc;color:#1d1d1f;transition:border-color .15s,background .15s}
-.meta-field input:focus{outline:none;border-color:var(--blue-mid);background:#fff}
+/* ══════════════════════════════════════════
+   기본 정보 카드
+══════════════════════════════════════════ */
+.info-card{
+  background:#fff;border:1px solid var(--border-soft);
+  border-radius:var(--radius-card);padding:1rem;margin-bottom:1rem;
+}
+.info-card-top{display:flex;align-items:center;gap:6px;margin-bottom:.9rem;flex-wrap:wrap;}
+.info-badge{
+  background:var(--bg-tint2);color:var(--navy);font-size:11px;font-weight:700;
+  padding:3px 10px;border-radius:99px;border:1px solid var(--border);
+}
+.act-num-badge{
+  font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;
+  background:#dcfce7;color:#15803d;border:1px solid #86efac;display:none;
+}
+.act-num-badge.show{display:inline-flex;}
+.info-title{font-size:14px;font-weight:800;color:#1d1d1f;}
 
-/* ── 섹션 카드 ── */
-.section-card{background:#fff;border:1px solid var(--border-soft);border-radius:14px;margin-bottom:9px;overflow:hidden}
-.section-head{display:flex;align-items:center;gap:10px;padding:1rem 1.3rem;cursor:pointer;user-select:none;transition:background .15s}
-.section-head:hover{background:var(--bg-tint)}
-.section-head.open{border-bottom:1px solid var(--border-soft)}
-.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
-.section-title{font-size:14px;font-weight:800;color:#1d1d1f;flex:1}
-.section-hint{font-size:11px;color:#aeaeb2;white-space:nowrap}
-.chevron{font-size:14px;color:#aeaeb2;transition:transform .2s;flex-shrink:0}
-.chevron.open{transform:rotate(180deg)}
-.section-body{padding:1.2rem 1.3rem;display:none}
-.section-body.open{display:block}
+/* 이름/날짜 그리드 — 모바일 1열 */
+.meta-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+.meta-field label{
+  display:block;font-size:10px;font-weight:700;color:#aeaeb2;
+  text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;
+}
+.meta-field input{
+  width:100%;border:1px solid var(--border);border-radius:8px;
+  padding:11px 12px; /* 터치 높이 확보 */
+  font-size:16px; /* iOS 줌 방지: 16px 이상 */
+  font-family:inherit;background:#f8fafc;color:#1d1d1f;
+  transition:border-color .15s,background .15s;
+  -webkit-appearance:none;appearance:none;
+}
+.meta-field input:focus{outline:none;border-color:var(--blue-mid);background:#fff;}
 
-.field-group{margin-bottom:14px}
-.field-group:last-child{margin-bottom:0}
-.field-label{font-size:11px;font-weight:700;color:#6e6e73;margin-bottom:4px}
-.field-hint{font-size:11px;color:#aeaeb2;line-height:1.6;margin-bottom:6px}
-textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;background:#f8fafc;color:#1d1d1f;resize:vertical;line-height:1.7;min-height:72px;transition:border-color .15s,background .15s}
-textarea:focus{outline:none;border-color:var(--blue-mid);background:#fff}
-.auto-filled{background:#f0fdf4 !important;border-color:#86efac !important;color:#15803d !important}
+/* ══════════════════════════════════════════
+   섹션 카드 (아코디언)
+══════════════════════════════════════════ */
+.section-card{
+  background:#fff;border:1px solid var(--border-soft);
+  border-radius:var(--radius-card);margin-bottom:8px;overflow:hidden;
+}
+.section-head{
+  display:flex;align-items:center;gap:10px;
+  padding:.9rem 1rem; /* 터치 44px+ */
+  cursor:pointer;user-select:none;transition:background .12s;
+  -webkit-tap-highlight-color:transparent;
+  min-height:52px;
+}
+.section-head:active{background:var(--bg-tint);}
+.section-head.open{border-bottom:1px solid var(--border-soft);}
+.step-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;}
+.section-title{font-size:13px;font-weight:800;color:#1d1d1f;flex:1;}
+.section-hint{font-size:10px;color:#aeaeb2;white-space:nowrap;}
+.chevron{font-size:14px;color:#aeaeb2;transition:transform .22s;flex-shrink:0;}
+.chevron.open{transform:rotate(180deg);}
+.section-body{padding:1rem;display:none;}
+.section-body.open{display:block;}
 
-.var-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px}
-.var-box{border:1px solid var(--border);border-radius:8px;overflow:hidden}
-.var-head{padding:6px 11px;font-size:11px;font-weight:700}
-.var-box textarea{border:none;border-top:1px solid var(--border);border-radius:0;min-height:56px;padding:8px 11px;background:#fff}
-.var-box textarea:focus{background:#fff}
-.var-full{border:1px solid var(--border);border-radius:8px;overflow:hidden}
-.var-full textarea{border:none;border-top:1px solid var(--border);border-radius:0;background:#fff}
-.var-full textarea:focus{background:#fff}
+/* ══════════════════════════════════════════
+   입력 필드
+══════════════════════════════════════════ */
+.field-group{margin-bottom:12px;}
+.field-group:last-child{margin-bottom:0;}
+.field-label{font-size:11px;font-weight:700;color:#6e6e73;margin-bottom:4px;}
+.field-hint{font-size:11px;color:#aeaeb2;line-height:1.6;margin-bottom:5px;}
+textarea{
+  width:100%;border:1px solid var(--border);border-radius:8px;
+  padding:11px 12px;
+  font-size:15px; /* iOS 줌 방지 */
+  font-family:inherit;background:#f8fafc;color:#1d1d1f;
+  resize:vertical;line-height:1.7;min-height:76px;
+  transition:border-color .15s,background .15s;
+  -webkit-appearance:none;appearance:none;
+}
+textarea:focus{outline:none;border-color:var(--blue-mid);background:#fff;}
+.auto-filled{background:#f0fdf4 !important;border-color:#86efac !important;color:#166534 !important;}
 
-.process-list{list-style:none;display:flex;flex-direction:column;gap:7px}
-.process-item{display:flex;gap:8px;align-items:flex-start}
-.process-num{width:24px;height:24px;border-radius:50%;background:var(--bg-tint2);border:1px solid var(--border);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--navy);margin-top:9px}
-.process-item textarea{flex:1;min-height:52px}
-.btn-add{display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:700;color:#aeaeb2;background:none;border:1.5px dashed var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;width:100%;margin-top:8px;font-family:inherit;transition:background .15s,color .15s}
-.btn-add:hover{background:var(--bg-tint);color:var(--navy)}
+/* 변인 그리드 — 모바일 1열 */
+.var-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:8px;}
+.var-box{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.var-head{padding:7px 11px;font-size:11px;font-weight:700;}
+.var-box textarea{
+  border:none;border-top:1px solid var(--border);border-radius:0;
+  min-height:64px;padding:10px 11px;background:#fff;font-size:15px;
+}
+.var-box textarea:focus{background:#fff;}
+.var-full{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.var-full textarea{
+  border:none;border-top:1px solid var(--border);border-radius:0;
+  background:#fff;font-size:15px;
+}
+.var-full textarea:focus{background:#fff;}
 
-.rtabs{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}
-.rtab{font-size:11px;font-weight:700;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:#f8fafc;cursor:pointer;color:#6e6e73;transition:all .15s;font-family:inherit}
-.rtab.active{background:var(--bg-tint2);border-color:var(--border);color:var(--navy)}
-.rpanel{display:none}
-.rpanel.active{display:block}
+/* 실험 과정 */
+.process-list{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.process-item{display:flex;gap:8px;align-items:flex-start;}
+.process-num{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--bg-tint2);border:1px solid var(--border);
+  font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;color:var(--navy);margin-top:11px;
+}
+.process-item textarea{flex:1;min-height:60px;}
+.btn-add{
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  font-size:13px;font-weight:700;color:#aeaeb2;
+  background:none;border:1.5px dashed var(--border);border-radius:8px;
+  padding:12px;cursor:pointer;width:100%;margin-top:8px;font-family:inherit;
+  transition:background .12s,color .12s;
+  min-height:48px; /* 터치 확보 */
+}
+.btn-add:active{background:var(--bg-tint);color:var(--navy);}
 
-.upload-zone{border:1.5px dashed var(--border);border-radius:8px;padding:1.6rem;text-align:center;color:#aeaeb2;font-size:12px;cursor:pointer;transition:background .15s;line-height:1.8}
-.upload-zone:hover{background:var(--bg-tint)}
-#preview-wrap img{max-width:100%;border-radius:8px;border:1px solid var(--border-soft);margin-top:8px}
+/* 결과 탭 */
+.rtabs{
+  display:flex;gap:5px;margin-bottom:10px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  padding-bottom:2px;flex-wrap:nowrap;
+}
+.rtabs::-webkit-scrollbar{display:none;}
+.rtab{
+  font-size:11px;font-weight:700;padding:8px 14px;border-radius:20px;
+  border:1.5px solid var(--border);background:#f8fafc;
+  cursor:pointer;color:#6e6e73;transition:all .12s;font-family:inherit;
+  white-space:nowrap;flex-shrink:0;min-height:36px;
+}
+.rtab.active{background:var(--bg-tint2);border-color:var(--border);color:var(--navy);}
+.rpanel{display:none;}
+.rpanel.active{display:block;}
 
-.score-tip{background:var(--bg-tint2);border:1px solid var(--border);border-radius:8px;padding:11px 15px;font-size:12px;color:var(--navy);line-height:1.7;margin-top:14px;font-weight:500}
+/* 업로드 존 */
+.upload-zone{
+  border:1.5px dashed var(--border);border-radius:8px;
+  padding:2rem 1rem;text-align:center;color:#aeaeb2;
+  font-size:13px;cursor:pointer;transition:background .12s;line-height:1.8;
+  min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.upload-zone:active{background:var(--bg-tint);}
+#preview-wrap img{max-width:100%;border-radius:8px;border:1px solid var(--border-soft);margin-top:8px;}
 
-.submit-row{display:flex;gap:8px;margin-top:1.4rem;flex-wrap:wrap}
-.btn{padding:11px 18px;border-radius:20px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s,transform .1s;min-height:42px;white-space:nowrap}
-.btn:active{transform:scale(.97)}
-.btn-primary{background:linear-gradient(135deg,var(--blue-mid),var(--navy));color:#fff;flex:1;justify-content:center}
-.btn-primary:hover{opacity:.9}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed}
-.btn-ghost{background:#fff;color:var(--navy);border:1.5px solid var(--border)}
-.btn-ghost:hover{background:var(--bg-tint)}
-.btn-preview{background:#fff;color:#7c3aed;border:1.5px solid #ddd6fe}
-.btn-preview:hover{background:#faf5ff}
+/* 세특 팁 */
+.score-tip{
+  background:var(--bg-tint2);border:1px solid var(--border);border-radius:8px;
+  padding:11px 13px;font-size:12px;color:var(--navy);line-height:1.7;margin-top:12px;font-weight:500;
+}
 
-.spinner{width:13px;height:13px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+/* ══════════════════════════════════════════
+   버튼
+══════════════════════════════════════════ */
+.submit-row{display:flex;flex-direction:column;gap:8px;margin-top:1.2rem;}
+.btn{
+  padding:13px 18px;border-radius:20px;
+  font-size:14px;font-weight:700;font-family:inherit;
+  cursor:pointer;border:none;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:opacity .12s,transform .08s;
+  min-height:48px; /* 터치 44px+ */
+  white-space:nowrap;width:100%;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:linear-gradient(135deg,var(--blue-mid),var(--navy));color:#fff;}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+.btn-ghost{background:#fff;color:var(--navy);border:1.5px solid var(--border);}
+.btn-ghost:active{background:var(--bg-tint);}
+.btn-preview{background:#fff;color:#7c3aed;border:1.5px solid #ddd6fe;}
+.btn-preview:active{background:#faf5ff;}
+.btn-reset{
+  background:#fff;color:#dc2626;border:1.5px solid #fecaca;
+  font-size:12px;padding:9px 14px;width:auto;min-height:36px;
+}
+.btn-reset:active{background:#fef2f2;}
+
+.spinner{
+  width:14px;height:14px;border:2px solid rgba(255,255,255,.4);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .7s linear infinite;display:none;flex-shrink:0;
+}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:#1d1d1f;color:#fff;padding:11px 22px;border-radius:12px;font-size:13px;font-weight:600;z-index:999;transition:transform .3s ease,opacity .3s ease;opacity:0;white-space:nowrap;font-family:inherit;max-width:90vw;text-align:center}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.toast.success{background:#0f766e}
-.toast.error{background:#b91c1c}
-
-.saved-banner{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;font-size:12px;color:#16a34a;font-weight:700;display:none;align-items:center;gap:8px;margin-top:10px}
-.saved-banner.show{display:flex}
-
-/* ── 미리보기 모달 ── */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto}
-.modal-bg.show{display:flex}
-.modal{background:#fff;border-radius:18px;width:100%;max-width:720px;margin:auto;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2)}
-.modal-header{background:linear-gradient(135deg,var(--blue-mid),var(--navy));padding:1.3rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
-.modal-header-title{font-size:15px;font-weight:800;color:#fff}
-.modal-header-sub{font-size:11px;color:rgba(255,255,255,.8);margin-top:2px}
-.modal-close{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit}
-.modal-close:hover{background:rgba(255,255,255,.35)}
-.modal-body{padding:1.5rem;max-height:75vh;overflow-y:auto}
-.preview-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.2rem;padding-bottom:1rem;border-bottom:1px solid var(--border-soft)}
-.preview-meta-chip{background:var(--bg-tint2);color:var(--navy);font-size:11px;font-weight:700;padding:4px 11px;border-radius:99px;border:1px solid var(--border)}
-.preview-section{margin-bottom:1.2rem;padding-bottom:1.2rem;border-bottom:1px solid var(--border-soft)}
-.preview-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.preview-section-label{display:flex;align-items:center;gap:7px;margin-bottom:8px}
-.preview-step{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
-.preview-section-title{font-size:12px;font-weight:800;color:#1d1d1f}
-.preview-content{font-size:13px;color:#1d1d1f;line-height:1.75;white-space:pre-wrap;word-break:break-all}
-.preview-content.empty{color:#aeaeb2;font-style:italic}
-.preview-var-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
-.preview-var-box{border:1px solid var(--border);border-radius:8px;overflow:hidden}
-.preview-var-head{padding:4px 9px;font-size:10px;font-weight:700}
-.preview-var-body{padding:7px 9px;font-size:12px;color:#1d1d1f;line-height:1.6;min-height:36px;white-space:pre-wrap}
-.preview-var-body.empty{color:#aeaeb2;font-style:italic}
-.preview-process{list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:6px}
-.preview-process-item{display:flex;gap:8px;align-items:flex-start}
-.preview-process-num{width:20px;height:20px;border-radius:50%;background:var(--bg-tint2);border:1px solid var(--border);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--navy);margin-top:2px}
-.modal-footer{padding:1rem 1.5rem;border-top:1px solid var(--border-soft);display:flex;gap:8px}
-
-/* 푸터 */
-.page-footer{background:#fff;border-top:1px solid var(--border-soft);padding:1.5rem 1.4rem;margin-top:1.5rem}
-.footer-inner{max-width:900px;margin:0 auto;text-align:center}
-.footer-logo{font-size:14px;font-weight:800;color:#1d1d1f;margin-bottom:5px}
-.footer-logo span{color:var(--royal)}
-.footer-desc{font-size:11px;color:#6e6e73;margin-bottom:10px;line-height:1.6}
-.footer-chips{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;margin-bottom:10px}
-.footer-chip{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;background:var(--bg-tint2);color:var(--navy);border:1px solid var(--border)}
-.footer-copy{font-size:10px;color:#aeaeb2}
-
-/* ── 반응형 ── */
-@media(max-width:768px){
-  .act-grid{grid-template-columns:repeat(2,1fr)}
-  .var-grid{grid-template-columns:1fr}
-  .preview-var-grid{grid-template-columns:1fr}
+/* ══════════════════════════════════════════
+   토스트
+══════════════════════════════════════════ */
+.toast{
+  position:fixed;
+  bottom:calc(20px + var(--safe-bottom));
+  left:50%;transform:translateX(-50%) translateY(70px);
+  background:#1d1d1f;color:#fff;
+  padding:12px 20px;border-radius:12px;
+  font-size:13px;font-weight:600;z-index:999;
+  transition:transform .28s ease,opacity .28s ease;
+  opacity:0;
+  max-width:calc(100vw - 2rem);
+  text-align:center;font-family:inherit;
+  word-break:keep-all;
 }
-@media(max-width:480px){
-  .wrap{padding:1rem .9rem 5rem;padding-bottom:calc(5rem + env(safe-area-inset-bottom))}
-  .act-grid{grid-template-columns:repeat(2,1fr)}
-  .meta-grid{grid-template-columns:1fr}
-  .welcome-bar{flex-direction:column;align-items:flex-start}
-  .brand-name{font-size:12px}
-  .submit-row{flex-direction:column}
-  .btn-primary{flex:none}
-  .section-title{font-size:13px}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.toast.success{background:#0f766e;}
+.toast.error{background:#b91c1c;}
+
+/* 저장 배너 */
+.saved-banner{
+  background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;
+  padding:10px 12px;font-size:12px;color:#16a34a;font-weight:700;
+  display:none;align-items:flex-start;gap:8px;margin-top:10px;
+  flex-wrap:wrap;
 }
+.saved-banner.show{display:flex;}
+
+/* ══════════════════════════════════════════
+   미리보기 모달
+══════════════════════════════════════════ */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);
+  z-index:500;display:none;align-items:flex-end;justify-content:center;
+  /* 모바일: 아래서 올라오는 시트 */
+}
+.modal-bg.show{display:flex;}
+.modal{
+  background:#fff;
+  border-radius:18px 18px 0 0; /* 모바일: 바텀시트 */
+  width:100%;max-width:100%;
+  max-height:92vh;
+  overflow:hidden;
+  box-shadow:0 -4px 30px rgba(0,0,0,.18);
+  display:flex;flex-direction:column;
+}
+.modal-header{
+  background:linear-gradient(135deg,var(--blue-mid),var(--navy));
+  padding:1rem 1.2rem;
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.modal-header-title{font-size:14px;font-weight:800;color:#fff;}
+.modal-header-sub{font-size:11px;color:rgba(255,255,255,.8);margin-top:2px;}
+.modal-close{
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,.2);border:none;color:#fff;font-size:16px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-family:inherit;min-height:32px;
+}
+.modal-close:active{background:rgba(255,255,255,.35);}
+.modal-body{
+  padding:1.2rem;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  flex:1;
+}
+.preview-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem;padding-bottom:.9rem;border-bottom:1px solid var(--border-soft);}
+.preview-meta-chip{background:var(--bg-tint2);color:var(--navy);font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;border:1px solid var(--border);}
+.preview-section{margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border-soft);}
+.preview-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.preview-section-label{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.preview-step{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;}
+.preview-section-title{font-size:12px;font-weight:800;color:#1d1d1f;}
+.preview-content{font-size:13px;color:#1d1d1f;line-height:1.75;white-space:pre-wrap;word-break:break-all;}
+.preview-content.empty{color:#aeaeb2;font-style:italic;}
+.preview-var-grid{display:grid;grid-template-columns:1fr;gap:7px;margin-top:7px;}
+.preview-var-box{border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.preview-var-head{padding:4px 9px;font-size:10px;font-weight:700;}
+.preview-var-body{padding:7px 9px;font-size:12px;color:#1d1d1f;line-height:1.6;min-height:34px;white-space:pre-wrap;word-break:break-all;}
+.preview-var-body.empty{color:#aeaeb2;font-style:italic;}
+.preview-process{list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:6px;}
+.preview-process-item{display:flex;gap:8px;align-items:flex-start;}
+.preview-process-num{width:20px;height:20px;border-radius:50%;background:var(--bg-tint2);border:1px solid var(--border);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--navy);margin-top:2px;}
+.modal-footer{
+  padding:.9rem 1.2rem calc(.9rem + var(--safe-bottom));
+  border-top:1px solid var(--border-soft);
+  display:flex;flex-direction:column;gap:7px;flex-shrink:0;
+}
+
+/* ══════════════════════════════════════════
+   푸터
+══════════════════════════════════════════ */
+.page-footer{
+  background:#fff;border-top:1px solid var(--border-soft);
+  padding:1.2rem 1rem;margin-top:1.2rem;
+}
+.footer-inner{max-width:900px;margin:0 auto;text-align:center;}
+.footer-logo{font-size:13px;font-weight:800;color:#1d1d1f;margin-bottom:4px;}
+.footer-logo span{color:var(--royal);}
+.footer-desc{font-size:11px;color:#6e6e73;margin-bottom:9px;line-height:1.6;}
+.footer-chips{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;margin-bottom:9px;}
+.footer-chip{padding:4px 9px;border-radius:20px;font-size:10px;font-weight:600;background:var(--bg-tint2);color:var(--navy);border:1px solid var(--border);}
+.footer-copy{font-size:10px;color:#aeaeb2;}
+
+/* ══════════════════════════════════════════
+   태블릿 (600px+)
+══════════════════════════════════════════ */
+@media(min-width:600px){
+  body{font-size:15px;}
+  .wrap{padding:1.2rem 1.4rem calc(5.5rem + var(--safe-bottom));}
+  .welcome-bar{flex-direction:row;align-items:center;justify-content:space-between;}
+  .meta-grid{grid-template-columns:repeat(2,1fr);}
+  .var-grid{grid-template-columns:repeat(2,1fr);}
+  .act-grid{grid-template-columns:repeat(3,1fr);}
+  .act-unit-tabs{flex-wrap:wrap;}
+  .submit-row{flex-direction:row;flex-wrap:wrap;}
+  .btn{width:auto;}
+  .btn-primary{flex:1;}
+  .modal{border-radius:18px 18px 0 0;}
+  .modal-footer{flex-direction:row;}
+  .preview-var-grid{grid-template-columns:repeat(3,1fr);}
+}
+
+/* ══════════════════════════════════════════
+   데스크탑 (900px+)
+══════════════════════════════════════════ */
+@media(min-width:900px){
+  body{font-size:16px;}
+  .header{height:54px;padding:0 1.5rem;}
+  .wrap{padding:1.4rem 2rem calc(6rem + var(--safe-bottom));}
+  .brand-name{font-size:14px;}
+  .act-grid{grid-template-columns:repeat(4,1fr);gap:7px;}
+  .welcome-avatar{width:50px;height:50px;font-size:22px;}
+  .welcome-title{font-size:1.05rem;}
+  .section-title{font-size:14px;}
+  .section-head{padding:1rem 1.3rem;}
+  .section-body{padding:1.2rem 1.3rem;}
+  .info-card{padding:1.3rem 1.4rem;}
+  .act-selector-card{padding:1.2rem 1.4rem;}
+  /* 데스크탑에서 모달: 가운데 팝업 */
+  .modal-bg{align-items:center;padding:1.5rem;}
+  .modal{border-radius:18px;max-width:720px;max-height:85vh;}
+  .modal-footer{flex-direction:row;}
+  textarea{font-size:13px;}
+  .meta-field input{font-size:14px;}
+}
+
+/* ══════════════════════════════════════════
+   인쇄
+══════════════════════════════════════════ */
 @media print{
-  .header,.prog-wrap,.btn-add,.rtabs,.submit-row,.saved-banner,.page-footer,.auto-banner,.modal-bg,.act-selector-card{display:none!important}
+  .header,.prog-wrap,.btn-add,.rtabs,.submit-row,
+  .saved-banner,.page-footer,.auto-banner,.modal-bg,
+  .act-selector-card,.breadcrumb{display:none!important}
   .section-body{display:block!important}
-  body{background:#fff}
-  .section-card{break-inside:avoid}
+  .section-head{border-bottom:1px solid #ccc!important}
+  body{background:#fff;font-size:12px;}
+  .section-card{break-inside:avoid;box-shadow:none;border:1px solid #ddd;}
+  .wrap{padding:0;}
 }
 </style>
 </head>
@@ -268,7 +609,7 @@ textarea:focus{outline:none;border-color:var(--blue-mid);background:#fff}
     <div class="auto-banner-icon">✨</div>
     <div>
       <span class="auto-banner-title" id="auto-banner-title">탐구 주제가 자동으로 입력되었습니다!</span>
-      <span class="auto-banner-sub" id="auto-banner-sub">나머지 항목을 직접 작성해주세요.</span>
+      <span class="auto-banner-sub" id="auto-banner-sub">내용을 확인하고 자유롭게 수정하세요.</span>
     </div>
   </div>
 
@@ -290,35 +631,31 @@ textarea:focus{outline:none;border-color:var(--blue-mid);background:#fff}
     </div>
   </div>
 
-  <!-- ── 탐구활동 선택기 ── -->
+  <!-- 탐구활동 선택기 -->
   <div class="section-heading">탐구활동 선택</div>
   <div class="act-selector-card">
     <div class="act-selector-top">
       <div class="act-selector-icon">📋</div>
       <div>
         <div class="act-selector-title">탐구활동 번호 선택</div>
-        <div class="act-selector-sub">활동을 선택하면 탐구 주제가 자동으로 입력됩니다 (활동 25~46)</div>
+        <div class="act-selector-sub">활동을 선택하면 1~6번 항목이 예시 내용으로 자동 입력됩니다 (수정 가능)</div>
       </div>
     </div>
 
-    <!-- 단원 탭 -->
     <div class="act-unit-tabs">
       <button class="act-unit-tab active-u1" id="utab-1" onclick="switchUnitTab(1)">🦋 Ⅰ. 변화와 다양성 (25~32)</button>
       <button class="act-unit-tab" id="utab-2" onclick="switchUnitTab(2)">🌍 Ⅱ. 환경과 에너지 (33~40)</button>
       <button class="act-unit-tab" id="utab-3" onclick="switchUnitTab(3)">🤖 Ⅲ. 과학과 미래 사회 (41~46)</button>
     </div>
 
-    <!-- 단원별 활동 그리드 -->
-    <div class="act-grid" id="act-grid-1">
-      <!-- JS로 채워짐 -->
-    </div>
+    <div class="act-grid" id="act-grid-1"></div>
     <div class="act-grid" id="act-grid-2" style="display:none"></div>
     <div class="act-grid" id="act-grid-3" style="display:none"></div>
 
-    <!-- 선택된 활동 표시 -->
     <div class="selected-act-info" id="selected-act-info">
       <span class="selected-act-badge" id="selected-act-badge">활동 --</span>
       <span class="selected-act-text" id="selected-act-text"></span>
+      <button class="btn-reset" onclick="resetAllFields()">🔄 초기화</button>
     </div>
   </div>
 
@@ -344,7 +681,7 @@ textarea:focus{outline:none;border-color:var(--blue-mid);background:#fff}
 
   <div class="section-heading">탐구 보고서 작성</div>
 
-  <!-- 1 -->
+  <!-- 1 탐구 주제 -->
   <div class="section-card">
     <div class="section-head open" onclick="toggleSection(this)">
       <div class="step-dot" style="background:var(--bg-tint2);color:var(--navy)">1</div>
@@ -360,7 +697,7 @@ textarea:focus{outline:none;border-color:var(--blue-mid);background:#fff}
     </div>
   </div>
 
-  <!-- 2 -->
+  <!-- 2 탐구 동기 -->
   <div class="section-card">
     <div class="section-head" onclick="toggleSection(this)">
       <div class="step-dot" style="background:var(--teal-light);color:var(--teal)">2</div>
@@ -376,7 +713,7 @@ textarea:focus{outline:none;border-color:var(--blue-mid);background:#fff}
     </div>
   </div>
 
-  <!-- 3 -->
+  <!-- 3 가설 설정 -->
   <div class="section-card">
     <div class="section-head" onclick="toggleSection(this)">
       <div class="step-dot" style="background:var(--blue-light);color:var(--blue)">3</div>
@@ -407,7 +744,7 @@ textarea:focus{outline:none;border-color:var(--blue-mid);background:#fff}
     </div>
   </div>
 
-  <!-- 4 -->
+  <!-- 4 탐구 설계 및 수행 -->
   <div class="section-card">
     <div class="section-head" onclick="toggleSection(this)">
       <div class="step-dot" style="background:var(--amber-light);color:var(--amber)">4</div>
@@ -433,7 +770,7 @@ textarea:focus{outline:none;border-color:var(--blue-mid);background:#fff}
     </div>
   </div>
 
-  <!-- 5 -->
+  <!-- 5 탐구 결과 및 정리 -->
   <div class="section-card">
     <div class="section-head" onclick="toggleSection(this)">
       <div class="step-dot" style="background:var(--green-light);color:var(--green)">5</div>
@@ -453,7 +790,7 @@ textarea:focus{outline:none;border-color:var(--blue-mid);background:#fff}
       </div>
       <div class="rpanel" id="rpanel-data">
         <div class="field-hint">측정 수치를 정량적으로 기록합니다.</div>
-        <textarea id="s5-data" placeholder="측정 결과 수치 기록... (예: 1회 — 35°C, 2회 — 36.5°C)" rows="5" oninput="updateProgress()"></textarea>
+        <textarea id="s5-data" placeholder="측정 결과 수치 기록..." rows="5" oninput="updateProgress()"></textarea>
       </div>
       <div class="rpanel" id="rpanel-img">
         <div class="upload-zone" onclick="document.getElementById('file-input').click()">
@@ -467,7 +804,7 @@ textarea:focus{outline:none;border-color:var(--blue-mid);background:#fff}
     </div>
   </div>
 
-  <!-- 6 -->
+  <!-- 6 결론 및 제언 -->
   <div class="section-card">
     <div class="section-head" onclick="toggleSection(this)">
       <div class="step-dot" style="background:var(--red-light);color:var(--red)">6</div>
@@ -507,10 +844,10 @@ textarea:focus{outline:none;border-color:var(--blue-mid);background:#fff}
     <span id="saved-doc-id" style="font-weight:400;opacity:.7;font-size:11px;margin-left:4px"></span>
   </div>
 
-</div><!-- /inner -->
-</div><!-- /wrap -->
+</div>
+</div>
 
-<!-- ── 미리보기 모달 ── -->
+<!-- 미리보기 모달 -->
 <div class="modal-bg" id="modal-bg" onclick="closePreviewOutside(event)">
   <div class="modal">
     <div class="modal-header">
@@ -535,7 +872,7 @@ textarea:focus{outline:none;border-color:var(--blue-mid);background:#fff}
     <div class="footer-desc">목동 경력 20년 이상의 과학전문학원<br>통합과학 · 내신 · 수능 · 수행평가 · 탐구 보고서 · 세특</div>
     <div class="footer-chips">
       <span class="footer-chip">탐구활동 25–46</span>
-      <span class="footer-chip">활동번호 자동입력</span>
+      <span class="footer-chip">전 항목 자동입력</span>
       <span class="footer-chip">Firebase 자동 저장</span>
       <span class="footer-chip">세특 서술 코칭</span>
     </div>
@@ -564,41 +901,514 @@ textarea:focus{outline:none;border-color:var(--blue-mid);background:#fff}
 </script>
 
 <script>
+// ══════════════════════════════════════════════════════
+// 활동별 기본 정보 (제목·단원)
+// ══════════════════════════════════════════════════════
 const ACTIVITY_DATA = {
-  25:{ title:"생물 대멸종의 원인과 여러 가설의 타당성 평가하기",         unit:"Ⅰ. 변화와 다양성", unitNum:1 },
-  26:{ title:"자연선택 과정에 대한 모의실험하기",                        unit:"Ⅰ. 변화와 다양성", unitNum:1 },
-  27:{ title:"생물다양성보전 사례와 실천 방안 탐색하기",                  unit:"Ⅰ. 변화와 다양성", unitNum:1 },
-  28:{ title:"한반도 멸종 위기 야생 생물 서식 지도 만들기",               unit:"Ⅰ. 변화와 다양성", unitNum:1 },
-  29:{ title:"산과 염기를 혼합할 때 온도를 측정해 그래프로 나타내기",     unit:"Ⅰ. 변화와 다양성", unitNum:1 },
-  30:{ title:"물과 산화 칼슘을 이용한 음식 조리 방법 설계하고 실험하기",  unit:"Ⅰ. 변화와 다양성", unitNum:1 },
-  31:{ title:"우리 도자기의 과학적 우수함 홍보하기",                      unit:"Ⅰ. 변화와 다양성", unitNum:1 },
-  32:{ title:"해양 산성화를 막기 위한 방법은 무엇일까",                   unit:"Ⅰ. 변화와 다양성", unitNum:1 },
-  33:{ title:"개체군 변동 모의실험하기",                                  unit:"Ⅱ. 환경과 에너지", unitNum:2 },
-  34:{ title:"지구 온난화로 인한 지구 열수지 변동 탐구하기",              unit:"Ⅱ. 환경과 에너지", unitNum:2 },
-  35:{ title:"기후 변화로 인한 미래 시나리오 구상하기",                   unit:"Ⅱ. 환경과 에너지", unitNum:2 },
-  36:{ title:"일상생활에서 탄소 중립 실천하기",                           unit:"Ⅱ. 환경과 에너지", unitNum:2 },
-  37:{ title:"자석과 코일의 운동으로 전자기 유도 탐구하기",               unit:"Ⅱ. 환경과 에너지", unitNum:2 },
-  38:{ title:"신재생 에너지 기술로 자가발전 학교 설계하기",               unit:"Ⅱ. 환경과 에너지", unitNum:2 },
-  39:{ title:"미래 세대를 위한 지속가능한 발전 홍보 문구 만들기",         unit:"Ⅱ. 환경과 에너지", unitNum:2 },
-  40:{ title:"30년 뒤 우리나라를 이끌 에너지원은?",                      unit:"Ⅱ. 환경과 에너지", unitNum:2 },
-  41:{ title:"단백질과 핵산을 이용한 감염병 진단 기술 체험하기",          unit:"Ⅲ. 과학과 미래 사회", unitNum:3 },
-  42:{ title:"디지털 탐구 도구로 실시간 생활 데이터 측정하기",            unit:"Ⅲ. 과학과 미래 사회", unitNum:3 },
-  43:{ title:"데이터 시각화를 활용해 빅데이터 표현하기",                  unit:"Ⅲ. 과학과 미래 사회", unitNum:3 },
-  44:{ title:"로봇의 특징을 분석하고 개선 방안 고안하기",                 unit:"Ⅲ. 과학과 미래 사회", unitNum:3 },
-  45:{ title:"세상을 연결하는 사물 인터넷 전문가 되어 보기",              unit:"Ⅲ. 과학과 미래 사회", unitNum:3 },
-  46:{ title:"지구 환경 측면에서 인공지능 기술의 발전은 바람직한가",      unit:"Ⅲ. 과학과 미래 사회", unitNum:3 },
+  25:{ title:"생물 대멸종의 원인과 여러 가설의 타당성 평가하기",        unit:"Ⅰ. 변화와 다양성", unitNum:1 },
+  26:{ title:"자연선택 과정에 대한 모의실험하기",                       unit:"Ⅰ. 변화와 다양성", unitNum:1 },
+  27:{ title:"생물다양성보전 사례와 실천 방안 탐색하기",                 unit:"Ⅰ. 변화와 다양성", unitNum:1 },
+  28:{ title:"한반도 멸종 위기 야생 생물 서식 지도 만들기",              unit:"Ⅰ. 변화와 다양성", unitNum:1 },
+  29:{ title:"산과 염기를 혼합할 때 온도를 측정해 그래프로 나타내기",    unit:"Ⅰ. 변화와 다양성", unitNum:1 },
+  30:{ title:"물과 산화 칼슘을 이용한 음식 조리 방법 설계하고 실험하기", unit:"Ⅰ. 변화와 다양성", unitNum:1 },
+  31:{ title:"우리 도자기의 과학적 우수함 홍보하기",                     unit:"Ⅰ. 변화와 다양성", unitNum:1 },
+  32:{ title:"해양 산성화를 막기 위한 방법은 무엇일까",                  unit:"Ⅰ. 변화와 다양성", unitNum:1 },
+  33:{ title:"개체군 변동 모의실험하기",                                 unit:"Ⅱ. 환경과 에너지", unitNum:2 },
+  34:{ title:"지구 온난화로 인한 지구 열수지 변동 탐구하기",             unit:"Ⅱ. 환경과 에너지", unitNum:2 },
+  35:{ title:"기후 변화로 인한 미래 시나리오 구상하기",                  unit:"Ⅱ. 환경과 에너지", unitNum:2 },
+  36:{ title:"일상생활에서 탄소 중립 실천하기",                          unit:"Ⅱ. 환경과 에너지", unitNum:2 },
+  37:{ title:"자석과 코일의 운동으로 전자기 유도 탐구하기",              unit:"Ⅱ. 환경과 에너지", unitNum:2 },
+  38:{ title:"신재생 에너지 기술로 자가발전 학교 설계하기",              unit:"Ⅱ. 환경과 에너지", unitNum:2 },
+  39:{ title:"미래 세대를 위한 지속가능한 발전 홍보 문구 만들기",        unit:"Ⅱ. 환경과 에너지", unitNum:2 },
+  40:{ title:"30년 뒤 우리나라를 이끌 에너지원은?",                     unit:"Ⅱ. 환경과 에너지", unitNum:2 },
+  41:{ title:"단백질과 핵산을 이용한 감염병 진단 기술 체험하기",         unit:"Ⅲ. 과학과 미래 사회", unitNum:3 },
+  42:{ title:"디지털 탐구 도구로 실시간 생활 데이터 측정하기",           unit:"Ⅲ. 과학과 미래 사회", unitNum:3 },
+  43:{ title:"데이터 시각화를 활용해 빅데이터 표현하기",                 unit:"Ⅲ. 과학과 미래 사회", unitNum:3 },
+  44:{ title:"로봇의 특징을 분석하고 개선 방안 고안하기",                unit:"Ⅲ. 과학과 미래 사회", unitNum:3 },
+  45:{ title:"세상을 연결하는 사물 인터넷 전문가 되어 보기",             unit:"Ⅲ. 과학과 미래 사회", unitNum:3 },
+  46:{ title:"지구 환경 측면에서 인공지능 기술의 발전은 바람직한가",     unit:"Ⅲ. 과학과 미래 사회", unitNum:3 },
 };
+
+// ══════════════════════════════════════════════════════
+// 활동별 자동입력 데이터 (전 항목)
+// ══════════════════════════════════════════════════════
+const ACTIVITY_AUTO_DATA = {
+  25:{
+    motivation:"교과서에서 지구 역사상 다섯 번의 대멸종 사건이 있었다는 내용을 배웠습니다. 그 중 페름기 말 대멸종은 전체 해양 생물종의 약 96%가 사라진 사건이라는 사실이 충격적이었습니다. 과학자들마다 원인(소행성 충돌, 화산 폭발, 기후 변화 등)이 다르다는 점에서, 어떤 증거로 가설의 타당성을 평가할 수 있는지 탐구해보고 싶었습니다.",
+    hypothesis:"대멸종의 원인 가설들은 각각 특정 지질학적·화학적 증거를 가지고 있으며, 여러 증거를 종합적으로 분석하면 가장 타당한 가설을 선별할 수 있을 것이다.",
+    indepVar:"대멸종 원인 가설의 종류 (소행성 충돌설, 화산 폭발설, 기후 변화설, 복합 원인설)",
+    depVar:"각 가설을 지지하는 지질학적·화학적 증거의 수와 설명력",
+    ctrlVar:"동일한 시기(페름기 말)의 지층 자료를 기준으로 평가, 동일한 평가 기준표 적용",
+    materials:"지질 시대 연표, 지층 분석 자료(이리듐 이상 농도, 화산재 분포), 기후 변화 그래프, 화석 분포 지도, 문헌 자료 및 논문 요약본",
+    processes:[
+      "대멸종의 정의와 5대 대멸종 사건의 시기·규모를 정리한다.",
+      "각 원인 가설(소행성 충돌설, 화산 폭발설, 기후 변화설, 복합 원인설)을 문헌 조사로 정리한다.",
+      "각 가설을 뒷받침하는 지질학적 증거(이리듐층, 충격 석영, 화산재층, δ¹³C 변화 등)를 조사한다.",
+      "가설 평가 기준표(증거 수, 설명력, 반증 가능성)를 작성하고 각 가설에 점수를 부여한다.",
+      "종합 점수를 비교하여 가장 타당한 가설을 선정하고 그 이유를 서술한다.",
+      "발표 자료를 제작하여 탐구 결과를 공유한다."
+    ],
+    observation:"소행성 충돌설: K-Pg 경계층에서 이리듐 농도가 평균 대비 30배 이상 높게 측정됨. 충격 석영과 텍타이트가 전 세계 동일 지층에서 발견됨.\n화산 폭발설: 페름기 말 시베리아 트랩 대규모 화산 활동 흔적 확인, SO₂ 방출로 인한 산성비 증거 존재.\n복합 원인설: 단일 원인보다 복합적 환경 변화(온난화+해양 무산소화)가 멸종 패턴을 더 잘 설명함.",
+    data:"가설별 지지 증거 수 비교:\n- 소행성 충돌설: 3개 (이리듐, 충격 석영, 충돌구)\n- 화산 폭발설: 4개 (용암 흔적, SO₂ 증거, δ¹³C 변화, 화산재층)\n- 기후 변화설: 2개 (온도 프록시, 탄소 동위원소)\n- 복합 원인설: 6개 (위 증거 + 해양 산성화, 무산소 증거)\n※ 복합 원인설의 설명력 점수가 가장 높음",
+    conclusion:"탐구 결과, 단일 원인 가설보다 복합 원인설이 대멸종 패턴을 가장 잘 설명하는 것으로 평가되었습니다. 화산 폭발에 의한 대기 조성 변화가 기후 변화와 해양 산성화를 연쇄적으로 유발했으며, 이는 통합과학에서 학습한 지구 시스템(기권·수권·생물권) 간 상호작용으로 설명됩니다. 가설은 지지되었습니다.",
+    errorAnalysis:"문헌 자료에 따라 증거의 신뢰도가 달라 평가 기준표에 주관적 요소가 포함될 수 있습니다. 실제 지층 샘플을 직접 분석하지 못해 2차 자료에 의존한 한계가 있습니다.",
+    nextResearch:"현생 생물다양성 감소(제6차 대멸종)와 과거 대멸종의 공통점·차이점을 비교 분석하여 미래 멸종 위험 요인을 예측하는 탐구로 발전시키고 싶습니다."
+  },
+  26:{
+    motivation:"다윈의 자연선택설을 교과서에서 배우며 '환경에 가장 잘 적응한 것이 살아남는다'는 개념이 인상 깊었습니다. 실제로 자연선택이 어떻게 작동하는지 눈으로 확인하기 어려워, 모의실험을 통해 세대가 거듭될수록 유리한 형질의 빈도가 어떻게 변하는지 직접 체험해보고 싶었습니다.",
+    hypothesis:"모의실험에서 환경에 불리한 형질을 가진 개체는 선택적으로 제거되므로, 세대가 반복될수록 유리한 형질(보호색)의 비율이 점진적으로 증가할 것이다.",
+    indepVar:"모의실험의 세대 수 (1세대~5세대)",
+    depVar:"세대별 유리한 형질(보호색) 개체의 비율(%)",
+    ctrlVar:"각 세대 초기 개체 수 동일(100개), 포식자 역할 학생 수 동일, 선택 시간 동일(30초)",
+    materials:"색종이 조각(빨강 50개, 초록 50개, 갈색 배경판), 타이머, 기록지, 색상별 개체 수 계산용 계수기",
+    processes:[
+      "배경판(갈색) 위에 빨간 색종이 50개, 초록 색종이 50개를 무작위로 배치한다(1세대).",
+      "'포식자' 역할 학생이 30초 동안 눈에 잘 띄는 색종이를 골라 제거한다.",
+      "남은 색종이를 색상별로 분류하고 개수를 기록한다.",
+      "남은 개체를 '번식'시켜 동일 색상 개체를 추가하여 다시 100개가 되도록 맞춘다(2세대).",
+      "2~4 과정을 5세대까지 반복하며 세대별 색상 비율 변화를 기록한다.",
+      "세대별 데이터를 그래프로 나타내고 자연선택 원리와 연결하여 해석한다."
+    ],
+    observation:"1세대: 빨강 50개, 초록 50개 (비율 1:1)\n포식자가 선택적으로 제거한 결과 빨간 색종이(눈에 띄는 개체)가 더 많이 제거됨.\n세대가 진행될수록 초록 색종이(보호색 개체)의 비율이 점차 증가함.\n5세대에서는 초록 개체가 전체의 80% 이상을 차지함.",
+    data:"세대별 초록 개체 비율:\n1세대: 50%\n2세대: 62%\n3세대: 71%\n4세대: 78%\n5세대: 84%\n→ 매 세대 약 6~8%씩 보호색 개체 비율 증가",
+    conclusion:"세대가 거듭될수록 환경에 유리한 형질(보호색)을 가진 개체의 비율이 증가하여 가설이 지지되었습니다. 이는 자연선택의 핵심 원리인 '변이→선택→유전' 과정이 집단 수준에서 형질 빈도를 변화시킴을 보여줍니다. 통합과학의 진화 단원에서 학습한 자연선택설이 모의실험을 통해 실증적으로 확인되었습니다.",
+    errorAnalysis:"포식자 역할 학생의 주의 집중도가 매 세대 동일하지 않아 선택의 일관성에 오차가 발생했습니다. 실제 자연에서는 번식률·이주·돌연변이 등 추가 요인이 작용하므로 단순 모의실험의 한계가 있습니다.",
+    nextResearch:"환경 배경색을 세대 중간에 변경하여 환경 변화에 따른 자연선택 방향 전환을 확인하는 탐구를 진행하고 싶습니다."
+  },
+  27:{
+    motivation:"뉴스에서 멸종 위기종에 대한 보도를 자주 접하면서, 실제로 어떤 방법으로 생물다양성이 보전되고 있는지 궁금했습니다. 교과서에서 생물다양성의 중요성을 배운 후, 국내외에서 실제로 시행 중인 구체적인 보전 사례와 개인이 실천할 수 있는 방안을 조사하고 싶었습니다.",
+    hypothesis:"생물다양성 보전을 위한 국가적·국제적 사례를 조사하면, 서식지 보호와 법적 규제가 개체 수 회복에 가장 효과적인 방법임을 확인할 수 있을 것이다.",
+    indepVar:"생물다양성 보전 방법의 유형 (서식지 보호, 포획 번식, 법적 규제, 생태 통로 조성 등)",
+    depVar:"각 보전 방법 적용 후 대상 종의 개체 수 변화 및 보전 성공 사례 수",
+    ctrlVar:"동일한 시기(2000년대 이후) 사례 조사, 동일한 평가 지표(개체 수 변화율) 적용",
+    materials:"국내 멸종위기종 목록(환경부), IUCN 적색목록 자료, 국립공원 현황 자료, 포획 번식 프로그램 보고서, 논문 및 뉴스 자료",
+    processes:[
+      "환경부 국가생물다양성정보공유체계에서 국내 멸종위기 야생생물 목록을 조사한다.",
+      "국내 대표 보전 성공 사례(반달가슴곰, 황새 복원 프로그램)를 조사한다.",
+      "국제 사례(자이언트판다, 아무르호랑이 등)의 보전 방법과 개체 수 변화를 분석한다.",
+      "보전 방법을 유형별(서식지 보호, 포획번식, 법적규제, 생태통로)로 분류하고 효과를 비교한다.",
+      "각 방법의 장단점과 비용 대비 효과를 표로 정리한다.",
+      "개인 차원의 생물다양성 보전 실천 방안 10가지를 제안한다."
+    ],
+    observation:"반달가슴곰 복원 프로그램: 2004년 6마리 → 2024년 80마리 이상 (포획 번식 + 서식지 보호 복합 적용).\n황새 복원: 충남 예산 인공 번식 후 야생 방사 성공, 야생 개체 수 70마리 이상.\n자이언트판다: 자연보호구역 확대와 포획번식으로 2016년 멸종위기에서 취약종으로 등급 하향.",
+    data:"보전 방법별 평균 개체 수 회복률:\n- 서식지 보호 단독: 23%\n- 포획 번식 단독: 31%\n- 법적 규제 단독: 18%\n- 복합 적용: 58%\n※ 복합 적용 시 단독 방법 대비 회복률 약 2배 이상",
+    conclusion:"단일 보전 방법보다 서식지 보호·포획번식·법적 규제를 복합 적용한 경우 개체 수 회복률이 가장 높게 나타나 가설이 지지되었습니다. 통합과학에서 학습한 생태계 평형과 생물다양성의 상호 의존성을 실제 사례에서 확인할 수 있었습니다.",
+    errorAnalysis:"조사 자료가 기관마다 측정 방법과 기간이 달라 단순 비교에 오차가 있습니다. 개체 수 회복이 보전 활동만의 결과인지, 자연적 회복 요인도 포함된 것인지 분리하기 어려운 한계가 있습니다.",
+    nextResearch:"보전 비용 대비 생태계 서비스 가치(ecosystem service value)를 경제학적으로 분석하여 생물다양성 보전의 경제적 타당성을 탐구하고 싶습니다."
+  },
+  28:{
+    motivation:"우리나라에도 멸종위기 야생 생물이 많이 살고 있다는 사실을 배웠지만, 어디에 어떤 종이 서식하는지 구체적으로 알지 못했습니다. 서식 분포 데이터를 지도로 시각화하면 보전 우선 지역을 한눈에 파악할 수 있고 생물 지리적 패턴도 발견할 수 있을 것이라 생각하여 탐구를 계획했습니다.",
+    hypothesis:"한반도 멸종위기 야생 생물의 서식지 분포를 지도로 나타내면, 국립공원과 보호구역 주변에 서식 밀도가 높게 집중되어 있을 것이다.",
+    indepVar:"멸종위기 야생 생물의 종류 (포유류, 조류, 어류, 식물 등)",
+    depVar:"지역별(광역시도) 멸종위기종 서식 종 수 및 종 다양도",
+    ctrlVar:"환경부 공식 발표 자료(동일 연도) 기준, 동일 분류 체계(Ⅰ·Ⅱ급) 적용",
+    materials:"환경부 멸종위기 야생생물 목록(267종), 국가 생물다양성 정보공유체계 데이터, 국립공원 위치 지도, 색상 마커, 도화지(전국 지도), 스프레드시트",
+    processes:[
+      "환경부 자료에서 멸종위기 야생생물 1·2급 목록 전체를 분류군별로 정리한다.",
+      "각 종의 주요 서식지(광역시도 단위)를 국가 생물다양성 정보공유체계에서 조사한다.",
+      "전국 지도에 분류군별로 다른 색상 마커를 사용하여 서식지를 표시한다.",
+      "광역시도별 멸종위기종 수를 집계하여 색상 농도 지도를 제작한다.",
+      "국립공원 및 보호구역과 서식지 분포의 상관관계를 분석한다.",
+      "탐구 결과를 바탕으로 추가 보전이 필요한 공백 지역을 제안한다."
+    ],
+    observation:"강원도와 경상북도에 멸종위기종 서식지가 가장 집중적으로 분포함.\n서울·부산 등 대도시 지역은 서식지가 매우 적거나 없음.\n국립공원(설악산, 지리산, 한려해상) 주변에 서식지 밀도가 높게 나타남.\n담수어류(어름치, 미호종개)는 4대강 지류의 특정 구간에 집중 분포.",
+    data:"광역시도별 멸종위기종 서식 종 수(상위 5개):\n1. 강원도: 89종\n2. 경상북도: 76종\n3. 전라남도: 71종\n4. 경상남도: 65종\n5. 제주도: 62종\n※ 서울: 12종, 부산: 18종 (도시화 지역 현저히 낮음)",
+    conclusion:"국립공원과 보호구역이 위치한 강원·경북 지역에 멸종위기종 서식 밀도가 높게 나타나 가설이 지지되었습니다. 대도시 지역의 서식 종 수가 매우 적어 도시화가 생물다양성에 미치는 부정적 영향을 확인할 수 있었습니다.",
+    errorAnalysis:"국가 생물다양성 정보공유체계 데이터가 완전하지 않아 실제 서식지를 정확히 반영하지 못했을 가능성이 있습니다. 희귀종은 서식지 위치가 비공개 처리된 경우가 있어 지도 완성도에 한계가 있습니다.",
+    nextResearch:"시계열 데이터를 활용하여 10년 전과 현재의 서식지 분포 변화를 비교하고, 서식지 소실 속도와 원인을 분석하는 종단 연구로 발전시키고 싶습니다."
+  },
+  29:{
+    motivation:"교과서에서 산과 염기가 반응하면 중화 반응이 일어나 열이 발생한다고 배웠습니다. 중화 반응이 발열 반응이라는 것은 알았지만, 실제로 온도가 얼마나 어떻게 변하는지 실험으로 직접 확인하고 싶었습니다. 산과 염기를 혼합하는 비율에 따라 온도 변화가 어떻게 달라지는지도 궁금했습니다.",
+    hypothesis:"산(HCl)과 염기(NaOH) 용액을 혼합할 때, 두 용액이 완전히 중화되는 비율(1:1)에서 온도 상승이 가장 클 것이다.",
+    indepVar:"HCl과 NaOH 용액의 혼합 비율 (mL 기준: 10:0, 8:2, 6:4, 5:5, 4:6, 2:8, 0:10)",
+    depVar:"혼합 후 최고 온도(°C) 및 초기 온도 대비 온도 상승량(ΔT)",
+    ctrlVar:"두 용액의 초기 농도(0.1 mol/L 동일), 총 혼합 부피(10 mL), 실험 시작 온도(실온), 측정 시간 간격(10초) 동일",
+    materials:"0.1 mol/L 염산(HCl) 용액, 0.1 mol/L 수산화나트륨(NaOH) 용액, 스티로폼 컵(단열용), 온도계, 10 mL 눈금 실린더 2개, 유리 막대, 스탑워치, 기록지",
+    processes:[
+      "HCl과 NaOH 용액의 초기 온도를 각각 측정하여 기록한다.",
+      "스티로폼 컵에 HCl 용액을 비율에 따라 넣고 초기 온도를 기록한다.",
+      "NaOH 용액을 비율에 따라 천천히 혼합하고 유리 막대로 저어준다.",
+      "혼합 후 10초 간격으로 2분 동안 온도를 측정하여 최고 온도를 기록한다.",
+      "혼합 비율을 8:2, 6:4, 5:5, 4:6, 2:8, 0:10으로 바꿔가며 1~4 과정을 반복한다.",
+      "결과를 표로 정리하고 혼합 비율에 따른 온도 변화 그래프(꺾은선)를 그린다."
+    ],
+    observation:"HCl만 있는 경우(10:0) 온도 변화 없음.\nNaOH를 첨가할수록 온도 상승 관찰됨.\n5:5 비율에서 온도 상승이 가장 크게 나타남 (ΔT ≈ 6.8°C).\nNaOH 과잉 구간(4:6, 2:8)에서는 온도 상승이 다시 감소함.",
+    data:"혼합 비율(HCl:NaOH) → 최고 온도 → ΔT:\n10:0 → 22.0°C → 0.0°C\n8:2 → 23.5°C → 1.5°C\n6:4 → 25.7°C → 3.7°C\n5:5 → 28.8°C → 6.8°C ← 최대\n4:6 → 25.3°C → 3.3°C\n2:8 → 23.2°C → 1.2°C\n0:10 → 22.1°C → 0.1°C",
+    conclusion:"HCl과 NaOH의 혼합 비율이 5:5일 때 온도 상승이 가장 크게 나타나 가설이 지지되었습니다. 이는 중화 반응(H⁺ + OH⁻ → H₂O)이 완전히 일어날 때 방출되는 중화열이 최대가 되기 때문입니다. 통합과학의 산-염기 단원에서 학습한 중화 반응의 발열 특성을 정량적으로 확인하였습니다.",
+    errorAnalysis:"스티로폼 컵이 완전한 단열재가 아니어서 외부로 열 손실이 발생했습니다. 온도계 삽입 시 용액의 일부가 손실되어 정확한 부피 측정에 오차가 생겼습니다 (±0.3°C 이내).",
+    nextResearch:"동일한 실험을 다양한 농도(0.1, 0.5, 1.0 mol/L)의 산·염기로 반복하여 농도와 중화열의 관계를 정량적으로 분석하고 싶습니다."
+  },
+  30:{
+    motivation:"발열 도시락이 어떤 원리로 뜨거워지는지 궁금해졌습니다. 조사해보니 산화칼슘(CaO)과 물의 반응이 강한 발열 반응이라는 것을 알았습니다. 이 원리를 이용하면 전기나 불 없이도 음식을 조리할 수 있을 것이라 생각하여 최적의 조리 조건을 실험으로 설계하고 싶었습니다.",
+    hypothesis:"물과 산화칼슘의 혼합 비율이 최적일 때 발생 열량이 최대가 되어 음식을 가장 효과적으로 조리할 수 있을 것이다.",
+    indepVar:"물과 CaO의 혼합 질량비 (물 10 mL 기준: CaO 10g, 20g, 30g, 20g, 30g 등 변화)",
+    depVar:"반응 후 최고 온도(°C), 지속 가열 시간(분), 쌀 익힘 정도(육안 평가)",
+    ctrlVar:"물의 양 10 mL로 고정, CaO 순도(98% 이상) 동일, 외부 기온과 바람 차단 조건 동일",
+    materials:"산화칼슘(CaO) 분말, 증류수, 스티로폼 박스, 알루미늄 호일 용기, 온도계, 전자저울, 소량의 쌀(20 g), 장갑, 보안경, 기록지",
+    processes:[
+      "안전 장비(장갑, 보안경)를 착용하고 CaO의 부식성 위험을 공지한다.",
+      "알루미늄 용기에 쌀 20 g과 물 20 mL를 넣어 스티로폼 박스에 올린다.",
+      "CaO를 질량비에 따라 계량하여 별도 격실에 담아 스티로폼 박스 아래 배치한다.",
+      "물 10 mL를 CaO에 천천히 부어 반응을 시작하고 즉시 박스를 닫는다.",
+      "30초 간격으로 내부 온도를 측정하여 기록하고, 10분 후 쌀의 익힘 정도를 평가한다.",
+      "혼합 비율을 바꿔가며 실험을 반복하고 결과를 비교하여 최적 조건을 도출한다."
+    ],
+    observation:"CaO 양이 증가할수록 최고 온도가 상승하지만 일정 비율 이상에서 상승폭이 둔화됨.\n물:CaO = 1:3 비율에서 최고 온도 88°C 도달, 8분 만에 쌀이 절반 정도 익음.\n반응 초기 격렬한 수증기 발생과 함께 온도가 빠르게 상승하는 양상 관찰.",
+    data:"물:CaO 비율 → 최고 온도 → 가열 지속 시간 → 쌀 익힘:\n1:1 → 62°C → 4분 → 불량\n1:2 → 81°C → 7분 → 양호\n1:3 → 88°C → 9분 → 우수 ← 최적\n2:1 → 48°C → 3분 → 불량\n3:1 → 35°C → 2분 → 불량",
+    conclusion:"물:CaO = 1:3 비율에서 최고 온도와 가열 지속 시간이 가장 우수하여 음식 조리에 가장 적합했습니다. CaO + H₂O → Ca(OH)₂ + 열 반응에서 CaO 과량일 때 물이 완전히 소비되어 반응 효율이 높아집니다. 통합과학에서 학습한 발열 반응과 에너지 전환 원리가 실제 조리 기술에 응용됨을 확인했습니다.",
+    errorAnalysis:"스티로폼 박스의 밀봉 상태가 실험마다 달라 열 손실에 차이가 발생했습니다. CaO 분말의 덩어리 형성으로 물과 균일하게 반응하지 않아 온도 측정에 오차가 있었습니다.",
+    nextResearch:"발열팩의 단열 용기 소재(스티로폼 vs 진공 단열)에 따른 열 손실 비교, 또는 철 산화 반응과의 효율 비교 탐구를 진행하고 싶습니다."
+  },
+  31:{
+    motivation:"박물관에서 고려청자와 조선백자를 보면서 수백 년이 지나도 형태와 색이 유지되는 이유가 궁금했습니다. 교과서에서 도자기가 규산염 화합물로 이루어져 있다고 배웠지만, 제조 과정에서 어떤 화학 반응이 일어나는지, 유약의 성분이 어떤 역할을 하는지 더 깊이 알고 싶어 탐구를 계획했습니다.",
+    hypothesis:"우리 도자기의 과학적 우수함은 고온(1300°C 이상) 소성 기술과 독자적인 유약 조성에 있으며, 흡수율·내구성 측면에서 현대 국제 자기 기준을 충족할 것이다.",
+    indepVar:"도자기의 종류 (고려청자, 조선백자, 현대 도자기) 및 소성 온도",
+    depVar:"흡수율(%), 경도(모스 경도), 광택도 및 색상 균일도",
+    ctrlVar:"동일한 측정 방법(흡수율은 KS 기준 적용), 동일 크기 샘플 사용",
+    materials:"도자기 샘플(복원품·시판 제품), 물, 전자저울, 확대경, 경도 테스트 세트, 도자기 역사·유약 성분 분석 자료(문헌)",
+    processes:[
+      "고려청자·조선백자·현대 도자기의 제조 역사와 기술적 특징을 문헌으로 조사한다.",
+      "각 도자기 샘플의 흡수율을 측정한다(건조 질량 대비 흡수 후 질량 비교).",
+      "경도 테스트로 표면 강도를 비교한다(모스 경도 기준).",
+      "유약의 화학 성분(SiO₂, Al₂O₃, Fe₂O₃ 비율)을 문헌 자료로 비교·분석한다.",
+      "소성 온도와 도자기 물성(흡수율, 경도)의 상관관계를 분석한다.",
+      "탐구 결과를 바탕으로 우리 도자기의 과학적 우수성을 홍보 문구로 정리한다."
+    ],
+    observation:"고려청자: 흡수율 0.08%로 거의 완전한 치밀 소결 달성. 산화철 비율에 따른 비색(翡色)이 현대 기술로도 완전 재현 어려움.\n조선백자: 고령토 99% 이상 순도의 원료 선별 기술이 당대 세계 최고 수준.\n고온 환원 소성 기술이 당시 유럽보다 200~300년 앞선 수준으로 평가.",
+    data:"도자기 종류별 흡수율:\n- 고려청자 (복원품): 0.08%\n- 조선백자 (복원품): 0.12%\n- 현대 도자기 (고품질): 0.05%\n- 현대 도자기 (일반): 0.30%\n※ 흡수율 0.1% 이하 = 국제 자기 기준 충족",
+    conclusion:"고려청자와 조선백자는 현대 국제 자기 기준(흡수율 0.1% 이하)을 충족하는 높은 기술적 완성도를 보여 가설이 지지되었습니다. 비색 청자의 색상 발현은 Fe₂O₃의 환원 분위기 소성에 의한 것으로, 통합과학의 산화-환원 반응이 예술·기술에 응용된 대표적 사례입니다.",
+    errorAnalysis:"문화재를 직접 실험할 수 없어 복원품을 사용했으므로 실제 역사적 유물과 차이가 있을 수 있습니다. 측정 샘플 수가 적어 통계적 신뢰도에 한계가 있습니다.",
+    nextResearch:"우리나라 도자기의 유약 성분과 현대 특수 세라믹(반도체 기판, 생체 이식 재료)의 성분을 비교하여 전통 기술이 첨단 소재 산업에 주는 시사점을 탐구하고 싶습니다."
+  },
+  32:{
+    motivation:"산호초가 탈색되어 죽어가고 있다는 뉴스를 보았습니다. 교과서에서 대기 중 CO₂ 농도 증가가 해양 산성화를 유발한다고 배웠는데, 실제로 pH가 얼마나 변하며 이것이 해양 생물에게 어떤 영향을 미치는지, 그리고 이를 막기 위한 방법은 무엇인지 탐구하고 싶었습니다.",
+    hypothesis:"CO₂ 용해량이 증가할수록 해수의 pH는 낮아지고, 이로 인해 탄산칼슘(CaCO₃)으로 이루어진 조개껍데기나 산호가 용해되는 현상이 심화될 것이다.",
+    indepVar:"물에 용해된 CO₂의 양 (탄산수 첨가 비율: 0%, 10%, 30%, 50%, 100%)",
+    depVar:"pH 변화, 달걀껍데기(CaCO₃ 모형) 질량 감소량(g)",
+    ctrlVar:"물의 초기 온도(25°C), 달걀껍데기 초기 질량(5 g), 침지 시간(24시간) 동일",
+    materials:"탄산수(CO₂ 포화 용액), 증류수, pH 미터, 달걀껍데기 시편, 전자저울, 비커(250 mL) 5개, 온도계, 보호 장갑",
+    processes:[
+      "달걀껍데기를 동일한 크기(약 2×2 cm)로 5개 준비하고 건조 질량을 측정한다.",
+      "증류수와 탄산수를 비율별로 혼합하여 5가지 농도의 시험 용액을 만든다.",
+      "각 시험 용액의 pH를 pH 미터로 측정하고 기록한다.",
+      "각 비커에 달걀껍데기를 1개씩 넣고 24시간 동안 침지한다.",
+      "24시간 후 달걀껍데기를 꺼내 건조시킨 후 질량을 측정하여 질량 감소량을 계산한다.",
+      "CO₂ 농도-pH-질량 감소량의 관계를 그래프로 나타내고 해양 산성화와 연결하여 해석한다."
+    ],
+    observation:"탄산수 비율이 높아질수록 pH가 뚜렷하게 낮아짐.\n탄산수 100%: pH 3.8, 달걀껍데기 표면에 기포 발생하며 표면이 거칠어짐.\n탄산수 농도가 높을수록 달걀껍데기의 질량 감소가 크고 표면이 용해된 것이 육안으로 확인됨.",
+    data:"탄산수 비율 → pH → 달걀껍데기 질량 감소(g):\n0% → 7.0 → 0.01 g\n10% → 6.2 → 0.08 g\n30% → 5.5 → 0.19 g\n50% → 4.8 → 0.31 g\n100% → 3.8 → 0.52 g",
+    conclusion:"CO₂ 용해량이 증가할수록 pH가 낮아지고 CaCO₃ 용해량이 증가하여 가설이 지지되었습니다. CO₂ + H₂O → H₂CO₃ → H⁺ + HCO₃⁻ 반응으로 산성화가 진행되며, CaCO₃ + 2H⁺ → Ca²⁺ + H₂O + CO₂ 반응으로 패각류와 산호가 손상됩니다. 통합과학의 산-염기 개념이 해양 환경 문제와 직결됨을 확인했습니다.",
+    errorAnalysis:"탄산수의 CO₂ 농도가 개봉 시간에 따라 변화하여 정확한 농도 통제가 어려웠습니다. 달걀껍데기가 실제 해양 생물 껍데기와 조성이 다를 수 있어 결과 해석에 한계가 있습니다.",
+    nextResearch:"실제 해수 샘플을 채취하여 현재 pH를 측정하고, 2100년 예측 pH(약 7.8) 조건에서 산호 조각의 변화를 관찰하는 장기 탐구로 발전시키고 싶습니다."
+  },
+  33:{
+    motivation:"교과서에서 개체군의 성장 곡선(S자형, J자형)에 대해 배웠지만, 실제로 개체 수가 어떤 요인에 의해 조절되는지 이해하기 어려웠습니다. 포식자-피식자 관계가 개체군 크기에 어떤 영향을 미치는지 모의실험을 통해 직접 체험해보고 싶었습니다.",
+    hypothesis:"포식자와 피식자가 공존하는 시스템에서 피식자가 증가하면 포식자 수도 시간차를 두고 증가하고, 이후 피식자가 감소하면 포식자도 감소하는 주기적 진동 패턴이 나타날 것이다.",
+    indepVar:"세대(시간 단계)의 진행 / 포식자-피식자 초기 비율",
+    depVar:"세대별 포식자 및 피식자 개체 수",
+    ctrlVar:"번식률과 사망률 공식(Lotka-Volterra 모델) 동일 적용, 초기값 동일",
+    materials:"주사위 2개, 색깔이 다른 바둑돌(흰색=피식자 50개, 검정=포식자 10개), 기록지, 모눈종이, 시뮬레이션 규칙 카드",
+    processes:[
+      "피식자(흰색 바둑돌) 50개, 포식자(검정 바둑돌) 10개로 초기 개체군을 설정한다.",
+      "매 세대: 피식자는 자연 번식으로 20% 증가한다(주사위 굴림으로 결정).",
+      "포식자는 피식자 10마리당 1마리를 포식하여 포식자 1마리를 번식시킨다.",
+      "포식된 피식자와 먹이를 못 구한 포식자(사망률 적용)를 제거한다.",
+      "세대별 각 개체군 수를 기록하고 20세대까지 반복한다.",
+      "결과를 그래프로 나타내고 포식자-피식자 수의 관계를 분석한다."
+    ],
+    observation:"초기 피식자 증가 → 포식자 증가 → 피식자 감소 → 포식자 감소 → 피식자 회복 패턴 반복.\n두 개체군의 주기적 진동 패턴이 약 4~6세대 주기로 나타남.\n포식자 수는 피식자 수보다 약 2세대 뒤처져서 변화하는 시간 지연(time lag) 관찰.",
+    data:"세대별 개체 수(주요 세대):\n1세대: 피식자 50, 포식자 10\n3세대: 피식자 72, 포식자 15\n5세대: 피식자 48, 포식자 22\n7세대: 피식자 31, 포식자 14\n10세대: 피식자 58, 포식자 11\n15세대: 피식자 65, 포식자 18",
+    conclusion:"포식자-피식자 개체군이 주기적인 진동 패턴을 보이며, 포식자 수 변화가 피식자 수 변화보다 시간적으로 지연되는 것을 확인하여 가설이 지지되었습니다. 이는 Lotka-Volterra 모델의 예측과 일치하며, 통합과학의 생태계 평형과 개체군 상호 작용 단원을 실험적으로 검증했습니다.",
+    errorAnalysis:"주사위를 이용한 무작위 과정이 실제 생태계의 복잡한 확률 과정을 완전히 모사하지 못합니다. 이주, 기생, 경쟁 등 다른 생태적 요인이 배제되어 진동 주기가 실제보다 규칙적으로 나타난 한계가 있습니다.",
+    nextResearch:"Python의 scipy 라이브러리를 활용하여 Lotka-Volterra 방정식을 수치 해석하고, 매개변수 변화에 따른 개체군 동태를 탐구하고 싶습니다."
+  },
+  34:{
+    motivation:"여름마다 폭염이 심해지고 있다는 뉴스를 자주 접합니다. 교과서에서 지구 온난화로 인해 지구의 열수지가 변한다고 배웠는데, 실제로 흡수되는 열과 방출되는 열의 균형이 어떻게 무너지는지를 데이터로 직접 탐구하고 싶었습니다.",
+    hypothesis:"대기 중 CO₂ 농도 증가는 지구 복사 에너지의 방출을 감소시키므로, CO₂ 농도가 높아질수록 지구 표면 온도 상승량이 더 크게 나타날 것이다.",
+    indepVar:"대기 중 CO₂ 농도 (산업화 이전 280 ppm → 현재 420 ppm까지의 변화)",
+    depVar:"지구 평균 기온 상승량(°C), 해수면 상승량(mm)",
+    ctrlVar:"태양 복사 에너지 입력량 동일 기준, 지구 반사율(알베도) 변화 배제하여 분석",
+    materials:"NOAA·NASA 기후 데이터셋, CO₂ 농도 추이 그래프(마우나로아 관측소), 지구 평균 기온 변화 자료, 해수면 상승 자료, 엑셀 또는 데이터 분석 소프트웨어",
+    processes:[
+      "NOAA에서 1958년 이후 대기 CO₂ 농도 데이터를 내려받는다.",
+      "NASA GISS에서 동일 기간 지구 평균 기온 편차 데이터를 확보한다.",
+      "CO₂ 농도와 지구 평균 기온 변화를 같은 축에 시계열 그래프로 나타낸다.",
+      "CO₂ 농도와 기온 편차 사이의 상관계수를 계산한다.",
+      "온실 효과 원리(Stefan-Boltzmann 법칙 적용)로 이론적 온도 상승값과 비교한다.",
+      "탐구 결과를 바탕으로 열수지 변동이 미래에 미칠 영향을 예측한다."
+    ],
+    observation:"1958년 CO₂ 315 ppm → 2024년 424 ppm으로 약 35% 증가.\n같은 기간 지구 평균 기온은 약 +1.1°C 상승.\nCO₂ 농도와 기온 편차 사이에 강한 양의 상관관계 확인 (r ≈ 0.97).\n해수면은 1900년 이후 약 20 cm 상승.",
+    data:"연도별 CO₂ 농도와 기온 편차(일부):\n1960: 317 ppm / +0.01°C\n1980: 338 ppm / +0.27°C\n2000: 370 ppm / +0.42°C\n2010: 390 ppm / +0.72°C\n2023: 421 ppm / +1.17°C",
+    conclusion:"CO₂ 농도 증가와 지구 기온 상승 사이에 강한 양의 상관관계(r ≈ 0.97)가 확인되어 가설이 지지되었습니다. 이는 CO₂가 적외선을 흡수·방출하여 대기 중 에너지를 보존하는 온실 효과 원리로 설명됩니다. 지구 열수지 불균형이 심화될수록 기온·해수면 상승이 가속됨을 확인했습니다.",
+    errorAnalysis:"CO₂ 농도와 기온 사이의 상관관계가 반드시 인과관계를 의미하지는 않습니다. 화산 활동, 태양 활동 변화, 엘니뇨 등 다른 요인을 완전히 배제하지 못해 해석에 한계가 있습니다.",
+    nextResearch:"IPCC 시나리오별(SSP1-2.6, SSP5-8.5) 미래 기온 예측값을 비교하고, 우리나라 특정 지역의 기후 취약성을 분석하는 탐구로 발전시키고 싶습니다."
+  },
+  35:{
+    motivation:"교과서에서 기후 변화의 현상과 원인을 배웠지만, 실제로 기후 변화가 우리의 미래 생활에 어떤 모습으로 나타날지 구체적으로 상상하기 어려웠습니다. 과학적 데이터를 바탕으로 미래 시나리오를 직접 구상함으로써 기후 변화의 심각성을 실감하고 대응 방안을 탐구하고 싶었습니다.",
+    hypothesis:"현재의 온실가스 배출 추세가 지속된다면, 2100년에는 한반도의 기온이 최대 +4°C 이상 상승하고 이로 인해 농업·보건·생태계에 복합적인 위기가 발생할 것이다.",
+    indepVar:"온실가스 감축 시나리오 (고배출 SSP5-8.5 vs 저배출 SSP1-2.6)",
+    depVar:"2100년 예측 기온 상승폭(°C), 해수면 상승(m), 폭염 일수(일/년)",
+    ctrlVar:"IPCC 6차 보고서의 동일한 기후 모델(CMIP6) 기반으로 비교",
+    materials:"IPCC 6차 보고서 요약본, 기상청 한반도 기후변화 시나리오 자료, 미래 시나리오 설계 템플릿, 세계 지도, 창작 활동 도구(스케치북 또는 컴퓨터)",
+    processes:[
+      "IPCC 6차 보고서에서 SSP 시나리오별 2100년 기온·해수면 상승 예측값을 조사한다.",
+      "한반도에 적용했을 때 예상되는 변화(농업 지대 이동, 해안 침수 지역 등)를 분석한다.",
+      "고배출 시나리오(SSP5-8.5) 기준 2050년, 2100년 생활 모습을 구체적으로 기술한다.",
+      "저배출 시나리오(SSP1-2.6) 기준 같은 시점의 생활 모습과 비교한다.",
+      "두 시나리오의 차이를 식량·보건·생태계·경제 측면에서 표로 정리한다.",
+      "기후 위기 대응을 위한 개인·국가·국제 차원의 실천 방안을 제안한다."
+    ],
+    observation:"SSP5-8.5 시나리오: 한반도 평균 기온 +4.5°C, 여름 폭염 일수 연 46일 이상, 동해안 일부 침수 예상.\nSSP1-2.6 시나리오: 한반도 평균 기온 +1.5°C 이내, 폭염 일수 연 12일, 침수 피해 최소화.\n한반도 사과 주산지가 강원 고지대로 이동, 열대 과일 재배 가능 지역 확대 예측.",
+    data:"2100년 예측 비교(한반도 기준):\n구분 | 고배출(SSP5-8.5) | 저배출(SSP1-2.6)\n기온 상승 | +4.5°C | +1.5°C\n해수면 상승 | +0.86 m | +0.32 m\n폭염 일수 | 46일/년 | 12일/년\n홍수 빈도 | 현재의 3배 | 현재의 1.3배",
+    conclusion:"현재 추세의 온실가스 배출이 지속된다면 2100년 한반도의 환경 변화는 매우 심각할 것으로 예측되어 가설이 지지되었습니다. 반면 적극적인 감축 시나리오(SSP1-2.6)를 따르면 피해를 크게 줄일 수 있음을 확인했습니다. 통합과학에서 학습한 기후 시스템의 피드백 원리가 시나리오 예측의 근거가 됩니다.",
+    errorAnalysis:"기후 모델은 수많은 가정과 단순화를 포함하므로 실제 미래와 차이가 있을 수 있습니다. 사회·경제적 변수(기술 발전, 정책 변화)가 배제된 과학적 시나리오의 한계가 있습니다.",
+    nextResearch:"우리 지역(시·군 단위)의 기후 취약성 지수를 산출하고, 실제 적응 계획을 지자체 정책에 반영하는 방안을 탐구하고 싶습니다."
+  },
+  36:{
+    motivation:"학교에서 탄소 중립을 실천하자는 캠페인을 자주 보았지만, 실제로 우리의 일상적인 행동이 탄소 배출에 얼마나 영향을 주는지 구체적으로 알지 못했습니다. 내 하루 생활에서 발생하는 탄소 발자국을 직접 계산해보고, 줄일 수 있는 방법을 탐구하고 싶었습니다.",
+    hypothesis:"일상생활에서 이동 수단, 식생활, 전기 사용 등을 친환경적으로 바꾸면 개인의 탄소 발자국을 현재 대비 30% 이상 줄일 수 있을 것이다.",
+    indepVar:"생활 습관의 종류 (이동 수단, 식생활, 전기 사용, 소비 습관)",
+    depVar:"하루 탄소 발자국(kg CO₂e), 실천 전후 탄소 배출량 변화율(%)",
+    ctrlVar:"동일한 탄소 발자국 계산 기준(환경부 온실가스 계산기), 동일 기간(1주일) 측정",
+    materials:"환경부 탄소 발자국 계산기, 교통수단별 CO₂ 배출계수 자료, 식품별 탄소 배출 자료, 가정 전기 사용량 고지서, 기록 일지",
+    processes:[
+      "1주일간 하루 이동 수단(자동차, 대중교통, 도보), 식사 내용, 전기 사용량을 기록한다.",
+      "환경부 탄소 발자국 계산기를 사용하여 항목별 탄소 배출량을 계산한다.",
+      "가장 탄소 배출이 많은 상위 3개 행동을 파악한다.",
+      "친환경 대안(대중교통 이용, 채식 식단 1회 추가, 전자기기 절전 설정)으로 바꿔 1주일 실천한다.",
+      "실천 후 탄소 발자국을 다시 계산하여 감소율을 비교한다.",
+      "결과를 바탕으로 가장 효과적인 탄소 저감 행동을 선정하고 공유한다."
+    ],
+    observation:"실천 전 평균 하루 탄소 발자국: 약 8.2 kg CO₂e.\n이동 수단이 전체의 약 45%(자동차 사용)로 가장 큰 비중을 차지함.\n대중교통으로 전환 후 이동 관련 배출량 62% 감소.\n채식 식단 1회 추가 시 식생활 배출량 약 15% 감소.",
+    data:"항목별 일평균 탄소 배출량(실천 전/후):\n이동: 3.7 / 1.4 kg CO₂e (-62%)\n식생활: 2.1 / 1.8 kg CO₂e (-14%)\n전기: 1.6 / 1.2 kg CO₂e (-25%)\n소비: 0.8 / 0.7 kg CO₂e (-13%)\n합계: 8.2 / 5.1 kg CO₂e (전체 -38%)",
+    conclusion:"이동 수단 변경, 식생활 개선, 전기 절약을 통해 하루 탄소 발자국을 8.2 → 5.1 kg CO₂e로 약 38% 줄여 가설이 지지되었습니다. 이동 수단이 가장 큰 감축 효과를 나타냈으며, 이는 통합과학에서 학습한 화석연료 연소와 탄소 순환의 원리로 설명됩니다.",
+    errorAnalysis:"탄소 발자국 계산기가 사용하는 배출계수가 평균값이므로 개인별 실제 배출량과 차이가 있을 수 있습니다. 1주일이라는 짧은 기간으로 계절적 변동이나 특수 상황을 반영하지 못했습니다.",
+    nextResearch:"학교 전체 학생의 탄소 발자국을 합산하여 우리 학교의 총 탄소 배출량을 추정하고, 학교 차원의 탄소 중립 계획을 수립하는 탐구로 발전시키고 싶습니다."
+  },
+  37:{
+    motivation:"교과서에서 전자기 유도 현상이 발전기와 변압기의 원리라고 배웠습니다. 자석과 코일의 운동이 어떻게 전기를 만들어내는지, 실제로 자석의 속도나 코일의 감은 수가 달라지면 유도 기전력이 어떻게 변하는지 직접 실험으로 확인하고 싶었습니다.",
+    hypothesis:"코일의 감은 수가 많을수록, 그리고 자석을 빠르게 움직일수록 전자기 유도에 의한 유도 기전력(유도 전압)이 크게 나타날 것이다.",
+    indepVar:"코일의 감은 수(100회, 200회, 300회) 및 자석 이동 속도(느리게/빠르게)",
+    depVar:"유도 기전력(mV), 전류 방향(검류계 바늘 방향)",
+    ctrlVar:"자석의 종류(네오디뮴 자석, 동일 세기)와 크기 동일, 코일 단면적 동일",
+    materials:"네오디뮴 자석, 에나멜 코일(100회·200회·300회), 검류계(mV 단위), 도선, 스탠드, 타이머, 기록지",
+    processes:[
+      "100회 감은 코일을 검류계에 연결하고 자석을 천천히 코일 내부로 삽입한다.",
+      "검류계 바늘의 방향과 최대 편향값(mV)을 기록한다.",
+      "자석을 빠르게 삽입하여 1번과 비교한다.",
+      "자석을 코일에서 빼낼 때의 검류계 반응을 관찰하고 기록한다.",
+      "코일을 200회, 300회로 바꿔가며 1~4 과정을 반복한다.",
+      "감은 수와 속도에 따른 유도 기전력 변화를 표와 그래프로 나타낸다."
+    ],
+    observation:"자석을 삽입할 때와 뺄 때 검류계 바늘이 반대 방향으로 편향됨 (렌츠의 법칙 확인).\n자석을 빠르게 움직일수록 검류계 바늘의 편향이 더 크게 나타남.\n코일의 감은 수가 많을수록 동일 속도에서도 더 큰 유도 기전력이 관측됨.",
+    data:"코일 감은 수 / 속도 → 유도 기전력(mV):\n100회 / 느리게 → 12 mV\n100회 / 빠르게 → 31 mV\n200회 / 느리게 → 24 mV\n200회 / 빠르게 → 63 mV\n300회 / 느리게 → 36 mV\n300회 / 빠르게 → 94 mV",
+    conclusion:"코일 감은 수와 자석 이동 속도 모두 유도 기전력에 비례하는 영향을 미쳐 가설이 지지되었습니다. 이는 패러데이 전자기 유도 법칙(ε = -N × ΔΦ/Δt)에서 N(감은 수)과 ΔΦ/Δt(자속 변화율)가 클수록 유도 기전력이 커지는 원리와 일치합니다.",
+    errorAnalysis:"자석을 일정한 속도로 움직이기 어려워 '빠르게/느리게'가 정량적이지 않았습니다. 코일의 저항이 감은 수에 따라 달라져 검류계 측정값에 영향을 주었을 수 있습니다.",
+    nextResearch:"코일 안에 철심을 넣었을 때와 넣지 않았을 때의 유도 기전력을 비교하고, 변압기 원리를 정량적으로 검증하는 탐구를 진행하고 싶습니다."
+  },
+  38:{
+    motivation:"학교 건물에서 낭비되는 전기 에너지를 보면서, 학교 자체적으로 재생에너지를 생산한다면 얼마나 많은 탄소를 줄일 수 있을지 궁금했습니다. 교과서에서 신재생 에너지의 종류와 특성을 배운 후, 우리 학교에 실제로 적용 가능한 자가발전 시스템을 설계해보고 싶었습니다.",
+    hypothesis:"학교 건물의 태양광 발전 가능 면적과 일사량 데이터를 분석하면, 태양광 패널 설치만으로 학교 전기 사용량의 20~30%를 자가 충당할 수 있을 것이다.",
+    indepVar:"신재생 에너지 설비의 종류 (태양광, 소형 풍력, 지열, 연료전지) 및 설치 용량",
+    depVar:"연간 발전 예상량(kWh), 탄소 감축량(톤 CO₂/년), 설치 비용 대비 회수 기간(년)",
+    ctrlVar:"우리 학교의 실제 연간 전기 사용량 및 건물 면적 기준으로 분석",
+    materials:"학교 전기 사용량 고지서(1년치), 우리 지역 평균 일사량 자료(기상청), 태양광 패널 효율 데이터, 에너지 계산 소프트웨어 또는 엑셀, 학교 도면",
+    processes:[
+      "우리 학교의 최근 1년 전기 사용량(kWh)을 월별로 조사한다.",
+      "학교 옥상·남향 외벽의 태양광 패널 설치 가능 면적(m²)을 측정한다.",
+      "우리 지역의 연평균 일사량(kWh/m²/일) 데이터를 기상청에서 확인한다.",
+      "태양광 발전 예상량 = 면적 × 패널 효율 × 일사량으로 계산한다.",
+      "풍력·지열 등 추가 에너지원의 가능성을 검토하고 복합 설계안을 작성한다.",
+      "설치 비용, 연간 절감액, 탄소 감축량을 계산하여 경제성 분석을 제시한다."
+    ],
+    observation:"우리 학교 옥상 태양광 설치 가능 면적: 약 350 m².\n연평균 일사량(서울 기준): 3.5 kWh/m²/일.\n태양광 패널 효율: 20% 적용 시 연간 발전량 ≈ 89,425 kWh.\n학교 연간 전기 사용량: 약 320,000 kWh → 자가 충당률 약 28%.",
+    data:"설비별 예상 발전량 및 비용:\n태양광(350 m²): 89,425 kWh/년 / 설치비 7,000만원 / 회수기간 12년\n소형 풍력(3기): 8,000 kWh/년 / 설치비 1,500만원 / 회수기간 15년\n복합 설계 합계: 97,425 kWh/년 → 자가 충당률 30.4%\n연간 탄소 감축량: 약 43.8톤 CO₂",
+    conclusion:"태양광 패널 설치만으로 학교 전기 사용량의 약 28%를 자가 충당할 수 있어 가설이 지지되었습니다. 소형 풍력을 추가하면 약 30.4%까지 높아집니다. 통합과학에서 학습한 태양 에너지 전환 원리와 에너지 효율 개념이 실제 설계에 적용됨을 확인했습니다.",
+    errorAnalysis:"실제 태양광 발전량은 날씨·계절·패널 오염도에 따라 이론값과 차이가 있습니다. 학교 건물의 그늘 영역과 구조물로 인한 설치 불가 면적이 추가로 존재할 수 있어 실제 가능 면적은 더 작을 수 있습니다.",
+    nextResearch:"에너지 저장 시스템(ESS)을 추가 설계하여 잉여 전력 저장 방안을 분석하고, 실제 그린 스쿨 인증을 위한 종합 에너지 계획서를 작성해보고 싶습니다."
+  },
+  39:{
+    motivation:"'지속가능한 발전'이라는 개념을 교과서에서 배웠지만, 경제 성장과 환경 보전이 동시에 가능한지 실제로 이해하기 어려웠습니다. 사람들이 지속가능성 개념을 쉽게 이해하고 행동으로 이어질 수 있도록 효과적인 홍보 문구를 탐구하고 싶었습니다.",
+    hypothesis:"과학적 데이터와 감성적 메시지를 결합한 홍보 문구는 단순 통계나 경고 문구보다 사람들의 태도 변화에 더 효과적일 것이다.",
+    indepVar:"홍보 문구의 유형 (통계 중심형, 감성 호소형, 행동 촉구형, 과학+감성 결합형)",
+    depVar:"대상자(학생 20명)의 태도 변화 점수(5점 척도 설문), 공유 의향(%)",
+    ctrlVar:"동일 대상 집단, 동일 설문 문항, 동일 제시 시간(30초 노출)",
+    materials:"홍보 문구 4종 설계 자료, 설문지(태도 변화·공유 의향 측정), 포스터 또는 카드뉴스 제작 도구, 통계 분석 소프트웨어",
+    processes:[
+      "지속가능한 발전의 개념과 UN SDGs(지속가능발전목표) 17개 항목을 조사한다.",
+      "홍보 문구 4유형 각 3개씩(총 12개)을 제작한다.",
+      "학생 20명에게 각 유형의 홍보 문구를 제시하고 태도 변화와 공유 의향을 5점 척도로 설문한다.",
+      "유형별 평균 점수를 비교하고 가장 효과적인 문구 유형을 선정한다.",
+      "최고 효과 문구를 바탕으로 학교 캠페인용 포스터를 제작한다.",
+      "포스터를 학교에 게시하고 2주 후 행동 변화 여부를 추적 설문한다."
+    ],
+    observation:"단순 통계 문구('매년 800만 톤의 플라스틱이 바다로 유입됩니다')는 충격적이지만 공유 의향이 낮음.\n감성 호소형 문구('우리 아이들이 살아갈 바다를 지켜주세요')는 감정 이입 효과가 높음.\n과학+감성 결합형이 두 효과를 모두 유발하여 공유 의향과 태도 변화 모두 최고점 기록.",
+    data:"유형별 평균 점수(5점 만점):\n통계 중심형: 태도 변화 2.8 / 공유 의향 2.3\n감성 호소형: 태도 변화 3.6 / 공유 의향 3.8\n행동 촉구형: 태도 변화 3.1 / 공유 의향 3.2\n과학+감성 결합형: 태도 변화 4.2 / 공유 의향 4.1",
+    conclusion:"과학적 데이터와 감성 메시지를 결합한 홍보 문구가 태도 변화와 공유 의향 모두에서 가장 높은 점수를 얻어 가설이 지지되었습니다. 환경 문제의 과학적 사실을 인간의 감정과 연결하면 행동 변화를 이끌어내는 데 더 효과적임을 확인했습니다.",
+    errorAnalysis:"설문 대상이 20명으로 소수여서 통계적 신뢰도가 제한적입니다. 설문 당시 분위기나 응답자의 심리 상태가 결과에 영향을 줄 수 있는 사회 바람직성 편향이 존재합니다.",
+    nextResearch:"소셜 미디어 플랫폼별 홍보 문구의 효과 차이를 분석하거나, 연령대별 효과적인 메시지 유형을 비교하는 탐구로 발전시키고 싶습니다."
+  },
+  40:{
+    motivation:"우리나라의 에너지 수입 의존도가 매우 높다는 뉴스를 보면서, 30년 후 우리나라의 에너지 공급이 어떻게 변화할지 궁금했습니다. 교과서에서 배운 다양한 에너지원의 특성과 현재 기술 동향을 바탕으로 미래 에너지 구조를 과학적으로 예측해보고 싶었습니다.",
+    hypothesis:"30년 후(2056년) 우리나라의 주요 에너지원은 화석연료에서 태양광·풍력·수소 에너지로 전환될 것이며, 재생에너지 비중이 전체의 50% 이상을 차지할 것이다.",
+    indepVar:"에너지원의 종류 (석탄, 천연가스, 원자력, 태양광, 풍력, 수소)",
+    depVar:"2056년 예측 발전 비중(%), 비용(원/kWh), 탄소 배출량(g CO₂/kWh)",
+    ctrlVar:"정부 에너지 기본 계획과 국제 에너지 기구(IEA) 전망 자료 동일 적용",
+    materials:"산업통상자원부 에너지 기본 계획, IEA World Energy Outlook, IRENA 재생에너지 비용 자료, 에너지 전환 사례 국가 자료(독일, 덴마크)",
+    processes:[
+      "현재 우리나라 에너지원별 발전 비중을 산업통상자원부 자료로 확인한다.",
+      "IEA와 정부의 2030·2050 에너지 목표치를 조사한다.",
+      "재생에너지 기술 비용 하락 추세(IRENA 자료)를 분석하여 2056년 예측값을 산출한다.",
+      "독일·덴마크의 에너지 전환 사례에서 성공 요인과 시사점을 분석한다.",
+      "에너지원별 2056년 예측 발전 비중·비용·탄소 배출량을 표로 정리한다.",
+      "탐구 결과를 바탕으로 우리나라에 가장 적합한 미래 에너지 포트폴리오를 제안한다."
+    ],
+    observation:"태양광 발전 비용: 2010년 381원/kWh → 2023년 68원/kWh (82% 하락), 2050년 약 30원/kWh 예측.\n풍력도 유사한 비용 하락 추세. 수소 경제 활성화로 그린수소 비용 2030년 이후 급격히 하락 예측.\n독일: 2023년 재생에너지 발전 비중 59% 달성 사례로 실현 가능성 확인.",
+    data:"에너지원별 2056년 예측 발전 비중:\n태양광: 28%\n풍력: 18%\n수소(연료전지): 12%\n원자력: 15%\n천연가스: 14%\n기타 재생에너지: 8%\n석탄: 5%\n→ 재생에너지 합계: 66% (탄소중립 목표 달성 가능)",
+    conclusion:"30년 후 우리나라의 재생에너지 비중이 50%를 넘어 66% 수준에 달할 것으로 예측되어 가설이 지지되었습니다. 기술 비용 하락과 정책 목표가 맞물려 에너지 전환이 가속화될 것으로 분석됩니다. 통합과학에서 학습한 에너지 전환과 효율의 원리가 미래 에너지 설계의 핵심 기준임을 확인했습니다.",
+    errorAnalysis:"에너지 전환 속도는 정치·경제·기술 변수에 크게 의존하므로 예측의 불확실성이 높습니다. IEA 자료는 선진국 중심이므로 우리나라의 특수한 에너지 여건(수입 의존, 반도체 산업 전력 수요 등)을 완전히 반영하지 못할 수 있습니다.",
+    nextResearch:"에너지 전환에 따른 전력 저장 기술(배터리, 수소 저장) 발전 방향과 우리나라 지역별 재생에너지 잠재량을 분석하는 탐구로 발전시키고 싶습니다."
+  },
+  41:{
+    motivation:"COVID-19 팬데믹 때 PCR 검사가 왜 그렇게 정확한지, 그리고 신속항원검사는 어떤 원리인지 궁금했습니다. 교과서에서 단백질과 핵산의 특성을 배웠는데, 이것이 실제 감염병 진단 기술에 어떻게 활용되는지 직접 체험하고 싶었습니다.",
+    hypothesis:"단백질의 항원-항체 반응과 핵산의 염기 상보성 원리를 이용한 진단 기술(면역크로마토그래피, PCR)은 특이도와 민감도가 높아 감염병을 빠르고 정확하게 진단할 수 있을 것이다.",
+    indepVar:"진단 기술의 종류 (신속항원검사, PCR, ELISA)",
+    depVar:"검사 소요 시간(분), 민감도(%), 특이도(%), 비용(원/건)",
+    ctrlVar:"동일한 감염병(코로나19)에 대한 검사 성능 비교, 동일한 기준 문헌 적용",
+    materials:"신속항원검사 키트(모형 또는 실제), 식용색소 용액(항원 모의 재현), 모세관 현상 관찰용 종이 띠, 현미경, PCR 원리 시뮬레이션 자료, 비교 분석 기록지",
+    processes:[
+      "PCR, 신속항원검사, ELISA의 원리를 각각 조사하여 정리한다.",
+      "신속항원검사의 면역크로마토그래피 원리를 종이 띠와 색소 용액으로 모의 시연한다.",
+      "PCR의 변성-어닐링-연장 3단계를 시뮬레이션 자료로 단계별 설명한다.",
+      "세 가지 진단법의 민감도·특이도·소요 시간·비용을 비교하는 표를 작성한다.",
+      "감염병 상황별(초기 감염, 대규모 스크리닝, 확진 판정) 최적 진단법을 선정한다.",
+      "미래 진단 기술(CRISPR 진단, 바이오센서) 동향을 조사하여 발표 자료를 제작한다."
+    ],
+    observation:"신속항원검사: 모세관 현상으로 항원이 이동하여 항체 결합 시 색선 발현을 육안으로 확인.\nPCR: 특정 유전자 서열을 수백만 배 증폭하여 극미량의 바이러스도 검출 가능.\n신속항원검사는 결과가 15분 이내로 빠르지만 초기 감염 단계에서 위음성 발생 가능.",
+    data:"진단 기술 비교:\n구분 | 신속항원검사 | PCR | ELISA\n소요시간 | 15분 | 4~6시간 | 2~4시간\n민감도 | 70~85% | 95~99% | 85~95%\n특이도 | 95~99% | 99% 이상 | 95~98%\n비용 | 약 5천원 | 약 8만원 | 약 3만원",
+    conclusion:"PCR이 민감도와 특이도 모두 가장 높아 확진 판정에 가장 적합하고, 신속항원검사는 빠른 스크리닝에 유리함을 확인하여 가설이 지지되었습니다. 단백질의 항원-항체 특이적 결합과 핵산의 염기 상보성이 각각의 진단 원리 핵심임을 통합과학 개념과 연결하여 이해했습니다.",
+    errorAnalysis:"신속항원검사 모의 시연에 식용색소를 사용하여 실제 항원-항체 반응과 완전히 동일하지 않습니다. 문헌 데이터의 민감도·특이도 범위가 연구마다 달라 단일 값으로 정리하는 데 한계가 있습니다.",
+    nextResearch:"CRISPR-Cas9을 이용한 차세대 진단 기술(SHERLOCK, DETECTR)의 원리를 분석하고, 현재 진단법과 성능을 비교하는 탐구를 진행하고 싶습니다."
+  },
+  42:{
+    motivation:"스마트폰 앱으로 심박수나 소음을 측정할 수 있다는 것을 알고, 디지털 도구가 과학 탐구에 어떻게 활용될 수 있는지 궁금했습니다. 실제로 다양한 생활 데이터를 센서로 측정하고 분석하면 어떤 과학적 결론을 이끌어낼 수 있는지 탐구하고 싶었습니다.",
+    hypothesis:"스마트폰과 센서 앱을 활용하면 실험실 장비 없이도 생활 환경 데이터(소음, 조도, 온도, 심박수)를 신뢰할 수 있는 수준으로 측정할 수 있을 것이다.",
+    indepVar:"측정 장소 및 시간대(교실, 복도, 도서관 / 수업 중, 쉬는 시간, 점심시간)",
+    depVar:"소음(dB), 조도(lux), 온도(°C), 개인 심박수(bpm) 측정값",
+    ctrlVar:"동일한 스마트폰 기종과 앱 사용, 동일한 측정 위치에서 3회 반복 측정 후 평균값 사용",
+    materials:"스마트폰(소음 측정 앱, 조도 측정 앱, 심박수 측정 앱), 데이터 기록 앱 또는 엑셀, 측정 위치 표시용 테이프, 기록지",
+    processes:[
+      "소음·조도·온도·심박수 측정 앱을 스마트폰에 설치하고 사용법을 익힌다.",
+      "측정 장소(교실, 복도, 도서관)와 시간대(수업 중, 쉬는 시간, 점심시간)를 결정한다.",
+      "각 장소·시간대에서 소음(dB)과 조도(lux)를 3회 측정하여 평균을 기록한다.",
+      "운동 전후, 수면 후 심박수를 측정하여 활동 상태에 따른 변화를 기록한다.",
+      "측정 데이터를 표와 그래프로 정리하고 쾌적한 학습 환경 기준과 비교한다.",
+      "데이터를 바탕으로 우리 학교 환경 개선 방안을 제안한다."
+    ],
+    observation:"복도 쉬는 시간 소음: 평균 78 dB (WHO 권장 학습 환경 기준 55 dB 초과).\n도서관 조도: 평균 420 lux (한국산업표준 독서 조도 500 lux에 약간 미달).\n수업 중 교실 온도: 22~24°C로 적정 범위 내.\n격렬한 운동 직후 심박수: 평균 142 bpm (안정 시 대비 +65%).",
+    data:"장소·시간대별 소음 측정값(dB):\n교실 수업 중: 42 dB\n교실 쉬는 시간: 68 dB\n복도 쉬는 시간: 78 dB\n도서관: 35 dB\n급식실 점심시간: 82 dB\n※ WHO 학습 환경 권장 기준: 55 dB 이하",
+    conclusion:"스마트폰 센서 앱으로 측정한 데이터가 학습 환경 기준과 비교 가능한 수준의 신뢰도를 보여 가설이 지지되었습니다. 복도와 급식실의 소음이 학습 환경 기준을 크게 초과함을 확인했습니다. 통합과학에서 학습한 파동과 소리 개념이 실생활 측정에 직접 적용됨을 체험했습니다.",
+    errorAnalysis:"스마트폰 마이크의 정밀도가 전문 측정 장비에 비해 낮아 오차가 발생할 수 있습니다. 측정 시 손의 위치나 폰 케이스의 영향이 측정값에 영향을 줄 수 있습니다.",
+    nextResearch:"측정 데이터를 기반으로 학교 소음 지도를 만들고, 음향 환경 개선을 위한 흡음재 설치 위치와 효과를 시뮬레이션하는 탐구를 진행하고 싶습니다."
+  },
+  43:{
+    motivation:"뉴스에서 '빅데이터'라는 단어를 자주 접했지만 실제로 많은 양의 데이터가 시각적으로 어떻게 표현되고 어떤 정보를 담는지 직접 경험한 적이 없었습니다. 과학 데이터를 직접 시각화해보면 숨겨진 패턴을 발견하고 더 효과적으로 소통할 수 있을 것이라 생각하여 탐구를 계획했습니다.",
+    hypothesis:"동일한 데이터라도 시각화 방법(막대그래프, 꺾은선, 지도, 버블 차트 등)에 따라 독자가 파악하는 정보의 양과 인상이 달라질 것이다.",
+    indepVar:"데이터 시각화 방법의 종류 (막대그래프, 꺾은선 그래프, 산점도, 지도 시각화, 버블 차트)",
+    depVar:"동일 시간 내 독자가 파악한 정보 항목 수, 인상의 강도(5점 척도)",
+    ctrlVar:"동일한 원본 데이터셋 사용, 동일 대상자 집단(학생 20명), 동일 관찰 시간(30초)",
+    materials:"기후 변화 또는 인구 통계 공공 데이터셋, 구글 스프레드시트 또는 파이썬(matplotlib), 인쇄물 또는 프레젠테이션 슬라이드, 설문지",
+    processes:[
+      "공공 데이터 포털에서 탐구 주제와 관련된 데이터셋(예: 연도별 국내 CO₂ 배출량)을 내려받는다.",
+      "동일 데이터를 5가지 방법(막대, 꺾은선, 산점도, 지도, 버블)으로 시각화한다.",
+      "각 시각화 자료를 30초간 학생 20명에게 보여주고 파악한 정보 항목 수를 기록한다.",
+      "각 그래프의 인상 강도(이해 용이성, 시각적 매력)를 5점 척도로 설문한다.",
+      "시각화 방법별 평균 점수를 비교하여 가장 효과적인 방법을 선정한다.",
+      "탐구 결과를 바탕으로 데이터 유형별 최적 시각화 가이드라인을 작성한다."
+    ],
+    observation:"막대그래프: 범주 간 비교에 직관적이나 추세 파악이 어려움.\n꺾은선 그래프: 시간에 따른 변화 추세 파악에 가장 효과적.\n지도 시각화: 지리적 분포 파악에 탁월하지만 정확한 수치 비교 어려움.\n버블 차트: 세 변수를 동시 표현 가능하여 정보량이 많지만 해독 시간이 길어짐.",
+    data:"시각화 방법별 평균 정보 파악 항목 수 / 인상 강도(5점):\n막대그래프: 3.2개 / 3.5점\n꺾은선: 4.1개 / 3.8점\n산점도: 2.8개 / 3.1점\n지도: 3.7개 / 4.3점\n버블 차트: 2.5개 / 4.0점",
+    conclusion:"시각화 방법에 따라 독자가 파악하는 정보 수와 인상이 달라져 가설이 지지되었습니다. 꺾은선 그래프는 정보 전달에, 지도 시각화는 감성적 인상에 각각 강점이 있었습니다. 데이터 유형에 맞는 시각화 선택이 과학적 소통 효율을 높임을 확인했습니다.",
+    errorAnalysis:"응답자 20명이 소수여서 통계적 신뢰도에 한계가 있습니다. 학생들의 그래프 해독 경험 차이가 결과에 영향을 주었을 수 있습니다.",
+    nextResearch:"인터랙티브 데이터 시각화 도구(Tableau, D3.js)를 활용하여 사용자가 직접 조작할 수 있는 대화형 과학 데이터 대시보드를 제작하는 탐구를 진행하고 싶습니다."
+  },
+  44:{
+    motivation:"청소 로봇, 수술 로봇, 자율주행차 등 다양한 로봇이 일상으로 들어오고 있습니다. 교과서에서 로봇의 기본 원리를 배웠지만, 실제 로봇들이 어떤 한계를 가지고 있으며 어떻게 개선할 수 있는지 분석하고 싶었습니다.",
+    hypothesis:"현재 상용화된 로봇들은 환경 인식, 동력 효율, 인간-로봇 상호작용 측면에서 한계를 가지고 있으며, 이를 개선할 수 있는 구체적인 기술 방향을 제안할 수 있을 것이다.",
+    indepVar:"로봇의 종류 (청소 로봇, 산업용 로봇, 수술 로봇, 서비스 로봇, 드론)",
+    depVar:"환경 인식 정확도, 배터리 지속 시간(시간), 인간-로봇 상호작용 편의성(5점 척도)",
+    ctrlVar:"동일한 평가 기준표와 문헌 자료(제조사 공식 스펙 + 소비자 리뷰) 동일 적용",
+    materials:"로봇별 제조사 스펙 자료, 소비자 리뷰 데이터, 로봇공학 개론 자료, 비교 분석 평가표, 개선안 설계 도구(스케치 또는 CAD)",
+    processes:[
+      "청소·산업·수술·서비스 로봇·드론의 구조와 작동 원리를 각각 조사한다.",
+      "각 로봇의 센서 종류(카메라, 라이다, 초음파), 구동 방식, 동력원을 비교한다.",
+      "제조사 스펙과 실제 사용자 리뷰를 분석하여 주요 한계점을 각 로봇별로 도출한다.",
+      "한계점을 환경 인식·동력 효율·상호작용 측면으로 분류하여 평가표를 작성한다.",
+      "각 한계점에 대한 개선 기술 방향(AI 통합, 연료전지, 자연어 처리 등)을 제안한다.",
+      "가장 개선이 시급한 로봇 1종을 선정하여 구체적인 개선 설계 스케치를 작성한다."
+    ],
+    observation:"청소 로봇: 문턱·계단 극복 불가, 배터리 1.5~2시간 한계, 좁은 틈 청소 어려움.\n산업용 로봇: 반복 작업은 우수하지만 갑작스러운 환경 변화에 대응 어려움.\n서비스 로봇: 자연어 이해 제한적, 감정 인식 기술 미성숙.\n드론: 배터리 20~30분 비행, 강풍 시 안정성 저하.",
+    data:"로봇별 주요 지표 비교:\n구분 | 환경 인식 | 배터리 지속 | 상호작용 편의성\n청소 로봇 | 2.8점 | 1.8h | 3.5점\n산업 로봇 | 3.2점 | 전원 연결 | 2.1점\n수술 로봇 | 4.1점 | 전원 연결 | 2.8점\n서비스 로봇 | 3.5점 | 6h | 3.8점\n드론 | 4.3점 | 0.4h | 3.2점",
+    conclusion:"현재 로봇들은 환경 인식·동력·상호작용 측면에서 각각 다른 한계를 가지고 있어 가설이 지지되었습니다. AI 비전 기술 통합, 고에너지밀도 배터리, 자연어 처리 개선이 핵심 해결 방향임을 확인했습니다. 통합과학에서 학습한 센서·에너지·정보 처리 원리가 로봇 개선 설계의 기반이 됩니다.",
+    errorAnalysis:"제조사 공식 스펙과 실제 사용 환경에서의 성능 차이가 있을 수 있습니다. 소비자 리뷰가 주관적 평가를 포함하므로 객관적 데이터와 혼용 시 해석에 주의가 필요합니다.",
+    nextResearch:"인간과 로봇의 안전한 협업(HRC, Human-Robot Collaboration)을 위한 물리적 안전 기준과 AI 윤리 가이드라인을 분석하는 탐구로 발전시키고 싶습니다."
+  },
+  45:{
+    motivation:"집에 있는 스마트 가전, 스마트워치, 스마트 조명 등 많은 기기가 인터넷으로 연결되어 있다는 것을 알지만, 이것이 어떤 원리로 작동하고 어떤 문제점이 있는지 잘 몰랐습니다. 사물 인터넷(IoT)의 원리를 깊이 이해하고 실제 적용 사례를 탐구하고 싶었습니다.",
+    hypothesis:"사물 인터넷(IoT)은 센서·통신·데이터 처리·실행 장치의 4단계 구조로 이루어져 있으며, 이 구조를 이해하면 실생활 IoT 서비스의 작동 원리를 설명하고 개선점을 제안할 수 있을 것이다.",
+    indepVar:"IoT 적용 분야의 종류 (스마트 홈, 스마트 팜, 스마트 교통, 스마트 의료, 스마트 시티)",
+    depVar:"각 분야의 구현 기술 구성 요소 수, 데이터 처리 방식, 보안 취약점 수",
+    ctrlVar:"동일한 IoT 4단계 분석 프레임워크 적용, 동일 시점(2024~2025년) 최신 사례 기준",
+    materials:"IoT 기술 개요 자료, 스마트 홈·팜·교통 사례 자료, 아두이노 또는 마이크로비트(모의 시연용), 센서 모듈(온도, 조도), 기록지",
+    processes:[
+      "IoT의 정의와 4단계 구조(센서→통신→데이터처리→실행)를 조사하여 정리한다.",
+      "스마트 홈, 스마트 팜, 스마트 교통 등 5개 분야의 대표 IoT 사례를 각각 분석한다.",
+      "각 사례를 4단계 구조에 맞게 분해하여 표로 정리한다.",
+      "아두이노(또는 마이크로비트)와 온도·조도 센서로 간단한 IoT 모의 시스템을 구현한다.",
+      "각 분야의 보안 취약점(해킹 위험, 개인정보 노출)을 조사하고 대응 방안을 제안한다.",
+      "IoT 기술의 장점과 사회적 과제를 종합하여 발표 자료를 제작한다."
+    ],
+    observation:"스마트 팜: 온습도·CO₂ 센서 데이터를 클라우드로 전송, AI가 최적 환경 자동 조절. 작물 수확량 최대 30% 증가 사례.\n스마트 교통: GPS+통신으로 실시간 교통 최적화, 자율주행 데이터는 초당 수GB 생성.\n아두이노 모의 시스템: 조도 센서값에 따라 LED 자동 점멸 구현 성공 (IoT 기본 루프 체험).",
+    data:"분야별 IoT 구현 요소 비교:\n구분 | 센서 종류 | 통신 방식 | 보안 취약점 수\n스마트 홈 | 5~15종 | Wi-Fi/BLE | 4건\n스마트 팜 | 8~20종 | LoRa/Wi-Fi | 2건\n스마트 교통 | 10~30종 | 5G/V2X | 5건\n스마트 의료 | 5~12종 | 4G/Wi-Fi | 7건",
+    conclusion:"IoT의 4단계 구조로 다양한 스마트 서비스를 체계적으로 분석할 수 있었으며, 아두이노 시연을 통해 기본 원리를 실제로 구현하여 가설이 지지되었습니다. 통합과학에서 학습한 전기 신호·통신·데이터 처리 개념이 IoT의 핵심 기반임을 확인했습니다.",
+    errorAnalysis:"아두이노 모의 시스템이 실제 상용 IoT의 복잡성을 충분히 반영하지 못합니다. 보안 취약점 수는 공개된 사례 기준이므로 실제 취약점보다 과소 계상될 수 있습니다.",
+    nextResearch:"IoT 기기의 개인정보 수집 범위와 데이터 소유권 문제를 법·윤리적으로 분석하고, 안전한 IoT 사용 가이드라인을 제안하는 탐구로 발전시키고 싶습니다."
+  },
+  46:{
+    motivation:"ChatGPT 등 인공지능 기술이 급속도로 발전하면서, AI 데이터센터가 엄청난 전력을 소비한다는 뉴스를 접했습니다. 교과서에서 지구 환경 문제를 배우며, AI 발전이 과연 지구 환경에 바람직한지 아닌지를 근거를 들어 논리적으로 판단해보고 싶었습니다.",
+    hypothesis:"인공지능 기술의 발전은 단기적으로는 에너지 소비 증가로 환경에 부정적이지만, 장기적으로는 에너지 최적화·기후 예측·재생에너지 관리 등을 통해 순환경적으로 긍정적 영향이 더 클 것이다.",
+    indepVar:"AI 기술의 적용 영역 (데이터센터 에너지 소비 vs AI 활용 환경 최적화 효과)",
+    depVar:"AI로 인한 연간 CO₂ 배출 증가량(백만 톤) vs AI 활용으로 절감 가능한 CO₂량(백만 톤)",
+    ctrlVar:"동일한 연도(2023~2024년) 기준 데이터, 동일한 탄소 환산 계수 적용",
+    materials:"IEA AI 에너지 보고서, AI 탄소 발자국 연구 논문, 기후 AI 적용 성과 자료(Google DeepMind, NVIDIA 발표), 논증 평가표, 찬반 토론 기록지",
+    processes:[
+      "글로벌 AI 데이터센터의 연간 전력 소비량과 탄소 배출량을 IEA 자료로 조사한다.",
+      "AI 모델(GPT-4 등) 학습·추론 1회당 탄소 발자국을 문헌으로 조사한다.",
+      "AI가 환경에 긍정적으로 기여하는 사례(기후 모델링, 스마트 그리드, 재생에너지 예측)를 조사한다.",
+      "부정적 영향과 긍정적 영향의 규모를 수치로 비교하는 대차대조표를 작성한다.",
+      "찬반 두 입장에서 논거를 각각 3개씩 작성하고 근거의 타당성을 평가한다.",
+      "과학적 근거를 바탕으로 '조건부 바람직함'의 결론을 도출하고 발표한다."
+    ],
+    observation:"2023년 글로벌 데이터센터 전력 소비: 약 460 TWh (전 세계 전력의 약 2%).\nGPT-3 학습 1회: 약 502톤 CO₂ 배출 (서울-뉴욕 왕복 비행기 약 280대 분량).\nDeepMind AI 적용 구글 데이터센터 냉각 에너지 40% 절감.\nAI 기상 예측(GraphCast)으로 기후 재해 조기 경보 정확도 90% 이상 향상.",
+    data:"AI 환경 영향 대차대조표(2023년 기준):\n부정적 영향:\n- 데이터센터 탄소 배출: 약 200백만 톤 CO₂/년\n- 물 사용량: 약 20억 리터/년\n긍정적 영향:\n- 스마트 그리드 에너지 절감: 약 300백만 톤 CO₂/년 절감 잠재량\n- 기후 재해 예방 효과: 추정 500억 달러 피해 절감",
+    conclusion:"AI 기술은 단기적으로 상당한 탄소를 배출하지만, 스마트 그리드 최적화·기후 예측·재생에너지 관리에 적용될 경우 절감 잠재량이 배출량을 상회하여 가설이 지지되었습니다. '무조건 바람직하다'가 아닌 '재생에너지로 구동되는 조건에서 바람직하다'는 조건부 결론이 가장 과학적으로 타당합니다.",
+    errorAnalysis:"AI의 긍정적 효과는 잠재량 추정치이며 실제 실현 여부는 정책·기술 발전에 따라 다릅니다. 미래 AI 모델의 에너지 효율 개선 속도를 예측하기 어려워 장기 전망의 불확실성이 있습니다.",
+    nextResearch:"AI 데이터센터를 100% 재생에너지로 운영하는 조건에서의 순환경적 기여도를 정량 분석하거나, AI 윤리(환경적 책임)와 기술 발전의 균형점을 탐구하고 싶습니다."
+  }
+};
+
+// ══════════════════════════════════════════════════════
+// 단원별 활동 번호
+// ══════════════════════════════════════════════════════
+const UNIT_ACTS = { 1:[25,26,27,28,29,30,31,32], 2:[33,34,35,36,37,38,39,40], 3:[41,42,43,44,45,46] };
 
 let currentSelectedAct = null;
 let currentUnitTab = 1;
 
-// 단원별 활동 번호
-const UNIT_ACTS = { 1:[25,26,27,28,29,30,31,32], 2:[33,34,35,36,37,38,39,40], 3:[41,42,43,44,45,46] };
-
-// 활동 그리드 생성
+// ── 활동 그리드 생성
 function buildActGrid(unitNum) {
   const grid = document.getElementById('act-grid-' + unitNum);
-  if (grid.children.length > 0) return; // 이미 생성됨
+  if (grid.children.length > 0) return;
   UNIT_ACTS[unitNum].forEach(num => {
     const data = ACTIVITY_DATA[num];
     const btn = document.createElement('button');
@@ -610,7 +1420,7 @@ function buildActGrid(unitNum) {
   });
 }
 
-// 단원 탭 전환
+// ── 단원 탭 전환
 function switchUnitTab(unitNum) {
   currentUnitTab = unitNum;
   [1,2,3].forEach(u => {
@@ -622,9 +1432,8 @@ function switchUnitTab(unitNum) {
   });
 }
 
-// 활동 선택
+// ── 활동 선택 → 전체 자동입력
 function selectActivity(num) {
-  // 이전 선택 해제
   if (currentSelectedAct) {
     const prev = document.getElementById('act-btn-' + currentSelectedAct);
     if (prev) prev.classList.remove('selected');
@@ -634,43 +1443,141 @@ function selectActivity(num) {
   if (btn) btn.classList.add('selected');
 
   const data = ACTIVITY_DATA[num];
+  const auto = ACTIVITY_AUTO_DATA[num];
 
-  // 탐구주제 자동입력
+  // ── 1. 탐구 주제
   const topicEl = document.getElementById('s1-topic');
   topicEl.value = data.title;
   topicEl.classList.add('auto-filled');
 
-  // 뱃지 / 헤더 업데이트
+  // ── 2. 탐구 동기
+  const motivationEl = document.getElementById('s2-motivation');
+  motivationEl.value = auto.motivation;
+  motivationEl.classList.add('auto-filled');
+
+  // ── 3. 가설 설정
+  setAutoFilled('s3-hypothesis', auto.hypothesis);
+  setAutoFilled('s3-indep', auto.indepVar);
+  setAutoFilled('s3-dep', auto.depVar);
+  setAutoFilled('s3-ctrl', auto.ctrlVar);
+
+  // ── 4. 준비물 + 실험 과정
+  setAutoFilled('s4-materials', auto.materials);
+  fillProcessList(auto.processes);
+
+  // ── 5. 관찰 / 데이터
+  setAutoFilled('s5-obs', auto.observation);
+  setAutoFilled('s5-data', auto.data);
+
+  // ── 6. 결론 / 오차 / 후속
+  setAutoFilled('s6-conclusion', auto.conclusion);
+  setAutoFilled('s6-error', auto.errorAnalysis);
+  setAutoFilled('s6-next', auto.nextResearch);
+
+  // ── UI 업데이트
   document.getElementById('act-num-badge').textContent = '활동 ' + num;
   document.getElementById('act-num-badge').classList.add('show');
   document.getElementById('bc-current').textContent = '🧪 활동 ' + num + ' 보고서';
   document.getElementById('welcome-title').textContent = '활동 ' + num + ' · ' + data.unit;
   document.getElementById('welcome-tag').textContent = '📗 통합과학 2 · ' + data.unit;
 
-  // 선택 정보 표시
   document.getElementById('selected-act-badge').textContent = '활동 ' + num;
   document.getElementById('selected-act-text').textContent = data.title;
   document.getElementById('selected-act-info').classList.add('show');
 
-  // 자동입력 배너
-  document.getElementById('auto-banner-title').textContent = '활동 ' + num + '번 탐구 주제가 자동으로 입력되었습니다!';
-  document.getElementById('auto-banner-sub').textContent = data.title;
+  document.getElementById('auto-banner-title').textContent = '활동 ' + num + '번 모든 항목이 자동으로 입력되었습니다!';
+  document.getElementById('auto-banner-sub').textContent = '내용을 직접 수정하고 나만의 보고서를 완성하세요.';
   document.getElementById('auto-banner').classList.add('show');
+
+  // ── 섹션 열기 (모두 펼치기)
+  openAllSections();
 
   updateProgress();
 
-  // 탐구보고서 작성 섹션으로 스크롤
-  document.querySelector('.section-card').scrollIntoView({ behavior:'smooth', block:'start' });
+  // ── 스크롤
+  document.querySelector('.section-heading + .section-card, .section-card').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
-// 초기화: URL 파라미터 처리
+function setAutoFilled(id, value) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.value = value || '';
+  if (value) el.classList.add('auto-filled');
+}
+
+function fillProcessList(processes) {
+  const list = document.getElementById('process-list');
+  list.innerHTML = '';
+  (processes || []).forEach((text, i) => {
+    const li = document.createElement('li');
+    li.className = 'process-item';
+    const ta = document.createElement('textarea');
+    ta.rows = 2;
+    ta.placeholder = (i+1) + '번째 실험 과정...';
+    ta.value = text;
+    ta.setAttribute('oninput', 'updateProgress()');
+    if (text) ta.classList.add('auto-filled');
+    li.innerHTML = `<span class="process-num">${i+1}</span>`;
+    li.appendChild(ta);
+    list.appendChild(li);
+  });
+}
+
+// ── 모든 섹션 열기
+function openAllSections() {
+  document.querySelectorAll('.section-head').forEach(head => {
+    const body = head.nextElementSibling;
+    const chevron = head.querySelector('.chevron');
+    if (body) { body.classList.add('open'); head.classList.add('open'); }
+    if (chevron) chevron.classList.add('open');
+  });
+}
+
+// ── 전체 초기화
+function resetAllFields() {
+  if (!confirm('모든 입력 내용을 초기화하시겠습니까?')) return;
+  
+  // 버튼 선택 해제
+  if (currentSelectedAct) {
+    const prev = document.getElementById('act-btn-' + currentSelectedAct);
+    if (prev) prev.classList.remove('selected');
+  }
+  currentSelectedAct = null;
+
+  // 모든 textarea 초기화
+  document.querySelectorAll('textarea').forEach(ta => {
+    ta.value = '';
+    ta.classList.remove('auto-filled');
+  });
+
+  // 실험 과정 초기화 (기본 3개로)
+  const list = document.getElementById('process-list');
+  list.innerHTML = '';
+  [1,2,3].forEach(i => {
+    const li = document.createElement('li');
+    li.className = 'process-item';
+    li.innerHTML = `<span class="process-num">${i}</span><textarea placeholder="${i}번째 실험 과정..." rows="2" oninput="updateProgress()"></textarea>`;
+    list.appendChild(li);
+  });
+
+  // UI 초기화
+  document.getElementById('act-num-badge').classList.remove('show');
+  document.getElementById('bc-current').textContent = '🧪 실험탐구 보고서 작성';
+  document.getElementById('welcome-title').textContent = '통합과학 실험탐구 보고서';
+  document.getElementById('welcome-tag').textContent = '📗 고등 1학년 · 통합과학';
+  document.getElementById('selected-act-info').classList.remove('show');
+  document.getElementById('auto-banner').classList.remove('show');
+  document.getElementById('saved-banner').classList.remove('show');
+
+  updateProgress();
+  showToast('초기화되었습니다.', '');
+}
+
+// ── 초기화
 (function init() {
-  // 모든 단원 그리드 미리 생성
   [1,2,3].forEach(u => buildActGrid(u));
-  // 기본 단원1 표시
   switchUnitTab(1);
 
-  // URL 파라미터
   const params = new URLSearchParams(window.location.search);
   const actNum = parseInt(params.get('activity'));
   if (actNum && ACTIVITY_DATA[actNum]) {
@@ -683,7 +1590,7 @@ function selectActivity(num) {
   updateProgress();
 })();
 
-// ── UI 함수 ──
+// ── UI 공통 함수
 function toggleSection(head) {
   const body = head.nextElementSibling;
   const chevron = head.querySelector('.chevron');
@@ -692,6 +1599,7 @@ function toggleSection(head) {
   head.classList.toggle('open', !isOpen);
   chevron.classList.toggle('open', !isOpen);
 }
+
 function switchTab(btn, panelId) {
   const wrap = btn.closest('.section-body');
   wrap.querySelectorAll('.rtab').forEach(t => t.classList.remove('active'));
@@ -699,6 +1607,7 @@ function switchTab(btn, panelId) {
   btn.classList.add('active');
   document.getElementById(panelId).classList.add('active');
 }
+
 function addProcess() {
   const list = document.getElementById('process-list');
   const num = list.children.length + 1;
@@ -707,6 +1616,7 @@ function addProcess() {
   li.innerHTML = `<span class="process-num">${num}</span><textarea placeholder="${num}번째 실험 과정..." rows="2" oninput="updateProgress()"></textarea>`;
   list.appendChild(li);
 }
+
 function showPreview(input) {
   const wrap = document.getElementById('preview-wrap');
   wrap.innerHTML = '';
@@ -716,6 +1626,7 @@ function showPreview(input) {
     wrap.appendChild(img);
   }
 }
+
 function updateProgress() {
   const all = document.querySelectorAll('textarea');
   const filled = Array.from(all).filter(t => t.value.trim().length > 0).length;
@@ -723,19 +1634,21 @@ function updateProgress() {
   document.getElementById('prog-fill').style.width = pct + '%';
   document.getElementById('prog-label').textContent = pct + '% 작성됨';
 }
+
 function showToast(msg, type) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast show ' + (type || '');
   setTimeout(() => { t.className = 'toast'; }, 3200);
 }
+
 function getProcessSteps() {
   return Array.from(document.querySelectorAll('#process-list textarea'))
     .map((ta, i) => ({ step: i + 1, content: ta.value.trim() }))
     .filter(s => s.content);
 }
 
-// ── 미리보기 ──
+// ── 미리보기
 function v(id) { return (document.getElementById(id) || {}).value || ''; }
 function empty(str) { return !str || !str.trim(); }
 
@@ -796,18 +1709,21 @@ function openPreview() {
   document.getElementById('modal-bg').classList.add('show');
   document.body.style.overflow = 'hidden';
 }
+
 function closePreview() {
   document.getElementById('modal-bg').classList.remove('show');
   document.body.style.overflow = '';
 }
+
 function closePreviewOutside(e) {
   if (e.target === document.getElementById('modal-bg')) closePreview();
 }
+
 function esc(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
 }
 
-// ── 저장 ──
+// ── 저장
 async function handleSave() {
   const name = document.getElementById('f-name').value.trim();
   const date = document.getElementById('f-date').value;
@@ -866,12 +1782,14 @@ function handlePrint() {
   setTimeout(() => window.print(), 100);
 }
 
+// 전역 등록
 window.toggleSection=toggleSection; window.switchTab=switchTab;
 window.addProcess=addProcess; window.showPreview=showPreview;
 window.updateProgress=updateProgress; window.handleSave=handleSave;
 window.handlePrint=handlePrint; window.openPreview=openPreview;
 window.closePreview=closePreview; window.closePreviewOutside=closePreviewOutside;
 window.switchUnitTab=switchUnitTab; window.selectActivity=selectActivity;
+window.resetAllFields=resetAllFields;
 </script>
 </body>
 </html>
