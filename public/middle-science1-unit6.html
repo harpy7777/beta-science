@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel='icon' type='image/svg+xml' href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpolygon points='70,8 121,38 121,102 70,132 19,102 19,38' fill='none' stroke='%23E85D75' stroke-width='8' stroke-linejoin='round'/%3E%3Cpolygon points='70,38 97,53 97,87 70,102 43,87 43,53' fill='none' stroke='%23E85D75' stroke-width='4' stroke-linejoin='round' stroke-dasharray='10 6'/%3E%3Ccircle cx='70' cy='8' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='38' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='70' cy='132' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='38' r='10' fill='%23E85D75'/%3E%3C/svg%3E">
+<title>베타과학학원 · 기체의 성질</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+:root {
+  --pur-dark:    #3b1fa3;
+  --pur-main:    #5b3fd4;
+  --pur-mid:     #7c5ce8;
+  --pur-light:   #a78bfa;
+  --pur-tint:    #f5f3ff;
+  --pur-tint2:   #ede9fe;
+  --pur-border:  #c4b5fd;
+  --pur-border2: #a78bfa;
+
+  --green:#059669; --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --blue2:#2563eb; --blue-bg:#eff6ff;  --blue-border:#bfdbfe;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626;   --red-bg:#fef2f2;   --red-border:#fecaca;
+  --indigo:#4f46e5;--indigo-bg:#eef2ff;--indigo-border:#c7d2fe;
+
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#f8f7ff;   --white:#fff;
+  --radius-sm:10px; --radius:14px; --radius-lg:18px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+p{line-height:1.78;font-size:13.5px;margin:.4rem 0}
+
+.header{background:#fff;border-bottom:1px solid #ede9fe;padding:0 1rem;padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right));height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:500;box-shadow:0 1px 0 #ede9fe}
+.header-left{display:flex;align-items:center;gap:9px;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--pur-mid) 0%,var(--pur-dark) 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{display:flex;align-items:center;gap:5px;background:var(--pur-tint);border:1px solid var(--pur-border);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--pur-dark);white-space:nowrap}
+.dot-pur{width:5px;height:5px;background:var(--pur-mid);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{padding:7px 14px;min-height:36px;background:transparent;border:1.5px solid var(--pur-border);border-radius:20px;font-size:12px;font-weight:700;color:var(--pur-dark);cursor:pointer;white-space:nowrap;transition:background .15s}
+.back-btn:hover{background:var(--pur-tint)}
+.back-btn:active{background:var(--pur-tint2)}
+
+.hero{background:linear-gradient(135deg,var(--pur-dark) 0%,var(--pur-main) 55%,var(--pur-mid) 100%);padding:2.8rem 1.5rem 2.2rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero::after{content:'';position:absolute;left:-50px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hero-deco{position:absolute;right:10%;top:15%;width:120px;height:120px;border-radius:50%;border:2px solid rgba(255,255,255,.12);pointer-events:none}
+.hero-deco2{position:absolute;right:18%;top:25%;width:60px;height:60px;border-radius:50%;border:1.5px solid rgba(255,255,255,.1);pointer-events:none}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+.hero-eyebrow{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+.hero-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem}
+.hero-desc{font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.7;max-width:580px;margin:0 auto 1.8rem}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:14px;padding:.9rem 1.4rem;text-align:center;backdrop-filter:blur(6px);min-width:80px;transition:background .2s}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+.tabs-wrap{background:#fff;border-bottom:2px solid var(--pur-border);position:sticky;top:54px;z-index:400}
+.tabs-inner{max-width:1100px;margin:0 auto;padding:0 1.5rem;display:flex;overflow-x:auto;justify-content:center;gap:4px;scrollbar-width:none}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{padding:13px 26px;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;margin-bottom:-2px;border-radius:8px 8px 0 0}
+.tab-btn:hover{color:var(--pur-main);background:var(--pur-tint)}
+.tab-btn.active{color:var(--pur-main);border-bottom-color:var(--pur-main)}
+
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}
+.unit-section.visible{display:block}
+
+.unit-banner{border-radius:var(--radius-lg);padding:1.4rem 1.8rem;margin-bottom:1.8rem;display:flex;align-items:center;gap:1.2rem;background:linear-gradient(135deg,var(--pur-tint),var(--pur-tint2));border:2px solid var(--pur-border)}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--pur-main);margin-bottom:4px}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius-lg);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.acc-item.open{border-color:var(--pur-border);box-shadow:0 4px 20px rgba(91,63,212,.1)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:1.2rem 1.5rem;cursor:pointer;user-select:none;transition:background .15s}
+.acc-header:hover{background:var(--pur-tint)}
+.acc-num{width:32px;height:32px;border-radius:10px;background:var(--pur-tint2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--pur-dark);flex-shrink:0;transition:background .2s}
+.acc-item.open .acc-num{background:var(--pur-main);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--pur-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-item.open .acc-subtitle{color:var(--pur-main)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--pur-main)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--pur-tint2)}
+.acc-item.open .acc-body{display:block}
+
+.sec-title{font-size:12px;font-weight:800;color:var(--pur-dark);letter-spacing:.06em;text-transform:uppercase;margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--pur-main);border-radius:2px;display:block;flex-shrink:0}
+
+.concept-box{background:var(--pur-tint);border:1.5px solid var(--pur-border);border-left:4px solid var(--pur-main);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.concept-box .cb-title{font-weight:800;color:var(--pur-dark);font-size:14px;margin-bottom:.4rem}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--green);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+.amber-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-left:4px solid var(--amber);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+.blue-box{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-left:4px solid var(--blue2);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.blue-box .cb-title{font-weight:800;color:#1e40af;font-size:14px;margin-bottom:.4rem}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+.indigo-box{background:var(--indigo-bg);border:1.5px solid var(--indigo-border);border-left:4px solid var(--indigo);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.indigo-box .cb-title{font-weight:800;color:#3730a3;font-size:14px;margin-bottom:.4rem}
+
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:var(--radius);border:1.5px solid var(--pur-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--pur-tint2);padding:10px 14px;text-align:left;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--pur-dark)}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6;vertical-align:top}
+tbody tr:hover td{background:var(--pur-tint)}
+
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0}
+.flow-box{background:#fff;border:1.5px solid var(--pur-border);border-radius:8px;padding:7px 12px;font-weight:700;color:var(--pur-dark);text-align:center;font-size:12px;line-height:1.4}
+.flow-arrow{color:var(--pur-main);font-size:18px;font-weight:900}
+
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:.8rem 0}
+.point-card{background:#fff;border:1.5px solid var(--pur-border);border-radius:var(--radius);padding:1rem;text-align:center;transition:border-color .2s,box-shadow .2s}
+.point-card:hover{border-color:var(--pur-main);box-shadow:0 4px 12px rgba(91,63,212,.12)}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--pur-main);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+.hp{color:var(--pur-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--blue2);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.hi{color:var(--indigo);font-weight:800}
+
+.formula-box{background:linear-gradient(135deg,var(--pur-tint),var(--pur-tint2));border:2px solid var(--pur-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--pur-dark);letter-spacing:-.01em;font-style:italic}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+.steps{display:flex;flex-direction:column;gap:8px;margin:.8rem 0}
+.step-item{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius);padding:.9rem 1.1rem;transition:border-color .2s}
+.step-item:hover{border-color:var(--pur-border)}
+.step-num{width:28px;height:28px;border-radius:8px;background:var(--pur-main);color:#fff;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px}
+.step-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+.quiz-wrap{background:linear-gradient(135deg,var(--pur-tint2),var(--pur-tint));border:1.5px solid var(--pur-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin-top:1.6rem}
+.quiz-label{font-size:11px;font-weight:800;color:var(--pur-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{background:var(--pur-main);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.quiz-toggle:hover{background:var(--pur-dark)}
+.quiz-ans{display:none;margin-top:.8rem;padding:.9rem 1rem;background:rgba(255,255,255,.85);border-radius:10px;font-size:13.5px;color:var(--text);line-height:1.75;border:1px solid var(--pur-border)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:.6rem 0}
+.chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:var(--pur-tint2);color:var(--pur-dark);border:1px solid var(--pur-border)}
+.chip-g{background:var(--green-bg);color:#065f46;border-color:var(--green-border)}
+.chip-r{background:var(--red-bg);color:#991b1b;border-color:var(--red-border)}
+.chip-a{background:var(--amber-bg);color:#92400e;border-color:var(--amber-border)}
+.chip-b{background:var(--blue-bg);color:#1e40af;border-color:var(--blue-border)}
+
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.45rem}
+  .hero-desc{font-size:13px}
+  .hero-eyebrow{font-size:10px;padding:4px 11px}
+  .hero-stats{gap:7px}
+  .hero-stat-card{min-width:68px;padding:.75rem .9rem}
+  .hs-num{font-size:1.45rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{justify-content:flex-start;gap:0;padding:0 .5rem}
+  .tab-btn{padding:11px 13px;font-size:11.5px;border-radius:6px 6px 0 0}
+  .content-wrap{padding:1.2rem .85rem 4rem}
+  .unit-banner{flex-direction:column;gap:.75rem;padding:1.1rem}
+  .ub-emoji{font-size:2.1rem}
+  .ub-title{font-size:1.1rem}
+  .acc-header{padding:.95rem 1rem;gap:10px}
+  .acc-num{width:30px;height:30px;font-size:12px;border-radius:8px}
+  .acc-htitle{font-size:14px}
+  .acc-hdesc{font-size:11.5px}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .steps{gap:7px}
+  .step-item{padding:.8rem .95rem}
+  table{font-size:12px}
+  thead th{font-size:10px;padding:8px 10px}
+  tbody td{padding:8px 10px}
+  .concept-box,.green-box,.amber-box,.blue-box,.red-box,.indigo-box{padding:.85rem 1rem;font-size:13px}
+  .formula-box{padding:1rem 1.1rem}
+  .formula-text{font-size:1.15rem}
+  .quiz-wrap{padding:1rem 1.1rem}
+  .quiz-q{font-size:13px}
+}
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .hero-deco,.hero-deco2{display:none}
+  .hero{padding:1.7rem .9rem 1.5rem}
+  .hero-title{font-size:1.28rem;letter-spacing:-.025em}
+  .hero-desc{font-size:12.5px;margin-bottom:1.4rem}
+  .breadcrumb{gap:4px;margin-bottom:.9rem}
+  .bc-item,.bc-current,.bc-sep{font-size:11px}
+  .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;max-width:280px;margin:0 auto}
+  .hero-stat-card{min-width:0;padding:.7rem .5rem}
+  .hs-num{font-size:1.3rem}
+  .tabs-inner{padding:0 .3rem}
+  .tab-btn{padding:10px 11px;font-size:11px;white-space:nowrap}
+  .ub-title{font-size:1rem}
+  .ub-desc{font-size:12px}
+  .acc-header{padding:.85rem .9rem;gap:8px}
+  .acc-htitle{font-size:13.5px}
+  .acc-hdesc{font-size:11px}
+  .acc-body{padding:0 .9rem 1.2rem}
+  .sec-title{font-size:11px}
+  .point-box{grid-template-columns:1fr}
+  .pc-icon{font-size:1.5rem}
+  .pc-title{font-size:12px}
+  .pc-desc{font-size:11.5px}
+  .step-num{width:26px;height:26px;font-size:12px;border-radius:7px;flex-shrink:0}
+  .step-title{font-size:12.5px}
+  .step-desc{font-size:12px}
+  .formula-text{font-size:1rem}
+  .formula-sub{font-size:11px}
+  .table-wrap{-webkit-overflow-scrolling:touch}
+  .quiz-q{font-size:12.5px}
+  .quiz-toggle{font-size:11.5px;padding:6px 15px}
+  .quiz-ans{font-size:13px}
+  .chip,.chip-g,.chip-r,.chip-a,.chip-b{font-size:10.5px;padding:3px 10px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-pur"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="science1-summary.html" class="bc-item">중학 과학 1</a><span class="bc-sep">›</span>
+      <span class="bc-current">🌬️ Ⅵ. 기체의 성질</span>
+    </div>
+    <div class="hero-eyebrow">🌬️ PART 06 · 중학 과학 1 · UNIT 06</div>
+    <div class="hero-title">Ⅵ. 기체의 성질</div>
+    <div class="hero-desc">기체의 압력과 부피(보일 법칙), 기체의 온도와 부피(샤를 법칙),<br>입자 운동으로 원리 이해 · 생활 속 적용 사례 완벽 정리</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">2</div><div class="hs-lbl">중단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">5</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">10+</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">🔵 중단원1 · 기체의 압력과 부피</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">🌡️ 중단원2 · 기체의 온도와 부피</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ══════════════════════════════════
+     중단원 1: 기체의 압력과 부피
+══════════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner">
+    <div class="ub-emoji">🔵</div>
+    <div>
+      <div class="ub-num">중단원 01 · Pressure & Volume (Boyle's Law)</div>
+      <div class="ub-title">기체의 압력과 부피</div>
+      <div class="ub-desc">기체의 압력을 입자 운동으로 이해하고, 보일 법칙과 생활 속 활용 사례를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 압력과 기체의 압력 -->
+    <div class="acc-item" id="acc-pressure">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Pressure · 압력과 기체의 압력</div>
+          <div class="acc-htitle">압력과 기체의 압력</div>
+          <div class="acc-hdesc">압력의 정의 · 기체의 압력 = 입자 충돌 · 대기압 · 생활 속 압력 이용</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">압력이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">⚡ 압력 (Pressure)</div>
+          <span class="hp">일정한 면적에 작용하는 힘</span>.<br><br>
+          • 같은 힘이라도 면적이 <span class="hp">작을수록 압력이 크다</span><br>
+          • 같은 힘이라도 면적이 <span class="hp">클수록 압력이 작다</span><br><br>
+          예: 하이힐 굽(면적↓) → 압력↑ / 스노우보드(면적↑) → 압력↓
+        </div>
+
+        <div class="sec-title">기체의 압력이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">💨 기체의 압력 (Gas Pressure)</div>
+          기체 입자들이 끊임없이 운동하며 <span class="hp">일정한 면적의 용기 벽에 충돌하여 가하는 힘</span>.<br><br>
+          • 기체 입자는 <span class="hp">모든 방향으로 운동</span>하므로, 기체의 압력도 <strong>모든 방향으로 작용</strong><br>
+          • 기체 입자 수가 많을수록 → 벽에 충돌 횟수↑ → 기체의 압력↑
+        </div>
+
+        <div class="sec-title">대기압이란?</div>
+        <div class="blue-box">
+          <div class="cb-title">🌍 대기압 (Atmospheric Pressure)</div>
+          대기(공기)가 지구 표면을 누르는 압력을 <span class="hb">대기압</span>이라고 한다.<br><br>
+          • 대기압도 모든 방향으로 작용<br>
+          • 지표 부근에서 대기압 ≈ <strong>1 기압</strong>
+        </div>
+
+        <div class="sec-title">기체의 압력을 이용하는 예</div>
+        <div class="chips">
+          <span class="chip-g chip">💉 주사기로 약물 주입</span>
+          <span class="chip-g chip">🍶 빨대로 음료 마시기</span>
+          <span class="chip-g chip">🪄 스포이트</span>
+          <span class="chip-g chip">🫁 공기 펌프</span>
+          <span class="chip chip">🛞 타이어에 공기 주입</span>
+          <span class="chip chip">💨 에어백</span>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">압력에 관한 설명으로 옳은 것만을 보기에서 있는 대로 고르시오.<br><br>
+          ㄱ. 일정한 면적에 작용하는 힘을 압력이라고 한다.<br>
+          ㄴ. 같은 힘이라도 작용하는 면적이 클수록 압력이 크다.<br>
+          ㄷ. 기체 입자가 일정한 면적의 용기 벽에 충돌하여 가하는 힘을 기체의 압력이라고 한다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ㄱ, ㄷ</strong><br><br>
+            ㄱ ✅ 압력 = 일정한 면적에 작용하는 힘<br>
+            ㄴ ❌ 같은 힘에서 면적이 <strong>작을수록</strong> 압력이 크다 (면적↑ → 압력↓)<br>
+            ㄷ ✅ 기체 입자의 충돌 = 기체의 압력
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 보일 법칙 -->
+    <div class="acc-item" id="acc-boyle">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Boyle's Law · 보일 법칙</div>
+          <div class="acc-htitle">보일 법칙 — 압력과 부피의 반비례 관계</div>
+          <div class="acc-hdesc">온도 일정 · 압력↑ 부피↓ · 입자 충돌 횟수 변화로 설명</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">보일 법칙이란?</div>
+        <div class="formula-box">
+          <div class="formula-text">보일 법칙: 압력 × 부피 = 일정 (온도 일정)</div>
+          <div class="formula-sub">온도가 일정할 때, 기체의 압력과 부피는 반비례 관계 — 보일(Boyle, R., 1627~1691) 발표(1662년)</div>
+        </div>
+
+        <div class="sec-title">압력 변화에 따른 부피와 입자 운동 변화</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>외부 압력 변화</th><th>기체 부피</th><th>입자 충돌 횟수</th><th>기체 압력</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hr">압력 커짐 (1기압→2기압→4기압)</span></td>
+              <td><span class="hr">작아진다</span> (4L→2L→1L)</td>
+              <td><span class="hr">커진다</span></td>
+              <td><span class="hr">커진다</span></td>
+            </tr>
+            <tr>
+              <td><span class="hg">압력 작아짐</span></td>
+              <td><span class="hg">커진다</span></td>
+              <td><span class="hg">작아진다</span></td>
+              <td><span class="hg">작아진다</span></td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="amber-box">
+          <div class="cb-title">🔬 입자 운동으로 설명하기</div>
+          압력이 커지면 → 기체 부피가 줄어들어 → 같은 공간에 입자가 더 빽빽 → <span class="ha">단위 면적당 충돌 횟수 증가</span> → 기체의 압력도 증가하여 외부 압력과 같아질 때까지 부피가 작아진다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">일정한 온도에서 기체의 압력과 부피에 관한 설명으로 옳은 것만을 보기에서 고르시오. (온도 일정)<br><br>
+          ㄱ. 기체에 압력을 가하면 기체의 부피는 줄어든다.<br>
+          ㄴ. 일정한 양의 기체의 부피가 클수록 기체의 압력은 크다.<br>
+          ㄷ. 용기에 들어 있는 기체에 작용하는 압력이 커지면 기체 입자가 용기 벽에 충돌하는 횟수가 커진다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ㄱ, ㄷ</strong><br><br>
+            ㄱ ✅ 압력↑ → 부피↓ (보일 법칙)<br>
+            ㄴ ❌ 부피가 클수록 기체의 압력은 <strong>작다</strong> (반비례 관계)<br>
+            ㄷ ✅ 압력↑ → 부피↓ → 입자 밀도↑ → 충돌 횟수↑
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 03: 생활 속 보일 법칙 -->
+    <div class="acc-item" id="acc-boyle-life">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Boyle's Law in Life · 생활 속 보일 법칙</div>
+          <div class="acc-htitle">생활 속 보일 법칙 적용 사례</div>
+          <div class="acc-hdesc">기체 저장 · 과자 봉지 부풀기 · 잠수부 공기 방울 · 에어백 원리</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">보일 법칙 적용 사례</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🏺</div>
+            <div class="pc-title">기체 저장 용기</div>
+            <div class="pc-desc">높은 압력을 가해 기체 부피를 줄여 작은 용기에 많은 양의 기체 저장 (수소, 산소, 헬륨)</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🛩️</div>
+            <div class="pc-title">높은 하늘의 과자 봉지</div>
+            <div class="pc-desc">높은 하늘 → 대기압↓ → 과자 봉지 속 기체 부피↑ → 봉지 팽팽하게 부풀어 오름</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🤿</div>
+            <div class="pc-title">잠수부 공기 방울</div>
+            <div class="pc-desc">깊은 바닷속 → 수압 높음 → 수면 위로 올라올수록 수압↓ → 공기 방울 크기↑</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">💨</div>
+            <div class="pc-title">에어백</div>
+            <div class="pc-desc">충돌 시 기체가 빠르게 팽창하며 부피 증가 → 사람 보호</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🩺</div>
+            <div class="pc-title">주사기</div>
+            <div class="pc-desc">피스톤을 당기면 내부 압력↓ → 부피↑ → 액체 흡입</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🫁</div>
+            <div class="pc-title">호흡</div>
+            <div class="pc-desc">숨을 들이쉬면 가슴 부피↑ → 폐 내부 압력↓ → 공기가 밀려 들어옴</div>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">일정한 온도에서 작은 용기에 많은 양의 기체를 넣기 위해서는 기체에 어떤 압력을 가해야 하는가? 보일 법칙으로 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 높은 압력을 가해야 한다.</strong><br><br>
+            보일 법칙에 따르면 온도가 일정할 때 기체의 압력과 부피는 <strong>반비례</strong>한다.<br><br>
+            → 높은 압력을 가할수록 기체의 부피가 줄어들므로, 많은 양의 기체를 작은 용기에 저장할 수 있다.<br><br>
+            예: 산소 기체 저장 용기, 소화기 속 이산화탄소 저장
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ══════════════════════════════════
+     중단원 2: 기체의 온도와 부피
+══════════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner">
+    <div class="ub-emoji">🌡️</div>
+    <div>
+      <div class="ub-num">중단원 02 · Temperature & Volume (Charles's Law)</div>
+      <div class="ub-title">기체의 온도와 부피</div>
+      <div class="ub-desc">샤를 법칙의 원리를 입자 운동으로 이해하고, 생활 속 온도-부피 변화 사례를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 샤를 법칙 -->
+    <div class="acc-item" id="acc-charles">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Charles's Law · 샤를 법칙</div>
+          <div class="acc-htitle">샤를 법칙 — 온도와 부피의 비례 관계</div>
+          <div class="acc-hdesc">압력 일정 · 온도↑ 부피↑ · 입자 운동 빠르기 변화로 설명</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">샤를 법칙이란?</div>
+        <div class="formula-box">
+          <div class="formula-text">샤를 법칙: 부피 ÷ 온도 = 일정 (압력 일정)</div>
+          <div class="formula-sub">압력이 일정할 때, 기체의 온도와 부피는 비례 관계 — 샤를(Charles, J. A. C., 1746~1823) 발표(1787년)</div>
+        </div>
+
+        <div class="sec-title">온도 변화에 따른 부피와 입자 운동 변화</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>온도 변화</th><th>입자 운동</th><th>용기 벽 충돌</th><th>기체 부피</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hr">온도 높아짐</span></td>
+              <td><span class="hr">빠르게 운동</span></td>
+              <td>강하게 충돌 → 압력↑</td>
+              <td><span class="hr">커진다</span></td>
+            </tr>
+            <tr>
+              <td><span class="hb">온도 낮아짐</span></td>
+              <td><span class="hb">느리게 운동</span></td>
+              <td>약하게 충돌 → 압력↓</td>
+              <td><span class="hb">작아진다</span></td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="amber-box">
+          <div class="cb-title">🔬 입자 운동으로 설명하기</div>
+          온도가 높아지면 → 기체 입자가 <span class="ha">더 빠르게 운동</span> → 용기 벽에 더 강하게 충돌 → 기체 압력이 일시적으로 커짐 → 기체의 부피가 커져 압력이 다시 일정해질 때까지 팽창<br><br>
+          💡 0°C → 273°C → 546°C 로 온도가 높아질수록 기체 부피도 일정 비율로 커진다
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">일정한 압력에서 일정한 양의 기체의 온도가 높아지면 기체의 부피는 어떻게 되는가? 입자 운동과 관련지어 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 기체의 부피가 커진다.</strong><br><br>
+            온도가 높아지면 기체 입자가 <strong>더 빠르게 운동</strong>하여 용기 벽에 더 강하게 충돌하므로 기체의 압력이 커진다. 압력을 일정하게 유지하려면 기체의 <strong>부피가 커져야</strong> 한다.<br><br>
+            → 샤를 법칙: 압력이 일정할 때 온도 ↑ → 부피 ↑ (비례 관계)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 생활 속 샤를 법칙 -->
+    <div class="acc-item" id="acc-charles-life">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Charles's Law in Life · 생활 속 샤를 법칙</div>
+          <div class="acc-htitle">생활 속 샤를 법칙 적용 사례</div>
+          <div class="acc-hdesc">열기구 · 농구공 · 페트병 · 비닐랩 · 찌그러진 탁구공 · 비스킷 구멍</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">보일 법칙 vs 샤를 법칙 구분</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>법칙</th><th>변하는 것</th><th>일정한 것</th><th>관계</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hp">보일 법칙</span></td>
+              <td>압력, 부피</td>
+              <td>온도</td>
+              <td>압력 ↑ → 부피 ↓ (반비례)</td>
+            </tr>
+            <tr>
+              <td><span class="hg">샤를 법칙</span></td>
+              <td>온도, 부피</td>
+              <td>압력</td>
+              <td>온도 ↑ → 부피 ↑ (비례)</td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">샤를 법칙 적용 사례</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🎈</div>
+            <div class="pc-title">열기구</div>
+            <div class="pc-desc">열기구 속 공기를 가열 → 온도↑ → 기체 부피↑ → 기체 밀도↓ → 부력↑ → 하늘로 떠오름</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🏀</div>
+            <div class="pc-title">여름철 타이어·농구공</div>
+            <div class="pc-desc">온도↑ → 내부 기체 부피↑ → 타이어/농구공이 팽팽해짐</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🥤</div>
+            <div class="pc-title">냉장고 속 페트병</div>
+            <div class="pc-desc">냉장고 → 온도↓ → 기체 부피↓ → 페트병 찌그러짐 → 꺼내면 온도↑ → 다시 팽팽해짐</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🫙</div>
+            <div class="pc-title">뜨거운 그릇의 비닐랩</div>
+            <div class="pc-desc">뜨거운 음식 → 온도↑ → 기체 부피↑ → 랩이 볼록 → 식으면 온도↓ → 랩이 오목해짐</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🏓</div>
+            <div class="pc-title">찌그러진 탁구공</div>
+            <div class="pc-desc">뜨거운 물에 넣으면 → 온도↑ → 내부 기체 부피↑ → 탁구공 원래 모양 복원</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🍪</div>
+            <div class="pc-title">비스킷의 구멍</div>
+            <div class="pc-desc">오븐 가열 → 반죽 속 기체 온도↑ → 부피↑ → 구멍으로 기체 빠져나감 → 납작하게 잘 구워짐</div>
+          </div>
+        </div>
+
+        <div class="sec-title">보일·샤를 법칙 구분 연습</div>
+        <div class="green-box">
+          <div class="cb-title">✅ 법칙 분류 기준</div>
+          • <span class="hg">온도 변화</span>로 기체 부피가 변하는 경우 → <strong>샤를 법칙</strong><br>
+          &nbsp;&nbsp;예: 농구공(추운 창고), 찌그러진 탁구공, 열기구, 비닐랩<br><br>
+          • <span class="hp">압력 변화</span>로 기체 부피가 변하는 경우 → <strong>보일 법칙</strong><br>
+          &nbsp;&nbsp;예: 잠수부 공기 방울, 과자 봉지(높은 하늘), 주사기
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">다음 현상이 보일 법칙과 샤를 법칙 중 어느 것과 관련이 있는지 구분하시오.<br><br>
+          ㄱ. 추운 겨울, 창고에 보관한 농구공이 찌그러진다.<br>
+          ㄴ. 찌그러진 탁구공을 뜨거운 물에 넣으면 탁구공이 펴진다.<br>
+          ㄷ. 잠수부가 바닷속에서 내뿜는 공기 방울은 수면 위로 올라올수록 크기가 커진다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            <strong>샤를 법칙</strong> (온도 변화로 부피 변화):<br>
+            ㄱ — 겨울(온도↓) → 농구공 내부 기체 부피↓ → 찌그러짐<br>
+            ㄴ — 뜨거운 물(온도↑) → 탁구공 내부 기체 부피↑ → 복원<br><br>
+            <strong>보일 법칙</strong> (압력 변화로 부피 변화):<br>
+            ㄷ — 수면에 가까워질수록 수압↓ → 공기 방울 부피↑
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">겨울철 언 강이나 호수에 빠진 사람을 구조할 때 얼음판에 엎드린 자세로 이동해야 하는 까닭을 압력의 관점에서 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안:</strong><br><br>
+            얼음판에 엎드리면 몸이 얼음 표면에 접촉하는 <strong>면적이 매우 커진다</strong>.<br><br>
+            압력 = 힘 ÷ 면적이므로, 같은 몸무게(힘)라도 접촉 면적이 클수록 <strong>압력이 작아진다</strong>.<br><br>
+            따라서 얼음에 가해지는 압력이 작아져 얼음판이 깨지지 않고 안전하게 이동할 수 있다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  document.querySelectorAll('.unit-section').forEach(el => el.classList.remove('visible'));
+  document.getElementById('unit' + n).classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => item.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+const hashMap = {
+  '#unit1':1,'#acc-pressure':1,'#acc-boyle':1,'#acc-boyle-life':1,
+  '#unit2':2,'#acc-charles':2,'#acc-charles-life':2
+};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n-1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
