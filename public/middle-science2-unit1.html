@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel='icon' type='image/svg+xml' href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpolygon points='70,8 121,38 121,102 70,132 19,102 19,38' fill='none' stroke='%23E85D75' stroke-width='8' stroke-linejoin='round'/%3E%3Cpolygon points='70,38 97,53 97,87 70,102 43,87 43,53' fill='none' stroke='%23E85D75' stroke-width='4' stroke-linejoin='round' stroke-dasharray='10 6'/%3E%3Ccircle cx='70' cy='8' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='38' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='70' cy='132' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='38' r='10' fill='%23E85D75'/%3E%3C/svg%3E">
+<title>베타과학학원 · 물질의 특성</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+:root {
+  /* 인디고 계열 (중2 메인 팔레트) */
+  --ind-dark:    #1e1b4b;
+  --ind-main:    #4338ca;
+  --ind-mid:     #4f46e5;
+  --ind-light:   #6366f1;
+  --ind-bright:  #818cf8;
+  --ind-tint:    #f5f3ff;
+  --ind-tint2:   #ede9fe;
+  --ind-border:  #c4b5fd;
+  --ind-border2: #a78bfa;
+
+  /* 보조 색상 박스 */
+  --green:#059669; --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --blue2:#2563eb; --blue-bg:#eff6ff;  --blue-border:#bfdbfe;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626;   --red-bg:#fef2f2;   --red-border:#fecaca;
+  --teal:#0f766e;  --teal-bg:#f0fdfa;  --teal-border:#99f6e4;
+
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#f8f7ff;   --white:#fff;
+  --radius-sm:10px; --radius:14px; --radius-lg:18px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+p{line-height:1.78;font-size:13.5px;margin:.4rem 0}
+
+/* HEADER */
+.header{background:#fff;border-bottom:1px solid #e0e7ff;padding:0 1rem;padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right));height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:500;box-shadow:0 1px 0 #e0e7ff}
+.header-left{display:flex;align-items:center;gap:9px;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--ind-mid) 0%,var(--ind-dark) 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(79,70,229,.32)}
+.brand-name{font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{display:flex;align-items:center;gap:5px;background:var(--ind-tint2);border:1px solid var(--ind-border);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--ind-dark);white-space:nowrap}
+.dot-ind{width:5px;height:5px;background:var(--ind-mid);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{padding:7px 14px;min-height:36px;background:transparent;border:1.5px solid var(--ind-border);border-radius:20px;font-size:12px;font-weight:700;color:var(--ind-dark);cursor:pointer;white-space:nowrap;transition:background .15s}
+.back-btn:hover{background:var(--ind-tint)}
+.back-btn:active{background:var(--ind-tint2)}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--ind-dark) 0%,var(--ind-main) 55%,var(--ind-mid) 100%);padding:2.8rem 1.5rem 2.2rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero::after{content:'';position:absolute;left:-50px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hero-deco{position:absolute;right:10%;top:15%;width:120px;height:120px;border-radius:50%;border:2px solid rgba(255,255,255,.12);pointer-events:none}
+.hero-deco2{position:absolute;right:18%;top:25%;width:60px;height:60px;border-radius:50%;border:1.5px solid rgba(255,255,255,.1);pointer-events:none}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+.hero-eyebrow{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+.hero-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem}
+.hero-desc{font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.7;max-width:580px;margin:0 auto 1.8rem}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:14px;padding:.9rem 1.4rem;text-align:center;backdrop-filter:blur(6px);min-width:80px;transition:background .2s}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+/* TABS */
+.tabs-wrap{background:#fff;border-bottom:2px solid var(--ind-border);position:sticky;top:54px;z-index:400}
+.tabs-inner{max-width:1100px;margin:0 auto;padding:0 1.5rem;display:flex;overflow-x:auto;justify-content:center;gap:4px;scrollbar-width:none}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{padding:13px 26px;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;margin-bottom:-2px;border-radius:8px 8px 0 0}
+.tab-btn:hover{color:var(--ind-mid);background:var(--ind-tint)}
+.tab-btn.active{color:var(--ind-mid);border-bottom-color:var(--ind-mid)}
+
+/* CONTENT */
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}
+.unit-section.visible{display:block}
+
+/* UNIT BANNER */
+.unit-banner{border-radius:var(--radius-lg);padding:1.4rem 1.8rem;margin-bottom:1.8rem;display:flex;align-items:center;gap:1.2rem;background:linear-gradient(135deg,var(--ind-tint),var(--ind-tint2));border:2px solid var(--ind-border)}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ind-mid);margin-bottom:4px}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ACCORDION */
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius-lg);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.acc-item.open{border-color:var(--ind-border);box-shadow:0 4px 20px rgba(79,70,229,.1)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:1.2rem 1.5rem;cursor:pointer;user-select:none;transition:background .15s}
+.acc-header:hover{background:var(--ind-tint)}
+.acc-num{width:32px;height:32px;border-radius:10px;background:var(--ind-tint2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--ind-dark);flex-shrink:0;transition:background .2s}
+.acc-item.open .acc-num{background:var(--ind-mid);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--ind-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-item.open .acc-subtitle{color:var(--ind-mid)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--ind-mid)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--ind-tint2)}
+.acc-item.open .acc-body{display:block}
+
+/* SECTION TITLE */
+.sec-title{font-size:12px;font-weight:800;color:var(--ind-dark);letter-spacing:.06em;text-transform:uppercase;margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--ind-mid);border-radius:2px;display:block;flex-shrink:0}
+
+/* CONTENT BOXES — 인디고 테마 */
+.concept-box{background:var(--ind-tint);border:1.5px solid var(--ind-border);border-left:4px solid var(--ind-mid);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.concept-box .cb-title{font-weight:800;color:var(--ind-dark);font-size:14px;margin-bottom:.4rem}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--green);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+.amber-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-left:4px solid var(--amber);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+.blue-box{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-left:4px solid var(--blue2);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.blue-box .cb-title{font-weight:800;color:#1e40af;font-size:14px;margin-bottom:.4rem}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+.teal-box{background:var(--teal-bg);border:1.5px solid var(--teal-border);border-left:4px solid var(--teal);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.teal-box .cb-title{font-weight:800;color:var(--teal);font-size:14px;margin-bottom:.4rem}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:var(--radius);border:1.5px solid var(--ind-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--ind-tint2);padding:10px 14px;text-align:left;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ind-dark)}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6;vertical-align:top}
+tbody tr:hover td{background:var(--ind-tint)}
+
+/* FLOW */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0}
+.flow-box{background:#fff;border:1.5px solid var(--ind-border);border-radius:8px;padding:7px 12px;font-weight:700;color:var(--ind-dark);text-align:center;font-size:12px;line-height:1.4}
+.flow-arrow{color:var(--ind-mid);font-size:18px;font-weight:900}
+
+/* POINT CARDS */
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:.8rem 0}
+.point-card{background:#fff;border:1.5px solid var(--ind-border);border-radius:var(--radius);padding:1rem;text-align:center;transition:border-color .2s,box-shadow .2s}
+.point-card:hover{border-color:var(--ind-mid);box-shadow:0 4px 12px rgba(79,70,229,.12)}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--ind-mid);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* HIGHLIGHT */
+.hp{color:var(--ind-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--blue2);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.ht{color:var(--teal);font-weight:800}
+
+/* FORMULA */
+.formula-box{background:linear-gradient(135deg,var(--ind-tint),var(--ind-tint2));border:2px solid var(--ind-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--ind-dark);letter-spacing:-.01em;font-style:italic}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:8px;margin:.8rem 0}
+.step-item{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius);padding:.9rem 1.1rem;transition:border-color .2s}
+.step-item:hover{border-color:var(--ind-border)}
+.step-num{width:28px;height:28px;border-radius:8px;background:var(--ind-mid);color:#fff;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px}
+.step-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+/* QUIZ */
+.quiz-wrap{background:linear-gradient(135deg,var(--ind-tint2),var(--ind-tint));border:1.5px solid var(--ind-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin-top:1.6rem}
+.quiz-label{font-size:11px;font-weight:800;color:var(--ind-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{background:var(--ind-mid);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.quiz-toggle:hover{background:var(--ind-dark)}
+.quiz-ans{display:none;margin-top:.8rem;padding:.9rem 1rem;background:rgba(255,255,255,.85);border-radius:10px;font-size:13.5px;color:var(--text);line-height:1.75;border:1px solid var(--ind-border)}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:.6rem 0}
+.chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:var(--ind-tint2);color:var(--ind-dark);border:1px solid var(--ind-border)}
+.chip-g{background:var(--green-bg);color:#065f46;border-color:var(--green-border)}
+.chip-r{background:var(--red-bg);color:#991b1b;border-color:var(--red-border)}
+.chip-a{background:var(--amber-bg);color:#92400e;border-color:var(--amber-border)}
+.chip-b{background:var(--blue-bg);color:#1e40af;border-color:var(--blue-border)}
+.chip-t{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-border)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.45rem}
+  .hero-desc{font-size:13px}
+  .hero-eyebrow{font-size:10px;padding:4px 11px}
+  .hero-stats{gap:7px}
+  .hero-stat-card{min-width:68px;padding:.75rem .9rem}
+  .hs-num{font-size:1.45rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{justify-content:flex-start;gap:0;padding:0 .5rem}
+  .tab-btn{padding:11px 13px;font-size:11.5px;border-radius:6px 6px 0 0}
+  .content-wrap{padding:1.2rem .85rem 4rem}
+  .unit-banner{flex-direction:column;gap:.75rem;padding:1.1rem}
+  .ub-emoji{font-size:2.1rem}
+  .ub-title{font-size:1.1rem}
+  .acc-header{padding:.95rem 1rem;gap:10px}
+  .acc-num{width:30px;height:30px;font-size:12px;border-radius:8px}
+  .acc-htitle{font-size:14px}
+  .acc-hdesc{font-size:11.5px}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .steps{gap:7px}
+  .step-item{padding:.8rem .95rem}
+  table{font-size:12px}
+  thead th{font-size:10px;padding:8px 10px}
+  tbody td{padding:8px 10px}
+  .concept-box,.green-box,.amber-box,.blue-box,.red-box,.teal-box{padding:.85rem 1rem;font-size:13px}
+  .formula-box{padding:1rem 1.1rem}
+  .formula-text{font-size:1.15rem}
+  .quiz-wrap{padding:1rem 1.1rem}
+  .quiz-q{font-size:13px}
+}
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .hero-deco,.hero-deco2{display:none}
+  .hero{padding:1.7rem .9rem 1.5rem}
+  .hero-title{font-size:1.28rem;letter-spacing:-.025em}
+  .hero-desc{font-size:12.5px;margin-bottom:1.4rem}
+  .breadcrumb{gap:4px;margin-bottom:.9rem}
+  .bc-item,.bc-current,.bc-sep{font-size:11px}
+  .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;max-width:280px;margin:0 auto}
+  .hero-stat-card{min-width:0;padding:.7rem .5rem}
+  .hs-num{font-size:1.3rem}
+  .tabs-inner{padding:0 .3rem}
+  .tab-btn{padding:10px 11px;font-size:11px;white-space:nowrap}
+  .ub-title{font-size:1rem}
+  .ub-desc{font-size:12px}
+  .acc-header{padding:.85rem .9rem;gap:8px}
+  .acc-htitle{font-size:13.5px}
+  .acc-hdesc{font-size:11px}
+  .acc-body{padding:0 .9rem 1.2rem}
+  .sec-title{font-size:11px}
+  .point-box{grid-template-columns:1fr}
+  .pc-icon{font-size:1.5rem}
+  .pc-title{font-size:12px}
+  .pc-desc{font-size:11.5px}
+  .step-num{width:26px;height:26px;font-size:12px;border-radius:7px;flex-shrink:0}
+  .step-title{font-size:12.5px}
+  .step-desc{font-size:12px}
+  .formula-text{font-size:1rem}
+  .formula-sub{font-size:11px}
+  .table-wrap{-webkit-overflow-scrolling:touch}
+  .quiz-q{font-size:12.5px}
+  .quiz-toggle{font-size:11.5px;padding:6px 15px}
+  .quiz-ans{font-size:13px}
+  .chip,.chip-g,.chip-r,.chip-a,.chip-b,.chip-t{font-size:10.5px;padding:3px 10px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-ind"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="science2-summary.html" class="bc-item">중학 과학 2</a><span class="bc-sep">›</span>
+      <span class="bc-current">🧪 Ⅰ. 물질의 특성</span>
+    </div>
+    <div class="hero-eyebrow">🧪 PART 01 · 중학 과학 2 · UNIT 01</div>
+    <div class="hero-title">Ⅰ. 물질의 특성</div>
+    <div class="hero-desc">밀도·녹는점·끓는점·용해도 등 물질의 고유한 특성,<br>순물질과 혼합물 구별, 밀도·끓는점·용해도 차를 이용한 혼합물 분리</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">2</div><div class="hs-lbl">중단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">9</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">12+</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">🧪 중단원1 · 물질의 특성</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">⚗️ 중단원2 · 혼합물의 분리</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ═══════════════════════════════
+     중단원 1: 물질의 특성
+═══════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner">
+    <div class="ub-emoji">🧪</div>
+    <div>
+      <div class="ub-num">중단원 01 · Properties of Matter</div>
+      <div class="ub-title">물질의 특성</div>
+      <div class="ub-desc">밀도·녹는점·끓는점·용해도가 물질의 특성임을 이해하고, 순물질과 혼합물을 구별하는 방법을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 물질의 고유한 성질 -->
+    <div class="acc-item" id="acc-property">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Intrinsic Properties · 물질의 고유한 성질</div>
+          <div class="acc-htitle">물질의 고유한 성질과 물질의 특성</div>
+          <div class="acc-hdesc">물질의 특성 정의 · 고유한 성질의 조건 · 순물질 vs 혼합물 구별</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">물질의 특성이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">💡 물질의 특성 (Properties of Matter)</div>
+          <span class="hp">어떤 물질이 다른 물질과 구별되는 그 물질만의 고유한 성질</span>.<br><br>
+          물질의 특성은 <span class="hp">물질의 양에 관계없이 항상 일정</span>하다.<br><br>
+          예: 밀도, 녹는점, 끓는점, 용해도, 색깔, 냄새, 맛 등
+        </div>
+
+        <div class="sec-title">순물질 vs 혼합물</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>순물질</th><th>혼합물</th></tr></thead>
+          <tbody>
+            <tr><td><strong>정의</strong></td><td><span class="hp">한 가지 물질</span>로만 이루어진 것</td><td><span class="hb">두 가지 이상</span>의 순물질이 섞인 것</td></tr>
+            <tr><td><strong>밀도</strong></td><td><span class="hg">일정</span></td><td><span class="ha">성분 비율에 따라 변함</span></td></tr>
+            <tr><td><strong>녹는점·끓는점</strong></td><td><span class="hg">일정</span></td><td><span class="ha">일정하지 않음</span></td></tr>
+            <tr><td><strong>예시</strong></td><td>물, 드라이아이스, 산소, 구리</td><td>공기, 바닷물, 탄산음료, 간장</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="amber-box">
+          <div class="cb-title">📌 순물질·혼합물 구별 핵심</div>
+          • 소금물: 소금을 더 넣을수록 밀도 <span class="ha">변함</span> → <strong>혼합물</strong><br>
+          • 소금물은 물보다 높은 온도에서 끓기 시작하고, 끓는 동안에도 온도가 계속 변함<br>
+          • 물(순물질): 끓는 동안 온도 <span class="hg">일정(100°C)</span>, 어는 동안 온도 <span class="hg">일정(0°C)</span>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">다음 물질을 순물질과 혼합물로 분류하시오.<br><br>
+          구리 / 탄산음료 / 간장 / 헬륨 / 바닷물 / 드라이아이스</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            <strong>순물질</strong>: 구리, 헬륨, 드라이아이스 — 한 가지 물질만으로 이루어짐<br>
+            <strong>혼합물</strong>: 탄산음료, 간장, 바닷물 — 두 가지 이상의 물질이 섞임<br><br>
+            💡 암석은 혼합물 (여러 광물이 섞임), 물은 순물질 (H₂O 한 가지)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 밀도 -->
+    <div class="acc-item" id="acc-density">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Density · 밀도</div>
+          <div class="acc-htitle">밀도 — 단위 부피당 질량</div>
+          <div class="acc-hdesc">밀도 공식 · 물질의 특성인 이유 · 밀도와 뜨고 가라앉음</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">밀도란?</div>
+        <div class="concept-box">
+          <div class="cb-title">⚖️ 밀도 (Density)</div>
+          <span class="hp">일정한 부피에 해당하는 물질의 질량</span>, 즉 <span class="hp">단위 부피당 질량</span>.<br><br>
+          일정한 온도와 압력에서 밀도는 물질의 양에 관계없이 일정하며, <span class="hp">물질의 종류에 따라 다르므로 물질의 특성</span>이다.
+        </div>
+
+        <div class="formula-box">
+          <div class="formula-text">밀도 (g/cm³) = 질량 (g) ÷ 부피 (cm³)</div>
+          <div class="formula-sub">단위: g/cm³ (고체·액체) 또는 g/L (기체)</div>
+        </div>
+
+        <div class="sec-title">밀도와 뜨고 가라앉음</div>
+        <div class="blue-box">
+          <div class="cb-title">🌊 밀도 비교로 설명하는 현상</div>
+          • 물체 밀도 < 액체 밀도 → <span class="hb">위로 뜬다</span><br>
+          • 물체 밀도 > 액체 밀도 → <span class="hr">아래로 가라앉는다</span><br><br>
+          예: 플라스틱(밀도 작음) → 물 위에 뜸<br>
+          예: 글리세린(밀도 큼) → 물 아래로 가라앉음<br>
+          예: 사해 — 소금물의 밀도가 매우 커서 사람이 뜸
+        </div>
+
+        <div class="sec-title">여러 가지 물질의 밀도 (20°C, 1기압)</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>물질</th><th>밀도 (g/cm³)</th><th>물질</th><th>밀도 (g/cm³)</th></tr></thead>
+          <tbody>
+            <tr><td>물</td><td>1.00</td><td>철</td><td>7.87</td></tr>
+            <tr><td>얼음</td><td>0.92 (물보다 작음)</td><td>구리</td><td>8.96</td></tr>
+            <tr><td>식용유</td><td>0.92</td><td>금</td><td>19.3</td></tr>
+            <tr><td>에탄올</td><td>0.79</td><td>공기</td><td>0.0013</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 밀도의 특징</div>
+          • 같은 물질이면 크기가 달라도 밀도는 <strong>같다</strong><br>
+          • 기체의 밀도는 온도·압력에 따라 크게 변하므로 표시할 때 온도·압력을 함께 쓴다<br>
+          • 얼음의 밀도(0.92) < 물의 밀도(1.00) → 얼음이 물 위에 뜬다 ← 예외적인 현상
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">질량이 54 g이고 부피가 20 cm³인 물체의 밀도는 얼마인가? 또한 이 물체를 물(밀도 1 g/cm³)에 넣으면 뜨는가, 가라앉는가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            밀도 = 54 g ÷ 20 cm³ = <strong>2.7 g/cm³</strong><br><br>
+            물의 밀도(1.0 g/cm³) < 이 물체의 밀도(2.7 g/cm³)<br>
+            → 물체의 밀도가 물보다 크므로 <strong>가라앉는다</strong><br><br>
+            💡 밀도 2.7 g/cm³는 알루미늄의 밀도와 같다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 03: 녹는점과 끓는점 -->
+    <div class="acc-item" id="acc-melt-boil">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Melting & Boiling Points · 녹는점·끓는점</div>
+          <div class="acc-htitle">녹는점과 끓는점</div>
+          <div class="acc-hdesc">정의 · 물질의 특성인 이유 · 어는점 = 녹는점 · 가열·냉각 곡선</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">녹는점과 끓는점의 정의</div>
+        <div class="concept-box">
+          <div class="cb-title">🌡️ 녹는점과 끓는점</div>
+          • <span class="hp">녹는점 (Melting Point)</span>: 일정 압력에서 물질이 <strong>고체 → 액체</strong>로 변할 때의 온도<br>
+          • <span class="hp">끓는점 (Boiling Point)</span>: 일정 압력에서 물질이 <strong>액체 → 기체</strong>로 변할 때의 온도<br>
+          • <span class="hp">어는점 (Freezing Point)</span>: 물질이 <strong>액체 → 고체</strong>로 변할 때의 온도<br><br>
+          💡 어는점 = 녹는점 (같은 온도)
+        </div>
+
+        <div class="sec-title">물질의 특성인 이유</div>
+        <div class="green-box">
+          <div class="cb-title">✅ 녹는점·끓는점이 물질의 특성인 이유</div>
+          • 물질마다 <span class="hg">다르다</span> — 서로 다른 물질을 구별하는 기준이 됨<br>
+          • 같은 물질이면 양에 관계없이 <span class="hg">항상 일정</span>하다<br><br>
+          예: 에탄올의 끓는점은 항상 78°C (1기압), 물의 끓는점은 항상 100°C (1기압)
+        </div>
+
+        <div class="sec-title">여러 가지 물질의 녹는점·끓는점 (1기압)</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>물질</th><th>녹는점 (°C)</th><th>끓는점 (°C)</th></tr></thead>
+          <tbody>
+            <tr><td>물 (H₂O)</td><td>0</td><td>100</td></tr>
+            <tr><td>에탄올</td><td>-117</td><td>78</td></tr>
+            <tr><td>소금 (NaCl)</td><td>801</td><td>1413</td></tr>
+            <tr><td>철</td><td>1538</td><td>2862</td></tr>
+            <tr><td>질소</td><td>-210</td><td>-196</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="red-box">
+          <div class="cb-title">🔴 혼합물의 끓는점·녹는점 특징</div>
+          • 혼합물은 끓는점이 <span class="hr">일정하지 않다</span> (순물질보다 높거나 낮아짐)<br>
+          • 소금물: 물보다 <span class="hr">높은 온도</span>에서 끓기 시작하고, 끓는 동안 온도가 계속 상승<br>
+          • 소금물: 물보다 <span class="hr">낮은 온도</span>에서 얼기 시작하고, 어는 동안 온도 계속 하강
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">녹는점과 끓는점이 물질의 특성이 될 수 있는 이유를 두 가지 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            ① 물질의 종류에 따라 <strong>다르다</strong> (서로 다른 물질을 구별할 수 있다)<br>
+            ② 같은 물질이면 양에 관계없이 <strong>항상 일정</strong>하다<br><br>
+            → 이 두 조건을 만족하므로 물질의 특성이 된다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 04: 용해도 -->
+    <div class="acc-item" id="acc-solubility">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">04</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Solubility · 용해도</div>
+          <div class="acc-htitle">용해도</div>
+          <div class="acc-hdesc">고체 용해도·곡선 · 기체 용해도(온도↑ 작아짐·압력↑ 커짐) · 석출</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">용해도란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🧂 용해도 (Solubility)</div>
+          어떤 온도에서 <span class="hp">용매 100 g에 최대로 녹을 수 있는 용질의 질량(g)</span>.<br><br>
+          • 물질의 종류에 따라 다르므로 <span class="hp">물질의 특성</span>이다<br>
+          • 용해도는 온도가 달라지면 변함 → 표시할 때 온도도 함께 씀
+        </div>
+
+        <div class="sec-title">고체의 용해도</div>
+        <div class="blue-box">
+          <div class="cb-title">📈 온도와 고체의 용해도</div>
+          대부분의 고체: 온도가 <span class="hb">높아질수록 용해도 커짐</span><br>
+          (예외: 수산화칼슘 — 온도 높아질수록 용해도 작아짐)<br><br>
+          <strong>용해도 곡선</strong>: 온도에 따른 물질의 용해도를 그래프로 나타낸 것<br><br>
+          • 온도가 높아질수록 용해도 차가 큰 물질: 질산 칼륨, 질산 나트륨<br>
+          • 온도 변화에 관계없이 용해도가 거의 변하지 않는 물질: 염화 나트륨(소금)
+        </div>
+
+        <div class="sec-title">기체의 용해도</div>
+        <div class="teal-box">
+          <div class="cb-title">🫧 온도·압력과 기체의 용해도</div>
+          • 온도 <span class="ht">높아지면</span> → 기체 용해도 <span class="ht">작아진다</span> (탄산음료를 가열하면 CO₂ 빠져나옴)<br>
+          • 압력 <span class="ht">높아지면</span> → 기체 용해도 <span class="ht">커진다</span><br><br>
+          예: 탄산음료 뚜껑을 열면 거품이 나오는 이유 → 압력 감소 → CO₂ 용해도 감소<br>
+          예: 물고기가 더운 여름에 힘들어하는 이유 → 수온 상승 → 물속 O₂ 용해도 감소
+        </div>
+
+        <div class="sec-title">석출</div>
+        <div class="concept-box">
+          <div class="cb-title">❄️ 석출 (Crystallization)</div>
+          용액에 녹아 있던 <span class="hp">용질이 고체 상태로 용액에서 분리되는 현상</span>.<br><br>
+          방법: 온도를 낮추거나 용매를 증발시키면 용해도 이상의 용질이 석출된다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">기체의 용해도에 영향을 주는 두 가지 요인과 각각의 변화 방향을 서술하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            ① <strong>온도</strong>: 온도가 <strong>높아지면</strong> 기체의 용해도가 <strong>작아진다</strong><br>
+            ② <strong>압력</strong>: 압력이 <strong>높아지면</strong> 기체의 용해도가 <strong>커진다</strong><br><br>
+            💡 고체와 반대! 고체는 온도↑ → 용해도↑, 기체는 온도↑ → 용해도↓
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ═══════════════════════════════
+     중단원 2: 혼합물의 분리
+═══════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner">
+    <div class="ub-emoji">⚗️</div>
+    <div>
+      <div class="ub-num">중단원 02 · Separation of Mixtures</div>
+      <div class="ub-title">혼합물의 분리</div>
+      <div class="ub-desc">밀도 차·끓는점 차·용해도 차를 이용한 혼합물 분리 방법과 실생활 활용 사례를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 밀도 차를 이용한 분리 -->
+    <div class="acc-item" id="acc-density-sep">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Density Difference · 밀도 차 분리</div>
+          <div class="acc-htitle">밀도 차를 이용한 혼합물 분리</div>
+          <div class="acc-hdesc">고체 혼합물 분리 · 분별 깔때기(액체) · 실생활 사례</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">밀도 차를 이용한 고체 혼합물 분리</div>
+        <div class="concept-box">
+          <div class="cb-title">⚖️ 원리</div>
+          밀도가 다른 고체 물질이 섞인 혼합물을 <span class="hp">두 고체의 중간 밀도를 가진 액체</span>에 넣으면 분리된다.<br><br>
+          • 액체보다 밀도 작은 고체 → 위로 뜸<br>
+          • 액체보다 밀도 큰 고체 → 아래로 가라앉음
+        </div>
+
+        <div class="sec-title">서로 섞이지 않는 액체 혼합물 — 분별 깔때기</div>
+        <div class="blue-box">
+          <div class="cb-title">🫙 분별 깔때기 (Separatory Funnel)</div>
+          물과 식용유처럼 <span class="hb">서로 섞이지 않는 액체 혼합물</span>을 밀도 차를 이용해 분리하는 기구.<br><br>
+          ① 분별 깔때기에 혼합물을 넣고 기다린다<br>
+          ② 두 층으로 나뉘면 꼭지를 열어 아래층(밀도 큰 물) 먼저 받아낸다<br>
+          ③ 위층(밀도 작은 식용유) 따라낸다
+        </div>
+
+        <div class="sec-title">밀도 차 이용 사례</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🍒</div>
+            <div class="pc-title">크랜베리 수확</div>
+            <div class="pc-desc">밭에 물을 채우면 밀도 작은 크랜베리가 수면 위로 떠올라 쉽게 수확</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🧫</div>
+            <div class="pc-title">혈액 분리 (원심 분리)</div>
+            <div class="pc-desc">혈액을 고속 회전 → 밀도 큰 고체 성분 아래, 액체 성분 위로 분리</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🛢️</div>
+            <div class="pc-title">기름 유출 제거</div>
+            <div class="pc-desc">바닷물보다 밀도 작은 기름이 수면에 뜸 → 기름막이·흡착포로 제거</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🌰</div>
+            <div class="pc-title">상한 밤 분리</div>
+            <div class="pc-desc">상한 밤: 내부 빈 공간 → 밀도 작음 → 소금물에 넣으면 위로 뜸</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🥩</div>
+            <div class="pc-title">고깃국 기름 제거</div>
+            <div class="pc-desc">기름(밀도 작음)이 국물 위로 떠오름 → 쉽게 제거 가능</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🥛</div>
+            <div class="pc-title">우유에서 지방 분리</div>
+            <div class="pc-desc">원심 분리기로 밀도 차 이용 → 지방 분리 → 버터·치즈·저지방우유 제조</div>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">물과 식용유 혼합물을 분별 깔때기로 분리할 때, 어느 층에 어떤 물질이 위치하며 어느 것을 먼저 받아내는지 서술하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • <strong>위층</strong>: 식용유 (밀도 ≈ 0.92 g/cm³, 물보다 작음)<br>
+            • <strong>아래층</strong>: 물 (밀도 1.0 g/cm³, 식용유보다 큼)<br><br>
+            → 꼭지를 열어 <strong>아래층(물)</strong>을 먼저 받아낸 뒤, 위층(식용유)를 따라낸다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 끓는점 차를 이용한 분리 — 증류 -->
+    <div class="acc-item" id="acc-distill">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Boiling Point · 끓는점 차 — 증류</div>
+          <div class="acc-htitle">끓는점 차를 이용한 분리 — 증류</div>
+          <div class="acc-hdesc">증류 정의 · 물과 에탄올 분리 · 증류탑(원유) · 소줏고리</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">증류란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🔬 증류 (Distillation)</div>
+          <span class="hp">액체 상태의 혼합물을 가열했을 때 끓어 나오는 기체를 냉각하여 액체 물질을 분리하는 방법</span>.<br><br>
+          끓는점이 낮은 물질이 먼저 기화하여 나온다.<br><br>
+          예: 물(끓는점 100°C)과 에탄올(끓는점 78°C) 혼합물<br>
+          → 가열하면 에탄올이 먼저 끓어 나온다 → 기체를 냉각 → 에탄올 분리
+        </div>
+
+        <div class="sec-title">증류를 이용한 혼합물 분리 사례</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🏭</div>
+            <div class="pc-title">원유 분리 (증류탑)</div>
+            <div class="pc-desc">원유 가열 → 끓는점 비슷한 물질끼리 분리 → 석유 가스·휘발유·등유·경유·중유·아스팔트</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🍶</div>
+            <div class="pc-title">소줏고리</div>
+            <div class="pc-desc">발효한 술을 가열 → 에탄올(끓는점 낮음)이 먼저 기화 → 냉각하여 맑은 술 획득</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🌊</div>
+            <div class="pc-title">바닷물 담수화</div>
+            <div class="pc-desc">바닷물 가열 → 물 수증기로 끓어 나옴 → 냉각 → 짠맛 없는 식수 획득</div>
+          </div>
+        </div>
+
+        <div class="amber-box">
+          <div class="cb-title">📌 원유 증류탑 분리 물질 (끓는점 낮은 순)</div>
+          석유 가스(-42~1°C) → 휘발유(30~120°C) → 등유(150~280°C) → 경유(230~350°C) → 중유(300°C 이상) → 아스팔트
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">물과 에탄올 혼합물을 가열하면 먼저 끓어 나오는 물질은 무엇이며, 그 이유를 끓는점과 관련지어 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 에탄올이 먼저 끓어 나온다.</strong><br><br>
+            이유: 에탄올의 끓는점(78°C)이 물의 끓는점(100°C)보다 <strong>낮기 때문</strong>이다.<br><br>
+            끓는점이 낮은 에탄올이 먼저 기화하여 나오므로, 이 기체를 냉각하면 에탄올을 분리할 수 있다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 03: 용해도 차를 이용한 분리 — 재결정 -->
+    <div class="acc-item" id="acc-recrystal">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Solubility Difference · 용해도 차 — 재결정</div>
+          <div class="acc-htitle">용해도 차를 이용한 분리 — 재결정</div>
+          <div class="acc-hdesc">재결정 정의 · 질산 칼륨 분리 · 꽃소금·아스피린·설탕 정제</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">재결정이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🧊 재결정 (Recrystallization)</div>
+          불순물이 섞인 고체 물질을 <span class="hp">적절한 용매에 녹인 뒤 용매를 증발시키거나 용액의 온도를 낮추어 순수한 고체 물질을 분리하는 방법</span>.<br><br>
+          원리: 온도에 따른 <span class="hp">용해도 차</span>를 이용한다.<br>
+          → 용해도 차가 큰 물질은 온도를 낮추면 많이 석출됨
+        </div>
+
+        <div class="sec-title">재결정 실험 — 질산 칼륨 분리</div>
+        <div class="steps">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">고온의 물에 용해</div>
+              <div class="step-desc">40°C 물 100 g에 질산 칼륨 30 g + 황산 구리(Ⅱ) 1 g 혼합물을 모두 녹인다</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">냉각 (온도 낮춤)</div>
+              <div class="step-desc">얼음물에 비커를 담가 급냉 → 용해도 차가 큰 질산 칼륨이 먼저 석출됨</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">거르기</div>
+              <div class="step-desc">거름 장치로 걸러 석출된 질산 칼륨 고체를 분리. 황산 구리(Ⅱ)는 용액에 녹아 있어 거름종이 통과</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="blue-box">
+          <div class="cb-title">📊 왜 질산 칼륨이 먼저 석출되는가?</div>
+          질산 칼륨: 온도에 따른 용해도 변화가 <span class="hb">매우 큼</span> → 냉각하면 많이 석출<br>
+          황산 구리(Ⅱ): 온도에 따른 용해도 변화가 <span class="hb">비교적 작음</span> → 냉각해도 용액 속에 남음
+        </div>
+
+        <div class="sec-title">재결정 활용 사례</div>
+        <div class="chips">
+          <span class="chip-g chip">💊 아스피린 정제 — 불순물 제거</span>
+          <span class="chip-g chip">🍬 설탕 정제 — 순수한 설탕 결정 획득</span>
+          <span class="chip-g chip">🧂 천일염 → 꽃소금 — 불순물 제거</span>
+          <span class="chip chip">🧪 화학 의약품 순도 향상</span>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 7</div>
+          <div class="quiz-q">천일염으로부터 꽃소금을 얻을 때 이용하는 물질의 특성과 그 방법(재결정)의 원리를 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            이용하는 물질의 특성: <strong>용해도</strong><br><br>
+            원리: 천일염을 물에 녹여 불순물을 제거한 뒤 물을 다시 증발시키면, 용해도 차에 의해 순수한 소금 결정(꽃소금)이 석출된다.<br><br>
+            이처럼 불순물이 섞인 고체 물질을 용매에 녹인 뒤 냉각하거나 용매를 증발시켜 순수한 고체를 분리하는 방법을 <strong>재결정</strong>이라고 한다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화 — 분리 방법 종합 정리</div>
+          <div class="quiz-q">밀도 차·끓는점 차·용해도 차를 이용하는 분리 방법의 이름과 대표적인 예시를 각각 한 가지씩 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안:</strong><br><br>
+            • <strong>밀도 차</strong> 이용: <strong>분별 깔때기</strong> 사용 — 물과 식용유 혼합물 분리<br>
+            &nbsp;&nbsp;(또는 소금물에서 상한 밤 분리, 크랜베리 수확 등)<br><br>
+            • <strong>끓는점 차</strong> 이용: <strong>증류</strong> — 물과 에탄올 혼합물에서 에탄올 분리<br>
+            &nbsp;&nbsp;(또는 원유 증류탑, 바닷물 담수화 등)<br><br>
+            • <strong>용해도 차</strong> 이용: <strong>재결정</strong> — 불순물이 섞인 질산 칼륨에서 순수한 질산 칼륨 분리<br>
+            &nbsp;&nbsp;(또는 아스피린 정제, 꽃소금 제조 등)
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  document.querySelectorAll('.unit-section').forEach(el => el.classList.remove('visible'));
+  document.getElementById('unit' + n).classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => item.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+const hashMap = {
+  '#unit1':1,'#acc-property':1,'#acc-density':1,'#acc-melt-boil':1,'#acc-solubility':1,
+  '#unit2':2,'#acc-density-sep':2,'#acc-distill':2,'#acc-recrystal':2
+};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n-1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
