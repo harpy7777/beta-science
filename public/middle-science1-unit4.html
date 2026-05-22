@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel='icon' type='image/svg+xml' href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpolygon points='70,8 121,38 121,102 70,132 19,102 19,38' fill='none' stroke='%23E85D75' stroke-width='8' stroke-linejoin='round'/%3E%3Cpolygon points='70,38 97,53 97,87 70,102 43,87 43,53' fill='none' stroke='%23E85D75' stroke-width='4' stroke-linejoin='round' stroke-dasharray='10 6'/%3E%3Ccircle cx='70' cy='8' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='38' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='70' cy='132' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='38' r='10' fill='%23E85D75'/%3E%3C/svg%3E">
+<title>베타과학학원 · 물질의 상태 변화</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+:root {
+  --pur-dark:    #3b1fa3;
+  --pur-main:    #5b3fd4;
+  --pur-mid:     #7c5ce8;
+  --pur-light:   #a78bfa;
+  --pur-tint:    #f5f3ff;
+  --pur-tint2:   #ede9fe;
+  --pur-border:  #c4b5fd;
+  --pur-border2: #a78bfa;
+
+  --green:#059669; --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --blue2:#2563eb; --blue-bg:#eff6ff;  --blue-border:#bfdbfe;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626;   --red-bg:#fef2f2;   --red-border:#fecaca;
+  --indigo:#4f46e5;--indigo-bg:#eef2ff;--indigo-border:#c7d2fe;
+
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#f8f7ff;   --white:#fff;
+
+  --radius-sm:10px; --radius:14px; --radius-lg:18px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;-webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+p{line-height:1.78;font-size:13.5px;margin:.4rem 0}
+
+/* ── HEADER ── */
+.header{
+  background:#fff;border-bottom:1px solid #ede9fe;
+  padding:0 1rem;
+  padding-left:max(1rem,env(safe-area-inset-left));
+  padding-right:max(1rem,env(safe-area-inset-right));
+  height:54px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:500;
+  box-shadow:0 1px 0 #ede9fe;
+}
+.header-left{display:flex;align-items:center;gap:9px;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{
+  width:30px;height:30px;
+  background:linear-gradient(135deg,var(--pur-mid) 0%,var(--pur-dark) 100%);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.brand-name{font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{
+  display:flex;align-items:center;gap:5px;
+  background:var(--pur-tint);border:1px solid var(--pur-border);
+  border-radius:20px;padding:4px 10px;
+  font-size:10px;font-weight:700;color:var(--pur-dark);white-space:nowrap;
+}
+.dot-pur{width:5px;height:5px;background:var(--pur-mid);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{
+  padding:7px 14px;min-height:36px;
+  background:transparent;border:1.5px solid var(--pur-border);
+  border-radius:20px;font-size:12px;font-weight:700;color:var(--pur-dark);
+  cursor:pointer;white-space:nowrap;transition:background .15s;
+}
+.back-btn:hover{background:var(--pur-tint)}
+.back-btn:active{background:var(--pur-tint2)}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(135deg,var(--pur-dark) 0%,var(--pur-main) 55%,var(--pur-mid) 100%);
+  padding:2.8rem 1.5rem 2.2rem;
+  position:relative;overflow:hidden;
+}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero::after{content:'';position:absolute;left:-50px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hero-deco{position:absolute;right:10%;top:15%;width:120px;height:120px;border-radius:50%;border:2px solid rgba(255,255,255,.12);pointer-events:none}
+.hero-deco2{position:absolute;right:18%;top:25%;width:60px;height:60px;border-radius:50%;border:1.5px solid rgba(255,255,255,.1);pointer-events:none}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+
+.hero-eyebrow{
+  display:inline-block;
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:5px 14px;
+  font-size:11px;font-weight:700;color:#fff;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;
+}
+.hero-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem}
+.hero-desc{font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.7;max-width:580px;margin:0 auto 1.8rem}
+
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{
+  background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);
+  border-radius:14px;padding:.9rem 1.4rem;
+  text-align:center;backdrop-filter:blur(6px);min-width:80px;transition:background .2s;
+}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+/* ── TABS ── */
+.tabs-wrap{background:#fff;border-bottom:2px solid var(--pur-border);position:sticky;top:54px;z-index:400}
+.tabs-inner{
+  max-width:1100px;margin:0 auto;
+  padding:0 1.5rem;display:flex;overflow-x:auto;
+  justify-content:center;gap:4px;scrollbar-width:none;
+}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{
+  padding:13px 26px;font-size:13px;font-weight:700;
+  color:var(--muted);border:none;background:none;cursor:pointer;
+  font-family:inherit;border-bottom:3px solid transparent;
+  white-space:nowrap;transition:all .2s;
+  margin-bottom:-2px;border-radius:8px 8px 0 0;
+}
+.tab-btn:hover{color:var(--pur-main);background:var(--pur-tint)}
+.tab-btn.active{color:var(--pur-main);border-bottom-color:var(--pur-main)}
+
+/* ── CONTENT ── */
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}
+.unit-section.visible{display:block}
+
+/* ── UNIT BANNER ── */
+.unit-banner{
+  border-radius:var(--radius-lg);padding:1.4rem 1.8rem;margin-bottom:1.8rem;
+  display:flex;align-items:center;gap:1.2rem;
+  background:linear-gradient(135deg,var(--pur-tint),var(--pur-tint2));
+  border:2px solid var(--pur-border);
+}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--pur-main);margin-bottom:4px}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── ACCORDION ── */
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius-lg);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.acc-item.open{border-color:var(--pur-border);box-shadow:0 4px 20px rgba(91,63,212,.1)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:1.2rem 1.5rem;cursor:pointer;user-select:none;transition:background .15s}
+.acc-header:hover{background:var(--pur-tint)}
+.acc-num{width:32px;height:32px;border-radius:10px;background:var(--pur-tint2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--pur-dark);flex-shrink:0;transition:background .2s}
+.acc-item.open .acc-num{background:var(--pur-main);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--pur-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-item.open .acc-subtitle{color:var(--pur-main)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--pur-main)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--pur-tint2)}
+.acc-item.open .acc-body{display:block}
+
+/* ── SECTION TITLE ── */
+.sec-title{
+  font-size:12px;font-weight:800;color:var(--pur-dark);
+  letter-spacing:.06em;text-transform:uppercase;
+  margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px;
+}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--pur-main);border-radius:2px;display:block;flex-shrink:0}
+
+/* ── CONTENT BOXES ── */
+.concept-box{background:var(--pur-tint);border:1.5px solid var(--pur-border);border-left:4px solid var(--pur-main);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.concept-box .cb-title{font-weight:800;color:var(--pur-dark);font-size:14px;margin-bottom:.4rem}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--green);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+.amber-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-left:4px solid var(--amber);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+.blue-box{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-left:4px solid var(--blue2);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.blue-box .cb-title{font-weight:800;color:#1e40af;font-size:14px;margin-bottom:.4rem}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+.indigo-box{background:var(--indigo-bg);border:1.5px solid var(--indigo-border);border-left:4px solid var(--indigo);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.indigo-box .cb-title{font-weight:800;color:#3730a3;font-size:14px;margin-bottom:.4rem}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:var(--radius);border:1.5px solid var(--pur-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--pur-tint2);padding:10px 14px;text-align:left;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--pur-dark)}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6;vertical-align:top}
+tbody tr:hover td{background:var(--pur-tint)}
+
+/* ── FLOW ── */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0;font-size:13px}
+.flow-box{background:#fff;border:1.5px solid var(--pur-border);border-radius:8px;padding:7px 12px;font-weight:700;color:var(--pur-dark);text-align:center;font-size:12px;line-height:1.4}
+.flow-arrow{color:var(--pur-main);font-size:18px;font-weight:900}
+
+/* ── POINT CARDS ── */
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:.8rem 0}
+.point-card{background:#fff;border:1.5px solid var(--pur-border);border-radius:var(--radius);padding:1rem;text-align:center;transition:border-color .2s,box-shadow .2s}
+.point-card:hover{border-color:var(--pur-main);box-shadow:0 4px 12px rgba(91,63,212,.12)}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--pur-main);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ── HIGHLIGHT TEXT ── */
+.hp{color:var(--pur-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--blue2);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.hi{color:var(--indigo);font-weight:800}
+
+/* ── FORMULA BOX ── */
+.formula-box{background:linear-gradient(135deg,var(--pur-tint),var(--pur-tint2));border:2px solid var(--pur-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--pur-dark);letter-spacing:-.01em;font-style:italic}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* ── STEP CARDS ── */
+.steps{display:flex;flex-direction:column;gap:8px;margin:.8rem 0}
+.step-item{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius);padding:.9rem 1.1rem;transition:border-color .2s}
+.step-item:hover{border-color:var(--pur-border)}
+.step-num{width:28px;height:28px;border-radius:8px;background:var(--pur-main);color:#fff;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px}
+.step-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+/* ── QUIZ ── */
+.quiz-wrap{background:linear-gradient(135deg,var(--pur-tint2),var(--pur-tint));border:1.5px solid var(--pur-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin-top:1.6rem}
+.quiz-label{font-size:11px;font-weight:800;color:var(--pur-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{background:var(--pur-main);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.quiz-toggle:hover{background:var(--pur-dark)}
+.quiz-ans{display:none;margin-top:.8rem;padding:.9rem 1rem;background:rgba(255,255,255,.85);border-radius:10px;font-size:13.5px;color:var(--text);line-height:1.75;border:1px solid var(--pur-border)}
+
+/* ── CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:.6rem 0}
+.chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:var(--pur-tint2);color:var(--pur-dark);border:1px solid var(--pur-border)}
+.chip-g{background:var(--green-bg);color:#065f46;border-color:var(--green-border)}
+.chip-r{background:var(--red-bg);color:#991b1b;border-color:var(--red-border)}
+.chip-a{background:var(--amber-bg);color:#92400e;border-color:var(--amber-border)}
+.chip-b{background:var(--blue-bg);color:#1e40af;border-color:var(--blue-border)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.45rem}
+  .hero-desc{font-size:13px}
+  .hero-eyebrow{font-size:10px;padding:4px 11px}
+  .hero-stats{gap:7px}
+  .hero-stat-card{min-width:68px;padding:.75rem .9rem}
+  .hs-num{font-size:1.45rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{justify-content:flex-start;gap:0;padding:0 .5rem}
+  .tab-btn{padding:11px 13px;font-size:11.5px;border-radius:6px 6px 0 0}
+  .content-wrap{padding:1.2rem .85rem 4rem}
+  .unit-banner{flex-direction:column;gap:.75rem;padding:1.1rem}
+  .ub-emoji{font-size:2.1rem}
+  .ub-title{font-size:1.1rem}
+  .acc-header{padding:.95rem 1rem;gap:10px}
+  .acc-num{width:30px;height:30px;font-size:12px;border-radius:8px}
+  .acc-htitle{font-size:14px}
+  .acc-hdesc{font-size:11.5px}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .steps{gap:7px}
+  .step-item{padding:.8rem .95rem}
+  table{font-size:12px}
+  thead th{font-size:10px;padding:8px 10px}
+  tbody td{padding:8px 10px}
+  .concept-box,.green-box,.amber-box,.blue-box,.red-box,.indigo-box{padding:.85rem 1rem;font-size:13px}
+  .formula-box{padding:1rem 1.1rem}
+  .formula-text{font-size:1.15rem}
+  .quiz-wrap{padding:1rem 1.1rem}
+  .quiz-q{font-size:13px}
+}
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .hero-deco,.hero-deco2{display:none}
+  .hero{padding:1.7rem .9rem 1.5rem}
+  .hero-title{font-size:1.28rem;letter-spacing:-.025em}
+  .hero-desc{font-size:12.5px;margin-bottom:1.4rem}
+  .breadcrumb{gap:4px;margin-bottom:.9rem}
+  .bc-item,.bc-current,.bc-sep{font-size:11px}
+  .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;max-width:280px;margin:0 auto}
+  .hero-stat-card{min-width:0;padding:.7rem .5rem}
+  .hs-num{font-size:1.3rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{padding:0 .3rem}
+  .tab-btn{padding:10px 11px;font-size:11px;white-space:nowrap}
+  .ub-title{font-size:1rem}
+  .ub-desc{font-size:12px}
+  .acc-header{padding:.85rem .9rem;gap:8px}
+  .acc-htitle{font-size:13.5px}
+  .acc-hdesc{font-size:11px}
+  .acc-body{padding:0 .9rem 1.2rem}
+  .sec-title{font-size:11px}
+  .point-box{grid-template-columns:1fr}
+  .pc-icon{font-size:1.5rem}
+  .pc-title{font-size:12px}
+  .pc-desc{font-size:11.5px}
+  .step-num{width:26px;height:26px;font-size:12px;border-radius:7px;flex-shrink:0}
+  .step-title{font-size:12.5px}
+  .step-desc{font-size:12px}
+  .formula-text{font-size:1rem}
+  .formula-sub{font-size:11px}
+  .table-wrap{-webkit-overflow-scrolling:touch}
+  .quiz-q{font-size:12.5px}
+  .quiz-toggle{font-size:11.5px;padding:6px 15px}
+  .quiz-ans{font-size:13px}
+  .chip,.chip-g,.chip-r,.chip-a,.chip-b{font-size:10.5px;padding:3px 10px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"
+          stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-pur"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="science1-summary.html" class="bc-item">중학 과학 1</a><span class="bc-sep">›</span>
+      <span class="bc-current">💧 Ⅳ. 물질의 상태 변화</span>
+    </div>
+    <div class="hero-eyebrow">💧 PART 04 · 중학 과학 1 · UNIT 04</div>
+    <div class="hero-title">Ⅳ. 물질의 상태 변화</div>
+    <div class="hero-desc">입자의 운동과 물질의 세 가지 상태, 6가지 상태 변화,<br>열에너지 흡수·방출과 생활 속 활용까지 완벽 정리합니다</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">2</div><div class="hs-lbl">중단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">6</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">10+</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">🌊 중단원1 · 입자의 운동과 상태 변화</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">🔥 중단원2 · 상태 변화와 열에너지</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ═══════════════════════════════
+     중단원 1: 입자의 운동과 상태 변화
+═══════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner">
+    <div class="ub-emoji">🌊</div>
+    <div>
+      <div class="ub-num">중단원 01 · Particle Motion & States of Matter</div>
+      <div class="ub-title">입자의 운동과 상태 변화</div>
+      <div class="ub-desc">증발·확산으로 입자 운동 이해, 물질의 세 가지 상태 특징, 6가지 상태 변화를 입자 모형으로 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 스스로 움직이는 입자 -->
+    <div class="acc-item" id="acc-particle">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Particle Motion · 입자 운동</div>
+          <div class="acc-htitle">스스로 움직이는 입자 — 증발과 확산</div>
+          <div class="acc-hdesc">증발의 정의 · 확산의 정의 · 입자 운동의 증거</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">증발이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">💨 증발 (Evaporation)</div>
+          <span class="hp">액체 표면</span>에서 운동이 활발한 입자가 떨어져 나와 <span class="hp">기체로 변하는 현상</span>.<br><br>
+          예: 비 온 뒤 젖은 땅이 마른다, 향수가 사라진다, 손 소독제가 마른다<br><br>
+          → 증발은 물질을 이루는 <span class="hp">입자가 스스로 운동</span>하기 때문에 나타난다.
+        </div>
+
+        <div class="sec-title">확산이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🌬️ 확산 (Diffusion)</div>
+          물질을 이루고 있는 입자가 <span class="hp">스스로 운동하여 멀리 퍼져 나가는 현상</span>.<br><br>
+          예: 교실 한쪽에서 팝콘 뚜껑을 열면 점점 넓은 범위에서 냄새가 난다,<br>
+          향수를 뿌리면 멀리서도 냄새를 맡을 수 있다.<br><br>
+          → 확산은 증발과 마찬가지로 <span class="hp">입자가 스스로 운동</span>하여 일어난다.
+        </div>
+
+        <div class="amber-box">
+          <div class="cb-title">📌 증발 vs 확산 비교</div>
+          • <span class="ha">증발</span>: <strong>액체 → 기체</strong>로 상태 변화 (액체 표면에서 일어남)<br>
+          • <span class="ha">확산</span>: 기체(또는 액체) 입자가 스스로 <strong>퍼져 나가는 현상</strong> (상태 변화 아님)<br><br>
+          공통점: 둘 다 <strong>입자가 스스로 운동</strong>한다는 증거
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">다음 중 입자가 스스로 운동하고 있다는 증거로 볼 수 있는 현상을 모두 고르시오.<br><br>
+          ① 젖은 빨래가 마른다.<br>
+          ② 공기 중에 향수 냄새가 퍼진다.<br>
+          ③ 물을 가열하면 온도가 올라간다.<br>
+          ④ 아이스크림을 밖에 두면 녹는다.<br>
+          ⑤ 실내에서 방향제를 놓으면 멀리서도 향기가 난다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ①②⑤</strong><br><br>
+            ① ✅ 빨래의 물이 <strong>증발</strong> — 액체 표면의 입자가 스스로 기체로 탈출<br>
+            ② ✅ 향수 냄새가 <strong>확산</strong> — 향수 입자가 스스로 공기 중으로 퍼짐<br>
+            ⑤ ✅ 방향제가 <strong>확산</strong> — 입자가 스스로 운동하여 퍼짐<br><br>
+            ③ ❌ 가열에 의한 온도 상승 (입자의 자발적 운동 아님)<br>
+            ④ ❌ 열에 의한 융해 (외부 에너지 공급으로 인한 상태 변화)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 물질의 세 가지 상태 -->
+    <div class="acc-item" id="acc-states">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Three States · 세 가지 상태</div>
+          <div class="acc-htitle">물질의 세 가지 상태</div>
+          <div class="acc-hdesc">고체·액체·기체의 특징 · 입자 배열과 운동 비교</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">세 가지 상태의 특징 비교</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>고체</th><th>액체</th><th>기체</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>입자 사이 거리</strong></td>
+              <td><span class="hb">매우 가깝다</span></td>
+              <td>비교적 가깝다</td>
+              <td><span class="hr">매우 멀다</span></td>
+            </tr>
+            <tr>
+              <td><strong>입자 배열</strong></td>
+              <td><span class="hb">규칙적</span></td>
+              <td>고체보다 불규칙</td>
+              <td><span class="hr">매우 불규칙</span></td>
+            </tr>
+            <tr>
+              <td><strong>입자 운동</strong></td>
+              <td>제자리 진동</td>
+              <td>자유롭게 이동 가능</td>
+              <td><span class="hr">매우 활발하고 자유롭다</span></td>
+            </tr>
+            <tr>
+              <td><strong>모양</strong></td>
+              <td>일정 (변하지 않음)</td>
+              <td>담는 용기에 따라 변함</td>
+              <td>담는 용기에 따라 변함</td>
+            </tr>
+            <tr>
+              <td><strong>부피</strong></td>
+              <td>일정</td>
+              <td>일정</td>
+              <td>일정하지 않음</td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🧊</div>
+            <div class="pc-title">고체</div>
+            <div class="pc-desc">입자 규칙 배열, 모양·부피 일정. 예: 얼음, 철, 소금</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">💧</div>
+            <div class="pc-title">액체</div>
+            <div class="pc-desc">입자 불규칙 배열, 모양 변함·부피 일정. 예: 물, 에탄올</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">💨</div>
+            <div class="pc-title">기체</div>
+            <div class="pc-desc">입자 매우 불규칙, 모양·부피 모두 변함. 예: 수증기, 공기</div>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">물질의 세 가지 상태 중 다음 설명에 해당하는 상태를 쓰시오.<br><br>
+          (가) 입자의 운동이 가장 활발하고 자유롭다.<br>
+          (나) 담는 용기에 따라 모양이 달라지지만 부피는 일정하다.<br>
+          (다) 입자들이 규칙적으로 배열되어 있고 모양이 일정하다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            (가) <strong class="hr">기체</strong> — 입자 운동이 가장 활발하고 자유롭다<br>
+            (나) <strong class="hb">액체</strong> — 모양은 변하지만 부피는 일정<br>
+            (다) <strong class="hp">고체</strong> — 입자가 규칙적으로 배열, 모양·부피 모두 일정
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 03: 물질의 상태 변화 -->
+    <div class="acc-item" id="acc-change">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">State Changes · 상태 변화 6종</div>
+          <div class="acc-htitle">물질의 상태 변화 — 6가지 완전 정리</div>
+          <div class="acc-hdesc">융해·응고·기화·액화·승화(고→기)·승화(기→고) · 질량·부피 변화</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">6가지 상태 변화</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>이름</th><th>방향</th><th>예시</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">융해</span></td><td>고체 → 액체</td><td>얼음이 녹는다, 고드름이 녹는다, 버터가 녹는다</td></tr>
+            <tr><td><span class="hb">응고</span></td><td>액체 → 고체</td><td>쇳물이 굳는다, 물이 얼음이 된다</td></tr>
+            <tr><td><span class="hr">기화</span></td><td>액체 → 기체</td><td>물이 수증기가 된다, 손 소독제가 마른다</td></tr>
+            <tr><td><span class="hg">액화</span></td><td>기체 → 액체</td><td>새벽녘 이슬이 맺힌다, 안경에 김이 서린다</td></tr>
+            <tr><td><span class="ha">승화 ①</span></td><td>고체 → 기체</td><td>드라이아이스가 사라진다, 겨울철 얼음(명태)이 마른다</td></tr>
+            <tr><td><span class="ha">승화 ②</span></td><td>기체 → 고체</td><td>나뭇잎에 서리가 생긴다</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">상태 변화 흐름도</div>
+        <div class="flow" style="justify-content:center">
+          <div class="flow-box" style="background:var(--blue-bg);border-color:var(--blue2)">🧊 고체</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+            <span style="font-size:11px;color:var(--pur-main);font-weight:700">융해 →</span>
+            <span style="font-size:11px;color:var(--blue2);font-weight:700">← 응고</span>
+          </div>
+          <div class="flow-box" style="background:var(--green-bg);border-color:var(--green)">💧 액체</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+            <span style="font-size:11px;color:var(--pur-main);font-weight:700">기화 →</span>
+            <span style="font-size:11px;color:var(--blue2);font-weight:700">← 액화</span>
+          </div>
+          <div class="flow-box" style="background:var(--red-bg);border-color:var(--red)">💨 기체</div>
+        </div>
+        <div style="text-align:center;margin:.4rem 0;font-size:11px;color:var(--amber);font-weight:700">
+          ↕ 승화 (고체 ⇌ 기체 직접 전환)
+        </div>
+
+        <div class="sec-title">상태 변화 시 변하는 것 vs 변하지 않는 것</div>
+        <div class="green-box">
+          <div class="cb-title">✅ 변하지 않는 것</div>
+          • <span class="hg">질량</span>: 입자의 종류·개수·크기가 변하지 않으므로 질량 불변<br>
+          • <span class="hg">성질</span>: 물질 고유의 성질 유지
+        </div>
+        <div class="red-box">
+          <div class="cb-title">⚠️ 변하는 것</div>
+          • <span class="hr">부피</span>: 입자 사이의 거리가 변하므로 부피 변화<br>
+          &nbsp;&nbsp;- 융해·기화·고체→기체 승화: 입자 거리 멀어짐 → <strong>부피 커짐</strong><br>
+          &nbsp;&nbsp;- 응고·액화·기체→고체 승화: 입자 거리 가까워짐 → <strong>부피 작아짐</strong><br>
+          &nbsp;&nbsp;⚠️ 예외: 물이 얼 때는 부피가 <strong>커진다</strong> (얼음의 독특한 구조)
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">다음 상태 변화의 이름을 쓰시오.<br><br>
+          (가) 고체에서 기체로 직접 변하는 현상<br>
+          (나) 기체에서 액체로 변하는 현상<br>
+          (다) 액체에서 고체로 변하는 현상</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            (가) <strong class="ha">승화</strong> — 고체 → 기체 (예: 드라이아이스가 사라짐)<br>
+            (나) <strong class="hg">액화</strong> — 기체 → 액체 (예: 이슬, 안경 김)<br>
+            (다) <strong class="hb">응고</strong> — 액체 → 고체 (예: 물이 어는 것)<br><br>
+            💡 암기법: 융(融)해=녹음, 응(凝)고=굳음, 기(氣)화=기체로, 액(液)화=액체로, 승(昇)화=오름
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">물질의 상태 변화가 일어날 때 변하는 것을 모두 고르시오.<br><br>
+          ① 입자의 개수 &nbsp; ② 입자 사이의 거리 &nbsp; ③ 부피 &nbsp; ④ 질량 &nbsp; ⑤ 입자의 크기</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ②③</strong><br><br>
+            ② ✅ 입자 사이의 거리 — 상태에 따라 달라짐<br>
+            ③ ✅ 부피 — 입자 거리 변화로 부피 변화<br><br>
+            ① ❌ 입자 개수는 변하지 않음<br>
+            ④ ❌ 질량은 변하지 않음 (입자 개수·종류 불변)<br>
+            ⑤ ❌ 입자의 크기(종류)는 변하지 않음
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ═══════════════════════════════
+     중단원 2: 상태 변화와 열에너지
+═══════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner">
+    <div class="ub-emoji">🔥</div>
+    <div>
+      <div class="ub-num">중단원 02 · States & Thermal Energy</div>
+      <div class="ub-title">상태 변화와 열에너지</div>
+      <div class="ub-desc">열에너지를 흡수·방출하는 상태 변화, 온도 변화 그래프, 생활 속 열에너지 이용 사례를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 열에너지를 흡수하는 상태 변화 -->
+    <div class="acc-item" id="acc-absorb">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Endothermic · 흡열 변화</div>
+          <div class="acc-htitle">열에너지를 흡수하는 상태 변화</div>
+          <div class="acc-hdesc">융해·기화·승화(고→기) · 가열 곡선 · 온도 변화 특징</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">열에너지를 흡수하는 상태 변화 종류</div>
+        <div class="chips">
+          <span class="chip-r chip">🫠 융해 (고체→액체)</span>
+          <span class="chip-r chip">💨 기화 (액체→기체)</span>
+          <span class="chip-r chip">⬆️ 승화 (고체→기체)</span>
+        </div>
+
+        <div class="concept-box">
+          <div class="cb-title">🌡️ 가열 시 온도 변화의 특징</div>
+          고체를 가열하면:<br>
+          ① 온도가 높아진다 (고체 상태)<br>
+          ② <span class="hp">융해가 일어나는 동안 온도가 일정</span>하다<br>
+          ③ 온도가 높아진다 (액체 상태)<br>
+          ④ <span class="hp">기화가 일어나는 동안 온도가 일정</span>하다<br>
+          ⑤ 온도가 높아진다 (기체 상태)<br><br>
+          💡 상태 변화가 일어나는 동안 온도가 일정한 이유:<br>
+          흡수한 열에너지가 <span class="hp">온도를 높이는 데 쓰이지 않고</span>, 입자 배열을 불규칙하게 만드는 데 사용되기 때문
+        </div>
+
+        <div class="formula-box">
+          <div class="formula-text">상태 변화 중 온도 = 일정</div>
+          <div class="formula-sub">흡수한 열에너지 → 입자 배열 변화(불규칙화)에 사용 → 온도 변화 없음</div>
+        </div>
+
+        <div class="sec-title">주위 온도에 미치는 영향</div>
+        <div class="blue-box">
+          <div class="cb-title">❄️ 열에너지 흡수 → 주위 온도 낮아진다</div>
+          융해·기화·승화(고→기)가 일어날 때 물질이 <span class="hb">주위로부터 열에너지를 흡수</span><br>→ 주위의 온도가 <span class="hb">낮아진다</span><br><br>
+          예: 물놀이 후 젖은 채로 있으면 춥게 느껴진다<br>
+          → 몸에 묻은 물이 <strong>기화</strong>하면서 몸으로부터 열에너지를 흡수하기 때문
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">물질은 융해와 기화가 일어날 때 열에너지를 어떻게 하고, 이때 물질의 온도는 어떻게 변하는가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • 열에너지를 <strong>흡수</strong>한다<br>
+            • 물질의 온도는 <strong>일정</strong>하다<br><br>
+            💡 이유: 흡수한 열에너지가 온도를 높이는 데 사용되지 않고, 입자의 배열을 불규칙하게 만드는 데(상태 변화에) 사용되기 때문이다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 열에너지를 방출하는 상태 변화 -->
+    <div class="acc-item" id="acc-release">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Exothermic · 발열 변화</div>
+          <div class="acc-htitle">열에너지를 방출하는 상태 변화</div>
+          <div class="acc-hdesc">응고·액화·승화(기→고) · 냉각 곡선 · 주위 온도 상승</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">열에너지를 방출하는 상태 변화 종류</div>
+        <div class="chips">
+          <span class="chip-b chip">🧊 응고 (액체→고체)</span>
+          <span class="chip-b chip">💧 액화 (기체→액체)</span>
+          <span class="chip-b chip">⬇️ 승화 (기체→고체)</span>
+        </div>
+
+        <div class="concept-box">
+          <div class="cb-title">🌡️ 냉각 시 온도 변화의 특징</div>
+          기체를 냉각하면:<br>
+          ① 온도가 낮아진다 (기체 상태)<br>
+          ② <span class="hp">액화가 일어나는 동안 온도가 일정</span>하다<br>
+          ③ 온도가 낮아진다 (액체 상태)<br>
+          ④ <span class="hp">응고가 일어나는 동안 온도가 일정</span>하다<br>
+          ⑤ 온도가 낮아진다 (고체 상태)<br><br>
+          💡 상태 변화 중 온도가 일정한 이유:<br>
+          방출하는 열에너지가 입자 배열을 <span class="hp">규칙적으로 만드는 데 사용</span>되기 때문
+        </div>
+
+        <div class="sec-title">주위 온도에 미치는 영향</div>
+        <div class="amber-box">
+          <div class="cb-title">🌡️ 열에너지 방출 → 주위 온도 높아진다</div>
+          응고·액화·승화(기→고)가 일어날 때 물질이 <span class="ha">주위로 열에너지를 방출</span><br>→ 주위의 온도가 <span class="ha">높아진다</span><br><br>
+          예: 무더운 여름 냉방된 곳에서 밖으로 나오면 후텁지근하다<br>
+          → 공기 중 수증기가 차가운 피부에 닿아 <strong>액화</strong>하면서 열에너지를 방출하기 때문
+        </div>
+
+        <div class="green-box">
+          <div class="cb-title">🍊 오렌지 나무에 물을 뿌리는 이유</div>
+          갑자기 추워질 때 과일 나무에 물을 뿌리면 → 물이 <span class="hg">응고</span>하면서 <span class="hg">열에너지를 방출</span><br>→ 주위 온도가 높아져 → 과일이 얼지 않도록 보호
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">열에너지를 방출하는 상태 변화가 일어날 때 입자의 배열은 어떻게 변하며, 주위의 온도는 어떻게 되는가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • 입자의 배열: <strong>규칙적</strong>으로 변한다<br>
+            • 주위의 온도: <strong>높아진다</strong><br><br>
+            💡 열에너지를 방출하는 상태 변화(응고·액화·기체→고체 승화)에서는 입자가 규칙적으로 배열되며 열에너지를 방출하므로 주위가 따뜻해진다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 03: 상태 변화와 열에너지의 이용 -->
+    <div class="acc-item" id="acc-application">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Applications · 생활 속 이용</div>
+          <div class="acc-htitle">상태 변화 시 열에너지의 생활 속 이용</div>
+          <div class="acc-hdesc">에어컨 냉방 원리 · 드라이아이스 · 항아리 냉장고 · 다양한 활용 사례</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">전체 정리 — 상태 변화와 열에너지 방향</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>상태 변화</th><th>열에너지</th><th>주위 온도</th></tr></thead>
+          <tbody>
+            <tr>
+              <td rowspan="3"><span class="hr">흡열</span></td>
+              <td>융해 (고체→액체)</td>
+              <td rowspan="3">흡수</td>
+              <td rowspan="3">낮아진다</td>
+            </tr>
+            <tr><td>기화 (액체→기체)</td></tr>
+            <tr><td>승화 (고체→기체)</td></tr>
+            <tr>
+              <td rowspan="3"><span class="hb">발열</span></td>
+              <td>응고 (액체→고체)</td>
+              <td rowspan="3">방출</td>
+              <td rowspan="3">높아진다</td>
+            </tr>
+            <tr><td>액화 (기체→액체)</td></tr>
+            <tr><td>승화 (기체→고체)</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">에어컨의 냉방 원리</div>
+        <div class="indigo-box">
+          <div class="cb-title">❄️ 에어컨 — 냉매의 상태 변화 이용</div>
+          <span class="hi">냉매</span>: 냉장고·에어컨 등에 쓰이는 물질. 장치 속 관을 따라 이동하며 상태가 변함<br><br>
+          • <strong>실내기</strong>: 냉매가 <span class="hi">기화(액체→기체)</span> → 열에너지 <strong>흡수</strong> → 실내 온도 낮아짐 → <strong>찬 바람</strong><br>
+          • <strong>실외기</strong>: 냉매가 <span class="hi">액화(기체→액체)</span> → 열에너지 <strong>방출</strong> → 따뜻한 바람이 밖으로
+        </div>
+
+        <div class="sec-title">생활 속 이용 사례</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🧊</div>
+            <div class="pc-title">드라이아이스</div>
+            <div class="pc-desc">승화(고→기)하며 열에너지 흡수 → 주위 온도 낮춤 → 냉동 식품 보관·백신 수송</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🏺</div>
+            <div class="pc-title">항아리 냉장고</div>
+            <div class="pc-desc">모래에 뿌린 물이 기화하며 열에너지 흡수 → 항아리 내부 온도 낮아짐 (전기 없는 냉장)</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">💉</div>
+            <div class="pc-title">동결 건조</div>
+            <div class="pc-desc">음식을 얼린 후 얼음을 승화(고→기)시켜 제거 → 우주 식품·인스턴트커피</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🌧️</div>
+            <div class="pc-title">여름철 물 뿌리기</div>
+            <div class="pc-desc">물이 기화하며 열에너지 흡수 → 주위 온도 낮아짐</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🍊</div>
+            <div class="pc-title">과일나무 물 뿌리기</div>
+            <div class="pc-desc">물이 응고하며 열에너지 방출 → 주위 온도 상승 → 과일 동해 방지</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🩹</div>
+            <div class="pc-title">찜질 팩</div>
+            <div class="pc-desc">액체 파라핀이 응고하며 열에너지 방출 → 환부를 따뜻하게 유지</div>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 7</div>
+          <div class="quiz-q">에어컨의 실내기에서 냉매의 상태 변화와 열에너지의 이동을 서술하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            실내기에서 냉매는 <strong>액체 → 기체</strong>로 <strong>기화</strong>한다.<br>
+            기화할 때 주위(실내 공기)로부터 <strong>열에너지를 흡수</strong>하므로 실내 온도가 <strong>낮아진다</strong>.<br>
+            이 때문에 에어컨에서 찬 바람이 나온다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">냉동식품을 배송할 때 드라이아이스를 사용하는 까닭을 상태 변화와 열에너지의 관계로 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안:</strong><br><br>
+            드라이아이스(고체 이산화탄소)는 <strong>승화(고체 → 기체)</strong>하면서 주위로부터 <strong>열에너지를 흡수</strong>한다.<br><br>
+            드라이아이스가 승화할 때 주위의 열에너지를 흡수하므로 상자 안의 온도가 <strong>낮아져</strong> 냉동 식품이 냉동 상태를 유지할 수 있다.<br><br>
+            또한 드라이아이스는 승화하여 기체가 되므로 녹은 물이 생기지 않아 식품이 젖지 않는 장점도 있다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  document.querySelectorAll('.unit-section').forEach(el => el.classList.remove('visible'));
+  document.getElementById('unit' + n).classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => item.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+const hashMap = {
+  '#unit1':1,'#acc-particle':1,'#acc-states':1,'#acc-change':1,
+  '#unit2':2,'#acc-absorb':2,'#acc-release':2,'#acc-application':2
+};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n-1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
