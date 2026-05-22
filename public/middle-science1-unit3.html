@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel='icon' type='image/svg+xml' href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpolygon points='70,8 121,38 121,102 70,132 19,102 19,38' fill='none' stroke='%23E85D75' stroke-width='8' stroke-linejoin='round'/%3E%3Cpolygon points='70,38 97,53 97,87 70,102 43,87 43,53' fill='none' stroke='%23E85D75' stroke-width='4' stroke-linejoin='round' stroke-dasharray='10 6'/%3E%3Ccircle cx='70' cy='8' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='38' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='70' cy='132' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='38' r='10' fill='%23E85D75'/%3E%3C/svg%3E">
+<title>베타과학학원 · 열</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+:root {
+  --pur-dark:    #3b1fa3;
+  --pur-main:    #5b3fd4;
+  --pur-mid:     #7c5ce8;
+  --pur-light:   #a78bfa;
+  --pur-tint:    #f5f3ff;
+  --pur-tint2:   #ede9fe;
+  --pur-border:  #c4b5fd;
+  --pur-border2: #a78bfa;
+
+  --green:#059669; --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --blue2:#2563eb;  --blue-bg:#eff6ff;  --blue-border:#bfdbfe;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626;   --red-bg:#fef2f2;   --red-border:#fecaca;
+  --indigo:#4f46e5;--indigo-bg:#eef2ff;--indigo-border:#c7d2fe;
+
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#f8f7ff;   --white:#fff;
+
+  --radius-sm:10px; --radius:14px; --radius-lg:18px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+p{line-height:1.78;font-size:13.5px;margin:.4rem 0}
+
+/* ── HEADER ── */
+.header{
+  background:#fff;
+  border-bottom:1px solid #ede9fe;
+  padding:0 1rem;
+  padding-left:max(1rem,env(safe-area-inset-left));
+  padding-right:max(1rem,env(safe-area-inset-right));
+  height:54px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;top:0;z-index:500;
+  box-shadow:0 1px 0 #ede9fe;
+}
+.header-left{display:flex;align-items:center;gap:9px;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{
+  width:30px;height:30px;
+  background:linear-gradient(135deg,var(--pur-mid) 0%,var(--pur-dark) 100%);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.brand-name{font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{
+  display:flex;align-items:center;gap:5px;
+  background:var(--pur-tint);border:1px solid var(--pur-border);
+  border-radius:20px;padding:4px 10px;
+  font-size:10px;font-weight:700;color:var(--pur-dark);
+  white-space:nowrap;
+}
+.dot-pur{width:5px;height:5px;background:var(--pur-mid);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{
+  padding:7px 14px;min-height:36px;
+  background:transparent;border:1.5px solid var(--pur-border);
+  border-radius:20px;font-size:12px;font-weight:700;color:var(--pur-dark);
+  cursor:pointer;white-space:nowrap;transition:background .15s;
+}
+.back-btn:hover{background:var(--pur-tint)}
+.back-btn:active{background:var(--pur-tint2)}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(135deg,var(--pur-dark) 0%,var(--pur-main) 55%,var(--pur-mid) 100%);
+  padding:2.8rem 1.5rem 2.2rem;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;right:-80px;top:-80px;
+  width:300px;height:300px;border-radius:50%;
+  background:rgba(255,255,255,.06);
+}
+.hero::after{
+  content:'';position:absolute;left:-50px;bottom:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:rgba(255,255,255,.04);
+}
+.hero-deco{
+  position:absolute;right:10%;top:15%;
+  width:120px;height:120px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.12);
+  pointer-events:none;
+}
+.hero-deco2{
+  position:absolute;right:18%;top:25%;
+  width:60px;height:60px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.1);
+  pointer-events:none;
+}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+
+.hero-eyebrow{
+  display:inline-block;
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:5px 14px;
+  font-size:11px;font-weight:700;color:#fff;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;
+}
+.hero-title{
+  font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;
+  color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem;
+}
+.hero-desc{
+  font-size:13.5px;color:rgba(255,255,255,.85);
+  line-height:1.7;max-width:580px;margin:0 auto 1.8rem;
+}
+
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{
+  background:rgba(255,255,255,.15);
+  border:1.5px solid rgba(255,255,255,.3);
+  border-radius:14px;padding:.9rem 1.4rem;
+  text-align:center;backdrop-filter:blur(6px);
+  min-width:80px;transition:background .2s;
+}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+/* ── TABS ── */
+.tabs-wrap{
+  background:#fff;border-bottom:2px solid var(--pur-border);
+  position:sticky;top:54px;z-index:400;
+}
+.tabs-inner{
+  max-width:1100px;margin:0 auto;
+  padding:0 1.5rem;display:flex;overflow-x:auto;
+  justify-content:center;gap:4px;
+  scrollbar-width:none;
+}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{
+  padding:13px 26px;font-size:13px;font-weight:700;
+  color:var(--muted);border:none;background:none;cursor:pointer;
+  font-family:inherit;border-bottom:3px solid transparent;
+  white-space:nowrap;transition:all .2s;
+  margin-bottom:-2px;border-radius:8px 8px 0 0;
+}
+.tab-btn:hover{color:var(--pur-main);background:var(--pur-tint)}
+.tab-btn.active{color:var(--pur-main);border-bottom-color:var(--pur-main)}
+
+/* ── CONTENT ── */
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}
+.unit-section.visible{display:block}
+
+/* ── UNIT BANNER ── */
+.unit-banner{
+  border-radius:var(--radius-lg);
+  padding:1.4rem 1.8rem;margin-bottom:1.8rem;
+  display:flex;align-items:center;gap:1.2rem;
+  background:linear-gradient(135deg,var(--pur-tint),var(--pur-tint2));
+  border:2px solid var(--pur-border);
+}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--pur-main);margin-bottom:4px}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── ACCORDION ── */
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{
+  background:#fff;border:1.5px solid #e5e7eb;
+  border-radius:var(--radius-lg);overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+}
+.acc-item.open{
+  border-color:var(--pur-border);
+  box-shadow:0 4px 20px rgba(91,63,212,.1);
+}
+.acc-header{
+  display:flex;align-items:center;gap:12px;
+  padding:1.2rem 1.5rem;cursor:pointer;user-select:none;
+  transition:background .15s;
+}
+.acc-header:hover{background:var(--pur-tint)}
+.acc-num{
+  width:32px;height:32px;border-radius:10px;
+  background:var(--pur-tint2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:900;color:var(--pur-dark);flex-shrink:0;
+  transition:background .2s;
+}
+.acc-item.open .acc-num{background:var(--pur-main);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--pur-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-item.open .acc-subtitle{color:var(--pur-main)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--pur-main)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--pur-tint2)}
+.acc-item.open .acc-body{display:block}
+
+/* ── SECTION TITLE ── */
+.sec-title{
+  font-size:12px;font-weight:800;color:var(--pur-dark);
+  letter-spacing:.06em;text-transform:uppercase;
+  margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px;
+}
+.sec-title::before{
+  content:'';width:4px;height:16px;
+  background:var(--pur-main);border-radius:2px;display:block;flex-shrink:0;
+}
+
+/* ── CONTENT BOXES ── */
+.concept-box{
+  background:var(--pur-tint);border:1.5px solid var(--pur-border);
+  border-left:4px solid var(--pur-main);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.concept-box .cb-title{font-weight:800;color:var(--pur-dark);font-size:14px;margin-bottom:.4rem}
+
+.green-box{
+  background:var(--green-bg);border:1.5px solid var(--green-border);
+  border-left:4px solid var(--green);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+
+.amber-box{
+  background:var(--amber-bg);border:1.5px solid var(--amber-border);
+  border-left:4px solid var(--amber);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+
+.blue-box{
+  background:var(--blue-bg);border:1.5px solid var(--blue-border);
+  border-left:4px solid var(--blue2);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.blue-box .cb-title{font-weight:800;color:#1e40af;font-size:14px;margin-bottom:.4rem}
+
+.red-box{
+  background:var(--red-bg);border:1.5px solid var(--red-border);
+  border-left:4px solid var(--red);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+
+.indigo-box{
+  background:var(--indigo-bg);border:1.5px solid var(--indigo-border);
+  border-left:4px solid var(--indigo);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.indigo-box .cb-title{font-weight:800;color:#3730a3;font-size:14px;margin-bottom:.4rem}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:var(--radius);border:1.5px solid var(--pur-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  background:var(--pur-tint2);padding:10px 14px;
+  text-align:left;font-weight:800;font-size:11px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--pur-dark);
+}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6;vertical-align:top}
+tbody tr:hover td{background:var(--pur-tint)}
+
+/* ── FLOW ── */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0;font-size:13px}
+.flow-box{
+  background:#fff;border:1.5px solid var(--pur-border);
+  border-radius:8px;padding:7px 12px;
+  font-weight:700;color:var(--pur-dark);text-align:center;font-size:12px;line-height:1.4;
+}
+.flow-arrow{color:var(--pur-main);font-size:18px;font-weight:900}
+
+/* ── POINT CARDS ── */
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:.8rem 0}
+.point-card{
+  background:#fff;border:1.5px solid var(--pur-border);
+  border-radius:var(--radius);padding:1rem;text-align:center;
+  transition:border-color .2s,box-shadow .2s;
+}
+.point-card:hover{border-color:var(--pur-main);box-shadow:0 4px 12px rgba(91,63,212,.12)}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--pur-main);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ── HIGHLIGHT TEXT ── */
+.hp{color:var(--pur-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--blue2);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.hi{color:var(--indigo);font-weight:800}
+
+/* ── FORMULA BOX ── */
+.formula-box{
+  background:linear-gradient(135deg,var(--pur-tint),var(--pur-tint2));
+  border:2px solid var(--pur-border);border-radius:var(--radius-lg);
+  padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center;
+}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--pur-dark);letter-spacing:-.01em;font-style:italic}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* ── STEP CARDS ── */
+.steps{display:flex;flex-direction:column;gap:8px;margin:.8rem 0}
+.step-item{
+  display:flex;align-items:flex-start;gap:12px;
+  background:#fff;border:1.5px solid #e5e7eb;
+  border-radius:var(--radius);padding:.9rem 1.1rem;
+  transition:border-color .2s;
+}
+.step-item:hover{border-color:var(--pur-border)}
+.step-num{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--pur-main);color:#fff;
+  font-size:13px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px}
+.step-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+/* ── QUIZ ── */
+.quiz-wrap{
+  background:linear-gradient(135deg,var(--pur-tint2),var(--pur-tint));
+  border:1.5px solid var(--pur-border);
+  border-radius:var(--radius-lg);
+  padding:1.2rem 1.4rem;margin-top:1.6rem;
+}
+.quiz-label{font-size:11px;font-weight:800;color:var(--pur-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{
+  background:var(--pur-main);color:#fff;border:none;
+  border-radius:20px;padding:7px 18px;
+  font-size:12px;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:background .15s;
+}
+.quiz-toggle:hover{background:var(--pur-dark)}
+.quiz-ans{
+  display:none;margin-top:.8rem;padding:.9rem 1rem;
+  background:rgba(255,255,255,.85);border-radius:10px;
+  font-size:13.5px;color:var(--text);line-height:1.75;
+  border:1px solid var(--pur-border);
+}
+
+/* ── CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:.6rem 0}
+.chip{
+  padding:4px 12px;border-radius:20px;
+  font-size:11px;font-weight:700;
+  background:var(--pur-tint2);color:var(--pur-dark);
+  border:1px solid var(--pur-border);
+}
+.chip-g{background:var(--green-bg);color:#065f46;border-color:var(--green-border)}
+.chip-a{background:var(--amber-bg);color:#92400e;border-color:var(--amber-border)}
+.chip-r{background:var(--red-bg);color:#991b1b;border-color:var(--red-border)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.45rem}
+  .hero-desc{font-size:13px}
+  .hero-eyebrow{font-size:10px;padding:4px 11px}
+  .hero-stats{gap:7px}
+  .hero-stat-card{min-width:68px;padding:.75rem .9rem}
+  .hs-num{font-size:1.45rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{justify-content:flex-start;gap:0;padding:0 .5rem}
+  .tab-btn{padding:11px 13px;font-size:11.5px;border-radius:6px 6px 0 0}
+  .content-wrap{padding:1.2rem .85rem 4rem}
+  .unit-banner{flex-direction:column;gap:.75rem;padding:1.1rem}
+  .ub-emoji{font-size:2.1rem}
+  .ub-title{font-size:1.1rem}
+  .acc-header{padding:.95rem 1rem;gap:10px}
+  .acc-num{width:30px;height:30px;font-size:12px;border-radius:8px}
+  .acc-htitle{font-size:14px}
+  .acc-hdesc{font-size:11.5px}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .steps{gap:7px}
+  .step-item{padding:.8rem .95rem}
+  table{font-size:12px}
+  thead th{font-size:10px;padding:8px 10px}
+  tbody td{padding:8px 10px}
+  .concept-box,.green-box,.amber-box,.blue-box,.red-box,.indigo-box{padding:.85rem 1rem;font-size:13px}
+  .formula-box{padding:1rem 1.1rem}
+  .formula-text{font-size:1.15rem}
+  .quiz-wrap{padding:1rem 1.1rem}
+  .quiz-q{font-size:13px}
+}
+
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .hero-deco,.hero-deco2{display:none}
+  .hero{padding:1.7rem .9rem 1.5rem}
+  .hero-title{font-size:1.28rem;letter-spacing:-.025em}
+  .hero-desc{font-size:12.5px;margin-bottom:1.4rem}
+  .breadcrumb{gap:4px;margin-bottom:.9rem}
+  .bc-item,.bc-current,.bc-sep{font-size:11px}
+  .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;max-width:280px;margin:0 auto}
+  .hero-stat-card{min-width:0;padding:.7rem .5rem}
+  .hs-num{font-size:1.3rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{padding:0 .3rem}
+  .tab-btn{padding:10px 11px;font-size:11px;white-space:nowrap}
+  .ub-title{font-size:1rem}
+  .ub-desc{font-size:12px}
+  .acc-header{padding:.85rem .9rem;gap:8px}
+  .acc-htitle{font-size:13.5px}
+  .acc-hdesc{font-size:11px}
+  .acc-body{padding:0 .9rem 1.2rem}
+  .sec-title{font-size:11px}
+  .point-box{grid-template-columns:1fr}
+  .pc-icon{font-size:1.5rem}
+  .pc-title{font-size:12px}
+  .pc-desc{font-size:11.5px}
+  .step-num{width:26px;height:26px;font-size:12px;border-radius:7px;flex-shrink:0}
+  .step-title{font-size:12.5px}
+  .step-desc{font-size:12px}
+  .formula-text{font-size:1rem}
+  .formula-sub{font-size:11px}
+  .table-wrap{-webkit-overflow-scrolling:touch}
+  .quiz-q{font-size:12.5px}
+  .quiz-toggle{font-size:11.5px;padding:6px 15px}
+  .quiz-ans{font-size:13px}
+  .chip,.chip-g,.chip-a,.chip-r{font-size:10.5px;padding:3px 10px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"
+          stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-pur"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="science1-summary.html" class="bc-item">중학 과학 1</a><span class="bc-sep">›</span>
+      <span class="bc-current">🔥 Ⅲ. 열</span>
+    </div>
+    <div class="hero-eyebrow">🌡️ PART 03 · 중학 과학 1 · UNIT 03</div>
+    <div class="hero-title">Ⅲ. 열</div>
+    <div class="hero-desc">온도와 입자 운동, 열평형, 열의 이동 방법(전도·대류·복사),<br>비열과 열팽창까지 동아출판 2022 개정 교과서 핵심 개념을 완벽하게 학습합니다</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">2</div><div class="hs-lbl">중단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">5</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">10+</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">🌡️ 중단원1 · 열의 이동</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">🧪 중단원2 · 비열과 열팽창</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ═══════════════════════════════════
+     중단원 1: 열의 이동
+═══════════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner">
+    <div class="ub-emoji">🌡️</div>
+    <div>
+      <div class="ub-num">중단원 01 · Heat Transfer</div>
+      <div class="ub-title">열의 이동</div>
+      <div class="ub-desc">온도와 입자 운동의 관계, 열평형 과정, 열의 세 가지 이동 방법(전도·대류·복사)을 이해합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 온도와 입자 운동 -->
+    <div class="acc-item" id="acc-temp">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Temperature & Particles · 온도와 입자</div>
+          <div class="acc-htitle">온도와 입자 운동</div>
+          <div class="acc-hdesc">온도의 정의 · 입자 운동과 온도의 관계 · 온도계의 종류</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">온도란 무엇인가?</div>
+        <div class="concept-box">
+          <div class="cb-title">🌡️ 온도의 정의</div>
+          <span class="hp">온도</span>는 물질을 구성하는 <span class="hp">입자의 운동이 활발한 정도</span>를 나타낸 것이다.<br><br>
+          단위: <strong>℃ (섭씨도)</strong> 등을 사용한다.<br><br>
+          모든 물질은 눈으로 볼 수 없는 매우 작은 입자로 이루어져 있으며, 이 입자는 끊임없이 운동한다. <span class="hp">온도가 높을수록 입자 운동이 활발</span>하고, 온도가 낮을수록 입자 운동이 둔하다.
+        </div>
+
+        <div class="sec-title">온도와 입자 운동의 관계</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>온도 상태</th><th>입자 운동</th><th>잉크 확산 속도</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hb">온도가 낮은 물 (찬물)</span></td><td>입자 운동이 <strong>둔하다</strong></td><td>잉크가 천천히 퍼진다</td></tr>
+            <tr><td><span class="hr">온도가 높은 물 (뜨거운 물)</span></td><td>입자 운동이 <strong>활발하다</strong></td><td>잉크가 빨리 퍼진다</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 주의: 온도 ≠ 입자의 개수</div>
+          온도가 높아져도 물질을 구성하는 입자의 <span class="ha">개수는 변하지 않는다</span>. 변하는 것은 입자의 <span class="ha">운동 활발 정도(속도)</span>이다.
+        </div>
+
+        <div class="sec-title">다양한 온도계의 종류</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🌡️</div>
+            <div class="pc-title">알코올 온도계</div>
+            <div class="pc-desc">알코올의 부피 변화 이용. 기체·액체 온도 측정에 주로 사용</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🍳</div>
+            <div class="pc-title">탐침 온도계</div>
+            <div class="pc-desc">가느다란 탐침을 물질에 넣어 내부 온도 측정. 요리사 활용</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🎨</div>
+            <div class="pc-title">액정 온도계</div>
+            <div class="pc-desc">온도에 따라 색이 변하는 물질 이용. 어항·프라이팬 등 사용</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">📷</div>
+            <div class="pc-title">열화상 카메라</div>
+            <div class="pc-desc">물체의 열을 감지해 색깔로 표시. 접촉 불가 물체 온도 측정</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">👂</div>
+            <div class="pc-title">고막 체온계</div>
+            <div class="pc-desc">고막에서 발생하는 열 감지. 병원·가정에서 체온 측정에 사용</div>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">온도와 입자 운동에 관한 설명으로 옳은 것은?<br><br>
+          ① 온도의 단위로 ℃를 사용한다.<br>
+          ② 열을 얻으면 물체의 온도가 내려간다.<br>
+          ③ 뜨거운 물보다 찬물에서 물 입자의 운동이 더 활발하다.<br>
+          ④ 온도가 높아지면 물질을 구성하는 입자의 개수가 많아진다.<br>
+          ⑤ 온도는 사람이 느끼는 차고 뜨거운 정도를 숫자로 나타낸 것이다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ①</strong><br><br>
+            ① ✅ 온도의 단위로 <strong>℃(섭씨도)</strong>를 사용한다.<br><br>
+            ② ❌ 열을 얻으면 온도가 <strong>올라간다</strong>.<br>
+            ③ ❌ 뜨거운 물에서 입자 운동이 더 <strong>활발</strong>하다.<br>
+            ④ ❌ 온도가 높아져도 입자의 <strong>개수는 변하지 않는다</strong>. 변하는 것은 운동의 활발한 정도.<br>
+            ⑤ ❌ 온도는 입자 운동의 활발한 정도를 나타낸 것 (사람의 감각 아님).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 열평형 -->
+    <div class="acc-item" id="acc-equilibrium">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Thermal Equilibrium · 열평형</div>
+          <div class="acc-htitle">열평형</div>
+          <div class="acc-hdesc">열의 정의 · 열평형 과정 · 입자 운동으로 설명하기 · 생활 속 열평형 사례</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">열이란 무엇인가?</div>
+        <div class="concept-box">
+          <div class="cb-title">🔥 열의 정의</div>
+          <span class="hp">열</span>이란 <span class="hp">온도가 높은 물체에서 온도가 낮은 물체로 이동하는 에너지</span>이다.<br><br>
+          예: 냉장고에서 꺼낸 주스를 실온에 두면 → 공기(온도 높음)에서 주스(온도 낮음)로 열이 이동 → 주스가 미지근해짐
+        </div>
+
+        <div class="sec-title">열평형이란?</div>
+        <div class="formula-box">
+          <div class="formula-text">열평형 (Thermal Equilibrium)</div>
+          <div class="formula-sub">온도가 다른 두 물체가 접촉하여 열이 이동한 결과, 두 물체의 온도가 같아진 상태</div>
+        </div>
+
+        <div class="sec-title">열평형 과정 (입자 운동으로 설명)</div>
+        <div class="steps">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">접촉 전</div>
+              <div class="step-desc">온도가 높은 물체: 입자 운동 <span class="hr">활발</span> / 온도가 낮은 물체: 입자 운동 <span class="hb">둔함</span></div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">접촉 후 열 이동</div>
+              <div class="step-desc">온도가 높은 물체 → 열을 잃어 입자 운동이 <span class="hp">처음보다 둔해짐</span><br>온도가 낮은 물체 → 열을 얻어 입자 운동이 <span class="hp">처음보다 활발해짐</span></div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">열평형 도달</div>
+              <div class="step-desc">두 물체를 구성하는 입자 운동의 <span class="hg">활발한 정도가 같아진다</span> → 두 물체의 온도가 같아짐 → 열 이동 중단</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-title">생활 속 열평형 사례</div>
+        <div class="chips">
+          <span class="chip-g chip">🥚 뜨거운 달걀을 찬물에 담가 식히기</span>
+          <span class="chip-g chip">🌡️ 음식 온도 측정 (온도계-음식 열평형)</span>
+          <span class="chip-g chip">❄️ 냉장고로 음식 차갑게 보관</span>
+          <span class="chip chip">☕ 뜨거운 커피가 식는 것</span>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">온도가 높은 물체 (가)와 온도가 낮은 물체 (나)가 접촉한 상황이다. 옳지 않은 설명은? (단, 외부와의 열 출입은 무시)<br><br>
+          ① 열은 (가)에서 (나)로 이동한다.<br>
+          ② (가)의 입자 운동은 처음보다 둔해진다.<br>
+          ③ (나)의 입자 운동은 처음보다 활발해진다.<br>
+          ④ 시간이 지나면 (가)와 (나)는 열평형을 이룬다.<br>
+          ⑤ 시간이 지나면 (가)의 온도는 (나)의 온도보다 낮아진다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ⑤</strong><br><br>
+            ⑤ ❌ 열평형에 도달하면 두 물체의 온도가 <strong>같아진다</strong>. (가)의 온도가 (나)보다 낮아지는 것이 아님.<br><br>
+            ① ✅ 열은 온도가 높은 (가) → 낮은 (나)로 이동<br>
+            ② ✅ (가)는 열을 잃으므로 입자 운동 둔해짐<br>
+            ③ ✅ (나)는 열을 얻으므로 입자 운동 활발해짐<br>
+            ④ ✅ 결국 두 물체는 같은 온도의 열평형 상태에 도달
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 03: 열의 이동 방법 -->
+    <div class="acc-item" id="acc-transfer">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Conduction · Convection · Radiation</div>
+          <div class="acc-htitle">열의 이동 방법 — 전도·대류·복사</div>
+          <div class="acc-hdesc">전도의 원리 · 대류의 원리 · 복사의 원리 · 생활 속 사례 비교</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">열의 3가지 이동 방법</div>
+
+        <div class="concept-box">
+          <div class="cb-title">🔩 전도 (Conduction)</div>
+          물질을 구성하는 <span class="hp">입자의 운동이 다른 이웃한 입자에 차례대로 전달</span>되어 열이 이동하는 현상.<br><br>
+          • 주로 <strong>고체</strong>에서 일어남<br>
+          • 열이 전도되는 빠르기는 물질에 따라 다름<br>
+          • <span class="hp">금속(구리, 알루미늄, 철)</span>: 유리나 나무보다 열을 <strong>잘 전도</strong><br>
+          • 예: 금속 막대의 한쪽 끝을 가열하면 막대 전체가 뜨거워짐, 프라이팬에서 베이컨 굽기
+        </div>
+
+        <div class="green-box">
+          <div class="cb-title">🌊 대류 (Convection)</div>
+          기체나 액체에서 <span class="hg">입자가 직접 이동</span>하면서 열이 이동하는 현상.<br><br>
+          • 주로 <strong>기체·액체</strong>에서 일어남<br>
+          • 난로를 켜면 데워진 따뜻한 공기 입자는 위로 올라가고, 위의 차가운 공기는 아래로 내려옴<br>
+          • 예: 냄비 아래쪽만 가열해도 물 전체가 데워짐, 에어컨이 위에 설치된 이유
+        </div>
+
+        <div class="red-box">
+          <div class="cb-title">☀️ 복사 (Radiation)</div>
+          열이 <span class="hr">물질의 도움 없이 직접 이동</span>하는 현상.<br><br>
+          • <strong>매질(물질) 불필요</strong> — 진공 상태에서도 열 이동 가능<br>
+          • 예: 모닥불 앞에 있으면 따뜻함, 태양열이 지구에 도달, 토스터로 빵 굽기
+        </div>
+
+        <div class="sec-title">세 가지 이동 방법 비교</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>전도</th><th>대류</th><th>복사</th></tr></thead>
+          <tbody>
+            <tr><td><strong>원리</strong></td><td>입자의 진동이 이웃 입자로 전달</td><td>입자 자체가 이동</td><td>물질 없이 직접 이동</td></tr>
+            <tr><td><strong>주요 매질</strong></td><td>고체 (특히 금속)</td><td>기체, 액체</td><td>매질 불필요 (진공 가능)</td></tr>
+            <tr><td><strong>생활 예시</strong></td><td>쇠막대 가열, 프라이팬</td><td>냄비의 물 끓기, 난방기</td><td>모닥불, 태양열, 토스터</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="blue-box">
+          <div class="cb-title">🍕 피자 화덕에서의 세 가지 열 이동</div>
+          • <span class="hb">전도</span>: 화덕 바닥 → 피자로 열이 전도되어 피자가 구워짐<br>
+          • <span class="hb">대류</span>: 밖에서 들어온 공기가 대류에 의해 이동하며 뜨거워짐<br>
+          • <span class="hb">복사</span>: 천장과 불꽃에서 열이 복사에 의해 피자에 직접 전달됨<br><br>
+          → 대체로 열이 이동할 때 한 가지 방법만으로 이동하지 않고 <strong>여러 방법이 함께 일어난다</strong>.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">냄비에 물을 담아 끓이는 상황이다. 각 경우의 주된 열의 이동 방법을 쓰시오.<br><br>
+          (가) 냄비의 손잡이가 뜨거워진다.<br>
+          (나) 냄비 속 물이 끓는다.<br>
+          (다) 불꽃 주위에 있으면 따뜻하다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            (가) <strong class="hp">전도</strong> — 냄비(고체)를 통해 손잡이까지 열이 차례대로 전달<br>
+            (나) <strong class="hg">대류</strong> — 물(액체)에서 입자가 직접 이동하며 열 전달<br>
+            (다) <strong class="hr">복사</strong> — 불꽃에서 열이 물질의 도움 없이 직접 이동
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ═══════════════════════════════════
+     중단원 2: 비열과 열팽창
+═══════════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner">
+    <div class="ub-emoji">🧪</div>
+    <div>
+      <div class="ub-num">중단원 02 · Specific Heat & Thermal Expansion</div>
+      <div class="ub-title">비열과 열팽창</div>
+      <div class="ub-desc">비열의 개념과 물질별 차이, 열팽창의 원리와 생활 속 활용 사례를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 비열 -->
+    <div class="acc-item" id="acc-specific-heat">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Specific Heat · 비열</div>
+          <div class="acc-htitle">비열 — 물질마다 다른 온도 변화</div>
+          <div class="acc-hdesc">비열의 정의 · 단위 · 비열과 온도 변화의 관계 · 생활 속 활용</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">왜 모래는 뜨겁고 바닷물은 시원할까?</div>
+        <div class="concept-box">
+          <div class="cb-title">🏖️ 비열 (Specific Heat)</div>
+          여름 한낮 바닷가에서 모래는 매우 뜨겁지만 바닷물은 시원하다. 이는 <span class="hp">같은 양의 열을 받아도 물질에 따라 온도가 변하는 정도가 다르기 때문</span>이다.<br><br>
+          <span class="hp">비열</span>: 어떤 물질 <strong>1 kg의 온도를 1 ℃ 높이는 데 필요한 열량</strong><br>
+          단위: <strong>J/(kg·℃)</strong>
+        </div>
+
+        <div class="formula-box">
+          <div class="formula-text">비열 = 열량 ÷ (질량 × 온도 변화)</div>
+          <div class="formula-sub">단위: J/(kg·℃) | 비열은 물질마다 고유한 값을 가진다</div>
+        </div>
+
+        <div class="sec-title">물질별 상대 비열 비교</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>물질</th><th>상대 비열</th><th>온도 변화 정도</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hb">물</span></td><td>1.00 (가장 큼)</td><td>온도 변화가 <strong>가장 작다</strong></td></tr>
+            <tr><td>콩기름</td><td>0.47</td><td>↑</td></tr>
+            <tr><td>모래</td><td>0.23</td><td>↑</td></tr>
+            <tr><td>알루미늄</td><td>0.21</td><td>↑</td></tr>
+            <tr><td><span class="hr">철</span></td><td>0.11 (가장 작음)</td><td>온도 변화가 <strong>가장 크다</strong></td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="amber-box">
+          <div class="cb-title">📌 핵심 관계 정리</div>
+          • 비열이 <span class="ha">클수록</span> → 온도를 높이는 데 <span class="ha">더 많은 열량</span>이 필요 → 온도 변화가 <span class="ha">작다</span><br>
+          • 비열이 <span class="hb">작을수록</span> → 온도를 높이는 데 <span class="hb">적은 열량</span>이 필요 → 온도 변화가 <span class="hb">크다</span><br><br>
+          💡 질량이 같은 두 물질에 <strong>같은 열량을 가하면</strong> 비열이 작은 물질이 온도가 더 크게 변한다.
+        </div>
+
+        <div class="sec-title">물의 큰 비열을 활용한 사례</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🚗</div>
+            <div class="pc-title">자동차 냉각수</div>
+            <div class="pc-desc">높은 온도의 엔진을 차게 식힐 때 물의 큰 비열 활용</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🔋</div>
+            <div class="pc-title">전기차 배터리 냉각</div>
+            <div class="pc-desc">배터리 온도가 높아지지 않도록 물로 냉각</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🌡️</div>
+            <div class="pc-title">찜질 팩</div>
+            <div class="pc-desc">한번 따뜻해진 물이 쉽게 식지 않는 특성 이용</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🏠</div>
+            <div class="pc-title">난방용 보일러</div>
+            <div class="pc-desc">물이 한번 따뜻해지면 오래 열을 유지하는 특성 활용</div>
+          </div>
+        </div>
+
+        <div class="indigo-box">
+          <div class="cb-title">🌊 바다가 있기에 기온 차이가 작다</div>
+          지구에 바다가 존재하는 덕분에 낮과 밤의 기온 차이가 줄어든다. 물의 비열이 크기 때문에 낮에 열을 받아도 온도가 크게 오르지 않고, 밤에 열을 잃어도 온도가 크게 내려가지 않아 <span class="hi">기후가 온화해지는 효과</span>가 있다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">오른쪽 그래프는 질량이 같은 액체 ㉠, ㉡을 동일한 조건에서 가열할 때 시간에 따른 온도 변화를 나타낸 것이다. 옳은 것만을 보기에서 고르시오.<br><br>
+          (그래프: ㉡의 온도 기울기 > ㉠의 온도 기울기)<br><br>
+          ㄱ. 비열은 ㉠보다 ㉡이 크다.<br>
+          ㄴ. 비열이 큰 물질일수록 온도 변화가 크다.<br>
+          ㄷ. 같은 온도에 도달하는 데 필요한 열의 양은 ㉠보다 ㉡이 더 크다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ㄷ</strong><br><br>
+            ㄱ ❌ 온도 변화가 작은 ㉠이 비열이 <strong>크다</strong> (온도 기울기: ㉡ > ㉠이므로 ㉠이 비열 큼)<br>
+            ㄴ ❌ 비열이 클수록 온도 변화가 <strong>작다</strong><br>
+            ㄷ ✅ ㉠이 비열이 크므로, 같은 온도에 도달하려면 ㉠에 더 많은 열이 필요<br><br>
+            💡 ㄷ에서 "㉡보다 ㉠이 더 크다"로 이해하기 — 그래프에서 ㉠의 온도가 천천히 올라가므로 ㉠의 비열이 더 크고, 같은 온도까지 올리는 데 더 많은 열이 필요하다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 열팽창 -->
+    <div class="acc-item" id="acc-expansion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Thermal Expansion · 열팽창</div>
+          <div class="acc-htitle">열팽창 — 온도 변화에 따른 부피 변화</div>
+          <div class="acc-hdesc">열팽창의 정의 · 입자 운동으로 설명 · 고체·액체·기체의 열팽창 · 생활 속 적용</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">열팽창이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">📏 열팽창 (Thermal Expansion)</div>
+          물체가 열을 얻어 <span class="hp">온도가 높아질 때 물체의 길이나 부피가 늘어나는 현상</span>이다.<br><br>
+          반대로 열을 잃어 온도가 낮아지면 <span class="hp">수축</span>한다.
+        </div>
+
+        <div class="sec-title">열팽창의 원리 (입자 운동)</div>
+        <div class="blue-box">
+          <div class="cb-title">🔬 입자 운동으로 설명</div>
+          온도가 높아지면 물질을 구성하는 <span class="hb">입자의 운동이 활발</span>해져 <span class="hb">입자 사이의 거리가 멀어지기 때문</span>에 열팽창이 일어난다.<br><br>
+          → 입자의 <strong>개수는 변하지 않고</strong>, 입자 사이의 <strong>간격만 커진다</strong>.
+        </div>
+
+        <div class="sec-title">고체·액체의 열팽창</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>물질 상태</th><th>열팽창</th><th>생활 예시</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hp">고체</span></td>
+              <td>온도 상승 시 길이·부피 증가 / 물질마다 정도 다름</td>
+              <td>에펠탑: 여름에 겨울보다 약 <strong>10 cm</strong> 높이가 늘어남</td>
+            </tr>
+            <tr>
+              <td><span class="hg">액체</span></td>
+              <td>온도 상승 시 부피 증가 / 에탄올이 물보다 더 많이 팽창</td>
+              <td>알코올 온도계 — 에탄올의 부피 변화 이용</td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">열팽창을 고려한 설계 사례</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🌉</div>
+            <div class="pc-title">다리의 틈</div>
+            <div class="pc-desc">다리 중간에 틈을 두어 온도 변화로 인한 열팽창·수축에 의한 파손 방지</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🔧</div>
+            <div class="pc-title">구부러진 가스관</div>
+            <div class="pc-desc">온도 변화에 따른 열팽창으로 가스관이 파손되지 않도록 중간에 구부러진 부분 설치</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🏗️</div>
+            <div class="pc-title">철근 콘크리트</div>
+            <div class="pc-desc">철근과 콘크리트의 열팽창 정도가 비슷 → 온도 변화에도 튼튼한 건물 가능</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">⚡</div>
+            <div class="pc-title">전깃줄 여유</div>
+            <div class="pc-desc">여름엔 열팽창으로 늘어나고 겨울엔 수축 → 줄을 여유 있게 설치</div>
+          </div>
+        </div>
+
+        <div class="sec-title">열팽창을 활용한 장치</div>
+        <div class="green-box">
+          <div class="cb-title">⚙️ 바이메탈 (Bimetal)</div>
+          <span class="hg">열팽창 정도가 다른 두 금속을 붙여서 만든 장치</span><br><br>
+          • <strong>온도가 높을 때</strong>: 두 금속이 팽창 → 열팽창 정도가 <em>작은</em> 금속 쪽으로 휘어짐 → <span class="hr">전류 차단</span><br>
+          • <strong>온도가 낮을 때</strong>: 두 금속이 수축 → 굽었던 바이메탈이 다시 펴짐 → <span class="hg">전류 흐름</span><br><br>
+          활용: 전기 주전자, 토스터 등의 <strong>온도 조절 장치</strong>
+        </div>
+
+        <div class="sec-title">기후 변화와 해수면 상승 (열팽창)</div>
+        <div class="amber-box">
+          <div class="cb-title">🌊 바닷물의 열팽창과 해수면 상승</div>
+          매년 해수면이 높아지는 두 가지 원인:<br><br>
+          ① <span class="ha">극지방 빙하 용해</span>: 지구 평균 기온 상승 → 극지방 빙하가 녹아 바다로 유입<br>
+          ② <span class="ha">바닷물의 열팽창</span>: 수온 상승 → 열팽창으로 물의 부피 증가<br><br>
+          → 투발루 등 해발고도가 낮은 섬나라는 <strong>침수 위기</strong>에 처할 수 있다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">열팽창과 관련이 있는 현상이 <u>아닌</u> 것은?<br><br>
+          ① 다리의 중간에 틈을 만든다.<br>
+          ② 알코올 온도계로 온도를 측정한다.<br>
+          ③ 가스관의 중간 부분이 휘어져 있다.<br>
+          ④ 프라이팬의 손잡이는 플라스틱으로 되어 있다.<br>
+          ⑤ 내열 유리는 급격한 온도 변화에 잘 견디도록 설계되었다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ④</strong><br><br>
+            ④ 프라이팬 손잡이를 플라스틱으로 만드는 것은 <strong>열의 전도를 막기 위한 것</strong>이지 열팽창과는 관계없다. (플라스틱은 열전도율이 낮아 손잡이가 뜨거워지지 않음)<br><br>
+            ① ✅ 열팽창으로 다리가 파손되는 것을 방지하기 위한 틈<br>
+            ② ✅ 에탄올의 열팽창 이용<br>
+            ③ ✅ 열팽창으로 가스관 파손 방지<br>
+            ⑤ ✅ 내열 유리: 열팽창이 적어 급격한 온도 변화에 견딤
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">겨울과 여름에 전선의 길이 변화에 관한 설명으로 옳은 것만을 보기에서 고르시오.<br><br>
+          ㄱ. 늘어진 쪽(처진 전선)이 여름이다.<br>
+          ㄴ. 전선을 구성하는 입자의 움직임은 여름보다 겨울에 활발하다.<br>
+          ㄷ. 전선을 구성하는 입자 사이의 거리는 겨울보다 여름에 더 멀다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ㄱ, ㄷ</strong><br><br>
+            ㄱ ✅ 여름에는 온도가 높아 열팽창으로 전선이 <strong>늘어나(처진다)</strong><br>
+            ㄴ ❌ 입자 운동은 온도가 높은 <strong>여름</strong>에 더 활발하다<br>
+            ㄷ ✅ 여름에 온도가 높아 입자 사이 거리가 멀어짐 → 전선 길이 증가
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">유리병의 금속 뚜껑이 꽉 닫혀 있어 잘 열리지 않을 때, 열팽창을 이용하여 뚜껑을 쉽게 열 수 있는 방법을 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안:</strong><br><br>
+            금속 뚜껑 부분에 <strong>뜨거운 물을 붓거나</strong> 뜨거운 물에 잠깐 담근다.<br><br>
+            원리: 금속 뚜껑은 <strong>열팽창</strong>으로 부피가 늘어나 유리병 입구보다 크기가 커진다. 유리는 금속보다 열팽창 정도가 작아 상대적으로 금속 뚜껑이 더 많이 팽창하므로, 뚜껑과 병 입구 사이에 틈이 생겨 쉽게 열 수 있다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  document.querySelectorAll('.unit-section').forEach(el => el.classList.remove('visible'));
+  const target = document.getElementById('unit' + n);
+  if (target) target.classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => {
+      item.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }, 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+// Hash navigation
+const hashMap = {
+  '#unit1':1,'#acc-temp':1,'#acc-equilibrium':1,'#acc-transfer':1,
+  '#unit2':2,'#acc-specific-heat':2,'#acc-expansion':2
+};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n-1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
