@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel='icon' type='image/svg+xml' href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpolygon points='70,8 121,38 121,102 70,132 19,102 19,38' fill='none' stroke='%23E85D75' stroke-width='8' stroke-linejoin='round'/%3E%3Cpolygon points='70,38 97,53 97,87 70,102 43,87 43,53' fill='none' stroke='%23E85D75' stroke-width='4' stroke-linejoin='round' stroke-dasharray='10 6'/%3E%3Ccircle cx='70' cy='8' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='38' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='70' cy='132' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='38' r='10' fill='%23E85D75'/%3E%3C/svg%3E">
+<title>베타과학학원 · 힘의 작용</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+:root {
+  --pur-dark:    #3b1fa3;
+  --pur-main:    #5b3fd4;
+  --pur-mid:     #7c5ce8;
+  --pur-light:   #a78bfa;
+  --pur-tint:    #f5f3ff;
+  --pur-tint2:   #ede9fe;
+  --pur-border:  #c4b5fd;
+  --pur-border2: #a78bfa;
+
+  --green:#059669; --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --blue2:#2563eb; --blue-bg:#eff6ff;  --blue-border:#bfdbfe;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626;   --red-bg:#fef2f2;   --red-border:#fecaca;
+  --indigo:#4f46e5;--indigo-bg:#eef2ff;--indigo-border:#c7d2fe;
+
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#f8f7ff;   --white:#fff;
+  --radius-sm:10px; --radius:14px; --radius-lg:18px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+p{line-height:1.78;font-size:13.5px;margin:.4rem 0}
+
+/* ── HEADER ── */
+.header{background:#fff;border-bottom:1px solid #ede9fe;padding:0 1rem;padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right));height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:500;box-shadow:0 1px 0 #ede9fe}
+.header-left{display:flex;align-items:center;gap:9px;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--pur-mid) 0%,var(--pur-dark) 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{display:flex;align-items:center;gap:5px;background:var(--pur-tint);border:1px solid var(--pur-border);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--pur-dark);white-space:nowrap}
+.dot-pur{width:5px;height:5px;background:var(--pur-mid);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{padding:7px 14px;min-height:36px;background:transparent;border:1.5px solid var(--pur-border);border-radius:20px;font-size:12px;font-weight:700;color:var(--pur-dark);cursor:pointer;white-space:nowrap;transition:background .15s}
+.back-btn:hover{background:var(--pur-tint)}
+.back-btn:active{background:var(--pur-tint2)}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,var(--pur-dark) 0%,var(--pur-main) 55%,var(--pur-mid) 100%);padding:2.8rem 1.5rem 2.2rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero::after{content:'';position:absolute;left:-50px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hero-deco{position:absolute;right:10%;top:15%;width:120px;height:120px;border-radius:50%;border:2px solid rgba(255,255,255,.12);pointer-events:none}
+.hero-deco2{position:absolute;right:18%;top:25%;width:60px;height:60px;border-radius:50%;border:1.5px solid rgba(255,255,255,.1);pointer-events:none}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+.hero-eyebrow{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+.hero-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem}
+.hero-desc{font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.7;max-width:580px;margin:0 auto 1.8rem}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:14px;padding:.9rem 1.4rem;text-align:center;backdrop-filter:blur(6px);min-width:80px;transition:background .2s}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+/* ── TABS ── */
+.tabs-wrap{background:#fff;border-bottom:2px solid var(--pur-border);position:sticky;top:54px;z-index:400}
+.tabs-inner{max-width:1100px;margin:0 auto;padding:0 1.5rem;display:flex;overflow-x:auto;justify-content:center;gap:4px;scrollbar-width:none}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{padding:13px 26px;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;margin-bottom:-2px;border-radius:8px 8px 0 0}
+.tab-btn:hover{color:var(--pur-main);background:var(--pur-tint)}
+.tab-btn.active{color:var(--pur-main);border-bottom-color:var(--pur-main)}
+
+/* ── CONTENT ── */
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}
+.unit-section.visible{display:block}
+
+/* ── UNIT BANNER ── */
+.unit-banner{border-radius:var(--radius-lg);padding:1.4rem 1.8rem;margin-bottom:1.8rem;display:flex;align-items:center;gap:1.2rem;background:linear-gradient(135deg,var(--pur-tint),var(--pur-tint2));border:2px solid var(--pur-border)}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--pur-main);margin-bottom:4px}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── ACCORDION ── */
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius-lg);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.acc-item.open{border-color:var(--pur-border);box-shadow:0 4px 20px rgba(91,63,212,.1)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:1.2rem 1.5rem;cursor:pointer;user-select:none;transition:background .15s}
+.acc-header:hover{background:var(--pur-tint)}
+.acc-num{width:32px;height:32px;border-radius:10px;background:var(--pur-tint2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--pur-dark);flex-shrink:0;transition:background .2s}
+.acc-item.open .acc-num{background:var(--pur-main);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--pur-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-item.open .acc-subtitle{color:var(--pur-main)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--pur-main)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--pur-tint2)}
+.acc-item.open .acc-body{display:block}
+
+/* ── SECTION TITLE ── */
+.sec-title{font-size:12px;font-weight:800;color:var(--pur-dark);letter-spacing:.06em;text-transform:uppercase;margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--pur-main);border-radius:2px;display:block;flex-shrink:0}
+
+/* ── CONTENT BOXES ── */
+.concept-box{background:var(--pur-tint);border:1.5px solid var(--pur-border);border-left:4px solid var(--pur-main);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.concept-box .cb-title{font-weight:800;color:var(--pur-dark);font-size:14px;margin-bottom:.4rem}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--green);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+.amber-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-left:4px solid var(--amber);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+.blue-box{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-left:4px solid var(--blue2);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.blue-box .cb-title{font-weight:800;color:#1e40af;font-size:14px;margin-bottom:.4rem}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+.indigo-box{background:var(--indigo-bg);border:1.5px solid var(--indigo-border);border-left:4px solid var(--indigo);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.indigo-box .cb-title{font-weight:800;color:#3730a3;font-size:14px;margin-bottom:.4rem}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:var(--radius);border:1.5px solid var(--pur-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--pur-tint2);padding:10px 14px;text-align:left;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--pur-dark)}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6;vertical-align:top}
+tbody tr:hover td{background:var(--pur-tint)}
+
+/* ── FLOW ── */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0}
+.flow-box{background:#fff;border:1.5px solid var(--pur-border);border-radius:8px;padding:7px 12px;font-weight:700;color:var(--pur-dark);text-align:center;font-size:12px;line-height:1.4}
+.flow-arrow{color:var(--pur-main);font-size:18px;font-weight:900}
+
+/* ── POINT CARDS ── */
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:.8rem 0}
+.point-card{background:#fff;border:1.5px solid var(--pur-border);border-radius:var(--radius);padding:1rem;text-align:center;transition:border-color .2s,box-shadow .2s}
+.point-card:hover{border-color:var(--pur-main);box-shadow:0 4px 12px rgba(91,63,212,.12)}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--pur-main);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ── HIGHLIGHT TEXT ── */
+.hp{color:var(--pur-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--blue2);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.hi{color:var(--indigo);font-weight:800}
+
+/* ── FORMULA BOX ── */
+.formula-box{background:linear-gradient(135deg,var(--pur-tint),var(--pur-tint2));border:2px solid var(--pur-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--pur-dark);letter-spacing:-.01em;font-style:italic}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* ── STEP CARDS ── */
+.steps{display:flex;flex-direction:column;gap:8px;margin:.8rem 0}
+.step-item{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius);padding:.9rem 1.1rem;transition:border-color .2s}
+.step-item:hover{border-color:var(--pur-border)}
+.step-num{width:28px;height:28px;border-radius:8px;background:var(--pur-main);color:#fff;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px}
+.step-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+/* ── QUIZ ── */
+.quiz-wrap{background:linear-gradient(135deg,var(--pur-tint2),var(--pur-tint));border:1.5px solid var(--pur-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin-top:1.6rem}
+.quiz-label{font-size:11px;font-weight:800;color:var(--pur-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{background:var(--pur-main);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.quiz-toggle:hover{background:var(--pur-dark)}
+.quiz-ans{display:none;margin-top:.8rem;padding:.9rem 1rem;background:rgba(255,255,255,.85);border-radius:10px;font-size:13.5px;color:var(--text);line-height:1.75;border:1px solid var(--pur-border)}
+
+/* ── CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:.6rem 0}
+.chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:var(--pur-tint2);color:var(--pur-dark);border:1px solid var(--pur-border)}
+.chip-g{background:var(--green-bg);color:#065f46;border-color:var(--green-border)}
+.chip-r{background:var(--red-bg);color:#991b1b;border-color:var(--red-border)}
+.chip-a{background:var(--amber-bg);color:#92400e;border-color:var(--amber-border)}
+.chip-b{background:var(--blue-bg);color:#1e40af;border-color:var(--blue-border)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.45rem}
+  .hero-desc{font-size:13px}
+  .hero-eyebrow{font-size:10px;padding:4px 11px}
+  .hero-stats{gap:7px}
+  .hero-stat-card{min-width:68px;padding:.75rem .9rem}
+  .hs-num{font-size:1.45rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{justify-content:flex-start;gap:0;padding:0 .5rem}
+  .tab-btn{padding:11px 13px;font-size:11.5px;border-radius:6px 6px 0 0}
+  .content-wrap{padding:1.2rem .85rem 4rem}
+  .unit-banner{flex-direction:column;gap:.75rem;padding:1.1rem}
+  .ub-emoji{font-size:2.1rem}
+  .ub-title{font-size:1.1rem}
+  .acc-header{padding:.95rem 1rem;gap:10px}
+  .acc-num{width:30px;height:30px;font-size:12px;border-radius:8px}
+  .acc-htitle{font-size:14px}
+  .acc-hdesc{font-size:11.5px}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .steps{gap:7px}
+  .step-item{padding:.8rem .95rem}
+  table{font-size:12px}
+  thead th{font-size:10px;padding:8px 10px}
+  tbody td{padding:8px 10px}
+  .concept-box,.green-box,.amber-box,.blue-box,.red-box,.indigo-box{padding:.85rem 1rem;font-size:13px}
+  .formula-box{padding:1rem 1.1rem}
+  .formula-text{font-size:1.15rem}
+  .quiz-wrap{padding:1rem 1.1rem}
+  .quiz-q{font-size:13px}
+}
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .hero-deco,.hero-deco2{display:none}
+  .hero{padding:1.7rem .9rem 1.5rem}
+  .hero-title{font-size:1.28rem;letter-spacing:-.025em}
+  .hero-desc{font-size:12.5px;margin-bottom:1.4rem}
+  .breadcrumb{gap:4px;margin-bottom:.9rem}
+  .bc-item,.bc-current,.bc-sep{font-size:11px}
+  .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;max-width:280px;margin:0 auto}
+  .hero-stat-card{min-width:0;padding:.7rem .5rem}
+  .hs-num{font-size:1.3rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{padding:0 .3rem}
+  .tab-btn{padding:10px 11px;font-size:11px;white-space:nowrap}
+  .ub-title{font-size:1rem}
+  .ub-desc{font-size:12px}
+  .acc-header{padding:.85rem .9rem;gap:8px}
+  .acc-htitle{font-size:13.5px}
+  .acc-hdesc{font-size:11px}
+  .acc-body{padding:0 .9rem 1.2rem}
+  .sec-title{font-size:11px}
+  .point-box{grid-template-columns:1fr}
+  .pc-icon{font-size:1.5rem}
+  .pc-title{font-size:12px}
+  .pc-desc{font-size:11.5px}
+  .step-num{width:26px;height:26px;font-size:12px;border-radius:7px;flex-shrink:0}
+  .step-title{font-size:12.5px}
+  .step-desc{font-size:12px}
+  .formula-text{font-size:1rem}
+  .formula-sub{font-size:11px}
+  .table-wrap{-webkit-overflow-scrolling:touch}
+  .quiz-q{font-size:12.5px}
+  .quiz-toggle{font-size:11.5px;padding:6px 15px}
+  .quiz-ans{font-size:13px}
+  .chip,.chip-g,.chip-r,.chip-a,.chip-b{font-size:10.5px;padding:3px 10px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-pur"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="science1-summary.html" class="bc-item">중학 과학 1</a><span class="bc-sep">›</span>
+      <span class="bc-current">💪 Ⅴ. 힘의 작용</span>
+    </div>
+    <div class="hero-eyebrow">💪 PART 05 · 중학 과학 1 · UNIT 05</div>
+    <div class="hero-title">Ⅴ. 힘의 작용</div>
+    <div class="hero-desc">힘의 정의와 표시, 알짜힘, 중력·탄성력·마찰력·부력의 특징,<br>힘과 운동의 관계까지 동아출판 2022 개정 교과서를 완벽 정리합니다</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">2</div><div class="hs-lbl">중단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">9</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">12+</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">💪 중단원1 · 여러 가지 힘</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">🚀 중단원2 · 힘과 운동</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ════════════════════════════════
+     중단원 1: 여러 가지 힘
+════════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner">
+    <div class="ub-emoji">💪</div>
+    <div>
+      <div class="ub-num">중단원 01 · Forces Around Us</div>
+      <div class="ub-title">여러 가지 힘</div>
+      <div class="ub-desc">힘의 정의와 화살표 표시, 알짜힘·힘의 평형, 중력·탄성력·마찰력·부력의 특징과 생활 사례를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 힘의 정의와 알짜힘 -->
+    <div class="acc-item" id="acc-force-def">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Force Definition · 힘의 정의</div>
+          <div class="acc-htitle">힘의 정의와 알짜힘</div>
+          <div class="acc-hdesc">과학에서 힘의 의미 · 화살표 표시 3요소 · 알짜힘 계산 · 힘의 평형</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">과학에서 말하는 힘이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">💡 힘의 정의</div>
+          과학에서 말하는 <span class="hp">힘</span>이란 <span class="hp">물체의 모양이나 운동 상태(속력·운동 방향)를 변화시키는 원인</span>이다.<br><br>
+          힘의 크기 단위: <strong>N (뉴턴, Newton)</strong><br>
+          → 영국 물리학자 뉴턴(Newton, I., 1642~1727)의 이름에서 유래
+        </div>
+
+        <div class="sec-title">힘을 화살표로 나타내는 방법</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">📍</div>
+            <div class="pc-title">작용점</div>
+            <div class="pc-desc">힘이 작용하는 지점 (●로 표시)</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">📏</div>
+            <div class="pc-title">힘의 크기</div>
+            <div class="pc-desc">화살표의 길이로 표시 (클수록 길게)</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">➡️</div>
+            <div class="pc-title">힘의 방향</div>
+            <div class="pc-desc">화살표가 가리키는 방향</div>
+          </div>
+        </div>
+
+        <div class="sec-title">나란하게 작용하는 두 힘의 알짜힘</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>두 힘의 방향</th><th>알짜힘의 크기</th><th>알짜힘의 방향</th><th>예시</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hp">같은 방향</span></td>
+              <td>두 힘의 크기를 <strong>더한</strong> 것</td>
+              <td>두 힘과 같은 방향</td>
+              <td>30N + 15N = <strong>45N</strong></td>
+            </tr>
+            <tr>
+              <td><span class="hb">반대 방향</span></td>
+              <td>큰 힘에서 작은 힘을 <strong>뺀</strong> 것</td>
+              <td>큰 힘의 방향</td>
+              <td>30N - 15N = <strong>15N</strong> (큰 힘 방향)</td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="blue-box">
+          <div class="cb-title">⚖️ 힘의 평형 (Equilibrium)</div>
+          한 물체에 두 힘이 작용할 때 <span class="hb">알짜힘이 0</span>이면 두 힘은 <span class="hb">힘의 평형</span>을 이룬다.<br><br>
+          힘의 평형 조건: <strong>두 힘의 크기가 같고, 방향이 서로 반대</strong>이며, 같은 직선 위에 있어야 한다.<br><br>
+          예: 책상 위 화분 → 중력(아래) = 책상이 떠받치는 힘(위) → 알짜힘 = 0 → 정지
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">물체에 3N과 2N의 힘이 반대 방향으로 작용할 때 알짜힘의 크기와 방향은?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • 크기: <strong>3N - 2N = 1N</strong><br>
+            • 방향: <strong>3N 힘의 방향</strong> (더 큰 힘의 방향)<br><br>
+            💡 반대 방향으로 나란하게 작용하는 두 힘의 알짜힘 = 큰 힘 − 작은 힘, 방향은 큰 힘쪽
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 중력 -->
+    <div class="acc-item" id="acc-gravity">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Gravity · 중력</div>
+          <div class="acc-htitle">중력 — 지구가 물체를 당기는 힘</div>
+          <div class="acc-hdesc">중력의 방향 · 무게 vs 질량 비교 · 천체에 따른 중력 차이</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">중력이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🌍 중력 (Gravity)</div>
+          <span class="hp">지구가 물체를 당기는 힘</span>.<br><br>
+          방향: 항상 <span class="hp">지구 중심 방향(연직 아래 방향)</span>으로 작용<br><br>
+          예: 공을 가만히 놓으면 아래로 떨어짐, 번지 점프, 달이 지구 주위를 도는 것, 지구에 공기가 존재하는 것
+        </div>
+
+        <div class="sec-title">무게 vs 질량 비교</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>무게 (Weight)</th><th>질량 (Mass)</th></tr></thead>
+          <tbody>
+            <tr><td><strong>정의</strong></td><td>물체에 작용하는 <span class="hp">중력의 크기</span></td><td>물질이 가진 <span class="hg">고유한 양</span></td></tr>
+            <tr><td><strong>단위</strong></td><td><span class="hp">N (뉴턴)</span></td><td><span class="hg">kg, g</span></td></tr>
+            <tr><td><strong>측정 도구</strong></td><td>용수철저울, 가정용 저울</td><td>양팔저울, 윗접시저울</td></tr>
+            <tr><td><strong>장소에 따른 변화</strong></td><td><span class="hr">변한다</span> (중력이 다르므로)</td><td><span class="hg">변하지 않는다</span></td></tr>
+            <tr><td><strong>지구에서 관계</strong></td><td colspan="2">질량 1 kg → 무게 약 <strong>9.8 N</strong></td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="amber-box">
+          <div class="cb-title">🌕 달에서의 무게와 질량</div>
+          달의 중력은 지구 중력의 약 <strong>1/6</strong><br>
+          → 달에서 무게는 지구의 <span class="ha">약 1/6</span>로 줄어든다<br>
+          → 달에서 질량은 지구와 <span class="ha">똑같다</span> (질량은 장소와 무관)
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">질량이 10kg인 물체를 달에 가져갔을 때 질량과 무게는 각각 어떻게 되는가? (달의 중력은 지구의 1/6)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • 질량: <strong>10 kg</strong> (변하지 않음 — 질량은 장소에 관계없이 일정)<br>
+            • 무게: 지구에서 10 kg × 9.8 N/kg = 98 N의 1/6 = 약 <strong>16.3 N</strong><br><br>
+            💡 무게는 중력의 크기이므로 중력이 작은 달에서는 작아지지만, 질량은 물질의 고유한 양이므로 달에서도 변하지 않는다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 03: 탄성력 -->
+    <div class="acc-item" id="acc-elastic">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Elastic Force · 탄성력</div>
+          <div class="acc-htitle">탄성력 — 원래 모양으로 되돌아가려는 힘</div>
+          <div class="acc-hdesc">탄성·탄성력의 정의 · 크기와 방향 · 생활 속 탄성력 이용</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">탄성과 탄성력이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🌀 탄성력 (Elastic Force)</div>
+          • <span class="hp">탄성</span>: 변형된 물체가 원래 모양으로 되돌아가려는 성질<br>
+          • <span class="hp">탄성력</span>: 변형된 물체가 원래 모양으로 되돌아가려는 힘<br>
+          • <strong>탄성체</strong>: 탄성을 가지는 물체 (용수철, 고무줄, 고무 띠 등)
+        </div>
+
+        <div class="sec-title">탄성력의 크기와 방향</div>
+        <div class="green-box">
+          <div class="cb-title">📐 탄성력의 특징</div>
+          • <span class="hg">방향</span>: 탄성체가 <strong>원래 모양으로 되돌아가려는 방향</strong> (변형 방향과 반대 방향)<br>
+          &nbsp;&nbsp;예: 용수철을 오른쪽으로 당기면 탄성력은 <strong>왼쪽</strong>으로 작용<br><br>
+          • <span class="hg">크기</span>: 탄성체가 <strong>변형된 정도(늘어난 길이)에 비례</strong><br>
+          &nbsp;&nbsp;→ 더 많이 늘일수록 탄성력이 커진다
+        </div>
+
+        <div class="sec-title">탄성력을 이용하는 예</div>
+        <div class="chips">
+          <span class="chip-g chip">📎 집게</span>
+          <span class="chip-g chip">🖊️ 볼펜 용수철</span>
+          <span class="chip-g chip">💇 머리끈</span>
+          <span class="chip-g chip">📱 스마트기기 거치대</span>
+          <span class="chip-g chip">🏃 장대높이뛰기</span>
+          <span class="chip-g chip">🏹 활과 화살</span>
+          <span class="chip chip">🎵 기타 줄</span>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">고무줄을 양쪽에서 잡아당길 때 고무줄에 작용하는 탄성력의 방향을 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            탄성력은 <strong>고무줄이 원래 모양으로 되돌아가려는 방향</strong>, 즉 <strong>당기는 힘의 반대 방향</strong>으로 작용한다.<br><br>
+            → 왼쪽으로 당기는 손에는 오른쪽 방향의 탄성력이, 오른쪽으로 당기는 손에는 왼쪽 방향의 탄성력이 작용한다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 04: 마찰력 -->
+    <div class="acc-item" id="acc-friction">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">04</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Friction · 마찰력</div>
+          <div class="acc-htitle">마찰력 — 운동을 방해하는 힘</div>
+          <div class="acc-hdesc">마찰력의 정의·방향·크기 요인 · 마찰력을 크게/작게 이용하는 예</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">마찰력이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🛑 마찰력 (Friction)</div>
+          두 물체의 <span class="hp">접촉면에서 물체의 운동을 방해하는 힘</span>.<br><br>
+          방향: 물체의 <span class="hp">운동 방향(미끄러짐)과 반대 방향</span>으로 작용
+        </div>
+
+        <div class="sec-title">마찰력의 크기에 영향을 주는 요인</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>요인</th><th>관계</th><th>이유</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hp">접촉면의 거칠기</span></td>
+              <td>거칠수록 마찰력 <strong>크다</strong></td>
+              <td>빙판(매끄러움) &lt; 흙길(거침)</td>
+            </tr>
+            <tr>
+              <td><span class="hp">물체의 무게</span></td>
+              <td>무거울수록 마찰력 <strong>크다</strong></td>
+              <td>가벼운 상자 &lt; 무거운 상자 끌기</td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">마찰력의 이용 사례</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🏂</div>
+            <div class="pc-title">마찰력 작게 이용</div>
+            <div class="pc-desc">스노보드 — 눈 위에서 마찰력이 작아 쉽게 미끄러짐</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🚲</div>
+            <div class="pc-title">마찰력 크게 이용</div>
+            <div class="pc-desc">자전거 제동 장치 — 마찰력 커져 바퀴 멈춤</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🥌</div>
+            <div class="pc-title">마찰력 조절 이용</div>
+            <div class="pc-desc">컬링 — 브러시로 얼음판의 마찰력을 조절하여 스톤 방향·속도 제어</div>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">마찰력의 크기는 접촉면이 ___수록, 물체의 무게가 ___수록 크다. 빈칸을 채우시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            마찰력의 크기는 접촉면이 <strong>거칠</strong>수록, 물체의 무게가 <strong>무거울</strong>수록 크다.<br><br>
+            → 빙판에서 잘 미끄러지는 이유: 빙판은 매끄러워 마찰력이 작기 때문<br>
+            → 무거운 짐이 끌기 힘든 이유: 무거울수록 마찰력이 크기 때문
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 05: 부력 -->
+    <div class="acc-item" id="acc-buoyancy">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">05</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Buoyancy · 부력</div>
+          <div class="acc-htitle">부력 — 물체를 밀어 올리는 힘</div>
+          <div class="acc-hdesc">부력의 정의·방향·크기 결정 요인 · 배·잠수함·헬륨풍선의 원리</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">부력이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🌊 부력 (Buoyancy)</div>
+          <span class="hp">액체나 기체가 그 속에 있는 물체를 위로 밀어 올리는 힘</span>.<br><br>
+          방향: <span class="hp">중력과 반대 방향</span> (위쪽)<br><br>
+          크기 측정법: 공기 중 용수철저울 눈금 − 물속 용수철저울 눈금 = <strong>부력의 크기</strong>
+        </div>
+
+        <div class="sec-title">부력의 크기에 영향을 주는 요인</div>
+        <div class="blue-box">
+          <div class="cb-title">📦 물에 잠긴 부피 ↑ → 부력 ↑</div>
+          물에 잠긴 물체의 <span class="hb">부피가 클수록 부력이 크다</span>.<br><br>
+          예: 금속 덩어리를 물에 넣으면 가라앉음 (잠긴 부피 작아 부력 < 중력)<br>
+          → 같은 금속으로 큰 배 모양을 만들면 물에 뜸 (잠긴 부피 커져 부력 ≥ 중력)
+        </div>
+
+        <div class="sec-title">부력과 중력의 관계</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>상태</th><th>조건</th><th>예시</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hg">물 위에 뜸</span></td><td>부력 ≥ 중력</td><td>배, 튜브, 구명조끼</td></tr>
+            <tr><td><span class="hb">공중에 떠 있음</span></td><td>부력 = 중력 (기체 중)</td><td>헬륨 풍선, 비행선</td></tr>
+            <tr><td><span class="hr">가라앉음</span></td><td>부력 < 중력</td><td>금속 덩어리</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="indigo-box">
+          <div class="cb-title">🚢 잠수함의 원리</div>
+          잠수함의 부피가 일정하므로 <span class="hi">부력의 크기는 변하지 않는다</span>. 잠수함 내부의 공기탱크에 바닷물을 채워 <strong>중력 크기를 조절</strong>하여 가라앉거나 뜬다.<br><br>
+          • 가라앉기: 공기탱크에 바닷물 채움 → 중력 > 부력<br>
+          • 떠오르기: 압축 공기로 바닷물 밀어냄 → 중력 < 부력
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">화물선이 비어 있을 때와 짐을 가득 실었을 때, 두 경우에 작용하는 부력의 크기를 비교하고 그 이유를 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            짐을 가득 실은 화물선에 더 <strong>큰 부력</strong>이 작용한다.<br><br>
+            이유: 짐을 실으면 화물선이 무거워져 물에 더 깊이 잠기므로 <strong>물에 잠긴 부피가 커진다</strong>. 부력의 크기는 물에 잠긴 부피가 클수록 크므로 부력이 더 크게 작용한다.<br><br>
+            (화물선은 항상 중력 = 부력인 힘의 평형 상태에서 떠 있으므로, 짐이 더 무거우면 더 깊이 잠겨 부력도 커진다.)
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ════════════════════════════════
+     중단원 2: 힘과 운동
+════════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner">
+    <div class="ub-emoji">🚀</div>
+    <div>
+      <div class="ub-num">중단원 02 · Force & Motion</div>
+      <div class="ub-title">힘과 운동</div>
+      <div class="ub-desc">알짜힘과 운동 상태 변화, 힘의 방향에 따른 속력·방향 변화, 힘의 평형 상태를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 알짜힘과 운동 상태 변화 -->
+    <div class="acc-item" id="acc-net-force">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Net Force & Motion · 알짜힘과 운동</div>
+          <div class="acc-htitle">물체에 작용하는 힘과 운동 상태 변화</div>
+          <div class="acc-hdesc">알짜힘의 방향에 따른 속력·방향 변화 3가지 경우</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">알짜힘이 작용하면 운동 상태가 변한다</div>
+        <div class="concept-box">
+          <div class="cb-title">🎯 핵심 원리</div>
+          물체에 <span class="hp">알짜힘(≠0)이 작용하면</span> 물체의 <span class="hp">속력이나 운동 방향이 변한다</span>.<br><br>
+          반대로, 알짜힘이 <strong>0</strong>이면 물체는 운동 상태가 변하지 않는다 (정지 또는 등속 직선 운동).
+        </div>
+
+        <div class="sec-title">알짜힘 방향에 따른 운동 변화 3가지</div>
+        <div class="steps">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">운동 방향과 <span style="color:var(--pur-main)">같은 방향</span>으로 알짜힘 작용</div>
+              <div class="step-desc"><span class="hp">속력만 빨라진다</span> (운동 방향 변하지 않음)<br>
+              예: 공을 가만히 놓아 아래로 떨어질 때 — 중력이 운동 방향(아래)과 같은 방향 → 점점 빨라짐<br>
+              예: 쇼트트랙에서 뒤 선수가 앞 선수를 밀 때 → 속력 빨라짐</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">운동 방향과 <span style="color:var(--red)">반대 방향</span>으로 알짜힘 작용</div>
+              <div class="step-desc"><span class="hr">속력만 느려진다</span> (운동 방향 변하지 않음)<br>
+              예: 공을 위로 던졌을 때 — 중력이 운동 방향(위)의 반대 방향 → 점점 느려짐<br>
+              예: 잔디 위를 굴러가는 공 — 마찰력이 운동 반대 방향 → 느려져 정지</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">운동 방향과 <span style="color:var(--green)">나란하지 않은 방향</span>으로 알짜힘 작용</div>
+              <div class="step-desc">비스듬한 방향: <span class="hg">속력과 운동 방향 모두 변한다</span><br>
+              수직 방향: <span class="hg">운동 방향만 변한다</span> (속력 변하지 않음)<br>
+              예: 비스듬히 던진 농구공 → 속력과 방향 모두 변함<br>
+              예: 인공위성 — 중력이 운동 방향에 수직 → 속력 일정, 방향만 계속 바뀜</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap"><table>
+          <thead><tr><th>알짜힘 방향</th><th>속력 변화</th><th>운동 방향 변화</th><th>대표 예</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">운동 방향과 같음</span></td><td><span class="hp">빨라짐</span></td><td>없음</td><td>자유낙하, 쇼트트랙 밀기</td></tr>
+            <tr><td><span class="hr">운동 방향과 반대</span></td><td><span class="hr">느려짐</span></td><td>없음</td><td>위로 던진 공, 잔디 위 공</td></tr>
+            <tr><td><span class="hg">비스듬한 방향</span></td><td>변함</td><td>변함</td><td>비스듬히 던진 공, 그네</td></tr>
+            <tr><td><span class="hg">수직 방향</span></td><td>없음</td><td>변함</td><td>인공위성, 회전목마</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">다음 운동에서 속력과 운동 방향의 변화를 쓰시오.<br><br>
+          (가) 비스듬히 차올린 공의 운동<br>
+          (나) 회전목마의 운동<br>
+          (다) 아래로 떨어지는 다이빙 선수의 운동</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            (가) <strong>속력과 운동 방향 모두 변함</strong><br>
+            → 중력이 비스듬한 방향으로 작용하기 때문<br><br>
+            (나) <strong>운동 방향만 변함</strong> (속력은 일정)<br>
+            → 원의 중심 방향으로 힘이 작용 (운동 방향에 수직)<br><br>
+            (다) <strong>속력만 빨라짐</strong> (운동 방향 변하지 않음)<br>
+            → 중력이 운동 방향(아래)과 같은 방향으로 작용
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 힘의 평형 -->
+    <div class="acc-item" id="acc-equilibrium">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Force Equilibrium · 힘의 평형</div>
+          <div class="acc-htitle">힘의 평형 — 알짜힘 = 0, 운동 상태 불변</div>
+          <div class="acc-hdesc">힘의 평형 조건 · 평형 사례 · 정지 vs 등속운동</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">힘의 평형이란?</div>
+        <div class="formula-box">
+          <div class="formula-text">힘의 평형 → 알짜힘 = 0 → 운동 상태 변하지 않음</div>
+          <div class="formula-sub">두 힘의 크기가 같고, 방향이 반대이며, 같은 직선 위에 있을 때</div>
+        </div>
+
+        <div class="sec-title">힘의 평형 조건</div>
+        <div class="blue-box">
+          <div class="cb-title">⚖️ 평형의 3가지 조건</div>
+          ① 두 힘의 <span class="hb">크기가 같다</span><br>
+          ② 두 힘의 <span class="hb">방향이 서로 반대</span>이다<br>
+          ③ 두 힘이 <span class="hb">같은 직선 위</span>에 있다<br><br>
+          → 세 조건을 모두 만족해야 평형!
+        </div>
+
+        <div class="sec-title">힘의 평형 사례</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🪴</div>
+            <div class="pc-title">책상 위 화분</div>
+            <div class="pc-desc">중력(아래) = 책상의 수직 항력(위) → 알짜힘 0 → 정지</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🎈</div>
+            <div class="pc-title">공중에 뜬 헬륨 풍선</div>
+            <div class="pc-desc">중력(아래) = 부력(위) → 알짜힘 0 → 정지</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">📦</div>
+            <div class="pc-title">밀어도 안 움직이는 상자</div>
+            <div class="pc-desc">미는 힘 = 마찰력 → 알짜힘 0 → 정지 유지</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">⚖️</div>
+            <div class="pc-title">수직추가 달린 실</div>
+            <div class="pc-desc">중력(아래) = 실이 추를 당기는 힘(위) → 정지</div>
+          </div>
+        </div>
+
+        <div class="amber-box">
+          <div class="cb-title">💡 평형 상태 = 반드시 정지는 아니다</div>
+          알짜힘 = 0이면 운동 상태가 <strong>변하지 않을 뿐</strong>이다.<br>
+          → 이미 정지해 있으면: <strong>계속 정지</strong><br>
+          → 이미 운동 중이면: <strong>등속 직선 운동</strong> (같은 속도로 계속 운동)<br><br>
+          예: 마찰이 없는 빙판에서 일정한 속도로 미끄러지는 스케이터 → 알짜힘 = 0 → 등속 운동
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 7</div>
+          <div class="quiz-q">바닥에 놓인 물체를 힘껏 밀었는데 물체가 움직이지 않았다. 이때 물체에 작용하는 힘의 평형 관계를 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            물체를 미는 힘과 물체에 작용하는 <strong>마찰력</strong>이 서로 <strong>힘의 평형</strong>을 이루기 때문이다.<br><br>
+            • 미는 힘의 방향: 앞쪽<br>
+            • 마찰력의 방향: 뒤쪽 (운동 방향 반대)<br>
+            • 두 힘의 크기가 같고 방향이 반대 → 알짜힘 = 0 → 운동 상태 변하지 않음(정지 유지)
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">인공위성은 지구 주위를 일정한 속력으로 원운동한다. 이때 인공위성의 속력과 운동 방향은 어떻게 변하는지, 작용하는 힘과 관련지어 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안:</strong><br><br>
+            인공위성에는 지구 중력이 <strong>운동 방향에 수직인 방향</strong>(지구 중심 방향)으로 작용한다.<br><br>
+            • <strong>속력</strong>: 힘이 운동 방향과 수직이므로 <strong>변하지 않는다</strong><br>
+            • <strong>운동 방향</strong>: 힘이 계속 운동 방향과 수직으로 작용하므로 <strong>계속 바뀐다</strong><br><br>
+            결과적으로 인공위성은 속력은 일정하고 방향만 계속 변하는 <strong>등속 원운동</strong>을 한다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  document.querySelectorAll('.unit-section').forEach(el => el.classList.remove('visible'));
+  document.getElementById('unit' + n).classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => item.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+const hashMap = {
+  '#unit1':1,'#acc-force-def':1,'#acc-gravity':1,'#acc-elastic':1,'#acc-friction':1,'#acc-buoyancy':1,
+  '#unit2':2,'#acc-net-force':2,'#acc-equilibrium':2
+};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n-1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
