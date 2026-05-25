@@ -397,18 +397,29 @@ export default function TeacherPage() {
               {/* ── 데스크탑 테이블 (md 이상) ── */}
               <div className="hidden md:block bg-white border border-pink-100 rounded-2xl overflow-hidden">
                 <div className="overflow-x-auto">
-                  <table className="w-full" style={{ minWidth: '1100px' }}>
+                  <table className="w-full table-fixed" style={{ minWidth: '1200px' }}>
+                    <colgroup>
+                      <col style={{ width: '130px' }} />
+                      <col style={{ width: '90px' }} />
+                      <col style={{ width: 'auto' }} />
+                      <col style={{ width: '110px' }} />
+                      <col style={{ width: '110px' }} />
+                      <col style={{ width: '80px' }} />
+                      <col style={{ width: '80px' }} />
+                      <col style={{ width: '90px' }} />
+                      <col style={{ width: '240px' }} />
+                    </colgroup>
                     <thead>
                       <tr className="border-b border-pink-100" style={{ background: '#fdf2f8' }}>
-                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">과목</th>
-                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">학년</th>
-                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-5 py-4">단원명</th>
-                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">게시일</th>
-                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">게시 상태</th>
-                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">OX</th>
-                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">4지선다</th>
-                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">총 문항</th>
-                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-5 py-4 whitespace-nowrap">관리</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-5 py-4 whitespace-nowrap">과목</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-5 py-4 whitespace-nowrap">학년</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-6 py-4">단원명</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-5 py-4 whitespace-nowrap">게시일</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-5 py-4 whitespace-nowrap">게시 상태</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-5 py-4 whitespace-nowrap">OX</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-5 py-4 whitespace-nowrap">4지선다</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-5 py-4 whitespace-nowrap">총 문항</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-6 py-4 whitespace-nowrap">관리</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -421,44 +432,44 @@ export default function TeacherPage() {
                             className="border-b border-gray-50 hover:bg-pink-50/40 transition-colors"
                             style={{ borderBottom: idx === exams.length - 1 ? 'none' : undefined }}
                           >
-                            <td className="px-3 py-4 text-center">
+                            <td className="px-5 py-5 text-center">
                               {exam.subject
                                 ? <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-blue-100 text-blue-700 whitespace-nowrap">{exam.subject}</span>
                                 : <span className="text-xs text-gray-300">—</span>
                               }
                             </td>
-                            <td className="px-3 py-4 text-center">
+                            <td className="px-5 py-5 text-center">
                               {exam.grade
                                 ? <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-pink-100 text-pink-700 whitespace-nowrap">{exam.grade}</span>
                                 : <span className="text-xs text-gray-300">—</span>
                               }
                             </td>
-                            <td className="px-5 py-4 text-center">
+                            <td className="px-6 py-5 text-center">
                               <span className="font-bold text-gray-900 text-sm">{exam.title}</span>
                             </td>
-                            <td className="px-3 py-4 text-center whitespace-nowrap">
+                            <td className="px-5 py-5 text-center whitespace-nowrap">
                               <span className="text-xs text-gray-600 font-medium">{formatDate(exam.regDate)}</span>
                             </td>
-                            <td className="px-3 py-4 text-center">
+                            <td className="px-5 py-5 text-center">
                               <span className={`inline-block text-xs px-3 py-1 rounded-full font-semibold whitespace-nowrap ${
                                 exam.isPublished ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
                               }`}>
                                 {exam.isPublished ? '게시됨' : '임시저장'}
                               </span>
                             </td>
-                            <td className="px-3 py-4 text-center">
+                            <td className="px-5 py-5 text-center">
                               <span className="text-sm font-bold text-gray-700">{oxCount}</span>
                               <span className="text-xs text-gray-400 ml-0.5">개</span>
                             </td>
-                            <td className="px-3 py-4 text-center">
+                            <td className="px-5 py-5 text-center">
                               <span className="text-sm font-bold text-gray-700">{multipleCount}</span>
                               <span className="text-xs text-gray-400 ml-0.5">개</span>
                             </td>
-                            <td className="px-3 py-4 text-center">
+                            <td className="px-5 py-5 text-center">
                               <span className="text-sm font-black" style={{ color:'#db2777' }}>{exam.questions.length}</span>
                               <span className="text-xs text-gray-400 ml-0.5">문항</span>
                             </td>
-                            <td className="px-5 py-4">
+                            <td className="px-6 py-5">
                               <div className="flex items-center justify-center gap-2">
                                 {/* 결과 보기 */}
                                 <button
