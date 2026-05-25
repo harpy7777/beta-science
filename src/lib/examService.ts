@@ -1,7 +1,7 @@
 // src/lib/examService.ts
 import {
   collection, addDoc, getDocs, doc, getDoc,
-  updateDoc, query, where, orderBy, Timestamp, serverTimestamp
+  updateDoc, query, where, orderBy, Timestamp, serverTimestamp, deleteDoc
 } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -169,7 +169,6 @@ export async function submitStudentAnswers(payload: {
 }): Promise<string> {
   const exam = await getExam(payload.examId);
 
-  // ✅ OX / 4지선다 분리 점수 계산
   const oxQuestions       = (exam?.questions ?? []).filter(q => q.type === 'ox');
   const multipleQuestions = (exam?.questions ?? []).filter(q => q.type === 'multiple');
 
@@ -191,9 +190,9 @@ export async function submitStudentAnswers(payload: {
     studentName:    payload.studentName,
     studentId:      payload.studentId ?? '',
     answers:        payload.answers,
-    score:          payload.score,          // 전체 점수 (기존 호환)
-    oxScore,                                // ✅ OX 점수만
-    multiScore,                             // ✅ 4지선다 점수만
+    score:          payload.score,
+    oxScore,
+    multiScore,
     oxCount:        oxQuestions.length,
     multiCount:     multipleQuestions.length,
     totalQuestions: payload.totalQuestions,
@@ -250,6 +249,7 @@ export async function getAllResults(): Promise<Result[]> {
     ...(d.data() as Omit<Result, 'id'>),
   }));
 }
+
 // 학생 ID로 학생 정보 조회
 export async function getStudentById(studentId: string): Promise<{ fireId: string; id: string; name: string; grade: string } | null> {
   const q = query(
@@ -260,4 +260,9 @@ export async function getStudentById(studentId: string): Promise<{ fireId: strin
   if (snap.empty) return null;
   const d = snap.docs[0];
   return { fireId: d.id, ...d.data() } as { fireId: string; id: string; name: string; grade: string };
+}
+
+// 시험지 삭제
+export async function deleteExam(examId: string): Promise<void> {
+  await deleteDoc(doc(db, 'tests', examId));
 }
