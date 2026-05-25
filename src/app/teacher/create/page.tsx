@@ -25,7 +25,10 @@ function formatDate(ts: unknown): string {
       date = new Date(ts as any);
     }
     if (isNaN(date.getTime())) return '—';
-    return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\.$/, '');
+    const yy = String(date.getFullYear()).slice(2);
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yy}.${mm}.${dd}`;
   } catch {
     return '—';
   }
@@ -314,7 +317,7 @@ export default function TeacherPage() {
           </div>
         </header>
 
-        <main className="max-w-screen-xl mx-auto px-4 sm:px-8 py-6">
+        <main className="w-full px-3 sm:px-4 py-6">
 
           {/* Welcome Bar */}
           <div
