@@ -1,925 +1,581 @@
 'use client';
-// src/app/teacher/create/page.tsx
-import { useState, useEffect, useCallback, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { onAuthStateChanged, User } from 'firebase/auth';
+// src/app/teacher/page.tsx
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  signInWithEmailAndPassword, signOut, onAuthStateChanged, User
+} from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { getExamsByTeacher, deleteExam, Exam } from '@/lib/examService';
 import {
-  saveExam, updateExam, getExam,
-  Question, QuestionType
-} from '@/lib/examService';
-import {
-  ArrowLeft, Plus, Trash2,
-  Send, Save, CheckCircle, FileText,
-  ExternalLink, ChevronDown, ChevronUp, FlaskConical
+  Plus, LogOut, BookOpen, Users,
+  Eye, BarChart3, CheckCircle, Clock, Trash2, AlertTriangle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-type Step = 1 | 2 | 3;
-
-// ─────────────────────────────────────────────────────────────────────────────
-const GRADES = ['중1', '중2', '중3', '고1', '고2', '고3'];
-
-const SUBJECTS: Record<string, string[]> = {
-  '중1': ['과학내신', '과학선행'],
-  '중2': ['과학내신', '과학선행'],
-  '중3': ['과학내신', '과학선행'],
-  '고1': ['통합과학1', '통합과학2', '화학1', '물질과 에너지', '화학 반응의 세계'],
-  '고2': ['통합과학1', '통합과학2', '화학1', '물질과 에너지', '화학 반응의 세계'],
-  '고3': ['통합과학1', '통합과학2', '화학1', '물질과 에너지', '화학 반응의 세계'],
-};
-// ─────────────────────────────────────────────────────────────────────────────
-
-function makeId() {
-  return Math.random().toString(36).substring(2, 10);
-}
-
-function makeQuestion(type: QuestionType): Question {
-  return {
-    id: makeId(),
-    type,
-    text: '',
-    options: type === 'multiple' ? ['', '', '', ''] : undefined,
-    answer: type === 'ox' ? 'O' : '1',
-    explanation: '',
-  };
-}
-
-function parseOXBulk(raw: string): Question[] {
-  const blocks = raw.trim().split(/\n\s*\n/);
-  const results: Question[] = [];
-  for (const block of blocks) {
-    const lines = block.split('\n').map(l => l.trim());
-    const get = (key: string) => {
-      const l = lines.find(x => x.startsWith(key));
-      return l ? l.replace(key, '').trim() : '';
-    };
-    const text = get('문제:');
-    if (!text) continue;
-    const ansRaw = get('정답:').toUpperCase();
-    const ans = ansRaw === 'X' ? 'X' : 'O';
-    results.push({ id: makeId(), type: 'ox', text, answer: ans, explanation: get('해설:') });
-  }
-  return results;
-}
-
-function parseMCBulk(raw: string): Question[] {
-  const blocks = raw.trim().split(/\n\s*\n/);
-  const results: Question[] = [];
-  for (const block of blocks) {
-    const lines = block.split('\n').map(l => l.trim());
-    const get = (key: string) => {
-      const l = lines.find(x => x.startsWith(key));
-      return l ? l.replace(key, '').trim() : '';
-    };
-    const text = get('문제:');
-    if (!text) continue;
-    const opts = [get('선택지1:'), get('선택지2:'), get('선택지3:'), get('선택지4:')];
-    const ansText = get('정답:');
-    const ansIdx = opts.findIndex(o => o === ansText);
-    const answer = ansIdx >= 0 ? String(ansIdx + 1) : (ansText || '1');
-    results.push({ id: makeId(), type: 'multiple', text, options: opts, answer, explanation: get('해설:') });
-  }
-  return results;
-}
-
-function generateCodePenData(title: string, questions: Question[]): { html: string; css: string; js: string } {
-  const allQ = questions.map(q => ({
-    id: q.id, type: q.type, text: q.text,
-    choices: q.type === 'multiple' ? q.options : undefined,
-    answer: q.answer, explanation: q.explanation || '',
-  }));
-  const dataJson = JSON.stringify(allQ);
-
-  const html = `<div class="header">
-  <h1>${title}</h1>
-  <p>베타과학학원</p>
-</div>
-<div class="wrap" id="app"></div>`;
-
-  const css = `* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Noto Sans KR', -apple-system, sans-serif; background: #f0fdf4; min-height: 100vh; }
-.header { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; padding: 1.25rem 1rem; text-align: center; }
-.header h1 { font-size: 20px; font-weight: 700; }
-.header p { font-size: 13px; opacity: .8; margin-top: 3px; }
-.wrap { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem; }
-.progress-bar { background: #dcfce7; border-radius: 10px; height: 8px; margin-bottom: 1.5rem; overflow: hidden; }
-.progress-fill { height: 100%; background: #16a34a; border-radius: 10px; transition: .3s; }
-.card { background: #fff; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,.07); }
-.q-counter { font-size: 13px; color: #6b7280; margin-bottom: .75rem; }
-.q-type { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 20px; margin-bottom: .75rem; }
-.q-type.ox { background: #dcfce7; color: #15803d; }
-.q-type.mc { background: #dbeafe; color: #1d4ed8; }
-.q-text { font-size: 16px; font-weight: 600; line-height: 1.6; color: #1f2937; margin-bottom: 1.25rem; }
-.ox-row { display: flex; gap: 12px; }
-.ox-btn { flex: 1; padding: 16px; border-radius: 12px; border: 2px solid #e5e7eb; font-size: 22px; font-weight: 800; cursor: pointer; background: #fff; transition: .15s; }
-.ox-btn.O { color: #16a34a; border-color: #86efac; }
-.ox-btn.O:hover { background: #f0fdf4; }
-.ox-btn.X { color: #dc2626; border-color: #fca5a5; }
-.ox-btn.X:hover { background: #fef2f2; }
-.ox-btn:disabled { opacity: .5; cursor: default; }
-.mc-list { display: flex; flex-direction: column; gap: 8px; }
-.mc-opt { padding: 12px 16px; border-radius: 10px; border: 2px solid #e5e7eb; font-size: 14px; cursor: pointer; background: #fff; text-align: left; transition: .15s; display: flex; align-items: center; gap: 10px; }
-.mc-opt:hover:not(:disabled) { border-color: #16a34a; background: #f0fdf4; }
-.mc-opt:disabled { cursor: default; opacity: .7; }
-.mc-opt .num { font-weight: 700; color: #16a34a; min-width: 22px; font-size: 15px; }
-.feedback { margin-top: 1rem; padding: 12px 16px; border-radius: 10px; font-size: 14px; line-height: 1.6; display: none; }
-.feedback.ok { background: #dcfce7; color: #14532d; border: 1.5px solid #86efac; }
-.feedback.ng { background: #fee2e2; color: #7f1d1d; border: 1.5px solid #fca5a5; }
-.nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; }
-.btn { padding: 10px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; }
-.btn-next { background: #16a34a; color: #fff; }
-.btn-next:hover { background: #15803d; }
-.btn-prev { background: #f3f4f6; color: #374151; }
-.btn-prev:hover { background: #e5e7eb; }
-.score-card { background: #fff; border-radius: 20px; padding: 2.5rem 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,.08); }
-.score-big { font-size: 64px; font-weight: 800; color: #16a34a; line-height: 1; }
-.score-denom { font-size: 24px; color: #9ca3af; }
-.score-msg { font-size: 17px; color: #374151; margin-top: .75rem; font-weight: 600; }
-.score-pct { font-size: 14px; color: #6b7280; margin-top: .25rem; }
-.btn-restart { margin-top: 1.5rem; padding: 12px 36px; background: #16a34a; color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
-.btn-restart:hover { background: #15803d; }`;
-
-  const js = `const QS = ${dataJson};
-let cur = 0, score = 0;
-const qs = [...QS].sort(() => Math.random() - 0.5);
-const app = document.getElementById('app');
-const NUMS = ['①','②','③','④'];
-
-function render() {
-  if (cur >= qs.length) { showScore(); return; }
-  const q = qs[cur];
-  const pct = Math.round((cur / qs.length) * 100);
-  let html = '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
-  html += '<div class="card">';
-  html += '<div class="q-counter">' + (cur+1) + ' / ' + qs.length + '</div>';
-  html += '<div class="q-type ' + (q.type==='ox'?'ox':'mc') + '">' + (q.type==='ox'?'OX 문제':'4지선다') + '</div>';
-  html += '<div class="q-text">' + q.text + '</div>';
-  if (q.type === 'ox') {
-    html += '<div class="ox-row">';
-    html += '<button class="ox-btn O" onclick="answerOX(&quot;O&quot;)">O</button>';
-    html += '<button class="ox-btn X" onclick="answerOX(&quot;X&quot;)">X</button>';
-    html += '</div>';
-  } else {
-    html += '<div class="mc-list">';
-    (q.choices||[]).forEach((c,i) => {
-      html += '<button class="mc-opt" onclick="answerMC(&quot;' + (i+1) + '&quot;)">'
-           + '<span class="num">' + NUMS[i] + '</span>' + c + '</button>';
-    });
-    html += '</div>';
-  }
-  html += '<div class="feedback" id="fb"></div>';
-  html += '</div>';
-  html += '<div class="nav">';
-  if (cur > 0) html += '<button class="btn btn-prev" onclick="prev()">← 이전</button>';
-  else html += '<span></span>';
-  html += '<button class="btn btn-next" id="nb" style="display:none" onclick="next()">다음 →</button>';
-  html += '</div>';
-  app.innerHTML = html;
-}
-
-function showFeedback(ok) {
-  const q = qs[cur];
-  const fb = document.getElementById('fb');
-  fb.className = 'feedback ' + (ok ? 'ok' : 'ng');
-  fb.style.display = 'block';
-  fb.innerHTML = (ok ? '✅ 정답입니다!' : '❌ 오답! 정답: <b>' + (q.type==='ox' ? q.answer : (NUMS[parseInt(q.answer)-1]||q.answer)) + '</b>')
-    + (q.explanation ? '<br>💡 ' + q.explanation : '');
-  document.querySelectorAll('.ox-btn,.mc-opt').forEach(b => b.disabled = true);
-  const nb = document.getElementById('nb');
-  if (nb) nb.style.display = 'block';
-}
-
-function answerOX(a) { const ok = a === qs[cur].answer; if (ok) score++; showFeedback(ok); }
-function answerMC(a) { const ok = a === qs[cur].answer; if (ok) score++; showFeedback(ok); }
-function next() { cur++; render(); }
-function prev() { if (cur > 0) { cur--; render(); } }
-
-function showScore() {
-  const pct = Math.round((score / qs.length) * 100);
-  const msg = pct===100?'완벽합니다! 🎉':pct>=80?'훌륭해요! 👏':pct>=60?'잘 했어요! 😊':'조금 더 노력해봐요 💪';
-  app.innerHTML = '<div class="score-card">'
-    + '<div class="score-big">' + score + '<span class="score-denom"> / ' + qs.length + '</span></div>'
-    + '<div class="score-msg">' + msg + '</div>'
-    + '<div class="score-pct">정답률 ' + pct + '%</div>'
-    + '<button class="btn-restart" onclick="restart()">다시 풀기</button>'
-    + '</div>';
-}
-function restart() { cur=0; score=0; qs.sort(()=>Math.random()-.5); render(); }
-render();`;
-
-  return { html, css, js };
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-function CreateExamInner() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const editId = searchParams.get('edit');
-
-  const [user, setUser] = useState<User | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
-  const [step, setStep] = useState<Step>(1);
-  const [title, setTitle] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-
-  const [grade, setGrade] = useState('');
-  const [subject, setSubject] = useState('');
-  const [codepenUrl, setCodepenUrl] = useState('');
-
-  const [oxBulk, setOxBulk] = useState('');
-  const [mcBulk, setMcBulk] = useState('');
-  const [oxOpen, setOxOpen] = useState(true);
-  const [mcOpen, setMcOpen] = useState(true);
-  const [oxParsed, setOxParsed] = useState<Question[]>([]);
-  const [mcParsed, setMcParsed] = useState<Question[]>([]);
-
-  const handleGradeChange = (g: string) => { setGrade(g); setSubject(''); };
-  const subjectList = grade ? (SUBJECTS[grade] ?? []) : [];
-  const allQuestions = [...oxParsed, ...mcParsed];
-
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (u) => {
-      if (!u) { router.push('/teacher'); return; }
-      setUser(u);
-      setAuthLoading(false);
-      if (editId) {
-        const exam = await getExam(editId);
-        if (exam) {
-          setTitle(exam.title);
-          setGrade(exam.grade ?? '');
-          setSubject(exam.subject ?? '');
-          setCodepenUrl(exam.codepenUrl ?? '');
-          setOxParsed(exam.questions.filter(q => q.type === 'ox'));
-          setMcParsed(exam.questions.filter(q => q.type === 'multiple'));
-          setStep(2);
-        }
-      }
-    });
-    return unsub;
-  }, [editId, router]);
-
-  const handleOxParse = useCallback(() => {
-    const parsed = parseOXBulk(oxBulk);
-    if (parsed.length === 0) { toast.error('형식을 확인해주세요'); return; }
-    setOxParsed(parsed);
-    toast.success(`OX 문제 ${parsed.length}개 불러옴`);
-  }, [oxBulk]);
-
-  const handleMcParse = useCallback(() => {
-    const parsed = parseMCBulk(mcBulk);
-    if (parsed.length === 0) { toast.error('형식을 확인해주세요'); return; }
-    setMcParsed(parsed);
-    toast.success(`4지선다 ${parsed.length}개 불러옴`);
-  }, [mcBulk]);
-
-  async function handleSave(publish: boolean) {
-    if (!grade) { toast.error('학년을 선택하세요'); setStep(1); return; }
-    if (!subject) { toast.error('과목을 선택하세요'); setStep(1); return; }
-    if (!title.trim()) { toast.error('단원명을 입력하세요'); setStep(1); return; }
-    if (allQuestions.length === 0) { toast.error('문제를 1개 이상 입력하세요'); return; }
-    setSaving(true);
-    try {
-      const payload = {
-        title: title.trim(),
-        teacherId: user!.uid,
-        questions: allQuestions,
-        oxQuestions: oxParsed,
-        multipleQuestions: mcParsed,
-        isPublished: publish,
-        grade,
-        subject,
-        codepenUrl: codepenUrl.trim(),
-      };
-      if (editId) {
-        await updateExam(editId, payload);
-        toast.success(publish ? '게시되었습니다!' : '저장되었습니다!');
-      } else {
-        await saveExam(payload);
-        toast.success(publish ? '시험지가 게시되었습니다!' : '임시 저장됨');
-      }
-      setSaved(true);
-    } catch (e) {
-      console.error(e);
-      toast.error('저장에 실패했습니다');
-    } finally {
-      setSaving(false);
+function formatDate(ts: unknown): string {
+  if (!ts) return '—';
+  try {
+    let date: Date;
+    if (typeof (ts as any).toDate === 'function') {
+      date = (ts as any).toDate();
+    } else if (typeof (ts as any).seconds === 'number') {
+      date = new Date((ts as any).seconds * 1000);
+    } else {
+      date = new Date(ts as any);
     }
+    if (isNaN(date.getTime())) return '—';
+    return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\.$/, '');
+  } catch {
+    return '—';
   }
+}
 
-  function openCodePen() {
-    if (allQuestions.length === 0) { toast.error('문제가 없습니다'); return; }
-    const { html, css, js } = generateCodePenData(title || '온라인 테스트', allQuestions);
-    const data = JSON.stringify({ html, css, js });
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'https://codepen.io/pen/define';
-    form.target = '_blank';
-    const input = document.createElement('input');
-    input.type = 'hidden'; input.name = 'data'; input.value = data;
-    form.appendChild(input);
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
-  }
-
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#fdf2f8' }}>
-        <div className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#f472b6', borderTopColor: 'transparent' }} />
-      </div>
-    );
-  }
-
-  // ── 공통 인풋 스타일
-  const inputCls = "w-full border border-pink-100 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-pink-400 transition-colors bg-white";
-
+/* ── 삭제 확인 모달 ── */
+function DeleteConfirmModal({
+  exam,
+  onConfirm,
+  onCancel,
+  loading,
+}: {
+  exam: Exam;
+  onConfirm: () => void;
+  onCancel: () => void;
+  loading: boolean;
+}) {
   return (
-    <div className="min-h-screen bg-gray-50">
-
-      {/* ── 헤더 ── */}
-      <header className="bg-white border-b border-pink-100 sticky top-0 z-50">
-        <div className="w-full px-4 sm:px-6 h-14 flex items-center justify-between">
-
-          {/* 왼쪽: 로고 + 타이틀 */}
-          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => router.push('/teacher')}>
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-              style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
-            >
-              <FlaskConical size={15} className="text-white" />
-            </div>
-            <div>
-              <div className="font-semibold text-gray-900 text-sm leading-tight">
-                {editId ? '시험지 수정' : '시험지 만들기'}
-              </div>
-              <div className="text-xs" style={{ color: '#db2777' }}>
-                {grade && subject ? `${grade} · ${subject}` : title || '베타과학학원'}
-              </div>
-            </div>
-          </div>
-
-          {/* 스텝 인디케이터 (중간) */}
-          <div className="hidden sm:flex items-center gap-1.5">
-            {([1, 2, 3] as Step[]).map(s => (
-              <button
-                key={s}
-                onClick={() => {
-                  if (s >= 2 && (!title.trim() || !grade || !subject)) {
-                    toast.error('학년·과목·단원명을 먼저 입력하세요'); return;
-                  }
-                  setStep(s);
-                }}
-                className="w-7 h-7 rounded-full text-xs font-bold transition-all flex items-center justify-center"
-                style={
-                  step === s
-                    ? { background: 'linear-gradient(135deg,#f472b6,#db2777)', color: '#fff' }
-                    : step > s
-                    ? { background: '#fce7f3', color: '#db2777' }
-                    : { background: '#f3f4f6', color: '#9ca3af' }
-                }
-              >
-                {step > s ? '✓' : s}
-              </button>
-            ))}
-          </div>
-
-          {/* 오른쪽 버튼 */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => handleSave(false)}
-              disabled={saving}
-              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border transition-colors disabled:opacity-50"
-              style={{ borderColor: '#f4c8d4', color: '#e8375a' }}
-            >
-              <Save size={14} />
-              <span className="hidden sm:inline">임시저장</span>
-            </button>
-            <button
-              onClick={() => { if (step < 3) { setStep(3); return; } handleSave(true); }}
-              disabled={saving}
-              className="flex items-center gap-1.5 text-sm font-semibold text-white px-3 py-2 rounded-xl transition-opacity disabled:opacity-50 hover:opacity-85"
-              style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
-            >
-              {saving
-                ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                : saved ? <CheckCircle size={14} />
-                : step < 3 ? <FileText size={14} />
-                : <Send size={14} />}
-              <span className="hidden sm:inline">
-                {saving ? '저장 중...' : saved ? '완료!' : step < 3 ? '미리보기' : '게시하기'}
-              </span>
-              <span className="sm:hidden">
-                {saving ? '...' : saved ? '완료' : step < 3 ? '미리보기' : '게시'}
-              </span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
-
-        {/* ── Welcome Bar ── */}
-        <div
-          className="rounded-2xl border border-pink-100 p-4 sm:p-5 mb-6 flex items-center justify-between gap-3"
-          style={{ background: 'linear-gradient(135deg,#fff0f7 0%,#fdf2f8 60%,#f0f9ff 100%)' }}
-        >
-          <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-xl flex-shrink-0"
-              style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)', boxShadow: '0 4px 12px rgba(219,39,119,0.25)' }}
-            >
-              📝
-            </div>
-            <div>
-              <div className="font-bold text-gray-900 text-sm sm:text-base">
-                {editId ? '시험지 수정' : '새 시험지 만들기'}
-              </div>
-              <div className="text-xs text-gray-500 mt-0.5">
-                학년과 과목을 선택하고 문제를 입력하세요
-              </div>
-            </div>
-          </div>
-          <div className="text-right flex-shrink-0">
-            <div className="font-bold text-xs sm:text-sm" style={{ color: '#db2777' }}>
-              {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
-            </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* 배경 오버레이 */}
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onCancel}
+      />
+      {/* 모달 카드 */}
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-[fadeInUp_0.2s_ease]">
+        {/* 경고 아이콘 */}
+        <div className="flex justify-center mb-4">
+          <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center">
+            <AlertTriangle size={28} className="text-red-500" />
           </div>
         </div>
 
-        {/* ── STEP 1: 기본 정보 ── */}
-        {step === 1 && (
-          <div className="space-y-4">
-            <div className="bg-white border border-pink-100 rounded-2xl p-5">
-              <h2 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <span
-                  className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                  style={{ background: '#db2777' }}
-                >1</span>
-                기본 정보
-              </h2>
+        {/* 텍스트 */}
+        <h3 className="text-center font-black text-gray-900 text-lg mb-2">
+          시험지를 삭제할까요?
+        </h3>
+        <p className="text-center text-sm text-gray-500 mb-1">
+          아래 시험지가 <span className="font-semibold text-red-500">영구적으로 삭제</span>됩니다.
+        </p>
 
-              {/* 학년 */}
-              <div className="mb-4">
-                <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
-                  학년 <span style={{ color: '#db2777' }}>*</span>
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {GRADES.map(g => (
-                    <button
-                      key={g}
-                      type="button"
-                      onClick={() => handleGradeChange(g)}
-                      className="py-2.5 rounded-xl text-sm font-bold border-2 transition-all"
-                      style={
-                        grade === g
-                          ? { background: 'linear-gradient(135deg,#f472b6,#db2777)', color: '#fff', borderColor: '#db2777' }
-                          : { borderColor: '#fce7f3', color: '#9ca3af' }
-                      }
-                    >
-                      {g}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 과목 */}
-              {grade && (
-                <div className="mb-4">
-                  <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
-                    과목 <span style={{ color: '#db2777' }}>*</span>
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {subjectList.map(s => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setSubject(s)}
-                        className="px-4 py-2 rounded-xl text-sm font-bold border-2 transition-all"
-                        style={
-                          subject === s
-                            ? { background: 'linear-gradient(135deg,#f472b6,#db2777)', color: '#fff', borderColor: '#db2777' }
-                            : { borderColor: '#fce7f3', color: '#9ca3af' }
-                        }
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* 단원명 */}
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">단원명</label>
-                <input
-                  type="text"
-                  className={inputCls}
-                  placeholder="예: 1단원 · 물질의 구성"
-                  value={title}
-                  onChange={e => setTitle(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter' && title.trim() && grade && subject) setStep(2); }}
-                  autoFocus
-                />
-              </div>
-            </div>
-
-            <button
-              onClick={() => {
-                if (!grade) { toast.error('학년을 선택하세요'); return; }
-                if (!subject) { toast.error('과목을 선택하세요'); return; }
-                if (!title.trim()) { toast.error('단원명을 입력하세요'); return; }
-                setStep(2);
-              }}
-              className="w-full py-4 text-white font-bold rounded-2xl text-base transition-opacity hover:opacity-85 flex items-center justify-center gap-2"
-              style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
-            >
-              다음: 문제 추가 →
-            </button>
-          </div>
-        )}
-
-        {/* ── STEP 2: 문제 입력 ── */}
-        {step === 2 && (
-          <div className="space-y-4">
-
-            {/* 요약 배지 */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: '#fce7f3', color: '#db2777' }}>{grade}</span>
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700">{subject}</span>
-              <span className="text-sm font-semibold text-gray-700">{title}</span>
-            </div>
-
-            {/* OX 섹션 */}
-            <div className="bg-white border border-pink-100 rounded-2xl overflow-hidden">
-              <button
-                onClick={() => setOxOpen(o => !o)}
-                className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-pink-50/40 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: '#dcfce7', color: '#15803d' }}>OX 문제</span>
-                  <span className="font-bold text-gray-800 text-sm">OX 일괄 입력</span>
-                  {oxParsed.length > 0 && (
-                    <span className="text-xs font-semibold" style={{ color: '#16a34a' }}>✓ {oxParsed.length}개 로드됨</span>
-                  )}
-                </div>
-                {oxOpen ? <ChevronUp size={15} className="text-gray-400" /> : <ChevronDown size={15} className="text-gray-400" />}
-              </button>
-
-              {oxOpen && (
-                <div className="px-5 pb-5 border-t border-pink-50">
-                  {/* 입력 형식 안내 */}
-                  <div className="rounded-xl p-3 my-4 text-xs leading-relaxed" style={{ background: '#f0fdf4', color: '#166534' }}>
-                    <strong>입력 형식</strong> (문제 사이 빈 줄로 구분)<br />
-                    <code className="block mt-1 bg-white rounded p-2 whitespace-pre" style={{ color: '#15803d' }}>{`문제: 물은 H2O로 표현된다.
-정답: O
-해설: 물 분자는 수소 2개, 산소 1개입니다.
-
-문제: 지구는 태양계의 중심이다.
-정답: X
-해설: 태양이 중심입니다.`}</code>
-                  </div>
-
-                  <textarea
-                    className={`${inputCls} resize-none font-mono`}
-                    rows={8}
-                    placeholder={`문제: \n정답: O\n해설: \n\n문제: \n정답: X\n해설: `}
-                    value={oxBulk}
-                    onChange={e => setOxBulk(e.target.value)}
-                  />
-
-                  <div className="flex items-center justify-between mt-3">
-                    <span className="text-xs text-gray-400">
-                      {oxBulk.trim().split(/\n\s*\n/).filter(b => b.includes('문제:')).length}개 감지됨
-                    </span>
-                    <button
-                      onClick={handleOxParse}
-                      className="text-sm font-semibold text-white px-4 py-2 rounded-xl transition-opacity hover:opacity-85"
-                      style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
-                    >
-                      가져오기 →
-                    </button>
-                  </div>
-
-                  {oxParsed.length > 0 && (
-                    <div className="mt-4 space-y-2">
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                        로드된 OX 문제 ({oxParsed.length}개)
-                      </div>
-                      {oxParsed.map((q, i) => (
-                        <div key={q.id} className="flex items-start gap-3 bg-gray-50 rounded-xl px-3 py-2.5">
-                          <span className="text-xs text-gray-400 mt-0.5 shrink-0">Q{i + 1}</span>
-                          <span className="flex-1 text-sm text-gray-700 line-clamp-1">{q.text}</span>
-                          <span className={`text-sm font-bold shrink-0 ${q.answer === 'O' ? 'text-green-600' : 'text-red-500'}`}>{q.answer}</span>
-                          <button
-                            onClick={() => setOxParsed(prev => prev.filter((_, idx) => idx !== i))}
-                            className="text-gray-300 hover:text-red-400 shrink-0 transition-colors"
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <button
-                    onClick={() => setOxParsed(prev => [...prev, makeQuestion('ox')])}
-                    className="flex items-center gap-1.5 text-xs font-semibold mt-3 px-3 py-2 rounded-xl border transition-colors"
-                    style={{ borderColor: '#fce7f3', color: '#db2777' }}
-                  >
-                    <Plus size={13} /> OX 문제 1개 추가
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* 4지선다 섹션 */}
-            <div className="bg-white border border-pink-100 rounded-2xl overflow-hidden">
-              <button
-                onClick={() => setMcOpen(o => !o)}
-                className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-pink-50/40 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">4지선다</span>
-                  <span className="font-bold text-gray-800 text-sm">4지선다 일괄 입력</span>
-                  {mcParsed.length > 0 && (
-                    <span className="text-xs font-semibold text-blue-600">✓ {mcParsed.length}개 로드됨</span>
-                  )}
-                </div>
-                {mcOpen ? <ChevronUp size={15} className="text-gray-400" /> : <ChevronDown size={15} className="text-gray-400" />}
-              </button>
-
-              {mcOpen && (
-                <div className="px-5 pb-5 border-t border-pink-50">
-                  <div className="rounded-xl p-3 my-4 text-xs leading-relaxed bg-blue-50 text-blue-800">
-                    <strong>입력 형식</strong> (문제 사이 빈 줄로 구분)<br />
-                    <code className="block mt-1 bg-white rounded p-2 text-blue-900 whitespace-pre">{`문제: 광합성을 하는 세포 소기관은?
-선택지1: 미토콘드리아
-선택지2: 엽록체
-선택지3: 리보솜
-선택지4: 골지체
-정답: 엽록체
-해설: 엽록체는 광합성을 담당합니다.`}</code>
-                  </div>
-
-                  <textarea
-                    className={`${inputCls} resize-none font-mono`}
-                    rows={10}
-                    placeholder={`문제: \n선택지1: \n선택지2: \n선택지3: \n선택지4: \n정답: \n해설: `}
-                    value={mcBulk}
-                    onChange={e => setMcBulk(e.target.value)}
-                  />
-
-                  <div className="flex items-center justify-between mt-3">
-                    <span className="text-xs text-gray-400">
-                      {mcBulk.trim().split(/\n\s*\n/).filter(b => b.includes('문제:')).length}개 감지됨
-                    </span>
-                    <button
-                      onClick={handleMcParse}
-                      className="text-sm font-semibold text-white px-4 py-2 rounded-xl transition-opacity hover:opacity-85"
-                      style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
-                    >
-                      가져오기 →
-                    </button>
-                  </div>
-
-                  {mcParsed.length > 0 && (
-                    <div className="mt-4 space-y-2">
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                        로드된 4지선다 ({mcParsed.length}개)
-                      </div>
-                      {mcParsed.map((q, i) => (
-                        <div key={q.id} className="flex items-start gap-3 bg-gray-50 rounded-xl px-3 py-2.5">
-                          <span className="text-xs text-gray-400 mt-0.5 shrink-0">Q{i + 1}</span>
-                          <span className="flex-1 text-sm text-gray-700 line-clamp-1">{q.text}</span>
-                          <span className="text-xs text-blue-600 font-semibold shrink-0">{q.answer}번</span>
-                          <button
-                            onClick={() => setMcParsed(prev => prev.filter((_, idx) => idx !== i))}
-                            className="text-gray-300 hover:text-red-400 shrink-0 transition-colors"
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <button
-                    onClick={() => setMcParsed(prev => [...prev, makeQuestion('multiple')])}
-                    className="flex items-center gap-1.5 text-xs font-semibold mt-3 px-3 py-2 rounded-xl border transition-colors"
-                    style={{ borderColor: '#dbeafe', color: '#1d4ed8' }}
-                  >
-                    <Plus size={13} /> 4지선다 1개 추가
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* 하단 네비 */}
-            <div className="flex items-center justify-between pt-1">
-              <button
-                onClick={() => setStep(1)}
-                className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2.5 rounded-xl border transition-colors"
-                style={{ borderColor: '#fce7f3', color: '#db2777' }}
-              >
-                <ArrowLeft size={14} /> 기본 정보 수정
-              </button>
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-500">총 <strong style={{ color: '#db2777' }}>{allQuestions.length}</strong>문항</span>
-                <button
-                  onClick={() => {
-                    if (allQuestions.length === 0) { toast.error('문제를 1개 이상 입력하세요'); return; }
-                    setStep(3);
-                  }}
-                  className="text-sm font-bold text-white px-5 py-2.5 rounded-xl transition-opacity hover:opacity-85"
-                  style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
-                >
-                  미리보기 →
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── STEP 3: 미리보기 & 게시 ── */}
-        {step === 3 && (
-          <div className="space-y-4">
-
-            {/* 시험지 요약 카드 */}
-            <div className="bg-white border border-pink-100 rounded-2xl p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: '#fce7f3', color: '#db2777' }}>{grade}</span>
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700">{subject}</span>
-                  </div>
-                  <h2 className="text-lg font-black text-gray-800">{title}</h2>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    총 {allQuestions.length}문항 · OX {oxParsed.length}개 / 4지선다 {mcParsed.length}개
-                  </p>
-                </div>
-                <button
-                  onClick={() => setStep(2)}
-                  className="text-xs font-semibold px-3 py-2 rounded-xl border transition-colors"
-                  style={{ borderColor: '#fce7f3', color: '#db2777' }}
-                >
-                  수정하기
-                </button>
-              </div>
-
-              {/* 문제 목록 */}
-              <div className="space-y-2.5">
-                {allQuestions.map((q, i) => (
-                  <div key={q.id} className="border border-pink-50 rounded-xl p-4">
-                    <div className="flex items-start gap-3">
-                      <span
-                        className="shrink-0 text-xs px-2 py-0.5 rounded font-bold mt-0.5"
-                        style={
-                          q.type === 'ox'
-                            ? { background: '#dcfce7', color: '#15803d' }
-                            : { background: '#dbeafe', color: '#1d4ed8' }
-                        }
-                      >
-                        {i + 1}
-                      </span>
-                      <div className="flex-1">
-                        <p className="text-gray-800 font-medium text-sm leading-relaxed">
-                          {q.text || <span className="text-red-400">⚠ 문제 미입력</span>}
-                        </p>
-                        {q.type === 'ox' && (
-                          <div className="flex gap-2 mt-2">
-                            {['O', 'X'].map(v => (
-                              <span
-                                key={v}
-                                className="px-3 py-1 rounded-lg text-sm font-bold border"
-                                style={
-                                  q.answer === v
-                                    ? v === 'O'
-                                      ? { background: '#dcfce7', color: '#15803d', borderColor: '#86efac' }
-                                      : { background: '#fee2e2', color: '#dc2626', borderColor: '#fca5a5' }
-                                    : { background: '#f9fafb', color: '#d1d5db', borderColor: '#e5e7eb' }
-                                }
-                              >
-                                {v}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        {q.type === 'multiple' && q.options && (
-                          <div className="grid grid-cols-2 gap-1.5 mt-2">
-                            {q.options.map((opt, j) => (
-                              <span
-                                key={j}
-                                className="px-2 py-1.5 rounded-lg text-xs border"
-                                style={
-                                  q.answer === String(j + 1)
-                                    ? { background: '#fce7f3', color: '#db2777', borderColor: '#f9a8d4', fontWeight: 600 }
-                                    : { background: '#f9fafb', color: '#6b7280', borderColor: '#e5e7eb' }
-                                }
-                              >
-                                <span className="font-bold mr-1">{j + 1}.</span>{opt || '(미입력)'}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        {q.explanation && (
-                          <p className="text-xs text-gray-400 mt-2 italic">💡 {q.explanation}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* CodePen 배포 카드 */}
-            <div
-              className="bg-white border-2 border-dashed rounded-2xl p-5"
-              style={{ borderColor: '#f9a8d4' }}
-            >
-              <div className="flex items-start gap-3 mb-4">
-                <FileText size={20} className="shrink-0 mt-0.5" style={{ color: '#db2777' }} />
-                <div className="flex-1">
-                  <div className="font-bold text-gray-800 text-sm mb-1">CodePen으로 배포하기</div>
-                  <p className="text-xs text-gray-500 leading-relaxed">
-                    1. 아래 버튼으로 CodePen 열기 → Ctrl+S 저장 → URL 복사<br />
-                    2. 복사한 URL을 아래에 붙여넣으면 학생 목록에 자동 연결됩니다.
-                  </p>
-                </div>
-                <button
-                  onClick={openCodePen}
-                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border transition-colors shrink-0"
-                  style={{ borderColor: '#f9a8d4', color: '#db2777' }}
-                >
-                  <ExternalLink size={13} /> CodePen 열기
-                </button>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
-                  CodePen URL (저장 후 붙여넣기)
-                </label>
-                <input
-                  type="url"
-                  className={inputCls}
-                  placeholder="https://codepen.io/..."
-                  value={codepenUrl}
-                  onChange={e => setCodepenUrl(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* 저장 완료 메시지 */}
-            {saved && (
-              <div className="rounded-2xl p-4 border flex items-center gap-2" style={{ background: '#fdf2f8', borderColor: '#f9a8d4' }}>
-                <CheckCircle size={16} style={{ color: '#db2777' }} />
-                <span className="text-sm font-semibold" style={{ color: '#db2777' }}>
-                  저장 완료! 학생들이 학년 · 과목으로 바로 찾을 수 있어요.
-                </span>
-              </div>
+        {/* 시험지 이름 박스 */}
+        <div className="mt-3 mb-5 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-center">
+          <span className="font-bold text-gray-800 text-sm">"{exam.title}"</span>
+          <div className="flex items-center justify-center gap-2 mt-1.5">
+            {exam.grade && (
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-pink-100 text-pink-700">{exam.grade}</span>
             )}
-
-            {/* 최종 버튼 */}
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => handleSave(false)}
-                disabled={saving}
-                className="py-4 text-sm font-bold rounded-2xl border-2 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                style={{ borderColor: '#f9a8d4', color: '#db2777' }}
-              >
-                <Save size={16} /> 임시저장
-              </button>
-              <button
-                onClick={() => handleSave(true)}
-                disabled={saving}
-                className="py-4 text-base font-bold text-white rounded-2xl transition-opacity disabled:opacity-50 hover:opacity-85 flex items-center justify-center gap-2"
-                style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
-              >
-                {saving
-                  ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  : <Send size={18} />}
-                {saving ? '게시 중...' : '게시하기'}
-              </button>
-            </div>
-
-            <p className="text-xs text-center text-gray-400 pb-4">
-              게시하면 학생들이 학년 · 과목으로 필터링해서 바로 찾을 수 있어요
-            </p>
+            {exam.subject && (
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">{exam.subject}</span>
+            )}
+            <span className="text-xs text-gray-400">총 {exam.questions.length}문항</span>
           </div>
-        )}
-      </main>
+        </div>
+
+        {/* 버튼 */}
+        <div className="flex gap-2.5">
+          <button
+            onClick={onCancel}
+            disabled={loading}
+            className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors disabled:opacity-50"
+          >
+            취소
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-85 disabled:opacity-50 flex items-center justify-center gap-1.5"
+            style={{ background: 'linear-gradient(135deg,#f87171,#dc2626)' }}
+          >
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                삭제 중...
+              </>
+            ) : (
+              <>
+                <Trash2 size={14} />
+                삭제하기
+              </>
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
 
-export default function CreateExamPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#fdf2f8' }}>
-        <div className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#f472b6', borderTopColor: 'transparent' }} />
+export default function TeacherPage() {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [examsLoading, setExamsLoading] = useState(false);
+
+  // 삭제 관련 state
+  const [deleteTarget, setDeleteTarget] = useState<Exam | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (u) => {
+      setUser(u);
+      setLoading(false);
+      if (u) {
+        setExamsLoading(true);
+        try {
+          const data = await getExamsByTeacher(u.uid);
+          setExams(data);
+        } catch {
+          toast.error('시험지를 불러오지 못했습니다');
+        } finally {
+          setExamsLoading(false);
+        }
+      }
+    });
+    return unsub;
+  }, []);
+
+  async function handleLogin() {
+    if (!email || !password) { toast.error('이메일과 비밀번호를 입력하세요'); return; }
+    setLoginLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      toast.success('로그인 성공!');
+    } catch {
+      toast.error('로그인 실패: 이메일 또는 비밀번호를 확인하세요');
+    } finally {
+      setLoginLoading(false);
+    }
+  }
+
+  async function handleLogout() {
+    await signOut(auth);
+    setExams([]);
+    toast('로그아웃 되었습니다');
+  }
+
+  async function handleDeleteConfirm() {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
+    try {
+      await deleteExam(deleteTarget.id);
+      setExams(prev => prev.filter(e => e.id !== deleteTarget.id));
+      toast.success(`"${deleteTarget.title}" 시험지가 삭제되었습니다`);
+      setDeleteTarget(null);
+    } catch {
+      toast.error('삭제에 실패했습니다. 다시 시도해주세요');
+    } finally {
+      setDeleteLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-pink-50">
+        <div className="w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full animate-spin" />
       </div>
-    }>
-      <CreateExamInner />
-    </Suspense>
+    );
+  }
+
+  /* ── 로그인 화면 ── */
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-white flex items-center justify-center p-4">
+        <div className="bg-white border border-pink-100 rounded-2xl shadow-sm p-8 w-full max-w-sm">
+          <div
+            className="flex items-center gap-3 mb-8 cursor-pointer"
+            onClick={() => router.push('/')}
+          >
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
+            >
+              <svg width="15" height="15" viewBox="0 0 18 18" fill="none">
+                <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+                <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"
+                  stroke="rgba(255,255,255,0.9)" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
+              </svg>
+            </div>
+            <div>
+              <div className="font-[500] text-gray-900 text-sm">베타과학학원</div>
+              <div className="text-xs text-pink-500">선생님 로그인</div>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5 tracking-wide uppercase">이메일</label>
+              <input
+                type="email"
+                className="w-full border border-pink-100 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-pink-400 transition-colors"
+                placeholder="teacher@beta.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleLogin()}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5 tracking-wide uppercase">비밀번호</label>
+              <input
+                type="password"
+                className="w-full border border-pink-100 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-pink-400 transition-colors"
+                placeholder="••••••••"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleLogin()}
+              />
+            </div>
+            <button
+              onClick={handleLogin}
+              disabled={loginLoading}
+              className="w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity disabled:opacity-50 mt-2"
+              style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
+            >
+              {loginLoading ? '로그인 중...' : '로그인'}
+            </button>
+          </div>
+          <p className="text-xs text-gray-400 text-center mt-6">
+            Firebase Console에서 계정을 생성해주세요
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── 대시보드 ── */
+  const publishedCount = exams.filter(e => e.isPublished).length;
+  const draftCount     = exams.filter(e => !e.isPublished).length;
+  const totalQ         = exams.reduce((a, e) => a + e.questions.length, 0);
+
+  return (
+    <>
+      {/* 삭제 확인 모달 */}
+      {deleteTarget && (
+        <DeleteConfirmModal
+          exam={deleteTarget}
+          onConfirm={handleDeleteConfirm}
+          onCancel={() => !deleteLoading && setDeleteTarget(null)}
+          loading={deleteLoading}
+        />
+      )}
+
+      <div className="min-h-screen bg-gray-50">
+
+        {/* Header */}
+        <header className="bg-white border-b border-pink-100 sticky top-0 z-40">
+          <div className="w-full px-4 sm:px-6 h-14 flex items-center justify-between">
+            <div
+              className="flex items-center gap-2.5 cursor-pointer"
+              onClick={() => router.push('/')}
+            >
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
+              >
+                <svg width="15" height="15" viewBox="0 0 18 18" fill="none">
+                  <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+                  <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"
+                    stroke="rgba(255,255,255,0.9)" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
+                </svg>
+              </div>
+              <div className="font-[500] text-gray-900 text-sm leading-tight">베타과학학원</div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => router.push('/teacher/create')}
+                className="flex items-center gap-1.5 text-sm font-semibold text-white px-3 py-2 rounded-xl transition-opacity hover:opacity-85"
+                style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
+              >
+                <Plus size={15} />
+                <span className="hidden sm:inline">시험지 만들기</span>
+                <span className="sm:hidden">만들기</span>
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-3 py-2 rounded-xl text-xs font-semibold border transition-colors flex items-center"
+                style={{ borderColor:'#f4c8d4', color:'#e8375a' }}
+                title="로그아웃"
+              >
+                <LogOut size={15} />
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <main className="max-w-screen-xl mx-auto px-4 sm:px-8 py-6">
+
+          {/* Welcome Bar */}
+          <div
+            className="rounded-2xl border border-pink-100 p-4 sm:p-5 mb-6 flex items-center justify-between gap-3"
+            style={{ background: 'linear-gradient(135deg,#fff0f7 0%,#fdf2f8 60%,#f0f9ff 100%)' }}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-lg flex-shrink-0"
+                style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)', boxShadow:'0 4px 12px rgba(219,39,119,0.25)' }}
+              >
+                🎓
+              </div>
+              <div>
+                <div className="font-bold text-gray-900 text-sm sm:text-base">선생님 대시보드</div>
+                <div className="text-xs text-gray-500 mt-0.5">시험지 생성 및 결과 관리</div>
+              </div>
+            </div>
+            <div className="text-right flex-shrink-0">
+              <div className="font-bold text-xs sm:text-sm" style={{ color:'#db2777' }}>
+                {new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' })}
+              </div>
+              <div className="text-xs text-gray-400 mt-0.5">
+                {['일요일','월요일','화요일','수요일','목요일','금요일','토요일'][new Date().getDay()]}
+              </div>
+            </div>
+          </div>
+
+          {/* OVERVIEW 라벨 */}
+          <div className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-3">OVERVIEW</div>
+
+          {/* 통계 카드 */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+            {[
+              { label: '전체 시험지', value: exams.length,   icon: BookOpen,    iconBg:'#fdf2f8', valColor:'#db2877' },
+              { label: '게시된 시험', value: publishedCount, icon: CheckCircle, iconBg:'#d1fae5', valColor:'#16a34a' },
+              { label: '임시 저장',   value: draftCount,     icon: Clock,       iconBg:'#fef9c3', valColor:'#d97706' },
+              { label: '총 문항 수',  value: totalQ,         icon: BarChart3,   iconBg:'#dbeafe', valColor:'#2563eb' },
+            ].map(({ label, value, icon: Icon, iconBg, valColor }) => (
+              <div key={label} className="bg-white border border-pink-100 rounded-2xl p-4 flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: iconBg }}>
+                  <Icon size={16} style={{ color: valColor }} />
+                </div>
+                <div>
+                  <div className="text-xl font-black leading-none" style={{ color: valColor }}>{value}</div>
+                  <div className="text-xs text-gray-400 mt-1">{label}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* 내 시험지 헤더 */}
+          <div className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-3">내 시험지</div>
+
+          {/* 로딩 */}
+          {examsLoading ? (
+            <div className="flex justify-center py-16">
+              <div className="w-8 h-8 border-4 border-pink-400 border-t-transparent rounded-full animate-spin" />
+            </div>
+
+          /* 빈 상태 */
+          ) : exams.length === 0 ? (
+            <div className="bg-white border-2 border-dashed border-pink-200 rounded-2xl p-12 text-center">
+              <BookOpen size={44} className="mx-auto mb-4" style={{ color:'#f9a8d4' }} />
+              <div className="font-semibold text-gray-600 mb-2">시험지가 없어요</div>
+              <p className="text-sm text-gray-400 mb-6">첫 번째 시험지를 만들어보세요!</p>
+              <button
+                onClick={() => router.push('/teacher/create')}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-white px-4 py-2.5 rounded-xl"
+                style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
+              >
+                <Plus size={16} />
+                시험지 만들기
+              </button>
+            </div>
+
+          ) : (
+            <>
+              {/* ── 데스크탑 테이블 (md 이상) ── */}
+              <div className="hidden md:block bg-white border border-pink-100 rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full" style={{ minWidth: '1100px' }}>
+                    <thead>
+                      <tr className="border-b border-pink-100" style={{ background: '#fdf2f8' }}>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">과목</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">학년</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-5 py-4">단원명</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">게시일</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">게시 상태</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">OX</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">4지선다</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">총 문항</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-5 py-4 whitespace-nowrap">관리</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {exams.map((exam, idx) => {
+                        const oxCount       = exam.questions.filter(q => q.type === 'ox').length;
+                        const multipleCount = exam.questions.filter(q => q.type === 'multiple').length;
+                        return (
+                          <tr
+                            key={exam.id}
+                            className="border-b border-gray-50 hover:bg-pink-50/40 transition-colors"
+                            style={{ borderBottom: idx === exams.length - 1 ? 'none' : undefined }}
+                          >
+                            <td className="px-3 py-4 text-center">
+                              {exam.subject
+                                ? <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-blue-100 text-blue-700 whitespace-nowrap">{exam.subject}</span>
+                                : <span className="text-xs text-gray-300">—</span>
+                              }
+                            </td>
+                            <td className="px-3 py-4 text-center">
+                              {exam.grade
+                                ? <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-pink-100 text-pink-700 whitespace-nowrap">{exam.grade}</span>
+                                : <span className="text-xs text-gray-300">—</span>
+                              }
+                            </td>
+                            <td className="px-5 py-4 text-center">
+                              <span className="font-bold text-gray-900 text-sm">{exam.title}</span>
+                            </td>
+                            <td className="px-3 py-4 text-center whitespace-nowrap">
+                              <span className="text-xs text-gray-600 font-medium">{formatDate(exam.regDate)}</span>
+                            </td>
+                            <td className="px-3 py-4 text-center">
+                              <span className={`inline-block text-xs px-3 py-1 rounded-full font-semibold whitespace-nowrap ${
+                                exam.isPublished ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                              }`}>
+                                {exam.isPublished ? '게시됨' : '임시저장'}
+                              </span>
+                            </td>
+                            <td className="px-3 py-4 text-center">
+                              <span className="text-sm font-bold text-gray-700">{oxCount}</span>
+                              <span className="text-xs text-gray-400 ml-0.5">개</span>
+                            </td>
+                            <td className="px-3 py-4 text-center">
+                              <span className="text-sm font-bold text-gray-700">{multipleCount}</span>
+                              <span className="text-xs text-gray-400 ml-0.5">개</span>
+                            </td>
+                            <td className="px-3 py-4 text-center">
+                              <span className="text-sm font-black" style={{ color:'#db2777' }}>{exam.questions.length}</span>
+                              <span className="text-xs text-gray-400 ml-0.5">문항</span>
+                            </td>
+                            <td className="px-5 py-4">
+                              <div className="flex items-center justify-center gap-2">
+                                {/* 결과 보기 */}
+                                <button
+                                  onClick={() => router.push(`/teacher/results/${exam.id}`)}
+                                  className="flex items-center gap-1.5 text-xs font-semibold text-yellow-600 hover:text-yellow-700 bg-yellow-50 hover:bg-yellow-100 px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
+                                >
+                                  <Users size={13} />
+                                  결과 보기
+                                </button>
+                                {/* 수정 */}
+                                <button
+                                  onClick={() => router.push(`/teacher/create?edit=${exam.id}`)}
+                                  className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
+                                >
+                                  <Eye size={13} />
+                                  수정
+                                </button>
+                                {/* 삭제 */}
+                                <button
+                                  onClick={() => setDeleteTarget(exam)}
+                                  className="flex items-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
+                                >
+                                  <Trash2 size={13} />
+                                  삭제
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* ── 모바일 카드 뷰 (md 미만) ── */}
+              <div className="md:hidden flex flex-col gap-3">
+                {exams.map((exam) => {
+                  const oxCount       = exam.questions.filter(q => q.type === 'ox').length;
+                  const multipleCount = exam.questions.filter(q => q.type === 'multiple').length;
+                  return (
+                    <div
+                      key={exam.id}
+                      className="bg-white border border-pink-100 rounded-2xl p-4"
+                    >
+                      {/* 상단: 단원명 + 상태 */}
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <span className="font-bold text-gray-900 text-sm leading-snug flex-1">{exam.title}</span>
+                        <span className={`flex-shrink-0 inline-block text-xs px-2.5 py-1 rounded-full font-semibold ${
+                          exam.isPublished ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          {exam.isPublished ? '게시됨' : '임시저장'}
+                        </span>
+                      </div>
+
+                      {/* 뱃지 행: 학년 + 과목 + 게시일 */}
+                      <div className="flex flex-wrap items-center gap-1.5 mb-3">
+                        {exam.grade && (
+                          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-pink-100 text-pink-700">{exam.grade}</span>
+                        )}
+                        {exam.subject && (
+                          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700">{exam.subject}</span>
+                        )}
+                        <span className="text-xs text-gray-400">{formatDate(exam.regDate)}</span>
+                      </div>
+
+                      {/* 문항 수 행 */}
+                      <div className="flex items-center gap-3 mb-3 py-2.5 px-3 rounded-xl bg-gray-50">
+                        <div className="flex-1 text-center">
+                          <div className="text-xs text-gray-400 mb-0.5">OX 문항</div>
+                          <div className="text-sm font-black text-gray-700">{oxCount}<span className="text-xs font-normal text-gray-400 ml-0.5">개</span></div>
+                        </div>
+                        <div className="w-px h-8 bg-gray-200" />
+                        <div className="flex-1 text-center">
+                          <div className="text-xs text-gray-400 mb-0.5">4지선다</div>
+                          <div className="text-sm font-black text-gray-700">{multipleCount}<span className="text-xs font-normal text-gray-400 ml-0.5">개</span></div>
+                        </div>
+                        <div className="w-px h-8 bg-gray-200" />
+                        <div className="flex-1 text-center">
+                          <div className="text-xs text-gray-400 mb-0.5">총 문항</div>
+                          <div className="text-sm font-black" style={{ color:'#db2777' }}>{exam.questions.length}<span className="text-xs font-normal text-gray-400 ml-0.5">문항</span></div>
+                        </div>
+                      </div>
+
+                      {/* 버튼 행 */}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => router.push(`/teacher/results/${exam.id}`)}
+                          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-yellow-600 hover:text-yellow-700 bg-yellow-50 hover:bg-yellow-100 py-2.5 rounded-xl transition-colors"
+                        >
+                          <Users size={13} />
+                          결과 보기
+                        </button>
+                        <button
+                          onClick={() => router.push(`/teacher/create?edit=${exam.id}`)}
+                          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 py-2.5 rounded-xl transition-colors"
+                        >
+                          <Eye size={13} />
+                          수정
+                        </button>
+                        {/* 삭제 버튼 */}
+                        <button
+                          onClick={() => setDeleteTarget(exam)}
+                          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 py-2.5 rounded-xl transition-colors"
+                        >
+                          <Trash2 size={13} />
+                          삭제
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </main>
+      </div>
+    </>
   );
 }
