@@ -402,7 +402,7 @@ export default function TeacherPage() {
                       <tr className="border-b border-pink-100" style={{ background: '#fdf2f8' }}>
                         <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">과목</th>
                         <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">학년</th>
-                        <th className="text-right text-xs font-bold text-gray-500 tracking-wide px-5 py-4">단원명</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-5 py-4">단원명</th>
                         <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">게시일</th>
                         <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">게시 상태</th>
                         <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">OX</th>
@@ -433,7 +433,7 @@ export default function TeacherPage() {
                                 : <span className="text-xs text-gray-300">—</span>
                               }
                             </td>
-                            <td className="px-5 py-4 text-right">
+                            <td className="px-5 py-4 text-center">
                               <span className="font-bold text-gray-900 text-sm">{exam.title}</span>
                             </td>
                             <td className="px-3 py-4 text-center whitespace-nowrap">
@@ -463,7 +463,7 @@ export default function TeacherPage() {
                                 {/* 결과 보기 */}
                                 <button
                                   onClick={() => router.push(`/teacher/results/${exam.id}`)}
-                                  className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 hover:text-blue-600 bg-gray-100 hover:bg-blue-50 px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
+                                  className="flex items-center gap-1.5 text-xs font-semibold text-yellow-600 hover:text-yellow-700 bg-yellow-50 hover:bg-yellow-100 px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
                                 >
                                   <Users size={13} />
                                   결과 보기
@@ -547,7 +547,7 @@ export default function TeacherPage() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => router.push(`/teacher/results/${exam.id}`)}
-                          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-blue-50 hover:text-blue-600 py-2.5 rounded-xl transition-colors"
+                          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-yellow-600 hover:text-yellow-700 bg-yellow-50 hover:bg-yellow-100 py-2.5 rounded-xl transition-colors"
                         >
                           <Users size={13} />
                           결과 보기
