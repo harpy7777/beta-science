@@ -400,11 +400,11 @@ export default function TeacherPage() {
                   <table className="w-full" style={{ minWidth: '960px' }}>
                     <thead>
                       <tr className="border-b border-pink-100" style={{ background: '#fdf2f8' }}>
-                        <th className="text-left text-xs font-bold text-gray-500 tracking-wide px-5 py-4">단원명</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">과목</th>
+                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">학년</th>
+                        <th className="text-right text-xs font-bold text-gray-500 tracking-wide px-5 py-4">단원명</th>
                         <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">게시일</th>
                         <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">게시 상태</th>
-                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">학년</th>
-                        <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">과목</th>
                         <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">OX</th>
                         <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">4지선다</th>
                         <th className="text-center text-xs font-bold text-gray-500 tracking-wide px-3 py-4 whitespace-nowrap">총 문항</th>
@@ -421,7 +421,19 @@ export default function TeacherPage() {
                             className="border-b border-gray-50 hover:bg-pink-50/40 transition-colors"
                             style={{ borderBottom: idx === exams.length - 1 ? 'none' : undefined }}
                           >
-                            <td className="px-5 py-4">
+                            <td className="px-3 py-4 text-center">
+                              {exam.subject
+                                ? <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-blue-100 text-blue-700 whitespace-nowrap">{exam.subject}</span>
+                                : <span className="text-xs text-gray-300">—</span>
+                              }
+                            </td>
+                            <td className="px-3 py-4 text-center">
+                              {exam.grade
+                                ? <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-pink-100 text-pink-700 whitespace-nowrap">{exam.grade}</span>
+                                : <span className="text-xs text-gray-300">—</span>
+                              }
+                            </td>
+                            <td className="px-5 py-4 text-right">
                               <span className="font-bold text-gray-900 text-sm">{exam.title}</span>
                             </td>
                             <td className="px-3 py-4 text-center whitespace-nowrap">
@@ -433,18 +445,6 @@ export default function TeacherPage() {
                               }`}>
                                 {exam.isPublished ? '게시됨' : '임시저장'}
                               </span>
-                            </td>
-                            <td className="px-3 py-4 text-center">
-                              {exam.grade
-                                ? <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-pink-100 text-pink-700 whitespace-nowrap">{exam.grade}</span>
-                                : <span className="text-xs text-gray-300">—</span>
-                              }
-                            </td>
-                            <td className="px-3 py-4 text-center">
-                              {exam.subject
-                                ? <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-blue-100 text-blue-700 whitespace-nowrap">{exam.subject}</span>
-                                : <span className="text-xs text-gray-300">—</span>
-                              }
                             </td>
                             <td className="px-3 py-4 text-center">
                               <span className="text-sm font-bold text-gray-700">{oxCount}</span>
@@ -471,8 +471,7 @@ export default function TeacherPage() {
                                 {/* 수정 */}
                                 <button
                                   onClick={() => router.push(`/teacher/create?edit=${exam.id}`)}
-                                  className="flex items-center gap-1.5 text-xs font-semibold text-white px-3 py-2 rounded-lg transition-opacity hover:opacity-85 whitespace-nowrap"
-                                  style={{ background:'#db2777' }}
+                                  className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
                                 >
                                   <Eye size={13} />
                                   수정
@@ -480,8 +479,7 @@ export default function TeacherPage() {
                                 {/* 삭제 */}
                                 <button
                                   onClick={() => setDeleteTarget(exam)}
-                                  className="flex items-center gap-1.5 text-xs font-semibold text-white px-3 py-2 rounded-lg transition-opacity hover:opacity-85 whitespace-nowrap"
-                                  style={{ background: 'linear-gradient(135deg,#f87171,#dc2626)' }}
+                                  className="flex items-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
                                 >
                                   <Trash2 size={13} />
                                   삭제
@@ -556,8 +554,7 @@ export default function TeacherPage() {
                         </button>
                         <button
                           onClick={() => router.push(`/teacher/create?edit=${exam.id}`)}
-                          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-white py-2.5 rounded-xl transition-opacity hover:opacity-85"
-                          style={{ background:'#db2777' }}
+                          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 py-2.5 rounded-xl transition-colors"
                         >
                           <Eye size={13} />
                           수정
@@ -565,8 +562,7 @@ export default function TeacherPage() {
                         {/* 삭제 버튼 */}
                         <button
                           onClick={() => setDeleteTarget(exam)}
-                          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-white py-2.5 rounded-xl transition-opacity hover:opacity-85"
-                          style={{ background: 'linear-gradient(135deg,#f87171,#dc2626)' }}
+                          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 py-2.5 rounded-xl transition-colors"
                         >
                           <Trash2 size={13} />
                           삭제
