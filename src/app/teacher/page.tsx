@@ -75,6 +75,8 @@ function DeleteConfirmModal({
   );
 }
 
+const FIXED_SUBJECTS = ['전체', '중1과학', '중2과학', '중3과학', '통합과학1', '통합과학2', '화학', '물질과 에너지', '화학 반응의 세계'];
+
 export default function TeacherPage() {
   const router = useRouter();
   const [user, setUser]               = useState<User | null>(null);
@@ -201,7 +203,6 @@ export default function TeacherPage() {
   const publishedCount = exams.filter(e => e.isPublished).length;
   const draftCount     = exams.filter(e => !e.isPublished).length;
   const totalQ         = exams.reduce((a, e) => a + e.questions.length, 0);
-  const subjects       = ['전체', ...Array.from(new Set(exams.map(e => e.subject).filter(Boolean))) as string[]];
   const filteredExams  = selectedSubject === '전체' ? exams : exams.filter(e => e.subject === selectedSubject);
 
   const now = new Date();
@@ -255,7 +256,7 @@ export default function TeacherPage() {
 
         <main className="max-w-6xl mx-auto px-5 py-7">
 
-          {/* ── 인사말 배너 (티쳐보드 스타일) ── */}
+          {/* ── 인사말 배너 ── */}
           <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-7 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl flex-shrink-0"
@@ -276,7 +277,7 @@ export default function TeacherPage() {
           {/* ── OVERVIEW 라벨 ── */}
           <div className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-3">OVERVIEW</div>
 
-          {/* ── OVERVIEW 카드 (티쳐보드 스타일) ── */}
+          {/* ── OVERVIEW 카드 ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
             {[
               { emoji: '📚', label: '전체 시험지', value: exams.length,   unit: '개', color: '#db2777' },
@@ -302,21 +303,24 @@ export default function TeacherPage() {
           {/* ── 내 시험지 라벨 ── */}
           <div className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-3">내 시험지</div>
 
-          {/* ── 과목 필터 탭 ── */}
-          {!examsLoading && subjects.length > 1 && (
-            <div className="flex flex-wrap gap-2 mb-4">
-              {subjects.map(subject => {
+          {/* ── 과목 필터 탭 (고정 목록, 균등 배열) ── */}
+          {!examsLoading && (
+            <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2 mb-4">
+              {FIXED_SUBJECTS.map(subject => {
                 const count    = subject === '전체' ? exams.length : exams.filter(e => e.subject === subject).length;
                 const isActive = selectedSubject === subject;
                 return (
-                  <button key={subject} onClick={() => setSelectedSubject(subject)}
-                    className="flex items-center justify-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full transition-all active:scale-95 whitespace-nowrap"
+                  <button
+                    key={subject}
+                    onClick={() => setSelectedSubject(subject)}
+                    className="flex flex-col items-center justify-center gap-1 text-xs font-semibold py-2.5 px-1 rounded-xl transition-all active:scale-95 w-full"
                     style={isActive
-                      ? { background: 'linear-gradient(135deg,#f472b6,#db2777)', color: '#fff', boxShadow: '0 2px 8px rgba(219,39,119,0.2)', minHeight: '34px' }
-                      : { background: '#fff', border: '1.5px solid #e5e7eb', color: '#9ca3af', minHeight: '34px' }
+                      ? { background: 'linear-gradient(135deg,#f472b6,#db2777)', color: '#fff', boxShadow: '0 2px 8px rgba(219,39,119,0.2)', minHeight: '54px' }
+                      : { background: '#fff', border: '1.5px solid #e5e7eb', color: '#9ca3af', minHeight: '54px' }
                     }>
-                    {subject}
-                    <span className="inline-flex items-center justify-center text-xs font-bold leading-none rounded-full"
+                    <span className="leading-tight text-center" style={{ wordBreak: 'keep-all' }}>{subject}</span>
+                    <span
+                      className="inline-flex items-center justify-center text-xs font-bold leading-none rounded-full"
                       style={{
                         minWidth: '20px',
                         height: '18px',
