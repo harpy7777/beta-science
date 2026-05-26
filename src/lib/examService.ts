@@ -113,10 +113,20 @@ export async function getExamsByTeacher(teacherId: string): Promise<Exam[]> {
   const q = query(
     collection(db, 'tests'),
     where('teacherId', '==', teacherId),
-    orderBy('regDate', 'asc')   // ← 오래된 것(먼저 만든 것)부터 정렬
+    orderBy('regDate', 'desc')  // desc 유지 (인덱스 오류 방지)
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }) as Exam);
+  const exams = snap.docs.map(d => ({ id: d.id, ...d.data() }) as Exam);
+  // 프론트에서 오름차순 정렬 (먼저 만든 것이 위로)
+  return exams.sort((a, b) => {
+    const getTime = (ts: any): number => {
+      if (!ts) return 0;
+      if (typeof ts.toDate === 'function') return ts.toDate().getTime();
+      if (typeof ts.seconds === 'number') return ts.seconds * 1000;
+      return new Date(ts).getTime();
+    };
+    return getTime(a.regDate) - getTime(b.regDate);
+  });
 }
 
 export async function getExamsByGrade(grade: string): Promise<Exam[]> {
@@ -250,7 +260,6 @@ export async function getAllResults(): Promise<Result[]> {
   }));
 }
 
-// 학생 ID로 학생 정보 조회
 export async function getStudentById(studentId: string): Promise<{ fireId: string; id: string; name: string; grade: string } | null> {
   const q = query(
     collection(db, 'students'),
@@ -262,7 +271,6 @@ export async function getStudentById(studentId: string): Promise<{ fireId: strin
   return { fireId: d.id, ...d.data() } as { fireId: string; id: string; name: string; grade: string };
 }
 
-// 시험지 삭제
 export async function deleteExam(examId: string): Promise<void> {
   await deleteDoc(doc(db, 'tests', examId));
 }
