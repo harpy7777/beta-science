@@ -113,7 +113,7 @@ export async function getExamsByTeacher(teacherId: string): Promise<Exam[]> {
   const q = query(
     collection(db, 'tests'),
     where('teacherId', '==', teacherId),
-    orderBy('regDate', 'desc')
+    orderBy('regDate', 'asc')   // ← 오래된 것(먼저 만든 것)부터 정렬
   );
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }) as Exam);
