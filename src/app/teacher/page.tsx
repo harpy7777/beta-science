@@ -251,18 +251,24 @@ export default function TeacherPage() {
 
         <main className="max-w-6xl mx-auto px-5 py-7">
 
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-7 flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="rounded-2xl border border-pink-100 p-5 mb-7 flex items-center justify-between overflow-hidden relative"
+            style={{ background: 'linear-gradient(135deg, #fff0f7 0%, #fce7f3 40%, #fdf4ff 70%, #f0f9ff 100%)' }}>
+            {/* 배경 장식 원 */}
+            <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full opacity-20 pointer-events-none"
+              style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }} />
+            <div className="absolute -bottom-4 right-24 w-20 h-20 rounded-full opacity-10 pointer-events-none"
+              style={{ background: 'linear-gradient(135deg,#a78bfa,#7c3aed)' }} />
+            <div className="flex items-center gap-4 relative">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg,#fce7f3,#fbcfe8)' }}>
+                style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)', boxShadow: '0 4px 12px rgba(219,39,119,0.25)' }}>
                 📋
               </div>
               <div>
                 <div className="font-bold text-gray-900 text-base">시험지 관리</div>
-                <div className="text-sm text-gray-400 mt-0.5">시험지를 만들고 결과를 확인하세요</div>
+                <div className="text-xs text-gray-400 mt-0.5">시험지를 만들고 결과를 확인하세요</div>
               </div>
             </div>
-            <div className="text-right hidden sm:block">
+            <div className="text-right hidden sm:block relative">
               <div className="font-bold text-sm" style={{ color: '#db2777' }}>{dateStr}</div>
               <div className="text-xs text-gray-400 mt-0.5">{dayStr}</div>
             </div>
@@ -277,7 +283,7 @@ export default function TeacherPage() {
               { emoji: '🕐', label: '임시 저장',   value: draftCount,     unit: '개', color: '#d97706' },
               { emoji: '📝', label: '총 문항 수',  value: totalQ,         unit: '문항', color: '#2563eb' },
             ].map(({ emoji, label, value, unit, color }) => (
-              <div key={label} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-3">
+              <div key={label} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-3 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-pink-100">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-gray-50">
                   {emoji}
                 </div>
