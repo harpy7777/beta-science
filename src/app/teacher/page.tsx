@@ -45,29 +45,22 @@ function DeleteConfirmModal({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* 배경 오버레이 */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onCancel}
       />
-      {/* 모달 카드 */}
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-[fadeInUp_0.2s_ease]">
-        {/* 경고 아이콘 */}
         <div className="flex justify-center mb-4">
           <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center">
             <AlertTriangle size={28} className="text-red-500" />
           </div>
         </div>
-
-        {/* 텍스트 */}
         <h3 className="text-center font-black text-gray-900 text-lg mb-2">
           시험지를 삭제할까요?
         </h3>
         <p className="text-center text-sm text-gray-500 mb-1">
           아래 시험지가 <span className="font-semibold text-red-500">영구적으로 삭제</span>됩니다.
         </p>
-
-        {/* 시험지 이름 박스 */}
         <div className="mt-3 mb-5 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-center">
           <span className="font-bold text-gray-800 text-sm">"{exam.title}"</span>
           <div className="flex items-center justify-center gap-2 mt-1.5">
@@ -80,8 +73,6 @@ function DeleteConfirmModal({
             <span className="text-xs text-gray-400">총 {exam.questions.length}문항</span>
           </div>
         </div>
-
-        {/* 버튼 */}
         <div className="flex gap-2.5">
           <button
             onClick={onCancel}
@@ -128,6 +119,9 @@ export default function TeacherPage() {
   const [deleteTarget, setDeleteTarget] = useState<Exam | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  // 과목 필터 state
+  const [selectedSubject, setSelectedSubject] = useState<string>('전체');
+
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
@@ -163,6 +157,7 @@ export default function TeacherPage() {
   async function handleLogout() {
     await signOut(auth);
     setExams([]);
+    setSelectedSubject('전체');
     toast('로그아웃 되었습니다');
   }
 
@@ -253,10 +248,18 @@ export default function TeacherPage() {
     );
   }
 
-  /* ── 대시보드 ── */
+  /* ── 대시보드 데이터 ── */
   const publishedCount = exams.filter(e => e.isPublished).length;
   const draftCount     = exams.filter(e => !e.isPublished).length;
   const totalQ         = exams.reduce((a, e) => a + e.questions.length, 0);
+
+  // 과목 목록 추출 (중복 제거, 빈값 제외)
+  const subjects = ['전체', ...Array.from(new Set(exams.map(e => e.subject).filter(Boolean))) as string[]];
+
+  // 선택된 과목으로 필터링
+  const filteredExams = selectedSubject === '전체'
+    ? exams
+    : exams.filter(e => e.subject === selectedSubject);
 
   return (
     <>
@@ -314,16 +317,16 @@ export default function TeacherPage() {
           </div>
         </header>
 
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
 
           {/* Welcome Bar */}
           <div
-            className="rounded-2xl border border-pink-100 p-4 sm:p-5 mb-6 flex items-center justify-between gap-3"
+            className="rounded-2xl border border-pink-100 p-4 sm:p-5 mb-5 flex items-center justify-between gap-3"
             style={{ background: 'linear-gradient(135deg,#fff0f7 0%,#fdf2f8 60%,#f0f9ff 100%)' }}
           >
             <div className="flex items-center gap-3">
               <div
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-lg flex-shrink-0"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0"
                 style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)', boxShadow:'0 4px 12px rgba(219,39,119,0.25)' }}
               >
                 🎓
@@ -347,21 +350,21 @@ export default function TeacherPage() {
           <div className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-3">OVERVIEW</div>
 
           {/* 통계 카드 */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 mb-6">
             {[
               { label: '전체 시험지', value: exams.length,   icon: BookOpen,    iconBg:'#fdf2f8', valColor:'#db2877' },
               { label: '게시된 시험', value: publishedCount, icon: CheckCircle, iconBg:'#d1fae5', valColor:'#16a34a' },
               { label: '임시 저장',   value: draftCount,     icon: Clock,       iconBg:'#fef9c3', valColor:'#d97706' },
               { label: '총 문항 수',  value: totalQ,         icon: BarChart3,   iconBg:'#dbeafe', valColor:'#2563eb' },
             ].map(({ label, value, icon: Icon, iconBg, valColor }) => (
-              <div key={label} className="bg-white border border-pink-100 rounded-2xl p-4 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+              <div key={label} className="bg-white border border-pink-100 rounded-2xl p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                   style={{ background: iconBg }}>
-                  <Icon size={16} style={{ color: valColor }} />
+                  <Icon size={15} style={{ color: valColor }} />
                 </div>
                 <div>
-                  <div className="text-xl font-black leading-none" style={{ color: valColor }}>{value}</div>
-                  <div className="text-xs text-gray-400 mt-1">{label}</div>
+                  <div className="text-lg sm:text-xl font-black leading-none" style={{ color: valColor }}>{value}</div>
+                  <div className="text-xs text-gray-400 mt-1 leading-tight">{label}</div>
                 </div>
               </div>
             ))}
@@ -370,13 +373,47 @@ export default function TeacherPage() {
           {/* 내 시험지 헤더 */}
           <div className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-3">내 시험지</div>
 
+          {/* ── 과목 필터 탭 ── */}
+          {!examsLoading && subjects.length > 1 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {subjects.map(subject => {
+                const count = subject === '전체'
+                  ? exams.length
+                  : exams.filter(e => e.subject === subject).length;
+                const isActive = selectedSubject === subject;
+                return (
+                  <button
+                    key={subject}
+                    onClick={() => setSelectedSubject(subject)}
+                    className="flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-full transition-all active:scale-95"
+                    style={isActive
+                      ? { background: 'linear-gradient(135deg,#f472b6,#db2777)', color: '#fff', boxShadow: '0 2px 8px rgba(219,39,119,0.25)' }
+                      : { background: '#fff', border: '1.5px solid #fce7f3', color: '#9ca3af' }
+                    }
+                  >
+                    {subject}
+                    <span
+                      className="text-xs px-1.5 py-0.5 rounded-full font-bold leading-none"
+                      style={isActive
+                        ? { background: 'rgba(255,255,255,0.25)', color: '#fff' }
+                        : { background: '#fce7f3', color: '#db2777' }
+                      }
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
           {/* 로딩 */}
           {examsLoading ? (
             <div className="flex justify-center py-16">
               <div className="w-8 h-8 border-4 border-pink-400 border-t-transparent rounded-full animate-spin" />
             </div>
 
-          /* 빈 상태 */
+          /* 빈 상태 — 전체가 비어있을 때 */
           ) : exams.length === 0 ? (
             <div className="bg-white border-2 border-dashed border-pink-200 rounded-2xl p-12 text-center">
               <BookOpen size={44} className="mx-auto mb-4" style={{ color:'#f9a8d4' }} />
@@ -390,6 +427,16 @@ export default function TeacherPage() {
                 <Plus size={16} />
                 시험지 만들기
               </button>
+            </div>
+
+          /* 빈 상태 — 필터 결과가 없을 때 */
+          ) : filteredExams.length === 0 ? (
+            <div className="bg-white border-2 border-dashed border-pink-200 rounded-2xl p-10 text-center">
+              <div className="text-3xl mb-3">🔍</div>
+              <div className="font-semibold text-gray-600 mb-1">
+                <span className="text-pink-500">"{selectedSubject}"</span> 과목의 시험지가 없어요
+              </div>
+              <p className="text-sm text-gray-400">다른 과목을 선택하거나 새 시험지를 만들어보세요</p>
             </div>
 
           ) : (
@@ -412,14 +459,14 @@ export default function TeacherPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {exams.map((exam, idx) => {
+                      {filteredExams.map((exam, idx) => {
                         const oxCount       = exam.questions.filter(q => q.type === 'ox').length;
                         const multipleCount = exam.questions.filter(q => q.type === 'multiple').length;
                         return (
                           <tr
                             key={exam.id}
                             className="border-b border-gray-50 hover:bg-pink-50/40 transition-colors"
-                            style={{ borderBottom: idx === exams.length - 1 ? 'none' : undefined }}
+                            style={{ borderBottom: idx === filteredExams.length - 1 ? 'none' : undefined }}
                           >
                             <td className="px-3 py-4 text-center">
                               {exam.subject
@@ -460,7 +507,6 @@ export default function TeacherPage() {
                             </td>
                             <td className="px-5 py-4">
                               <div className="flex items-center justify-center gap-2">
-                                {/* 결과 보기 */}
                                 <button
                                   onClick={() => router.push(`/teacher/results/${exam.id}`)}
                                   className="flex items-center gap-1.5 text-xs font-semibold text-yellow-600 hover:text-yellow-700 bg-yellow-50 hover:bg-yellow-100 px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
@@ -468,7 +514,6 @@ export default function TeacherPage() {
                                   <Users size={13} />
                                   결과 보기
                                 </button>
-                                {/* 수정 */}
                                 <button
                                   onClick={() => router.push(`/teacher/create?edit=${exam.id}`)}
                                   className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
@@ -476,7 +521,6 @@ export default function TeacherPage() {
                                   <Eye size={13} />
                                   수정
                                 </button>
-                                {/* 삭제 */}
                                 <button
                                   onClick={() => setDeleteTarget(exam)}
                                   className="flex items-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
@@ -496,13 +540,13 @@ export default function TeacherPage() {
 
               {/* ── 모바일 카드 뷰 (md 미만) ── */}
               <div className="md:hidden flex flex-col gap-3">
-                {exams.map((exam) => {
+                {filteredExams.map((exam) => {
                   const oxCount       = exam.questions.filter(q => q.type === 'ox').length;
                   const multipleCount = exam.questions.filter(q => q.type === 'multiple').length;
                   return (
                     <div
                       key={exam.id}
-                      className="bg-white border border-pink-100 rounded-2xl p-4"
+                      className="bg-white border border-pink-100 rounded-2xl p-4 active:scale-[0.99] transition-transform"
                     >
                       {/* 상단: 단원명 + 상태 */}
                       <div className="flex items-start justify-between gap-2 mb-3">
@@ -528,7 +572,7 @@ export default function TeacherPage() {
                       {/* 문항 수 행 */}
                       <div className="flex items-center gap-3 mb-3 py-2.5 px-3 rounded-xl bg-gray-50">
                         <div className="flex-1 text-center">
-                          <div className="text-xs text-gray-400 mb-0.5">OX 문항</div>
+                          <div className="text-xs text-gray-400 mb-0.5">OX</div>
                           <div className="text-sm font-black text-gray-700">{oxCount}<span className="text-xs font-normal text-gray-400 ml-0.5">개</span></div>
                         </div>
                         <div className="w-px h-8 bg-gray-200" />
@@ -544,27 +588,26 @@ export default function TeacherPage() {
                       </div>
 
                       {/* 버튼 행 */}
-                      <div className="flex gap-2">
+                      <div className="grid grid-cols-3 gap-2">
                         <button
                           onClick={() => router.push(`/teacher/results/${exam.id}`)}
-                          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-yellow-600 hover:text-yellow-700 bg-yellow-50 hover:bg-yellow-100 py-2.5 rounded-xl transition-colors"
+                          className="flex items-center justify-center gap-1 text-xs font-semibold text-yellow-600 bg-yellow-50 active:bg-yellow-100 py-2.5 rounded-xl transition-colors"
                         >
-                          <Users size={13} />
-                          결과 보기
+                          <Users size={12} />
+                          결과
                         </button>
                         <button
                           onClick={() => router.push(`/teacher/create?edit=${exam.id}`)}
-                          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 py-2.5 rounded-xl transition-colors"
+                          className="flex items-center justify-center gap-1 text-xs font-semibold text-gray-500 bg-gray-100 active:bg-gray-200 py-2.5 rounded-xl transition-colors"
                         >
-                          <Eye size={13} />
+                          <Eye size={12} />
                           수정
                         </button>
-                        {/* 삭제 버튼 */}
                         <button
                           onClick={() => setDeleteTarget(exam)}
-                          className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 py-2.5 rounded-xl transition-colors"
+                          className="flex items-center justify-center gap-1 text-xs font-semibold text-red-400 bg-red-50 active:bg-red-100 py-2.5 rounded-xl transition-colors"
                         >
-                          <Trash2 size={13} />
+                          <Trash2 size={12} />
                           삭제
                         </button>
                       </div>
