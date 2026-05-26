@@ -253,11 +253,7 @@ export default function TeacherPage() {
 
           <div className="rounded-2xl border border-pink-100 p-5 mb-7 flex items-center justify-between overflow-hidden relative"
             style={{ background: 'linear-gradient(135deg, #fff0f7 0%, #fce7f3 40%, #fdf4ff 70%, #f0f9ff 100%)' }}>
-            {/* 배경 장식 원 */}
-            <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full opacity-20 pointer-events-none"
-              style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }} />
-            <div className="absolute -bottom-4 right-24 w-20 h-20 rounded-full opacity-10 pointer-events-none"
-              style={{ background: 'linear-gradient(135deg,#a78bfa,#7c3aed)' }} />
+
             <div className="flex items-center gap-4 relative">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl flex-shrink-0"
                 style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)', boxShadow: '0 4px 12px rgba(219,39,119,0.25)' }}>
@@ -312,26 +308,12 @@ export default function TeacherPage() {
                     onClick={() => setSelectedSubject(subject)}
                     className="flex flex-col items-center justify-center gap-0.5 text-xs font-semibold py-2 px-1 rounded-xl transition-all active:scale-95 w-full"
                     style={isActive
-                      ? { background: 'linear-gradient(135deg,#f472b6,#db2777)', color: '#fff', boxShadow: '0 2px 8px rgba(219,39,119,0.2)', minHeight: '62px' }
-                      : { background: '#fff', border: '1.5px solid #e5e7eb', color: '#9ca3af', minHeight: '62px' }
+                      ? { background: 'linear-gradient(135deg,#f472b6,#db2777)', color: '#fff', boxShadow: '0 2px 8px rgba(219,39,119,0.2)', minHeight: '54px' }
+                      : { background: '#fff', border: '1.5px solid #e5e7eb', color: '#9ca3af', minHeight: '54px' }
                     }>
-                    {/* 순번 뱃지 */}
-                    <span
-                      className="inline-flex items-center justify-center font-black leading-none rounded-full"
-                      style={{
-                        minWidth: '18px',
-                        height: '18px',
-                        padding: '0 4px',
-                        fontSize: '10px',
-                        ...(isActive
-                          ? { background: 'rgba(255,255,255,0.3)', color: '#fff' }
-                          : { background: '#f3f4f6', color: '#9ca3af' })
-                      }}>
-                      {idx === 0 ? '전' : idx}
-                    </span>
                     {/* 과목명 */}
                     <span className="leading-tight text-center" style={{ wordBreak: 'keep-all' }}>
-                      {subject === '전체' ? '전체' : subject}
+                      {subject}
                     </span>
                     {/* 시험지 수 */}
                     <span
@@ -385,6 +367,7 @@ export default function TeacherPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full" style={{ minWidth: '1100px' }}>
                     <colgroup>
+                      <col style={{ width: '48px' }} />
                       <col style={{ width: '110px' }} />
                       <col style={{ width: '85px' }} />
                       <col />
@@ -397,6 +380,7 @@ export default function TeacherPage() {
                     </colgroup>
                     <thead>
                       <tr className="border-b border-gray-100 bg-gray-50">
+                        <th className="text-center text-xs font-bold text-gray-400 tracking-wide px-2 py-3 whitespace-nowrap">No.</th>
                         <th className="text-center text-xs font-bold text-gray-400 tracking-wide px-2 py-3 whitespace-nowrap">과목</th>
                         <th className="text-center text-xs font-bold text-gray-400 tracking-wide px-2 py-3 whitespace-nowrap">학년</th>
                         <th className="text-center text-xs font-bold text-gray-400 tracking-wide px-3 py-3 whitespace-nowrap">단원명</th>
@@ -416,6 +400,9 @@ export default function TeacherPage() {
                           <tr key={exam.id}
                             className="border-b border-gray-50 hover:bg-pink-50/30 transition-colors"
                             style={{ borderBottom: idx === filteredExams.length - 1 ? 'none' : undefined }}>
+                            <td className="px-2 py-3.5 text-center">
+                              <span className="text-xs font-bold text-gray-400">{idx + 1}</span>
+                            </td>
                             <td className="px-2 py-3.5 text-center">
                               {exam.subject
                                 ? <span className="inline-block text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 whitespace-nowrap">{exam.subject}</span>
