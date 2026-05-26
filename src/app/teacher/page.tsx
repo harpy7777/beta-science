@@ -152,7 +152,6 @@ export default function TeacherPage() {
     );
   }
 
-  /* ── 로그인 화면 ── */
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -199,7 +198,6 @@ export default function TeacherPage() {
     );
   }
 
-  /* ── 대시보드 데이터 ── */
   const publishedCount = exams.filter(e => e.isPublished).length;
   const draftCount     = exams.filter(e => !e.isPublished).length;
   const totalQ         = exams.reduce((a, e) => a + e.questions.length, 0);
@@ -222,10 +220,8 @@ export default function TeacherPage() {
 
       <div className="min-h-screen bg-gray-50">
 
-        {/* ── Header ── */}
         <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
           <div className="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between">
-            {/* 로고 */}
             <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => router.push('/')}>
               <div className="w-8 h-8 rounded-lg flex items-center justify-center"
                 style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}>
@@ -236,7 +232,6 @@ export default function TeacherPage() {
               </div>
               <span className="font-bold text-gray-900 text-sm">베타과학학원</span>
             </div>
-            {/* 우측 버튼 */}
             <div className="flex items-center gap-2">
               <button onClick={() => router.push('/teacher/create')}
                 className="flex items-center gap-1.5 text-sm font-semibold text-white px-4 py-2 rounded-xl transition-opacity hover:opacity-85"
@@ -256,7 +251,6 @@ export default function TeacherPage() {
 
         <main className="max-w-6xl mx-auto px-5 py-7">
 
-          {/* ── 인사말 배너 ── */}
           <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-7 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl flex-shrink-0"
@@ -274,10 +268,8 @@ export default function TeacherPage() {
             </div>
           </div>
 
-          {/* ── OVERVIEW 라벨 ── */}
           <div className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-3">OVERVIEW</div>
 
-          {/* ── OVERVIEW 카드 ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
             {[
               { emoji: '📚', label: '전체 시험지', value: exams.length,   unit: '개', color: '#db2777' },
@@ -300,34 +292,52 @@ export default function TeacherPage() {
             ))}
           </div>
 
-          {/* ── 내 시험지 라벨 ── */}
           <div className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-3">내 시험지</div>
 
-          {/* ── 과목 필터 탭 (고정 목록, 균등 배열) ── */}
+          {/* ── 과목 필터 탭 ── */}
           {!examsLoading && (
             <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2 mb-4">
-              {FIXED_SUBJECTS.map(subject => {
+              {FIXED_SUBJECTS.map((subject, idx) => {
                 const count    = subject === '전체' ? exams.length : exams.filter(e => e.subject === subject).length;
                 const isActive = selectedSubject === subject;
                 return (
                   <button
                     key={subject}
                     onClick={() => setSelectedSubject(subject)}
-                    className="flex flex-col items-center justify-center gap-1 text-xs font-semibold py-2.5 px-1 rounded-xl transition-all active:scale-95 w-full"
+                    className="flex flex-col items-center justify-center gap-0.5 text-xs font-semibold py-2 px-1 rounded-xl transition-all active:scale-95 w-full"
                     style={isActive
-                      ? { background: 'linear-gradient(135deg,#f472b6,#db2777)', color: '#fff', boxShadow: '0 2px 8px rgba(219,39,119,0.2)', minHeight: '54px' }
-                      : { background: '#fff', border: '1.5px solid #e5e7eb', color: '#9ca3af', minHeight: '54px' }
+                      ? { background: 'linear-gradient(135deg,#f472b6,#db2777)', color: '#fff', boxShadow: '0 2px 8px rgba(219,39,119,0.2)', minHeight: '62px' }
+                      : { background: '#fff', border: '1.5px solid #e5e7eb', color: '#9ca3af', minHeight: '62px' }
                     }>
-                    <span className="leading-tight text-center" style={{ wordBreak: 'keep-all' }}>{subject}</span>
+                    {/* 순번 뱃지 */}
                     <span
-                      className="inline-flex items-center justify-center text-xs font-bold leading-none rounded-full"
+                      className="inline-flex items-center justify-center font-black leading-none rounded-full"
+                      style={{
+                        minWidth: '18px',
+                        height: '18px',
+                        padding: '0 4px',
+                        fontSize: '10px',
+                        ...(isActive
+                          ? { background: 'rgba(255,255,255,0.3)', color: '#fff' }
+                          : { background: '#f3f4f6', color: '#9ca3af' })
+                      }}>
+                      {idx === 0 ? '전' : idx}
+                    </span>
+                    {/* 과목명 */}
+                    <span className="leading-tight text-center" style={{ wordBreak: 'keep-all' }}>
+                      {subject === '전체' ? '전체' : subject}
+                    </span>
+                    {/* 시험지 수 */}
+                    <span
+                      className="inline-flex items-center justify-center font-bold leading-none rounded-full"
                       style={{
                         minWidth: '20px',
-                        height: '18px',
+                        height: '16px',
                         padding: '0 5px',
+                        fontSize: '11px',
                         ...(isActive
                           ? { background: 'rgba(255,255,255,0.25)', color: '#fff' }
-                          : { background: '#f3f4f6', color: '#6b7280' })
+                          : { background: '#fce7f3', color: '#db2777' })
                       }}>
                       {count}
                     </span>
@@ -337,7 +347,6 @@ export default function TeacherPage() {
             </div>
           )}
 
-          {/* ── 로딩 ── */}
           {examsLoading ? (
             <div className="flex justify-center py-16">
               <div className="w-8 h-8 border-4 border-pink-400 border-t-transparent rounded-full animate-spin" />
@@ -366,7 +375,6 @@ export default function TeacherPage() {
 
           ) : (
             <>
-              {/* ── 데스크탑 테이블 ── */}
               <div className="hidden md:block bg-white rounded-2xl border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full" style={{ minWidth: '1100px' }}>
@@ -461,7 +469,6 @@ export default function TeacherPage() {
                 </div>
               </div>
 
-              {/* ── 모바일 카드 뷰 ── */}
               <div className="md:hidden flex flex-col gap-3">
                 {filteredExams.map((exam) => {
                   const oxCount       = exam.questions.filter(q => q.type === 'ox').length;
