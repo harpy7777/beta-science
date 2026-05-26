@@ -353,17 +353,17 @@ export default function TeacherPage() {
               {/* ── 데스크탑 테이블 ── */}
               <div className="hidden md:block bg-white border border-pink-100 rounded-2xl overflow-hidden">
                 <div className="overflow-x-auto">
-                  <table className="w-full" style={{ minWidth: '900px' }}>
+                  <table className="w-full" style={{ minWidth: '1100px' }}>
                     <colgroup>
-                      <col style={{ width: '90px' }} />   {/* 과목 */}
-                      <col style={{ width: '70px' }} />   {/* 학년 */}
+                      <col style={{ width: '110px' }} />  {/* 과목 */}
+                      <col style={{ width: '85px' }} />   {/* 학년 */}
                       <col />                              {/* 단원명 — 나머지 공간 전부 */}
-                      <col style={{ width: '76px' }} />   {/* 게시일 */}
-                      <col style={{ width: '76px' }} />   {/* 게시 상태 */}
-                      <col style={{ width: '56px' }} />   {/* OX */}
-                      <col style={{ width: '60px' }} />   {/* 4지선다 */}
-                      <col style={{ width: '64px' }} />   {/* 총 문항 */}
-                      <col style={{ width: '185px' }} />  {/* 관리 */}
+                      <col style={{ width: '88px' }} />   {/* 게시일 */}
+                      <col style={{ width: '88px' }} />   {/* 게시 상태 */}
+                      <col style={{ width: '70px' }} />   {/* OX */}
+                      <col style={{ width: '74px' }} />   {/* 4지선다 */}
+                      <col style={{ width: '78px' }} />   {/* 총 문항 */}
+                      <col style={{ width: '200px' }} />  {/* 관리 */}
                     </colgroup>
                     <thead>
                       <tr className="border-b border-pink-100" style={{ background: '#fdf2f8' }}>
