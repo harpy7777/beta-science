@@ -310,17 +310,21 @@ export default function TeacherPage() {
                 const isActive = selectedSubject === subject;
                 return (
                   <button key={subject} onClick={() => setSelectedSubject(subject)}
-                    className="flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-full transition-all active:scale-95"
+                    className="flex items-center justify-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full transition-all active:scale-95 whitespace-nowrap"
                     style={isActive
-                      ? { background: 'linear-gradient(135deg,#f472b6,#db2777)', color: '#fff', boxShadow: '0 2px 8px rgba(219,39,119,0.2)' }
-                      : { background: '#fff', border: '1.5px solid #e5e7eb', color: '#9ca3af' }
+                      ? { background: 'linear-gradient(135deg,#f472b6,#db2777)', color: '#fff', boxShadow: '0 2px 8px rgba(219,39,119,0.2)', minHeight: '34px' }
+                      : { background: '#fff', border: '1.5px solid #e5e7eb', color: '#9ca3af', minHeight: '34px' }
                     }>
                     {subject}
-                    <span className="text-xs px-1.5 py-0.5 rounded-full font-bold leading-none"
-                      style={isActive
-                        ? { background: 'rgba(255,255,255,0.25)', color: '#fff' }
-                        : { background: '#f3f4f6', color: '#6b7280' }
-                      }>
+                    <span className="inline-flex items-center justify-center text-xs font-bold leading-none rounded-full"
+                      style={{
+                        minWidth: '20px',
+                        height: '18px',
+                        padding: '0 5px',
+                        ...(isActive
+                          ? { background: 'rgba(255,255,255,0.25)', color: '#fff' }
+                          : { background: '#f3f4f6', color: '#6b7280' })
+                      }}>
                       {count}
                     </span>
                   </button>
