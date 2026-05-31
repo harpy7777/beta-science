@@ -93,11 +93,10 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
 .student-name-link:hover{color:#374151}
 
 /* ── Subject Filter (과목별 탭) ── */
-.subj-filter{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:2px 0 10px;margin-bottom:.4rem}
-.subj-filter::-webkit-scrollbar{display:none}
-.subj-chip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:92px;padding:13px 16px;border-radius:14px;border:1.5px solid #fce7f3;background:#fff;cursor:pointer;transition:all .15s;font-family:inherit}
+.subj-filter{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0 10px;margin-bottom:.4rem}
+.subj-chip{flex:1 1 92px;min-width:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:12px 8px;border-radius:14px;border:1.5px solid #fce7f3;background:#fff;cursor:pointer;transition:all .15s;font-family:inherit}
 .subj-chip:hover{border-color:#fbcfe8;transform:translateY(-1px)}
-.subj-chip .sc-name{font-size:13px;font-weight:700;color:#6e6e73;white-space:nowrap}
+.subj-chip .sc-name{font-size:13px;font-weight:700;color:#6e6e73;text-align:center;line-height:1.25;word-break:keep-all}
 .subj-chip .sc-cnt{font-size:12px;font-weight:700;color:#db2777;background:#fdf2f8;border-radius:20px;padding:1px 10px;min-width:26px;text-align:center}
 .subj-chip.on{background:linear-gradient(135deg,#f472b6,#db2777);border-color:#db2777;box-shadow:0 4px 12px rgba(219,39,119,.25)}
 .subj-chip.on .sc-name{color:#fff}
@@ -172,7 +171,7 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
   .page-hero{padding:.9rem 1rem;border-radius:14px}
   .hero-icon{width:40px;height:40px;font-size:18px}
   .section-card{padding:.9rem 1rem;border-radius:14px}
-  .subj-chip{min-width:80px;padding:11px 13px}
+  .subj-chip{flex-basis:72px;min-width:72px;padding:11px 6px}
   .subj-chip .sc-name{font-size:12px}
   .cc-modal{margin:0;border-radius:20px 20px 0 0}
   .modal-overlay{align-items:flex-end}
@@ -226,6 +225,11 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
       <div class="hero-date-main" id="today-date">—</div>
       <div class="hero-date-day" id="today-day">—</div>
     </div>
+  </div>
+
+  <!-- 학생 명단 백업 -->
+  <div style="display:flex;justify-content:flex-end;margin-bottom:1.2rem">
+    <button onclick="downloadStudentsBackup()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border:1.5px solid #bbf7d0;background:#f0fdf4;color:#16a34a;border-radius:20px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s" onmouseover="this.style.background='#dcfce7'" onmouseout="this.style.background='#f0fdf4'">💾 학생 명단 백업 파일 받기</button>
   </div>
 
   <!-- Stats -->
@@ -338,7 +342,7 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc,collection,onSnapshot,query,orderBy,writeBatch,getDocs,where}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,collection,onSnapshot,query,orderBy,writeBatch,getDocs,where,Timestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
 const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app);
 
@@ -351,6 +355,7 @@ onAuthStateChanged(auth,async u=>{
   document.body.style.visibility="visible";iSW();iStats();iRG();iExams();iMT();}catch(e){window.location.replace("/login.html");}
 });
 window.doLogout=async()=>{await signOut(auth);window.location.replace("/login.html");};
+window.downloadStudentsBackup=async function(){try{const snap=await getDocs(collection(db,"students"));const enc=v=>{if(v===null||v===undefined)return v;if(v instanceof Timestamp)return{__ts:true,s:v.seconds,n:v.nanoseconds};if(Array.isArray(v))return v.map(enc);if(typeof v==='object'){const o={};for(const k in v)o[k]=enc(v[k]);return o;}return v;};const students=snap.docs.map(d=>({__id:d.id,...enc(d.data())}));const payload={meta:{app:'beta-science',version:1,exportedAt:new Date().toISOString()},data:{students}};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');const n=new Date(),pad=x=>String(x).padStart(2,'0');a.href=url;a.download=`beta-science-students-${n.getFullYear()}${pad(n.getMonth()+1)}${pad(n.getDate())}-${pad(n.getHours())}${pad(n.getMinutes())}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);alert('학생 명단 백업 파일을 받았습니다. ('+students.length+'명)');}catch(e){alert('학생 백업 실패: '+e.message);}};
 function iSW(){onSnapshot(collection(db,"students"),s=>{aIds=new Set(s.docs.map(d=>d.data().id).filter(Boolean));sfMap={};s.docs.forEach(d=>{const id=d.data().id;if(id)sfMap[id]=d.id;});});}
 function pRD(r){if(!r)return null;if(r&&typeof r==='object'&&r.seconds)return new Date(r.seconds*1000);if(typeof r!=='string')return null;const m=r.match(/(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);const d=new Date(r);return isNaN(d)?null:d;}
 function tD(ts){if(!ts)return new Date(0);if(ts&&typeof ts==='object'&&ts.seconds)return new Date(ts.seconds*1000);if(ts&&typeof ts.toDate==='function')return ts.toDate();return new Date(ts);}
