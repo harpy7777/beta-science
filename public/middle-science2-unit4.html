@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel='icon' type='image/svg+xml' href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpolygon points='70,8 121,38 121,102 70,132 19,102 19,38' fill='none' stroke='%23E85D75' stroke-width='8' stroke-linejoin='round'/%3E%3Cpolygon points='70,38 97,53 97,87 70,102 43,87 43,53' fill='none' stroke='%23E85D75' stroke-width='4' stroke-linejoin='round' stroke-dasharray='10 6'/%3E%3Ccircle cx='70' cy='8' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='38' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='70' cy='132' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='38' r='10' fill='%23E85D75'/%3E%3C/svg%3E">
+<title>베타과학학원 · 물질의 구성</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+:root {
+  --ind-dark:    #1e1b4b;
+  --ind-main:    #4338ca;
+  --ind-mid:     #4f46e5;
+  --ind-light:   #6366f1;
+  --ind-bright:  #818cf8;
+  --ind-tint:    #f5f3ff;
+  --ind-tint2:   #ede9fe;
+  --ind-border:  #c4b5fd;
+  --ind-border2: #a78bfa;
+
+  --green:#059669; --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --blue2:#2563eb; --blue-bg:#eff6ff;  --blue-border:#bfdbfe;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626;   --red-bg:#fef2f2;   --red-border:#fecaca;
+  --teal:#0f766e;  --teal-bg:#f0fdfa;  --teal-border:#99f6e4;
+
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#f8f7ff;   --white:#fff;
+  --radius-sm:10px; --radius:14px; --radius-lg:18px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+p{line-height:1.78;font-size:13.5px;margin:.4rem 0}
+
+.header{background:#fff;border-bottom:1px solid #e0e7ff;padding:0 1rem;padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right));height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:500;box-shadow:0 1px 0 #e0e7ff}
+.header-left{display:flex;align-items:center;gap:9px;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--ind-mid) 0%,var(--ind-dark) 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(79,70,229,.32)}
+.brand-name{font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{display:flex;align-items:center;gap:5px;background:var(--ind-tint2);border:1px solid var(--ind-border);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--ind-dark);white-space:nowrap}
+.dot-ind{width:5px;height:5px;background:var(--ind-mid);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{padding:7px 14px;min-height:36px;background:transparent;border:1.5px solid var(--ind-border);border-radius:20px;font-size:12px;font-weight:700;color:var(--ind-dark);cursor:pointer;white-space:nowrap;transition:background .15s}
+.back-btn:hover{background:var(--ind-tint)}
+.back-btn:active{background:var(--ind-tint2)}
+
+.hero{background:linear-gradient(135deg,var(--ind-dark) 0%,var(--ind-main) 55%,var(--ind-mid) 100%);padding:2.8rem 1.5rem 2.2rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero::after{content:'';position:absolute;left:-50px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hero-deco{position:absolute;right:10%;top:15%;width:120px;height:120px;border-radius:50%;border:2px solid rgba(255,255,255,.12);pointer-events:none}
+.hero-deco2{position:absolute;right:18%;top:25%;width:60px;height:60px;border-radius:50%;border:1.5px solid rgba(255,255,255,.1);pointer-events:none}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+.hero-eyebrow{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+.hero-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem}
+.hero-desc{font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.7;max-width:580px;margin:0 auto 1.8rem}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:14px;padding:.9rem 1.4rem;text-align:center;backdrop-filter:blur(6px);min-width:80px;transition:background .2s}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+.tabs-wrap{background:#fff;border-bottom:2px solid var(--ind-border);position:sticky;top:54px;z-index:400}
+.tabs-inner{max-width:1100px;margin:0 auto;padding:0 1.5rem;display:flex;overflow-x:auto;justify-content:center;gap:4px;scrollbar-width:none}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{padding:13px 26px;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;margin-bottom:-2px;border-radius:8px 8px 0 0}
+.tab-btn:hover{color:var(--ind-mid);background:var(--ind-tint)}
+.tab-btn.active{color:var(--ind-mid);border-bottom-color:var(--ind-mid)}
+
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}
+.unit-section.visible{display:block}
+
+.unit-banner{border-radius:var(--radius-lg);padding:1.4rem 1.8rem;margin-bottom:1.8rem;display:flex;align-items:center;gap:1.2rem;background:linear-gradient(135deg,var(--ind-tint),var(--ind-tint2));border:2px solid var(--ind-border)}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ind-mid);margin-bottom:4px}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius-lg);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.acc-item.open{border-color:var(--ind-border);box-shadow:0 4px 20px rgba(79,70,229,.1)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:1.2rem 1.5rem;cursor:pointer;user-select:none;transition:background .15s}
+.acc-header:hover{background:var(--ind-tint)}
+.acc-num{width:32px;height:32px;border-radius:10px;background:var(--ind-tint2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--ind-dark);flex-shrink:0;transition:background .2s}
+.acc-item.open .acc-num{background:var(--ind-mid);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--ind-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-item.open .acc-subtitle{color:var(--ind-mid)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--ind-mid)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--ind-tint2)}
+.acc-item.open .acc-body{display:block}
+
+.sec-title{font-size:12px;font-weight:800;color:var(--ind-dark);letter-spacing:.06em;text-transform:uppercase;margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--ind-mid);border-radius:2px;display:block;flex-shrink:0}
+
+.concept-box{background:var(--ind-tint);border:1.5px solid var(--ind-border);border-left:4px solid var(--ind-mid);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.concept-box .cb-title{font-weight:800;color:var(--ind-dark);font-size:14px;margin-bottom:.4rem}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--green);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+.amber-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-left:4px solid var(--amber);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+.blue-box{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-left:4px solid var(--blue2);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.blue-box .cb-title{font-weight:800;color:#1e40af;font-size:14px;margin-bottom:.4rem}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+.teal-box{background:var(--teal-bg);border:1.5px solid var(--teal-border);border-left:4px solid var(--teal);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.teal-box .cb-title{font-weight:800;color:var(--teal);font-size:14px;margin-bottom:.4rem}
+
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:var(--radius);border:1.5px solid var(--ind-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--ind-tint2);padding:10px 14px;text-align:left;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ind-dark)}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6;vertical-align:top}
+tbody tr:hover td{background:var(--ind-tint)}
+
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0}
+.flow-box{background:#fff;border:1.5px solid var(--ind-border);border-radius:8px;padding:7px 12px;font-weight:700;color:var(--ind-dark);text-align:center;font-size:12px;line-height:1.4}
+.flow-arrow{color:var(--ind-mid);font-size:18px;font-weight:900}
+
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:.8rem 0}
+.point-card{background:#fff;border:1.5px solid var(--ind-border);border-radius:var(--radius);padding:1rem;text-align:center;transition:border-color .2s,box-shadow .2s}
+.point-card:hover{border-color:var(--ind-mid);box-shadow:0 4px 12px rgba(79,70,229,.12)}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--ind-mid);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+.hp{color:var(--ind-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--blue2);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.ht{color:var(--teal);font-weight:800}
+
+.formula-box{background:linear-gradient(135deg,var(--ind-tint),var(--ind-tint2));border:2px solid var(--ind-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--ind-dark);letter-spacing:-.01em;font-style:italic}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+.steps{display:flex;flex-direction:column;gap:8px;margin:.8rem 0}
+.step-item{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius);padding:.9rem 1.1rem;transition:border-color .2s}
+.step-item:hover{border-color:var(--ind-border)}
+.step-num{width:28px;height:28px;border-radius:8px;background:var(--ind-mid);color:#fff;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px}
+.step-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+.quiz-wrap{background:linear-gradient(135deg,var(--ind-tint2),var(--ind-tint));border:1.5px solid var(--ind-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin-top:1.6rem}
+.quiz-label{font-size:11px;font-weight:800;color:var(--ind-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{background:var(--ind-mid);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.quiz-toggle:hover{background:var(--ind-dark)}
+.quiz-ans{display:none;margin-top:.8rem;padding:.9rem 1rem;background:rgba(255,255,255,.85);border-radius:10px;font-size:13.5px;color:var(--text);line-height:1.75;border:1px solid var(--ind-border)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:.6rem 0}
+.chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:var(--ind-tint2);color:var(--ind-dark);border:1px solid var(--ind-border)}
+.chip-g{background:var(--green-bg);color:#065f46;border-color:var(--green-border)}
+.chip-r{background:var(--red-bg);color:#991b1b;border-color:var(--red-border)}
+.chip-a{background:var(--amber-bg);color:#92400e;border-color:var(--amber-border)}
+.chip-b{background:var(--blue-bg);color:#1e40af;border-color:var(--blue-border)}
+.chip-t{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-border)}
+
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.45rem}
+  .hero-desc{font-size:13px}
+  .hero-eyebrow{font-size:10px;padding:4px 11px}
+  .hero-stats{gap:7px}
+  .hero-stat-card{min-width:68px;padding:.75rem .9rem}
+  .hs-num{font-size:1.45rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{justify-content:flex-start;gap:0;padding:0 .5rem}
+  .tab-btn{padding:11px 13px;font-size:11.5px;border-radius:6px 6px 0 0}
+  .content-wrap{padding:1.2rem .85rem 4rem}
+  .unit-banner{flex-direction:column;gap:.75rem;padding:1.1rem}
+  .ub-emoji{font-size:2.1rem}
+  .ub-title{font-size:1.1rem}
+  .acc-header{padding:.95rem 1rem;gap:10px}
+  .acc-num{width:30px;height:30px;font-size:12px;border-radius:8px}
+  .acc-htitle{font-size:14px}
+  .acc-hdesc{font-size:11.5px}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .steps{gap:7px}
+  .step-item{padding:.8rem .95rem}
+  table{font-size:12px}
+  thead th{font-size:10px;padding:8px 10px}
+  tbody td{padding:8px 10px}
+  .concept-box,.green-box,.amber-box,.blue-box,.red-box,.teal-box{padding:.85rem 1rem;font-size:13px}
+  .formula-box{padding:1rem 1.1rem}
+  .formula-text{font-size:1.15rem}
+  .quiz-wrap{padding:1rem 1.1rem}
+  .quiz-q{font-size:13px}
+}
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .hero-deco,.hero-deco2{display:none}
+  .hero{padding:1.7rem .9rem 1.5rem}
+  .hero-title{font-size:1.28rem;letter-spacing:-.025em}
+  .hero-desc{font-size:12.5px;margin-bottom:1.4rem}
+  .breadcrumb{gap:4px;margin-bottom:.9rem}
+  .bc-item,.bc-current,.bc-sep{font-size:11px}
+  .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;max-width:280px;margin:0 auto}
+  .hero-stat-card{min-width:0;padding:.7rem .5rem}
+  .hs-num{font-size:1.3rem}
+  .tabs-inner{padding:0 .3rem}
+  .tab-btn{padding:10px 11px;font-size:11px;white-space:nowrap}
+  .ub-title{font-size:1rem}
+  .ub-desc{font-size:12px}
+  .acc-header{padding:.85rem .9rem;gap:8px}
+  .acc-htitle{font-size:13.5px}
+  .acc-hdesc{font-size:11px}
+  .acc-body{padding:0 .9rem 1.2rem}
+  .sec-title{font-size:11px}
+  .point-box{grid-template-columns:1fr}
+  .pc-icon{font-size:1.5rem}
+  .pc-title{font-size:12px}
+  .pc-desc{font-size:11.5px}
+  .step-num{width:26px;height:26px;font-size:12px;border-radius:7px;flex-shrink:0}
+  .step-title{font-size:12.5px}
+  .step-desc{font-size:12px}
+  .formula-text{font-size:1rem}
+  .formula-sub{font-size:11px}
+  .table-wrap{-webkit-overflow-scrolling:touch}
+  .quiz-q{font-size:12.5px}
+  .quiz-toggle{font-size:11.5px;padding:6px 15px}
+  .quiz-ans{font-size:13px}
+  .chip,.chip-g,.chip-r,.chip-a,.chip-b,.chip-t{font-size:10.5px;padding:3px 10px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-ind"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="science2-summary.html" class="bc-item">중학 과학 2</a><span class="bc-sep">›</span>
+      <span class="bc-current">⚛️ Ⅳ. 물질의 구성</span>
+    </div>
+    <div class="hero-eyebrow">⚛️ PART 04 · 중학 과학 2 · UNIT 04</div>
+    <div class="hero-title">Ⅳ. 물질의 구성</div>
+    <div class="hero-desc">원소와 화합물, 원소 기호와 화학식, 원자의 구조와 주기율표,<br>물질을 구성하는 입자(원자·분자·이온)와 이온의 이동까지 완벽 정리</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">2</div><div class="hs-lbl">중단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">6</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">10+</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">⚛️ 중단원1 · 물질을 구성하는 성분</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">🔬 중단원2 · 물질을 구성하는 입자</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ═══════════════════════════════
+     중단원 1: 물질을 구성하는 성분
+═══════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner">
+    <div class="ub-emoji">⚛️</div>
+    <div>
+      <div class="ub-num">중단원 01 · Components of Matter</div>
+      <div class="ub-title">물질을 구성하는 성분</div>
+      <div class="ub-desc">원소와 화합물의 구분, 원소 기호와 화학식 표현, 원자의 구조, 주기율표에서의 원소 배치와 같은 족 원소의 유사성을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 원소와 화합물 -->
+    <div class="acc-item" id="acc-element">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Element & Compound · 원소와 화합물</div>
+          <div class="acc-htitle">원소와 화합물</div>
+          <div class="acc-hdesc">순물질 · 원소(한 종류) vs 화합물(서로 다른 종류) · 118가지 원소</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">순물질 · 원소 · 화합물</div>
+        <div class="concept-box">
+          <div class="cb-title">🧱 기본 개념</div>
+          <span class="hp">순물질</span>: 다른 물질이 섞이지 않고 <strong>한 종류의 물질로만</strong> 이루어진 물질<br><br>
+          • <span class="hp">원소</span>: 한 가지 종류의 입자로 이루어진 물질 (예: 구리, 산소)<br>
+          • <span class="hp">화합물</span>: 서로 다른 종류의 입자로 이루어진 물질 (예: 염화 나트륨, 물)
+        </div>
+
+        <div class="sec-title">원소와 화합물 비교</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>이루는 입자</th><th>예</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hg">원소</span></td><td>한 가지 종류의 입자</td><td>구리, 산소, 철, 탄소, 알루미늄</td></tr>
+            <tr><td><span class="hb">화합물</span></td><td>서로 다른 종류의 입자</td><td>물, 염화 나트륨, 이산화 탄소, 메테인</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="amber-box">
+          <div class="cb-title">📌 화합물의 성질</div>
+          화합물은 <span class="ha">서로 다른 원소가 결합하여 생성된 새로운 물질</span>로, 각 성분 원소로 <strong>분해할 수 있다</strong>.<br><br>
+          💡 예: 염화 나트륨은 염소·나트륨과는 전혀 다른 성질을 가진다. 현재까지 알려진 원소는 <strong>118가지</strong>이지만, 원소가 결합해 다양한 화합물을 형성하므로 훨씬 많은 물질이 존재한다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">과산화 수소는 수소와 산소가 반응하여 생성된 물질이다. 과산화 수소, 수소, 산소를 원소와 화합물로 구분하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • <strong>원소</strong>: 수소, 산소 (각각 한 가지 종류의 입자로 이루어짐)<br>
+            • <strong>화합물</strong>: 과산화 수소 (수소와 산소가 결합한 새로운 물질, 성분 원소로 분해 가능)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 원소와 화합물의 표현 -->
+    <div class="acc-item" id="acc-symbol">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Symbols & Formula · 표현</div>
+          <div class="acc-htitle">원소와 화합물의 표현 — 원소 기호·화학식</div>
+          <div class="acc-hdesc">원소 기호 규칙 · 화학식으로 원자의 종류와 개수 표현</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">원소 기호 나타내는 방법</div>
+        <div class="steps">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">첫 글자 → 대문자</div>
+              <div class="step-desc">원소 이름의 첫 글자를 알파벳 대문자로 나타낸다. (예: 탄소 Carbonium → C)</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">첫 글자가 같으면 → 중간 글자를 소문자로</div>
+              <div class="step-desc">첫 글자가 같은 경우 중간 글자를 택해 첫 글자 다음에 소문자로 나타낸다. (예: 염소 Chlorium → Cl)</div>
+            </div>
+          </div>
+        </div>
+        <div class="green-box">
+          <div class="cb-title">🔤 주요 원소 기호</div>
+          수소 H · 헬륨 He · 리튬 Li · 탄소 C · 질소 N · 산소 O · 플루오린 F · 네온 Ne · 나트륨(소듐) Na · 마그네슘 Mg · 알루미늄 Al · 황 S · 염소 Cl · 칼륨(포타슘) K · 칼슘 Ca · 철 Fe · 구리 Cu · 은 Ag · 금 Au<br><br>
+          💡 원소를 기호로 나타내면 다른 언어를 쓰는 사람과도 정보를 쉽게 교환할 수 있다.
+        </div>
+
+        <div class="sec-title">화학식 나타내는 방법</div>
+        <div class="concept-box">
+          <div class="cb-title">🧮 화학식</div>
+          원소 기호와 숫자를 사용하여 물질을 구성하는 <span class="hp">원자의 종류와 개수</span>를 나타낸 것.<br><br>
+          ① 원자의 종류를 원소 기호로 나타낸다<br>
+          ② 원자의 개수를 원소 기호 <strong>오른쪽 아래에 작은 숫자</strong>로 나타낸다 (개수가 1개이면 1은 생략)
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>물질</th><th>화학식</th><th>구성</th></tr></thead>
+          <tbody>
+            <tr><td>수소</td><td>H<sub>2</sub></td><td>수소 원자 2개</td></tr>
+            <tr><td>물</td><td>H<sub>2</sub>O</td><td>수소 원자 2개 + 산소 원자 1개(1 생략)</td></tr>
+            <tr><td>철</td><td>Fe</td><td>한 종류 원자가 연속 배열 → 원소 기호로만</td></tr>
+            <tr><td>이산화 탄소</td><td>CO<sub>2</sub></td><td>탄소 1개 + 산소 2개</td></tr>
+            <tr><td>오존</td><td>O<sub>3</sub></td><td>산소 원자 3개</td></tr>
+            <tr><td>메테인</td><td>CH<sub>4</sub></td><td>탄소 1개 + 수소 4개</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">다음 물질 중 화합물을 모두 고르시오. &nbsp; H<sub>2</sub>, &nbsp; CH<sub>4</sub>, &nbsp; Fe, &nbsp; NH<sub>3</sub>, &nbsp; O<sub>3</sub></div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            화합물 → <strong>CH<sub>4</sub>(메테인), NH<sub>3</sub>(암모니아)</strong><br><br>
+            (서로 다른 종류의 원자가 결합한 물질)<br>
+            H<sub>2</sub>, Fe, O<sub>3</sub>는 한 가지 종류의 원자로 이루어진 <strong>원소</strong>이다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 03: 원자의 구조 -->
+    <div class="acc-item" id="acc-atom">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Atomic Structure · 원자의 구조</div>
+          <div class="acc-htitle">원자의 구조</div>
+          <div class="acc-hdesc">원자핵(양성자·중성자) · 전자 · 전기적 중성 · 양성자수와 원소</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">원자를 이루는 입자</div>
+        <div class="concept-box">
+          <div class="cb-title">⚛️ 원자 (Atom)</div>
+          원소를 구성하는 입자인 원자는 <span class="hp">원자핵</span>과 <span class="hp">전자</span>로 이루어져 있다.
+        </div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">➕</div>
+            <div class="pc-title">양성자</div>
+            <div class="pc-desc">(+)전하를 띤다. 원자핵을 이룸</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">⚪</div>
+            <div class="pc-title">중성자</div>
+            <div class="pc-desc">전하를 띠지 않는다. 원자핵을 이룸</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">➖</div>
+            <div class="pc-title">전자</div>
+            <div class="pc-desc">(-)전하를 띤다. 원자핵 주위에 존재. 질량은 무시할 정도로 작음</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🔵</div>
+            <div class="pc-title">원자핵</div>
+            <div class="pc-desc">(+)전하, 원자의 중심. 원자 질량의 대부분 차지 (양성자+중성자)</div>
+          </div>
+        </div>
+
+        <div class="blue-box">
+          <div class="cb-title">⚖️ 전기적 중성과 원소의 종류</div>
+          • 원자는 <span class="hb">양성자수 = 전자 수</span>이므로 전기적으로 <strong>중성</strong>이다.<br>
+          • 원자의 종류(원소)는 <span class="hb">원자핵을 구성하는 양성자수</span>에 따라 달라진다.<br><br>
+          💡 원소 = 동일한 양성자수를 갖는 원자로 이루어진 물질<br>
+          예: 수소(양성자 1) · 탄소(양성자 6) · 산소(양성자 8) · 헬륨(양성자 2)
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">운석에서 발견된 어떤 원자에 양성자가 19개 있었다면, 그 원자에는 전자가 몇 개 있을지 근거를 들어 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            전자 = <strong>19개</strong><br><br>
+            근거: 원자는 전기적으로 중성이므로 <strong>양성자수와 전자 수가 같다</strong>. 따라서 양성자가 19개이면 전자도 19개이다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 04: 주기율표 -->
+    <div class="acc-item" id="acc-periodic">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">04</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Periodic Table · 주기율표</div>
+          <div class="acc-htitle">주기율표</div>
+          <div class="acc-hdesc">원자 번호순 배치 · 족(세로)·주기(가로) · 같은 족 원소의 유사성</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">주기율표란?</div>
+        <div class="concept-box">
+          <div class="cb-title">📋 주기율표 (Periodic Table)</div>
+          원소들을 <span class="hp">일정한 규칙에 따라 분류한 표</span>.<br><br>
+          • 각 원소를 <strong>원자 번호순</strong>으로 나열 (원자 번호 = 양성자수)<br>
+          • <span class="hp">족</span> = 세로줄 (총 18개) / <span class="hp">주기</span> = 가로줄 (총 7개)<br>
+          • 성질이 비슷한 원소는 <strong>같은 족(세로줄)</strong>에 배열된다
+        </div>
+
+        <div class="sec-title">같은 족 원소의 유사성</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>족</th><th>대표 원소</th><th>공통된 성질</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hr">1족</span></td>
+              <td>리튬, 나트륨, 칼륨</td>
+              <td>모두 물과 활발하게 반응하여 기체를 발생시킴</td>
+            </tr>
+            <tr>
+              <td><span class="hb">18족</span></td>
+              <td>헬륨, 네온, 아르곤</td>
+              <td>상온에서 모두 기체 상태, 다른 물질과 잘 반응하지 않음</td>
+            </tr>
+          </tbody>
+        </table></div>
+        <div class="amber-box">
+          <div class="cb-title">📌 주기율표의 유용성</div>
+          같은 세로줄(족)에 위치한 원소들은 성질이 비슷하므로, 어떤 원소의 <span class="ha">위치만 봐도 대략적인 성질을 예측</span>할 수 있다.<br><br>
+          💡 단, 수소는 1족에 있지만 리튬·나트륨·칼륨 같은 금속과는 성질이 다르다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">플루오린(F), 염소(Cl)와 비슷한 성질을 나타내는 원소를 주기율표에서 찾는다면 어디에서 찾아야 하는지, 그 까닭과 함께 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            플루오린·염소와 <strong>같은 족(같은 세로줄)</strong>에 있는 원소(예: 브로민 Br, 아이오딘 I)를 찾으면 된다.<br><br>
+            까닭: 주기율표에서 <strong>같은 족에 위치한 원소들은 성질이 비슷</strong>하기 때문이다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ═══════════════════════════════
+     중단원 2: 물질을 구성하는 입자
+═══════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner">
+    <div class="ub-emoji">🔬</div>
+    <div>
+      <div class="ub-num">중단원 02 · Particles of Matter</div>
+      <div class="ub-title">물질을 구성하는 입자</div>
+      <div class="ub-desc">물질을 이루는 입자(원자·분자·이온)의 차이점과, 전류를 흘려 주었을 때 양이온·음이온의 이동을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 물질을 구성하는 입자 -->
+    <div class="acc-item" id="acc-particle">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Atom · Molecule · Ion</div>
+          <div class="acc-htitle">물질을 구성하는 입자 — 원자·분자·이온</div>
+          <div class="acc-hdesc">원자로 이루어진 물질 · 분자의 정의 · 이온(양이온·음이온)과 이온식</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">원자로 이루어진 물질</div>
+        <div class="green-box">
+          <div class="cb-title">🪙 원자</div>
+          금, 구리, 철, 나트륨과 같은 <span class="hg">금속</span>은 한 종류의 원자만으로 이루어져 있으며, 무수히 많은 원자가 <strong>규칙적으로 배열</strong>되어 있다.<br>
+          연필심의 주성분인 흑연도 탄소 원자가 규칙적으로 배열된 물질이다.
+        </div>
+
+        <div class="sec-title">분자</div>
+        <div class="concept-box">
+          <div class="cb-title">💧 분자 (Molecule)</div>
+          2개 이상의 원자가 결합하면 <span class="hp">새로운 성질을 가지는 분자</span>를 형성한다.<br><br>
+          분자는 독립된 입자로 존재하여 <span class="hp">물질의 성질을 나타내는 가장 작은 입자</span>이다.<br>
+          예: 물 분자(H<sub>2</sub>O) 1개 = 수소 원자 2개 + 산소 원자 1개. 물 분자가 수소·산소로 나누어지면 물의 성질은 사라진다.<br><br>
+          💡 헬륨(He) 같은 18족 원소는 원자 1개로 존재하지만 고유한 성질을 가지므로 분자라고 할 수 있다.
+        </div>
+
+        <div class="sec-title">이온</div>
+        <div class="concept-box">
+          <div class="cb-title">⚡ 이온 (Ion)</div>
+          원자가 <span class="hp">전자를 잃거나 얻어 전하를 띠게 된 입자</span>.<br><br>
+          • <span class="hr">양이온</span>: 전자를 <strong>잃어</strong> (+)전하를 띤 이온<br>
+          • <span class="hb">음이온</span>: 전자를 <strong>얻어</strong> (-)전하를 띤 이온
+        </div>
+        <div class="blue-box">
+          <div class="cb-title">🔠 이온식과 이름</div>
+          이온식: 원소 기호의 <strong>오른쪽 위</strong>에 잃거나 얻은 전자 수와 전하의 종류를 표시 (1은 생략)<br>
+          예: 나트륨 이온 Na<sup>+</sup> (전자 1개 잃음) · 산화 이온 O<sup>2-</sup> (전자 2개 얻음)<br><br>
+          이름: 양이온 = 원소 이름 + '이온' / 음이온 = 원소 이름 + '화 이온' (산소·염소는 '소'를 생략)
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>양이온</th><th>이온식</th><th>음이온</th><th>이온식</th></tr></thead>
+          <tbody>
+            <tr><td>수소 이온</td><td>H<sup>+</sup></td><td>염화 이온</td><td>Cl<sup>-</sup></td></tr>
+            <tr><td>리튬 이온</td><td>Li<sup>+</sup></td><td>질산 이온</td><td>NO<sub>3</sub><sup>-</sup></td></tr>
+            <tr><td>칼륨 이온</td><td>K<sup>+</sup></td><td>과망가니즈산 이온</td><td>MnO<sub>4</sub><sup>-</sup></td></tr>
+            <tr><td>구리 이온</td><td>Cu<sup>2+</sup></td><td>황산 이온</td><td>SO<sub>4</sub><sup>2-</sup></td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">원자가 전자를 얻으면 어떤 이온이 되며 어떤 전하를 띠는지 쓰고, 나트륨의 원자 번호가 11번일 때 나트륨 이온(Na<sup>+</sup>)의 양성자수와 전자 수를 각각 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • 전자를 얻으면 → <strong>음이온</strong>이 되며 <strong>(-)전하</strong>를 띤다.<br><br>
+            • Na<sup>+</sup>: 양성자수 = <strong>11개</strong> (원자 번호 = 양성자수, 변하지 않음)<br>
+            &nbsp;&nbsp;전자 수 = <strong>10개</strong> (전자 1개를 잃어 +전하를 띠므로 11 − 1 = 10)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 이온의 이동 -->
+    <div class="acc-item" id="acc-ion-move">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Ion Movement · 이온의 이동</div>
+          <div class="acc-htitle">이온의 이동</div>
+          <div class="acc-hdesc">전류를 흘려 줄 때 양이온·음이온의 이동 · 색깔 이온 관찰</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">이온의 이동 방향</div>
+        <div class="concept-box">
+          <div class="cb-title">🔋 전류와 이온의 이동</div>
+          이온이 들어 있는 수용액에 전류를 흘려 주면, 전하를 띤 이온은 자신과 다른 극(반대 전하의 극)으로 끌려 이동한다.
+        </div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">➕</div>
+            <div class="pc-title">양이온 (+)</div>
+            <div class="pc-desc">(-)극으로 이동</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">➖</div>
+            <div class="pc-title">음이온 (-)</div>
+            <div class="pc-desc">(+)극으로 이동</div>
+          </div>
+        </div>
+
+        <div class="sec-title">색깔을 띠는 이온으로 확인하기</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>수용액</th><th>색깔 띠는 이온</th><th>전하</th><th>이동 방향</th></tr></thead>
+          <tbody>
+            <tr><td>황산 구리(Ⅱ)</td><td>파란색 구리 이온(Cu<sup>2+</sup>)</td><td>(+) 양이온</td><td>(-)극으로 이동</td></tr>
+            <tr><td>과망가니즈산 칼륨</td><td>보라색 과망가니즈산 이온(MnO<sub>4</sub><sup>-</sup>)</td><td>(-) 음이온</td><td>(+)극으로 이동</td></tr>
+          </tbody>
+        </table></div>
+        <div class="teal-box">
+          <div class="cb-title">💡 색을 띠지 않는 이온도 이동한다</div>
+          눈에 보이지 않는 황산 이온(SO<sub>4</sub><sup>2-</sup>)과 칼륨 이온(K<sup>+</sup>)도 각각 전하에 따라 (+)극·(-)극으로 이동한다. 색깔을 띠는 이온의 이동을 통해 <span class="ht">이온이 전하를 띠고 있음</span>을 확인할 수 있다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">염화 이온(Cl<sup>-</sup>), 나트륨 이온(Na<sup>+</sup>), 마그네슘 이온(Mg<sup>2+</sup>)이 들어 있는 바닷물에 전류를 흘려 주면 각 이온은 어느 극으로 이동하는지 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • 나트륨 이온(Na<sup>+</sup>), 마그네슘 이온(Mg<sup>2+</sup>) → <strong>양이온이므로 (-)극으로 이동</strong><br>
+            • 염화 이온(Cl<sup>-</sup>) → <strong>음이온이므로 (+)극으로 이동</strong>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">물질을 구성하는 입자인 원자·분자·이온의 차이점을 각각의 정의를 들어 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안:</strong><br><br>
+            • <strong>원자</strong>: 물질을 이루는 기본 입자로 원자핵과 전자로 구성되며, 전기적으로 중성이다.<br><br>
+            • <strong>분자</strong>: 2개 이상의 원자가 결합하여 독립된 입자로 존재하며, 물질의 성질을 나타내는 가장 작은 입자이다.<br><br>
+            • <strong>이온</strong>: 원자가 전자를 잃거나 얻어 전하를 띠게 된 입자로, 양이온과 음이온이 있다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  document.querySelectorAll('.unit-section').forEach(el => el.classList.remove('visible'));
+  document.getElementById('unit' + n).classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => item.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+const hashMap = {
+  '#unit1':1,'#acc-element':1,'#acc-symbol':1,'#acc-atom':1,'#acc-periodic':1,
+  '#unit2':2,'#acc-particle':2,'#acc-ion-move':2
+};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n-1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
