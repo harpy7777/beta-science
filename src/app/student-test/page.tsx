@@ -42,20 +42,55 @@ function makeMultiSubExam(exam: Exam): Exam & { subType: 'multiple' } {
   } as any;
 }
 
+// ─────────────────────────────────────────────
+// ★ 정렬용: 제목 앞의 단원 번호(예 "1-1", "2-3")를 숫자로 변환
+//   "1-1" → 10001, "2-3" → 20003 (단원 순서대로 줄세우기 위함)
+//   번호가 없으면 맨 뒤(999999)
+function getUnitOrder(title: string): number {
+  const m = (title ?? '').match(/(\d+)\s*-\s*(\d+)/);
+  if (!m) return 999999;
+  return Number(m[1]) * 10000 + Number(m[2]);
+}
+
+// ★ 같은 단원 안에서 OX(0)를 먼저, 4지선다(1)를 나중에
+function getTypeOrder(sub?: string): number {
+  if (sub === 'ox') return 0;
+  if (sub === 'multiple') return 1;
+  return 2; // 혼합/기타는 뒤로
+}
+// ─────────────────────────────────────────────
+
 function splitExams(exams: Exam[]): Array<Exam & { subType?: 'ox' | 'multiple' }> {
-  const result: Array<Exam & { subType?: 'ox' | 'multiple' }> = [];
+  // 1) 시험을 OX / 4지선다 단위로 펼침
+  const flat: Array<Exam & { subType?: 'ox' | 'multiple' }> = [];
   for (const exam of exams) {
     const type = getExamType(exam);
     if (type === 'mixed') {
       const oxSub = makeOXSubExam(exam);
       const multiSub = makeMultiSubExam(exam);
-      if (oxSub.questions.length > 0) result.push(oxSub as any);
-      if (multiSub.questions.length > 0) result.push(multiSub as any);
+      if (oxSub.questions.length > 0) flat.push(oxSub as any);
+      if (multiSub.questions.length > 0) flat.push(multiSub as any);
     } else {
-      result.push(exam as any);
+      flat.push(exam as any);
     }
   }
-  return result;
+
+  // 2) 단원 번호 순 → 같은 단원이면 OX 먼저, 4지선다 나중 순으로 정렬
+  flat.sort((a, b) => {
+    const unitDiff = getUnitOrder(a.title) - getUnitOrder(b.title);
+    if (unitDiff !== 0) return unitDiff;
+
+    // 같은 단원이면 OX/4지선다 순서로
+    const subA = (a as any).subType ?? (getExamType(a) === 'ox' ? 'ox' : getExamType(a) === 'multiple' ? 'multiple' : undefined);
+    const subB = (b as any).subType ?? (getExamType(b) === 'ox' ? 'ox' : getExamType(b) === 'multiple' ? 'multiple' : undefined);
+    const typeDiff = getTypeOrder(subA) - getTypeOrder(subB);
+    if (typeDiff !== 0) return typeDiff;
+
+    // 그래도 같으면 제목 가나다순
+    return (a.title ?? '').localeCompare(b.title ?? '', 'ko');
+  });
+
+  return flat;
 }
 
 function getRealExamId(id: string): string {
