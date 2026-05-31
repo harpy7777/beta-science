@@ -11,7 +11,7 @@ import {
 import {
   ArrowLeft, Plus, Trash2,
   Send, Save, CheckCircle, FileText,
-  ExternalLink, ChevronDown, ChevronUp, FlaskConical
+  ExternalLink, ChevronDown, ChevronUp, FlaskConical, AlertTriangle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -211,6 +211,45 @@ render();`;
   return { html, css, js };
 }
 
+// ── 전체 삭제 확인 모달 ──
+function ClearConfirmModal({
+  kind, count, onConfirm, onCancel,
+}: {
+  kind: 'ox' | 'multiple'; count: number; onConfirm: () => void; onCancel: () => void;
+}) {
+  const label = kind === 'ox' ? 'OX 문제' : '4지선다 문제';
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onCancel} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+        <div className="flex justify-center mb-4">
+          <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center">
+            <AlertTriangle size={28} className="text-red-500" />
+          </div>
+        </div>
+        <h3 className="text-center font-black text-gray-900 text-lg mb-2">{label}을 모두 지울까요?</h3>
+        <p className="text-center text-sm text-gray-500 mb-1">
+          현재 입력된 <span className="font-semibold text-red-500">{label} {count}개</span>가 한 번에 삭제됩니다.
+        </p>
+        <p className="text-center text-xs text-gray-400 mb-5">
+          이 작업은 되돌릴 수 없어요. (저장 전이라면 다시 불러올 수 있습니다)
+        </p>
+        <div className="flex gap-2.5">
+          <button onClick={onCancel}
+            className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors">
+            취소
+          </button>
+          <button onClick={onConfirm}
+            className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-85 flex items-center justify-center gap-1.5"
+            style={{ background: 'linear-gradient(135deg,#f87171,#dc2626)' }}>
+            <Trash2 size={14} />모두 삭제
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 function CreateExamInner() {
   const router = useRouter();
@@ -234,6 +273,9 @@ function CreateExamInner() {
   const [mcOpen, setMcOpen] = useState(true);
   const [oxParsed, setOxParsed] = useState<Question[]>([]);
   const [mcParsed, setMcParsed] = useState<Question[]>([]);
+
+  // 전체 삭제 확인 모달 대상 ('ox' | 'multiple' | null)
+  const [clearTarget, setClearTarget] = useState<'ox' | 'multiple' | null>(null);
 
   const handleGradeChange = (g: string) => { setGrade(g); setSubject(''); };
   const subjectList = grade ? (SUBJECTS[grade] ?? []) : [];
@@ -273,6 +315,18 @@ function CreateExamInner() {
     setMcParsed(parsed);
     toast.success(`4지선다 ${parsed.length}개 불러옴`);
   }, [mcBulk]);
+
+  // 전체 삭제 실행
+  function handleClearConfirm() {
+    if (clearTarget === 'ox') {
+      setOxParsed([]);
+      toast.success('OX 문제를 모두 삭제했습니다');
+    } else if (clearTarget === 'multiple') {
+      setMcParsed([]);
+      toast.success('4지선다 문제를 모두 삭제했습니다');
+    }
+    setClearTarget(null);
+  }
 
   async function handleSave(publish: boolean) {
     if (!grade) { toast.error('학년을 선택하세요'); setStep(1); return; }
@@ -338,8 +392,18 @@ function CreateExamInner() {
   return (
     <div className="min-h-screen bg-gray-50">
 
+      {/* ── 전체 삭제 확인 모달 ── */}
+      {clearTarget && (
+        <ClearConfirmModal
+          kind={clearTarget}
+          count={clearTarget === 'ox' ? oxParsed.length : mcParsed.length}
+          onConfirm={handleClearConfirm}
+          onCancel={() => setClearTarget(null)}
+        />
+      )}
+
       {/* ── 헤더 ── */}
-      <header className="bg-white border-b border-pink-100 sticky top-0 z-50">
+      <header className="bg-white border-b border-pink-100 sticky top-0 z-40">
         <div className="w-full px-4 sm:px-6 h-14 flex items-center justify-between">
 
           {/* 왼쪽: 로고 + 타이틀 */}
@@ -623,13 +687,25 @@ function CreateExamInner() {
                     </div>
                   )}
 
-                  <button
-                    onClick={() => setOxParsed(prev => [...prev, makeQuestion('ox')])}
-                    className="flex items-center gap-1.5 text-xs font-semibold mt-3 px-3 py-2 rounded-xl border transition-colors"
-                    style={{ borderColor: '#fce7f3', color: '#db2777' }}
-                  >
-                    <Plus size={13} /> OX 문제 1개 추가
-                  </button>
+                  {/* OX 하단 버튼: 1개 추가 + 전체 삭제 */}
+                  <div className="flex items-center gap-2 mt-3">
+                    <button
+                      onClick={() => setOxParsed(prev => [...prev, makeQuestion('ox')])}
+                      className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border transition-colors"
+                      style={{ borderColor: '#fce7f3', color: '#db2777' }}
+                    >
+                      <Plus size={13} /> OX 문제 1개 추가
+                    </button>
+                    {oxParsed.length > 0 && (
+                      <button
+                        onClick={() => setClearTarget('ox')}
+                        className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border transition-colors"
+                        style={{ borderColor: '#fecaca', color: '#dc2626' }}
+                      >
+                        <Trash2 size={13} /> 전체 삭제
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -705,13 +781,25 @@ function CreateExamInner() {
                     </div>
                   )}
 
-                  <button
-                    onClick={() => setMcParsed(prev => [...prev, makeQuestion('multiple')])}
-                    className="flex items-center gap-1.5 text-xs font-semibold mt-3 px-3 py-2 rounded-xl border transition-colors"
-                    style={{ borderColor: '#dbeafe', color: '#1d4ed8' }}
-                  >
-                    <Plus size={13} /> 4지선다 1개 추가
-                  </button>
+                  {/* 4지선다 하단 버튼: 1개 추가 + 전체 삭제 */}
+                  <div className="flex items-center gap-2 mt-3">
+                    <button
+                      onClick={() => setMcParsed(prev => [...prev, makeQuestion('multiple')])}
+                      className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border transition-colors"
+                      style={{ borderColor: '#dbeafe', color: '#1d4ed8' }}
+                    >
+                      <Plus size={13} /> 4지선다 1개 추가
+                    </button>
+                    {mcParsed.length > 0 && (
+                      <button
+                        onClick={() => setClearTarget('multiple')}
+                        className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border transition-colors"
+                        style={{ borderColor: '#fecaca', color: '#dc2626' }}
+                      >
+                        <Trash2 size={13} /> 전체 삭제
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
