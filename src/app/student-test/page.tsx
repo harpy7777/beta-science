@@ -43,13 +43,29 @@ function makeMultiSubExam(exam: Exam): Exam & { subType: 'multiple' } {
 }
 
 // ─────────────────────────────────────────────
-// ★ 정렬용: 제목 앞의 단원 번호(예 "1-1", "2-3")를 숫자로 변환
-//   "1-1" → 10001, "2-3" → 20003 (단원 순서대로 줄세우기 위함)
-//   번호가 없으면 맨 뒤(999999)
+// ★ 제목 속 동그라미 숫자(①②③…)를 보통 숫자로 변환 (소단원 구분용)
+function circledToNumber(title: string): number {
+  const circled = '①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮';
+  for (const ch of title ?? '') {
+    const idx = circled.indexOf(ch);
+    if (idx >= 0) return idx + 1; // ① → 1, ② → 2 ...
+  }
+  // 동그라미가 없으면 "(1." "(2." 같은 괄호 안 숫자도 시도
+  const m2 = (title ?? '').match(/\(\s*(\d+)\s*[.)]/);
+  if (m2) return Number(m2[1]);
+  return 99; // 소단원 번호 못 찾으면 맨 뒤
+}
+
+// ★ 정렬용: 대단원(1-1) + 소단원(①②③)을 하나의 숫자로 합침
+//   "1-1 ① ..." → 1 * 1_000_000 + 1 * 1_000 + 1 = 1001001
+//   "1-1 ② ..." → 1001002  / "2-3 ① ..." → 2003001
+//   같은 소단원의 OX와 4지선다가 바로 붙도록 만들어 줌
 function getUnitOrder(title: string): number {
   const m = (title ?? '').match(/(\d+)\s*-\s*(\d+)/);
-  if (!m) return 999999;
-  return Number(m[1]) * 10000 + Number(m[2]);
+  const big   = m ? Number(m[1]) : 999;   // 대단원 앞자리 (1-1의 1)
+  const mid   = m ? Number(m[2]) : 999;   // 대단원 뒷자리 (1-1의 1)
+  const small = circledToNumber(title);    // 소단원 (①②③)
+  return big * 1_000_000 + mid * 1_000 + small;
 }
 
 // ★ 같은 단원 안에서 OX(0)를 먼저, 4지선다(1)를 나중에
