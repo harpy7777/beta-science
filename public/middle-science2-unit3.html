@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel='icon' type='image/svg+xml' href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpolygon points='70,8 121,38 121,102 70,132 19,102 19,38' fill='none' stroke='%23E85D75' stroke-width='8' stroke-linejoin='round'/%3E%3Cpolygon points='70,38 97,53 97,87 70,102 43,87 43,53' fill='none' stroke='%23E85D75' stroke-width='4' stroke-linejoin='round' stroke-dasharray='10 6'/%3E%3Ccircle cx='70' cy='8' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='38' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='70' cy='132' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='38' r='10' fill='%23E85D75'/%3E%3C/svg%3E">
+<title>베타과학학원 · 빛과 파동</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+:root {
+  --ind-dark:    #1e1b4b;
+  --ind-main:    #4338ca;
+  --ind-mid:     #4f46e5;
+  --ind-light:   #6366f1;
+  --ind-bright:  #818cf8;
+  --ind-tint:    #f5f3ff;
+  --ind-tint2:   #ede9fe;
+  --ind-border:  #c4b5fd;
+  --ind-border2: #a78bfa;
+
+  --green:#059669; --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --blue2:#2563eb; --blue-bg:#eff6ff;  --blue-border:#bfdbfe;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626;   --red-bg:#fef2f2;   --red-border:#fecaca;
+  --teal:#0f766e;  --teal-bg:#f0fdfa;  --teal-border:#99f6e4;
+
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#f8f7ff;   --white:#fff;
+  --radius-sm:10px; --radius:14px; --radius-lg:18px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+p{line-height:1.78;font-size:13.5px;margin:.4rem 0}
+
+.header{background:#fff;border-bottom:1px solid #e0e7ff;padding:0 1rem;padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right));height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:500;box-shadow:0 1px 0 #e0e7ff}
+.header-left{display:flex;align-items:center;gap:9px;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--ind-mid) 0%,var(--ind-dark) 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(79,70,229,.32)}
+.brand-name{font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{display:flex;align-items:center;gap:5px;background:var(--ind-tint2);border:1px solid var(--ind-border);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--ind-dark);white-space:nowrap}
+.dot-ind{width:5px;height:5px;background:var(--ind-mid);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{padding:7px 14px;min-height:36px;background:transparent;border:1.5px solid var(--ind-border);border-radius:20px;font-size:12px;font-weight:700;color:var(--ind-dark);cursor:pointer;white-space:nowrap;transition:background .15s}
+.back-btn:hover{background:var(--ind-tint)}
+.back-btn:active{background:var(--ind-tint2)}
+
+.hero{background:linear-gradient(135deg,var(--ind-dark) 0%,var(--ind-main) 55%,var(--ind-mid) 100%);padding:2.8rem 1.5rem 2.2rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero::after{content:'';position:absolute;left:-50px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hero-deco{position:absolute;right:10%;top:15%;width:120px;height:120px;border-radius:50%;border:2px solid rgba(255,255,255,.12);pointer-events:none}
+.hero-deco2{position:absolute;right:18%;top:25%;width:60px;height:60px;border-radius:50%;border:1.5px solid rgba(255,255,255,.1);pointer-events:none}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+.hero-eyebrow{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+.hero-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem}
+.hero-desc{font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.7;max-width:580px;margin:0 auto 1.8rem}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:14px;padding:.9rem 1.4rem;text-align:center;backdrop-filter:blur(6px);min-width:80px;transition:background .2s}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+.tabs-wrap{background:#fff;border-bottom:2px solid var(--ind-border);position:sticky;top:54px;z-index:400}
+.tabs-inner{max-width:1100px;margin:0 auto;padding:0 1.5rem;display:flex;overflow-x:auto;justify-content:center;gap:4px;scrollbar-width:none}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{padding:13px 26px;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;margin-bottom:-2px;border-radius:8px 8px 0 0}
+.tab-btn:hover{color:var(--ind-mid);background:var(--ind-tint)}
+.tab-btn.active{color:var(--ind-mid);border-bottom-color:var(--ind-mid)}
+
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}
+.unit-section.visible{display:block}
+
+.unit-banner{border-radius:var(--radius-lg);padding:1.4rem 1.8rem;margin-bottom:1.8rem;display:flex;align-items:center;gap:1.2rem;background:linear-gradient(135deg,var(--ind-tint),var(--ind-tint2));border:2px solid var(--ind-border)}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ind-mid);margin-bottom:4px}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius-lg);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.acc-item.open{border-color:var(--ind-border);box-shadow:0 4px 20px rgba(79,70,229,.1)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:1.2rem 1.5rem;cursor:pointer;user-select:none;transition:background .15s}
+.acc-header:hover{background:var(--ind-tint)}
+.acc-num{width:32px;height:32px;border-radius:10px;background:var(--ind-tint2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--ind-dark);flex-shrink:0;transition:background .2s}
+.acc-item.open .acc-num{background:var(--ind-mid);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--ind-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-item.open .acc-subtitle{color:var(--ind-mid)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--ind-mid)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--ind-tint2)}
+.acc-item.open .acc-body{display:block}
+
+.sec-title{font-size:12px;font-weight:800;color:var(--ind-dark);letter-spacing:.06em;text-transform:uppercase;margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--ind-mid);border-radius:2px;display:block;flex-shrink:0}
+
+.concept-box{background:var(--ind-tint);border:1.5px solid var(--ind-border);border-left:4px solid var(--ind-mid);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.concept-box .cb-title{font-weight:800;color:var(--ind-dark);font-size:14px;margin-bottom:.4rem}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--green);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+.amber-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-left:4px solid var(--amber);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+.blue-box{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-left:4px solid var(--blue2);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.blue-box .cb-title{font-weight:800;color:#1e40af;font-size:14px;margin-bottom:.4rem}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+.teal-box{background:var(--teal-bg);border:1.5px solid var(--teal-border);border-left:4px solid var(--teal);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.teal-box .cb-title{font-weight:800;color:var(--teal);font-size:14px;margin-bottom:.4rem}
+
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:var(--radius);border:1.5px solid var(--ind-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--ind-tint2);padding:10px 14px;text-align:left;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ind-dark)}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6;vertical-align:top}
+tbody tr:hover td{background:var(--ind-tint)}
+
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0}
+.flow-box{background:#fff;border:1.5px solid var(--ind-border);border-radius:8px;padding:7px 12px;font-weight:700;color:var(--ind-dark);text-align:center;font-size:12px;line-height:1.4}
+.flow-arrow{color:var(--ind-mid);font-size:18px;font-weight:900}
+
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:.8rem 0}
+.point-card{background:#fff;border:1.5px solid var(--ind-border);border-radius:var(--radius);padding:1rem;text-align:center;transition:border-color .2s,box-shadow .2s}
+.point-card:hover{border-color:var(--ind-mid);box-shadow:0 4px 12px rgba(79,70,229,.12)}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--ind-mid);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+.hp{color:var(--ind-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--blue2);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.ht{color:var(--teal);font-weight:800}
+
+.formula-box{background:linear-gradient(135deg,var(--ind-tint),var(--ind-tint2));border:2px solid var(--ind-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--ind-dark);letter-spacing:-.01em;font-style:italic}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+.steps{display:flex;flex-direction:column;gap:8px;margin:.8rem 0}
+.step-item{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius);padding:.9rem 1.1rem;transition:border-color .2s}
+.step-item:hover{border-color:var(--ind-border)}
+.step-num{width:28px;height:28px;border-radius:8px;background:var(--ind-mid);color:#fff;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px}
+.step-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+.quiz-wrap{background:linear-gradient(135deg,var(--ind-tint2),var(--ind-tint));border:1.5px solid var(--ind-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin-top:1.6rem}
+.quiz-label{font-size:11px;font-weight:800;color:var(--ind-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{background:var(--ind-mid);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.quiz-toggle:hover{background:var(--ind-dark)}
+.quiz-ans{display:none;margin-top:.8rem;padding:.9rem 1rem;background:rgba(255,255,255,.85);border-radius:10px;font-size:13.5px;color:var(--text);line-height:1.75;border:1px solid var(--ind-border)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:.6rem 0}
+.chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:var(--ind-tint2);color:var(--ind-dark);border:1px solid var(--ind-border)}
+.chip-g{background:var(--green-bg);color:#065f46;border-color:var(--green-border)}
+.chip-r{background:var(--red-bg);color:#991b1b;border-color:var(--red-border)}
+.chip-a{background:var(--amber-bg);color:#92400e;border-color:var(--amber-border)}
+.chip-b{background:var(--blue-bg);color:#1e40af;border-color:var(--blue-border)}
+.chip-t{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-border)}
+
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.45rem}
+  .hero-desc{font-size:13px}
+  .hero-eyebrow{font-size:10px;padding:4px 11px}
+  .hero-stats{gap:7px}
+  .hero-stat-card{min-width:68px;padding:.75rem .9rem}
+  .hs-num{font-size:1.45rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{justify-content:flex-start;gap:0;padding:0 .5rem}
+  .tab-btn{padding:11px 13px;font-size:11.5px;border-radius:6px 6px 0 0}
+  .content-wrap{padding:1.2rem .85rem 4rem}
+  .unit-banner{flex-direction:column;gap:.75rem;padding:1.1rem}
+  .ub-emoji{font-size:2.1rem}
+  .ub-title{font-size:1.1rem}
+  .acc-header{padding:.95rem 1rem;gap:10px}
+  .acc-num{width:30px;height:30px;font-size:12px;border-radius:8px}
+  .acc-htitle{font-size:14px}
+  .acc-hdesc{font-size:11.5px}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .steps{gap:7px}
+  .step-item{padding:.8rem .95rem}
+  table{font-size:12px}
+  thead th{font-size:10px;padding:8px 10px}
+  tbody td{padding:8px 10px}
+  .concept-box,.green-box,.amber-box,.blue-box,.red-box,.teal-box{padding:.85rem 1rem;font-size:13px}
+  .formula-box{padding:1rem 1.1rem}
+  .formula-text{font-size:1.15rem}
+  .quiz-wrap{padding:1rem 1.1rem}
+  .quiz-q{font-size:13px}
+}
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .hero-deco,.hero-deco2{display:none}
+  .hero{padding:1.7rem .9rem 1.5rem}
+  .hero-title{font-size:1.28rem;letter-spacing:-.025em}
+  .hero-desc{font-size:12.5px;margin-bottom:1.4rem}
+  .breadcrumb{gap:4px;margin-bottom:.9rem}
+  .bc-item,.bc-current,.bc-sep{font-size:11px}
+  .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;max-width:280px;margin:0 auto}
+  .hero-stat-card{min-width:0;padding:.7rem .5rem}
+  .hs-num{font-size:1.3rem}
+  .tabs-inner{padding:0 .3rem}
+  .tab-btn{padding:10px 11px;font-size:11px;white-space:nowrap}
+  .ub-title{font-size:1rem}
+  .ub-desc{font-size:12px}
+  .acc-header{padding:.85rem .9rem;gap:8px}
+  .acc-htitle{font-size:13.5px}
+  .acc-hdesc{font-size:11px}
+  .acc-body{padding:0 .9rem 1.2rem}
+  .sec-title{font-size:11px}
+  .point-box{grid-template-columns:1fr}
+  .pc-icon{font-size:1.5rem}
+  .pc-title{font-size:12px}
+  .pc-desc{font-size:11.5px}
+  .step-num{width:26px;height:26px;font-size:12px;border-radius:7px;flex-shrink:0}
+  .step-title{font-size:12.5px}
+  .step-desc{font-size:12px}
+  .formula-text{font-size:1rem}
+  .formula-sub{font-size:11px}
+  .table-wrap{-webkit-overflow-scrolling:touch}
+  .quiz-q{font-size:12.5px}
+  .quiz-toggle{font-size:11.5px;padding:6px 15px}
+  .quiz-ans{font-size:13px}
+  .chip,.chip-g,.chip-r,.chip-a,.chip-b,.chip-t{font-size:10.5px;padding:3px 10px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-ind"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="science2-summary.html" class="bc-item">중학 과학 2</a><span class="bc-sep">›</span>
+      <span class="bc-current">💡 Ⅲ. 빛과 파동</span>
+    </div>
+    <div class="hero-eyebrow">💡 PART 03 · 중학 과학 2 · UNIT 03</div>
+    <div class="hero-title">Ⅲ. 빛과 파동</div>
+    <div class="hero-desc">빛의 반사·굴절과 물체를 보는 과정, 거울·렌즈에 의한 상, 빛의 합성과 색,<br>파동의 발생·전달과 소리의 3요소까지 완벽 정리</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">2</div><div class="hs-lbl">중단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">8</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">10+</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">💡 중단원1 · 빛</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">〰️ 중단원2 · 파동</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ═══════════════════════════════
+     중단원 1: 빛
+═══════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner">
+    <div class="ub-emoji">💡</div>
+    <div>
+      <div class="ub-num">중단원 01 · Light</div>
+      <div class="ub-title">빛</div>
+      <div class="ub-desc">빛의 반사와 굴절, 물체를 보는 과정, 평면거울에서 상이 생기는 원리, 거울과 렌즈에 의한 상, 빛의 합성과 색을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 빛의 반사 -->
+    <div class="acc-item" id="acc-reflection">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Reflection · 빛의 반사</div>
+          <div class="acc-htitle">빛의 반사</div>
+          <div class="acc-hdesc">입사각·반사각 · 반사 법칙 · 거울·수면에 비친 모습</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">빛의 반사란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🔦 빛의 반사 (Reflection)</div>
+          직진하던 빛이 물체의 표면에 부딪쳐 <span class="hp">나아가는 방향이 바뀌는 현상</span>.<br><br>
+          거울은 빛의 반사를 이용한 대표적인 도구이다.
+        </div>
+
+        <div class="sec-title">반사에서 쓰이는 용어</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">➡️</div>
+            <div class="pc-title">입사 광선</div>
+            <div class="pc-desc">거울 면으로 들어가는 빛</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">↩️</div>
+            <div class="pc-title">반사 광선</div>
+            <div class="pc-desc">거울 면에서 반사하여 나아가는 빛</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">📏</div>
+            <div class="pc-title">법선</div>
+            <div class="pc-desc">거울 면에 수직으로 그은 선</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">📐</div>
+            <div class="pc-title">입사각 / 반사각</div>
+            <div class="pc-desc">입사 광선·반사 광선이 각각 법선과 이루는 각</div>
+          </div>
+        </div>
+
+        <div class="sec-title">빛의 반사 법칙</div>
+        <div class="formula-box">
+          <div class="formula-text">입사각 = 반사각</div>
+          <div class="formula-sub">입사각이 커지면 반사각도 함께 커진다</div>
+        </div>
+        <div class="blue-box">
+          <div class="cb-title">🪞 반사에 의한 현상</div>
+          거울에 모습이 비치거나 수면에 사물이 비치는 등 우리 주위의 다양한 반사 현상은 모두 <span class="hb">빛의 반사 법칙</span>으로 설명할 수 있다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">거울에서 반사한 빛의 반사각이 30°일 때 입사각의 크기는 몇 °인지 쓰고, 그렇게 답한 근거가 되는 법칙을 함께 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            입사각 = <strong>30°</strong><br><br>
+            근거: <strong>빛의 반사 법칙</strong> — 빛이 반사할 때 입사각과 반사각의 크기는 항상 같다. 따라서 반사각이 30°이면 입사각도 30°이다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 빛의 굴절 -->
+    <div class="acc-item" id="acc-refraction">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Refraction · 빛의 굴절</div>
+          <div class="acc-htitle">빛의 굴절</div>
+          <div class="acc-hdesc">입사각·굴절각 · 공기→물 굴절 · 꺾여 보이는 빨대·동전</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">빛의 굴절이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">💧 빛의 굴절 (Refraction)</div>
+          빛이 진행하다가 <span class="hp">두 물질의 경계면에서 진행 방향이 꺾이는 현상</span>.<br><br>
+          경계면으로 들어가는 빛 → <strong>입사 광선</strong>, 경계면에서 굴절하여 나아가는 빛 → <strong>굴절 광선</strong><br>
+          입사 광선과 법선이 이루는 각 → <strong>입사각</strong>, 굴절 광선과 법선이 이루는 각 → <strong>굴절각</strong>
+        </div>
+
+        <div class="sec-title">공기 → 물로 진행할 때</div>
+        <div class="amber-box">
+          <div class="cb-title">📌 굴절각과 입사각의 관계</div>
+          • 빛이 공기 중에서 물속으로 진행할 때 <span class="ha">굴절각은 입사각보다 작다</span><br>
+          • 입사각이 커지면 <span class="ha">굴절각도 커진다</span>
+        </div>
+
+        <div class="sec-title">빛의 굴절에 의한 현상</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🥤</div>
+            <div class="pc-title">꺾여 보이는 빨대</div>
+            <div class="pc-desc">물이 담긴 컵 속의 빨대가 수면에서 꺾여 보임 (굵어 보이기도 함)</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🪙</div>
+            <div class="pc-title">보이는 동전</div>
+            <div class="pc-desc">물을 붓기 전에는 안 보이던 동전이, 물을 부으면 빛이 굴절되어 눈에 들어와 보임</div>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">물속에 발을 담그면 다리가 실제와 다르게 보이는 까닭과, 빛이 공기 중에서 물속으로 진행할 때 입사각과 굴절각의 크기 관계를 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            물과 공기의 <strong>경계면에서 빛이 굴절</strong>하기 때문에 다리가 실제보다 짧고 꺾여 보인다.<br><br>
+            빛이 공기 중에서 물속으로 진행할 때 → <strong>굴절각 &lt; 입사각</strong> (입사각이 커지면 굴절각도 커진다)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 03: 물체를 보는 과정 -->
+    <div class="acc-item" id="acc-seeing">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">How We See · 물체를 보는 과정</div>
+          <div class="acc-htitle">물체를 보는 과정</div>
+          <div class="acc-hdesc">광원 · 반사된 빛이 눈으로 · 태양/텐트/물고기 경로</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">광원이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">☀️ 광원 (Light Source)</div>
+          전등이나 태양과 같이 <span class="hp">스스로 빛을 내는 물체</span>.<br><br>
+          우리 주변 대부분의 물체(책·물고기 등)는 스스로 빛을 내지 못한다. 이런 물체는 <span class="hp">광원에서 나온 빛이 물체에서 반사한 후 우리 눈으로 들어올 때</span> 볼 수 있다.
+        </div>
+
+        <div class="sec-title">물체를 보는 3가지 경로</div>
+        <div class="steps">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">태양 (광원) 보기</div>
+              <div class="step-desc">태양에서 나온 빛이 우리 눈으로 바로 들어오면 태양을 볼 수 있다.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">텐트 (반사) 보기</div>
+              <div class="step-desc">태양에서 나온 빛이 텐트에서 반사되어 우리 눈으로 들어오면 텐트를 볼 수 있다.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">물고기 (반사 + 굴절) 보기</div>
+              <div class="step-desc">물속 물고기에서 반사된 빛이 물과 공기의 경계면에서 굴절하여 눈으로 들어오기 때문에 물고기를 볼 수 있다.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">달은 스스로 빛을 내지 못하지만 밤하늘에 뜬 달은 밝게 보인다. 우리가 달을 보는 과정을 빛의 경로를 이용해 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            달은 광원이 아니므로 <strong>태양(광원)에서 나온 빛이 달 표면에서 반사</strong>되고, 그 반사된 빛이 우리 눈으로 들어오기 때문에 달을 볼 수 있다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 04: 평면거울에서 상이 생기는 원리 -->
+    <div class="acc-item" id="acc-mirror-image">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">04</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Plane Mirror · 평면거울의 상</div>
+          <div class="acc-htitle">평면거울에서 상이 생기는 원리</div>
+          <div class="acc-hdesc">상의 정의 · 실물과 같은 크기 · 거리 대칭 · 반사 광선의 연장선</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">상이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🪞 상 (Image)</div>
+          거울을 통해 보이는 <span class="hp">물체의 모습</span>.<br><br>
+          평면거울 앞에 물체를 놓으면 <span class="hp">실물과 같은 크기</span>의 상이 <span class="hp">거울 뒤쪽</span>에 생기며,
+          물체에서 거울까지의 거리와 거울에서 상까지의 거리는 <span class="hp">서로 같다</span>.
+        </div>
+
+        <div class="sec-title">상이 생기는 원리 (3단계)</div>
+        <div class="steps">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">반사</div>
+              <div class="step-desc">물체에서 반사된 빛의 일부가 평면거울에 도달하면, 빛은 거울 표면에서 반사 법칙에 따라 반사된다.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">연장선</div>
+              <div class="step-desc">눈으로 들어온 반사 광선의 연장선을 거울 뒤쪽으로 연장하면 한 점에서 만난다.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">상의 위치</div>
+              <div class="step-desc">사람은 그 점에서 빛이 나오는 것으로 인식하며, 그곳이 상의 위치가 된다.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">평면거울에서 15 cm 떨어진 곳에 물체를 두었을 때, 거울에서 상까지의 거리는 몇 cm이며 상의 크기는 실물과 어떠한지 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • 거울에서 상까지의 거리: <strong>15 cm</strong> (물체~거울 거리 = 거울~상 거리)<br>
+            • 상의 크기: 실물과 <strong>같다</strong> (평면거울의 상은 실물과 같은 크기, 거울 뒤쪽에 생김)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 05: 거울과 렌즈 -->
+    <div class="acc-item" id="acc-mirror-lens">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">05</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Mirrors & Lenses · 거울과 렌즈</div>
+          <div class="acc-htitle">거울과 렌즈에 의한 상</div>
+          <div class="acc-hdesc">볼록·오목 거울 / 볼록·오목 렌즈의 상 · 생활 속 이용</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">거울에 의한 상</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>거울</th><th>물체가 가까울 때</th><th>물체가 멀 때</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="ha">볼록 거울</span></td>
+              <td colspan="2">물체보다 <strong>작고 바로 선 상</strong> (멀어질수록 상의 크기는 더 작아짐)</td>
+            </tr>
+            <tr>
+              <td><span class="hr">오목 거울</span></td>
+              <td>물체보다 <strong>크고 바로 선 상</strong></td>
+              <td>물체보다 <strong>작고 거꾸로 선 상</strong></td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">렌즈에 의한 상</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>렌즈</th><th>물체가 가까울 때</th><th>물체가 멀 때</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="hb">볼록 렌즈</span></td>
+              <td>물체보다 <strong>크고 바로 선 상</strong></td>
+              <td>물체보다 <strong>작고 거꾸로 선 상</strong></td>
+            </tr>
+            <tr>
+              <td><span class="ht">오목 렌즈</span></td>
+              <td colspan="2">물체보다 <strong>작고 바로 선 상</strong> (멀어질수록 상의 크기는 더 작아짐)</td>
+            </tr>
+          </tbody>
+        </table></div>
+        <div class="green-box">
+          <div class="cb-title">🔍 모양 구별</div>
+          • <span class="hg">볼록 렌즈</span>: 가운데 부분이 바깥쪽보다 <strong>두껍다</strong><br>
+          • <span class="hg">오목 렌즈</span>: 가운데 부분보다 바깥쪽이 <strong>두껍다</strong>
+        </div>
+
+        <div class="sec-title">생활 속 이용</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🚪</div>
+            <div class="pc-title">평면거울</div>
+            <div class="pc-desc">실물과 같은 크기 → 전신 거울</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🛣️</div>
+            <div class="pc-title">볼록 거울</div>
+            <div class="pc-desc">넓은 범위 → 굽은 도로 거울, 자동차 측면 거울</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">💄</div>
+            <div class="pc-title">오목 거울</div>
+            <div class="pc-desc">크게 확대 → 화장 거울, 치과용 거울</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🔬</div>
+            <div class="pc-title">볼록 렌즈</div>
+            <div class="pc-desc">현미경, 사진기, 원시 교정 안경(돋보기)</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">👓</div>
+            <div class="pc-title">오목 렌즈</div>
+            <div class="pc-desc">근시 교정 안경 (멀리 있는 물체가 잘 안 보일 때)</div>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">근시와 원시를 교정할 때 각각 어떤 렌즈를 사용하는지 쓰고, 볼록 렌즈로 매우 멀리 있는 물체를 보면 어떤 상이 생기는지 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • <strong>근시</strong>(멀리 있는 물체가 잘 안 보임) → <strong>오목 렌즈</strong><br>
+            • <strong>원시</strong>(가까이 있는 물체가 잘 안 보임) → <strong>볼록 렌즈</strong><br><br>
+            볼록 렌즈로 멀리 있는 물체를 보면 → 물체보다 <strong>작고 거꾸로 선 상</strong>이 생긴다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 06: 빛의 합성 -->
+    <div class="acc-item" id="acc-light-mix">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">06</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Color Mixing · 빛의 합성</div>
+          <div class="acc-htitle">빛의 합성과 색</div>
+          <div class="acc-hdesc">백색광·물체의 색 · 빛의 삼원색 · 영상 장치의 화소</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">물체의 색</div>
+        <div class="concept-box">
+          <div class="cb-title">🌈 백색광과 물체의 색</div>
+          햇빛은 여러 가지 색의 빛이 고르게 합쳐진 <span class="hp">백색광</span>이다.<br><br>
+          물체에 백색광을 비추면 물체는 일부 색의 빛을 흡수하고 나머지 색의 빛을 반사한다.
+          <span class="hp">물체의 색 = 물체가 반사하는 빛의 색</span>이다.<br><br>
+          • 모든 색의 빛을 흡수 → <strong>검은색</strong>으로 보임<br>
+          • 모든 색의 빛을 반사 → <strong>흰색</strong>으로 보임
+        </div>
+
+        <div class="sec-title">빛의 합성</div>
+        <div class="concept-box">
+          <div class="cb-title">💡 빛의 합성</div>
+          두 가지 색 이상의 빛을 한곳에 비추었을 때 빛이 합쳐져 <span class="hp">다른 색의 빛으로 보이는 현상</span>.<br><br>
+          빛의 삼원색 = <span class="hr">빨간색</span>, <span class="hg">초록색</span>, <span class="hb">파란색</span> →
+          같은 밝기로 모두 합성하면 <strong>백색광(흰색)</strong>이 된다.
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>합성한 빛</th><th>보이는 색</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hr">빨간색</span> + <span class="hg">초록색</span></td><td>노란색</td></tr>
+            <tr><td><span class="hr">빨간색</span> + <span class="hb">파란색</span></td><td>자홍색</td></tr>
+            <tr><td><span class="hg">초록색</span> + <span class="hb">파란색</span></td><td>청록색</td></tr>
+            <tr><td>빨간색 + 초록색 + 파란색</td><td>흰색 (백색광)</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">영상 장치와 화소</div>
+        <div class="blue-box">
+          <div class="cb-title">📺 화소 (Pixel)</div>
+          컴퓨터 모니터·스마트 기기는 빛의 합성을 이용해 다양한 색을 표현한다.<br>
+          화면을 확대하면 <span class="hb">빨간색·초록색·파란색 빛을 내는 수많은 화소</span>를 볼 수 있으며,
+          각 화소에서 나오는 빛이 합성되어 다양한 색의 빛이 만들어진다.<br><br>
+          💡 화소 = 영상 장치에서 영상을 나타내는 가장 작은 점
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">흰색 스크린에 손전등 (가)와 (나)를 비추었더니 겹쳐진 부분이 자홍색으로 보였다. (가)가 빨간색 빛일 때, (나)는 무슨 색 빛인지 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            (나) = <strong>파란색</strong><br><br>
+            빨간색 + 파란색 = 자홍색이므로, (가)가 빨간색이면 (나)는 파란색 빛이다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">빨간색 조명 아래에서 빨간색 장미꽃과 초록색 잎은 각각 어떤 색으로 보이는지 빛의 반사·흡수와 관련지어 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안:</strong><br><br>
+            • <strong>빨간색 장미꽃</strong>: 빨간색 빛을 반사하므로 빨간색 조명 아래에서도 빨간색을 반사 → <strong>빨간색</strong>으로 보인다.<br><br>
+            • <strong>초록색 잎</strong>: 초록색 빛만 반사하고 빨간색 빛은 흡수한다. 빨간색 조명에는 반사할 초록색 빛이 없으므로 → <strong>검은색(어두운색)</strong>으로 보인다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ═══════════════════════════════
+     중단원 2: 파동
+═══════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner">
+    <div class="ub-emoji">〰️</div>
+    <div>
+      <div class="ub-num">중단원 02 · Wave</div>
+      <div class="ub-title">파동</div>
+      <div class="ub-desc">파동의 발생과 전달, 파동을 이루는 요소(마루·골·파장·진폭·주기·진동수), 소리의 특성과 소리의 3요소를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 파동의 발생과 전달 -->
+    <div class="acc-item" id="acc-wave">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Wave Propagation · 파동의 발생과 전달</div>
+          <div class="acc-htitle">파동의 발생과 전달</div>
+          <div class="acc-hdesc">파동·매질 · 마루·골·파장·진폭 · 주기·진동수 · 에너지 전달</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">파동과 매질</div>
+        <div class="concept-box">
+          <div class="cb-title">🌊 파동 (Wave)</div>
+          어느 한곳에서 발생한 <span class="hp">진동이 주위로 퍼져 나가는 것</span>.<br>
+          종류: <strong>물결파, 음파, 전파, 지진파, 빛</strong> 등<br><br>
+          <span class="hp">매질</span>: 파동을 전달하는 물질. 파동이 진행할 때 매질은 <strong>제자리에서 진동만 할 뿐, 파동의 진행 방향으로 이동하지 않는다.</strong>
+          <br>(예: 물결파가 퍼져도 탁구공은 제자리에서 위아래로만 진동)
+        </div>
+
+        <div class="sec-title">파동을 이루는 요소</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>요소</th><th>정의</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hr">마루</span></td><td>파동의 가장 높은 부분</td></tr>
+            <tr><td><span class="hb">골</span></td><td>파동의 가장 낮은 부분</td></tr>
+            <tr><td><span class="hp">파장</span></td><td>마루에서 이웃한 마루까지(또는 골에서 이웃한 골까지)의 거리</td></tr>
+            <tr><td><span class="hg">진폭</span></td><td>진동 중심에서 마루나 골까지의 거리</td></tr>
+            <tr><td><span class="ha">주기</span></td><td>매질의 한 점이 한 번 진동하여 제자리에 오는 데 걸리는 시간 (단위: 초, s)</td></tr>
+            <tr><td><span class="ht">진동수</span></td><td>1초 동안 매질의 한 점이 진동하는 횟수 (단위: 헤르츠, Hz)</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">진동수와 주기의 관계</div>
+        <div class="formula-box">
+          <div class="formula-text">진동수 = 1 / 주기</div>
+          <div class="formula-sub">진동수와 주기는 서로 역수 관계이다</div>
+        </div>
+
+        <div class="teal-box">
+          <div class="cb-title">⚡ 파동은 에너지를 전달한다</div>
+          파동이 진행할 때 매질이 진동하면서 <span class="ht">에너지를 주변으로 전달</span>한다.<br>
+          예: 파도가 오랜 시간 바위를 깎아 절벽을 만들고, 지진파가 건물을 무너뜨린다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 7</div>
+          <div class="quiz-q">바람이 없는 날 호수에 돌을 던져 물결파를 만들었다. 물 위에 떠 있는 축구공은 어떻게 움직이는지 쓰고, 그 이유를 '매질'이라는 용어를 사용해 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            축구공은 <strong>제자리에서 위아래로 진동</strong>만 할 뿐, 물결파의 진행 방향으로 이동하지 않는다.<br><br>
+            이유: 파동이 진행할 때 <strong>매질(물)</strong>은 제자리에서 진동만 하고 파동의 진행 방향으로 이동하지 않기 때문이다. (전달되는 것은 물질이 아니라 진동과 에너지)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 소리의 특성 -->
+    <div class="acc-item" id="acc-sound">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Sound · 소리의 특성</div>
+          <div class="acc-htitle">소리의 특성 — 소리의 3요소</div>
+          <div class="acc-hdesc">음파 · 세기(진폭)·높낮이(진동수)·음색(파형)</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">음파란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🎵 음파 (Sound Wave)</div>
+          악기를 연주하면 진동이 발생하고 주변의 공기를 진동시키며 소리가 퍼져 나간다.<br>
+          이처럼 소리는 <span class="hp">공기와 같은 매질을 통해 전달되는 파동</span>이며, 이를 음파라고 한다.
+        </div>
+
+        <div class="sec-title">소리의 3요소</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🔊</div>
+            <div class="pc-title">소리의 세기</div>
+            <div class="pc-desc">파동의 <strong>진폭</strong>에 따라 달라짐. 큰 소리 = 진폭이 큼</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🎹</div>
+            <div class="pc-title">소리의 높낮이</div>
+            <div class="pc-desc">파동의 <strong>진동수</strong>에 따라 달라짐. 높은 소리 = 진동수가 큼</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🎻</div>
+            <div class="pc-title">소리의 음색</div>
+            <div class="pc-desc">파동의 <strong>파형</strong>에 따라 달라짐. 악기마다 파형이 달라 구별됨</div>
+          </div>
+        </div>
+
+        <div class="table-wrap"><table>
+          <thead><tr><th>소리의 특성</th><th>결정하는 파동 요소</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hg">세기</span></td><td>진폭</td><td>진폭이 클수록 큰 소리</td></tr>
+            <tr><td><span class="ht">높낮이</span></td><td>진동수</td><td>진동수가 클수록 높은 소리</td></tr>
+            <tr><td><span class="ha">음색</span></td><td>파형</td><td>세기·높낮이가 같아도 파형이 다르면 다른 소리 (예: 플루트 vs 바이올린)</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="amber-box">
+          <div class="cb-title">📌 소리의 3요소 정리</div>
+          파동의 <span class="ha">진폭 → 세기</span>, <span class="ha">진동수 → 높낮이</span>, <span class="ha">파형 → 음색</span><br>
+          이 세 가지(세기·높낮이·음색)를 <strong>소리의 3요소</strong>라고 하며, 소리의 특성은 이 3요소에 의해 구분된다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 8</div>
+          <div class="quiz-q">세기와 높낮이가 같은데도 플루트와 바이올린 소리가 다르게 들린다. 이때 두 소리가 다른 까닭을 파동의 어떤 특성으로 설명할 수 있는지 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            두 소리의 진폭(세기)과 진동수(높낮이)는 비슷하지만 <strong>파형(음색)</strong>이 다르기 때문이다.<br><br>
+            악기마다 내는 소리의 파형이 달라 서로 구분되는 특징을 <strong>음색</strong>이라고 한다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">칼림바의 같은 막대를 ① 다른 세기로 튕길 때, ② 길이가 다른 막대를 같은 세기로 튕길 때 파동의 모습이 각각 어떻게 달라지는지 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안:</strong><br><br>
+            ① 같은 막대를 다른 세기로 튕길 때: 세게 튕길수록 큰 소리가 나며 <strong>진폭이 커진다</strong>. (소리의 세기 = 진폭)<br><br>
+            ② 길이가 다른 막대를 같은 세기로 튕길 때: 높은 소리가 날수록 <strong>진동수가 커진다</strong>. (소리의 높낮이 = 진동수)
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  document.querySelectorAll('.unit-section').forEach(el => el.classList.remove('visible'));
+  document.getElementById('unit' + n).classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => item.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+const hashMap = {
+  '#unit1':1,'#acc-reflection':1,'#acc-refraction':1,'#acc-seeing':1,'#acc-mirror-image':1,'#acc-mirror-lens':1,'#acc-light-mix':1,
+  '#unit2':2,'#acc-wave':2,'#acc-sound':2
+};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n-1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
