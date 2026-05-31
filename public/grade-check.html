@@ -121,7 +121,7 @@ body {
 .page-overlay.open { display: block; }
 .page-panel {
   position: fixed; top: 0; right: 0; bottom: 0;
-  width: min(900px, 100vw);
+  width: min(1200px, 100vw);
   background: #fafafa; z-index: 500;
   overflow-y: auto; -webkit-overflow-scrolling: touch;
   transform: translateX(100%);
@@ -1018,7 +1018,7 @@ function gcRenderList() {
         <div class="stu-av" style="background:${bg};color:${col};">${short}</div><span class="stu-name">${name}</span>
       </div></div>
       <div><span class="grade-tag ${cls}">${short}</span></div>
-      <div id="c-subject-${s.uid}"><span class="subject-tag">—</span></div>
+      <div id="c-subject-${s.uid}" style="flex-wrap:wrap;gap:3px;">${subjectCellHtml(s.subject)}</div>
       <div id="c-date-${s.uid}"><span class="date-tag" style="color:#aeaeb2;">—</span></div>
       <div id="c-tests-${s.uid}"><span style="font-size:11px;color:#aeaeb2;">—</span></div>
       <div id="c-ox-${s.uid}"><span class="score-pill p-na">—</span></div>
@@ -1063,8 +1063,6 @@ async function gcLoadSummary(s) {
     firstMap.forEach(r=>{ const t=r.testType||'mc', sc=scoreOf(r); if(t==='ox') ox.push(sc); else if(t==='master') ms.push(sc); else mc.push(sc); });
     const avg=arr=>arr.length?Math.round(arr.reduce((s,v)=>s+v,0)/arr.length):null;
     const allA=avg([...ox,...mc,...ms]);
-    const subEl=document.getElementById(`c-subject-${s.uid}`);
-    if(subEl) subEl.innerHTML=lastRec?`<span class="subject-tag">${esc2(lastRec.subject||'—')}</span>`:`<span class="subject-tag">—</span>`;
     const dateEl=document.getElementById(`c-date-${s.uid}`);
     if(dateEl) dateEl.innerHTML=lastRec?`<span class="date-tag">${fmtDateShort(lastRec.timestamp)}</span>`:`<span class="date-tag" style="color:#aeaeb2;">—</span>`;
     const testEl=document.getElementById(`c-tests-${s.uid}`);
@@ -1327,6 +1325,7 @@ function inRange(r,s,e){const d=toDate(r.timestamp||r.submittedAt);return d>=s&&
 function fmtDateShort(ts){if(!ts)return '';const d=toDate(ts);if(d.getTime()===0)return '';const yy=String(d.getFullYear()).slice(2),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0'),day=DAY_KO[d.getDay()];return `${yy}.${mm}.${dd}(${day})`;}
 function fmtDate(ts){if(!ts)return '';const d=toDate(ts);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;}
 function pill(v,cls){return v!==null?`<span class="score-pill ${cls}">${v}점</span>`:`<span class="score-pill p-na">—</span>`;}
+function subjectCellHtml(subject){const subs=(subject&&subject!=='-')?String(subject).split(',').map(x=>x.trim()).filter(Boolean):[];if(!subs.length)return `<span class="subject-tag">—</span>`;return subs.map(x=>`<span class="subject-tag">${esc2(x)}</span>`).join('');}
 function esc(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
 function esc2(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function set(id,html){const e=document.getElementById(id);if(e)e.innerHTML=html;}
