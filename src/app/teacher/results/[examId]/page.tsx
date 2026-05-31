@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { getExam, getAnswersByExam, Exam, StudentAnswer } from '@/lib/examService';
+import { getExam, getAnswersByExam, isAnswerCorrect, Exam, StudentAnswer } from '@/lib/examService';
 import { ArrowLeft, FlaskConical, Users, Trophy, BarChart2, ChevronDown, ChevronUp, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -101,8 +101,8 @@ export default function ResultsPage() {
 
   // 학생별 OX점수 / MC점수 계산
   function getStudentStats(ans: StudentAnswer) {
-    const oxCorrect = oxQs.filter(q => ans.answers?.[q.id] === q.answer).length;
-    const mcCorrect = mcQs.filter(q => ans.answers?.[q.id] === q.answer).length;
+    const oxCorrect = oxQs.filter(q => isAnswerCorrect(ans.answers?.[q.id], q.answer)).length;
+    const mcCorrect = mcQs.filter(q => isAnswerCorrect(ans.answers?.[q.id], q.answer)).length;
     const totalCorrect = oxCorrect + mcCorrect;
     const totalQ = exam!.questions.length;
     const pct = totalQ > 0 ? Math.round((totalCorrect / totalQ) * 100) : 0;
@@ -118,7 +118,7 @@ export default function ResultsPage() {
 
   // 문제별 정답률
   const qStats = exam.questions.map(q => {
-    const correct = filtered.filter(a => a.answers?.[q.id] === q.answer).length;
+    const correct = filtered.filter(a => isAnswerCorrect(a.answers?.[q.id], q.answer)).length;
     const rate = filtered.length > 0 ? Math.round((correct / filtered.length) * 100) : 0;
     return { q, correct, rate };
   });
@@ -288,7 +288,7 @@ export default function ResultsPage() {
                                   <div className="text-xs text-gray-400 mt-0.5">맞은 문제</div>
                                   <div className="mt-3 space-y-1.5">
                                     {oxQs.map((q, qi) => {
-                                      const correct = ans.answers?.[q.id] === q.answer;
+                                      const correct = isAnswerCorrect(ans.answers?.[q.id], q.answer);
                                       return (
                                         <div key={q.id} className="flex items-center gap-2 text-xs">
                                           <span className={`w-5 h-5 rounded-full flex items-center justify-center font-bold shrink-0 ${correct ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'}`}>
@@ -313,7 +313,7 @@ export default function ResultsPage() {
                                   <div className="text-xs text-gray-400 mt-0.5">맞은 문제</div>
                                   <div className="mt-3 space-y-1.5">
                                     {mcQs.map((q, qi) => {
-                                      const correct = ans.answers?.[q.id] === q.answer;
+                                      const correct = isAnswerCorrect(ans.answers?.[q.id], q.answer);
                                       return (
                                         <div key={q.id} className="flex items-center gap-2 text-xs">
                                           <span className={`w-5 h-5 rounded-full flex items-center justify-center font-bold shrink-0 ${correct ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'}`}>
