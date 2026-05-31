@@ -1,11 +1,12 @@
 'use client';
 // src/app/teacher/audit/page.tsx
-// 모든 시험(임시저장 포함)을 검사하여 "채점이 안 되는 4지선다 문제"를 찾아내는 관리자 도구 (읽기 전용)
+// 모든 시험(임시저장 포함)을 검사하여 "정말로 채점이 안 되는 4지선다 문제"만 찾아내는 관리자 도구 (읽기 전용)
+// ※ "선택지3" 처럼 저장돼도 새 채점 로직(isAnswerCorrect)에서 정상 채점되므로 더 이상 오류로 보지 않음
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { getAllPublishedExams, getExamsByTeacher, Exam, Question } from '@/lib/examService';
+import { getAllPublishedExams, getExamsByTeacher, isAnswerCorrect, Exam, Question } from '@/lib/examService';
 import { ArrowLeft, AlertTriangle, CheckCircle, Search, FlaskConical, ChevronDown, ChevronUp } from 'lucide-react';
 
 type Issue = {
@@ -16,24 +17,33 @@ type Issue = {
   suggestion: string;
 };
 
+// ★ 새 채점 기준으로 검사: 정답이 보기 중 하나와 매칭되면 정상
+// "선택지3", "3번", "3", 보기내용("유리") 등은 모두 정상으로 판정됨
 function auditQuestion(q: Question): { broken: boolean; suggestion: string } {
   if (q.type !== 'multiple') return { broken: false, suggestion: '' };
   const opts = q.options ?? [];
   const n = opts.length || 4;
   const a = (q.answer ?? '').trim();
 
-  const num = Number(a);
-  if (a !== '' && Number.isInteger(num) && num >= 1 && num <= n) {
-    return { broken: false, suggestion: '' };
+  // 정답이 비어있으면 채점 불가 → 진짜 오류
+  if (a === '') {
+    return { broken: true, suggestion: '⚠ 정답이 비어 있음 — 직접 입력 필요' };
   }
 
+  // 새 채점 로직 기준으로, 보기 1~n번 중 정답으로 채점되는 번호가 있는지 확인
+  for (let i = 1; i <= n; i++) {
+    if (isAnswerCorrect(String(i), a)) {
+      // 정상 채점됨 (어떤 번호가 정답인지도 확인됨)
+      return { broken: false, suggestion: '' };
+    }
+  }
+
+  // 보기 내용과 똑같이 저장된 경우도 정상으로 인정
   const exact = opts.findIndex(o => (o ?? '').trim() === a);
-  if (exact >= 0) return { broken: true, suggestion: `${exact + 1}번 (${opts[exact]})` };
+  if (exact >= 0) return { broken: false, suggestion: '' };
 
-  const m = a.match(/^선택지\s*([1-9])$/);
-  if (m && Number(m[1]) <= n) return { broken: true, suggestion: `${m[1]}번 (${opts[Number(m[1]) - 1] ?? '?'})` };
-
-  return { broken: true, suggestion: '⚠ 자동 추정 불가 — 직접 확인 필요' };
+  // 위 어디에도 안 걸리면 진짜로 채점 불가능한 정답
+  return { broken: true, suggestion: '⚠ 보기 어디에도 해당하지 않는 정답 — 직접 확인 필요' };
 }
 
 type ExamReport = {
@@ -145,7 +155,7 @@ export default function AuditPage() {
             </div>
             <div>
               <div className="font-semibold text-gray-900 text-sm leading-tight">시험 정답 검사</div>
-              <div className="text-xs" style={{ color: '#db2777' }}>4지선다 채점 오류 자동 점검</div>
+              <div className="text-xs" style={{ color: '#db2777' }}>채점 불가 문제 자동 점검</div>
             </div>
           </div>
           <button onClick={() => router.push('/teacher')}
@@ -161,8 +171,8 @@ export default function AuditPage() {
              style={{ background: 'linear-gradient(135deg,#fff0f7 0%,#fdf2f8 60%,#f0f9ff 100%)' }}>
           <div className="font-bold text-gray-900 text-sm sm:text-base mb-1">4지선다 정답 검사</div>
           <p className="text-xs text-gray-600 leading-relaxed">
-            <b>학생이 정답을 골라도 오답 처리되는 4지선다 문제</b>를 찾아냅니다.
-            (정답이 보기 번호 1~4로 저장되지 않은 경우) 이 검사는 <b>데이터를 변경하지 않습니다.</b>
+            <b>정말로 채점이 불가능한 4지선다 문제</b>만 찾아냅니다.
+            (정답이 비어 있거나, 어떤 보기와도 맞지 않는 경우) &quot;선택지3&quot;처럼 저장된 정답은 <b>정상적으로 채점</b>되므로 더 이상 오류로 표시되지 않습니다. 이 검사는 <b>데이터를 변경하지 않습니다.</b>
           </p>
 
           <div className="mt-4">
@@ -230,7 +240,7 @@ export default function AuditPage() {
                     {reports.length}개 시험에서 {totalIssues}개 문제 발견
                   </div>
                   <div className="text-xs text-gray-600 mt-0.5">
-                    검사한 {totalExams}개 시험{scannedScope === 'all' ? '(임시저장 포함)' : '(게시본)'} 중 문제가 있는 시험입니다. <b>시험을 누르면</b> 어떤 문제인지 펼쳐집니다.
+                    검사한 {totalExams}개 시험{scannedScope === 'all' ? '(임시저장 포함)' : '(게시본)'} 중 <b>채점이 불가능한</b> 문제가 있는 시험입니다. <b>시험을 누르면</b> 어떤 문제인지 펼쳐집니다.
                   </div>
                 </div>
               </div>
@@ -281,25 +291,19 @@ export default function AuditPage() {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-gray-800 font-medium leading-relaxed break-words">{iss.text}</p>
                           <div className="text-xs text-gray-600 mt-1.5 space-y-1">
-                            <div className="break-words">현재 저장된 정답: <span className="font-mono font-bold text-red-600">&quot;{iss.answer}&quot;</span> <span className="text-gray-400">(번호가 아니라 채점 안 됨)</span></div>
-                            <div className="break-words">올바른 정답: <span className="font-bold" style={{ color: '#15803d' }}>{iss.suggestion}</span></div>
+                            <div className="break-words">현재 저장된 정답: <span className="font-mono font-bold text-red-600">&quot;{iss.answer}&quot;</span></div>
+                            <div className="break-words">조치: <span className="font-bold" style={{ color: '#15803d' }}>{iss.suggestion}</span></div>
                             {iss.options.length > 0 && (
                               <div>
                                 <span className="text-gray-400">보기</span>
                                 <div className="flex flex-wrap gap-1.5 mt-1">
-                                  {iss.options.map((o, i) => {
-                                    // 정답으로 추정된 번호의 보기를 초록색으로 강조
-                                    const isAnswer = iss.suggestion.startsWith(`${i + 1}번`);
-                                    return (
-                                      <span key={i}
-                                        className="inline-block px-2 py-0.5 rounded-lg border text-xs break-all"
-                                        style={isAnswer
-                                          ? { background: '#dcfce7', borderColor: '#86efac', color: '#15803d', fontWeight: 600 }
-                                          : { background: '#f9fafb', borderColor: '#e5e7eb', color: '#6b7280' }}>
-                                        <span className="font-bold mr-0.5">{i + 1}.</span>{o || '(미입력)'}
-                                      </span>
-                                    );
-                                  })}
+                                  {iss.options.map((o, i) => (
+                                    <span key={i}
+                                      className="inline-block px-2 py-0.5 rounded-lg border text-xs break-all"
+                                      style={{ background: '#f9fafb', borderColor: '#e5e7eb', color: '#6b7280' }}>
+                                      <span className="font-bold mr-0.5">{i + 1}.</span>{o || '(미입력)'}
+                                    </span>
+                                  ))}
                                 </div>
                               </div>
                             )}
@@ -316,8 +320,7 @@ export default function AuditPage() {
 
         {done && totalIssues > 0 && (
           <p className="text-xs text-center text-gray-400 pb-6 leading-relaxed">
-            각 시험의 &quot;수정하기&quot;를 눌러 STEP 2에서 4지선다를 다시 입력하거나,<br />
-            정답 텍스트를 보기 내용과 똑같이 맞춰 다시 &quot;가져오기&quot; 하면 됩니다.
+            각 시험의 &quot;수정하기&quot;를 눌러 STEP 2에서 4지선다 정답을 다시 확인해 주세요.
           </p>
         )}
       </main>
