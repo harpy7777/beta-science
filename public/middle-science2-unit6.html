@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel='icon' type='image/svg+xml' href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpolygon points='70,8 121,38 121,102 70,132 19,102 19,38' fill='none' stroke='%23E85D75' stroke-width='8' stroke-linejoin='round'/%3E%3Cpolygon points='70,38 97,53 97,87 70,102 43,87 43,53' fill='none' stroke='%23E85D75' stroke-width='4' stroke-linejoin='round' stroke-dasharray='10 6'/%3E%3Ccircle cx='70' cy='8' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='38' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='70' cy='132' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='38' r='10' fill='%23E85D75'/%3E%3C/svg%3E">
+<title>베타과학학원 · 동물과 에너지</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+:root {
+  --ind-dark:    #1e1b4b;
+  --ind-main:    #4338ca;
+  --ind-mid:     #4f46e5;
+  --ind-light:   #6366f1;
+  --ind-bright:  #818cf8;
+  --ind-tint:    #f5f3ff;
+  --ind-tint2:   #ede9fe;
+  --ind-border:  #c4b5fd;
+  --ind-border2: #a78bfa;
+
+  --green:#059669; --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --blue2:#2563eb; --blue-bg:#eff6ff;  --blue-border:#bfdbfe;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626;   --red-bg:#fef2f2;   --red-border:#fecaca;
+  --teal:#0f766e;  --teal-bg:#f0fdfa;  --teal-border:#99f6e4;
+
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#f8f7ff;   --white:#fff;
+  --radius-sm:10px; --radius:14px; --radius-lg:18px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+p{line-height:1.78;font-size:13.5px;margin:.4rem 0}
+
+.header{background:#fff;border-bottom:1px solid #e0e7ff;padding:0 1rem;padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right));height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:500;box-shadow:0 1px 0 #e0e7ff}
+.header-left{display:flex;align-items:center;gap:9px;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--ind-mid) 0%,var(--ind-dark) 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(79,70,229,.32)}
+.brand-name{font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{display:flex;align-items:center;gap:5px;background:var(--ind-tint2);border:1px solid var(--ind-border);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--ind-dark);white-space:nowrap}
+.dot-ind{width:5px;height:5px;background:var(--ind-mid);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{padding:7px 14px;min-height:36px;background:transparent;border:1.5px solid var(--ind-border);border-radius:20px;font-size:12px;font-weight:700;color:var(--ind-dark);cursor:pointer;white-space:nowrap;transition:background .15s}
+.back-btn:hover{background:var(--ind-tint)}
+.back-btn:active{background:var(--ind-tint2)}
+
+.hero{background:linear-gradient(135deg,var(--ind-dark) 0%,var(--ind-main) 55%,var(--ind-mid) 100%);padding:2.8rem 1.5rem 2.2rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero::after{content:'';position:absolute;left:-50px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hero-deco{position:absolute;right:10%;top:15%;width:120px;height:120px;border-radius:50%;border:2px solid rgba(255,255,255,.12);pointer-events:none}
+.hero-deco2{position:absolute;right:18%;top:25%;width:60px;height:60px;border-radius:50%;border:1.5px solid rgba(255,255,255,.1);pointer-events:none}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+.hero-eyebrow{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+.hero-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem}
+.hero-desc{font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.7;max-width:580px;margin:0 auto 1.8rem}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:14px;padding:.9rem 1.4rem;text-align:center;backdrop-filter:blur(6px);min-width:80px;transition:background .2s}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+.tabs-wrap{background:#fff;border-bottom:2px solid var(--ind-border);position:sticky;top:54px;z-index:400}
+.tabs-inner{max-width:1100px;margin:0 auto;padding:0 1.5rem;display:flex;overflow-x:auto;justify-content:center;gap:4px;scrollbar-width:none}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{padding:13px 26px;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;margin-bottom:-2px;border-radius:8px 8px 0 0}
+.tab-btn:hover{color:var(--ind-mid);background:var(--ind-tint)}
+.tab-btn.active{color:var(--ind-mid);border-bottom-color:var(--ind-mid)}
+
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}
+.unit-section.visible{display:block}
+
+.unit-banner{border-radius:var(--radius-lg);padding:1.4rem 1.8rem;margin-bottom:1.8rem;display:flex;align-items:center;gap:1.2rem;background:linear-gradient(135deg,var(--ind-tint),var(--ind-tint2));border:2px solid var(--ind-border)}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ind-mid);margin-bottom:4px}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius-lg);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.acc-item.open{border-color:var(--ind-border);box-shadow:0 4px 20px rgba(79,70,229,.1)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:1.2rem 1.5rem;cursor:pointer;user-select:none;transition:background .15s}
+.acc-header:hover{background:var(--ind-tint)}
+.acc-num{width:32px;height:32px;border-radius:10px;background:var(--ind-tint2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--ind-dark);flex-shrink:0;transition:background .2s}
+.acc-item.open .acc-num{background:var(--ind-mid);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--ind-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-item.open .acc-subtitle{color:var(--ind-mid)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--ind-mid)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--ind-tint2)}
+.acc-item.open .acc-body{display:block}
+
+.sec-title{font-size:12px;font-weight:800;color:var(--ind-dark);letter-spacing:.06em;text-transform:uppercase;margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--ind-mid);border-radius:2px;display:block;flex-shrink:0}
+
+.concept-box{background:var(--ind-tint);border:1.5px solid var(--ind-border);border-left:4px solid var(--ind-mid);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.concept-box .cb-title{font-weight:800;color:var(--ind-dark);font-size:14px;margin-bottom:.4rem}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--green);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+.amber-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-left:4px solid var(--amber);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+.blue-box{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-left:4px solid var(--blue2);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.blue-box .cb-title{font-weight:800;color:#1e40af;font-size:14px;margin-bottom:.4rem}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+.teal-box{background:var(--teal-bg);border:1.5px solid var(--teal-border);border-left:4px solid var(--teal);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.teal-box .cb-title{font-weight:800;color:var(--teal);font-size:14px;margin-bottom:.4rem}
+
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:var(--radius);border:1.5px solid var(--ind-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--ind-tint2);padding:10px 14px;text-align:left;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ind-dark)}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6;vertical-align:top}
+tbody tr:hover td{background:var(--ind-tint)}
+
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0}
+.flow-box{background:#fff;border:1.5px solid var(--ind-border);border-radius:8px;padding:7px 12px;font-weight:700;color:var(--ind-dark);text-align:center;font-size:12px;line-height:1.4}
+.flow-arrow{color:var(--ind-mid);font-size:18px;font-weight:900}
+
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:.8rem 0}
+.point-card{background:#fff;border:1.5px solid var(--ind-border);border-radius:var(--radius);padding:1rem;text-align:center;transition:border-color .2s,box-shadow .2s}
+.point-card:hover{border-color:var(--ind-mid);box-shadow:0 4px 12px rgba(79,70,229,.12)}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--ind-mid);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+.hp{color:var(--ind-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--blue2);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.ht{color:var(--teal);font-weight:800}
+
+.formula-box{background:linear-gradient(135deg,var(--ind-tint),var(--ind-tint2));border:2px solid var(--ind-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--ind-dark);letter-spacing:-.01em;font-style:italic}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+.steps{display:flex;flex-direction:column;gap:8px;margin:.8rem 0}
+.step-item{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius);padding:.9rem 1.1rem;transition:border-color .2s}
+.step-item:hover{border-color:var(--ind-border)}
+.step-num{width:28px;height:28px;border-radius:8px;background:var(--ind-mid);color:#fff;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px}
+.step-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+.quiz-wrap{background:linear-gradient(135deg,var(--ind-tint2),var(--ind-tint));border:1.5px solid var(--ind-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin-top:1.6rem}
+.quiz-label{font-size:11px;font-weight:800;color:var(--ind-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{background:var(--ind-mid);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.quiz-toggle:hover{background:var(--ind-dark)}
+.quiz-ans{display:none;margin-top:.8rem;padding:.9rem 1rem;background:rgba(255,255,255,.85);border-radius:10px;font-size:13.5px;color:var(--text);line-height:1.75;border:1px solid var(--ind-border)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:.6rem 0}
+.chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:var(--ind-tint2);color:var(--ind-dark);border:1px solid var(--ind-border)}
+.chip-g{background:var(--green-bg);color:#065f46;border-color:var(--green-border)}
+.chip-r{background:var(--red-bg);color:#991b1b;border-color:var(--red-border)}
+.chip-a{background:var(--amber-bg);color:#92400e;border-color:var(--amber-border)}
+.chip-b{background:var(--blue-bg);color:#1e40af;border-color:var(--blue-border)}
+.chip-t{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-border)}
+
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.45rem}
+  .hero-desc{font-size:13px}
+  .hero-eyebrow{font-size:10px;padding:4px 11px}
+  .hero-stats{gap:7px}
+  .hero-stat-card{min-width:68px;padding:.75rem .9rem}
+  .hs-num{font-size:1.45rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{justify-content:flex-start;gap:0;padding:0 .5rem}
+  .tab-btn{padding:11px 13px;font-size:11.5px;border-radius:6px 6px 0 0}
+  .content-wrap{padding:1.2rem .85rem 4rem}
+  .unit-banner{flex-direction:column;gap:.75rem;padding:1.1rem}
+  .ub-emoji{font-size:2.1rem}
+  .ub-title{font-size:1.1rem}
+  .acc-header{padding:.95rem 1rem;gap:10px}
+  .acc-num{width:30px;height:30px;font-size:12px;border-radius:8px}
+  .acc-htitle{font-size:14px}
+  .acc-hdesc{font-size:11.5px}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .steps{gap:7px}
+  .step-item{padding:.8rem .95rem}
+  table{font-size:12px}
+  thead th{font-size:10px;padding:8px 10px}
+  tbody td{padding:8px 10px}
+  .concept-box,.green-box,.amber-box,.blue-box,.red-box,.teal-box{padding:.85rem 1rem;font-size:13px}
+  .formula-box{padding:1rem 1.1rem}
+  .formula-text{font-size:1.15rem}
+  .quiz-wrap{padding:1rem 1.1rem}
+  .quiz-q{font-size:13px}
+}
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .hero-deco,.hero-deco2{display:none}
+  .hero{padding:1.7rem .9rem 1.5rem}
+  .hero-title{font-size:1.28rem;letter-spacing:-.025em}
+  .hero-desc{font-size:12.5px;margin-bottom:1.4rem}
+  .breadcrumb{gap:4px;margin-bottom:.9rem}
+  .bc-item,.bc-current,.bc-sep{font-size:11px}
+  .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;max-width:280px;margin:0 auto}
+  .hero-stat-card{min-width:0;padding:.7rem .5rem}
+  .hs-num{font-size:1.3rem}
+  .tabs-inner{padding:0 .3rem}
+  .tab-btn{padding:10px 11px;font-size:11px;white-space:nowrap}
+  .ub-title{font-size:1rem}
+  .ub-desc{font-size:12px}
+  .acc-header{padding:.85rem .9rem;gap:8px}
+  .acc-htitle{font-size:13.5px}
+  .acc-hdesc{font-size:11px}
+  .acc-body{padding:0 .9rem 1.2rem}
+  .sec-title{font-size:11px}
+  .point-box{grid-template-columns:1fr}
+  .pc-icon{font-size:1.5rem}
+  .pc-title{font-size:12px}
+  .pc-desc{font-size:11.5px}
+  .step-num{width:26px;height:26px;font-size:12px;border-radius:7px;flex-shrink:0}
+  .step-title{font-size:12.5px}
+  .step-desc{font-size:12px}
+  .formula-text{font-size:1rem}
+  .formula-sub{font-size:11px}
+  .table-wrap{-webkit-overflow-scrolling:touch}
+  .quiz-q{font-size:12.5px}
+  .quiz-toggle{font-size:11.5px;padding:6px 15px}
+  .quiz-ans{font-size:13px}
+  .chip,.chip-g,.chip-r,.chip-a,.chip-b,.chip-t{font-size:10.5px;padding:3px 10px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-ind"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="science2-summary.html" class="bc-item">중학 과학 2</a><span class="bc-sep">›</span>
+      <span class="bc-current">🫀 Ⅵ. 동물과 에너지</span>
+    </div>
+    <div class="hero-eyebrow">🫀 PART 06 · 중학 과학 2 · UNIT 06</div>
+    <div class="hero-title">Ⅵ. 동물과 에너지</div>
+    <div class="hero-desc">영양소와 소화계·순환계의 구조와 기능,<br>호흡계·배설계의 구조와 기능, 기관계의 통합적 작용(세포호흡)까지 완벽 정리</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">2</div><div class="hs-lbl">중단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">5</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">12+</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">🍽️ 중단원1 · 소화와 순환</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">💨 중단원2 · 호흡과 배설</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ═══════════════════════════════
+     중단원 1: 소화와 순환
+═══════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner">
+    <div class="ub-emoji">🍽️</div>
+    <div>
+      <div class="ub-num">중단원 01 · Digestion & Circulation</div>
+      <div class="ub-title">소화와 순환</div>
+      <div class="ub-desc">6가지 영양소의 종류와 기능, 소화계의 구조와 소화효소의 작용, 순환계(심장·혈관·혈액)의 구조와 기능을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 영양소 -->
+    <div class="acc-item" id="acc-nutrient">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Nutrients · 영양소</div>
+          <div class="acc-htitle">영양소</div>
+          <div class="acc-hdesc">3대 영양소 · 부영양소(바이타민·무기염류·물) · 영양소 검출 반응</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">영양소란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🍱 영양소</div>
+          음식물 속에 들어 있는, 몸을 구성하거나 생명활동에 이용되는 물질.<br><br>
+          종류: <span class="hp">탄수화물, 단백질, 지방, 바이타민, 무기염류, 물</span> (한 가지라도 부족하면 건강한 생활 곤란)<br>
+          💡 에너지원으로 이용되는 <span class="hp">탄수화물·단백질·지방</span>을 <strong>3대 영양소</strong>라고 한다.
+        </div>
+
+        <div class="sec-title">영양소의 종류와 기능</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>영양소</th><th>기능</th><th>많은 음식물</th></tr></thead>
+          <tbody>
+            <tr><td><span class="ha">탄수화물</span></td><td>주로 에너지원 (포도당·엿당·설탕·녹말)</td><td>밥, 국수, 빵, 감자</td></tr>
+            <tr><td><span class="hr">단백질</span></td><td>몸 구성, 생명활동 조절, 에너지원</td><td>살코기, 생선, 달걀, 콩</td></tr>
+            <tr><td><span class="hb">지방</span></td><td>몸 구성, 에너지원, 체온 유지</td><td>땅콩, 깨, 버터, 참기름</td></tr>
+            <tr><td><span class="hg">바이타민</span></td><td>적은 양으로 생명활동 조절</td><td>과일, 채소</td></tr>
+            <tr><td><span class="ht">무기염류</span></td><td>몸 구성(뼈·이), 생명활동 조절</td><td>멸치, 다시마, 우유, 치즈</td></tr>
+            <tr><td><span class="hp">물</span></td><td>몸의 구성 성분 중 가장 많음, 물질 운반·체온 조절</td><td>—</td></tr>
+          </tbody>
+        </table></div>
+        <div class="amber-box">
+          <div class="cb-title">📌 참고</div>
+          • 바이타민·무기염류는 대부분 체내에서 합성할 수 없어 <strong>음식물로 섭취</strong>해야 한다.<br>
+          • 무기염류 종류: 칼슘, 칼륨, 나트륨, 철, 마그네슘 등<br>
+          • 바이타민·무기염류·물은 에너지원으로 쓰이지 <strong>않는다</strong>.
+        </div>
+
+        <div class="sec-title">영양소 검출 반응</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>검출 영양소</th><th>사용 용액</th><th>색깔 변화</th></tr></thead>
+          <tbody>
+            <tr><td>포도당(당분)</td><td>베네딕트 용액 (가열)</td><td>황적색</td></tr>
+            <tr><td>녹말</td><td>아이오딘–아이오딘화 칼륨 용액</td><td>청람색</td></tr>
+            <tr><td>단백질</td><td>뷰렛 용액</td><td>보라색</td></tr>
+            <tr><td>지방</td><td>수단 Ⅲ 용액</td><td>선홍색</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">어떤 음식물에 뷰렛 용액을 떨어뜨렸더니 보라색으로 변했다. 이 음식물에 들어 있는 영양소는 무엇이며, 이 영양소의 주요 기능 2가지를 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            영양소: <strong>단백질</strong> (뷰렛 용액 + 단백질 → 보라색)<br><br>
+            기능: ① 몸을 구성하고 생명활동을 조절한다 ② 에너지원으로 이용된다
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 소화계 -->
+    <div class="acc-item" id="acc-digestion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Digestive System · 소화계</div>
+          <div class="acc-htitle">소화계의 구조와 기능</div>
+          <div class="acc-hdesc">소화·소화효소 · 입·위·작은창자 소화 · 융털 흡수</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">소화와 소화계</div>
+        <div class="concept-box">
+          <div class="cb-title">🧫 소화 (Digestion)</div>
+          크기가 큰 영양소를 <span class="hp">크기가 작은 영양소로 분해</span>하여 몸속으로 흡수될 수 있게 하는 과정.<br><br>
+          소화계 = 소화관(<strong>입 → 식도 → 위 → 작은창자 → 큰창자 → 항문</strong>) + 소화샘(침샘·간·쓸개·이자)<br>
+          💡 <span class="hp">소화효소</span>: 영양소 분해를 촉진하는 물질. 각 소화효소는 <strong>특정 영양소에만</strong> 작용한다.
+        </div>
+
+        <div class="sec-title">기관별 소화 작용</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>기관</th><th>소화액 / 소화효소</th><th>작용</th></tr></thead>
+          <tbody>
+            <tr><td>입</td><td>침 (아밀레이스)</td><td>녹말 → 엿당</td></tr>
+            <tr><td>위</td><td>위액 (펩신 + 염산)</td><td>단백질 분해 시작 (염산: 펩신 작용 도움·살균)</td></tr>
+            <tr><td rowspan="3">작은창자</td><td>이자액 (아밀레이스)</td><td>녹말 → 엿당</td></tr>
+            <tr><td>이자액 (트립신)</td><td>단백질 분해</td></tr>
+            <tr><td>이자액 (라이페이스)</td><td>지방 분해</td></tr>
+            <tr><td>(작은창자)</td><td>쓸개즙 (소화효소 X)</td><td>간에서 생성·쓸개 저장, 지방 소화를 도움</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">최종 소화 산물 & 흡수</div>
+        <div class="flow" style="justify-content:center;flex-wrap:wrap">
+          <div class="flow-box" style="background:var(--amber-bg);border-color:var(--amber)">녹말<br>→ 포도당</div>
+          <div class="flow-box" style="background:var(--red-bg);border-color:var(--red)">단백질<br>→ 아미노산</div>
+          <div class="flow-box" style="background:var(--blue-bg);border-color:var(--blue2)">지방<br>→ 지방산 + 모노글리세라이드</div>
+        </div>
+        <div class="green-box">
+          <div class="cb-title">🌿 융털에서의 흡수</div>
+          작은창자 안쪽 벽에는 주름과 <span class="hg">융털</span>이 빽빽하게 있어 표면적이 매우 넓어 영양소를 효율적으로 흡수한다.<br>
+          • 수용성 영양소(포도당·아미노산 등) → 융털의 <strong>모세혈관</strong>으로 흡수<br>
+          • 지용성 영양소(지방산·모노글리세라이드) → 융털의 <strong>암죽관</strong>으로 흡수<br><br>
+          💡 큰창자에서는 소화가 거의 일어나지 않고 주로 <strong>물</strong>이 흡수된다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">작은창자 안쪽 벽에 주름과 융털이 발달해 있는 것이 소화·흡수에 어떤 점에서 유리한지 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            주름과 융털 때문에 영양소와 닿는 <strong>표면적이 매우 넓어져</strong>, 영양소를 더 효율적으로(빠르게 많이) 흡수할 수 있다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">녹말, 단백질, 지방이 최종적으로 분해되어 만들어지는 영양소를 각각 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • 녹말 → <strong>포도당</strong><br>
+            • 단백질 → <strong>아미노산</strong><br>
+            • 지방 → <strong>지방산 + 모노글리세라이드</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 03: 순환계 -->
+    <div class="acc-item" id="acc-circulation">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Circulatory System · 순환계</div>
+          <div class="acc-htitle">순환계의 구조와 기능</div>
+          <div class="acc-hdesc">심장(심방·심실·판막) · 혈관(동맥·모세혈관·정맥) · 혈액 성분 · 혈액 순환</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">심장의 구조</div>
+        <div class="concept-box">
+          <div class="cb-title">🫀 심장</div>
+          끊임없이 수축·이완(박동)하며 혈액을 순환시키는 기관. 2개의 <span class="hp">심방</span>과 2개의 <span class="hp">심실</span>로 구성.<br><br>
+          • 심방: 혈액을 <strong>받아들이는</strong> 곳 → 정맥과 연결<br>
+          • 심실: 혈액을 <strong>내보내는</strong> 곳 → 동맥과 연결 (심방보다 두껍고 강한 근육)<br>
+          • <span class="hp">판막</span>: 심방↔심실, 심실↔동맥 사이에 있어 혈액의 <strong>역류를 방지</strong>
+        </div>
+
+        <div class="sec-title">혈관의 종류</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>혈관</th><th>특징</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hr">동맥</span></td><td>심장에서 나가는 혈액이 흐름. 혈관벽이 두껍고 탄력이 강함</td></tr>
+            <tr><td><span class="ht">모세혈관</span></td><td>동맥과 정맥을 잇는 가느다란 혈관. 온몸에 그물처럼 분포, 물질 교환</td></tr>
+            <tr><td><span class="hb">정맥</span></td><td>심장으로 들어가는 혈액이 흐름. 혈관벽이 얇고 탄력 약함, 판막 있음(역류 방지)</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">혈액의 성분</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">💧</div>
+            <div class="pc-title">혈장 (액체)</div>
+            <div class="pc-desc">대부분 물. 영양소·노폐물 등 여러 물질을 운반</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🔴</div>
+            <div class="pc-title">적혈구</div>
+            <div class="pc-desc">헤모글로빈이 있어 산소 운반</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">⚪</div>
+            <div class="pc-title">백혈구</div>
+            <div class="pc-desc">몸에 침입한 세균 등을 잡아먹는 방어(보호) 작용</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🩹</div>
+            <div class="pc-title">혈소판</div>
+            <div class="pc-desc">상처가 났을 때 혈액을 굳게 하는 혈액 응고 작용</div>
+          </div>
+        </div>
+
+        <div class="sec-title">혈액 순환 경로</div>
+        <div class="blue-box">
+          <div class="cb-title">🔄 온몸 순환 vs 폐(허파) 순환</div>
+          • <span class="hr">온몸 순환</span>: 좌심실 → 대동맥 → 온몸 모세혈관 → 대정맥 → 우심방<br>
+          &nbsp;&nbsp;(조직세포에 산소·영양소 공급, 이산화 탄소·노폐물 받음)<br><br>
+          • <span class="hb">폐 순환</span>: 우심실 → 폐동맥 → 허파 모세혈관 → 폐정맥 → 좌심방<br>
+          &nbsp;&nbsp;(허파에서 이산화 탄소를 내보내고 산소를 받음)
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">심실과 심방 사이, 심실과 동맥 사이에 판막이 있는 까닭을 설명하고, 혈구 중 산소를 운반하는 것은 무엇인지 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • 판막의 역할: 혈액이 <strong>거꾸로 흐르는 것(역류)을 막기</strong> 위해. 그래서 혈액은 심방→심실, 심실→동맥 방향으로만 흐른다.<br><br>
+            • 산소 운반: <strong>적혈구</strong> (헤모글로빈)
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">온몸 순환과 폐 순환의 경로를 각각 심장의 어느 부분에서 출발해 어디로 돌아오는지 순서대로 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안:</strong><br><br>
+            • 온몸 순환: <strong>좌심실 → 대동맥 → 온몸 모세혈관 → 대정맥 → 우심방</strong><br><br>
+            • 폐 순환: <strong>우심실 → 폐동맥 → 허파 모세혈관 → 폐정맥 → 좌심방</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ═══════════════════════════════
+     중단원 2: 호흡과 배설
+═══════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner">
+    <div class="ub-emoji">💨</div>
+    <div>
+      <div class="ub-num">중단원 02 · Respiration & Excretion</div>
+      <div class="ub-title">호흡과 배설</div>
+      <div class="ub-desc">호흡계의 구조와 호흡운동의 원리·기체 교환, 배설계의 구조와 오줌 생성 과정, 기관계의 통합적 작용(세포호흡)을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 호흡계 -->
+    <div class="acc-item" id="acc-respiration">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Respiratory System · 호흡계</div>
+          <div class="acc-htitle">호흡계의 구조와 기능</div>
+          <div class="acc-hdesc">코·숨관·허파·허파꽈리 · 호흡운동(들숨·날숨) · 기체 교환</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">호흡계의 구조</div>
+        <div class="concept-box">
+          <div class="cb-title">🫁 호흡계</div>
+          산소를 받아들이고 이산화 탄소를 내보내는 기관계. <span class="hp">코 → 숨관 → 숨관가지 → 허파</span>로 이루어짐.<br><br>
+          허파는 무수히 많은 <span class="hp">허파꽈리</span>로 이루어져 있어 표면적이 넓다. 허파꽈리는 <strong>모세혈관</strong>으로 둘러싸여 기체 교환이 효율적으로 일어난다.<br>
+          💡 허파는 근육이 없어 <strong>스스로 움직이지 못한다</strong>. (갈비뼈·가로막의 운동으로 호흡)
+        </div>
+
+        <div class="sec-title">호흡운동의 원리 (들숨·날숨)</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>갈비뼈</th><th>가로막</th><th>흉강 부피</th><th>흉강 압력</th><th>공기 이동</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hg">들숨</span></td><td>올라감</td><td>내려감</td><td>커짐</td><td>낮아짐</td><td>몸 밖 → 허파</td></tr>
+            <tr><td><span class="ha">날숨</span></td><td>내려감</td><td>올라감</td><td>작아짐</td><td>높아짐</td><td>허파 → 몸 밖</td></tr>
+          </tbody>
+        </table></div>
+        <div class="amber-box">
+          <div class="cb-title">📌 원리 핵심</div>
+          공기는 <span class="ha">압력이 높은 곳 → 낮은 곳</span>으로 이동한다. 흉강의 부피가 커지면 압력이 낮아져 공기가 들어오고(들숨), 부피가 작아지면 압력이 높아져 공기가 나간다(날숨).
+        </div>
+
+        <div class="sec-title">기체 교환 (확산)</div>
+        <div class="blue-box">
+          <div class="cb-title">🔄 두 곳에서의 기체 교환</div>
+          • <span class="hb">허파꽈리 ↔ 모세혈관</span>: 산소는 허파꽈리 → 모세혈관, 이산화 탄소는 모세혈관 → 허파꽈리<br><br>
+          • <span class="hr">모세혈관 ↔ 조직세포</span>: 산소는 모세혈관 → 조직세포, 이산화 탄소는 조직세포 → 모세혈관<br><br>
+          💡 기체 교환은 농도 차이에 따른 <strong>확산</strong>으로 일어난다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">숨을 들이쉴 때(들숨) 갈비뼈와 가로막은 각각 어떻게 움직이며, 그 결과 흉강의 부피와 압력은 어떻게 변하는지 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            들숨: 갈비뼈가 <strong>올라가고</strong> 가로막이 <strong>내려가면서</strong> 흉강의 부피가 <strong>커진다</strong>. 부피가 커지면 압력이 <strong>낮아져</strong> 바깥 공기가 허파로 들어온다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">허파꽈리에서 산소와 이산화 탄소가 각각 어느 방향으로 이동하는지 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • 산소: 허파꽈리 → 모세혈관(혈액)으로 이동<br>
+            • 이산화 탄소: 모세혈관(혈액) → 허파꽈리로 이동<br><br>
+            (농도 차이에 따른 확산으로 일어난다)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 배설계 -->
+    <div class="acc-item" id="acc-excretion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Excretory System · 배설계</div>
+          <div class="acc-htitle">배설계의 구조와 기능</div>
+          <div class="acc-hdesc">노폐물·배설 경로 · 콩팥·콩팥단위 · 여과·재흡수·분비</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">노폐물과 배설</div>
+        <div class="concept-box">
+          <div class="cb-title">🚽 배설</div>
+          세포호흡 결과 생긴 노폐물을 몸 밖으로 내보내는 과정.<br><br>
+          노폐물의 생성·배설:<br>
+          • 이산화 탄소 → <strong>날숨</strong>(호흡계)으로 배출<br>
+          • 물 → 날숨·오줌·땀으로 배출<br>
+          • 암모니아 → 간에서 독성이 약한 <strong>요소</strong>로 바뀐 뒤 콩팥에서 오줌으로 배출
+        </div>
+
+        <div class="sec-title">배설계의 구조</div>
+        <div class="concept-box">
+          <div class="cb-title">🫘 콩팥과 콩팥단위(네프론)</div>
+          배설계: <span class="hp">콩팥 → 오줌관 → 방광 → 요도</span><br><br>
+          콩팥에서 오줌을 만드는 기본 단위 = <span class="hp">콩팥단위(네프론)</span> = 토리 + 보먼주머니 + 세뇨관
+        </div>
+
+        <div class="sec-title">오줌 생성 과정</div>
+        <div class="steps">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">여과 (토리 → 보먼주머니)</div>
+              <div class="step-desc">크기가 작은 물질(포도당·아미노산·무기염류·요소·물)이 보먼주머니로 빠져나감. 혈구·단백질 등 큰 물질은 여과되지 않고 혈액에 남음</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">재흡수 (세뇨관 → 모세혈관)</div>
+              <div class="step-desc">몸에 필요한 포도당·아미노산은 전부, 대부분의 물·무기염류가 모세혈관으로 재흡수됨</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">분비 (모세혈관 → 세뇨관)</div>
+              <div class="step-desc">여과되지 않고 혈액에 남아 있던 노폐물이 모세혈관에서 세뇨관으로 이동. 남은 액체는 오줌이 되어 콩팥깔때기에 모임</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">건강한 사람의 경우, 여과된 액체에는 들어 있지만 정상 오줌에는 거의 없는 물질을 한 가지 쓰고, 그 까닭을 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            물질: <strong>포도당</strong>(또는 아미노산)<br><br>
+            까닭: 포도당은 몸에 필요한 영양소이므로 세뇨관을 지나는 동안 <strong>모두 모세혈관으로 재흡수</strong>되어 정상 오줌에는 거의 들어 있지 않다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">단백질과 혈구가 정상적으로는 오줌에서 검출되지 않는 까닭을 여과 과정과 관련지어 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            단백질과 혈구는 <strong>크기가 커서 토리에서 보먼주머니로 여과되지 않고</strong> 혈액에 그대로 남는다. 따라서 정상적인 오줌에서는 검출되지 않는다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 03: 기관계의 통합적 작용 -->
+    <div class="acc-item" id="acc-integration">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Integration · 기관계의 통합</div>
+          <div class="acc-htitle">기관계의 통합적 작용 — 세포호흡</div>
+          <div class="acc-hdesc">세포호흡 · 소화계·순환계·호흡계·배설계의 협력</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">세포호흡이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">⚡ 세포호흡</div>
+          조직세포에서 <span class="hp">영양소(포도당)를 산소로 분해하여 생명활동에 필요한 에너지를 얻는 과정</span>. 이 과정에서 이산화 탄소와 물이 생성된다.
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">포도당 + 산소 &nbsp;→&nbsp; 이산화 탄소 + 물 + 에너지</div>
+          <div class="formula-sub">조직세포에서 일어나는 세포호흡</div>
+        </div>
+
+        <div class="sec-title">4가지 기관계의 통합적 작용</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>기관계</th><th>세포호흡에서의 역할</th></tr></thead>
+          <tbody>
+            <tr><td><span class="ha">소화계</span></td><td>음식물을 소화·흡수하여 <strong>영양소(포도당)</strong> 공급</td></tr>
+            <tr><td><span class="hb">호흡계</span></td><td>산소를 흡수하고 이산화 탄소를 배출</td></tr>
+            <tr><td><span class="hr">순환계</span></td><td>영양소와 산소를 조직세포로 운반, 노폐물·이산화 탄소를 운반</td></tr>
+            <tr><td><span class="ht">배설계</span></td><td>세포호흡으로 생긴 <strong>노폐물(요소 등)</strong>을 몸 밖으로 내보냄</td></tr>
+          </tbody>
+        </table></div>
+        <div class="teal-box">
+          <div class="cb-title">🤝 통합적 작용</div>
+          소화계·호흡계가 받아들인 영양소와 산소를 <span class="ht">순환계</span>가 온몸의 조직세포로 운반하면, 세포호흡으로 에너지가 만들어진다. 이때 생긴 노폐물은 다시 순환계를 통해 호흡계·배설계로 운반되어 몸 밖으로 배출된다. 이처럼 각 기관계는 <strong>서로 밀접하게 연결되어 통합적으로 작용</strong>한다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">세포호흡에 필요한 영양소와 산소를 공급하는 기관계는 각각 무엇이며, 세포호흡으로 생긴 노폐물을 내보내는 기관계 2가지는 무엇인지 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • 영양소 공급: <strong>소화계</strong> / 산소 공급: <strong>호흡계</strong><br>
+            • 노폐물 배출: <strong>호흡계</strong>(이산화 탄소 등)와 <strong>배설계</strong>(요소 등)<br><br>
+            💡 이 모든 물질의 운반은 <strong>순환계</strong>가 담당한다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  document.querySelectorAll('.unit-section').forEach(el => el.classList.remove('visible'));
+  document.getElementById('unit' + n).classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => item.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+const hashMap = {
+  '#unit1':1,'#acc-nutrient':1,'#acc-digestion':1,'#acc-circulation':1,
+  '#unit2':2,'#acc-respiration':2,'#acc-excretion':2,'#acc-integration':2
+};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n-1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
