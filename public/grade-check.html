@@ -238,6 +238,12 @@ body {
 .week-tabs::-webkit-scrollbar { display: none; }
 .wtab { padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 500; font-family: inherit; border: 1px solid #fce7f3; background: #fff; color: #6e6e73; cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; min-height: 36px; }
 .wtab.on { background: #db2777; color: #fff; border-color: #db2777; }
+/* 학년 선택 버튼 (추가) */
+.grade-tabs { display: flex; gap: 6px; margin-bottom: 1rem; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; scrollbar-width: none; }
+.grade-tabs::-webkit-scrollbar { display: none; }
+.gtab { padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 500; font-family: inherit; border: 1.5px solid #fce7f3; background: #fff; color: #6e6e73; cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; min-height: 36px; }
+.gtab:hover { border-color: #fbcfe8; }
+.gtab.on { background: #db2777; color: #fff; border-color: #db2777; font-weight: 700; }
 .exam-selector { display: flex; gap: 6px; margin-bottom: 1rem; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; scrollbar-width: none; }
 .exam-selector::-webkit-scrollbar { display: none; }
 .exam-sel-btn { padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; font-family: inherit; border: 1.5px solid #fce7f3; background: #fff; color: #6e6e73; cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; min-height: 36px; }
@@ -635,6 +641,15 @@ body {
           <div class="list-meta" id="stu-count">불러오는 중...</div>
         </div>
       </div>
+      <div class="grade-tabs" id="gc-grade-tabs">
+        <button class="gtab on" onclick="gcSelectGrade('',this)">전체</button>
+        <button class="gtab" onclick="gcSelectGrade('중등1학년',this)">중1</button>
+        <button class="gtab" onclick="gcSelectGrade('중등2학년',this)">중2</button>
+        <button class="gtab" onclick="gcSelectGrade('중등3학년',this)">중3</button>
+        <button class="gtab" onclick="gcSelectGrade('고등1학년',this)">고1</button>
+        <button class="gtab" onclick="gcSelectGrade('고등2학년',this)">고2</button>
+        <button class="gtab" onclick="gcSelectGrade('고등3학년',this)">고3</button>
+      </div>
       <div class="table-scroll-wrap">
         <div class="stu-table">
           <div class="stu-thead">
@@ -674,10 +689,11 @@ body {
         <div class="chart-body" id="d-chart"></div>
       </div>
       <div class="week-tabs">
-        <button class="wtab on" onclick="pickWeek(0,this)">1주차</button>
-        <button class="wtab" onclick="pickWeek(1,this)">2주차</button>
-        <button class="wtab" onclick="pickWeek(2,this)">3주차</button>
-        <button class="wtab" onclick="pickWeek(3,this)">4주차</button>
+        <button class="wtab on" data-week="-1" onclick="pickWeek(-1,this)">전체</button>
+        <button class="wtab" data-week="0" onclick="pickWeek(0,this)">1주차</button>
+        <button class="wtab" data-week="1" onclick="pickWeek(1,this)">2주차</button>
+        <button class="wtab" data-week="2" onclick="pickWeek(2,this)">3주차</button>
+        <button class="wtab" data-week="3" onclick="pickWeek(3,this)">4주차</button>
       </div>
       <div style="margin-bottom:0.5rem;font-size:12px;font-weight:600;color:#6e6e73;">응시 시험 선택</div>
       <div class="exam-selector" id="exam-selector"></div>
@@ -714,12 +730,16 @@ body {
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;width:100%;">
           <input style="flex:1;min-width:120px;padding:10px 12px;border:1.5px solid #fce7f3;border-radius:10px;font-size:16px;font-family:inherit;color:#1d1d1f;outline:none;-webkit-appearance:none;" type="text" id="rp-search" placeholder="이름 검색..." oninput="rpFilterCards()">
-          <select style="padding:10px 12px;border:1.5px solid #fce7f3;border-radius:10px;font-size:16px;font-family:inherit;color:#1d1d1f;background:#fff;outline:none;-webkit-appearance:none;appearance:none;min-width:90px;" id="rp-grade-filter" onchange="rpFilterCards()">
-            <option value="">전체 학년</option>
-            <option value="중등1학년">중1</option><option value="중등2학년">중2</option><option value="중등3학년">중3</option>
-            <option value="고등1학년">고1</option><option value="고등2학년">고2</option><option value="고등3학년">고3</option>
-          </select>
         </div>
+      </div>
+      <div class="grade-tabs" id="rp-grade-tabs">
+        <button class="gtab on" onclick="rpSelectGrade('',this)">전체</button>
+        <button class="gtab" onclick="rpSelectGrade('중등1학년',this)">중1</button>
+        <button class="gtab" onclick="rpSelectGrade('중등2학년',this)">중2</button>
+        <button class="gtab" onclick="rpSelectGrade('중등3학년',this)">중3</button>
+        <button class="gtab" onclick="rpSelectGrade('고등1학년',this)">고1</button>
+        <button class="gtab" onclick="rpSelectGrade('고등2학년',this)">고2</button>
+        <button class="gtab" onclick="rpSelectGrade('고등3학년',this)">고3</button>
       </div>
       <div class="stu-cards" id="rp-stu-cards"><div class="empty-box">학생 데이터를 불러오는 중입니다...</div></div>
     </div>
@@ -893,9 +913,9 @@ const GRADE_CLASS = {'중등1학년':'g-m1','중등2학년':'g-m2','중등3학�
 const DAY_KO = ['일','월','화','수','목','금','토'];
 
 let students = [], feedbacks = {};
-let gcRecs={}, gcCur=null, gcCurWeek=0, gcCurExamKey=null;
+let gcRecs={}, gcCur=null, gcCurWeek=0, gcCurExamKey=null, gcGradeSel='';
 let masterTests=[], selTest=null, selStudent=null, studentAnswers={};
-let rpAllRecs={}, rpCurStu=null, rpCurPeriod='all', rpCurExam='all';
+let rpAllRecs={}, rpCurStu=null, rpCurPeriod='all', rpCurExam='all', rpGradeSel='';
 let radarInst=null, trendInst=null;
 let curPanel = null;
 
@@ -993,7 +1013,7 @@ function gcRenderList() {
     const bg=GRADE_BG[grade]||'#f5f5f7', col=GRADE_COL[grade]||'#6e6e73';
     const short=GRADE_SHORT[grade]||grade, cls=GRADE_CLASS[grade]||'';
     const sid=s.id||s.uid;
-    return `<div class="stu-row">
+    return `<div class="stu-row" data-grade="${grade}">
       <div><div class="stu-name-wrap" onclick="window.gcOpenStu('${esc(sid)}','${esc(name)}','${grade}','${s.uid}')">
         <div class="stu-av" style="background:${bg};color:${col};">${short}</div><span class="stu-name">${name}</span>
       </div></div>
@@ -1007,6 +1027,25 @@ function gcRenderList() {
       <div id="c-avg-wrap-${s.uid}"><span class="score-pill p-na">—</span></div>
     </div>`;
   }).join('');
+  gcApplyGradeFilter();
+}
+
+// 성적 현황 학년 필터 (추가)
+window.gcSelectGrade = (g, el) => {
+  gcGradeSel = g;
+  document.querySelectorAll('#gc-grade-tabs .gtab').forEach(b=>b.classList.remove('on'));
+  if(el) el.classList.add('on');
+  gcApplyGradeFilter();
+};
+function gcApplyGradeFilter() {
+  const rows = document.querySelectorAll('#gc-list-body > .stu-row');
+  let shown = 0;
+  rows.forEach(r => {
+    const match = !gcGradeSel || r.getAttribute('data-grade') === gcGradeSel;
+    r.style.display = match ? '' : 'none';
+    if(match) shown++;
+  });
+  setTxt('stu-count', gcGradeSel ? `${gcGradeSel} · ${shown}명` : `총 ${students.length}명`);
 }
 
 async function gcLoadSummary(s) {
@@ -1042,14 +1081,14 @@ async function gcLoadSummary(s) {
 }
 
 window.gcOpenStu = async (sid, name, grade, uid) => {
-  gcCur={studentId:sid,name,grade,uid}; gcCurWeek=0; gcCurExamKey=null;
+  gcCur={studentId:sid,name,grade,uid}; gcCurWeek=-1; gcCurExamKey=null;
   const bg=GRADE_BG[grade]||'#f5f5f7',col=GRADE_COL[grade]||'#6e6e73',short=GRADE_SHORT[grade]||grade;
   const av=document.getElementById('d-av'); av.textContent=short; av.style.background=bg; av.style.color=col;
-  setTxt('d-name',name); setTxt('d-meta',`${grade} · 최근 4주 기록`);
+  setTxt('d-name',name); setTxt('d-meta',`${grade} · 최근 기록`);
   try { const fs=await getDoc(doc(db,'feedbacks',uid)); feedbacks[uid]=fs.exists()?(fs.data().text||''):''; } catch { feedbacks[uid]=''; }
   gcRenderFb();
   try {
-    const since=new Date(); since.setDate(since.getDate()-28);
+    const since=new Date(); since.setDate(since.getDate()-90);
     const snap=await getDocs(query(collection(db,'grades'),where('studentId','==',sid)));
     gcRecs[uid]=snap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>toDate(r.timestamp)>=since).sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp));
   } catch { gcRecs[uid]=[]; }
@@ -1067,15 +1106,19 @@ function gcGetExamList(uid) {
   const m=new Map(); (gcRecs[uid]||[]).forEach(r=>{ const k=r.examId||r.testId||r.testName||'?'; if(!m.has(k)) m.set(k,{key:k,name:r.testName||r.examTitle||k,type:r.testType||'mc'}); }); return Array.from(m.values());
 }
 function gcRenderDetail() {
-  const fr=gcGetFirstRecs(gcCur.uid), fil=gcCurExamKey?fr.filter(r=>(r.examId||r.testId||r.testName||'?')===gcCurExamKey):fr;
+  gcCurWeek = -1;
+  const frAll = gcGetFirstRecs(gcCur.uid);
+  const since28 = new Date(); since28.setDate(since28.getDate()-28);
+  const frMonth = frAll.filter(r=>toDate(r.timestamp)>=since28);
+  const fil = gcCurExamKey ? frMonth.filter(r=>(r.examId||r.testId||r.testName||'?')===gcCurExamKey) : frMonth;
   const ox=fil.filter(r=>(r.testType||'mc')==='ox'), mc=fil.filter(r=>(r.testType||'mc')==='mc'), ms=fil.filter(r=>(r.testType||'mc')==='master');
   const avg=arr=>arr.length?Math.round(arr.map(scoreOf).reduce((s,v)=>s+v,0)/arr.length):null;
   const allA=avg(fil);
-  setTxt('d-avg',allA!==null?allA+'점':'—'); setTxt('d-cnt',fr.length);
+  setTxt('d-avg',allA!==null?allA+'점':'—'); setTxt('d-cnt',frMonth.length);
   setTxt('d-ox',avg(ox)!==null?avg(ox)+'점':'—'); setTxt('d-mc',avg(mc)!==null?avg(mc)+'점':'—'); setTxt('d-ms',avg(ms)!==null?avg(ms)+'점':'—');
-  gcRenderExamSelector(); gcRenderChart(fr); gcRenderRecs(0);
-  document.querySelectorAll('.wtab').forEach((t,i)=>t.classList.toggle('on',i===0));
+  gcRenderExamSelector(); gcRenderChart(frAll); gcRenderRecs(-1); gcSetWeekActive(-1);
 }
+function gcSetWeekActive(wi){ document.querySelectorAll('.wtab').forEach(t=>t.classList.toggle('on', Number(t.getAttribute('data-week'))===wi)); }
 function gcRenderExamSelector() {
   const list=gcGetExamList(gcCur.uid), wrap=document.getElementById('exam-selector');
   if(list.length<=1){wrap.innerHTML='';return;}
@@ -1097,11 +1140,16 @@ function gcRenderChart(fr) {
   }).join('');
 }
 function gcRenderRecs(wi) {
-  const {s,e}=wkRange(wi);
-  let wr=gcGetFirstRecs(gcCur.uid).filter(r=>inRange(r,s,e));
+  let wr = gcGetFirstRecs(gcCur.uid);
+  if (wi === -1) {
+    wr = wr.slice().sort((a,b)=>toDate(b.timestamp)-toDate(a.timestamp));
+  } else {
+    const {s,e}=wkRange(wi);
+    wr = wr.filter(r=>inRange(r,s,e));
+  }
   if(gcCurExamKey) wr=wr.filter(r=>(r.examId||r.testId||r.testName||'?')===gcCurExamKey);
   const el=document.getElementById('d-records');
-  if(!wr.length){el.innerHTML=`<div style="background:#fff;border:1px solid #fce7f3;border-radius:14px;padding:2rem;text-align:center;font-size:13px;color:#aeaeb2;">이 주차에 응시한 기록이 없습니다.</div>`;return;}
+  if(!wr.length){const msg=wi===-1?'응시한 기록이 없습니다.':'이 주차에 응시한 기록이 없습니다.';el.innerHTML=`<div style="background:#fff;border:1px solid #fce7f3;border-radius:14px;padding:2rem;text-align:center;font-size:13px;color:#aeaeb2;">${msg}</div>`;return;}
   el.innerHTML=wr.map(r=>{
     const type=r.testType||'mc', sc=scoreOf(r);
     const bCls=type==='ox'?'t-ox':type==='master'?'t-ms':'t-mc';
@@ -1110,7 +1158,7 @@ function gcRenderRecs(wi) {
     return `<div class="rec-card"><div class="rec-head"><div class="rec-left"><span class="tbadge ${bCls}">${bLbl}</span><span class="rec-title">${r.testName||r.examTitle||'—'}</span></div><div class="rec-right"><div class="rec-score" style="color:${sCol};">${sc}점</div><div class="rec-date">${fmtDateShort(r.timestamp)}</div></div></div><div class="score-track"><div class="score-fill" style="width:${sc}%;background:${sCol};"></div></div><div style="display:flex;justify-content:flex-end;"><button class="rec-del-btn" onclick="window.gcDeleteRec('${esc(r.id)}','${esc(r.testName||r.examTitle||'')}','${bLbl}')">🗑 기록 삭제</button></div></div>`;
   }).join('');
 }
-window.pickWeek=(i,el)=>{ gcCurWeek=i; document.querySelectorAll('.wtab').forEach(t=>t.classList.remove('on')); el.classList.add('on'); gcRenderRecs(i); };
+window.pickWeek=(i,el)=>{ gcCurWeek=i; document.querySelectorAll('.wtab').forEach(t=>t.classList.remove('on')); if(el) el.classList.add('on'); gcRenderRecs(i); };
 
 // 기록 삭제 (추가)
 window.gcDeleteRec = async (recId, name, typeLabel) => {
@@ -1123,9 +1171,9 @@ window.gcDeleteRec = async (recId, name, typeLabel) => {
     const keepWeek = gcCurWeek;
     gcCurExamKey = null;
     gcRenderDetail();
-    if(keepWeek!==0){
+    if(keepWeek!==-1){
       gcCurWeek = keepWeek;
-      document.querySelectorAll('.wtab').forEach((t,i)=>t.classList.toggle('on',i===keepWeek));
+      gcSetWeekActive(keepWeek);
       gcRenderRecs(keepWeek);
     }
     const stu = students.find(s=>s.uid===uid);
@@ -1204,7 +1252,8 @@ function rpRenderCards(list) {
 async function rpLoadCardSummary(s) {
   const sid=s.id||s.uid; try { const since=new Date(); since.setDate(since.getDate()-28); const snap=await getDocs(query(collection(db,'grades'),where('studentId','==',sid))); const names=[]; const seen=new Set(); snap.docs.map(d=>d.data()).filter(r=>toDate(r.timestamp)>=since).forEach(r=>{ const n=r.testName||r.examTitle||''; if(n&&!seen.has(n)){seen.add(n);names.push(n);} }); const card=document.getElementById(`rp-sc-${s.uid}`); if(!card) return; const wrap=card.querySelector('.stu-card-tests'); if(wrap&&names.length){ const show=names.slice(0,2),more=names.length-show.length; wrap.innerHTML=show.map(n=>`<span class="stu-test-tag">${esc2(n)}</span>`).join('')+(more>0?`<span class="stu-test-more">+${more}개</span>`:''); } } catch {}
 }
-window.rpFilterCards=()=>{ const q=(document.getElementById('rp-search').value||'').toLowerCase(), g=document.getElementById('rp-grade-filter').value; rpRenderCards(students.filter(s=>{ const name=(s.name||s.displayName||'').toLowerCase(), grade=s.grade||s.year||''; return(!q||name.includes(q))&&(!g||grade===g); })); };
+window.rpFilterCards=()=>{ const q=(document.getElementById('rp-search').value||'').toLowerCase(), g=rpGradeSel; const list=students.filter(s=>{ const name=(s.name||s.displayName||'').toLowerCase(), grade=s.grade||s.year||''; return(!q||name.includes(q))&&(!g||grade===g); }); rpRenderCards(list); list.forEach(rpLoadCardSummary); };
+window.rpSelectGrade=(g,el)=>{ rpGradeSel=g; document.querySelectorAll('#rp-grade-tabs .gtab').forEach(b=>b.classList.remove('on')); if(el) el.classList.add('on'); rpFilterCards(); };
 async function rpEnrichWithExamSubjects(records) {
   try { const snap=await getDocs(collection(db,'tests')); const byId=new Map(), byTitle=new Map(); snap.forEach(d=>{ const data=d.data(); byId.set(d.id,data); if(data.title) byTitle.set(data.title,data); }); return records.map(r=>{ if(r.subject) return r; const eid=r.examId||r.testId; if(eid&&byId.has(eid)){const s=byId.get(eid).subject;if(s) return{...r,subject:s};} const title=r.testName||r.examTitle; if(title&&byTitle.has(title)){const s=byTitle.get(title).subject;if(s) return{...r,subject:s};} return r; }); } catch { return records; }
 }
