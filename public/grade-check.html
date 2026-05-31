@@ -430,6 +430,7 @@ body {
 
   /* 랩 */
   .wrap { padding: 1rem 0.9rem 4rem; padding-left: max(0.9rem, env(safe-area-inset-left)); padding-right: max(0.9rem, env(safe-area-inset-right)); }
+  .ms-open-btn { width: 100%; justify-content: center; }
 
   /* 환영 바 */
   .welcome-bar { padding: 1rem 1.2rem; border-radius: 14px; margin-bottom: 1.2rem; }
@@ -557,70 +558,31 @@ body {
 
 <div class="wrap">
 
-  <!-- Welcome -->
+  <!-- 안내 + 마스터 채점 -->
   <div class="welcome-bar">
     <div class="welcome-left">
       <div class="welcome-avatar">📊</div>
       <div>
         <div class="welcome-greeting">학생 성적 관리</div>
-        <div class="welcome-sub">성적 현황, 분석 리포트, 마스터 채점</div>
+        <div class="welcome-sub">학생을 누르면 성적 현황과 분석 리포트를 한 번에 볼 수 있어요</div>
       </div>
     </div>
-    <div class="welcome-date-box">
-      <div class="welcome-date" id="today-date">—</div>
-      <div class="welcome-day" id="today-day">—</div>
-    </div>
+    <button class="ms-open-btn" onclick="openPanel('master')" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;min-height:44px;background:linear-gradient(135deg,#e879f9,#a21caf);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:0 2px 10px rgba(162,28,175,0.25);flex-shrink:0;">✏️ 마스터 채점</button>
   </div>
 
-  <!-- 메뉴 카드 3개 -->
-  <div class="section-heading">MENU</div>
-  <div class="nav-grid">
-    <div class="nav-card nc-grade" onclick="openPanel('grade')">
-      <div class="nav-icon">📊</div>
-      <div class="nav-card-text">
-        <div class="nav-title">성적 현황</div>
-        <div class="nav-desc">학생별 OX·4지선다·마스터 점수 및 피드백</div>
-      </div>
-      <span class="nav-arrow">›</span>
-    </div>
-    <div class="nav-card nc-report" onclick="openPanel('report')">
-      <div class="nav-icon">📈</div>
-      <div class="nav-card-text">
-        <div class="nav-title">분석 리포트</div>
-        <div class="nav-desc">레이더 차트·점수 추이·역량 요약</div>
-      </div>
-      <span class="nav-arrow">›</span>
-    </div>
-    <div class="nav-card nc-master" onclick="openPanel('master')">
-      <div class="nav-icon">✏️</div>
-      <div class="nav-card-text">
-        <div class="nav-title">마스터 채점</div>
-        <div class="nav-desc">답안 입력·자동 채점·기록 저장</div>
-      </div>
-      <span class="nav-arrow">›</span>
-    </div>
+  <!-- 학년 버튼 -->
+  <div class="grade-tabs" id="main-grade-tabs">
+    <button class="gtab on" onclick="mainSelectGrade('',this)">전체</button>
+    <button class="gtab" onclick="mainSelectGrade('중등1학년',this)">중1</button>
+    <button class="gtab" onclick="mainSelectGrade('중등2학년',this)">중2</button>
+    <button class="gtab" onclick="mainSelectGrade('중등3학년',this)">중3</button>
+    <button class="gtab" onclick="mainSelectGrade('고등1학년',this)">고1</button>
+    <button class="gtab" onclick="mainSelectGrade('고등2학년',this)">고2</button>
+    <button class="gtab" onclick="mainSelectGrade('고등3학년',this)">고3</button>
   </div>
 
-  <!-- Quick Stats -->
-  <div class="section-heading">OVERVIEW</div>
-  <div class="quick-stats">
-    <div class="qs-card">
-      <div class="qs-icon" style="background:#fdf2f8;">👩‍🎓</div>
-      <div><div class="qs-num" id="qs-students" style="color:#db2777;">—</div><div class="qs-lbl">전체 학생</div></div>
-    </div>
-    <div class="qs-card">
-      <div class="qs-icon" style="background:#dbeafe;">📝</div>
-      <div><div class="qs-num" id="qs-ox" style="color:#1e40af;">—</div><div class="qs-lbl">OX 평균</div></div>
-    </div>
-    <div class="qs-card">
-      <div class="qs-icon" style="background:#ede9fe;">📋</div>
-      <div><div class="qs-num" id="qs-mc" style="color:#5b21b6;">—</div><div class="qs-lbl">4지선다</div></div>
-    </div>
-    <div class="qs-card">
-      <div class="qs-icon" style="background:#fdf4ff;">🏆</div>
-      <div><div class="qs-num" id="qs-ms" style="color:#db2777;">—</div><div class="qs-lbl">마스터 평균</div></div>
-    </div>
-  </div>
+  <div class="list-meta" id="main-stu-count" style="margin-bottom:0.8rem;">불러오는 중...</div>
+  <div class="stu-cards" id="main-stu-list"><div class="empty-box">학생 데이터를 불러오는 중입니다...</div></div>
 
 </div><!-- /wrap -->
 
@@ -923,8 +885,8 @@ let curPanel = null;
 (function() {
   const now = new Date();
   const days = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
-  document.getElementById('today-date').textContent = `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일`;
-  document.getElementById('today-day').textContent = days[now.getDay()];
+  const dEl=document.getElementById('today-date'); if(dEl) dEl.textContent = `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일`;
+  const wEl=document.getElementById('today-day'); if(wEl) wEl.textContent = days[now.getDay()];
 })();
 
 // 인증
@@ -976,12 +938,31 @@ async function loadStudents() {
   setTxt('stu-count', `총 ${students.length}명`);
   setTxt('rp-stu-count', `총 ${students.length}명`);
   setTxt('qs-students', students.length+'명');
+  renderMainList();
   gcRenderList();
   students.forEach(gcLoadSummary);
   rpRenderCards(students);
   students.forEach(rpLoadCardSummary);
   loadOverviewStats();
 }
+
+// ═══ 메인 학생 목록 (첫 화면) ═══
+let mainGradeSel='';
+function renderMainList() {
+  const list = mainGradeSel ? students.filter(s=>(s.grade||s.year||'')===mainGradeSel) : students;
+  const el=document.getElementById('main-stu-list');
+  setTxt('main-stu-count', mainGradeSel?`${mainGradeSel} · ${list.length}명`:`전체 ${students.length}명`);
+  if(!el) return;
+  if(!list.length){ el.innerHTML='<div class="empty-box">해당하는 학생이 없습니다.</div>'; return; }
+  el.innerHTML=list.map(s=>{
+    const name=s.name||s.displayName||'이름없음', grade=s.grade||s.year||'—';
+    const bg=GRADE_BG[grade]||'#f5f5f7', col=GRADE_COL[grade]||'#6e6e73', short=GRADE_SHORT[grade]||grade, sid=s.id||s.uid;
+    const subs=(s.subject&&s.subject!=='-')?String(s.subject).split(',').map(x=>x.trim()).filter(Boolean):[];
+    const subHtml=subs.length?subs.map(x=>`<span class="stu-test-tag">${esc2(x)}</span>`).join(''):'<span class="stu-card-grade">과목 미등록</span>';
+    return `<div class="stu-card" onclick="location.href='student-detail.html?id='+encodeURIComponent('${esc(sid)}')"><div class="stu-card-top"><div class="stu-card-av" style="background:${bg};color:${col};">${short}</div><div><div class="stu-card-name">${esc2(name)}</div><div class="stu-card-grade">${esc2(grade)}</div></div></div><div class="stu-card-tests">${subHtml}</div></div>`;
+  }).join('');
+}
+window.mainSelectGrade=(g,el)=>{ mainGradeSel=g; document.querySelectorAll('#main-grade-tabs .gtab').forEach(b=>b.classList.remove('on')); if(el) el.classList.add('on'); renderMainList(); };
 
 async function loadOverviewStats() {
   const since = new Date(); since.setDate(since.getDate()-28);
