@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { collection, getDocs, Timestamp } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
 import {
   saveExam, updateExam, getExam,
   Question, QuestionType
@@ -11,7 +12,7 @@ import {
 import {
   ArrowLeft, Plus, Trash2,
   Send, Save, CheckCircle, FileText,
-  ExternalLink, ChevronDown, ChevronUp, FlaskConical, AlertTriangle
+  ChevronDown, ChevronUp, FlaskConical, AlertTriangle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -81,134 +82,6 @@ function parseMCBulk(raw: string): Question[] {
     results.push({ id: makeId(), type: 'multiple', text, options: opts, answer, explanation: get('해설:') });
   }
   return results;
-}
-
-function generateCodePenData(title: string, questions: Question[]): { html: string; css: string; js: string } {
-  const allQ = questions.map(q => ({
-    id: q.id, type: q.type, text: q.text,
-    choices: q.type === 'multiple' ? q.options : undefined,
-    answer: q.answer, explanation: q.explanation || '',
-  }));
-  const dataJson = JSON.stringify(allQ);
-
-  const html = `<div class="header">
-  <h1>${title}</h1>
-  <p>베타과학학원</p>
-</div>
-<div class="wrap" id="app"></div>`;
-
-  const css = `* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Noto Sans KR', -apple-system, sans-serif; background: #f0fdf4; min-height: 100vh; }
-.header { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; padding: 1.25rem 1rem; text-align: center; }
-.header h1 { font-size: 20px; font-weight: 700; }
-.header p { font-size: 13px; opacity: .8; margin-top: 3px; }
-.wrap { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem; }
-.progress-bar { background: #dcfce7; border-radius: 10px; height: 8px; margin-bottom: 1.5rem; overflow: hidden; }
-.progress-fill { height: 100%; background: #16a34a; border-radius: 10px; transition: .3s; }
-.card { background: #fff; border-radius: 16px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,.07); }
-.q-counter { font-size: 13px; color: #6b7280; margin-bottom: .75rem; }
-.q-type { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 20px; margin-bottom: .75rem; }
-.q-type.ox { background: #dcfce7; color: #15803d; }
-.q-type.mc { background: #dbeafe; color: #1d4ed8; }
-.q-text { font-size: 16px; font-weight: 600; line-height: 1.6; color: #1f2937; margin-bottom: 1.25rem; }
-.ox-row { display: flex; gap: 12px; }
-.ox-btn { flex: 1; padding: 16px; border-radius: 12px; border: 2px solid #e5e7eb; font-size: 22px; font-weight: 800; cursor: pointer; background: #fff; transition: .15s; }
-.ox-btn.O { color: #16a34a; border-color: #86efac; }
-.ox-btn.O:hover { background: #f0fdf4; }
-.ox-btn.X { color: #dc2626; border-color: #fca5a5; }
-.ox-btn.X:hover { background: #fef2f2; }
-.ox-btn:disabled { opacity: .5; cursor: default; }
-.mc-list { display: flex; flex-direction: column; gap: 8px; }
-.mc-opt { padding: 12px 16px; border-radius: 10px; border: 2px solid #e5e7eb; font-size: 14px; cursor: pointer; background: #fff; text-align: left; transition: .15s; display: flex; align-items: center; gap: 10px; }
-.mc-opt:hover:not(:disabled) { border-color: #16a34a; background: #f0fdf4; }
-.mc-opt:disabled { cursor: default; opacity: .7; }
-.mc-opt .num { font-weight: 700; color: #16a34a; min-width: 22px; font-size: 15px; }
-.feedback { margin-top: 1rem; padding: 12px 16px; border-radius: 10px; font-size: 14px; line-height: 1.6; display: none; }
-.feedback.ok { background: #dcfce7; color: #14532d; border: 1.5px solid #86efac; }
-.feedback.ng { background: #fee2e2; color: #7f1d1d; border: 1.5px solid #fca5a5; }
-.nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; }
-.btn { padding: 10px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; }
-.btn-next { background: #16a34a; color: #fff; }
-.btn-next:hover { background: #15803d; }
-.btn-prev { background: #f3f4f6; color: #374151; }
-.btn-prev:hover { background: #e5e7eb; }
-.score-card { background: #fff; border-radius: 20px; padding: 2.5rem 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,.08); }
-.score-big { font-size: 64px; font-weight: 800; color: #16a34a; line-height: 1; }
-.score-denom { font-size: 24px; color: #9ca3af; }
-.score-msg { font-size: 17px; color: #374151; margin-top: .75rem; font-weight: 600; }
-.score-pct { font-size: 14px; color: #6b7280; margin-top: .25rem; }
-.btn-restart { margin-top: 1.5rem; padding: 12px 36px; background: #16a34a; color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
-.btn-restart:hover { background: #15803d; }`;
-
-  const js = `const QS = ${dataJson};
-let cur = 0, score = 0;
-const qs = [...QS].sort(() => Math.random() - 0.5);
-const app = document.getElementById('app');
-const NUMS = ['①','②','③','④'];
-
-function render() {
-  if (cur >= qs.length) { showScore(); return; }
-  const q = qs[cur];
-  const pct = Math.round((cur / qs.length) * 100);
-  let html = '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
-  html += '<div class="card">';
-  html += '<div class="q-counter">' + (cur+1) + ' / ' + qs.length + '</div>';
-  html += '<div class="q-type ' + (q.type==='ox'?'ox':'mc') + '">' + (q.type==='ox'?'OX 문제':'4지선다') + '</div>';
-  html += '<div class="q-text">' + q.text + '</div>';
-  if (q.type === 'ox') {
-    html += '<div class="ox-row">';
-    html += '<button class="ox-btn O" onclick="answerOX(&quot;O&quot;)">O</button>';
-    html += '<button class="ox-btn X" onclick="answerOX(&quot;X&quot;)">X</button>';
-    html += '</div>';
-  } else {
-    html += '<div class="mc-list">';
-    (q.choices||[]).forEach((c,i) => {
-      html += '<button class="mc-opt" onclick="answerMC(&quot;' + (i+1) + '&quot;)">'
-           + '<span class="num">' + NUMS[i] + '</span>' + c + '</button>';
-    });
-    html += '</div>';
-  }
-  html += '<div class="feedback" id="fb"></div>';
-  html += '</div>';
-  html += '<div class="nav">';
-  if (cur > 0) html += '<button class="btn btn-prev" onclick="prev()">← 이전</button>';
-  else html += '<span></span>';
-  html += '<button class="btn btn-next" id="nb" style="display:none" onclick="next()">다음 →</button>';
-  html += '</div>';
-  app.innerHTML = html;
-}
-
-function showFeedback(ok) {
-  const q = qs[cur];
-  const fb = document.getElementById('fb');
-  fb.className = 'feedback ' + (ok ? 'ok' : 'ng');
-  fb.style.display = 'block';
-  fb.innerHTML = (ok ? '✅ 정답입니다!' : '❌ 오답! 정답: <b>' + (q.type==='ox' ? q.answer : (NUMS[parseInt(q.answer)-1]||q.answer)) + '</b>')
-    + (q.explanation ? '<br>💡 ' + q.explanation : '');
-  document.querySelectorAll('.ox-btn,.mc-opt').forEach(b => b.disabled = true);
-  const nb = document.getElementById('nb');
-  if (nb) nb.style.display = 'block';
-}
-
-function answerOX(a) { const ok = a === qs[cur].answer; if (ok) score++; showFeedback(ok); }
-function answerMC(a) { const ok = a === qs[cur].answer; if (ok) score++; showFeedback(ok); }
-function next() { cur++; render(); }
-function prev() { if (cur > 0) { cur--; render(); } }
-
-function showScore() {
-  const pct = Math.round((score / qs.length) * 100);
-  const msg = pct===100?'완벽합니다! 🎉':pct>=80?'훌륭해요! 👏':pct>=60?'잘 했어요! 😊':'조금 더 노력해봐요 💪';
-  app.innerHTML = '<div class="score-card">'
-    + '<div class="score-big">' + score + '<span class="score-denom"> / ' + qs.length + '</span></div>'
-    + '<div class="score-msg">' + msg + '</div>'
-    + '<div class="score-pct">정답률 ' + pct + '%</div>'
-    + '<button class="btn-restart" onclick="restart()">다시 풀기</button>'
-    + '</div>';
-}
-function restart() { cur=0; score=0; qs.sort(()=>Math.random()-.5); render(); }
-render();`;
-
-  return { html, css, js };
 }
 
 // ── 전체 삭제 확인 모달 ──
@@ -366,20 +239,35 @@ function CreateExamInner() {
     }
   }
 
-  function openCodePen() {
-    if (allQuestions.length === 0) { toast.error('문제가 없습니다'); return; }
-    const { html, css, js } = generateCodePenData(title || '온라인 테스트', allQuestions);
-    const data = JSON.stringify({ html, css, js });
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'https://codepen.io/pen/define';
-    form.target = '_blank';
-    const input = document.createElement('input');
-    input.type = 'hidden'; input.name = 'data'; input.value = data;
-    form.appendChild(input);
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
+  // 등록된 모든 시험을 백업 파일(JSON)로 내려받기 — backup.html에서 그대로 복원 가능
+  async function downloadTestsBackup() {
+    try {
+      const snap = await getDocs(collection(db, 'tests'));
+      const enc = (v: any): any => {
+        if (v === null || v === undefined) return v;
+        if (v instanceof Timestamp) return { __ts: true, s: v.seconds, n: v.nanoseconds };
+        if (Array.isArray(v)) return v.map(enc);
+        if (typeof v === 'object') { const o: any = {}; for (const k in v) o[k] = enc(v[k]); return o; }
+        return v;
+      };
+      const tests = snap.docs.map(d => ({ __id: d.id, ...enc(d.data()) }));
+      const payload = {
+        meta: { app: 'beta-science', version: 1, exportedAt: new Date().toISOString() },
+        data: { tests },
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const n = new Date(); const pad = (x: number) => String(x).padStart(2, '0');
+      a.href = url;
+      a.download = `beta-science-tests-${n.getFullYear()}${pad(n.getMonth() + 1)}${pad(n.getDate())}-${pad(n.getHours())}${pad(n.getMinutes())}.json`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success(`시험 백업 파일을 받았습니다 (${tests.length}개)`);
+    } catch (e) {
+      console.error(e);
+      toast.error('백업에 실패했습니다. 다시 시도해주세요');
+    }
   }
 
   if (authLoading) {
@@ -925,40 +813,28 @@ function CreateExamInner() {
               </div>
             </div>
 
-            {/* CodePen 배포 카드 */}
+            {/* 시험 백업 카드 (코드펜 대체) */}
             <div
               className="bg-white border-2 border-dashed rounded-2xl p-5"
               style={{ borderColor: '#f9a8d4' }}
             >
-              <div className="flex items-start gap-3 mb-4">
-                <FileText size={20} className="shrink-0 mt-0.5" style={{ color: '#db2777' }} />
+              <div className="flex items-start gap-3 mb-3">
+                <Save size={20} className="shrink-0 mt-0.5" style={{ color: '#db2777' }} />
                 <div className="flex-1">
-                  <div className="font-bold text-gray-800 text-sm mb-1">CodePen으로 배포하기</div>
+                  <div className="font-bold text-gray-800 text-sm mb-1">시험 백업 받기</div>
                   <p className="text-xs text-gray-500 leading-relaxed">
-                    1. 아래 버튼으로 CodePen 열기 → Ctrl+S 저장 → URL 복사<br />
-                    2. 복사한 URL을 아래에 붙여넣으면 학생 목록에 자동 연결됩니다.
+                    게시한 뒤 아래 버튼을 누르면 <b>등록된 모든 시험</b>이 파일 하나로 내려받아집니다.
+                    그 파일을 노션·구글드라이브에 보관해 두세요. (나중에 백업 페이지에서 그대로 복원할 수 있어요)
                   </p>
                 </div>
-                <button
-                  onClick={openCodePen}
-                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border transition-colors shrink-0"
-                  style={{ borderColor: '#f9a8d4', color: '#db2777' }}
-                >
-                  <ExternalLink size={13} /> CodePen 열기
-                </button>
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
-                  CodePen URL (저장 후 붙여넣기)
-                </label>
-                <input
-                  type="url"
-                  className={inputCls}
-                  placeholder="https://codepen.io/..."
-                  value={codepenUrl}
-                  onChange={e => setCodepenUrl(e.target.value)}
-                />
-              </div>
+              <button
+                onClick={downloadTestsBackup}
+                className="w-full py-3 text-sm font-bold text-white rounded-xl transition-opacity hover:opacity-85 flex items-center justify-center gap-2"
+                style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
+              >
+                <Save size={16} /> 전체 시험 백업 파일 받기
+              </button>
             </div>
 
             {/* 저장 완료 메시지 */}
