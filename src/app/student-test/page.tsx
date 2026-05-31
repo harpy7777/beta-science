@@ -11,7 +11,13 @@ const GRADE_MAP: Record<string, string> = {
   '고1': '고1', '고2': '고2', '고3': '고3',
 };
 
-type Step = 'login' | 'select';
+// ★ 과목 표시 순서 (이 목록에 없는 과목은 뒤에 가나다순으로 붙음)
+const SUBJECT_ORDER = [
+  '과학내신', '과학선행',
+  '통합과학1', '통합과학2', '화학', '물질과 에너지', '화학 반응의 세계',
+];
+
+type Step = 'login' | 'subject' | 'select';
 
 function getExamType(exam: Exam): 'ox' | 'multiple' | 'mixed' {
   const questions = exam.questions ?? [];
@@ -43,6 +49,28 @@ function makeMultiSubExam(exam: Exam): Exam & { subType: 'multiple' } {
 }
 
 // ─────────────────────────────────────────────
+// ★ 과목명 정규화: 공백 제거, 비어있으면 "과목 미지정"으로 묶음
+function normSubject(s?: string): string {
+  const t = (s ?? '').trim();
+  return t || '과목 미지정';
+}
+
+// ★ 학년 시험 목록에서 실제 존재하는 과목만 뽑아 정해진 순서로 정렬
+function computeSubjects(exams: Exam[]): string[] {
+  const set = new Set<string>();
+  for (const e of exams) set.add(normSubject(e.subject));
+  const arr = Array.from(set);
+  arr.sort((a, b) => {
+    const ia = SUBJECT_ORDER.indexOf(a);
+    const ib = SUBJECT_ORDER.indexOf(b);
+    if (ia === -1 && ib === -1) return a.localeCompare(b, 'ko');
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
+  return arr;
+}
+
 // ★ 제목 속 동그라미 숫자(①②③…)를 보통 숫자로 변환 (소단원 구분용)
 function circledToNumber(title: string): number {
   const circled = '①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮';
@@ -142,7 +170,10 @@ export default function StudentTestPage() {
   const [step, setStep] = useState<Step>('login');
   const [studentIdInput, setStudentIdInput] = useState('');
   const [selectedGrade, setSelectedGrade] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState('');
   const [loading, setLoading] = useState(false);
+  const [allExams, setAllExams] = useState<Exam[]>([]);          // 학년 전체 시험 (원본)
+  const [subjects, setSubjects] = useState<string[]>([]);         // 그 학년에 존재하는 과목들
   const [displayExams, setDisplayExams] = useState<Array<Exam & { subType?: string }>>([]);
   const [loadingExams, setLoadingExams] = useState(false);
   const [studentInfo, setStudentInfo] = useState<{ id: string; name: string; grade: string } | null>(null);
@@ -153,6 +184,15 @@ export default function StudentTestPage() {
       if (savedId) setStudentIdInput(savedId);
     } catch {}
   }, []);
+
+  // ★ 과목을 골랐을 때: 그 과목 시험만 걸러서 시험 선택 화면으로
+  function pickSubject(subj: string, examsArg?: Exam[]) {
+    const src = examsArg ?? allExams;
+    const filtered = src.filter(e => normSubject(e.subject) === subj);
+    setSelectedSubject(subj);
+    setDisplayExams(splitExams(filtered));
+    setStep('select');
+  }
 
   async function handleEnter() {
     if (!studentIdInput.trim()) { toast.error('학생 ID를 입력하세요'); return; }
@@ -176,9 +216,23 @@ export default function StudentTestPage() {
 
       setLoadingExams(true);
       const gradeExams = await getExamsByGrade(selectedGrade);
-      const split = splitExams(gradeExams);
-      setDisplayExams(split);
-      setStep('select');
+      setAllExams(gradeExams);
+
+      const subs = computeSubjects(gradeExams);
+      setSubjects(subs);
+
+      if (gradeExams.length === 0) {
+        // 시험 자체가 없음 → 빈 목록으로 시험 선택 화면 표시
+        setSelectedSubject('');
+        setDisplayExams([]);
+        setStep('select');
+      } else if (subs.length === 1) {
+        // 과목이 하나뿐이면 과목 선택을 건너뛰고 바로 보여줌
+        pickSubject(subs[0], gradeExams);
+      } else {
+        // 과목이 여러 개 → 과목 선택 화면
+        setStep('subject');
+      }
     } catch {
       toast.error('오류가 발생했습니다. 다시 시도해주세요');
     } finally {
@@ -296,6 +350,70 @@ export default function StudentTestPage() {
     );
   }
 
+  // ── 과목 선택 화면 ──
+  if (step === 'subject') {
+    return (
+      <div
+        className="bg-gradient-to-br from-green-50 via-white to-emerald-50"
+        style={{ minHeight: '100svh', overflowX: 'hidden' }}
+      >
+        <TopHeader />
+
+        <div className="px-4 pt-8 pb-16">
+          <div className="w-full max-w-md mx-auto">
+            <div className="bg-white rounded-2xl border border-green-100 shadow-lg shadow-green-100/40 p-6 sm:p-7">
+
+              {/* 뒤로가기 */}
+              <button
+                type="button"
+                onClick={() => setStep('login')}
+                className="text-xs font-bold text-gray-400 hover:text-green-600 mb-5 flex items-center gap-1 transition-colors"
+              >
+                ← 뒤로
+              </button>
+
+              {/* 타이틀 + 학생 배지 */}
+              <div className="flex items-center justify-between mb-5 gap-2">
+                <h2 className="font-black text-gray-800 text-lg">📚 과목 선택</h2>
+                {studentInfo && (
+                  <span className="bg-green-100 text-green-800 text-xs font-bold px-3 py-1.5 rounded-full flex-shrink-0">
+                    {studentInfo.name} · {selectedGrade}
+                  </span>
+                )}
+              </div>
+
+              <p className="text-xs text-gray-400 mb-4">시험 볼 과목을 선택하세요</p>
+
+              {/* 과목 버튼 목록 (그 학년에 실제 있는 과목만) */}
+              <div className="space-y-2.5">
+                {subjects.map(subj => {
+                  const cnt = allExams.filter(e => normSubject(e.subject) === subj).length;
+                  return (
+                    <button
+                      key={subj}
+                      type="button"
+                      onClick={() => pickSubject(subj)}
+                      className="w-full text-left p-4 border-2 border-green-100 rounded-xl bg-white hover:bg-green-50 active:bg-green-100 hover:border-green-300 transition-all flex items-center justify-between group"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="font-bold text-gray-900 text-sm truncate">{subj}</div>
+                        <div className="text-xs text-gray-400 mt-0.5">시험 {cnt}개</div>
+                      </div>
+                      <ChevronRight
+                        size={18}
+                        className="text-green-300 group-hover:text-green-600 transition-colors flex-shrink-0 ml-3"
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ── 시험 선택 화면 ──
   return (
     <div
@@ -308,10 +426,10 @@ export default function StudentTestPage() {
         <div className="w-full max-w-md mx-auto">
           <div className="bg-white rounded-2xl border border-green-100 shadow-lg shadow-green-100/40 p-6 sm:p-7">
 
-            {/* 뒤로가기 */}
+            {/* 뒤로가기: 과목이 여러 개면 과목 선택으로, 아니면 로그인으로 */}
             <button
               type="button"
-              onClick={() => setStep('login')}
+              onClick={() => setStep(subjects.length > 1 ? 'subject' : 'login')}
               className="text-xs font-bold text-gray-400 hover:text-green-600 mb-5 flex items-center gap-1 transition-colors"
             >
               ← 뒤로
@@ -322,7 +440,7 @@ export default function StudentTestPage() {
               <h2 className="font-black text-gray-800 text-lg">📋 테스트 선택</h2>
               {studentInfo && (
                 <span className="bg-green-100 text-green-800 text-xs font-bold px-3 py-1.5 rounded-full flex-shrink-0">
-                  {studentInfo.name} · {selectedGrade}
+                  {studentInfo.name} · {selectedGrade}{selectedSubject ? ` · ${selectedSubject}` : ''}
                 </span>
               )}
             </div>
@@ -335,7 +453,7 @@ export default function StudentTestPage() {
             ) : displayExams.length === 0 ? (
               <div className="text-center py-10 text-gray-400 text-sm">
                 <div className="text-3xl mb-3">📭</div>
-                <p>{selectedGrade}에 등록된 시험이 없습니다</p>
+                <p>{selectedGrade}{selectedSubject ? ` · ${selectedSubject}` : ''}에 등록된 시험이 없습니다</p>
                 <p className="text-xs mt-1">선생님께 문의하세요</p>
               </div>
             ) : (
