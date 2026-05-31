@@ -109,6 +109,9 @@ export interface Result {
   wrongCount: number | null;
 }
 
+// ★ 허용된 학년 목록 (저장/필터 모두 이 기준 사용)
+export const VALID_GRADES = ['중1', '중2', '중3', '고1', '고2', '고3'];
+
 function removeUndefined(obj: unknown): unknown {
   return JSON.parse(JSON.stringify(obj));
 }
@@ -135,9 +138,15 @@ export async function verifyEntranceCode(code: string): Promise<boolean> {
 export async function saveExam(
   exam: Omit<Exam, 'id' | 'createdAt' | 'regDate'>
 ): Promise<string> {
+  // ★ 저장 직전 학년 검증: 잘못된 학년이면 저장 자체를 막음 (데이터 오염 방지)
+  const g = (exam.grade ?? '').trim();
+  if (!VALID_GRADES.includes(g)) {
+    throw new Error('학년이 올바르지 않습니다. 학년을 다시 선택하세요.');
+  }
   const code = Math.random().toString(36).substring(2, 8).toUpperCase();
   const data = removeUndefined({
     ...exam,
+    grade: g, // ★ 공백 제거된 정확한 학년으로 저장
     accessCode: code,
     regDate: Timestamp.now(),
   });
@@ -149,6 +158,14 @@ export async function updateExam(
   examId: string,
   exam: Partial<Omit<Exam, 'id' | 'createdAt' | 'regDate'>>
 ): Promise<void> {
+  // ★ 수정 시에도 학년이 들어오면 검증
+  if (exam.grade !== undefined) {
+    const g = (exam.grade ?? '').trim();
+    if (!VALID_GRADES.includes(g)) {
+      throw new Error('학년이 올바르지 않습니다. 학년을 다시 선택하세요.');
+    }
+    exam = { ...exam, grade: g };
+  }
   const data = removeUndefined(exam);
   await updateDoc(doc(db, 'tests', examId), data as object);
 }
@@ -174,14 +191,17 @@ export async function getExamsByTeacher(teacherId: string): Promise<Exam[]> {
 }
 
 export async function getExamsByGrade(grade: string): Promise<Exam[]> {
+  const target = (grade ?? '').trim();
   const q = query(
     collection(db, 'tests'),
-    where('grade', '==', grade),
+    where('grade', '==', target),
     where('isPublished', '==', true),
     orderBy('regDate', 'desc')
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }) as Exam);
+  const exams = snap.docs.map(d => ({ id: d.id, ...d.data() }) as Exam);
+  // ★ 안전장치: 학년이 정확히 일치하는 것만 통과시킴 (학년 섞임 방지)
+  return exams.filter(e => (e.grade ?? '').trim() === target);
 }
 
 export async function getAllPublishedExams(): Promise<Exam[]> {
