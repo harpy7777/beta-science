@@ -2,7 +2,7 @@
 // src/app/student/[examId]/page.tsx
 import { useState, useEffect, Suspense } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { getExam, submitStudentAnswers, calculateScore, isAnswerCorrect, Exam } from '@/lib/examService';
+import { getExam, submitStudentAnswers, calculateScore, isAnswerCorrect, formatCorrectAnswer, Exam } from '@/lib/examService';
 import { FlaskConical, ChevronLeft, ChevronRight, CheckCircle, ArrowLeft, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -423,14 +423,7 @@ function StudentExamInner() {
                           </p>
                           {!isCorrect && (
                             <p className="text-xs text-gray-500 mt-0.5">
-                              정답: {q.type === 'ox' ? q.answer : (() => {
-  const idx = Number(q.answer) - 1;
-  const optText = q.options?.[idx];
-  if (optText) return `${q.answer}번 - ${optText}`;
-  const foundIdx = q.options?.findIndex(opt => opt === q.answer);
-  if (foundIdx !== undefined && foundIdx >= 0) return `${foundIdx + 1}번 - ${q.answer}`;
-  return q.answer;
-})()}
+                              정답: {formatCorrectAnswer(q)}
                             </p>
                           )}
                           {q.explanation && (
@@ -506,14 +499,7 @@ function StudentExamInner() {
                           </p>
                           {!isCorrect && (
                             <p className="text-xs text-gray-500 mt-0.5">
-                              정답: {q.type === 'ox' ? q.answer : (() => {
-  const idx = Number(q.answer) - 1;
-  const optText = q.options?.[idx];
-  if (optText) return `${q.answer}번 - ${optText}`;
-  const foundIdx = q.options?.findIndex(opt => opt === q.answer);
-  if (foundIdx !== undefined && foundIdx >= 0) return `${foundIdx + 1}번 - ${q.answer}`;
-  return q.answer;
-})()}
+                              정답: {formatCorrectAnswer(q)}
                             </p>
                           )}
                           {q.explanation && (
