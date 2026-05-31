@@ -254,6 +254,9 @@ body {
 .rec-date  { font-size: 10px; color: #aeaeb2; margin-top: 2px; }
 .score-track { height: 5px; background: #f5f5f7; border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
 .score-fill  { height: 100%; border-radius: 3px; }
+/* 기록 삭제 버튼 (추가) */
+.rec-del-btn { margin-top: 2px; font-size: 11px; font-weight: 600; color: #dc2626; background: #fff; border: 1.5px solid #fca5a5; border-radius: 8px; padding: 7px 14px; cursor: pointer; font-family: inherit; min-height: 36px; transition: background 0.15s; }
+.rec-del-btn:hover { background: #fef2f2; }
 .fb-wrap { background: #fff; border: 1px solid #fce7f3; border-radius: 14px; padding: 1rem 1.1rem; margin-top: 10px; }
 .fb-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 8px; }
 .fb-title { font-size: 13px; font-weight: 600; color: #1d1d1f; display: flex; align-items: center; gap: 6px; }
@@ -867,7 +870,7 @@ body {
 import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, collection, getDocs, getDoc, setDoc, addDoc, doc,
+  getFirestore, collection, getDocs, getDoc, setDoc, addDoc, deleteDoc, doc,
   query, where, orderBy, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -1022,11 +1025,11 @@ async function gcLoadSummary(s) {
     const avg=arr=>arr.length?Math.round(arr.reduce((s,v)=>s+v,0)/arr.length):null;
     const allA=avg([...ox,...mc,...ms]);
     const subEl=document.getElementById(`c-subject-${s.uid}`);
-    if(subEl&&lastRec) subEl.innerHTML=`<span class="subject-tag">${esc2(lastRec.subject||'—')}</span>`;
+    if(subEl) subEl.innerHTML=lastRec?`<span class="subject-tag">${esc2(lastRec.subject||'—')}</span>`:`<span class="subject-tag">—</span>`;
     const dateEl=document.getElementById(`c-date-${s.uid}`);
-    if(dateEl&&lastRec) dateEl.innerHTML=`<span class="date-tag">${fmtDateShort(lastRec.timestamp)}</span>`;
+    if(dateEl) dateEl.innerHTML=lastRec?`<span class="date-tag">${fmtDateShort(lastRec.timestamp)}</span>`:`<span class="date-tag" style="color:#aeaeb2;">—</span>`;
     const testEl=document.getElementById(`c-tests-${s.uid}`);
-    if(testEl&&lastRec) testEl.innerHTML=`<span class="exam-name-tag">${esc2(lastRec.testName||lastRec.examTitle||'—')}</span>`;
+    if(testEl) testEl.innerHTML=lastRec?`<span class="exam-name-tag">${esc2(lastRec.testName||lastRec.examTitle||'—')}</span>`:`<span style="font-size:11px;color:#aeaeb2;">—</span>`;
     set(`c-ox-${s.uid}`,pill(avg(ox),'p-ox'));
     set(`c-mc-${s.uid}`,pill(avg(mc),'p-mc'));
     set(`c-ms-${s.uid}`,pill(avg(ms),'p-ms'));
@@ -1104,10 +1107,36 @@ function gcRenderRecs(wi) {
     const bCls=type==='ox'?'t-ox':type==='master'?'t-ms':'t-mc';
     const bLbl=type==='ox'?'OX 문제':type==='master'?'마스터테스트':'4지선다';
     const sCol=type==='ox'?'#1e40af':type==='master'?'#db2777':'#5b21b6';
-    return `<div class="rec-card"><div class="rec-head"><div class="rec-left"><span class="tbadge ${bCls}">${bLbl}</span><span class="rec-title">${r.testName||r.examTitle||'—'}</span></div><div class="rec-right"><div class="rec-score" style="color:${sCol};">${sc}점</div><div class="rec-date">${fmtDateShort(r.timestamp)}</div></div></div><div class="score-track"><div class="score-fill" style="width:${sc}%;background:${sCol};"></div></div></div>`;
+    return `<div class="rec-card"><div class="rec-head"><div class="rec-left"><span class="tbadge ${bCls}">${bLbl}</span><span class="rec-title">${r.testName||r.examTitle||'—'}</span></div><div class="rec-right"><div class="rec-score" style="color:${sCol};">${sc}점</div><div class="rec-date">${fmtDateShort(r.timestamp)}</div></div></div><div class="score-track"><div class="score-fill" style="width:${sc}%;background:${sCol};"></div></div><div style="display:flex;justify-content:flex-end;"><button class="rec-del-btn" onclick="window.gcDeleteRec('${esc(r.id)}','${esc(r.testName||r.examTitle||'')}','${bLbl}')">🗑 기록 삭제</button></div></div>`;
   }).join('');
 }
 window.pickWeek=(i,el)=>{ gcCurWeek=i; document.querySelectorAll('.wtab').forEach(t=>t.classList.remove('on')); el.classList.add('on'); gcRenderRecs(i); };
+
+// 기록 삭제 (추가)
+window.gcDeleteRec = async (recId, name, typeLabel) => {
+  if(!recId){ alert('기록 정보를 찾을 수 없습니다.'); return; }
+  if(!confirm(`"${name||'이 기록'}" (${typeLabel}) 기록을 삭제할까요?\n삭제하면 되돌릴 수 없습니다.`)) return;
+  try {
+    await deleteDoc(doc(db,'grades',recId));
+    const uid = gcCur && gcCur.uid;
+    if(uid && gcRecs[uid]) gcRecs[uid] = gcRecs[uid].filter(r=>r.id!==recId);
+    const keepWeek = gcCurWeek;
+    gcCurExamKey = null;
+    gcRenderDetail();
+    if(keepWeek!==0){
+      gcCurWeek = keepWeek;
+      document.querySelectorAll('.wtab').forEach((t,i)=>t.classList.toggle('on',i===keepWeek));
+      gcRenderRecs(keepWeek);
+    }
+    const stu = students.find(s=>s.uid===uid);
+    if(stu) gcLoadSummary(stu);
+    loadMasterHistory();
+    loadOverviewStats();
+  } catch(e) {
+    alert('삭제 실패: '+e.message);
+  }
+};
+
 function gcRenderFb() {
   const txt=feedbacks[gcCur?.uid]||'';
   document.getElementById('fb-body').innerHTML=txt?txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>'):'<span class="fb-na">아직 작성된 피드백이 없습니다.</span>';
@@ -1249,7 +1278,7 @@ function inRange(r,s,e){const d=toDate(r.timestamp||r.submittedAt);return d>=s&&
 function fmtDateShort(ts){if(!ts)return '';const d=toDate(ts);if(d.getTime()===0)return '';const yy=String(d.getFullYear()).slice(2),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0'),day=DAY_KO[d.getDay()];return `${yy}.${mm}.${dd}(${day})`;}
 function fmtDate(ts){if(!ts)return '';const d=toDate(ts);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;}
 function pill(v,cls){return v!==null?`<span class="score-pill ${cls}">${v}점</span>`:`<span class="score-pill p-na">—</span>`;}
-function esc(s){return(s||'').replace(/'/g,"\\'");}
+function esc(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
 function esc2(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function set(id,html){const e=document.getElementById(id);if(e)e.innerHTML=html;}
 function setTxt(id,txt){const e=document.getElementById(id);if(e)e.textContent=txt;}
