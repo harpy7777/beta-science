@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><script src="/favicon.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>데이터 백업 - 베타과학학원</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Arial,sans-serif;background:#fafafa;color:#1d1d1f;min-height:100vh;-webkit-font-smoothing:antialiased;visibility:hidden}
+.header{background:#fff;border-bottom:1px solid #f0e8ed;padding:0 1.2rem;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300}
+.header-left{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit;cursor:pointer}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,#f472b6 0%,#db2777 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:14px;font-weight:600;letter-spacing:-.3px}
+.back-btn{padding:7px 14px;background:transparent;border:1.5px solid #f4c8d4;border-radius:20px;font-family:inherit;font-size:12px;font-weight:600;color:#db2777;cursor:pointer;text-decoration:none}
+.back-btn:hover{background:#fceef2}
+.wrap{padding:1.4rem 1.2rem;max-width:680px;margin:0 auto}
+.page-hero{background:linear-gradient(135deg,#fff0f7 0%,#fdf2f8 60%,#f0f9ff 100%);border:1px solid #fce7f3;border-radius:18px;padding:1.2rem 1.4rem;margin-bottom:1.4rem;display:flex;align-items:center;gap:12px}
+.hero-icon{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#f472b6,#db2777);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 12px rgba(219,39,119,.25)}
+.hero-title{font-size:1.05rem;font-weight:700;letter-spacing:-.03em}
+.hero-sub{font-size:11px;color:#aeaeb2;margin-top:3px}
+.card{background:#fff;border:1px solid #fce7f3;border-radius:16px;padding:1.4rem;margin-bottom:1rem}
+.card-title{font-size:15px;font-weight:700;margin-bottom:.4rem;display:flex;align-items:center;gap:8px}
+.card-desc{font-size:12px;color:#6e6e73;line-height:1.7;margin-bottom:1rem}
+.btn{width:100%;padding:14px;border:none;border-radius:14px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s,background .15s}
+.btn:disabled{opacity:.5;cursor:default}
+.btn-pink{background:linear-gradient(135deg,#f472b6,#db2777);color:#fff}
+.btn-pink:hover:not(:disabled){opacity:.88}
+.btn-outline{background:#fff;border:1.5px solid #fbcfe8;color:#db2777}
+.btn-outline:hover:not(:disabled){background:#fdf2f8}
+.file-row{display:flex;gap:8px;align-items:center;margin-bottom:.9rem;flex-wrap:wrap}
+.file-label{flex:1;min-width:160px;font-size:12px;border:1.5px dashed #fbcfe8;border-radius:12px;padding:11px 14px;color:#6e6e73;cursor:pointer;background:#fdf2f8;text-align:center;font-weight:600}
+.file-label:hover{border-color:#db2777}
+input[type=file]{display:none}
+.warn{background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:11px 13px;font-size:11.5px;color:#9a3412;line-height:1.7;margin-bottom:1rem}
+.status{background:#0f172a;border-radius:12px;padding:13px 15px;font-size:12px;color:#cbd5e1;line-height:1.85;max-height:240px;overflow-y:auto;font-family:ui-monospace,Menlo,monospace;white-space:pre-wrap;word-break:break-word;display:none;margin-top:.4rem}
+.status.show{display:block}
+.status .ok{color:#86efac}.status .err{color:#fca5a5}.status .hi{color:#f9a8d4}
+.spin{width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:.6rem}
+.sum-chip{background:#fff0f7;border:1px solid #fce7f3;border-radius:10px;padding:9px 11px;font-size:11px;color:#9d174d;display:flex;justify-content:space-between;align-items:center}
+.sum-chip b{font-size:14px;color:#db2777}
+@media(max-width:520px){.wrap{padding:1rem .85rem}.header{padding:0 .9rem}}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="dashboard.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <a href="dashboard.html" class="back-btn">← 대시보드</a>
+</header>
+
+<div class="wrap">
+  <div class="page-hero">
+    <div class="hero-icon">💾</div>
+    <div>
+      <div class="hero-title">시험 · 학생 백업 · 복원</div>
+      <div class="hero-sub">OX·4지선다 시험 문제와 학생 명단을 파일 하나로 저장하고 되돌립니다</div>
+    </div>
+  </div>
+
+  <!-- 백업 -->
+  <div class="card">
+    <div class="card-title">⬇️ 백업 (내려받기)</div>
+    <div class="card-desc">
+      등록된 <b>OX·4지선다 시험 문제</b>와 <b>학생 명단 전체</b>를 <b>JSON 파일 하나</b>로 내려받습니다.
+      내려받은 파일은 노션·구글드라이브 등에 보관하세요.<br>
+      <span style="color:#db2777;font-weight:600">권장: 시험이나 학생을 추가·수정한 날엔 한 번씩 내려받기</span>
+    </div>
+    <button class="btn btn-pink" id="btnBackup" onclick="doBackup()">백업 파일 내려받기</button>
+    <div class="summary" id="backupSummary" style="display:none"></div>
+  </div>
+
+  <!-- 복원 -->
+  <div class="card">
+    <div class="card-title">⬆️ 복원 (되돌리기)</div>
+    <div class="warn">
+      <b>안전 설계:</b> 복원은 백업 파일에 들어있는 데이터를 <b>다시 채워 넣기만</b> 합니다.
+      기존 데이터를 지우지 않으므로, 실수로 날아간 시험을 되살리는 용도로 안전합니다.
+      같은 ID가 있으면 백업 파일 내용으로 덮어씁니다.
+    </div>
+    <div class="file-row">
+      <label class="file-label" id="fileLabel" for="restoreFile">📂 백업 파일(.json) 선택</label>
+      <input type="file" id="restoreFile" accept=".json,application/json" onchange="onPickFile()">
+    </div>
+    <button class="btn btn-outline" id="btnRestore" onclick="doRestore()" disabled>복원 실행</button>
+  </div>
+
+  <div class="status" id="statusBox"></div>
+</div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getFirestore,doc,getDoc,collection,getDocs,writeBatch,Timestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
+const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app);
+
+// 백업할 컬렉션 (OX·4지선다 시험 + 학생 명단)
+const COLLECTIONS=['tests','students'];
+const LABELS={tests:'시험 (OX·4지선다)',students:'학생 명단'};
+function lbl(c){return LABELS[c]||c;}
+
+// ── 인증 ──
+onAuthStateChanged(auth,async u=>{
+  if(!u){window.location.replace("/login.html");return;}
+  try{
+    const s=await getDoc(doc(db,"users",u.uid));
+    if(!s.exists()||s.data().status!=="approved"){await signOut(auth);window.location.replace("/login.html");return;}
+    document.body.style.visibility="visible";
+  }catch(e){window.location.replace("/login.html");}
+});
+
+// ── Timestamp 안전 변환 (round-trip 보존) ──
+function enc(v){
+  if(v===null||v===undefined)return v;
+  if(v instanceof Timestamp)return{__ts:true,s:v.seconds,n:v.nanoseconds};
+  if(Array.isArray(v))return v.map(enc);
+  if(typeof v==='object'){const o={};for(const k in v)o[k]=enc(v[k]);return o;}
+  return v;
+}
+function dec(v){
+  if(v===null||v===undefined)return v;
+  if(typeof v==='object'&&v.__ts===true)return new Timestamp(v.s,v.n);
+  if(Array.isArray(v))return v.map(dec);
+  if(typeof v==='object'){const o={};for(const k in v)o[k]=dec(v[k]);return o;}
+  return v;
+}
+
+// ── 상태 로그 ──
+const box=document.getElementById('statusBox');
+function log(msg,cls){box.classList.add('show');const span=cls?`<span class="${cls}">${msg}</span>`:msg;box.innerHTML+=span+'\n';box.scrollTop=box.scrollHeight;}
+function clearLog(){box.innerHTML='';}
+
+// ── 백업 ──
+window.doBackup=async function(){
+  const btn=document.getElementById('btnBackup');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> 백업 준비 중...';
+  clearLog();log('백업을 시작합니다...','hi');
+  try{
+    const out={};const counts={};
+    for(const coll of COLLECTIONS){
+      const snap=await getDocs(collection(db,coll));
+      out[coll]=snap.docs.map(d=>({__id:d.id,...enc(d.data())}));
+      counts[coll]=snap.size;
+      log(`· ${lbl(coll)}: ${snap.size}건`,'ok');
+    }
+    const payload={meta:{app:'beta-science',version:1,exportedAt:new Date().toISOString()},data:out};
+    const json=JSON.stringify(payload,null,2);
+    const blob=new Blob([json],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const n=new Date();const pad=x=>String(x).padStart(2,'0');
+    a.href=url;
+    a.download=`beta-science-backup-${n.getFullYear()}${pad(n.getMonth()+1)}${pad(n.getDate())}-${pad(n.getHours())}${pad(n.getMinutes())}.json`;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    const sum=document.getElementById('backupSummary');
+    sum.style.display='grid';
+    sum.innerHTML=COLLECTIONS.map(c=>`<div class="sum-chip"><span>${lbl(c)}</span><b>${counts[c]||0}</b></div>`).join('');
+    log('✅ 백업 파일을 내려받았습니다. 안전한 곳에 보관하세요.','ok');
+  }catch(e){
+    log('❌ 백업 실패: '+e.message,'err');
+  }finally{
+    btn.disabled=false;btn.textContent='전체 백업 파일 내려받기';
+  }
+};
+
+// ── 파일 선택 ──
+let picked=null;
+window.onPickFile=function(){
+  const f=document.getElementById('restoreFile').files[0];
+  picked=f||null;
+  const label=document.getElementById('fileLabel');
+  const btn=document.getElementById('btnRestore');
+  if(f){label.textContent='📄 '+f.name;btn.disabled=false;}
+  else{label.textContent='📂 백업 파일(.json) 선택';btn.disabled=true;}
+};
+
+// ── 복원 ──
+window.doRestore=async function(){
+  if(!picked){alert('백업 파일을 먼저 선택하세요.');return;}
+  if(!confirm('선택한 백업 파일의 내용을 복원합니다.\n(기존 데이터는 지우지 않고, 같은 ID는 덮어씁니다)\n\n진행할까요?'))return;
+  const btn=document.getElementById('btnRestore');
+  btn.disabled=true;btn.innerHTML='<span class="spin" style="border-color:#db2777;border-top-color:transparent"></span> 복원 중...';
+  clearLog();log('복원을 시작합니다...','hi');
+  try{
+    const text=await picked.text();
+    let parsed;
+    try{parsed=JSON.parse(text);}catch{throw new Error('JSON 파일을 읽을 수 없습니다. 올바른 백업 파일인지 확인하세요.');}
+    const data=parsed&&parsed.data?parsed.data:parsed;
+    if(!data||typeof data!=='object')throw new Error('백업 형식이 올바르지 않습니다.');
+
+    const ops=[];
+    for(const coll of Object.keys(data)){
+      const arr=data[coll];
+      if(!Array.isArray(arr))continue;
+      for(const item of arr){
+        if(!item||!item.__id){log(`· ${coll}: ID 없는 항목 건너뜀`,'err');continue;}
+        const{__id,...rest}=item;
+        ops.push({coll,id:__id,data:dec(rest)});
+      }
+      log(`· ${lbl(coll)}: ${arr.length}건 준비`,'ok');
+    }
+    if(ops.length===0)throw new Error('복원할 데이터가 없습니다.');
+
+    let done=0;const CHUNK=400;
+    for(let i=0;i<ops.length;i+=CHUNK){
+      const b=writeBatch(db);
+      const slice=ops.slice(i,i+CHUNK);
+      slice.forEach(o=>b.set(doc(db,o.coll,o.id),o.data,{merge:true}));
+      await b.commit();
+      done+=slice.length;
+      log(`  …저장 ${done}/${ops.length}`,'hi');
+    }
+    log('✅ 복원 완료! 대시보드에서 확인하세요.','ok');
+  }catch(e){
+    log('❌ 복원 실패: '+e.message,'err');
+  }finally{
+    btn.disabled=false;btn.textContent='복원 실행';
+  }
+};
+</script>
+</body>
+</html>
