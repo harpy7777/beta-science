@@ -227,12 +227,12 @@ function ClearConfirmModal({
             <AlertTriangle size={28} className="text-red-500" />
           </div>
         </div>
-        <h3 className="text-center font-black text-gray-900 text-lg mb-2">{label}을 모두 지울까요?</h3>
+        <h3 className="text-center font-black text-gray-900 text-lg mb-2">입력칸의 {label}를 비울까요?</h3>
         <p className="text-center text-sm text-gray-500 mb-1">
-          현재 입력된 <span className="font-semibold text-red-500">{label} {count}개</span>가 한 번에 삭제됩니다.
+          지금 입력창에 올라온 <span className="font-semibold text-red-500">{label} {count}개</span>가 화면에서 지워집니다.
         </p>
         <p className="text-center text-xs text-gray-400 mb-5">
-          이 작업은 되돌릴 수 없어요. (저장 전이라면 다시 불러올 수 있습니다)
+          ※ 이미 게시된 시험은 삭제되지 않습니다. (입력 중인 내용만 비웁니다)
         </p>
         <div className="flex gap-2.5">
           <button onClick={onCancel}
@@ -242,7 +242,7 @@ function ClearConfirmModal({
           <button onClick={onConfirm}
             className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-85 flex items-center justify-center gap-1.5"
             style={{ background: 'linear-gradient(135deg,#f87171,#dc2626)' }}>
-            <Trash2 size={14} />모두 삭제
+            <Trash2 size={14} />입력칸 비우기
           </button>
         </div>
       </div>
@@ -274,7 +274,7 @@ function CreateExamInner() {
   const [oxParsed, setOxParsed] = useState<Question[]>([]);
   const [mcParsed, setMcParsed] = useState<Question[]>([]);
 
-  // 전체 삭제 확인 모달 대상 ('ox' | 'multiple' | null)
+  // 입력칸 비우기 확인 모달 대상 ('ox' | 'multiple' | null)
   const [clearTarget, setClearTarget] = useState<'ox' | 'multiple' | null>(null);
 
   const handleGradeChange = (g: string) => { setGrade(g); setSubject(''); };
@@ -316,20 +316,24 @@ function CreateExamInner() {
     toast.success(`4지선다 ${parsed.length}개 불러옴`);
   }, [mcBulk]);
 
-  // 전체 삭제 실행
+  // 입력칸 비우기 실행 (화면의 입력 내용만 비움 - 게시된 시험과 무관)
   function handleClearConfirm() {
     if (clearTarget === 'ox') {
       setOxParsed([]);
-      toast.success('OX 문제를 모두 삭제했습니다');
+      toast.success('OX 입력칸을 비웠습니다');
     } else if (clearTarget === 'multiple') {
       setMcParsed([]);
-      toast.success('4지선다 문제를 모두 삭제했습니다');
+      toast.success('4지선다 입력칸을 비웠습니다');
     }
     setClearTarget(null);
   }
 
   async function handleSave(publish: boolean) {
     if (!grade) { toast.error('학년을 선택하세요'); setStep(1); return; }
+    // ★ 학년 검증: 정해진 학년(중1~고3)이 아니면 저장 차단 (학년 섞임 방지)
+    if (!GRADES.includes(grade)) {
+      toast.error('학년을 올바르게 선택하세요'); setStep(1); return;
+    }
     if (!subject) { toast.error('과목을 선택하세요'); setStep(1); return; }
     if (!title.trim()) { toast.error('단원명을 입력하세요'); setStep(1); return; }
     if (allQuestions.length === 0) { toast.error('문제를 1개 이상 입력하세요'); return; }
@@ -392,7 +396,7 @@ function CreateExamInner() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* ── 전체 삭제 확인 모달 ── */}
+      {/* ── 입력칸 비우기 확인 모달 ── */}
       {clearTarget && (
         <ClearConfirmModal
           kind={clearTarget}
@@ -687,7 +691,7 @@ function CreateExamInner() {
                     </div>
                   )}
 
-                  {/* OX 하단 버튼: 1개 추가 + 전체 삭제 */}
+                  {/* OX 하단 버튼: 1개 추가 + 입력칸 비우기 */}
                   <div className="flex items-center gap-2 mt-3">
                     <button
                       onClick={() => setOxParsed(prev => [...prev, makeQuestion('ox')])}
@@ -702,7 +706,7 @@ function CreateExamInner() {
                         className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border transition-colors"
                         style={{ borderColor: '#fecaca', color: '#dc2626' }}
                       >
-                        <Trash2 size={13} /> 전체 삭제
+                        <Trash2 size={13} /> 입력칸 비우기
                       </button>
                     )}
                   </div>
@@ -781,7 +785,7 @@ function CreateExamInner() {
                     </div>
                   )}
 
-                  {/* 4지선다 하단 버튼: 1개 추가 + 전체 삭제 */}
+                  {/* 4지선다 하단 버튼: 1개 추가 + 입력칸 비우기 */}
                   <div className="flex items-center gap-2 mt-3">
                     <button
                       onClick={() => setMcParsed(prev => [...prev, makeQuestion('multiple')])}
@@ -796,7 +800,7 @@ function CreateExamInner() {
                         className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border transition-colors"
                         style={{ borderColor: '#fecaca', color: '#dc2626' }}
                       >
-                        <Trash2 size={13} /> 전체 삭제
+                        <Trash2 size={13} /> 입력칸 비우기
                       </button>
                     )}
                   </div>
