@@ -1014,7 +1014,7 @@ function gcRenderList() {
     const short=GRADE_SHORT[grade]||grade, cls=GRADE_CLASS[grade]||'';
     const sid=s.id||s.uid;
     return `<div class="stu-row" data-grade="${grade}">
-      <div><div class="stu-name-wrap" onclick="window.gcOpenStu('${esc(sid)}','${esc(name)}','${grade}','${s.uid}')">
+      <div><div class="stu-name-wrap" onclick="window.gcOpenStu('${esc(sid)}','${esc(name)}','${grade}','${s.uid}')" style="cursor:pointer;">
         <div class="stu-av" style="background:${bg};color:${col};">${short}</div><span class="stu-name">${name}</span>
       </div></div>
       <div><span class="grade-tag ${cls}">${short}</span></div>
@@ -1079,6 +1079,8 @@ async function gcLoadSummary(s) {
 }
 
 window.gcOpenStu = async (sid, name, grade, uid) => {
+  location.href = `student-detail.html?id=${encodeURIComponent(sid)}`;
+  return;
   gcCur={studentId:sid,name,grade,uid}; gcCurWeek=-1; gcCurExamKey=null;
   const bg=GRADE_BG[grade]||'#f5f5f7',col=GRADE_COL[grade]||'#6e6e73',short=GRADE_SHORT[grade]||grade;
   const av=document.getElementById('d-av'); av.textContent=short; av.style.background=bg; av.style.color=col;
@@ -1256,6 +1258,8 @@ async function rpEnrichWithExamSubjects(records) {
   try { const snap=await getDocs(collection(db,'tests')); const byId=new Map(), byTitle=new Map(); snap.forEach(d=>{ const data=d.data(); byId.set(d.id,data); if(data.title) byTitle.set(data.title,data); }); return records.map(r=>{ if(r.subject) return r; const eid=r.examId||r.testId; if(eid&&byId.has(eid)){const s=byId.get(eid).subject;if(s) return{...r,subject:s};} const title=r.testName||r.examTitle; if(title&&byTitle.has(title)){const s=byTitle.get(title).subject;if(s) return{...r,subject:s};} return r; }); } catch { return records; }
 }
 window.rpOpenReport=async(sid,name,grade,uid)=>{
+  location.href = `student-detail.html?id=${encodeURIComponent(sid)}`;
+  return;
   rpCurStu={studentId:sid,name,grade,uid}; rpCurPeriod='all'; rpCurExam='all';
   document.querySelectorAll('.ptab').forEach((t,i)=>t.classList.toggle('on',i===0));
   document.querySelectorAll('.etab').forEach((t,i)=>t.classList.toggle('on',i===0));
