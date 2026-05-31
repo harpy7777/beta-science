@@ -5,6 +5,29 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 
+// ─────────────────────────────────────────────
+// ★ 채점 정규화: "선택지3","3번","3" → "3" / "O","X" → 대문자 통일
+// 정답이 어떤 형식으로 저장돼 있어도 학생 답(번호)과 정확히 비교됨
+function normalizeAnswer(val: string | undefined | null): string {
+  if (val === undefined || val === null) return '';
+  const str = String(val).trim();
+  if (/^[oOxX]$/.test(str)) return str.toUpperCase();
+  const numMatch = str.match(/\d+/);
+  if (numMatch) return numMatch[0];
+  return str;
+}
+
+// ★ 학생답과 정답이 일치하는지 판정 (모든 채점은 이 함수를 사용)
+export function isAnswerCorrect(
+  studentAnswer: string | undefined | null,
+  correctAnswer: string | undefined | null
+): boolean {
+  const a = normalizeAnswer(studentAnswer);
+  const b = normalizeAnswer(correctAnswer);
+  return a !== '' && a === b;
+}
+// ─────────────────────────────────────────────
+
 export type QuestionType = 'ox' | 'multiple';
 
 export interface Question {
@@ -186,12 +209,12 @@ export async function submitStudentAnswers(payload: {
   let multiScore: number | null = null;
 
   if (oxQuestions.length > 0) {
-    const correct = oxQuestions.filter(q => payload.answers[q.id] === q.answer).length;
+    const correct = oxQuestions.filter(q => isAnswerCorrect(payload.answers[q.id], q.answer)).length;
     oxScore = Math.round((correct / oxQuestions.length) * 100);
   }
 
   if (multipleQuestions.length > 0) {
-    const correct = multipleQuestions.filter(q => payload.answers[q.id] === q.answer).length;
+    const correct = multipleQuestions.filter(q => isAnswerCorrect(payload.answers[q.id], q.answer)).length;
     multiScore = Math.round((correct / multipleQuestions.length) * 100);
   }
 
@@ -239,7 +262,7 @@ export function calculateScore(
   answers: Record<string, string>
 ): number {
   if (!exam.questions || exam.questions.length === 0) return 0;
-  const correct = exam.questions.filter(q => answers[q.id] === q.answer).length;
+  const correct = exam.questions.filter(q => isAnswerCorrect(answers[q.id], q.answer)).length;
   return Math.round((correct / exam.questions.length) * 100);
 }
 
