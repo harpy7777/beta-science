@@ -257,13 +257,28 @@ export default function AuditPage() {
                     <span className="shrink-0 text-xs font-bold px-2 py-0.5 rounded mt-0.5"
                           style={{ background: '#fef3c7', color: '#92400e' }}>{iss.qIndex}번</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-800 font-medium leading-relaxed">{iss.text}</p>
-                      <div className="text-xs text-gray-600 mt-1.5 space-y-0.5">
-                        <div>현재 저장된 정답: <span className="font-mono font-bold text-red-600">&quot;{iss.answer}&quot;</span> <span className="text-gray-400">(번호가 아니라 채점 안 됨)</span></div>
-                        <div>올바른 정답: <span className="font-bold" style={{ color: '#15803d' }}>{iss.suggestion}</span></div>
+                      <p className="text-sm text-gray-800 font-medium leading-relaxed break-words">{iss.text}</p>
+                      <div className="text-xs text-gray-600 mt-1.5 space-y-1">
+                        <div className="break-words">현재 저장된 정답: <span className="font-mono font-bold text-red-600">&quot;{iss.answer}&quot;</span> <span className="text-gray-400">(번호가 아니라 채점 안 됨)</span></div>
+                        <div className="break-words">올바른 정답: <span className="font-bold" style={{ color: '#15803d' }}>{iss.suggestion}</span></div>
                         {iss.options.length > 0 && (
-                          <div className="text-gray-400">
-                            보기: {iss.options.map((o, i) => `${i + 1}.${o}`).join('  /  ')}
+                          <div>
+                            <span className="text-gray-400">보기</span>
+                            <div className="flex flex-wrap gap-1.5 mt-1">
+                              {iss.options.map((o, i) => {
+                                // 정답으로 추정된 번호의 보기를 초록색으로 강조
+                                const isAnswer = iss.suggestion.startsWith(`${i + 1}번`);
+                                return (
+                                  <span key={i}
+                                    className="inline-block px-2 py-0.5 rounded-lg border text-xs break-all"
+                                    style={isAnswer
+                                      ? { background: '#dcfce7', borderColor: '#86efac', color: '#15803d', fontWeight: 600 }
+                                      : { background: '#f9fafb', borderColor: '#e5e7eb', color: '#6b7280' }}>
+                                    <span className="font-bold mr-0.5">{i + 1}.</span>{o || '(미입력)'}
+                                  </span>
+                                );
+                              })}
+                            </div>
                           </div>
                         )}
                       </div>
