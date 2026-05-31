@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { getAllPublishedExams, getExamsByTeacher, Exam, Question } from '@/lib/examService';
-import { ArrowLeft, AlertTriangle, CheckCircle, Search, FlaskConical } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, CheckCircle, Search, FlaskConical, ChevronDown, ChevronUp } from 'lucide-react';
 
 type Issue = {
   qIndex: number;
@@ -58,6 +58,10 @@ export default function AuditPage() {
   const [totalExams, setTotalExams] = useState(0);
   const [scannedScope, setScannedScope] = useState<Scope>('all');
   const [error, setError] = useState('');
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  const toggleExpand = (id: string) =>
+    setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
@@ -74,6 +78,7 @@ export default function AuditPage() {
     setDone(false);
     setError('');
     setReports([]);
+    setExpanded({});
     try {
       const exams: Exam[] = scope === 'all'
         ? await getExamsByTeacher(user.uid)
@@ -225,7 +230,7 @@ export default function AuditPage() {
                     {reports.length}개 시험에서 {totalIssues}개 문제 발견
                   </div>
                   <div className="text-xs text-gray-600 mt-0.5">
-                    검사한 {totalExams}개 시험{scannedScope === 'all' ? '(임시저장 포함)' : '(게시본)'} 중 아래 문제들의 정답을 수정해야 합니다.
+                    검사한 {totalExams}개 시험{scannedScope === 'all' ? '(임시저장 포함)' : '(게시본)'} 중 문제가 있는 시험입니다. <b>시험을 누르면</b> 어떤 문제인지 펼쳐집니다.
                   </div>
                 </div>
               </div>
@@ -234,59 +239,78 @@ export default function AuditPage() {
         )}
 
         {reports.map(r => (
-          <div key={r.id} className="bg-white border border-pink-100 rounded-2xl p-5 mb-4">
-            <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-              <div className="flex items-center gap-2 flex-wrap">
+          <div key={r.id} className="bg-white border border-pink-100 rounded-2xl overflow-hidden mb-3">
+            {/* ── 접힌 헤더: 누르면 펼쳐짐 ── */}
+            <button
+              onClick={() => toggleExpand(r.id)}
+              className="w-full flex items-center justify-between gap-2 px-4 sm:px-5 py-3.5 text-left hover:bg-pink-50/40 transition-colors">
+              <div className="flex items-center gap-2 flex-wrap min-w-0">
+                {/* 오류 개수 배지 */}
+                <span className="shrink-0 inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full"
+                      style={{ background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' }}>
+                  <AlertTriangle size={11} /> {r.issues.length}개
+                </span>
                 {r.isPublished
-                  ? <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: '#dcfce7', color: '#15803d' }}>게시됨</span>
-                  : <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: '#f3f4f6', color: '#6b7280' }}>임시저장</span>}
-                {r.grade && <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: '#fce7f3', color: '#db2777' }}>{r.grade}</span>}
-                {r.subject && <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700">{r.subject}</span>}
-                <span className="font-bold text-gray-800 text-sm">{r.title}</span>
+                  ? <span className="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: '#dcfce7', color: '#15803d' }}>게시됨</span>
+                  : <span className="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: '#f3f4f6', color: '#6b7280' }}>임시저장</span>}
+                {r.grade && <span className="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: '#fce7f3', color: '#db2777' }}>{r.grade}</span>}
+                {r.subject && <span className="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">{r.subject}</span>}
+                <span className="font-bold text-gray-800 text-sm break-words">{r.title}</span>
               </div>
-              <button onClick={() => router.push(`/teacher/create?edit=${r.id}`)}
-                      className="text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors"
-                      style={{ borderColor: '#f9a8d4', color: '#db2777' }}>
-                이 시험 수정하기 →
-              </button>
-            </div>
-            <div className="space-y-2">
-              {r.issues.map((iss, k) => (
-                <div key={k} className="border border-amber-100 bg-amber-50/40 rounded-xl p-3">
-                  <div className="flex items-start gap-2">
-                    <span className="shrink-0 text-xs font-bold px-2 py-0.5 rounded mt-0.5"
-                          style={{ background: '#fef3c7', color: '#92400e' }}>{iss.qIndex}번</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-800 font-medium leading-relaxed break-words">{iss.text}</p>
-                      <div className="text-xs text-gray-600 mt-1.5 space-y-1">
-                        <div className="break-words">현재 저장된 정답: <span className="font-mono font-bold text-red-600">&quot;{iss.answer}&quot;</span> <span className="text-gray-400">(번호가 아니라 채점 안 됨)</span></div>
-                        <div className="break-words">올바른 정답: <span className="font-bold" style={{ color: '#15803d' }}>{iss.suggestion}</span></div>
-                        {iss.options.length > 0 && (
-                          <div>
-                            <span className="text-gray-400">보기</span>
-                            <div className="flex flex-wrap gap-1.5 mt-1">
-                              {iss.options.map((o, i) => {
-                                // 정답으로 추정된 번호의 보기를 초록색으로 강조
-                                const isAnswer = iss.suggestion.startsWith(`${i + 1}번`);
-                                return (
-                                  <span key={i}
-                                    className="inline-block px-2 py-0.5 rounded-lg border text-xs break-all"
-                                    style={isAnswer
-                                      ? { background: '#dcfce7', borderColor: '#86efac', color: '#15803d', fontWeight: 600 }
-                                      : { background: '#f9fafb', borderColor: '#e5e7eb', color: '#6b7280' }}>
-                                    <span className="font-bold mr-0.5">{i + 1}.</span>{o || '(미입력)'}
-                                  </span>
-                                );
-                              })}
-                            </div>
+              <span className="shrink-0 text-gray-400">
+                {expanded[r.id] ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+              </span>
+            </button>
+
+            {/* ── 펼쳤을 때만 보이는 상세 ── */}
+            {expanded[r.id] && (
+              <div className="px-4 sm:px-5 pb-5 border-t border-pink-50">
+                <div className="flex justify-end pt-3 pb-1">
+                  <button onClick={() => router.push(`/teacher/create?edit=${r.id}`)}
+                          className="text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors"
+                          style={{ borderColor: '#f9a8d4', color: '#db2777' }}>
+                    이 시험 수정하기 →
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {r.issues.map((iss, k) => (
+                    <div key={k} className="border border-amber-100 bg-amber-50/40 rounded-xl p-3">
+                      <div className="flex items-start gap-2">
+                        <span className="shrink-0 text-xs font-bold px-2 py-0.5 rounded mt-0.5"
+                              style={{ background: '#fef3c7', color: '#92400e' }}>{iss.qIndex}번</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-800 font-medium leading-relaxed break-words">{iss.text}</p>
+                          <div className="text-xs text-gray-600 mt-1.5 space-y-1">
+                            <div className="break-words">현재 저장된 정답: <span className="font-mono font-bold text-red-600">&quot;{iss.answer}&quot;</span> <span className="text-gray-400">(번호가 아니라 채점 안 됨)</span></div>
+                            <div className="break-words">올바른 정답: <span className="font-bold" style={{ color: '#15803d' }}>{iss.suggestion}</span></div>
+                            {iss.options.length > 0 && (
+                              <div>
+                                <span className="text-gray-400">보기</span>
+                                <div className="flex flex-wrap gap-1.5 mt-1">
+                                  {iss.options.map((o, i) => {
+                                    // 정답으로 추정된 번호의 보기를 초록색으로 강조
+                                    const isAnswer = iss.suggestion.startsWith(`${i + 1}번`);
+                                    return (
+                                      <span key={i}
+                                        className="inline-block px-2 py-0.5 rounded-lg border text-xs break-all"
+                                        style={isAnswer
+                                          ? { background: '#dcfce7', borderColor: '#86efac', color: '#15803d', fontWeight: 600 }
+                                          : { background: '#f9fafb', borderColor: '#e5e7eb', color: '#6b7280' }}>
+                                        <span className="font-bold mr-0.5">{i + 1}.</span>{o || '(미입력)'}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
                           </div>
-                        )}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
           </div>
         ))}
 
