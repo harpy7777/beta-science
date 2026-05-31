@@ -2,7 +2,7 @@
 // src/app/student/[examId]/page.tsx
 import { useState, useEffect, Suspense } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { getExam, submitStudentAnswers, calculateScore, Exam } from '@/lib/examService';
+import { getExam, submitStudentAnswers, calculateScore, isAnswerCorrect, Exam } from '@/lib/examService';
 import { FlaskConical, ChevronLeft, ChevronRight, CheckCircle, ArrowLeft, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -112,7 +112,7 @@ function StudentExamInner() {
     } else {
       let correct = 0;
       retryQuestions.forEach(q => {
-        if (newAnswers[q.id] === q.answer) correct++;
+        if (isAnswerCorrect(newAnswers[q.id], q.answer)) correct++;
       });
       const s = Math.round((correct / retryQuestions.length) * 100);
       setRetryScore(s);
@@ -124,7 +124,7 @@ function StudentExamInner() {
   function startRetry() {
     if (!exam) return;
     const filteredQs = getFilteredQuestions(exam);
-    const wrong = filteredQs.filter(q => answers[q.id] !== q.answer);
+    const wrong = filteredQs.filter(q => !isAnswerCorrect(answers[q.id], q.answer));
     if (wrong.length === 0) return;
     setRetryQuestions(wrong);
     setRetryAnswers({});
@@ -192,7 +192,7 @@ function StudentExamInner() {
   const answered = Object.keys(currentAnswers).length;
 
   // 틀린 문제 (filteredQuestions 기준)
-  const wrongQuestions = filteredQuestions.filter(q => answers[q.id] !== q.answer);
+  const wrongQuestions = filteredQuestions.filter(q => !isAnswerCorrect(answers[q.id], q.answer));
 
   // ★ 시험 제목에 타입 표시
   const examDisplayTitle = typeFilter === 'ox'
@@ -408,7 +408,7 @@ function StudentExamInner() {
               <div className="space-y-3 mb-6 text-left">
                 {retryQuestions.map((q, i) => {
                   const myAns = retryAnswers[q.id];
-                  const isCorrect = myAns === q.answer;
+                  const isCorrect = isAnswerCorrect(myAns, q.answer);
                   return (
                     <div key={q.id} className={`p-3 rounded-xl text-sm ${
                       isCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
@@ -491,7 +491,7 @@ function StudentExamInner() {
               <div className="space-y-3 mb-6 text-left">
                 {filteredQuestions.map((q, i) => {
                   const myAns = answers[q.id];
-                  const isCorrect = myAns === q.answer;
+                  const isCorrect = isAnswerCorrect(myAns, q.answer);
                   return (
                     <div key={q.id} className={`p-3 rounded-xl text-sm ${
                       isCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
