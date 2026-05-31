@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel='icon' type='image/svg+xml' href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpolygon points='70,8 121,38 121,102 70,132 19,102 19,38' fill='none' stroke='%23E85D75' stroke-width='8' stroke-linejoin='round'/%3E%3Cpolygon points='70,38 97,53 97,87 70,102 43,87 43,53' fill='none' stroke='%23E85D75' stroke-width='4' stroke-linejoin='round' stroke-dasharray='10 6'/%3E%3Ccircle cx='70' cy='8' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='38' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='70' cy='132' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='38' r='10' fill='%23E85D75'/%3E%3C/svg%3E">
+<title>베타과학학원 · 식물과 에너지</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+:root {
+  --ind-dark:    #1e1b4b;
+  --ind-main:    #4338ca;
+  --ind-mid:     #4f46e5;
+  --ind-light:   #6366f1;
+  --ind-bright:  #818cf8;
+  --ind-tint:    #f5f3ff;
+  --ind-tint2:   #ede9fe;
+  --ind-border:  #c4b5fd;
+  --ind-border2: #a78bfa;
+
+  --green:#059669; --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --blue2:#2563eb; --blue-bg:#eff6ff;  --blue-border:#bfdbfe;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626;   --red-bg:#fef2f2;   --red-border:#fecaca;
+  --teal:#0f766e;  --teal-bg:#f0fdfa;  --teal-border:#99f6e4;
+
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#f8f7ff;   --white:#fff;
+  --radius-sm:10px; --radius:14px; --radius-lg:18px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+p{line-height:1.78;font-size:13.5px;margin:.4rem 0}
+
+.header{background:#fff;border-bottom:1px solid #e0e7ff;padding:0 1rem;padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right));height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:500;box-shadow:0 1px 0 #e0e7ff}
+.header-left{display:flex;align-items:center;gap:9px;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--ind-mid) 0%,var(--ind-dark) 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(79,70,229,.32)}
+.brand-name{font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{display:flex;align-items:center;gap:5px;background:var(--ind-tint2);border:1px solid var(--ind-border);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:var(--ind-dark);white-space:nowrap}
+.dot-ind{width:5px;height:5px;background:var(--ind-mid);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{padding:7px 14px;min-height:36px;background:transparent;border:1.5px solid var(--ind-border);border-radius:20px;font-size:12px;font-weight:700;color:var(--ind-dark);cursor:pointer;white-space:nowrap;transition:background .15s}
+.back-btn:hover{background:var(--ind-tint)}
+.back-btn:active{background:var(--ind-tint2)}
+
+.hero{background:linear-gradient(135deg,var(--ind-dark) 0%,var(--ind-main) 55%,var(--ind-mid) 100%);padding:2.8rem 1.5rem 2.2rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hero::after{content:'';position:absolute;left:-50px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hero-deco{position:absolute;right:10%;top:15%;width:120px;height:120px;border-radius:50%;border:2px solid rgba(255,255,255,.12);pointer-events:none}
+.hero-deco2{position:absolute;right:18%;top:25%;width:60px;height:60px;border-radius:50%;border:1.5px solid rgba(255,255,255,.1);pointer-events:none}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+.hero-eyebrow{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+.hero-title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem}
+.hero-desc{font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.7;max-width:580px;margin:0 auto 1.8rem}
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:14px;padding:.9rem 1.4rem;text-align:center;backdrop-filter:blur(6px);min-width:80px;transition:background .2s}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+.tabs-wrap{background:#fff;border-bottom:2px solid var(--ind-border);position:sticky;top:54px;z-index:400}
+.tabs-inner{max-width:1100px;margin:0 auto;padding:0 1.5rem;display:flex;overflow-x:auto;justify-content:center;gap:4px;scrollbar-width:none}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{padding:13px 26px;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;margin-bottom:-2px;border-radius:8px 8px 0 0}
+.tab-btn:hover{color:var(--ind-mid);background:var(--ind-tint)}
+.tab-btn.active{color:var(--ind-mid);border-bottom-color:var(--ind-mid)}
+
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}
+.unit-section.visible{display:block}
+
+.unit-banner{border-radius:var(--radius-lg);padding:1.4rem 1.8rem;margin-bottom:1.8rem;display:flex;align-items:center;gap:1.2rem;background:linear-gradient(135deg,var(--ind-tint),var(--ind-tint2));border:2px solid var(--ind-border)}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ind-mid);margin-bottom:4px}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius-lg);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.acc-item.open{border-color:var(--ind-border);box-shadow:0 4px 20px rgba(79,70,229,.1)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:1.2rem 1.5rem;cursor:pointer;user-select:none;transition:background .15s}
+.acc-header:hover{background:var(--ind-tint)}
+.acc-num{width:32px;height:32px;border-radius:10px;background:var(--ind-tint2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--ind-dark);flex-shrink:0;transition:background .2s}
+.acc-item.open .acc-num{background:var(--ind-mid);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--ind-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-item.open .acc-subtitle{color:var(--ind-mid)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--ind-mid)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--ind-tint2)}
+.acc-item.open .acc-body{display:block}
+
+.sec-title{font-size:12px;font-weight:800;color:var(--ind-dark);letter-spacing:.06em;text-transform:uppercase;margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--ind-mid);border-radius:2px;display:block;flex-shrink:0}
+
+.concept-box{background:var(--ind-tint);border:1.5px solid var(--ind-border);border-left:4px solid var(--ind-mid);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.concept-box .cb-title{font-weight:800;color:var(--ind-dark);font-size:14px;margin-bottom:.4rem}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--green);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+.amber-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-left:4px solid var(--amber);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+.blue-box{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-left:4px solid var(--blue2);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.blue-box .cb-title{font-weight:800;color:#1e40af;font-size:14px;margin-bottom:.4rem}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+.teal-box{background:var(--teal-bg);border:1.5px solid var(--teal-border);border-left:4px solid var(--teal);border-radius:var(--radius);padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.teal-box .cb-title{font-weight:800;color:var(--teal);font-size:14px;margin-bottom:.4rem}
+
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:var(--radius);border:1.5px solid var(--ind-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--ind-tint2);padding:10px 14px;text-align:left;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ind-dark)}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6;vertical-align:top}
+tbody tr:hover td{background:var(--ind-tint)}
+
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0}
+.flow-box{background:#fff;border:1.5px solid var(--ind-border);border-radius:8px;padding:7px 12px;font-weight:700;color:var(--ind-dark);text-align:center;font-size:12px;line-height:1.4}
+.flow-arrow{color:var(--ind-mid);font-size:18px;font-weight:900}
+
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:.8rem 0}
+.point-card{background:#fff;border:1.5px solid var(--ind-border);border-radius:var(--radius);padding:1rem;text-align:center;transition:border-color .2s,box-shadow .2s}
+.point-card:hover{border-color:var(--ind-mid);box-shadow:0 4px 12px rgba(79,70,229,.12)}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--ind-mid);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+.hp{color:var(--ind-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--blue2);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.ht{color:var(--teal);font-weight:800}
+
+.formula-box{background:linear-gradient(135deg,var(--ind-tint),var(--ind-tint2));border:2px solid var(--ind-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--ind-dark);letter-spacing:-.01em;font-style:italic}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+.steps{display:flex;flex-direction:column;gap:8px;margin:.8rem 0}
+.step-item{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1.5px solid #e5e7eb;border-radius:var(--radius);padding:.9rem 1.1rem;transition:border-color .2s}
+.step-item:hover{border-color:var(--ind-border)}
+.step-num{width:28px;height:28px;border-radius:8px;background:var(--ind-mid);color:#fff;font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px}
+.step-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+.quiz-wrap{background:linear-gradient(135deg,var(--ind-tint2),var(--ind-tint));border:1.5px solid var(--ind-border);border-radius:var(--radius-lg);padding:1.2rem 1.4rem;margin-top:1.6rem}
+.quiz-label{font-size:11px;font-weight:800;color:var(--ind-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{background:var(--ind-mid);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.quiz-toggle:hover{background:var(--ind-dark)}
+.quiz-ans{display:none;margin-top:.8rem;padding:.9rem 1rem;background:rgba(255,255,255,.85);border-radius:10px;font-size:13.5px;color:var(--text);line-height:1.75;border:1px solid var(--ind-border)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:.6rem 0}
+.chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:var(--ind-tint2);color:var(--ind-dark);border:1px solid var(--ind-border)}
+.chip-g{background:var(--green-bg);color:#065f46;border-color:var(--green-border)}
+.chip-r{background:var(--red-bg);color:#991b1b;border-color:var(--red-border)}
+.chip-a{background:var(--amber-bg);color:#92400e;border-color:var(--amber-border)}
+.chip-b{background:var(--blue-bg);color:#1e40af;border-color:var(--blue-border)}
+.chip-t{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-border)}
+
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.45rem}
+  .hero-desc{font-size:13px}
+  .hero-eyebrow{font-size:10px;padding:4px 11px}
+  .hero-stats{gap:7px}
+  .hero-stat-card{min-width:68px;padding:.75rem .9rem}
+  .hs-num{font-size:1.45rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{justify-content:flex-start;gap:0;padding:0 .5rem}
+  .tab-btn{padding:11px 13px;font-size:11.5px;border-radius:6px 6px 0 0}
+  .content-wrap{padding:1.2rem .85rem 4rem}
+  .unit-banner{flex-direction:column;gap:.75rem;padding:1.1rem}
+  .ub-emoji{font-size:2.1rem}
+  .ub-title{font-size:1.1rem}
+  .acc-header{padding:.95rem 1rem;gap:10px}
+  .acc-num{width:30px;height:30px;font-size:12px;border-radius:8px}
+  .acc-htitle{font-size:14px}
+  .acc-hdesc{font-size:11.5px}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .steps{gap:7px}
+  .step-item{padding:.8rem .95rem}
+  table{font-size:12px}
+  thead th{font-size:10px;padding:8px 10px}
+  tbody td{padding:8px 10px}
+  .concept-box,.green-box,.amber-box,.blue-box,.red-box,.teal-box{padding:.85rem 1rem;font-size:13px}
+  .formula-box{padding:1rem 1.1rem}
+  .formula-text{font-size:1.15rem}
+  .quiz-wrap{padding:1rem 1.1rem}
+  .quiz-q{font-size:13px}
+}
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .hero-deco,.hero-deco2{display:none}
+  .hero{padding:1.7rem .9rem 1.5rem}
+  .hero-title{font-size:1.28rem;letter-spacing:-.025em}
+  .hero-desc{font-size:12.5px;margin-bottom:1.4rem}
+  .breadcrumb{gap:4px;margin-bottom:.9rem}
+  .bc-item,.bc-current,.bc-sep{font-size:11px}
+  .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;max-width:280px;margin:0 auto}
+  .hero-stat-card{min-width:0;padding:.7rem .5rem}
+  .hs-num{font-size:1.3rem}
+  .tabs-inner{padding:0 .3rem}
+  .tab-btn{padding:10px 11px;font-size:11px;white-space:nowrap}
+  .ub-title{font-size:1rem}
+  .ub-desc{font-size:12px}
+  .acc-header{padding:.85rem .9rem;gap:8px}
+  .acc-htitle{font-size:13.5px}
+  .acc-hdesc{font-size:11px}
+  .acc-body{padding:0 .9rem 1.2rem}
+  .sec-title{font-size:11px}
+  .point-box{grid-template-columns:1fr}
+  .pc-icon{font-size:1.5rem}
+  .pc-title{font-size:12px}
+  .pc-desc{font-size:11.5px}
+  .step-num{width:26px;height:26px;font-size:12px;border-radius:7px;flex-shrink:0}
+  .step-title{font-size:12.5px}
+  .step-desc{font-size:12px}
+  .formula-text{font-size:1rem}
+  .formula-sub{font-size:11px}
+  .table-wrap{-webkit-overflow-scrolling:touch}
+  .quiz-q{font-size:12.5px}
+  .quiz-toggle{font-size:11.5px;padding:6px 15px}
+  .quiz-ans{font-size:13px}
+  .chip,.chip-g,.chip-r,.chip-a,.chip-b,.chip-t{font-size:10.5px;padding:3px 10px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-ind"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="science2-summary.html" class="bc-item">중학 과학 2</a><span class="bc-sep">›</span>
+      <span class="bc-current">🌱 Ⅴ. 식물과 에너지</span>
+    </div>
+    <div class="hero-eyebrow">🌱 PART 05 · 중학 과학 2 · UNIT 05</div>
+    <div class="hero-title">Ⅴ. 식물과 에너지</div>
+    <div class="hero-desc">광합성 과정과 광합성에 영향을 미치는 환경요인,<br>식물의 호흡과 광합성의 관계, 광합성산물의 저장과 이용까지 완벽 정리</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">2</div><div class="hs-lbl">중단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">4</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">10+</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">🌞 중단원1 · 광합성</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">🌳 중단원2 · 식물의 호흡과 에너지</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ═══════════════════════════════
+     중단원 1: 광합성
+═══════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner">
+    <div class="ub-emoji">🌞</div>
+    <div>
+      <div class="ub-num">중단원 01 · Photosynthesis</div>
+      <div class="ub-title">광합성</div>
+      <div class="ub-desc">식물이 빛에너지로 양분을 만드는 광합성 과정과, 빛의 세기·이산화 탄소 농도·온도 등 광합성에 영향을 미치는 환경요인을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 식물의 광합성 -->
+    <div class="acc-item" id="acc-photosynthesis">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Photosynthesis · 식물의 광합성</div>
+          <div class="acc-htitle">식물의 광합성</div>
+          <div class="acc-hdesc">엽록체·엽록소 · 광합성 과정 · 필요한 물질과 광합성산물</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">광합성이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🌿 광합성 (Photosynthesis)</div>
+          식물이 <span class="hp">빛에너지를 이용하여 스스로 양분을 만드는 과정</span>.<br><br>
+          광합성은 식물세포의 <span class="hp">엽록체</span>에서 일어난다. 엽록체 안에는 초록색 색소인 <span class="hp">엽록소</span>가 있으며, 엽록소는 광합성에 필요한 <strong>빛에너지를 흡수</strong>한다.
+        </div>
+
+        <div class="sec-title">광합성에 필요한 물질의 이동</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">☀️</div>
+            <div class="pc-title">빛에너지</div>
+            <div class="pc-desc">엽록소가 흡수</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">💨</div>
+            <div class="pc-title">이산화 탄소</div>
+            <div class="pc-desc">주로 잎의 기공을 통해 식물 안으로 들어옴</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">💧</div>
+            <div class="pc-title">물</div>
+            <div class="pc-desc">뿌리에서 흡수되어 물관을 통해 잎까지 운반됨</div>
+          </div>
+        </div>
+
+        <div class="sec-title">광합성 과정</div>
+        <div class="formula-box">
+          <div class="formula-text">이산화 탄소 + 물 &nbsp;→&nbsp; 포도당 + 산소</div>
+          <div class="formula-sub">엽록체에서 빛에너지를 이용 (빛에너지가 화살표 위에서 작용)</div>
+        </div>
+        <div class="green-box">
+          <div class="cb-title">🍬 광합성산물</div>
+          • 광합성으로 만들어지는 양분 = <span class="hg">포도당</span> → 곧 <strong>녹말</strong>로 바뀌어 엽록체에 저장됨<br>
+          • 포도당과 함께 <span class="hg">산소</span>가 만들어지며, 산소는 잎의 <strong>기공</strong>을 통해 식물 밖으로 나간다<br><br>
+          💡 녹말 = 많은 수의 포도당으로 이루어진 탄수화물
+        </div>
+
+        <div class="amber-box">
+          <div class="cb-title">🧪 광합성산물 확인 실험</div>
+          햇빛을 받은 잎과 받지 않은 잎을 에탄올에 넣어 탈색한 뒤 <span class="ha">아이오딘–아이오딘화 칼륨 용액</span>을 떨어뜨리면, 햇빛을 받은 잎만 <strong>청람색</strong>으로 변한다. → 광합성으로 <strong>녹말</strong>이 만들어졌음을 확인 (청람색 = 녹말 반응)
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">광합성이 일어나는 장소와 광합성에 필요한 물질, 그리고 광합성으로 만들어지는 산물을 각각 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • 장소: 식물세포의 <strong>엽록체</strong><br>
+            • 필요한 물질: <strong>빛에너지, 이산화 탄소, 물</strong><br>
+            • 광합성산물: <strong>포도당</strong>(곧 녹말로 바뀜)과 <strong>산소</strong>
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">숲은 도시보다 공기의 산소 농도가 높을지 낮을지, 식물의 광합성과 관련지어 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안:</strong><br><br>
+            숲은 도시보다 식물이 많아 광합성이 활발하게 일어난다. 광합성으로 <strong>산소가 만들어지므로</strong>, 숲은 도시보다 공기의 산소 농도가 <strong>높다</strong>.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 광합성에 영향을 미치는 환경요인 -->
+    <div class="acc-item" id="acc-factors">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Environmental Factors · 환경요인</div>
+          <div class="acc-htitle">광합성에 영향을 미치는 환경요인</div>
+          <div class="acc-hdesc">빛의 세기 · 이산화 탄소의 농도 · 온도와 광합성량의 관계</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">3가지 환경요인</div>
+        <div class="concept-box">
+          <div class="cb-title">🌡️ 광합성에 영향을 미치는 환경요인</div>
+          식물의 광합성은 <span class="hp">빛의 세기, 이산화 탄소의 농도, 온도</span>의 영향을 받는다. 세 요인이 모두 알맞게 유지될 때 광합성이 활발하게 일어나 식물이 잘 자란다.
+        </div>
+
+        <div class="sec-title">요인별 광합성량의 변화</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>환경요인</th><th>광합성량의 변화</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="ha">빛의 세기</span></td>
+              <td>셀수록 광합성량 증가 → 일정 세기 이상이 되면 더 이상 증가하지 않고 <strong>일정</strong>해짐</td>
+            </tr>
+            <tr>
+              <td><span class="hb">이산화 탄소의 농도</span></td>
+              <td>높을수록 광합성량 증가 → 일정 농도 이상이 되면 더 이상 증가하지 않고 <strong>일정</strong>해짐</td>
+            </tr>
+            <tr>
+              <td><span class="hr">온도</span></td>
+              <td>높을수록 광합성량 증가 → 일정 온도 이상이 되면 <strong>빠르게 감소</strong></td>
+            </tr>
+          </tbody>
+        </table></div>
+        <div class="blue-box">
+          <div class="cb-title">📌 광합성량이 계속 증가하지 않는 이유</div>
+          식물세포에 들어 있는 <span class="hb">엽록체의 수는 한정</span>되어 있어서, 빛의 세기나 이산화 탄소 농도가 일정 수준 이상이 되면 광합성량이 계속 증가하지는 않는다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">이산화 탄소의 농도가 높을수록 식물의 광합성량이 계속 증가하는가? 그렇지 않다면 어떻게 변하는지 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            계속 증가하지 <strong>않는다</strong>(✕).<br><br>
+            이산화 탄소의 농도가 높을수록 광합성량이 증가하다가, <strong>일정 농도 이상이 되면 더 이상 증가하지 않고 일정</strong>해진다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">온도와 광합성의 관계를 탐구하는 실험을 설계할 때, 다르게 해야 할 조건과 같게 해야 할 조건을 각각 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안:</strong><br><br>
+            • <strong>다르게 해야 할 조건</strong>: 온도<br>
+            • <strong>같게 해야 할 조건</strong>: 빛의 세기, 이산화 탄소의 농도, 식물의 종류·크기 등 온도를 제외한 나머지 조건<br><br>
+            💡 탐구하려는 요인(온도)만 다르게 하고 나머지는 모두 같게 해야 온도의 영향을 정확히 알 수 있다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ═══════════════════════════════
+     중단원 2: 식물의 호흡과 에너지
+═══════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner">
+    <div class="ub-emoji">🌳</div>
+    <div>
+      <div class="ub-num">중단원 02 · Respiration & Energy</div>
+      <div class="ub-title">식물의 호흡과 에너지</div>
+      <div class="ub-desc">식물의 호흡과 광합성의 관계, 낮과 밤의 기체 출입, 광합성산물(녹말·설탕)의 생성·이동·저장·이용 과정을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 식물의 호흡과 광합성 -->
+    <div class="acc-item" id="acc-respiration">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Respiration · 식물의 호흡과 광합성</div>
+          <div class="acc-htitle">식물의 호흡과 광합성</div>
+          <div class="acc-hdesc">호흡의 정의 · 낮·밤 기체 출입 · 광합성과 호흡의 관계</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">호흡이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🫁 호흡 (Respiration)</div>
+          세포에서 <span class="hp">양분을 분해하여 에너지를 얻는 과정</span>.<br><br>
+          식물세포에서는 광합성으로 만들어진 <strong>포도당과 산소</strong>를 사용하여 에너지를 얻으며, 이 과정에서 <strong>이산화 탄소와 물</strong>이 생성된다.<br>
+          💡 세포에서 일어나므로 '세포호흡'이라고도 하며, 주로 <strong>마이토콘드리아</strong>에서 일어난다.
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">포도당 + 산소 &nbsp;→&nbsp; 이산화 탄소 + 물</div>
+          <div class="formula-sub">이 과정에서 에너지가 방출됨</div>
+        </div>
+
+        <div class="sec-title">광합성과 호흡 비교</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>광합성</th><th>호흡</th></tr></thead>
+          <tbody>
+            <tr><td>일어나는 시기</td><td>주로 낮 (빛이 있을 때)</td><td>항상 (낮·밤 관계없이)</td></tr>
+            <tr><td>장소</td><td><span class="hg">엽록체</span></td><td><span class="ha">마이토콘드리아</span></td></tr>
+            <tr><td>필요한 물질</td><td>이산화 탄소, 물</td><td>포도당, 산소</td></tr>
+            <tr><td>생성되는 물질</td><td>포도당, 산소</td><td>이산화 탄소, 물</td></tr>
+            <tr><td>양분</td><td>합성</td><td>분해</td></tr>
+            <tr><td>에너지 출입</td><td>빛에너지 흡수</td><td>에너지 방출</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">낮과 밤의 기체 출입</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🌞</div>
+            <div class="pc-title">낮 (빛이 강할 때)</div>
+            <div class="pc-desc">광합성 &gt; 호흡 → 이산화 탄소를 흡수하고 산소를 방출</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🌙</div>
+            <div class="pc-title">밤</div>
+            <div class="pc-desc">호흡만 일어남 → 산소를 흡수하고 이산화 탄소를 방출</div>
+          </div>
+        </div>
+        <div class="teal-box">
+          <div class="cb-title">🔄 광합성과 호흡의 관계</div>
+          광합성에서 생성된 물질(포도당·산소)은 호흡에 이용되고, 호흡에서 생성된 물질(이산화 탄소·물)은 광합성에 이용된다.<br>
+          광합성은 빛에너지를 흡수해 양분을 만드는 과정, 호흡은 양분을 분해해 에너지를 얻는 과정이므로 <span class="ht">둘 다 식물이 에너지를 얻기 위해 꼭 필요</span>하다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">식물의 광합성과 호흡은 각각 언제 일어나는지 쓰고, 밤에 식물이 흡수하고 방출하는 기체를 각각 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • 광합성: 주로 <strong>낮</strong>(빛이 있을 때) / 호흡: <strong>항상</strong>(낮·밤 관계없이)<br><br>
+            • 밤: 호흡만 일어나므로 <strong>산소를 흡수</strong>하고 <strong>이산화 탄소를 방출</strong>한다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">연일 계속되는 열대야(밤에 온도가 높은 현상) 때 과일의 당도가 낮아지는 까닭을 광합성산물과 호흡으로 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안:</strong><br><br>
+            밤에 온도가 높으면 식물이 <strong>호흡을 많이</strong> 하게 된다. 호흡은 양분(광합성산물)을 분해하는 과정이므로, 낮에 광합성으로 저장한 양분이 밤에 많이 소모된다. 그 결과 열매에 남는 양분이 줄어들어 <strong>당도가 낮아지고 수확량이 감소</strong>한다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 광합성산물의 저장과 이용 -->
+    <div class="acc-item" id="acc-product">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Storage & Use · 광합성산물</div>
+          <div class="acc-htitle">광합성산물의 저장과 이용</div>
+          <div class="acc-hdesc">녹말→설탕 이동(체관) · 이용 · 부위별 저장 형태</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">생성 → 이동 → 이용·저장</div>
+        <div class="flow" style="justify-content:center;flex-wrap:wrap">
+          <div class="flow-box" style="background:var(--green-bg);border-color:var(--green)">포도당<br><small>잎 엽록체에서 생성</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box" style="background:var(--ind-tint2);border-color:var(--ind-border)">녹말<br><small>엽록체에 저장</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box" style="background:var(--amber-bg);border-color:var(--amber)">설탕<br><small>주로 밤에 전환</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box" style="background:var(--blue-bg);border-color:var(--blue2)">체관 이동<br><small>각 기관으로</small></div>
+        </div>
+        <div class="concept-box">
+          <div class="cb-title">🚚 광합성산물의 이동</div>
+          잎의 엽록체에서 만들어진 포도당은 물에 녹지 않는 <span class="hp">녹말</span>로 바뀌어 엽록체에 저장된다. 엽록체에 저장된 녹말은 주로 <strong>밤에 설탕</strong>으로 바뀌어 <span class="hp">체관</span>을 따라 꽃·열매·뿌리·줄기 등으로 이동한다.<br><br>
+          💡 물은 <strong>물관</strong>으로, 광합성산물(설탕)은 <strong>체관</strong>으로 이동한다.
+        </div>
+
+        <div class="sec-title">광합성산물의 이용</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🔋</div>
+            <div class="pc-title">에너지</div>
+            <div class="pc-desc">호흡으로 에너지를 얻을 때 이용</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🌸</div>
+            <div class="pc-title">성장·개화</div>
+            <div class="pc-desc">몸을 구성하는 성분이 되어 성장하거나 꽃을 피울 때 이용</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🐿️</div>
+            <div class="pc-title">먹이</div>
+            <div class="pc-desc">동물의 먹이가 되어 다른 생물에게 양분 제공</div>
+          </div>
+        </div>
+
+        <div class="sec-title">부위별 저장 형태</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>식물</th><th>저장 부위</th><th>저장 형태</th></tr></thead>
+          <tbody>
+            <tr><td>포도</td><td>열매</td><td>포도당</td></tr>
+            <tr><td>사탕수수</td><td>줄기</td><td>설탕</td></tr>
+            <tr><td>고구마·감자</td><td>뿌리(고구마)</td><td>녹말</td></tr>
+            <tr><td>콩</td><td>씨</td><td>단백질</td></tr>
+            <tr><td>깨·땅콩</td><td>씨</td><td>지방</td></tr>
+          </tbody>
+        </table></div>
+        <div class="green-box">
+          <div class="cb-title">🌍 광합성산물은 에너지원</div>
+          식물에 저장된 광합성산물은 동물의 먹이가 되어 사람을 비롯한 많은 동물에게 양분을 제공한다. 따라서 광합성산물은 식물과 다른 많은 생물의 생명활동에 필요한 에너지를 제공하는 <span class="hg">에너지원</span>이다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">잎의 엽록체에 저장된 녹말은 무엇으로 바뀌어 어떤 통로를 따라 이동하는지 쓰시오. 또 광합성산물은 뿌리·줄기 등에 녹말 형태로만 저장되는가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • 녹말 → <strong>설탕</strong>으로 바뀌어 <strong>체관</strong>을 따라 이동한다.<br><br>
+            • 녹말 형태로만 저장되지 <strong>않는다</strong>(✕). 식물의 종류·부위에 따라 <strong>녹말, 단백질, 지방, 포도당, 설탕</strong> 등 다양한 형태로 저장된다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">사과 과수원에서 열매가 다 자라기 전에 일부 열매를 떼어 내는 '솎아주기'를 하는 까닭을 광합성산물의 저장과 관련지어 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안:</strong><br><br>
+            식물이 만드는 광합성산물의 양은 한정되어 있다. 열매 수가 많으면 양분이 여러 열매로 나뉘어 저장되지만, 일부 열매를 솎아 내면 <strong>남은 열매에 더 많은 양분이 집중 저장</strong>되어 열매가 크고 당도가 높게 자란다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  document.querySelectorAll('.unit-section').forEach(el => el.classList.remove('visible'));
+  document.getElementById('unit' + n).classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => item.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+const hashMap = {
+  '#unit1':1,'#acc-photosynthesis':1,'#acc-factors':1,
+  '#unit2':2,'#acc-respiration':2,'#acc-product':2
+};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n-1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
