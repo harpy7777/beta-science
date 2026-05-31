@@ -9,7 +9,7 @@ import { auth } from '@/lib/firebase';
 import { getExamsByTeacher, deleteExam, Exam } from '@/lib/examService';
 import {
   Plus, LogOut, BookOpen, Users,
-  Eye, BarChart3, CheckCircle, Clock, Trash2, AlertTriangle
+  Eye, BarChart3, CheckCircle, Clock, Trash2, AlertTriangle, Search
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -233,6 +233,12 @@ export default function TeacherPage() {
               <span className="font-bold text-gray-900 text-sm">베타과학학원</span>
             </div>
             <div className="flex items-center gap-2">
+              <button onClick={() => router.push('/teacher/audit')}
+                className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border transition-colors"
+                style={{ borderColor: '#fce7f3', color: '#db2777' }}>
+                <Search size={14} />
+                <span className="hidden sm:inline">정답 검사</span>
+              </button>
               <button onClick={() => router.push('/teacher/create')}
                 className="flex items-center gap-1.5 text-sm font-semibold text-white px-4 py-2 rounded-xl transition-opacity hover:opacity-85"
                 style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}>
