@@ -72,7 +72,8 @@ input[type=file]{display:none}
     <div class="card-title">⬇️ 백업 (내려받기)</div>
     <div class="card-desc">
       등록된 <b>OX·4지선다 시험 문제</b>와 <b>학생 명단 전체</b>를 <b>JSON 파일 하나</b>로 내려받습니다.
-      내려받은 파일은 노션·구글드라이브 등에 보관하세요.<br>
+      내려받은 파일은 노션·구글드라이브 등에 보관하세요.
+      <b>(누를 때마다 Firebase 보관함에도 사본이 자동 저장됩니다)</b><br>
       <span style="color:#db2777;font-weight:600">권장: 시험이나 학생을 추가·수정한 날엔 한 번씩 내려받기</span>
     </div>
     <button class="btn btn-pink" id="btnBackup" onclick="doBackup()">백업 파일 내려받기</button>
@@ -101,8 +102,9 @@ input[type=file]{display:none}
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getFirestore,doc,getDoc,collection,getDocs,writeBatch,Timestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getStorage,ref as sref,uploadString}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
-const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app);
+const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app);
 
 // 백업할 컬렉션 (OX·4지선다 시험 + 학생 명단)
 const COLLECTIONS=['tests','students'];
@@ -164,6 +166,17 @@ window.doBackup=async function(){
     document.body.appendChild(a);a.click();document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
+    // Firebase 보관함(Storage)에도 자동 사본 저장 — Firestore와 별도 공간이라 더 안전
+    try{
+      const fname=`backup-${n.getFullYear()}${pad(n.getMonth()+1)}${pad(n.getDate())}-${pad(n.getHours())}${pad(n.getMinutes())}.json`;
+      await uploadString(sref(storage,`backups/${fname}`),json,'raw',{contentType:'application/json'});
+      log('✅ Firebase 보관함에도 자동 저장됨 (backups/'+fname+')','ok');
+    }catch(se){
+      log('⚠️ Firebase 자동 저장 실패 (내려받기는 정상 완료됨)','err');
+      log('   → Firebase 콘솔에서 Storage 규칙을 설정했는지 확인하세요.','err');
+      log('   사유: '+(se&&se.code?se.code:(se&&se.message?se.message:String(se))),'err');
+    }
+
     const sum=document.getElementById('backupSummary');
     sum.style.display='grid';
     sum.innerHTML=COLLECTIONS.map(c=>`<div class="sum-chip"><span>${lbl(c)}</span><b>${counts[c]||0}</b></div>`).join('');
@@ -171,7 +184,7 @@ window.doBackup=async function(){
   }catch(e){
     log('❌ 백업 실패: '+e.message,'err');
   }finally{
-    btn.disabled=false;btn.textContent='전체 백업 파일 내려받기';
+    btn.disabled=false;btn.textContent='백업 파일 내려받기';
   }
 };
 
