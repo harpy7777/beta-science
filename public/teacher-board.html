@@ -293,24 +293,37 @@ body {
 .grade-badge { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 5px; background: #ede9fe; color: #5b21b6; white-space: nowrap; }
 .cc-chip-grade { background: #ede9fe; color: #5b21b6; }
 
-/* ── 개념정리 ── */
-.concept-search {
-  width: 100%; padding: 12px 14px; min-height: 48px;
-  border: 1.5px solid #fce7f3; border-radius: 12px;
-  font-size: 16px; font-family: inherit; color: #1d1d1f;
-  outline: none; margin-bottom: 10px; transition: border 0.15s;
-  -webkit-appearance: none;
+/* ── 핵심정리 카드 (개념정리 패널 내부) ── */
+.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.summary-card {
+  display: flex; flex-direction: column; gap: 6px;
+  background: #fff; border: 1px solid #ede9fe; border-radius: 16px;
+  padding: 1.1rem 1rem; min-height: 116px;
+  text-decoration: none; color: inherit; cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  -webkit-user-select: none; user-select: none;
 }
-.concept-search:focus { border-color: #db2777; }
-.concept-list { display: flex; flex-direction: column; gap: 8px; }
-.concept-card { background: #fff; border: 1px solid #f0fdf4; border-left: 3px solid #16a34a; border-radius: 12px; overflow: hidden; }
-.concept-head { padding: 12px 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.15s; min-height: 52px; }
-.concept-head:hover { background: #f0fdf4; }
-.concept-head:active { background: #f0fdf4; }
-.concept-title { font-size: 13px; font-weight: 600; color: #1d1d1f; flex: 1; }
-.concept-body { padding: 0 14px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; }
-.concept-body.open { max-height: 400px; padding: 0 14px 14px; }
-.concept-text { font-size: 13px; color: #3c3c43; line-height: 1.8; white-space: pre-wrap; }
+.summary-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(124,58,237,0.12); }
+.summary-card:active { transform: scale(0.98); }
+.summary-card.mid  { background: #faf5ff; border-color: #e9d5ff; }
+.summary-card.mid:hover  { border-color: #c4b5fd; box-shadow: 0 8px 24px rgba(124,58,237,0.15); }
+.summary-card.high { background: #f0f9ff; border-color: #bae6fd; }
+.summary-card.high:hover { border-color: #7dd3fc; box-shadow: 0 8px 24px rgba(2,132,199,0.15); }
+.summary-tag {
+  align-self: flex-start; font-size: 10px; font-weight: 700;
+  padding: 3px 9px; border-radius: 6px; white-space: nowrap; margin-bottom: 2px;
+}
+.tag-mid  { background: #ede9fe; color: #6d28d9; }
+.tag-high { background: #e0f2fe; color: #0369a1; }
+.summary-title { font-size: 14px; font-weight: 700; color: #1d1d1f; letter-spacing: -0.02em; line-height: 1.35; word-break: keep-all; }
+.summary-desc  { font-size: 11px; color: #9ca3af; line-height: 1.45; }
+@media (max-width: 700px) {
+  .summary-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 420px) {
+  .summary-grid { grid-template-columns: 1fr; }
+  .summary-card { min-height: auto; padding: 1rem; }
+}
 
 /* ── 수업카드 패널 ── */
 .cc-filter-bar {
@@ -644,8 +657,8 @@ body {
     </div>
     <div class="nav-card nc-concept" onclick="openPanel('concept')">
       <div class="nav-icon">📚</div>
-      <div class="nav-title">개념정리 창고</div>
-      <div class="nav-desc">핵심 개념 저장<br>검색·분류 기능</div>
+      <div class="nav-title">핵심정리</div>
+      <div class="nav-desc">중·고 과학<br>핵심 정리 바로가기</div>
       <span class="nav-arrow">›</span>
     </div>
     <div class="nav-card nc-classcard" onclick="openPanel('classcard')">
@@ -756,47 +769,47 @@ body {
   </div>
 </div>
 
-<!-- 개념정리 패널 -->
+<!-- 핵심정리 패널 -->
 <div class="page-panel" id="panel-concept">
-  <div class="panel-bar"><span class="panel-bar-title">📚 개념정리 창고</span><button class="close-btn" onclick="closePanel()">✕</button></div>
+  <div class="panel-bar"><span class="panel-bar-title">📚 핵심정리</span><button class="close-btn" onclick="closePanel()">✕</button></div>
   <div class="panel-body">
-    <input class="concept-search" type="text" id="concept-search" placeholder="개념 검색..." oninput="filterConcepts()">
-    <div class="filter-chips" id="concept-subj-chips">
-      <button class="fchip on" onclick="setConceptFilter('전체',this)">전체</button>
-      <button class="fchip" onclick="setConceptFilter('통합과학',this)">통합과학</button>
-      <button class="fchip" onclick="setConceptFilter('화학',this)">화학</button>
-      <button class="fchip" onclick="setConceptFilter('생물',this)">생물</button>
-      <button class="fchip" onclick="setConceptFilter('물리',this)">물리</button>
-      <button class="fchip" onclick="setConceptFilter('지학',this)">지학</button>
-      <button class="fchip" onclick="setConceptFilter('내신',this)">내신</button>
+    <div class="section-label" style="color:#7e22ce;">중학교 과학 핵심 정리</div>
+    <div class="summary-grid">
+      <a class="summary-card mid" href="middle-science1.html">
+        <div class="summary-tag tag-mid">중1 과학</div>
+        <div class="summary-title">중학교 1학년 과학</div>
+        <div class="summary-desc">지권·생물·힘·물질 핵심 정리</div>
+      </a>
+      <a class="summary-card mid" href="middle-science2.html">
+        <div class="summary-tag tag-mid">중2 과학</div>
+        <div class="summary-title">중학교 2학년 과학</div>
+        <div class="summary-desc">전기·자기·화학·생명 핵심 정리</div>
+      </a>
+      <a class="summary-card mid" href="middle-science3.html">
+        <div class="summary-tag tag-mid">중3 과학</div>
+        <div class="summary-title">중학교 3학년 과학</div>
+        <div class="summary-desc">화학반응·운동·에너지 핵심 정리</div>
+      </a>
     </div>
-    <div class="filter-chips grade-chip-row" id="concept-grade-chips">
-      <button class="fchip on" onclick="setConceptGradeFilter('전체',this)">학년 전체</button>
-      <button class="fchip" onclick="setConceptGradeFilter('중1',this)">중1</button>
-      <button class="fchip" onclick="setConceptGradeFilter('중2',this)">중2</button>
-      <button class="fchip" onclick="setConceptGradeFilter('중3',this)">중3</button>
-      <button class="fchip" onclick="setConceptGradeFilter('고1',this)">고1</button>
-      <button class="fchip" onclick="setConceptGradeFilter('고2',this)">고2</button>
-      <button class="fchip" onclick="setConceptGradeFilter('고3',this)">고3</button>
+
+    <div class="section-label" style="color:#0284c7;margin-top:1.4rem;">고등학교 과학 핵심 정리</div>
+    <div class="summary-grid">
+      <a class="summary-card high" href="science-performance.html">
+        <div class="summary-tag tag-high">고등 과학</div>
+        <div class="summary-title">통합과학 수행평가</div>
+        <div class="summary-desc">수행평가 내용정리 및 관리</div>
+      </a>
+      <a class="summary-card high" href="chemistry1.html">
+        <div class="summary-tag tag-high">고등 과학</div>
+        <div class="summary-title">화학 1 핵심 정리</div>
+        <div class="summary-desc">단원별 핵심 개념 요약</div>
+      </a>
+      <a class="summary-card high" href="chemistry2.html">
+        <div class="summary-tag tag-high">고등 과학</div>
+        <div class="summary-title">물질과 에너지 &amp; 화학 반응의 세계</div>
+        <div class="summary-desc">2022년 개정 핵심 정리</div>
+      </a>
     </div>
-    <div class="qbank-form">
-      <div class="section-label">개념 추가</div>
-      <div class="form-row" style="flex-wrap:wrap;">
-        <select class="form-select" id="con-subj">
-          <option>통합과학</option><option>화학</option><option>생물</option>
-          <option>물리</option><option>지학</option><option>내신</option>
-        </select>
-        <select class="form-select" id="con-grade">
-          <option value="">학년선택</option>
-          <option>중1</option><option>중2</option><option>중3</option>
-          <option>고1</option><option>고2</option><option>고3</option>
-        </select>
-        <input class="form-input" type="text" id="con-title" placeholder="개념 제목" style="min-width:150px;">
-      </div>
-      <textarea class="form-textarea" id="con-content" placeholder="개념 내용을 입력하세요..."></textarea>
-      <div style="margin-top:8px;"><button class="btn-primary" onclick="addConcept()">저장</button></div>
-    </div>
-    <div class="concept-list" id="concept-list"></div>
   </div>
 </div>
 
@@ -996,7 +1009,7 @@ onAuthStateChanged(auth, async user => {
 window.doLogout = async () => { await auth.signOut(); location.replace('/login.html'); };
 
 async function loadAll() {
-  loadStats(); loadNotices(); loadTasks(); loadConcepts(); loadExams(); buildTimetable(); loadStudentList();
+  loadStats(); loadNotices(); loadTasks(); loadExams(); buildTimetable(); loadStudentList();
 }
 
 // ── 통계 ──
@@ -1125,65 +1138,6 @@ window.clearDoneTasks = async () => {
   if (!confirm(`완료된 ${dones.length}개 항목을 삭제할까요?`)) return;
   try { await Promise.all(dones.map(t=>deleteDoc(doc(db,'tasks',t.id)))); await loadTasks(); }
   catch(e) { alert('오류: '+e.message); }
-};
-
-// ── 개념정리 ──
-let conceptData=[], conceptFilter='전체', conceptGradeFilter='전체', conceptSearch='';
-async function loadConcepts() {
-  try {
-    const snap=await getDocs(query(collection(db,'concepts'),orderBy('createdAt','desc')));
-    conceptData=[]; snap.forEach(d=>conceptData.push({id:d.id,...d.data()}));
-  } catch { conceptData=[]; }
-  renderConcepts();
-}
-function renderConcepts() {
-  let list=conceptData;
-  if(conceptFilter!=='전체') list=list.filter(c=>c.subject===conceptFilter);
-  if(conceptGradeFilter!=='전체') list=list.filter(c=>(c.grade||'')===conceptGradeFilter);
-  if(conceptSearch) list=list.filter(c=>(c.title||'').includes(conceptSearch)||(c.content||'').includes(conceptSearch));
-  const el=document.getElementById('concept-list');
-  if(!list.length) { el.innerHTML='<div class="empty-hint">개념이 없습니다</div>'; return; }
-  el.innerHTML=list.map(c=>`
-    <div class="concept-card">
-      <div class="concept-head" onclick="toggleConcept('${c.id}')">
-        <span class="qb-chip qbc-subj-${c.subject||'통합과학'}" style="flex-shrink:0;">${c.subject||'—'}</span>
-        ${c.grade?`<span class="grade-badge">${esc(c.grade)}</span>`:''}
-        <span class="concept-title">${esc(c.title)}</span>
-        <button class="notice-del" onclick="event.stopPropagation();delConcept('${c.id}')">✕</button>
-      </div>
-      <div class="concept-body" id="cb-${c.id}"><div class="concept-text">${esc(c.content||'')}</div></div>
-    </div>`).join('');
-}
-window.toggleConcept=id=>{ const b=document.getElementById('cb-'+id); if(b) b.classList.toggle('open'); };
-window.setConceptFilter=(f,el)=>{
-  conceptFilter=f;
-  document.querySelectorAll('#concept-subj-chips .fchip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on'); renderConcepts();
-};
-window.setConceptGradeFilter=(f,el)=>{
-  conceptGradeFilter=f;
-  document.querySelectorAll('#concept-grade-chips .fchip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on'); renderConcepts();
-};
-window.filterConcepts=()=>{ conceptSearch=document.getElementById('concept-search').value; renderConcepts(); };
-window.addConcept = async () => {
-  const title=document.getElementById('con-title').value.trim();
-  if(!title) return alert('제목을 입력하세요');
-  const content=document.getElementById('con-content').value.trim();
-  const subject=document.getElementById('con-subj').value;
-  const grade=document.getElementById('con-grade').value;
-  try {
-    await addDoc(collection(db,'concepts'),{title,content,subject,grade,createdAt:serverTimestamp()});
-    document.getElementById('con-title').value='';
-    document.getElementById('con-content').value='';
-    document.getElementById('con-grade').value='';
-    await loadConcepts();
-  } catch(e) { alert('저장 실패: '+e.message); }
-};
-window.delConcept = async id => {
-  if(!confirm('삭제할까요?')) return;
-  try { await deleteDoc(doc(db,'concepts',id)); await loadConcepts(); }
-  catch(e) { alert('삭제 실패: '+e.message); }
 };
 
 // ── 수업카드 ──
