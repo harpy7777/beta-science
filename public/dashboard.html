@@ -97,7 +97,7 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
 .type-ox{background:#eff6ff;color:#1d4ed8}
 .type-multi{background:#f0fdf4;color:#15803d}
 .type-master{background:#faf5ff;color:#7e22ce}
-.test-name-cell{font-weight:700;color:#1d1d1f;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.test-name-cell{font-weight:700;color:#1d1d1f;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ── Subject Filter (과목별 탭) ── */
 .subj-filter{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0 10px;margin-bottom:.4rem}
@@ -285,7 +285,7 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
     </div>
     <div class="table-wrap">
       <table id="recentAttemptsTable" style="min-width:560px">
-        <colgroup><col style="width:14%"><col style="width:14%"><col style="width:10%"><col style="width:16%"><col style="width:30%"><col style="width:16%"></colgroup>
+        <colgroup><col style="width:11%"><col style="width:11%"><col style="width:9%"><col style="width:13%"><col style="width:44%"><col style="width:12%"></colgroup>
         <thead><tr><th>아이디</th><th>이름</th><th>학년</th><th>과목</th><th>응시한 시험</th><th>제출일</th></tr></thead>
         <tbody id="recentAttemptsBody"><tr><td colspan="6" style="text-align:center;padding:2.5rem;color:#aeaeb2">데이터를 불러오는 중...</td></tr></tbody>
       </table>
@@ -447,8 +447,10 @@ function renderRecentAttempts(){
   rows.sort((x,y)=>y.ts-x.ts);
   const ds=rows.slice(0,10);
   tb.innerHTML=ds.map(({r,a,sid})=>{
-    let dt=r.date||'';
-    if(!dt&&r.timestamp){const x=tD(r.timestamp);dt=`${x.getFullYear()}. ${x.getMonth()+1}. ${x.getDate()}.`;}
+    // 응시일: 26.05.04 형식 (연도 2자리.월.일, 0채움)
+    let dt='-';
+    {const src=r.timestamp||r.date;const x=r.timestamp?tD(r.timestamp):pRD(r.date);
+     if(x&&!isNaN(x)){const yy=String(x.getFullYear()).slice(-2),mm=String(x.getMonth()+1).padStart(2,'0'),dd=String(x.getDate()).padStart(2,'0');dt=`${yy}.${mm}.${dd}`;}}
     const g=r.studentGrade||r.grade||'',gc=gm[g]||'',gs=g.replace('등','').replace('학년','')||g;
     const gb=g?`<span class="grade-badge ${gc}">${gs}</span>`:'<span style="color:#aeaeb2">-</span>';
     const subj=resolveSubject(r);
@@ -458,7 +460,7 @@ function renderRecentAttempts(){
     const ti=TYPE_INFO[a.type]||TYPE_INFO.ox;
     const tname=r.testName||r.examTitle||'-';
     const testCell=`<div style="display:flex;align-items:center;justify-content:center;gap:6px"><span class="type-badge ${ti.cls}">${ti.label}</span><span class="test-name-cell" title="${e(tname)}">${e(tname)}</span></div>`;
-    return `<tr><td><span class="sid-text">${e(sid||'-')}</span></td><td style="font-weight:700;color:#1d1d1f">${nc}</td><td>${gb}</td><td>${sb}</td><td>${testCell}</td><td style="color:#aeaeb2;font-size:11px">${dt||'-'}</td></tr>`;
+    return `<tr><td><span class="sid-text">${e(sid||'-')}</span></td><td style="font-weight:700;color:#1d1d1f">${nc}</td><td>${gb}</td><td>${sb}</td><td>${testCell}</td><td style="color:#aeaeb2;font-size:11px;white-space:nowrap">${dt}</td></tr>`;
   }).join('');
 }
 
