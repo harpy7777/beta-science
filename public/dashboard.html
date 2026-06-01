@@ -91,6 +91,13 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
 .s-reaction{background:#fef9c3;color:#713f12}.s-default{background:#f1f5f9;color:#475569}
 .student-name-link{color:#1d1d1f;font-weight:700;cursor:pointer;text-decoration:none;}
 .student-name-link:hover{color:#374151}
+/* 응시 학생 테이블 전용 */
+.sid-text{font-size:11px;color:#aeaeb2;font-family:'SF Mono',ui-monospace,Menlo,monospace}
+.type-badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.type-ox{background:#eff6ff;color:#1d4ed8}
+.type-multi{background:#f0fdf4;color:#15803d}
+.type-master{background:#faf5ff;color:#7e22ce}
+.test-name-cell{font-weight:700;color:#1d1d1f;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ── Subject Filter (과목별 탭) ── */
 .subj-filter{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0 10px;margin-bottom:.4rem}
@@ -179,6 +186,7 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
   table{min-width:440px}
   thead th,tbody td{padding:8px 9px;font-size:11px}
   .test-tab-btn{padding:8px 12px;font-size:12px}
+  .test-name-cell{max-width:130px}
 }
 </style>
 </head>
@@ -252,33 +260,34 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
       </div>
     </div>
     <div class="stat-card" style="cursor:default">
-      <div class="stat-icon" style="background:#fffbeb">📈</div>
+      <div class="stat-icon" style="background:#eff6ff">📚</div>
       <div class="stat-body">
-        <div class="stat-num" id="stat-avg-score" style="color:#d97706">-</div>
-        <div class="stat-lbl">전체 평균 점수</div>
+        <div class="stat-num" id="stat-total-tests" style="color:#2563eb">-</div>
+        <div class="stat-lbl">총 테스트 수</div>
       </div>
     </div>
     <a href="special.html" class="stat-card">
       <div class="stat-icon" style="background:#fef2f2">⚠️</div>
       <div class="stat-body">
-        <div class="stat-num" id="stat-pending-special" style="color:#dc2626">-</div>
+        <div class="stat-num" id="stat-low-students" style="color:#dc2626">-</div>
         <div class="stat-lbl">집중 관리 필요</div>
+        <div class="stat-change same" id="stat-low-sub">50점 이하</div>
       </div>
     </a>
   </div>
 
-  <!-- Recent Grades -->
+  <!-- Recent Attempts -->
   <div class="section-heading">RECENT</div>
   <div class="section-card">
     <div class="section-header">
-      <span class="section-title">최근 테스트 결과</span>
+      <span class="section-title">최근 응시 학생</span>
       <a href="https://beta-science.vercel.app/grade-check.html" class="view-all">전체보기 ›</a>
     </div>
     <div class="table-wrap">
-      <table id="recentGradesTable" style="min-width:500px">
-        <colgroup><col style="width:13%"><col style="width:9%"><col style="width:22%"><col style="width:13%"><col style="width:13%"><col style="width:13%"><col style="width:17%"></colgroup>
-        <thead><tr><th>학생</th><th>학년</th><th>테스트</th><th>OX 점수</th><th>4지선다 점수</th><th>마스터 점수</th><th>제출일</th></tr></thead>
-        <tbody id="recentGradesBody"><tr><td colspan="7" style="text-align:center;padding:2.5rem;color:#aeaeb2">데이터를 불러오는 중...</td></tr></tbody>
+      <table id="recentAttemptsTable" style="min-width:560px">
+        <colgroup><col style="width:14%"><col style="width:14%"><col style="width:10%"><col style="width:16%"><col style="width:30%"><col style="width:16%"></colgroup>
+        <thead><tr><th>아이디</th><th>이름</th><th>학년</th><th>과목</th><th>응시한 시험</th><th>제출일</th></tr></thead>
+        <tbody id="recentAttemptsBody"><tr><td colspan="6" style="text-align:center;padding:2.5rem;color:#aeaeb2">데이터를 불러오는 중...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -350,6 +359,23 @@ const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app);
 (function(){const n=new Date(),days=['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];const el=document.getElementById('today-date');if(el)el.textContent=`${n.getFullYear()}년 ${n.getMonth()+1}월 ${n.getDate()}일`;const dl=document.getElementById('today-day');if(dl)dl.textContent=days[n.getDay()];})();
 
 let aIds=new Set(),sfMap={};
+// 시험ID -> 과목 맵 (tests + master-tests). 응시 기록에 subject가 없을 때 시험지에서 끌어옴
+let examSubjMap={};
+function buildExamSubjMap(){
+  const m={};
+  oxDocs.forEach(d=>{const t=d.data();if(t.subject)m[d.id]=t.subject;});
+  muDocs.forEach(d=>{const t=d.data();if(t.subject)m[d.id]=t.subject;});
+  masterDocs.forEach(d=>{const t=d.data();if(t.subject)m[d.id]=t.subject;});
+  examSubjMap=m;
+}
+// 응시 기록 r에서 과목 결정: 기록의 subject 우선 → 시험지 과목 → '-'
+function resolveSubject(r){
+  if(r.subject)return r.subject;
+  if(r.studentSubject)return r.studentSubject;
+  const key=r.examId||r.testId;
+  if(key&&examSubjMap[key])return examSubjMap[key];
+  return '';
+}
 onAuthStateChanged(auth,async u=>{
   if(!u){window.location.replace("/login.html");return;}
   try{const s=await getDoc(doc(db,"users",u.uid));if(!s.exists()||s.data().status!=="approved"){await signOut(auth);window.location.replace("/login.html");return;}
@@ -362,13 +388,80 @@ function pRD(r){if(!r)return null;if(r&&typeof r==='object'&&r.seconds)return ne
 function tD(ts){if(!ts)return new Date(0);if(ts&&typeof ts==='object'&&ts.seconds)return new Date(ts.seconds*1000);if(ts&&typeof ts.toDate==='function')return ts.toDate();return new Date(ts);}
 function cSC(docs){const n=new Date(),y=n.getFullYear(),m=n.getMonth(),sT=new Date(y,m,1),sL=new Date(y,m-1,1),eL=new Date(y,m,0,23,59,59);let tN=0,lN=0;docs.forEach(d=>{const dt=pRD(d.data().regDate);if(!dt)return;if(dt>=sT)tN++;else if(dt>=sL&&dt<=eL)lN++;});const el=document.getElementById('stat-student-change');if(lN===0){el.textContent=tN>0?`▲ 이번 달 ${tN}명 신규`:'전월 신규 등록 없음';el.className='stat-change '+(tN>0?'up':'same');}else{const d=tN-lN,p=Math.round(Math.abs(d/lN)*100);el.textContent=d>0?`▲ 전월 대비 +${p}% (+${d}명)`:d<0?`▼ 전월 대비 -${p}% (${d}명)`:'전월 대비 변동 없음';el.className='stat-change '+(d>0?'up':d<0?'down':'same');}}
 function cSc(r){let o,mu,ma;if(r.oxScore!=null)o=+r.oxScore;else if(Array.isArray(r.oxAnswers)&&Array.isArray(r.oxCorrect)){let c=0;r.oxAnswers.forEach((a,i)=>{if(a===r.oxCorrect[i])c++;});o=Math.round(c/r.oxCorrect.length*100);}else if(r.testType==='ox'&&r.score!=null)o=+r.score;if(r.multiScore!=null)mu=+r.multiScore;else if(Array.isArray(r.multiAnswers)&&Array.isArray(r.multiCorrect)){let c=0;r.multiAnswers.forEach((a,i)=>{if(a===r.multiCorrect[i])c++;});mu=Math.round(c/r.multiCorrect.length*100);}else if(r.testType==='multiple'&&r.score!=null)mu=+r.score;if(r.testType==='master'&&r.score!=null)ma=+r.score;else if(r.masterScore!=null)ma=+r.masterScore;if(o==null&&mu==null&&ma==null){if(r.testType==='ox')o=+(r.score||0);else if(r.testType==='multiple')mu=+(r.score||0);}return{oxScore:o,multiScore:mu,masterScore:ma};}
-function sBadge(s){if(s==null)return'<span style="color:#aeaeb2">-</span>';const c=s>=80?'score-high':s>=60?'score-mid':'score-low';return`<span class="score-badge ${c}">${s}점</span>`;}
+
+/* ── 응시 기록(grades) 타입 분해: 한 문서가 OX/4지선다/마스터 여러 개를 품을 수 있으므로 응시 "건"별로 쪼갬 ── */
+function splitAttempts(r){
+  const{oxScore:o,multiScore:mu,masterScore:ma}=cSc(r);
+  const out=[];
+  if(o!=null) out.push({type:'ox',score:o});
+  if(mu!=null) out.push({type:'multi',score:mu});
+  if(ma!=null) out.push({type:'master',score:ma});
+  if(out.length===0){
+    // 점수 추출 실패 시 testType으로라도 1건 처리
+    const t=r.testType==='multiple'?'multi':(r.testType==='master'?'master':'ox');
+    const rs=+r.score;out.push({type:t,score:isNaN(rs)?null:rs});
+  }
+  return out;
+}
+
 function iStats(){
   onSnapshot(collection(db,"students"),s=>{document.getElementById('stat-total-students').textContent=s.size;cSC(s.docs);});
-  onSnapshot(collection(db,"grades"),s=>{let v=0,tot=0,cnt=0;s.forEach(d=>{const r=d.data(),sid=r.studentId||'';if(aIds.size===0||aIds.has(sid)){v++;const{oxScore:o,multiScore:mu,masterScore:ma}=cSc(r);if(o!=null){tot+=o;cnt++;}if(mu!=null){tot+=mu;cnt++;}if(ma!=null){tot+=ma;cnt++;}if(o==null&&mu==null&&ma==null){const rs=+r.score;if(!isNaN(rs)){tot+=rs;cnt++;}}}}); document.getElementById('stat-total-grades').textContent=v;document.getElementById('stat-avg-score').textContent=cnt>0?(tot/cnt).toFixed(1):'0';});
-  onSnapshot(collection(db,"specialManagement"),s=>{document.getElementById('stat-pending-special').textContent=s.docs.filter(d=>!d.data().done).length;});
+  onSnapshot(collection(db,"grades"),s=>{
+    let v=0; const lowSet=new Set();
+    s.forEach(d=>{const r=d.data(),sid=r.studentId||'';
+      if(aIds.size===0||aIds.has(sid)){
+        v++;
+        // 50점 이하가 하나라도 있으면 그 학생을 집중관리 대상에 추가(중복 제거)
+        splitAttempts(r).forEach(a=>{if(a.score!=null&&a.score<=50&&sid)lowSet.add(sid);});
+      }
+    });
+    document.getElementById('stat-total-grades').textContent=v;
+    document.getElementById('stat-low-students').textContent=lowSet.size;
+  });
 }
-function iRG(){onSnapshot(query(collection(db,"grades"),orderBy("timestamp","asc")),s=>{const tb=document.getElementById('recentGradesBody');if(s.empty){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}const mp=new Map();s.docs.forEach(d=>{const r=d.data(),sid=r.studentId||'';if(aIds.size>0&&!aIds.has(sid))return;const k=`${sid}_${r.examId||r.testId||r.testName||r.examTitle||'unknown'}`;if(!mp.has(k))mp.set(k,d);});const ds=Array.from(mp.values()).sort((a,b)=>tD(b.data().timestamp).getTime()-tD(a.data().timestamp).getTime()).slice(0,10);if(!ds.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}const gm={'중1':'g-mid1','중2':'g-mid2','중3':'g-mid3','고1':'g-high1','고2':'g-high2','고3':'g-high3','중등1학년':'g-mid1','중등2학년':'g-mid2','중등3학년':'g-mid3','고등1학년':'g-high1','고등2학년':'g-high2','고등3학년':'g-high3'};tb.innerHTML=ds.map(d=>{const r=d.data();let dt=r.date||'';if(!dt&&r.timestamp){const x=tD(r.timestamp);dt=`${x.getFullYear()}. ${x.getMonth()+1}. ${x.getDate()}.`;}const g=r.studentGrade||r.grade||'',gc=gm[g]||'',gs=g.replace('등','').replace('학년','')||g;const gb=g?`<span class="grade-badge ${gc}">${gs}</span>`:'<span style="color:#aeaeb2">-</span>';const{oxScore:o,multiScore:mu,masterScore:ma}=cSc(r);const sid=r.studentId||'',sn=r.studentName||'-',sf=sn.replace(/'/g,"\\'");const nc=sid?`<span class="student-name-link" onclick="openSCC('${sid}','${sf}')">${sn}</span>`:sn;return`<tr><td>${nc}</td><td>${gb}</td><td title="${r.testName||r.examTitle||'-'}" style="font-weight:700;color:#1d1d1f">${r.testName||r.examTitle||'-'}</td><td>${sBadge(o)}</td><td>${sBadge(mu)}</td><td>${sBadge(ma)}</td><td style="color:#aeaeb2;font-size:11px">${dt||'-'}</td></tr>`;}).join('');});}
+/* ── 총 테스트 수: 티쳐 페이지 "응시 가능 테스트"와 동일 기준 (OX 시험지 + 4지선다 시험지) ── */
+function updateTotalTests(){
+  const el=document.getElementById('stat-total-tests');
+  if(el)el.textContent=oxDocs.length+muDocs.length;
+}
+
+function sBadge(s){if(s==null)return'<span style="color:#aeaeb2">-</span>';const c=s>=80?'score-high':s>=60?'score-mid':'score-low';return`<span class="score-badge ${c}">${s}점</span>`;}
+
+/* ── 최근 응시 학생 (제출 건별로 한 줄, 점수 없음) ── */
+const TYPE_INFO={ox:{cls:'type-ox',label:'OX'},multi:{cls:'type-multi',label:'4지선다'},master:{cls:'type-master',label:'마스터'}};
+let lastGradeDocs=null;
+function iRG(){onSnapshot(query(collection(db,"grades"),orderBy("timestamp","asc")),s=>{lastGradeDocs=s.docs;renderRecentAttempts();});}
+function renderRecentAttempts(){
+  const tb=document.getElementById('recentAttemptsBody');
+  if(!tb)return;
+  if(!lastGradeDocs||lastGradeDocs.length===0){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
+  const gm={'중1':'g-mid1','중2':'g-mid2','중3':'g-mid3','고1':'g-high1','고2':'g-high2','고3':'g-high3','중등1학년':'g-mid1','중등2학년':'g-mid2','중등3학년':'g-mid3','고등1학년':'g-high1','고등2학년':'g-high2','고등3학년':'g-high3'};
+  // 제출 건별로 펼치기
+  const rows=[];
+  lastGradeDocs.forEach(d=>{const r=d.data(),sid=r.studentId||'';
+    if(aIds.size>0&&!aIds.has(sid))return;
+    const ts=tD(r.timestamp).getTime();
+    splitAttempts(r).forEach(a=>{rows.push({r,a,sid,ts});});
+  });
+  if(!rows.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
+  rows.sort((x,y)=>y.ts-x.ts);
+  const ds=rows.slice(0,10);
+  tb.innerHTML=ds.map(({r,a,sid})=>{
+    let dt=r.date||'';
+    if(!dt&&r.timestamp){const x=tD(r.timestamp);dt=`${x.getFullYear()}. ${x.getMonth()+1}. ${x.getDate()}.`;}
+    const g=r.studentGrade||r.grade||'',gc=gm[g]||'',gs=g.replace('등','').replace('학년','')||g;
+    const gb=g?`<span class="grade-badge ${gc}">${gs}</span>`:'<span style="color:#aeaeb2">-</span>';
+    const subj=resolveSubject(r);
+    const sb=subj?`<span class="subj-badge ${sC(subj)}">${e(subj)}</span>`:'<span style="color:#aeaeb2">-</span>';
+    const sn=r.studentName||'-',sf=sn.replace(/'/g,"\\'");
+    const nc=sid?`<span class="student-name-link" onclick="openSCC('${sid}','${sf}')">${e(sn)}</span>`:e(sn);
+    const ti=TYPE_INFO[a.type]||TYPE_INFO.ox;
+    const tname=r.testName||r.examTitle||'-';
+    const testCell=`<div style="display:flex;align-items:center;justify-content:center;gap:6px"><span class="type-badge ${ti.cls}">${ti.label}</span><span class="test-name-cell" title="${e(tname)}">${e(tname)}</span></div>`;
+    return `<tr><td><span class="sid-text">${e(sid||'-')}</span></td><td style="font-weight:700;color:#1d1d1f">${nc}</td><td>${gb}</td><td>${sb}</td><td>${testCell}</td><td style="color:#aeaeb2;font-size:11px">${dt||'-'}</td></tr>`;
+  }).join('');
+}
+
 window.openSCC=async function(sid,sn){const fi=sfMap[sid];if(!fi){try{const s=await getDocs(query(collection(db,"students"),where("id","==",sid)));if(s.empty){alert('학생 정보를 찾을 수 없습니다.');return;}oCCM(s.docs[0].id,sn);}catch(e){alert('오류: '+e.message);}return;}oCCM(fi,sn);};
 async function oCCM(fi,sn){document.getElementById('ccModalTitle').textContent=`${sn} · 수업카드`;['cc-total','cc-month','cc-avg'].forEach(id=>document.getElementById(id).textContent='—');document.getElementById('ccListScroll').innerHTML='<div class="cc-loading">불러오는 중...</div>';document.getElementById('classCardModal').classList.add('open');try{const s=await getDocs(query(collection(db,"classCards"),where("studentId","==",fi),orderBy("classDate","desc")));const cs=s.docs.map(d=>({id:d.id,...d.data()}));rCCS(cs);rCCL(cs);}catch(e){document.getElementById('ccListScroll').innerHTML=`<div class="cc-empty">로드 실패: ${e.message}</div>`;}}
 function rCCS(cs){document.getElementById('cc-total').textContent=cs.length+'건';const n=new Date(),ms=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`;document.getElementById('cc-month').textContent=cs.filter(c=>(c.classDate||'').startsWith(ms)).length+'건';const sc=cs.filter(c=>typeof c.score==='number'&&c.score>=0&&!c.scoreNone);document.getElementById('cc-avg').textContent=sc.length?Math.round(sc.reduce((a,c)=>a+c.score,0)/sc.length)+'점':'—';}
@@ -392,7 +485,7 @@ function matchSubj(t,key){if(key==='전체')return true;const g=nG(t.grade),s=t.
 function subjCnt(key){const f=d=>matchSubj(d.data(),key);return oxDocs.filter(f).length+muDocs.filter(f).length+masterDocs.filter(f).length;}
 function renderSubjFilter(){const wrap=document.getElementById('subjFilter');if(!wrap)return;wrap.innerHTML=SUBJ_TABS.map(k=>{const c=k==='전체'?(oxDocs.length+muDocs.length+masterDocs.length):subjCnt(k);const on=k===activeSubj?'on':'';return`<button class="subj-chip ${on}" onclick="selectSubj('${k.replace(/'/g,"\\'")}',this)"><span class="sc-name">${e(k)}</span><span class="sc-cnt">${c}</span></button>`;}).join('');}
 function renderPanels(){const f=d=>matchSubj(d.data(),activeSubj);const ox=oxDocs.filter(f),mu=muDocs.filter(f),ma=masterDocs.filter(f);document.getElementById('cnt-ox').textContent=ox.length;document.getElementById('cnt-multi').textContent=mu.length;document.getElementById('cnt-master').textContent=ma.length;document.getElementById('tbody-ox').innerHTML=ox.length===0?EMPTY_ROW:ox.map(mTR).join('');document.getElementById('tbody-multi').innerHTML=mu.length===0?EMPTY_ROW:mu.map(mTR).join('');document.getElementById('tbody-master').innerHTML=ma.length===0?EMPTY_ROW:ma.map(mMR).join('');}
-function renderAll(){renderSubjFilter();renderPanels();}
+function renderAll(){buildExamSubjMap();renderSubjFilter();renderPanels();updateTotalTests();renderRecentAttempts();}
 window.selectSubj=(key,el)=>{activeSubj=key;document.querySelectorAll('.subj-chip').forEach(c=>c.classList.remove('on'));if(el)el.classList.add('on');renderPanels();};
 function iExams(){onSnapshot(collection(db,"tests"),s=>{oxDocs=s.docs.filter(d=>(d.data().questions||[]).some(q=>q.type==='ox'));muDocs=s.docs.filter(d=>(d.data().questions||[]).some(q=>q.type==='multiple'));renderAll();});}
 function iMT(){onSnapshot(query(collection(db,"master-tests"),orderBy("regDate","desc")),s=>{masterDocs=s.docs;renderAll();});}
