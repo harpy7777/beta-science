@@ -201,6 +201,12 @@ export default function TeacherPage() {
   const publishedCount = exams.filter(e => e.isPublished).length;
   const draftCount     = exams.filter(e => !e.isPublished).length;
   const totalQ         = exams.reduce((a, e) => a + e.questions.length, 0);
+  // 응시 가능 테스트 수: 한 시험지에 OX/4지선다가 따로 응시되므로 타입별로 분해해서 카운트
+  const takeableCount  = exams.reduce((a, e) => {
+    const hasOx    = e.questions.some(q => q.type === 'ox');
+    const hasMulti = e.questions.some(q => q.type === 'multiple');
+    return a + (hasOx ? 1 : 0) + (hasMulti ? 1 : 0);
+  }, 0);
   const filteredExams  = selectedSubject === '전체' ? exams : exams.filter(e => e.subject === selectedSubject);
 
   const now = new Date();
@@ -280,10 +286,10 @@ export default function TeacherPage() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
             {[
-              { emoji: '📚', label: '전체 시험지', value: exams.length,   unit: '개', color: '#db2777' },
-              { emoji: '✅', label: '게시된 시험', value: publishedCount, unit: '개', color: '#16a34a' },
-              { emoji: '🕐', label: '임시 저장',   value: draftCount,     unit: '개', color: '#d97706' },
-              { emoji: '📝', label: '총 문항 수',  value: totalQ,         unit: '문항', color: '#2563eb' },
+              { emoji: '📚', label: '제작 시험지',      value: exams.length,  unit: '개',   color: '#db2777' },
+              { emoji: '📝', label: '응시 가능 테스트', value: takeableCount, unit: '개',   color: '#16a34a' },
+              { emoji: '🕐', label: '임시 저장',        value: draftCount,    unit: '개',   color: '#d97706' },
+              { emoji: '🧮', label: '총 문항 수',       value: totalQ,        unit: '문항', color: '#2563eb' },
             ].map(({ emoji, label, value, unit, color }) => (
               <div key={label} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-3 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-pink-100">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-gray-50">
