@@ -248,7 +248,7 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
       <div class="stat-icon" style="background:#fff0f7">👩‍🎓</div>
       <div class="stat-body">
         <div class="stat-num" id="stat-total-students" style="color:#db2777">-</div>
-        <div class="stat-lbl">등록 학생 수 <span class="stat-sub same" id="stat-student-change"></span></div>
+        <div class="stat-lbl">등록 학생 수 <span class="stat-sub same" id="stat-student-change" style="margin-left:4px"></span></div>
       </div>
     </a>
     <div class="stat-card" style="cursor:default">
@@ -269,7 +269,7 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
       <div class="stat-icon" style="background:#fef2f2">⚠️</div>
       <div class="stat-body">
         <div class="stat-num" id="stat-low-students" style="color:#dc2626">-</div>
-        <div class="stat-lbl">집중 관리 필요 <span class="stat-sub same">50점 이하</span></div>
+        <div class="stat-lbl">집중 관리 필요 <span class="stat-sub down" style="margin-left:4px">50점 이하</span></div>
       </div>
     </a>
   </div>
@@ -384,7 +384,7 @@ window.downloadStudentsBackup=async function(){try{const snap=await getDocs(coll
 function iSW(){onSnapshot(collection(db,"students"),s=>{aIds=new Set(s.docs.map(d=>d.data().id).filter(Boolean));sfMap={};s.docs.forEach(d=>{const id=d.data().id;if(id)sfMap[id]=d.id;});});}
 function pRD(r){if(!r)return null;if(r&&typeof r==='object'&&r.seconds)return new Date(r.seconds*1000);if(typeof r!=='string')return null;const m=r.match(/(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);const d=new Date(r);return isNaN(d)?null:d;}
 function tD(ts){if(!ts)return new Date(0);if(ts&&typeof ts==='object'&&ts.seconds)return new Date(ts.seconds*1000);if(ts&&typeof ts.toDate==='function')return ts.toDate();return new Date(ts);}
-function cSC(docs){const n=new Date(),y=n.getFullYear(),m=n.getMonth(),sT=new Date(y,m,1),sL=new Date(y,m-1,1),eL=new Date(y,m,0,23,59,59);let tN=0,lN=0;docs.forEach(d=>{const dt=pRD(d.data().regDate);if(!dt)return;if(dt>=sT)tN++;else if(dt>=sL&&dt<=eL)lN++;});const el=document.getElementById('stat-student-change');if(!el)return;if(lN===0){el.textContent=tN>0?`· 이번 달 +${tN}`:'· 변동 없음';el.className='stat-sub '+(tN>0?'up':'same');}else{const d=tN-lN,p=Math.round(Math.abs(d/lN)*100);el.textContent=d>0?`· ▲ ${p}%`:d<0?`· ▼ ${p}%`:'· 변동 없음';el.className='stat-sub '+(d>0?'up':d<0?'down':'same');}}
+function cSC(docs){const n=new Date(),y=n.getFullYear(),m=n.getMonth(),sT=new Date(y,m,1),sL=new Date(y,m-1,1),eL=new Date(y,m,0,23,59,59);let tN=0,lN=0;docs.forEach(d=>{const dt=pRD(d.data().regDate);if(!dt)return;if(dt>=sT)tN++;else if(dt>=sL&&dt<=eL)lN++;});const el=document.getElementById('stat-student-change');if(!el)return;const d=tN-lN;if(d>0){el.textContent=`+${d}명`;el.className='stat-sub up';}else if(d<0){el.textContent=`${d}명`;el.className='stat-sub down';}else{el.textContent='변동 없음';el.className='stat-sub same';}}
 function cSc(r){let o,mu,ma;if(r.oxScore!=null)o=+r.oxScore;else if(Array.isArray(r.oxAnswers)&&Array.isArray(r.oxCorrect)){let c=0;r.oxAnswers.forEach((a,i)=>{if(a===r.oxCorrect[i])c++;});o=Math.round(c/r.oxCorrect.length*100);}else if(r.testType==='ox'&&r.score!=null)o=+r.score;if(r.multiScore!=null)mu=+r.multiScore;else if(Array.isArray(r.multiAnswers)&&Array.isArray(r.multiCorrect)){let c=0;r.multiAnswers.forEach((a,i)=>{if(a===r.multiCorrect[i])c++;});mu=Math.round(c/r.multiCorrect.length*100);}else if(r.testType==='multiple'&&r.score!=null)mu=+r.score;if(r.testType==='master'&&r.score!=null)ma=+r.score;else if(r.masterScore!=null)ma=+r.masterScore;if(o==null&&mu==null&&ma==null){if(r.testType==='ox')o=+(r.score||0);else if(r.testType==='multiple')mu=+(r.score||0);}return{oxScore:o,multiScore:mu,masterScore:ma};}
 
 /* ── 응시 기록(grades) 타입 분해: 한 문서가 OX/4지선다/마스터 여러 개를 품을 수 있으므로 응시 "건"별로 쪼갬 ── */
