@@ -275,12 +275,8 @@ body {
 .clear-btn { padding: 10px 14px; min-height: 44px; background: #f5f5f7; border: none; border-radius: 10px; font-size: 12px; font-weight: 600; color: #6e6e73; cursor: pointer; font-family: inherit; margin-top: 10px; width: 100%; transition: background 0.15s; }
 .clear-btn:hover { background: #ebebec; }
 
-/* ── 문제은행 ── */
+/* ── 개념정리 / 폼 공통 카드 ── */
 .qbank-form { background: #fff; border: 1px solid #fce7f3; border-radius: 14px; padding: 12px 14px; margin-bottom: 14px; }
-.qbank-list { display: flex; flex-direction: column; gap: 8px; }
-.qbank-card { background: #fff; border: 1px solid #fce7f3; border-radius: 14px; padding: 12px 14px; transition: border-color 0.15s; }
-.qbank-card:hover { border-color: #fbcfe8; }
-.qbank-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
 .qbank-q { font-size: 13px; font-weight: 500; color: #1d1d1f; line-height: 1.5; }
 .qb-chip { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 5px; white-space: nowrap; }
 .qbc-subj-물리 { background: #dbeafe; color: #1e40af; }
@@ -640,10 +636,10 @@ body {
       <div class="nav-desc">이번주 할 일 체크<br>우선순위 관리</div>
       <span class="nav-arrow">›</span>
     </div>
-    <div class="nav-card nc-qbank" onclick="openPanel('qbank')">
+    <div class="nav-card nc-qbank" onclick="location.href='/teacher'">
       <div class="nav-icon">📝</div>
-      <div class="nav-title">문제은행</div>
-      <div class="nav-desc">과목별 문제 저장<br>유형·난이도 관리</div>
+      <div class="nav-title">베이직 테스트 출제</div>
+      <div class="nav-desc">OX 퀴즈, 4지선다형<br>시험 문제 만들기</div>
       <span class="nav-arrow">›</span>
     </div>
     <div class="nav-card nc-concept" onclick="openPanel('concept')">
@@ -757,51 +753,6 @@ body {
     </div>
     <div class="task-list" id="task-list"></div>
     <button class="clear-btn" onclick="clearDoneTasks()">✓ 완료 항목 정리</button>
-  </div>
-</div>
-
-<!-- 문제은행 패널 -->
-<div class="page-panel" id="panel-qbank">
-  <div class="panel-bar"><span class="panel-bar-title">📝 문제은행</span><button class="close-btn" onclick="closePanel()">✕</button></div>
-  <div class="panel-body">
-    <div class="filter-chips" id="qbank-subj-chips">
-      <button class="fchip on" onclick="setQFilter('전체',this)">전체</button>
-      <button class="fchip" onclick="setQFilter('통합과학',this)">통합과학</button>
-      <button class="fchip" onclick="setQFilter('화학',this)">화학</button>
-      <button class="fchip" onclick="setQFilter('생물',this)">생물</button>
-      <button class="fchip" onclick="setQFilter('물리',this)">물리</button>
-      <button class="fchip" onclick="setQFilter('지학',this)">지학</button>
-      <button class="fchip" onclick="setQFilter('내신',this)">내신</button>
-    </div>
-    <div class="filter-chips grade-chip-row" id="qbank-grade-chips">
-      <button class="fchip on" onclick="setQGradeFilter('전체',this)">학년 전체</button>
-      <button class="fchip" onclick="setQGradeFilter('중1',this)">중1</button>
-      <button class="fchip" onclick="setQGradeFilter('중2',this)">중2</button>
-      <button class="fchip" onclick="setQGradeFilter('중3',this)">중3</button>
-      <button class="fchip" onclick="setQGradeFilter('고1',this)">고1</button>
-      <button class="fchip" onclick="setQGradeFilter('고2',this)">고2</button>
-      <button class="fchip" onclick="setQGradeFilter('고3',this)">고3</button>
-    </div>
-    <div class="qbank-form">
-      <div class="section-label">문제 추가</div>
-      <div class="form-row" style="flex-wrap:wrap;">
-        <select class="form-select" id="q-subj">
-          <option>통합과학</option><option>화학</option><option>생물</option>
-          <option>물리</option><option>지학</option><option>내신</option>
-        </select>
-        <select class="form-select" id="q-grade">
-          <option value="">학년선택</option>
-          <option>중1</option><option>중2</option><option>중3</option>
-          <option>고1</option><option>고2</option><option>고3</option>
-        </select>
-        <input class="form-input" type="text" id="q-unit" placeholder="단원명" style="min-width:120px;">
-        <select class="form-select" id="q-diff"><option value="상">난이도 상</option><option value="중" selected>난이도 중</option><option value="하">난이도 하</option></select>
-        <select class="form-select" id="q-type"><option>OX</option><option>4지선다</option><option>마스터</option></select>
-      </div>
-      <textarea class="form-textarea" id="q-text" placeholder="문제 내용을 입력하세요..." style="min-height:70px;"></textarea>
-      <div style="margin-top:8px;"><button class="btn-primary" onclick="addQBank()">문제 등록</button></div>
-    </div>
-    <div class="qbank-list" id="qbank-list"></div>
   </div>
 </div>
 
@@ -1045,7 +996,7 @@ onAuthStateChanged(auth, async user => {
 window.doLogout = async () => { await auth.signOut(); location.replace('/login.html'); };
 
 async function loadAll() {
-  loadStats(); loadNotices(); loadTasks(); loadQBank(); loadConcepts(); loadExams(); buildTimetable(); loadStudentList();
+  loadStats(); loadNotices(); loadTasks(); loadConcepts(); loadExams(); buildTimetable(); loadStudentList();
 }
 
 // ── 통계 ──
@@ -1174,65 +1125,6 @@ window.clearDoneTasks = async () => {
   if (!confirm(`완료된 ${dones.length}개 항목을 삭제할까요?`)) return;
   try { await Promise.all(dones.map(t=>deleteDoc(doc(db,'tasks',t.id)))); await loadTasks(); }
   catch(e) { alert('오류: '+e.message); }
-};
-
-// ── 문제은행 ──
-let qbData=[], qFilter='전체', qGradeFilter='전체';
-async function loadQBank() {
-  try {
-    const snap=await getDocs(query(collection(db,'qbank'),orderBy('createdAt','desc')));
-    qbData=[]; snap.forEach(d=>qbData.push({id:d.id,...d.data()}));
-  } catch { qbData=[]; }
-  renderQBank();
-}
-function renderQBank() {
-  let list = qFilter==='전체' ? qbData : qbData.filter(q=>q.subject===qFilter);
-  if (qGradeFilter !== '전체') list = list.filter(q=>(q.grade||'')=== qGradeFilter);
-  const el=document.getElementById('qbank-list');
-  if (!list.length) { el.innerHTML='<div class="empty-hint">문제가 없습니다</div>'; return; }
-  el.innerHTML=list.map(q=>`
-    <div class="qbank-card">
-      <div class="qbank-card-top">
-        <span class="qb-chip qbc-subj-${q.subject||'통합과학'}">${q.subject||'—'}</span>
-        ${q.grade?`<span class="qb-chip qbc-grade">${esc(q.grade)}</span>`:''}
-        <span class="qb-chip qbc-type">${q.type}</span>
-        <span class="qb-chip qbc-diff">난이도 ${q.difficulty}</span>
-        ${q.unit?`<span class="qb-chip" style="background:#f5f5f7;color:#6e6e73;">${esc(q.unit)}</span>`:''}
-        <button class="notice-del" style="margin-left:auto;" onclick="delQ('${q.id}')">✕</button>
-      </div>
-      <div class="qbank-q">${esc(q.text)}</div>
-    </div>`).join('');
-}
-window.setQFilter = (f, el) => {
-  qFilter=f;
-  document.querySelectorAll('#qbank-subj-chips .fchip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on'); renderQBank();
-};
-window.setQGradeFilter = (f, el) => {
-  qGradeFilter=f;
-  document.querySelectorAll('#qbank-grade-chips .fchip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on'); renderQBank();
-};
-window.addQBank = async () => {
-  const text=document.getElementById('q-text').value.trim();
-  if(!text) return alert('문제 내용을 입력하세요');
-  const subject=document.getElementById('q-subj').value;
-  const grade=document.getElementById('q-grade').value;
-  const unit=document.getElementById('q-unit').value.trim();
-  const difficulty=document.getElementById('q-diff').value;
-  const type=document.getElementById('q-type').value;
-  try {
-    await addDoc(collection(db,'qbank'),{text,subject,grade,unit,difficulty,type,createdAt:serverTimestamp()});
-    document.getElementById('q-text').value='';
-    document.getElementById('q-unit').value='';
-    document.getElementById('q-grade').value='';
-    await loadQBank();
-  } catch(e) { alert('저장 실패: '+e.message); }
-};
-window.delQ = async id => {
-  if(!confirm('삭제할까요?')) return;
-  try { await deleteDoc(doc(db,'qbank',id)); await loadQBank(); }
-  catch(e) { alert('삭제 실패: '+e.message); }
 };
 
 // ── 개념정리 ──
