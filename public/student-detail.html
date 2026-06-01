@@ -332,7 +332,9 @@ body {
 .subject-table td { padding: 5px 10px; border-bottom: 1px solid #fdf2f8; color: #3c3c43; font-size: 11px; }
 .subject-table tr:last-child td { border-bottom: none; }
 .subject-table td:first-child { color: #5b21b6; font-weight: 600; border-right: 1px solid #fdf2f8; }
-.analysis-row { display: grid; grid-template-columns: 240px 1fr; gap: 10px; margin-bottom: 1rem; }
+.analysis-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; align-items: stretch; }
+.analysis-row .chart-card { margin-bottom: 0; }
+.analysis-row .radar-wrap { align-items: center; height: 100%; }
 .radar-wrap { display: flex; justify-content: center; }
 .analysis-items { display: flex; flex-direction: column; gap: 7px; }
 .analysis-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 10px; background: #fafafa; border: 1px solid #f5f5f7; }
@@ -621,6 +623,14 @@ body {
       <button class="wtab" data-week="1" onclick="pickWeek(1,this)">2주차</button>
       <button class="wtab" data-week="2" onclick="pickWeek(2,this)">3주차</button>
       <button class="wtab" data-week="3" onclick="pickWeek(3,this)">4주차</button>
+      <button class="wtab" data-week="4" onclick="pickWeek(4,this)">5주차</button>
+      <button class="wtab" data-week="5" onclick="pickWeek(5,this)">6주차</button>
+      <button class="wtab" data-week="6" onclick="pickWeek(6,this)">7주차</button>
+      <button class="wtab" data-week="7" onclick="pickWeek(7,this)">8주차</button>
+      <button class="wtab" data-week="8" onclick="pickWeek(8,this)">9주차</button>
+      <button class="wtab" data-week="9" onclick="pickWeek(9,this)">10주차</button>
+      <button class="wtab" data-week="10" onclick="pickWeek(10,this)">11주차</button>
+      <button class="wtab" data-week="11" onclick="pickWeek(11,this)">12주차</button>
     </div>
     <div style="margin-bottom:0.5rem;font-size:12px;font-weight:600;color:#6e6e73;">응시 시험 선택</div>
     <div class="exam-selector" id="exam-selector"></div>
@@ -651,10 +661,14 @@ body {
       <button class="ptab" onclick="rpSetPeriod('2w',this)">2주차</button>
       <button class="ptab" onclick="rpSetPeriod('3w',this)">3주차</button>
       <button class="ptab" onclick="rpSetPeriod('4w',this)">4주차</button>
-      <button class="ptab" onclick="rpSetPeriod('1m',this)">1개월</button>
-      <button class="ptab" onclick="rpSetPeriod('2m',this)">2개월</button>
-      <button class="ptab" onclick="rpSetPeriod('3m',this)">3개월</button>
-      <button class="ptab" onclick="rpSetPeriod('6m',this)">6개월</button>
+      <button class="ptab" onclick="rpSetPeriod('5w',this)">5주차</button>
+      <button class="ptab" onclick="rpSetPeriod('6w',this)">6주차</button>
+      <button class="ptab" onclick="rpSetPeriod('7w',this)">7주차</button>
+      <button class="ptab" onclick="rpSetPeriod('8w',this)">8주차</button>
+      <button class="ptab" onclick="rpSetPeriod('9w',this)">9주차</button>
+      <button class="ptab" onclick="rpSetPeriod('10w',this)">10주차</button>
+      <button class="ptab" onclick="rpSetPeriod('11w',this)">11주차</button>
+      <button class="ptab" onclick="rpSetPeriod('12w',this)">12주차</button>
     </div>
     <div id="rp-subject-table" style="margin-bottom:1rem;"></div>
     <div class="mini-grid">
@@ -779,18 +793,15 @@ function renderProfile() {
 /* ════ 성적 현황 ════ */
 function gcFirstRecs(list){ const m=new Map(); list.forEach(r=>{ const k=r.examId||r.testId||r.testName||'?'; if(!m.has(k)) m.set(k,r); }); return Array.from(m.values()); }
 function gcExamList(list){ const m=new Map(); list.forEach(r=>{ const k=r.examId||r.testId||r.testName||'?'; if(!m.has(k)) m.set(k,{key:k,name:r.testName||r.examTitle||k,type:r.testType||'mc'}); }); return Array.from(m.values()); }
-function recs90(){ const since=new Date(); since.setDate(since.getDate()-90); return recsAll.filter(r=>toDate(r.timestamp)>=since); }
+function recs90(){ return recsAll.slice(); }
 
 function gcRender() {
   gcCurWeek=-1;
   const frAll=gcFirstRecs(recs90());
-  const since28=new Date(); since28.setDate(since28.getDate()-28);
-  const frMonth=frAll.filter(r=>toDate(r.timestamp)>=since28);
-  const fil=gcCurExamKey?frMonth.filter(r=>(r.examId||r.testId||r.testName||'?')===gcCurExamKey):frMonth;
+  const fil=gcCurExamKey?frAll.filter(r=>(r.examId||r.testId||r.testName||'?')===gcCurExamKey):frAll;
   const ox=fil.filter(r=>(r.testType||'mc')==='ox'), mc=fil.filter(r=>(r.testType||'mc')==='mc'), ms=fil.filter(r=>(r.testType||'mc')==='master');
   const avg=arr=>arr.length?Math.round(arr.map(scoreOf).reduce((s,v)=>s+v,0)/arr.length):null;
-  const allA=avg(fil);
-  setTxt('d-cnt',frMonth.length);
+  setTxt('d-cnt',frAll.length);
   setTxt('d-ox',avg(ox)!==null?avg(ox)+'점':'—'); setTxt('d-mc',avg(mc)!==null?avg(mc)+'점':'—'); setTxt('d-ms',avg(ms)!==null?avg(ms)+'점':'—');
   gcRenderExamSelector(); gcRenderChart(frAll); gcRenderRecs(-1); gcSetWeekActive(-1);
 }
@@ -803,8 +814,9 @@ function gcRenderExamSelector() {
 }
 window.gcSelectExam=(key,el)=>{ gcCurExamKey=key; document.querySelectorAll('.exam-sel-btn').forEach(b=>b.classList.remove('on')); if(el) el.classList.add('on'); gcRenderRecs(gcCurWeek); };
 function gcRenderChart(fr) {
+  const base=enrollDate();
   document.getElementById('d-chart').innerHTML=[0,1,2,3].map(w=>{
-    const {s,e}=wkRange(w), wr=fr.filter(r=>inRange(r,s,e));
+    const wr=base?fr.filter(r=>enrollWeekIndex(r,base)===w):[];
     const avgV=arr=>arr.length?Math.round(arr.reduce((s,v)=>s+v,0)/arr.length):0;
     const oxA=avgV(wr.filter(r=>(r.testType||'mc')==='ox').map(scoreOf));
     const mcA=avgV(wr.filter(r=>(r.testType||'mc')==='mc').map(scoreOf));
@@ -815,9 +827,10 @@ function gcRenderChart(fr) {
   }).join('');
 }
 function gcRenderRecs(wi) {
+  const base=enrollDate();
   let wr=gcFirstRecs(recs90());
   if(wi===-1){ wr=wr.slice().sort((a,b)=>toDate(b.timestamp)-toDate(a.timestamp)); }
-  else { const {s,e}=wkRange(wi); wr=wr.filter(r=>inRange(r,s,e)); }
+  else { wr=wr.filter(r=>enrollWeekIndex(r,base)===wi); }
   if(gcCurExamKey) wr=wr.filter(r=>(r.examId||r.testId||r.testName||'?')===gcCurExamKey);
   const el=document.getElementById('d-records');
   if(!wr.length){ const msg=wi===-1?'응시한 기록이 없습니다.':'이 주차에 응시한 기록이 없습니다.'; el.innerHTML=`<div style="background:#fff;border:1px solid #fce7f3;border-radius:14px;padding:2rem;text-align:center;font-size:13px;color:#aeaeb2;">${msg}</div>`; return; }
@@ -861,7 +874,7 @@ window.saveFb=async()=>{ const txt=document.getElementById('fb-ta').value.trim()
 async function rpEnrichWithExamSubjects(records) {
   try { const snap=await getDocs(collection(db,'tests')); const byId=new Map(), byTitle=new Map(); snap.forEach(d=>{ const data=d.data(); byId.set(d.id,data); if(data.title) byTitle.set(data.title,data); }); return records.map(r=>{ if(r.subject) return r; const eid=r.examId||r.testId; if(eid&&byId.has(eid)){const s=byId.get(eid).subject;if(s) return{...r,subject:s};} const title=r.testName||r.examTitle; if(title&&byTitle.has(title)){const s=byTitle.get(title).subject;if(s) return{...r,subject:s};} return r; }); } catch { return records; }
 }
-function rpFilterByPeriod(recs,period){ if(period==='all') return recs; const days={'1w':7,'2w':14,'3w':21,'4w':28,'1m':30,'2m':60,'3m':90,'6m':180}[period]||0; if(!days) return recs; const since=new Date(); since.setDate(since.getDate()-days); return recs.filter(r=>toDate(r.timestamp||0)>=since); }
+function rpFilterByPeriod(recs,period){ if(period==='all') return recs; const m=/^(\d+)w$/.exec(period); if(!m) return recs; const wi=(+m[1])-1; const base=enrollDate(); if(!base) return recs; return recs.filter(r=>enrollWeekIndex(r,base)===wi); }
 function rpBuildAttemptInfo(recs){ const gm=new Map(); recs.forEach(r=>{ const k=r.examId||r.testId||r.testName||'?'; if(!gm.has(k)) gm.set(k,[]); gm.get(k).push(r); }); const im=new Map(); gm.forEach(arr=>arr.forEach((r,i)=>im.set(r.id,{index:i,total:arr.length,isRetry:i>0}))); return im; }
 
 function rpRender() {
@@ -914,8 +927,28 @@ window.rpPickExam=(e,el)=>{ rpCurExam=e; document.querySelectorAll('.etab').forE
 /* 유틸 */
 function scoreOf(r){return typeof r.score==='number'?r.score:(r.percentage||0);}
 function toDate(ts){if(!ts)return new Date(0);if(typeof ts==='object'&&ts.seconds)return new Date(ts.seconds*1000);if(typeof ts.toDate==='function')return ts.toDate();return new Date(ts);}
-function wkRange(w){const now=new Date(),day=now.getDay(),diff=(day===0?-6:1-day);const mon=new Date(now);mon.setDate(now.getDate()+diff-w*7);mon.setHours(0,0,0,0);const sun=new Date(mon);sun.setDate(mon.getDate()+6);sun.setHours(23,59,59,999);return{s:mon,e:sun};}
-function inRange(r,s,e){const d=toDate(r.timestamp||r.submittedAt);return d>=s&&d<=e;}
+/* 등록일 파싱: Timestamp/{seconds}/"2026. 5. 9." 문자열 등 모두 대응 */
+function parseRegDate(r){
+  if(!r) return null;
+  if(typeof r==='object'&&r.seconds) return new Date(r.seconds*1000);
+  if(typeof r==='object'&&typeof r.toDate==='function') return r.toDate();
+  if(typeof r==='string'){ const m=r.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/); if(m) return new Date(+m[1],+m[2]-1,+m[3]); const d=new Date(r); return isNaN(d)?null:d; }
+  const d=new Date(r); return isNaN(d)?null:d;
+}
+/* 학생 등록일(1주차 시작 기준점). 없으면 가장 오래된 시험 기록일로 폴백 */
+function enrollDate(){
+  const d=parseRegDate(stu&&(stu.regDate||stu.registeredAt||stu.createdAt||stu.joinDate));
+  if(d){ d.setHours(0,0,0,0); return d; }
+  if(recsAll.length){ const oldest=recsAll.reduce((a,r)=>{const t=toDate(r.timestamp);return t<a?t:a;},toDate(recsAll[0].timestamp)); const e=new Date(oldest); e.setHours(0,0,0,0); return e; }
+  return null;
+}
+/* 기록이 등록 후 몇 주차인지(0=1주차, 1=2주차 …). 등록일 이전이면 0주차로 묶음 */
+function enrollWeekIndex(r,base){
+  if(!base) return null;
+  const d=toDate(r.timestamp||r.submittedAt); if(d.getTime()===0) return null;
+  const diffDays=Math.floor((d-base)/86400000);
+  return diffDays<0?0:Math.floor(diffDays/7);
+}
 function fmtDateShort(ts){if(!ts)return '';const d=toDate(ts);if(d.getTime()===0)return '';const yy=String(d.getFullYear()).slice(2),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0'),day=DAY_KO[d.getDay()];return `${yy}.${mm}.${dd}(${day})`;}
 function fmtDate(ts){if(!ts)return '';const d=toDate(ts);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;}
 function esc(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
