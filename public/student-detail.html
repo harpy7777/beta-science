@@ -234,7 +234,8 @@ body {
 .chart-wpct { font-size: 10px; font-weight: 700; color: #db2777; }
 
 /* 탭 공통 */
-.week-tabs { display: flex; gap: 6px; justify-content: space-between; margin-bottom: 1rem; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; scrollbar-width: none; }.week-tabs::-webkit-scrollbar { display: none; }
+.week-tabs { display: flex; gap: 6px; justify-content: space-between; margin-bottom: 1rem; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; scrollbar-width: none; }
+.week-tabs::-webkit-scrollbar { display: none; }
 .wtab { padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 500; font-family: inherit; border: 1px solid #fce7f3; background: #fff; color: #6e6e73; cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; min-height: 36px; }
 .wtab.on { background: #db2777; color: #fff; border-color: #db2777; }
 /* 학년 선택 버튼 (추가) */
@@ -320,7 +321,8 @@ body {
 .stu-test-tag { font-size: 10px; color: #7c3aed; background: #ede9fe; padding: 2px 7px; border-radius: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: inline-block; }
 .stu-test-more { font-size: 10px; color: #aeaeb2; }
 
-.period-tabs { display: flex; gap: 6px; justify-content: space-between; margin-bottom: 1.2rem; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; scrollbar-width: none; }.period-tabs::-webkit-scrollbar { display: none; }
+.period-tabs { display: flex; gap: 6px; justify-content: space-between; margin-bottom: 1.2rem; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; scrollbar-width: none; }
+.period-tabs::-webkit-scrollbar { display: none; }
 .ptab { padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; font-family: inherit; border: 1px solid #fce7f3; background: #fff; color: #6e6e73; cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; min-height: 36px; }
 .ptab.on { background: #db2777; color: #fff; border-color: #db2777; }
 .subject-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 8px; border-radius: 8px; overflow: hidden; border: 1px solid #fce7f3; }
@@ -655,18 +657,9 @@ body {
     </div>
     <div class="period-tabs">
       <button class="ptab on" onclick="rpSetPeriod('all',this)">전체</button>
-      <button class="ptab" onclick="rpSetPeriod('1w',this)">1주차</button>
-      <button class="ptab" onclick="rpSetPeriod('2w',this)">2주차</button>
-      <button class="ptab" onclick="rpSetPeriod('3w',this)">3주차</button>
-      <button class="ptab" onclick="rpSetPeriod('4w',this)">4주차</button>
-      <button class="ptab" onclick="rpSetPeriod('5w',this)">5주차</button>
-      <button class="ptab" onclick="rpSetPeriod('6w',this)">6주차</button>
-      <button class="ptab" onclick="rpSetPeriod('7w',this)">7주차</button>
-      <button class="ptab" onclick="rpSetPeriod('8w',this)">8주차</button>
-      <button class="ptab" onclick="rpSetPeriod('9w',this)">9주차</button>
-      <button class="ptab" onclick="rpSetPeriod('10w',this)">10주차</button>
-      <button class="ptab" onclick="rpSetPeriod('11w',this)">11주차</button>
-      <button class="ptab" onclick="rpSetPeriod('12w',this)">12주차</button>
+      <button class="ptab" onclick="rpSetPeriod('m1',this)">1~4주</button>
+      <button class="ptab" onclick="rpSetPeriod('m2',this)">5~8주</button>
+      <button class="ptab" onclick="rpSetPeriod('m3',this)">9~12주</button>
     </div>
     <div id="rp-subject-table" style="margin-bottom:1rem;"></div>
     <div class="mini-grid">
@@ -872,7 +865,7 @@ window.saveFb=async()=>{ const txt=document.getElementById('fb-ta').value.trim()
 async function rpEnrichWithExamSubjects(records) {
   try { const snap=await getDocs(collection(db,'tests')); const byId=new Map(), byTitle=new Map(); snap.forEach(d=>{ const data=d.data(); byId.set(d.id,data); if(data.title) byTitle.set(data.title,data); }); return records.map(r=>{ if(r.subject) return r; const eid=r.examId||r.testId; if(eid&&byId.has(eid)){const s=byId.get(eid).subject;if(s) return{...r,subject:s};} const title=r.testName||r.examTitle; if(title&&byTitle.has(title)){const s=byTitle.get(title).subject;if(s) return{...r,subject:s};} return r; }); } catch { return records; }
 }
-function rpFilterByPeriod(recs,period){ if(period==='all') return recs; const m=/^(\d+)w$/.exec(period); if(!m) return recs; const wi=(+m[1])-1; const base=enrollDate(); if(!base) return recs; return recs.filter(r=>enrollWeekIndex(r,base)===wi); }
+function rpFilterByPeriod(recs,period){ if(period==='all') return recs; const base=enrollDate(); if(!base) return recs; const mm=/^m(\d+)$/.exec(period); if(mm){ const startW=(+mm[1]-1)*4, endW=startW+3; return recs.filter(r=>{ const wi=enrollWeekIndex(r,base); return wi!==null && wi>=startW && wi<=endW; }); } const m=/^(\d+)w$/.exec(period); if(m){ const wi=(+m[1])-1; return recs.filter(r=>enrollWeekIndex(r,base)===wi); } return recs; }
 function rpBuildAttemptInfo(recs){ const gm=new Map(); recs.forEach(r=>{ const k=r.examId||r.testId||r.testName||'?'; if(!gm.has(k)) gm.set(k,[]); gm.get(k).push(r); }); const im=new Map(); gm.forEach(arr=>arr.forEach((r,i)=>im.set(r.id,{index:i,total:arr.length,isRetry:i>0}))); return im; }
 
 function rpRender() {
