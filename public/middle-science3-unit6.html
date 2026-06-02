@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel='icon' type='image/svg+xml' href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpolygon points='70,8 121,38 121,102 70,132 19,102 19,38' fill='none' stroke='%23E85D75' stroke-width='8' stroke-linejoin='round'/%3E%3Cpolygon points='70,38 97,53 97,87 70,102 43,87 43,53' fill='none' stroke='%23E85D75' stroke-width='4' stroke-linejoin='round' stroke-dasharray='10 6'/%3E%3Ccircle cx='70' cy='8' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='38' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='70' cy='132' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='38' r='10' fill='%23E85D75'/%3E%3C/svg%3E">
+<title>베타과학학원 · 에너지 전환과 보존</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+:root {
+  /* Blue palette */
+  --blu-dark:    #1e3a8a;
+  --blu-main:    #2563eb;
+  --blu-mid:     #3b82f6;
+  --blu-light:   #93c5fd;
+  --blu-tint:    #eff6ff;
+  --blu-tint2:   #dbeafe;
+  --blu-border:  #bfdbfe;
+  --blu-border2: #93c5fd;
+
+  /* Semantic colours */
+  --green:#059669; --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --cyan:#0891b2;  --cyan-bg:#ecfeff;   --cyan-border:#a5f3fc;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626;   --red-bg:#fef2f2;   --red-border:#fecaca;
+  --indigo:#4f46e5;--indigo-bg:#eef2ff;--indigo-border:#c7d2fe;
+
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#f5f8ff;   --white:#fff;
+
+  --radius-sm:10px; --radius:14px; --radius-lg:18px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+p{line-height:1.78;font-size:13.5px;margin:.4rem 0}
+
+/* ── HEADER ── */
+.header{
+  background:#fff;
+  border-bottom:1px solid #e0edff;
+  padding:0 1rem;
+  padding-left:max(1rem,env(safe-area-inset-left));
+  padding-right:max(1rem,env(safe-area-inset-right));
+  height:54px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;top:0;z-index:500;
+  box-shadow:0 1px 0 #e0edff;
+}
+.header-left{display:flex;align-items:center;gap:9px;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{
+  width:30px;height:30px;
+  background:linear-gradient(135deg,var(--blu-mid) 0%,var(--blu-dark) 100%);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.brand-name{font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{
+  display:flex;align-items:center;gap:5px;
+  background:var(--blu-tint);border:1px solid var(--blu-border);
+  border-radius:20px;padding:4px 10px;
+  font-size:10px;font-weight:700;color:var(--blu-dark);
+  white-space:nowrap;
+}
+.dot-blu{width:5px;height:5px;background:var(--blu-mid);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{
+  padding:7px 14px;min-height:36px;
+  background:transparent;border:1.5px solid var(--blu-border);
+  border-radius:20px;font-size:12px;font-weight:700;color:var(--blu-dark);
+  cursor:pointer;white-space:nowrap;transition:background .15s;
+}
+.back-btn:hover{background:var(--blu-tint)}
+.back-btn:active{background:var(--blu-tint2)}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(135deg,var(--blu-dark) 0%,var(--blu-main) 55%,var(--blu-mid) 100%);
+  padding:2.8rem 1.5rem 2.2rem;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;right:-80px;top:-80px;
+  width:300px;height:300px;border-radius:50%;
+  background:rgba(255,255,255,.06);
+}
+.hero::after{
+  content:'';position:absolute;left:-50px;bottom:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:rgba(255,255,255,.04);
+}
+.hero-deco{
+  position:absolute;right:10%;top:15%;
+  width:120px;height:120px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.12);
+  pointer-events:none;
+}
+.hero-deco2{
+  position:absolute;right:18%;top:25%;
+  width:60px;height:60px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.1);
+  pointer-events:none;
+}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+
+.hero-eyebrow{
+  display:inline-block;
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:5px 14px;
+  font-size:11px;font-weight:700;color:#fff;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;
+}
+.hero-title{
+  font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;
+  color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem;
+}
+.hero-desc{
+  font-size:13.5px;color:rgba(255,255,255,.85);
+  line-height:1.7;max-width:580px;margin:0 auto 1.8rem;
+}
+
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{
+  background:rgba(255,255,255,.15);
+  border:1.5px solid rgba(255,255,255,.3);
+  border-radius:14px;padding:.9rem 1.4rem;
+  text-align:center;backdrop-filter:blur(6px);
+  min-width:80px;transition:background .2s;
+}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+/* ── TABS ── */
+.tabs-wrap{
+  background:#fff;border-bottom:2px solid var(--blu-border);
+  position:sticky;top:54px;z-index:400;
+}
+.tabs-inner{
+  max-width:1100px;margin:0 auto;
+  padding:0 1.5rem;display:flex;overflow-x:auto;
+  justify-content:center;gap:4px;
+  scrollbar-width:none;
+}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{
+  padding:13px 26px;font-size:13px;font-weight:700;
+  color:var(--muted);border:none;background:none;cursor:pointer;
+  font-family:inherit;border-bottom:3px solid transparent;
+  white-space:nowrap;transition:all .2s;
+  margin-bottom:-2px;border-radius:8px 8px 0 0;
+}
+.tab-btn:hover{color:var(--blu-main);background:var(--blu-tint)}
+.tab-btn.active{color:var(--blu-main);border-bottom-color:var(--blu-main)}
+
+/* ── CONTENT ── */
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}
+.unit-section.visible{display:block}
+
+/* ── UNIT BANNER ── */
+.unit-banner{
+  border-radius:var(--radius-lg);
+  padding:1.4rem 1.8rem;margin-bottom:1.8rem;
+  display:flex;align-items:center;gap:1.2rem;
+  background:linear-gradient(135deg,var(--blu-tint),var(--blu-tint2));
+  border:2px solid var(--blu-border);
+}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blu-main);margin-bottom:4px}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── ACCORDION ── */
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{
+  background:#fff;border:1.5px solid #e5e7eb;
+  border-radius:var(--radius-lg);overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+}
+.acc-item.open{
+  border-color:var(--blu-border);
+  box-shadow:0 4px 20px rgba(37,99,235,.1);
+}
+.acc-header{
+  display:flex;align-items:center;gap:12px;
+  padding:1.2rem 1.5rem;cursor:pointer;user-select:none;
+  transition:background .15s;
+}
+.acc-header:hover{background:var(--blu-tint)}
+.acc-num{
+  width:32px;height:32px;border-radius:10px;
+  background:var(--blu-tint2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:900;color:var(--blu-dark);flex-shrink:0;
+  transition:background .2s;
+}
+.acc-item.open .acc-num{background:var(--blu-main);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--blu-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-item.open .acc-subtitle{color:var(--blu-main)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--blu-main)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--blu-tint2)}
+.acc-item.open .acc-body{display:block}
+
+/* ── SECTION TITLE ── */
+.sec-title{
+  font-size:12px;font-weight:800;color:var(--blu-dark);
+  letter-spacing:.06em;text-transform:uppercase;
+  margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px;
+}
+.sec-title::before{
+  content:'';width:4px;height:16px;
+  background:var(--blu-main);border-radius:2px;display:block;flex-shrink:0;
+}
+
+/* ── CONTENT BOXES ── */
+.concept-box{
+  background:var(--blu-tint);border:1.5px solid var(--blu-border);
+  border-left:4px solid var(--blu-main);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.concept-box .cb-title{font-weight:800;color:var(--blu-dark);font-size:14px;margin-bottom:.4rem}
+
+.green-box{
+  background:var(--green-bg);border:1.5px solid var(--green-border);
+  border-left:4px solid var(--green);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+
+.amber-box{
+  background:var(--amber-bg);border:1.5px solid var(--amber-border);
+  border-left:4px solid var(--amber);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+
+.blue-box{
+  background:var(--cyan-bg);border:1.5px solid var(--cyan-border);
+  border-left:4px solid var(--cyan);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.blue-box .cb-title{font-weight:800;color:#155e75;font-size:14px;margin-bottom:.4rem}
+
+.red-box{
+  background:var(--red-bg);border:1.5px solid var(--red-border);
+  border-left:4px solid var(--red);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+
+.indigo-box{
+  background:var(--indigo-bg);border:1.5px solid var(--indigo-border);
+  border-left:4px solid var(--indigo);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.indigo-box .cb-title{font-weight:800;color:#3730a3;font-size:14px;margin-bottom:.4rem}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:var(--radius);border:1.5px solid var(--blu-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  background:var(--blu-tint2);padding:10px 14px;
+  text-align:left;font-weight:800;font-size:11px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--blu-dark);
+}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6;vertical-align:top}
+tbody tr:hover td{background:var(--blu-tint)}
+
+/* ── FLOW ── */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0;font-size:13px}
+.flow-box{
+  background:#fff;border:1.5px solid var(--blu-border);
+  border-radius:8px;padding:7px 12px;
+  font-weight:700;color:var(--blu-dark);text-align:center;font-size:12px;line-height:1.4;
+}
+.flow-arrow{color:var(--blu-main);font-size:18px;font-weight:900}
+
+/* ── POINT CARDS ── */
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:.8rem 0}
+.point-card{
+  background:#fff;border:1.5px solid var(--blu-border);
+  border-radius:var(--radius);padding:1rem;text-align:center;
+  transition:border-color .2s,box-shadow .2s;
+}
+.point-card:hover{border-color:var(--blu-main);box-shadow:0 4px 12px rgba(37,99,235,.12)}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--blu-main);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ── HIGHLIGHT TEXT ── */
+.hp{color:var(--blu-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--cyan);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.hi{color:var(--indigo);font-weight:800}
+
+/* ── FORMULA BOX ── */
+.formula-box{
+  background:linear-gradient(135deg,var(--blu-tint),var(--blu-tint2));
+  border:2px solid var(--blu-border);border-radius:var(--radius-lg);
+  padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center;
+}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--blu-dark);letter-spacing:-.01em;font-style:italic}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* ── STEP CARDS ── */
+.steps{display:flex;flex-direction:column;gap:8px;margin:.8rem 0}
+.step-item{
+  display:flex;align-items:flex-start;gap:12px;
+  background:#fff;border:1.5px solid #e5e7eb;
+  border-radius:var(--radius);padding:.9rem 1.1rem;
+  transition:border-color .2s;
+}
+.step-item:hover{border-color:var(--blu-border)}
+.step-num{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--blu-main);color:#fff;
+  font-size:13px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px}
+.step-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+/* ── QUIZ ── */
+.quiz-wrap{
+  background:linear-gradient(135deg,var(--blu-tint2),var(--blu-tint));
+  border:1.5px solid var(--blu-border);
+  border-radius:var(--radius-lg);
+  padding:1.2rem 1.4rem;margin-top:1.6rem;
+}
+.quiz-label{font-size:11px;font-weight:800;color:var(--blu-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{
+  background:var(--blu-main);color:#fff;border:none;
+  border-radius:20px;padding:7px 18px;
+  font-size:12px;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:background .15s;
+}
+.quiz-toggle:hover{background:var(--blu-dark)}
+.quiz-ans{
+  display:none;margin-top:.8rem;padding:.9rem 1rem;
+  background:rgba(255,255,255,.85);border-radius:10px;
+  font-size:13.5px;color:var(--text);line-height:1.75;
+  border:1px solid var(--blu-border);
+}
+
+/* ── TAG CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:.6rem 0}
+.chip{
+  padding:4px 12px;border-radius:20px;
+  font-size:11px;font-weight:700;
+  background:var(--blu-tint2);color:var(--blu-dark);
+  border:1px solid var(--blu-border);
+}
+.chip-g{background:var(--green-bg);color:#065f46;border-color:var(--green-border)}
+.chip-a{background:var(--amber-bg);color:#92400e;border-color:var(--amber-border)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.45rem}
+  .hero-desc{font-size:13px}
+  .hero-eyebrow{font-size:10px;padding:4px 11px}
+
+  .hero-stats{gap:7px}
+  .hero-stat-card{min-width:68px;padding:.75rem .9rem}
+  .hs-num{font-size:1.45rem}
+  .hs-lbl{font-size:9px}
+
+  .tabs-inner{justify-content:flex-start;gap:0;padding:0 .5rem}
+  .tab-btn{padding:11px 13px;font-size:11.5px;border-radius:6px 6px 0 0}
+
+  .content-wrap{padding:1.2rem .85rem 4rem}
+
+  .unit-banner{flex-direction:column;gap:.75rem;padding:1.1rem}
+  .ub-emoji{font-size:2.1rem}
+  .ub-title{font-size:1.1rem}
+
+  .acc-header{padding:.95rem 1rem;gap:10px}
+  .acc-num{width:30px;height:30px;font-size:12px;border-radius:8px}
+  .acc-htitle{font-size:14px}
+  .acc-hdesc{font-size:11.5px}
+  .acc-body{padding:0 1rem 1.4rem}
+
+  .point-box{grid-template-columns:1fr 1fr}
+  .steps{gap:7px}
+  .step-item{padding:.8rem .95rem}
+
+  table{font-size:12px}
+  thead th{font-size:10px;padding:8px 10px}
+  tbody td{padding:8px 10px}
+
+  .concept-box,.green-box,.amber-box,.blue-box,.red-box,.indigo-box{
+    padding:.85rem 1rem;font-size:13px}
+  .concept-box .cb-title,.green-box .cb-title,.amber-box .cb-title,
+  .blue-box .cb-title,.red-box .cb-title,.indigo-box .cb-title{font-size:13px}
+
+  .formula-box{padding:1rem 1.1rem}
+  .formula-text{font-size:1.15rem}
+
+  .quiz-wrap{padding:1rem 1.1rem}
+  .quiz-q{font-size:13px}
+}
+
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .hero-deco,.hero-deco2{display:none}
+
+  .hero{padding:1.7rem .9rem 1.5rem}
+  .hero-title{font-size:1.28rem;letter-spacing:-.025em}
+  .hero-desc{font-size:12.5px;margin-bottom:1.4rem}
+  .breadcrumb{gap:4px;margin-bottom:.9rem}
+  .bc-item,.bc-current,.bc-sep{font-size:11px}
+
+  .hero-stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;width:100%;max-width:280px;margin:0 auto;
+  }
+  .hero-stat-card{min-width:0;padding:.7rem .5rem}
+  .hs-num{font-size:1.3rem}
+  .hs-lbl{font-size:9px}
+
+  .tabs-inner{padding:0 .3rem}
+  .tab-btn{padding:10px 11px;font-size:11px;white-space:nowrap}
+
+  .ub-title{font-size:1rem}
+  .ub-desc{font-size:12px}
+
+  .acc-header{padding:.85rem .9rem;gap:8px}
+  .acc-htitle{font-size:13.5px}
+  .acc-hdesc{font-size:11px}
+  .acc-body{padding:0 .9rem 1.2rem}
+  .sec-title{font-size:11px}
+
+  .point-box{grid-template-columns:1fr}
+  .pc-icon{font-size:1.5rem}
+  .pc-title{font-size:12px}
+  .pc-desc{font-size:11.5px}
+
+  .step-num{width:26px;height:26px;font-size:12px;border-radius:7px;flex-shrink:0}
+  .step-title{font-size:12.5px}
+  .step-desc{font-size:12px}
+
+  .formula-text{font-size:1rem}
+  .formula-sub{font-size:11px}
+
+  .table-wrap{-webkit-overflow-scrolling:touch}
+
+  .quiz-q{font-size:12.5px}
+  .quiz-toggle{font-size:11.5px;padding:6px 15px}
+  .quiz-ans{font-size:13px}
+
+  .chip,.chip-g,.chip-a{font-size:10.5px;padding:3px 10px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"
+          stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-blu"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="middle-science3.html" class="bc-item">중학 과학 3</a><span class="bc-sep">›</span>
+      <span class="bc-current">⚡ Ⅵ. 에너지 전환과 보존</span>
+    </div>
+    <div class="hero-eyebrow">⚡ PART 04 · 중학 과학 3 · UNIT 06</div>
+    <div class="hero-title">Ⅵ. 에너지 전환과 보존</div>
+    <div class="hero-desc">자유 낙하·던져 올린 물체의 역학적 에너지 전환과 보존부터, 전자기 유도와 발전,<br>전기 에너지의 전환·이용, 소비 전력과 전력량까지 동아출판 교과서 핵심 개념을 학습합니다</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">2</div><div class="hs-lbl">중단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">14</div><div class="hs-lbl">핵심개념</div></div>
+      <div class="hero-stat-card"><div class="hs-num">8+</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">🎢 중단원1 · 역학적 에너지</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">🔌 중단원2 · 에너지의 전환과 이용</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ═══════════════════════════════════
+     중단원 1: 역학적 에너지 전환과 보존
+═══════════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner">
+    <div class="ub-emoji">🎢</div>
+    <div>
+      <div class="ub-num">중단원 01 · Mechanical Energy</div>
+      <div class="ub-title">역학적 에너지 전환과 보존</div>
+      <div class="ub-desc">자유 낙하 운동과 던져 올린 물체에서 일어나는 위치 에너지·운동 에너지의 전환, 그리고 마찰이 없을 때 역학적 에너지가 일정하게 보존되는 법칙을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 떨어지는 물체의 역학적 에너지 -->
+    <div class="acc-item" id="acc-free-fall">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Free Fall · 자유 낙하</div>
+          <div class="acc-htitle">떨어지는 물체의 역학적 에너지</div>
+          <div class="acc-hdesc">역학적 에너지의 뜻 · 위치 에너지 ↔ 운동 에너지 전환 · 역학적 에너지 보존 법칙</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">역학적 에너지란?</div>
+        <div class="concept-box">
+          <div class="cb-title">💡 역학적 에너지 = 위치 에너지 + 운동 에너지</div>
+          물체가 중력을 받아 떨어지는 동안 높이와 속력이 함께 변하므로 <span class="hp">중력에 의한 위치 에너지</span>와 <span class="hp">운동 에너지</span>도 계속 변한다. 이 두 에너지의 합을 <span class="hp">역학적 에너지</span>라고 한다.
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">역학적 에너지 = 위치 에너지 + 운동 에너지</div>
+          <div class="formula-sub">위치 에너지 = 9.8 × 질량(kg) × 높이(m) = 9.8mh　|　운동 에너지 = ½mv<sup>2</sup></div>
+        </div>
+
+        <div class="sec-title">자유 낙하할 때의 에너지 전환</div>
+        <div class="green-box">
+          <div class="cb-title">⬇️ 위치 에너지 → 운동 에너지</div>
+          물체가 낙하하면 높이가 낮아져 <span class="hg">위치 에너지는 점점 감소</span>하고, 속력이 빨라져 <span class="hg">운동 에너지는 점점 증가</span>한다. 즉 위치 에너지가 운동 에너지로 전환된다. 이렇게 위치 에너지와 운동 에너지가 서로 바뀌는 것을 <span class="hg">역학적 에너지 전환</span>이라고 한다.
+        </div>
+
+        <div class="sec-title">역학적 에너지 보존 법칙</div>
+        <div class="amber-box">
+          <div class="cb-title">⚖️ 감소한 위치 에너지 = 증가한 운동 에너지</div>
+          공기와의 마찰이 없을 때, 낙하한 거리에 비례해 줄어든 위치 에너지만큼 운동 에너지가 늘어난다. 따라서 두 에너지의 합인 <span class="ha">역학적 에너지는 높이에 관계없이 항상 일정하게 보존</span>된다. 이를 <span class="ha">역학적 에너지 보존 법칙</span>이라고 한다.
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>높이</th><th>운동 E (J)</th><th>위치 E (J)</th><th>역학적 E (J)</th></tr></thead>
+          <tbody>
+            <tr><td>가장 높은 곳</td><td>0</td><td>9.8mh</td><td>9.8mh</td></tr>
+            <tr><td>중간 높이</td><td>증가</td><td>감소</td><td>9.8mh (일정)</td></tr>
+            <tr><td>지면 도달 순간</td><td>9.8mh</td><td>0</td><td>9.8mh</td></tr>
+          </tbody>
+        </table></div>
+        <div class="blue-box">
+          <div class="cb-title">🧪 자유 낙하 실험으로 확인</div>
+          쇠구슬을 떨어뜨리며 0 cm, 50 cm, 100 cm 지점에서 속력과 질량을 측정해 각 에너지를 구하면, 높이가 달라도 <span class="hb">운동 에너지와 위치 에너지의 합(역학적 에너지)은 항상 같은 값</span>으로 유지됨을 알 수 있다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">질량이 2 kg인 물체를 지면으로부터 5 m 높이에서 가만히 놓았다. 공기와의 마찰을 무시할 때, 지면에 도달한 순간 물체의 운동 에너지는 몇 J인가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 98 J</strong><br><br>
+            처음 위치 에너지 = 9.8 × 질량 × 높이 = 9.8 × 2 × 5 = <strong>98 J</strong>이다. 역학적 에너지가 보존되므로, 지면에 도달한 순간에는 위치 에너지(0 J)가 모두 운동 에너지로 전환된다. 따라서 지면 도달 순간의 운동 에너지 = 처음 위치 에너지 = <strong>98 J</strong>이다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 던져 올린 물체의 역학적 에너지 -->
+    <div class="acc-item" id="acc-throw-up">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Projectile Up · 연직 위로 던지기</div>
+          <div class="acc-htitle">던져 올린 물체의 역학적 에너지</div>
+          <div class="acc-hdesc">운동 E → 위치 E 전환 · 최고점에서 속력 0 · 같은 높이 같은 속력</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">연직 위로 던진 물체의 운동</div>
+        <div class="concept-box">
+          <div class="cb-title">⬆️ 운동 에너지 → 위치 에너지</div>
+          연직 위로 던져 올린 물체에는 운동 방향과 <span class="hp">반대 방향(연직 아래)으로 중력</span>이 작용한다. 그래서 올라가는 동안 속력이 점점 감소하여 <span class="hp">운동 에너지가 줄고</span>, 높이가 높아져 <span class="hp">위치 에너지가 늘어난다.</span> 즉 운동 에너지가 위치 에너지로 전환된다.
+        </div>
+        <div class="flow">
+          <div class="flow-box">던지는 순간<br>운동 E 최대</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">올라가는 중<br>운동 E↓ 위치 E↑</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">최고점<br>속력 0 · 위치 E 최대</div>
+        </div>
+
+        <div class="sec-title">자유 낙하 운동과의 비교</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>힘의 방향</th><th>운동 방향</th><th>속력 변화</th></tr></thead>
+          <tbody>
+            <tr><td>자유 낙하</td><td>연직 아래</td><td>연직 아래</td><td><span class="hr">증가</span></td></tr>
+            <tr><td>던져 올린 물체</td><td>연직 아래</td><td>연직 위</td><td><span class="hb">감소</span></td></tr>
+          </tbody>
+        </table></div>
+        <div class="amber-box">
+          <div class="cb-title">⚖️ 올라갈 때도 역학적 에너지 보존</div>
+          공기와의 마찰이 없다면 올라간 거리에 비례해 늘어난 위치 에너지만큼 운동 에너지가 줄어, <span class="ha">역학적 에너지는 일정하게 보존</span>된다. 최고점에서 정지한 뒤에는 방향을 바꿔 다시 낙하하며, <span class="ha">올라갈 때와 내려올 때 같은 높이에서는 속력이 같다.</span>
+        </div>
+        <div class="red-box">
+          <div class="cb-title">❗ 자주 하는 오개념</div>
+          많은 학생이 "최고점에서도 물체가 멈추지 않는다"고 생각한다. 하지만 연직 위로 던진 물체는 <span class="hr">가장 높은 지점에 이른 순간 속력이 0</span>이 되어 운동 에너지도 0이 된다. (단, 정지한 시간이 매우 짧을 뿐이다.)
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">질량이 2 kg인 물체를 4 m/s의 속력으로 연직 위로 던져 올렸다. 공기와의 마찰을 무시할 때, 물체가 가장 높은 지점에 도달한 순간의 위치 에너지는 몇 J인가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 16 J</strong><br><br>
+            처음 운동 에너지 = ½mv<sup>2</sup> = ½ × 2 × 4<sup>2</sup> = <strong>16 J</strong>이다. 최고점에서는 속력이 0이 되어 운동 에너지(16 J)가 모두 위치 에너지로 전환된다. 역학적 에너지가 보존되므로 최고점의 위치 에너지 = 처음 운동 에너지 = <strong>16 J</strong>이다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 03: 역학적 에너지 전환의 예 -->
+    <div class="acc-item" id="acc-mech-example">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Examples · 생활 속 역학적 에너지</div>
+          <div class="acc-htitle">역학적 에너지 전환의 예</div>
+          <div class="acc-hdesc">롤러코스터 · 하프파이프 · 투포환 · 진자 — 위치 E ↔ 운동 E</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">중력이 작용하는 운동에서는 늘 전환이 일어난다</div>
+        <div class="concept-box">
+          <div class="cb-title">🎢 롤러코스터</div>
+          내려가는 구간에서는 높이가 낮아져 <span class="hp">위치 에너지 → 운동 에너지</span>로, 올라가는 구간에서는 <span class="hp">운동 에너지 → 위치 에너지</span>로 전환된다. 레일과 공기의 마찰이 없다면 역학적 에너지는 일정하게 보존된다.
+        </div>
+        <div class="point-box">
+          <div class="point-card"><div class="pc-icon">🏔️</div><div class="pc-title">가장 높은 곳</div><div class="pc-desc">위치 에너지 최대<br>운동 에너지 최소</div></div>
+          <div class="point-card"><div class="pc-icon">⚡</div><div class="pc-title">가장 낮은 곳</div><div class="pc-desc">운동 에너지 최대<br>위치 에너지 최소</div></div>
+        </div>
+        <div class="green-box">
+          <div class="cb-title">🛹 그 밖의 예</div>
+          • <span class="hg">하프파이프 스케이트보드</span>: 내려올 때 위치 E→운동 E, 올라갈 때 운동 E→위치 E<br>
+          • <span class="hg">비스듬히 던진 투포환·제기차기</span>: 올라가며 운동 E→위치 E, 내려오며 위치 E→운동 E<br>
+          • <span class="hg">그네·진자</span>: 가장 낮은 곳에서 속력(운동 E) 최대, 가장 높은 곳에서 위치 E 최대
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">쇠구슬이 레일 위에서 A→B→C→D를 지나 D 지점에서 정지한다. (단, 모든 마찰은 무시) 다음 중 옳지 <u>않은</u> 것은?<br>① A→B로 갈 때 운동 E가 위치 E로 전환된다.　② B 지점에서 운동 E는 0이다.　③ 운동 E는 가장 낮은 C 지점에서 가장 크다.　④ 위치 E는 D 지점에서 가장 크다.　⑤ A·B·C·D에서 역학적 E는 같다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ②</strong><br><br>
+            운동 에너지가 0이 되려면 쇠구슬이 정지해야 한다. B 지점에서 쇠구슬은 정지하지 않고 계속 운동하므로 <strong>운동 에너지는 0이 아니다.</strong> 모든 마찰을 무시하면 역학적 에너지는 어디서나 같고(⑤), 가장 낮은 곳 C에서 운동 에너지가 최대(③), 가장 높은 곳 D에서 위치 에너지가 최대(④)이다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ═══════════════════════════════════
+     중단원 2: 에너지의 전환과 이용
+═══════════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner">
+    <div class="ub-emoji">🔌</div>
+    <div>
+      <div class="ub-num">중단원 02 · Energy Conversion &amp; Use</div>
+      <div class="ub-title">에너지의 전환과 이용</div>
+      <div class="ub-desc">전자기 유도로 전기를 만드는 원리, 에너지가 여러 형태로 전환되며 총량이 보존되는 과정, 전기 에너지의 이용과 소비 전력·전력량을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 04: 전자기 유도와 발전기 -->
+    <div class="acc-item" id="acc-induction">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">04</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Electromagnetic Induction · 전자기 유도</div>
+          <div class="acc-htitle">움직이는 자석이 전기를 만들어</div>
+          <div class="acc-hdesc">전자기 유도 · 유도 전류 · 검류계 · 발전기의 구조 · 수력·풍력 발전</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">전자기 유도란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🧲 자기장이 변하면 전류가 흐른다</div>
+          코일 근처에서 자석을 움직이거나 자석 근처에서 코일을 움직여 <span class="hp">코일을 통과하는 자기장이 변하면 코일에 전류가 흐른다.</span> 이 현상을 <span class="hp">전자기 유도</span>, 이때 흐르는 전류를 <span class="hp">유도 전류</span>라고 한다.
+        </div>
+        <div class="red-box">
+          <div class="cb-title">❗ 자석을 가만히 두면?</div>
+          아무리 강한 자석이라도 <span class="hr">자석이나 코일이 움직이지 않으면 자기장이 변하지 않아 유도 전류가 흐르지 않는다.</span> 핵심은 "자기장의 변화"이다.
+        </div>
+
+        <div class="sec-title">유도 전류의 세기</div>
+        <div class="point-box">
+          <div class="point-card"><div class="pc-icon">🧲</div><div class="pc-title">강한 자석</div><div class="pc-desc">자석이 셀수록<br>유도 전류 ↑</div></div>
+          <div class="point-card"><div class="pc-icon">🌀</div><div class="pc-title">많은 감은 수</div><div class="pc-desc">코일을 많이<br>감을수록 ↑</div></div>
+          <div class="point-card"><div class="pc-icon">💨</div><div class="pc-title">빠른 운동</div><div class="pc-desc">자석을 빠르게<br>움직일수록 ↑</div></div>
+        </div>
+
+        <div class="sec-title">발전기와 발전소</div>
+        <div class="green-box">
+          <div class="cb-title">⚙️ 발전기 = 자석 + 코일</div>
+          발전기는 자석과 코일로 이루어져 있다. 다양한 에너지로 <span class="hg">코일을 회전</span>시키면 전자기 유도가 일어나 전기가 생산된다. 자가 발전 손전등도 흔들면 자석이 코일을 통과하며 유도 전류를 만든다.
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>발전소</th><th>코일(날개)을 돌리는 에너지</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hg">수력 발전</span></td><td>높은 곳에서 떨어지는 물의 운동 에너지</td></tr>
+            <tr><td><span class="hg">풍력 발전</span></td><td>바람의 운동 에너지</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">검류계와 연결된 코일에서 검류계 바늘이 움직이는(유도 전류가 흐르는) 경우를 <보기>에서 모두 고르시오.<br>ㄱ. 자석을 코일 속에서 뺄 때　ㄴ. 코일을 움직여 자석을 코일 속에 넣을 때　ㄷ. 자석을 코일 속에 넣어 둔 채 가만히 있을 때</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ㄱ, ㄴ</strong><br><br>
+            자석이나 코일을 움직여 코일을 통과하는 자기장이 변할 때만 전자기 유도가 일어난다. ㄱ·ㄴ은 자석 또는 코일이 움직여 자기장이 변하므로 유도 전류가 흐른다. ㄷ은 자석을 가만히 둬 자기장이 변하지 않으므로 <strong>유도 전류가 흐르지 않는다.</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 05: 에너지는 전환되고 보존돼 -->
+    <div class="acc-item" id="acc-energy-conserve">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">05</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Conservation of Energy · 에너지 보존</div>
+          <div class="acc-htitle">에너지는 전환되고 보존돼</div>
+          <div class="acc-hdesc">역학적 E → 전기 E · 손발전기 실험 · 에너지 보존 법칙</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">자석이 코일을 지날 때</div>
+        <div class="concept-box">
+          <div class="cb-title">🧲 역학적 에너지의 일부가 전기 에너지로</div>
+          코일을 감은 관과 감지 않은 관에 같은 자석을 동시에 떨어뜨리면, <span class="hp">코일을 감은 관의 자석이 더 늦게</span> 도착한다. 이는 코일을 감은 관에서 자석의 <span class="hp">역학적 에너지 일부가 전자기 유도로 전기 에너지로 전환</span>되어 역학적 에너지가 감소했기 때문이다. (마찰이 없을 때 자유 낙하 자석의 역학적 에너지는 보존됨)
+        </div>
+
+        <div class="sec-title">손발전기 실험 — 에너지의 연쇄 전환</div>
+        <div class="flow">
+          <div class="flow-box">손발전기 A<br>역학적 E</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">전기 E</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">빛·소리 E<br>+ 손발전기 B 역학적 E</div>
+        </div>
+        <p>손발전기 A의 손잡이를 돌리는 <span class="hp">역학적 에너지</span>가 전자기 유도로 <span class="hp">전기 에너지</span>가 되고, 이 전기 에너지가 꼬마전구의 <span class="hp">빛</span>, 버저의 <span class="hp">소리</span>, 손발전기 B의 <span class="hp">역학적 에너지</span>로 전환된다.</p>
+
+        <div class="sec-title">에너지 보존 법칙</div>
+        <div class="amber-box">
+          <div class="cb-title">⚖️ 에너지는 생기거나 사라지지 않는다</div>
+          에너지는 한 형태에서 다른 형태로 <span class="ha">전환</span>될 뿐, 새로 생기거나 소멸하지 않으며 <span class="ha">그 총합은 항상 일정하게 보존</span>된다. 이를 <span class="ha">에너지 보존 법칙</span>이라고 한다.
+        </div>
+        <div class="indigo-box">
+          <div class="cb-title">🔥 생활 속 에너지 전환</div>
+          • 모닥불: 화학 E → 빛 + 열 E　• 기타 연주: 역학적 E → 소리 E<br>
+          • 손전등: 전기 E → 빛 E　• 손뼉: 역학적 E → 소리 E
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">코일을 감은 관을 통해 자석이 A에서 B까지 낙하한다. A에서는 위치 E 20 J, 운동 E 0 J이고, B에서는 위치 E 2 J, 운동 E 14 J이다. A에서 B까지 낙하하는 동안 전기 에너지로 전환된 역학적 에너지는 몇 J인가? (단, 모든 마찰은 무시)</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 4 J</strong><br><br>
+            A에서 역학적 E = 20 + 0 = 20 J, B에서 역학적 E = 2 + 14 = 16 J이다. 마찰을 무시하므로 감소한 역학적 에너지 20 − 16 = <strong>4 J</strong>이 모두 전기 에너지로 전환되었다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 06: 전기 에너지는 다양하게 이용돼 -->
+    <div class="acc-item" id="acc-electric-use">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">06</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Electric Energy · 전기 에너지의 이용</div>
+          <div class="acc-htitle">전기 에너지는 다양하게 이용돼</div>
+          <div class="acc-hdesc">전기 에너지의 3가지 장점 · 스마트폰·가전제품의 에너지 전환</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">전기 에너지의 장점</div>
+        <div class="point-box">
+          <div class="point-card"><div class="pc-icon">🔌</div><div class="pc-title">먼 곳까지 전달</div><div class="pc-desc">전선으로 비교적 쉽게<br>먼 곳까지 보냄</div></div>
+          <div class="point-card"><div class="pc-icon">🔋</div><div class="pc-title">저장·휴대</div><div class="pc-desc">전지에 화학 E로 저장해<br>휴대하며 사용</div></div>
+          <div class="point-card"><div class="pc-icon">🔄</div><div class="pc-title">다양한 전환</div><div class="pc-desc">전기 기구로 여러 다른<br>에너지로 전환</div></div>
+        </div>
+
+        <div class="sec-title">전기 에너지의 전환 예</div>
+        <div class="concept-box">
+          <div class="cb-title">📱 스마트폰 하나에서 일어나는 전환</div>
+          • 화면 표시 → <span class="hp">빛 에너지</span>　• 음악·통화 → <span class="hp">소리 에너지</span><br>
+          • 진동 알림 → <span class="hp">역학적 에너지</span>　• 통화·문자 전송 → <span class="hp">파동 에너지</span>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>전환 형태</th><th>가전제품 예</th></tr></thead>
+          <tbody>
+            <tr><td>전기 E → <span class="hp">빛 E</span></td><td>조명, 형광등, 텔레비전 화면</td></tr>
+            <tr><td>전기 E → <span class="hr">열 E</span></td><td>전기난로, 전기장판, 전기밥솥</td></tr>
+            <tr><td>전기 E → <span class="hg">역학적 E</span></td><td>선풍기, 진공청소기, 고속 열차</td></tr>
+            <tr><td>전기 E → <span class="hb">소리 E</span></td><td>스피커, 버저</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">발광 다이오드(LED) 전구는 전기 에너지의 일부를 빛으로, 나머지를 열로 전환한다. 어떤 LED 전구에서 「전기 에너지(100%) = 빛에너지(㉠) + 열에너지(18%)」일 때, ㉠에 알맞은 값은 몇 %인가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 82 %</strong><br><br>
+            에너지는 보존되므로 빛에너지 + 열에너지 = 100 %이다. 따라서 ㉠ = 100 − 18 = <strong>82 %</strong>이다. 같은 밝기라도 빛으로 전환되는 비율이 높을수록(열로 버려지는 비율이 낮을수록) 에너지 효율이 좋은 전구이다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 07: 소비 전력과 전력량 -->
+    <div class="acc-item" id="acc-power">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">07</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Power &amp; Energy Use · 소비 전력</div>
+          <div class="acc-htitle">전기 기구는 전기 에너지를 소비해</div>
+          <div class="acc-hdesc">소비 전력(W) · 전력량(Wh) · 에너지 효율 등급 · 대기전력</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">소비 전력</div>
+        <div class="concept-box">
+          <div class="cb-title">⚡ 1초 동안 사용한 전기 에너지</div>
+          전기 기구마다 같은 시간 동안 사용하는 전기 에너지의 양이 다른데, 이를 나타낸 것이 <span class="hp">소비 전력</span>이다. 소비 전력은 <span class="hp">1초 동안 사용한 전기 에너지</span>로, 단위는 <span class="hp">W(와트)</span>를 쓴다. 소비 전력이 20 W이면 1초에 20 J의 전기 에너지를 소비한다는 뜻이다.
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">소비 전력(W) = 전기 에너지(J) ÷ 시간(s)</div>
+          <div class="formula-sub">1 W = 1초 동안 1 J의 전기 에너지를 사용할 때의 소비 전력</div>
+        </div>
+
+        <div class="sec-title">전력량</div>
+        <div class="green-box">
+          <div class="cb-title">🧾 전기 요금의 기준</div>
+          <span class="hg">전력량</span>은 사용한 전기 에너지의 총량으로, <span class="hg">소비 전력 × 사용한 시간</span>이다. 단위는 <span class="hg">Wh(와트시)</span>, kWh(킬로와트시)를 쓴다. 소비 전력 20 W인 기구를 1시간 사용하면 전력량은 20 Wh이다.
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">전력량(Wh) = 소비 전력(W) × 시간(h)</div>
+          <div class="formula-sub">같은 성능이면 소비 전력이 작은 기구를 쓸수록 전기 에너지를 절약</div>
+        </div>
+
+        <div class="sec-title">에너지 효율과 대기전력</div>
+        <div class="blue-box">
+          <div class="cb-title">🏷️ 에너지 소비 효율 등급</div>
+          가전제품의 에너지 이용 효율을 <span class="hb">1등급(가장 효율적)~5등급</span>으로 표시하는 제도이다. 같은 밝기라도 백열전구는 효율이 가장 낮고, <span class="hb">LED 전구가 가장 높다.</span>
+        </div>
+        <div class="red-box">
+          <div class="cb-title">🔌 대기전력</div>
+          전원을 꺼도 플러그가 콘센트에 꽂혀 있기만 하면 소비되는 전력이 <span class="hr">대기전력</span>이다. 한 가구 소비 전력의 6% 이상을 차지하므로, <span class="hr">사용하지 않는 기구의 플러그를 뽑아</span> 절약할 수 있다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 7</div>
+          <div class="quiz-q">소비 전력이 30 W인 텔레비전을 2시간 동안 시청했을 때 사용한 전력량은 몇 Wh인가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 60 Wh</strong><br><br>
+            전력량 = 소비 전력 × 시간 = 30 W × 2 h = <strong>60 Wh</strong>이다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 8 · 서술형 심화</div>
+          <div class="quiz-q">밝기가 같은 두 전구 (가), (나)를 10분 동안 사용했다. (가)는 빛에너지 3600 J·열에너지 1200 J, (나)는 빛에너지 3600 J·열에너지 3600 J을 방출했다. 두 전구의 소비 전력을 비교하고 그 까닭을 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: (나)의 소비 전력이 (가)보다 크다.</strong><br><br>
+            에너지는 보존되므로 10분 동안 소비한 전기 에너지는 방출한 빛·열에너지의 합과 같다. (가) = 3600 + 1200 = <strong>4800 J</strong>, (나) = 3600 + 3600 = <strong>7200 J</strong>이다. 같은 시간 동안 소비한 전기 에너지가 (나)가 더 크므로, 1초 동안 소비한 전기 에너지인 <strong>소비 전력도 (나)가 (가)보다 크다.</strong> 즉 같은 밝기라도 (가)가 열로 버리는 에너지가 적어 더 효율적이다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+</div><!-- /content-wrap -->
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  document.querySelectorAll('.unit-section').forEach(el => el.classList.remove('visible'));
+  const target = document.getElementById('unit' + n);
+  if (target) target.classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => {
+      item.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }, 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+// Hash navigation
+const hashMap = {
+  '#unit1':1,'#acc-free-fall':1,'#acc-throw-up':1,'#acc-mech-example':1,
+  '#unit2':2,'#acc-induction':2,'#acc-energy-conserve':2,'#acc-electric-use':2,'#acc-power':2
+};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n-1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
