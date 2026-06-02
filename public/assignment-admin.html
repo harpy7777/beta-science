@@ -203,11 +203,11 @@ body {
 .modal-title { font-size:15px; font-weight:700; }
 .modal-close { width:36px; height:36px; min-width:44px; min-height:44px; border-radius:50%; background:#f5f5f7; border:none; cursor:pointer; font-size:14px; color:#3c3c43; display:flex; align-items:center; justify-content:center; }
 .modal-close:hover { background:#fce7f3; color:#db2777; }
-.modal-filter { display:flex; align-items:center; gap:6px; padding:0 1.4rem 0.9rem; overflow-x:auto; -webkit-overflow-scrolling:touch; flex-wrap:nowrap; }
+.modal-filter { display:flex; align-items:center; gap:6px; padding:0 1.4rem 0.9rem; overflow-x:auto; -webkit-overflow-scrolling:touch; flex-wrap:nowrap; flex-shrink:0; }
 .modal-filter::-webkit-scrollbar { display:none; }
 .subj-tab { padding:7px 14px; min-height:36px; border-radius:20px; font-size:12px; font-weight:700; border:1.5px solid #fce7f3; background:#fff; color:#6e6e73; cursor:pointer; font-family:inherit; white-space:nowrap; flex-shrink:0; }
 .subj-tab.on { background:#db2777; color:#fff; border-color:#db2777; }
-.modal-body { padding:0 1.4rem 1.4rem; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.modal-body { padding:0 1.4rem 1.4rem; overflow-y:auto; -webkit-overflow-scrolling:touch; flex:1 1 auto; min-height:0; }
 
 /* 단원(시험) 행 */
 .test-card { border:1px solid #fce7f3; border-radius:14px; margin-bottom:.6rem; overflow:hidden; }
@@ -217,6 +217,7 @@ body {
 .test-title { font-size:13px; font-weight:700; color:#1d1d1f; line-height:1.4; }
 .test-meta { font-size:11px; color:#aeaeb2; margin-top:2px; }
 .test-allbtn { background:linear-gradient(135deg,#f472b6,#db2777); color:#fff; border:none; border-radius:8px; padding:7px 12px; font-size:11.5px; font-weight:700; white-space:nowrap; flex-shrink:0; cursor:pointer; }
+.test-allbtn.added { background:#059669; pointer-events:none; }
 .test-chev { font-size:12px; color:#aeaeb2; transition:transform 0.2s; flex-shrink:0; }
 .test-card.open .test-chev { transform:rotate(180deg); }
 .test-body { display:none; padding:0 1rem 1rem; border-top:1px solid #fce7f3; }
@@ -234,6 +235,7 @@ body {
 .test-foot { display:flex; gap:8px; justify-content:flex-end; padding-top:.7rem; }
 .test-addsel { background:#059669; color:#fff; border:none; border-radius:9px; padding:9px 15px; font-size:12.5px; font-weight:700; cursor:pointer; }
 .test-addsel:disabled { opacity:.4; cursor:default; }
+.test-addsel.added { background:#059669; }
 .exam-row { display:flex; align-items:center; justify-content:space-between; gap:10px; border:1px solid #fce7f3; border-radius:14px; padding:.85rem 1rem; margin-bottom:.6rem; }
 .exam-row:hover { border-color:#fbcfe8; }
 .ex-info { min-width:0; }
@@ -294,7 +296,7 @@ body {
     <div class="welcome-avatar">🩺</div>
     <div>
       <div class="welcome-greeting">주간 학습 클리닉</div>
-      <div class="welcome-sub">학생별 OX·객관식·핵심내용 링크 만들기</div>
+      <div class="welcome-sub">학생별 OX·4지선다·핵심내용 링크 만들기</div>
     </div>
   </div>
 
@@ -329,7 +331,7 @@ body {
     <div id="studentGrid" class="student-grid"></div>
 
     <span class="fld-label" style="margin-top:4px;">학습 내용</span>
-    <div class="hint">기존에 올린 시험을 골라 담거나, 핵심내용·OX·객관식을 직접 추가하세요. 추가한 순서대로 학생에게 보입니다.</div>
+    <div class="hint">기존에 올린 시험을 골라 담거나, 핵심내용·OX·4지선다를 직접 추가하세요. 추가한 순서대로 학생에게 보입니다.</div>
     <div id="items"></div>
     <div class="add-row">
       <button class="add-btn primary" id="pickExamBtn">📚 기존 시험에서 담기</button>
@@ -441,7 +443,7 @@ function addCard(type){
   card.className='item-card'; card.dataset.type=type;
   let inner=`
     <div class="item-head">
-      <span class="item-tag">${type==='concept'?'📖 핵심내용':type==='ox'?'⭕ OX 문제':'📝 객관식'}</span>
+      <span class="item-tag">${type==='concept'?'📖 핵심내용':type==='ox'?'⭕ OX 문제':'📝 4지선다'}</span>
       <div class="item-ctrls">
         <button class="icbtn" data-mv="up">↑</button>
         <button class="icbtn" data-mv="down">↓</button>
@@ -482,7 +484,7 @@ function addExamItemCard(item, examTitle){
   card.dataset.payload=JSON.stringify(item);
 
   const head=el('div','item-head');
-  head.appendChild(el('span','item-tag', item.type==='ox'?'⭕ OX (시험)':'📝 객관식 (시험)'));
+  head.appendChild(el('span','item-tag', item.type==='ox'?'⭕ OX (시험)':'📝 4지선다 (시험)'));
   const ctrls=el('div','item-ctrls');
   const up=el('button','icbtn','↑'), down=el('button','icbtn','↓'), del=el('button','icbtn del','✕');
   ctrls.append(up,down,del); head.append(ctrls); card.appendChild(head);
@@ -529,7 +531,7 @@ const CONCEPT_PAGES = {
     {f:"middle-science3-unit7.html", t:"7단원 - 별과 우주"},
     {f:"middle-science3-unit8.html", t:"8단원 - 과학기술과 인류 문명"}
   ],
-  "통합과학": [
+  "통합과학1": [
     {f:"unit1-01.html", t:"1단원 - 미시 세계와 거시 세계"},
     {f:"unit1-02.html", t:"1단원 - 미시 세계와 거시 세계 완벽대비"},
     {f:"unit1-03.html", t:"1단원 - 측정 표준 활용 사례 탐색"},
@@ -545,19 +547,19 @@ const CONCEPT_PAGES = {
     {f:"science2-inquiry3740.html", t:"탐구 37~40 - 환경과 에너지"},
     {f:"science2-inquiry4146.html", t:"탐구 41~46 - 과학과 미래 사회"}
   ],
-  "화학1": [
+  "화학": [
     {f:"chemistry1-unit1.html", t:"1단원 - 생활 속 화학과 물질의 양"},
     {f:"chemistry1-unit2.html", t:"2단원 - 물질의 구조와 성질"},
     {f:"chemistry1-unit3.html", t:"3단원 - 화학 평형 & 평형 이동"},
     {f:"chemistry1-unit4.html", t:"4단원 - 물의 자동 이온화와 pH / 중화 반응"}
   ],
-  "화학2 (물질과 에너지)": [
+  "물질과 에너지": [
     {f:"chemistry2-unit1-1.html", t:"1단원 - 물질의 세 가지 상태"},
     {f:"chemistry2-unit1-2.html", t:"2단원 - 용액의 성질"},
     {f:"chemistry2-unit1-3.html", t:"3단원 - 화학 변화의 자발성"},
     {f:"chemistry2-unit1-4.html", t:"4단원 - 반응 속도"}
   ],
-  "화학2 (화학 반응의 세계)": [
+  "화학 반응의 세계": [
     {f:"chemistry2-unit2-1.html", t:"1단원 - 산 염기 평형"},
     {f:"chemistry2-unit2-2.html", t:"2단원 - 산화·환원 반응"},
     {f:"chemistry2-unit2-3.html", t:"3단원 - 탄소 화합물과 반응"}
@@ -713,12 +715,13 @@ function renderExamList(){
     const head=el('div','test-head');
     const info=el('div','test-info');
     info.appendChild(el('div','test-title', exam.title||'(제목 없음)'));
-    info.appendChild(el('div','test-meta', `${exam.subject||''}${exam.grade?' · '+exam.grade:''} · OX ${nOX} · 객관식 ${nMC}`));
+    info.appendChild(el('div','test-meta', `${exam.subject||''}${exam.grade?' · '+exam.grade:''} · OX ${nOX} · 4지선다 ${nMC}`));
     const allBtn=el('button','test-allbtn','전체 담기');
     allBtn.addEventListener('click',(e)=>{
       e.stopPropagation();
       qs.forEach(q=>addExamItemCard(questionToItem(q), exam.title));
       autofillRange(exam.title);
+      allBtn.textContent='담김 ✓'; allBtn.classList.add('added');
       toast(`${qs.length}문제를 담았습니다.`);
     });
     const chev=el('span','test-chev','▾');
@@ -729,12 +732,13 @@ function renderExamList(){
     qs.forEach((q,i)=>{
       const item=el('div','q-item');
       const chk=el('div','q-check');
-      const tp=el('span','q-type '+(q.type==='ox'?'ox':'mc'), q.type==='ox'?'OX':'객관식');
+      const tp=el('span','q-type '+(q.type==='ox'?'ox':'mc'), q.type==='ox'?'OX':'4지선다');
       const txt=el('div','q-text', (i+1)+'. '+(q.text||''));
       item.append(chk,tp,txt);
       item.addEventListener('click',()=>{
         if(selected.has(i)){ selected.delete(i); chk.classList.remove('on'); chk.textContent=''; }
         else { selected.add(i); chk.classList.add('on'); chk.textContent='✓'; }
+        addSelBtn.classList.remove('added');
         addSelBtn.disabled = selected.size===0;
         addSelBtn.textContent = selected.size? `선택한 ${selected.size}문제 담기` : '선택한 문제 담기';
       });
@@ -747,9 +751,7 @@ function renderExamList(){
       [...selected].sort((a,b)=>a-b).forEach(i=>addExamItemCard(questionToItem(qs[i]), exam.title));
       autofillRange(exam.title);
       toast(`${selected.size}문제를 담았습니다.`);
-      selected.clear();
-      body.querySelectorAll('.q-check.on').forEach(c=>{c.classList.remove('on');c.textContent='';});
-      addSelBtn.disabled=true; addSelBtn.textContent='선택한 문제 담기';
+      addSelBtn.textContent='담김 ✓'; addSelBtn.classList.add('added'); addSelBtn.disabled=true;
     });
     foot.appendChild(addSelBtn); body.appendChild(foot);
 
@@ -828,9 +830,9 @@ function collectItems(){
       const choices=[...c.querySelectorAll('.f-choice')].map(i=>i.value.trim());
       const ans=c.querySelector('input[type=radio]:checked');
       const explain=c.querySelector('.f-explain').value.trim();
-      if(!q) throw `${n}번째 객관식 문제를 입력하세요.`;
-      if(choices.some(x=>!x)) throw `${n}번째 객관식의 보기 4개를 모두 입력하세요.`;
-      if(!ans) throw `${n}번째 객관식의 정답을 선택하세요.`;
+      if(!q) throw `${n}번째 4지선다 문제를 입력하세요.`;
+      if(choices.some(x=>!x)) throw `${n}번째 4지선다의 보기 4개를 모두 입력하세요.`;
+      if(!ans) throw `${n}번째 4지선다의 정답을 선택하세요.`;
       items.push({type:'mc',q,choices,answer:Number(ans.value),explain});
     }
   });
