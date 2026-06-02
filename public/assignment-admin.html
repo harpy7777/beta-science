@@ -90,12 +90,48 @@ textarea.txt{min-height:58px;line-height:1.6}
 .lr-btn.del{color:var(--red);border-color:var(--red-border)}
 .lr-btn.del:hover{background:var(--red-bg)}
 
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(29,29,31,.45);z-index:800;align-items:flex-end;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;width:100%;max-width:680px;max-height:82vh;border-radius:18px 18px 0 0;display:flex;flex-direction:column;overflow:hidden}
+@media(min-width:560px){.modal{border-radius:18px;margin-bottom:5vh}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.3rem;border-bottom:1px solid #eee}
+.modal-title{font-size:15px;font-weight:900}
+.modal-close{width:32px;height:32px;border-radius:9px;background:var(--pur-tint);font-size:14px;font-weight:800;color:var(--pur-dark)}
+.modal-filter{display:flex;align-items:center;gap:8px;padding:.8rem 1.3rem;border-bottom:1px solid #f3f3f3}
+.grade-sel{border:1.5px solid var(--pur-border);border-radius:9px;padding:7px 11px;font-size:13px;font-family:inherit;color:var(--text);background:#fff}
+.modal-body{padding:1rem 1.3rem;overflow-y:auto}
+.exam-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1.5px solid #e5e7eb;border-radius:var(--radius);padding:.85rem 1rem;margin-bottom:.6rem}
+.exam-row:hover{border-color:var(--pur-border)}
+.ex-info{min-width:0}
+.ex-title{font-size:13.5px;font-weight:800}
+.ex-meta{font-size:11.5px;color:var(--muted);margin-top:2px}
+.ex-add{background:var(--pur-main);color:#fff;border-radius:9px;padding:7px 14px;font-size:12.5px;font-weight:700;white-space:nowrap;flex-shrink:0}
+.ex-add:hover{background:var(--pur-dark)}
+.ex-add.added{background:var(--green);pointer-events:none}
+.item-card.from-exam{background:var(--green-bg);border-color:var(--green-border)}
+
 .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;font-size:13px;font-weight:700;padding:11px 20px;border-radius:24px;opacity:0;transition:all .25s;z-index:900;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 @media(max-width:520px){
   .wrap{padding:1.2rem .85rem 4rem}
   .card{padding:1.1rem 1.1rem}
+  .row2>div{flex:1 1 100%;min-width:0}
+  .add-row{gap:6px}
+  .add-btn{flex:1 1 calc(50% - 3px);text-align:center;padding:10px 8px;font-size:12px}
+  .add-btn#pickExamBtn{flex:1 1 100%}
+  .item-card{padding:.9rem .95rem}
+  .choice-line .num{width:16px}
+  .modal{max-height:90vh;border-radius:16px 16px 0 0}
+  .modal-head{padding:1rem 1.1rem}
+  .modal-filter{padding:.7rem 1.1rem}
+  .modal-body{padding:.9rem 1.1rem}
+  .exam-row{padding:.8rem .85rem}
+  .ex-add{padding:9px 14px}
+  .save-btn{padding:13px 0;font-size:14px}
+}
+@media(max-width:360px){
+  .add-btn{flex:1 1 100%}
 }
 </style>
 </head>
@@ -140,12 +176,13 @@ textarea.txt{min-height:58px;line-height:1.6}
     </div>
 
     <label class="fld" style="margin-top:.3rem">학습 내용</label>
-    <div class="hint">아래 버튼으로 핵심내용·OX·객관식을 원하는 만큼 추가하세요. 추가한 순서대로 학생에게 보입니다.</div>
+    <div class="hint">기존에 올린 시험을 골라 담거나, 핵심내용·OX·객관식을 직접 추가하세요. 추가한 순서대로 학생에게 보입니다.</div>
     <div id="items"></div>
     <div class="add-row">
+      <button class="add-btn" id="pickExamBtn" style="border-style:solid;background:var(--pur-main);color:#fff;border-color:var(--pur-main)">📚 기존 시험에서 담기</button>
       <button class="add-btn" data-add="concept">＋ 핵심내용</button>
-      <button class="add-btn" data-add="ox">＋ OX 문제</button>
-      <button class="add-btn" data-add="mc">＋ 객관식</button>
+      <button class="add-btn" data-add="ox">＋ OX 직접 추가</button>
+      <button class="add-btn" data-add="mc">＋ 객관식 직접 추가</button>
     </div>
 
     <button class="save-btn" id="saveBtn">🔗 처방 링크 만들기</button>
@@ -166,12 +203,31 @@ textarea.txt{min-height:58px;line-height:1.6}
 
 </main>
 
+<!-- 시험 선택 모달 -->
+<div class="modal-overlay" id="examModal">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">📚 기존 시험에서 담기</span>
+      <button class="modal-close" id="examModalClose">✕</button>
+    </div>
+    <div class="modal-filter">
+      <span style="font-size:12px;font-weight:700;color:var(--pur-dark)">학년</span>
+      <select id="gradeFilter" class="grade-sel">
+        <option value="">전체</option>
+        <option value="중1">중1</option><option value="중2">중2</option><option value="중3">중3</option>
+        <option value="고1">고1</option><option value="고2">고2</option><option value="고3">고3</option>
+      </select>
+    </div>
+    <div class="modal-body" id="examList"><div class="list-empty">불러오는 중…</div></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, query, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, query, orderBy, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg = {
   apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
@@ -264,9 +320,121 @@ function addCard(type){
   $('items').appendChild(card);
 }
 
-document.querySelectorAll('.add-btn').forEach(b=>{
+document.querySelectorAll('.add-btn[data-add]').forEach(b=>{
   b.addEventListener('click',()=>addCard(b.dataset.add));
 });
+
+/* ── examService와 동일한 정답 정규화 ── */
+function normalizeAnswer(val){
+  if(val===undefined||val===null) return '';
+  const str=String(val).trim();
+  if(/^[oOxX]$/.test(str)) return str.toUpperCase();
+  const m=str.match(/\d+/);
+  if(m) return m[0];
+  return str;
+}
+
+/* ── 시험에서 담은 문제 → 편집불가 카드 (데이터는 dataset에 보관) ── */
+let examCardSeq=0;
+function addExamItemCard(item, examTitle){
+  examCardSeq++;
+  const card=document.createElement('div');
+  card.className='item-card from-exam';
+  card.dataset.type = item.type==='ox' ? 'ox' : 'mc';
+  card.dataset.fromExam='1';
+  card.dataset.payload=JSON.stringify(item);
+
+  const tagText = item.type==='ox' ? '⭕ OX (시험)' : '📝 객관식 (시험)';
+  const head=document.createElement('div'); head.className='item-head';
+  const tag=el('span','item-tag', tagText);
+  const ctrls=document.createElement('div'); ctrls.className='item-ctrls';
+  const up=el('button','icbtn','↑'); up.title='위로';
+  const down=el('button','icbtn','↓'); down.title='아래로';
+  const del=el('button','icbtn del','✕'); del.title='삭제';
+  ctrls.append(up,down,del); head.append(tag,ctrls); card.appendChild(head);
+
+  const qp=el('div',null,item.q); qp.style.cssText='font-size:13.5px;font-weight:700;line-height:1.6;margin-bottom:.3rem;white-space:pre-line';
+  card.appendChild(qp);
+  if(item.type==='mc'){
+    (item.choices||[]).forEach((c,i)=>{
+      const line=el('div',null,`${i+1}. ${c}`);
+      line.style.cssText='font-size:12.5px;color:var(--text);line-height:1.6;'+(i===item.answer?'font-weight:800;color:var(--green)':'');
+      card.appendChild(line);
+    });
+  }
+  const ans=el('div',null,'정답: '+(item.type==='ox'?(item.answer?'O':'X'):(item.answer+1)+'번'));
+  ans.style.cssText='font-size:11.5px;color:var(--green);font-weight:700;margin-top:.4rem';
+  card.appendChild(ans);
+  if(examTitle){ const src=el('div',null,'출처: '+examTitle); src.style.cssText='font-size:11px;color:var(--muted);margin-top:2px'; card.appendChild(src); }
+
+  del.addEventListener('click',()=>card.remove());
+  up.addEventListener('click',()=>{const p=card.previousElementSibling; if(p) card.parentNode.insertBefore(card,p);});
+  down.addEventListener('click',()=>{const nx=card.nextElementSibling; if(nx) card.parentNode.insertBefore(nx,card);});
+  $('items').appendChild(card);
+}
+
+/* ── 시험 한 개를 처방용 item 배열로 변환 ── */
+function examToItems(exam){
+  const out=[];
+  (exam.questions||[]).forEach(q=>{
+    if(q.type==='ox'){
+      out.push({ type:'ox', q:q.text||'', answer: normalizeAnswer(q.answer)==='O', explain:q.explanation||'' });
+    } else if(q.type==='multiple'){
+      const opts=Array.isArray(q.options)?q.options.slice(0,8):[];
+      let idx=Number(normalizeAnswer(q.answer))-1;            // "선택지3" → 2
+      if(!(idx>=0 && idx<opts.length)){                        // 정답이 보기내용으로 저장된 경우 대비
+        const f=opts.findIndex(o=>o===q.answer);
+        idx = f>=0 ? f : 0;
+      }
+      out.push({ type:'mc', q:q.text||'', choices:opts, answer:idx, explain:q.explanation||'' });
+    }
+  });
+  return out;
+}
+
+/* ── 시험 모달 ── */
+let examsCache=null;
+async function openExamModal(){
+  $('examModal').classList.add('show');
+  if(examsCache===null){
+    $('examList').innerHTML='<div class="list-empty">불러오는 중…</div>';
+    try{
+      const qy=query(collection(db,'tests'), where('isPublished','==',true), orderBy('regDate','desc'));
+      const snap=await getDocs(qy);
+      examsCache=snap.docs.map(d=>({id:d.id, ...d.data()}));
+    }catch(err){
+      $('examList').innerHTML='<div class="list-empty">시험 목록을 불러오지 못했습니다.</div>';
+      console.error(err); return;
+    }
+  }
+  renderExamList();
+}
+function renderExamList(){
+  const g=$('gradeFilter').value.trim();
+  const box=$('examList'); box.innerHTML='';
+  const list=(examsCache||[]).filter(e=> !g || (e.grade||'').trim()===g);
+  if(list.length===0){ box.innerHTML='<div class="list-empty">해당하는 시험이 없습니다.</div>'; return; }
+  list.forEach(exam=>{
+    const cnt=Array.isArray(exam.questions)?exam.questions.length:0;
+    const row=document.createElement('div'); row.className='exam-row';
+    const info=document.createElement('div'); info.className='ex-info';
+    info.appendChild(el('div','ex-title', exam.title||'(제목 없음)'));
+    info.appendChild(el('div','ex-meta', `${(exam.grade||'학년?')} · 문제 ${cnt}개`));
+    const btn=el('button','ex-add','담기');
+    btn.addEventListener('click',()=>{
+      const items=examToItems(exam);
+      if(items.length===0){ toast('이 시험에는 담을 문제가 없습니다.'); return; }
+      items.forEach(it=>addExamItemCard(it, exam.title));
+      btn.textContent='담김 ✓'; btn.classList.add('added');
+      toast(`${items.length}문제를 담았습니다.`);
+    });
+    row.append(info,btn); box.appendChild(row);
+  });
+}
+$('pickExamBtn').addEventListener('click', openExamModal);
+$('examModalClose').addEventListener('click',()=>$('examModal').classList.remove('show'));
+$('examModal').addEventListener('click',e=>{ if(e.target===$('examModal')) $('examModal').classList.remove('show'); });
+$('gradeFilter').addEventListener('change', renderExamList);
 
 /* ── 입력값 수집 + 검증 ── */
 function collectItems(){
@@ -274,8 +442,14 @@ function collectItems(){
   if(cards.length===0) throw '학습 내용을 1개 이상 추가하세요.';
   const items=[];
   cards.forEach((c,idx)=>{
-    const type=c.dataset.type;
     const n=idx+1;
+    // 시험에서 담은 문제: 그대로 사용
+    if(c.dataset.fromExam==='1'){
+      try{ items.push(JSON.parse(c.dataset.payload)); }
+      catch(e){ throw `${n}번째 시험 문제를 읽지 못했습니다.`; }
+      return;
+    }
+    const type=c.dataset.type;
     if(type==='concept'){
       const title=c.querySelector('.f-title').value.trim();
       const body=c.querySelector('.f-body').value.trim();
