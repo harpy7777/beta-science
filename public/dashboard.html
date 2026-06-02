@@ -484,7 +484,21 @@ let oxDocs=[],muDocs=[],masterDocs=[],activeSubj='전체';
 function matchSubj(t,key){if(key==='전체')return true;const g=nG(t.grade),s=t.subject||'';if(key==='중1과학')return g==='중1';if(key==='중2과학')return g==='중2';if(key==='중3과학')return g==='중3';if(key==='통합과학1')return s==='통합과학1';if(key==='통합과학2')return s==='통합과학2';if(key==='화학')return s==='화학'||s==='화학1';if(key==='물질과 에너지')return s==='물질과 에너지';if(key==='화학 반응의 세계')return s==='화학 반응의 세계';return false;}
 function subjCnt(key){const f=d=>matchSubj(d.data(),key);return oxDocs.filter(f).length+muDocs.filter(f).length+masterDocs.filter(f).length;}
 function renderSubjFilter(){const wrap=document.getElementById('subjFilter');if(!wrap)return;wrap.innerHTML=SUBJ_TABS.map(k=>{const c=k==='전체'?(oxDocs.length+muDocs.length+masterDocs.length):subjCnt(k);const on=k===activeSubj?'on':'';return`<button class="subj-chip ${on}" onclick="selectSubj('${k.replace(/'/g,"\\'")}',this)"><span class="sc-name">${e(k)}</span><span class="sc-cnt">${c}</span></button>`;}).join('');}
-function renderPanels(){const f=d=>matchSubj(d.data(),activeSubj);const ox=oxDocs.filter(f),mu=muDocs.filter(f),ma=masterDocs.filter(f);document.getElementById('cnt-ox').textContent=ox.length;document.getElementById('cnt-multi').textContent=mu.length;document.getElementById('cnt-master').textContent=ma.length;document.getElementById('tbody-ox').innerHTML=ox.length===0?EMPTY_ROW:ox.map(mTR).join('');document.getElementById('tbody-multi').innerHTML=mu.length===0?EMPTY_ROW:mu.map(mTR).join('');document.getElementById('tbody-master').innerHTML=ma.length===0?EMPTY_ROW:ma.map(mMR).join('');}
+
+/* ── 단원 순서 정렬 (1단원이 위로, 같은 단원이면 ①②③… 순) ── */
+const CIRCLED_NUMS='①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳';
+function unitKey(name){
+  const s=String(name||'');
+  const um=s.match(/(\d+)\s*단원/);
+  const unit=um?parseInt(um[1],10):9999;
+  let sub=9999;
+  for(const ch of s){const i=CIRCLED_NUMS.indexOf(ch);if(i>=0){sub=i+1;break;}}
+  return{unit,sub,s};
+}
+function cmpUnit(n1,n2){const a=unitKey(n1),b=unitKey(n2);if(a.unit!==b.unit)return a.unit-b.unit;if(a.sub!==b.sub)return a.sub-b.sub;return a.s.localeCompare(b.s,'ko');}
+function sortByUnit(docs,key){return docs.slice().sort((x,y)=>cmpUnit(x.data()[key],y.data()[key]));}
+
+function renderPanels(){const f=d=>matchSubj(d.data(),activeSubj);const ox=sortByUnit(oxDocs.filter(f),'title'),mu=sortByUnit(muDocs.filter(f),'title'),ma=sortByUnit(masterDocs.filter(f),'unitName');document.getElementById('cnt-ox').textContent=ox.length;document.getElementById('cnt-multi').textContent=mu.length;document.getElementById('cnt-master').textContent=ma.length;document.getElementById('tbody-ox').innerHTML=ox.length===0?EMPTY_ROW:ox.map(mTR).join('');document.getElementById('tbody-multi').innerHTML=mu.length===0?EMPTY_ROW:mu.map(mTR).join('');document.getElementById('tbody-master').innerHTML=ma.length===0?EMPTY_ROW:ma.map(mMR).join('');}
 function renderAll(){buildExamSubjMap();renderSubjFilter();renderPanels();updateTotalTests();renderRecentAttempts();}
 window.selectSubj=(key,el)=>{activeSubj=key;document.querySelectorAll('.subj-chip').forEach(c=>c.classList.remove('on'));if(el)el.classList.add('on');renderPanels();};
 function iExams(){onSnapshot(collection(db,"tests"),s=>{oxDocs=s.docs.filter(d=>(d.data().questions||[]).some(q=>q.type==='ox'));muDocs=s.docs.filter(d=>(d.data().questions||[]).some(q=>q.type==='multiple'));renderAll();});}
