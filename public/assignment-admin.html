@@ -198,9 +198,9 @@ body {
 /* ── 시험 선택 모달 ── */
 .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:600; align-items:flex-end; justify-content:center; }
 .modal-bg.open { display:flex; }
-.modal-box { background:#fff; border-radius:24px 24px 0 0; width:100%; max-width:600px; max-height:86vh; display:flex; flex-direction:column; box-shadow:0 -8px 40px rgba(0,0,0,0.18); padding-bottom:env(safe-area-inset-bottom); }
-@media(min-width:600px){ .modal-box{ border-radius:24px; margin-bottom:4vh; } }
-.modal-head { display:flex; align-items:center; justify-content:space-between; padding:1.2rem 1.4rem 0.9rem; }
+.modal-box { background:#fff; border-radius:24px 24px 0 0; width:100%; max-width:600px; max-height:88vh; display:flex; flex-direction:column; box-shadow:0 -8px 40px rgba(0,0,0,0.18); padding-bottom:env(safe-area-inset-bottom); }
+@media(min-width:600px){ .modal-bg{ align-items:center; } .modal-box{ border-radius:24px; max-height:82vh; } }
+.modal-head { display:flex; align-items:center; justify-content:space-between; padding:1.2rem 1.4rem 0.9rem; flex-shrink:0; }
 .modal-title { font-size:15px; font-weight:700; }
 .modal-close { width:36px; height:36px; min-width:44px; min-height:44px; border-radius:50%; background:#f5f5f7; border:none; cursor:pointer; font-size:14px; color:#3c3c43; display:flex; align-items:center; justify-content:center; }
 .modal-close:hover { background:#fce7f3; color:#db2777; }
@@ -321,7 +321,7 @@ body {
       </div>
       <div class="field">
         <span class="fld-label">학습 범위</span>
-        <input class="form-input" id="rangeLabel" placeholder="예: 3단원 · 화학 반응">
+        <input class="form-input" id="rangeLabel" placeholder="시험을 담으면 자동으로 채워져요 (직접 수정 가능)">
       </div>
     </div>
 
@@ -334,9 +334,7 @@ body {
     <div id="items"></div>
     <div class="add-row">
       <button class="add-btn primary" id="pickExamBtn">📚 기존 시험에서 담기</button>
-      <button class="add-btn" data-add="concept">＋ 핵심내용</button>
-      <button class="add-btn" data-add="ox">＋ OX 직접 추가</button>
-      <button class="add-btn" data-add="mc">＋ 객관식 직접 추가</button>
+      <button class="add-btn primary" id="pickConceptBtn" style="background:linear-gradient(135deg,#60a5fa,#2563eb);">📖 핵심내용 담기</button>
     </div>
 
     <button class="save-btn" id="saveBtn">🔗 클리닉 링크 만들기</button>
@@ -367,6 +365,18 @@ body {
     </div>
     <div class="modal-filter" id="subjTabs"></div>
     <div class="modal-body" id="examBody"><div class="list-empty">불러오는 중…</div></div>
+  </div>
+</div>
+
+<!-- 핵심내용(단원 페이지) 선택 모달 -->
+<div class="modal-bg" id="conceptModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-title">📖 핵심내용 담기 (단원 페이지)</span>
+      <button class="modal-close" id="conceptModalClose">✕</button>
+    </div>
+    <div class="modal-filter" id="conceptTabs"></div>
+    <div class="modal-body" id="conceptBody"><div class="list-empty">과목을 선택하세요.</div></div>
   </div>
 </div>
 
@@ -493,6 +503,138 @@ function addExamItemCard(item, examTitle){
   $('items').appendChild(card);
 }
 
+/* ── 단원 페이지(핵심내용) 목록: 과목 → [{f:파일, t:단원명}] ── */
+const CONCEPT_PAGES = {
+  "중1과학": [
+    {f:"middle-science1-unit1.html", t:"1단원 - 과학과 인류의 지속가능한 삶"},
+    {f:"middle-science1-unit2.html", t:"2단원 - 생물의 구성과 다양성"},
+    {f:"middle-science1-unit3.html", t:"3단원 - 열"},
+    {f:"middle-science1-unit4.html", t:"4단원 - 물질의 상태 변화"},
+    {f:"middle-science1-unit5.html", t:"5단원 - 힘의 작용"},
+    {f:"middle-science1-unit6.html", t:"6단원 - 기체의 성질"},
+    {f:"middle-science1-unit7.html", t:"7단원 - 태양계"}
+  ],
+  "중2과학": [
+    {f:"middle-science2-unit1.html", t:"1단원 - 물질의 특성"},
+    {f:"middle-science2-unit2.html", t:"2단원 - 지권의 변화"},
+    {f:"middle-science2-unit3.html", t:"3단원 - 빛과 파동"},
+    {f:"middle-science2-unit4.html", t:"4단원 - 물질의 구성"},
+    {f:"middle-science2-unit5.html", t:"5단원 - 식물과 에너지"},
+    {f:"middle-science2-unit6.html", t:"6단원 - 동물과 에너지"},
+    {f:"middle-science2-unit7.html", t:"7단원 - 전기와 자기"},
+    {f:"middle-science2-unit8.html", t:"8단원 - 별과 우주"}
+  ],
+  "중3과학": [
+    {f:"middle-science3-unit5.html", t:"5단원 - 생식과 유전"},
+    {f:"middle-science3-unit6.html", t:"6단원 - 에너지 전환과 보존"},
+    {f:"middle-science3-unit7.html", t:"7단원 - 별과 우주"},
+    {f:"middle-science3-unit8.html", t:"8단원 - 과학기술과 인류 문명"}
+  ],
+  "통합과학": [
+    {f:"unit1-01.html", t:"1단원 - 미시 세계와 거시 세계"},
+    {f:"unit1-02.html", t:"1단원 - 미시 세계와 거시 세계 완벽대비"},
+    {f:"unit1-03.html", t:"1단원 - 측정 표준 활용 사례 탐색"},
+    {f:"unit1-04.html", t:"1단원 - 신호와 정보"},
+    {f:"unit2-01.html", t:"2단원 - 멘델레예프 주기율표 만들기"},
+    {f:"science-performance.html", t:"통합과학 수행평가"},
+    {f:"science-inquiry-performance.html", t:"탐구활동 보고서"}
+  ],
+  "통합과학2": [
+    {f:"science2-inquiry2528.html", t:"탐구 25~28 - 환경 변화와 생물다양성"},
+    {f:"science2-inquiry2932.html", t:"탐구 29~32 - 우리 주변의 변화"},
+    {f:"science2-inquiry3336.html", t:"탐구 33~36 - 생태계와 환경"},
+    {f:"science2-inquiry3740.html", t:"탐구 37~40 - 환경과 에너지"},
+    {f:"science2-inquiry4146.html", t:"탐구 41~46 - 과학과 미래 사회"}
+  ],
+  "화학1": [
+    {f:"chemistry1-unit1.html", t:"1단원 - 생활 속 화학과 물질의 양"},
+    {f:"chemistry1-unit2.html", t:"2단원 - 물질의 구조와 성질"},
+    {f:"chemistry1-unit3.html", t:"3단원 - 화학 평형 & 평형 이동"},
+    {f:"chemistry1-unit4.html", t:"4단원 - 물의 자동 이온화와 pH / 중화 반응"}
+  ],
+  "화학2 (물질과 에너지)": [
+    {f:"chemistry2-unit1-1.html", t:"1단원 - 물질의 세 가지 상태"},
+    {f:"chemistry2-unit1-2.html", t:"2단원 - 용액의 성질"},
+    {f:"chemistry2-unit1-3.html", t:"3단원 - 화학 변화의 자발성"},
+    {f:"chemistry2-unit1-4.html", t:"4단원 - 반응 속도"}
+  ],
+  "화학2 (화학 반응의 세계)": [
+    {f:"chemistry2-unit2-1.html", t:"1단원 - 산 염기 평형"},
+    {f:"chemistry2-unit2-2.html", t:"2단원 - 산화·환원 반응"},
+    {f:"chemistry2-unit2-3.html", t:"3단원 - 탄소 화합물과 반응"}
+  ]
+};
+
+/* ── 핵심내용(단원 페이지) 담은 카드 ── */
+function addConceptCard(page){
+  const card=document.createElement('div');
+  card.className='item-card from-exam';
+  card.style.background='#eff6ff'; card.style.borderColor='#bfdbfe';
+  card.dataset.type='link';
+  card.dataset.payload=JSON.stringify({type:'link', title:page.t, file:page.f});
+  const head=el('div','item-head');
+  const tag=el('span','item-tag','📖 핵심내용'); tag.style.color='#1e40af'; tag.style.background='#dbeafe'; tag.style.borderColor='#bfdbfe';
+  head.appendChild(tag);
+  const ctrls=el('div','item-ctrls');
+  const up=el('button','icbtn','↑'), down=el('button','icbtn','↓'), del=el('button','icbtn del','✕');
+  ctrls.append(up,down,del); head.append(ctrls); card.appendChild(head);
+  const t=el('div',null,page.t); t.style.cssText='font-size:13.5px;font-weight:700;color:#1e40af;line-height:1.5'; card.appendChild(t);
+  const s=el('div',null,'학생이 이 단원 정리 페이지를 열어볼 수 있어요'); s.style.cssText='font-size:11px;color:#aeaeb2;margin-top:3px'; card.appendChild(s);
+  del.addEventListener('click',()=>card.remove());
+  up.addEventListener('click',()=>{const p=card.previousElementSibling; if(p) card.parentNode.insertBefore(card,p);});
+  down.addEventListener('click',()=>{const nx=card.nextElementSibling; if(nx) card.parentNode.insertBefore(nx,card);});
+  $('items').appendChild(card);
+}
+
+/* ── 핵심내용 모달 ── */
+let curConceptSubj=null;
+function openConceptModal(){
+  $('conceptModal').classList.add('open');
+  const subjects=Object.keys(CONCEPT_PAGES);
+  if(!curConceptSubj){
+    const g=selectedStudent? normalizeGrade(selectedStudent.grade):'';
+    if(g==='중1') curConceptSubj='중1과학';
+    else if(g==='중2') curConceptSubj='중2과학';
+    else if(g==='중3') curConceptSubj='중3과학';
+    else curConceptSubj=subjects[0];
+  }
+  const tabs=$('conceptTabs'); tabs.innerHTML='';
+  subjects.forEach(s=>{
+    const b=el('button','subj-tab'+(s===curConceptSubj?' on':''), s);
+    b.addEventListener('click',()=>{ curConceptSubj=s; document.querySelectorAll('#conceptTabs .subj-tab').forEach(t=>t.classList.remove('on')); b.classList.add('on'); renderConceptList(); });
+    tabs.appendChild(b);
+  });
+  renderConceptList();
+}
+function renderConceptList(){
+  const box=$('conceptBody'); box.innerHTML='';
+  const list=CONCEPT_PAGES[curConceptSubj]||[];
+  if(list.length===0){ box.innerHTML='<div class="list-empty">단원이 없습니다.</div>'; return; }
+  list.forEach(page=>{
+    const row=el('div','exam-row');
+    const info=el('div','ex-info');
+    info.appendChild(el('div','ex-title', page.t));
+    info.appendChild(el('div','ex-meta', curConceptSubj));
+    const btn=el('button','ex-add','담기');
+    btn.addEventListener('click',()=>{
+      addConceptCard(page);
+      autofillRange(page.t);
+      btn.textContent='담김 ✓'; btn.classList.add('added');
+      toast('핵심내용을 담았습니다.');
+    });
+    row.append(info,btn); box.appendChild(row);
+  });
+}
+$('pickConceptBtn').addEventListener('click', openConceptModal);
+$('conceptModalClose').addEventListener('click',()=>$('conceptModal').classList.remove('open'));
+$('conceptModal').addEventListener('click',e=>{ if(e.target===$('conceptModal')) $('conceptModal').classList.remove('open'); });
+
+/* 학습 범위가 비어 있으면 담은 시험 단원명으로 자동 채움 */
+function autofillRange(title){
+  const inp=$('rangeLabel');
+  if(inp && !inp.value.trim() && title){ inp.value=title; }
+}
+
 /* ── 시험 한 문제 → item 변환 ── */
 function questionToItem(q){
   if(q.type==='ox'){
@@ -536,7 +678,7 @@ function buildSubjTabs(){
   const subjects=[]; 
   (examsCache||[]).forEach(e=>{ const s=(e.subject||'').trim(); if(s && !subjects.includes(s)) subjects.push(s); });
   const tabs=$('subjTabs'); tabs.innerHTML='';
-  const mk=(label,val)=>{ const b=el('button','subj-tab'+(val===curSubj?' on':''),label); b.addEventListener('click',()=>{ curSubj=val; document.querySelectorAll('.subj-tab').forEach(t=>t.classList.remove('on')); b.classList.add('on'); renderExamList(); }); tabs.appendChild(b); };
+  const mk=(label,val)=>{ const b=el('button','subj-tab'+(val===curSubj?' on':''),label); b.addEventListener('click',()=>{ curSubj=val; document.querySelectorAll('#subjTabs .subj-tab').forEach(t=>t.classList.remove('on')); b.classList.add('on'); renderExamList(); }); tabs.appendChild(b); };
   mk('전체','전체');
   subjects.forEach(s=>mk(s,s));
 }
@@ -559,6 +701,7 @@ function renderExamList(){
     allBtn.addEventListener('click',(e)=>{
       e.stopPropagation();
       qs.forEach(q=>addExamItemCard(questionToItem(q), exam.title));
+      autofillRange(exam.title);
       toast(`${qs.length}문제를 담았습니다.`);
     });
     const chev=el('span','test-chev','▾');
@@ -585,6 +728,7 @@ function renderExamList(){
     addSelBtn.addEventListener('click',()=>{
       if(selected.size===0) return;
       [...selected].sort((a,b)=>a-b).forEach(i=>addExamItemCard(questionToItem(qs[i]), exam.title));
+      autofillRange(exam.title);
       toast(`${selected.size}문제를 담았습니다.`);
       selected.clear();
       body.querySelectorAll('.q-check.on').forEach(c=>{c.classList.remove('on');c.textContent='';});
@@ -643,6 +787,10 @@ function collectItems(){
     const n=idx+1;
     if(c.dataset.fromExam==='1'){
       try{ items.push(JSON.parse(c.dataset.payload)); }catch(e){ throw `${n}번째 시험 문제를 읽지 못했습니다.`; }
+      return;
+    }
+    if(c.dataset.type==='link'){
+      try{ items.push(JSON.parse(c.dataset.payload)); }catch(e){ throw `${n}번째 핵심내용을 읽지 못했습니다.`; }
       return;
     }
     const type=c.dataset.type;
