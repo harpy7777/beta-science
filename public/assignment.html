@@ -209,6 +209,18 @@ function renderConcept(it){
   box.appendChild(el('div','concept-body', it.body||''));
   return box;
 }
+function renderLink(it){
+  const a=document.createElement('a');
+  a.className='concept-box';
+  a.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:10px;text-decoration:none;border-left-color:#2563eb;background:#eff6ff;border-color:#bfdbfe;';
+  a.href=it.file||'#';
+  const left=el('div');
+  left.appendChild(el('div','concept-title', '📖 '+(it.title||'단원 정리'))).style.color='#1e40af';
+  left.appendChild(el('div',null,'눌러서 단원 정리를 확인하세요')).style.cssText='font-size:12px;color:#6e6e73;margin-top:3px';
+  const arrow=el('div',null,'›'); arrow.style.cssText='font-size:22px;color:#2563eb;font-weight:700;flex-shrink:0';
+  a.append(left,arrow);
+  return a;
+}
 function renderOX(it, idx){
   const w=el('div','quiz-box');
   w.appendChild(el('div','quiz-label', 'OX 문제 '+idx));
@@ -271,7 +283,7 @@ async function load(){
   $('heroTitle').textContent = (data.studentName||'') + ' 학생';
   $('heroSub').textContent = data.weekLabel ? '📅 '+data.weekLabel : '이번 주 학습 클리닉';
 
-  const nC=items.filter(i=>i.type==='concept').length;
+  const nC=items.filter(i=>i.type==='concept'||i.type==='link').length;
   const nO=items.filter(i=>i.type==='ox').length;
   const nM=items.filter(i=>i.type==='mc').length;
   const row=$('countRow');
@@ -282,6 +294,7 @@ async function load(){
   const box=$('items'); let oxN=0, mcN=0;
   items.forEach(it=>{
     if(it.type==='concept') box.appendChild(renderConcept(it));
+    else if(it.type==='link') box.appendChild(renderLink(it));
     else if(it.type==='ox') box.appendChild(renderOX(it, ++oxN));
     else if(it.type==='mc') box.appendChild(renderMC(it, ++mcN));
   });
