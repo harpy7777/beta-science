@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel='icon' type='image/svg+xml' href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpolygon points='70,8 121,38 121,102 70,132 19,102 19,38' fill='none' stroke='%23E85D75' stroke-width='8' stroke-linejoin='round'/%3E%3Cpolygon points='70,38 97,53 97,87 70,102 43,87 43,53' fill='none' stroke='%23E85D75' stroke-width='4' stroke-linejoin='round' stroke-dasharray='10 6'/%3E%3Ccircle cx='70' cy='8' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='38' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='70' cy='132' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='38' r='10' fill='%23E85D75'/%3E%3C/svg%3E">
+<title>베타과학학원 · 생식과 유전</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+:root {
+  /* Blue palette */
+  --blu-dark:    #1e3a8a;
+  --blu-main:    #2563eb;
+  --blu-mid:     #3b82f6;
+  --blu-light:   #93c5fd;
+  --blu-tint:    #eff6ff;
+  --blu-tint2:   #dbeafe;
+  --blu-border:  #bfdbfe;
+  --blu-border2: #93c5fd;
+
+  /* Semantic colours */
+  --green:#059669; --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --cyan:#0891b2;  --cyan-bg:#ecfeff;   --cyan-border:#a5f3fc;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626;   --red-bg:#fef2f2;   --red-border:#fecaca;
+  --indigo:#4f46e5;--indigo-bg:#eef2ff;--indigo-border:#c7d2fe;
+
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#f5f8ff;   --white:#fff;
+
+  --radius-sm:10px; --radius:14px; --radius-lg:18px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+p{line-height:1.78;font-size:13.5px;margin:.4rem 0}
+
+/* ── HEADER ── */
+.header{
+  background:#fff;
+  border-bottom:1px solid #e0edff;
+  padding:0 1rem;
+  padding-left:max(1rem,env(safe-area-inset-left));
+  padding-right:max(1rem,env(safe-area-inset-right));
+  height:54px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;top:0;z-index:500;
+  box-shadow:0 1px 0 #e0edff;
+}
+.header-left{display:flex;align-items:center;gap:9px;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{
+  width:30px;height:30px;
+  background:linear-gradient(135deg,var(--blu-mid) 0%,var(--blu-dark) 100%);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.brand-name{font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{
+  display:flex;align-items:center;gap:5px;
+  background:var(--blu-tint);border:1px solid var(--blu-border);
+  border-radius:20px;padding:4px 10px;
+  font-size:10px;font-weight:700;color:var(--blu-dark);
+  white-space:nowrap;
+}
+.dot-blu{width:5px;height:5px;background:var(--blu-mid);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{
+  padding:7px 14px;min-height:36px;
+  background:transparent;border:1.5px solid var(--blu-border);
+  border-radius:20px;font-size:12px;font-weight:700;color:var(--blu-dark);
+  cursor:pointer;white-space:nowrap;transition:background .15s;
+}
+.back-btn:hover{background:var(--blu-tint)}
+.back-btn:active{background:var(--blu-tint2)}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(135deg,var(--blu-dark) 0%,var(--blu-main) 55%,var(--blu-mid) 100%);
+  padding:2.8rem 1.5rem 2.2rem;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;right:-80px;top:-80px;
+  width:300px;height:300px;border-radius:50%;
+  background:rgba(255,255,255,.06);
+}
+.hero::after{
+  content:'';position:absolute;left:-50px;bottom:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:rgba(255,255,255,.04);
+}
+.hero-deco{
+  position:absolute;right:10%;top:15%;
+  width:120px;height:120px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.12);
+  pointer-events:none;
+}
+.hero-deco2{
+  position:absolute;right:18%;top:25%;
+  width:60px;height:60px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.1);
+  pointer-events:none;
+}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+
+.hero-eyebrow{
+  display:inline-block;
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:5px 14px;
+  font-size:11px;font-weight:700;color:#fff;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;
+}
+.hero-title{
+  font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;
+  color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem;
+}
+.hero-desc{
+  font-size:13.5px;color:rgba(255,255,255,.85);
+  line-height:1.7;max-width:580px;margin:0 auto 1.8rem;
+}
+
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{
+  background:rgba(255,255,255,.15);
+  border:1.5px solid rgba(255,255,255,.3);
+  border-radius:14px;padding:.9rem 1.4rem;
+  text-align:center;backdrop-filter:blur(6px);
+  min-width:80px;transition:background .2s;
+}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+/* ── TABS ── */
+.tabs-wrap{
+  background:#fff;border-bottom:2px solid var(--blu-border);
+  position:sticky;top:54px;z-index:400;
+}
+.tabs-inner{
+  max-width:1100px;margin:0 auto;
+  padding:0 1.5rem;display:flex;overflow-x:auto;
+  justify-content:center;gap:4px;
+  scrollbar-width:none;
+}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{
+  padding:13px 26px;font-size:13px;font-weight:700;
+  color:var(--muted);border:none;background:none;cursor:pointer;
+  font-family:inherit;border-bottom:3px solid transparent;
+  white-space:nowrap;transition:all .2s;
+  margin-bottom:-2px;border-radius:8px 8px 0 0;
+}
+.tab-btn:hover{color:var(--blu-main);background:var(--blu-tint)}
+.tab-btn.active{color:var(--blu-main);border-bottom-color:var(--blu-main)}
+
+/* ── CONTENT ── */
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}
+.unit-section.visible{display:block}
+
+/* ── UNIT BANNER ── */
+.unit-banner{
+  border-radius:var(--radius-lg);
+  padding:1.4rem 1.8rem;margin-bottom:1.8rem;
+  display:flex;align-items:center;gap:1.2rem;
+  background:linear-gradient(135deg,var(--blu-tint),var(--blu-tint2));
+  border:2px solid var(--blu-border);
+}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blu-main);margin-bottom:4px}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── ACCORDION ── */
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{
+  background:#fff;border:1.5px solid #e5e7eb;
+  border-radius:var(--radius-lg);overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+}
+.acc-item.open{
+  border-color:var(--blu-border);
+  box-shadow:0 4px 20px rgba(37,99,235,.1);
+}
+.acc-header{
+  display:flex;align-items:center;gap:12px;
+  padding:1.2rem 1.5rem;cursor:pointer;user-select:none;
+  transition:background .15s;
+}
+.acc-header:hover{background:var(--blu-tint)}
+.acc-num{
+  width:32px;height:32px;border-radius:10px;
+  background:var(--blu-tint2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:900;color:var(--blu-dark);flex-shrink:0;
+  transition:background .2s;
+}
+.acc-item.open .acc-num{background:var(--blu-main);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--blu-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-item.open .acc-subtitle{color:var(--blu-main)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--blu-main)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--blu-tint2)}
+.acc-item.open .acc-body{display:block}
+
+/* ── SECTION TITLE ── */
+.sec-title{
+  font-size:12px;font-weight:800;color:var(--blu-dark);
+  letter-spacing:.06em;text-transform:uppercase;
+  margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px;
+}
+.sec-title::before{
+  content:'';width:4px;height:16px;
+  background:var(--blu-main);border-radius:2px;display:block;flex-shrink:0;
+}
+
+/* ── CONTENT BOXES ── */
+.concept-box{
+  background:var(--blu-tint);border:1.5px solid var(--blu-border);
+  border-left:4px solid var(--blu-main);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.concept-box .cb-title{font-weight:800;color:var(--blu-dark);font-size:14px;margin-bottom:.4rem}
+
+.green-box{
+  background:var(--green-bg);border:1.5px solid var(--green-border);
+  border-left:4px solid var(--green);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+
+.amber-box{
+  background:var(--amber-bg);border:1.5px solid var(--amber-border);
+  border-left:4px solid var(--amber);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+
+.blue-box{
+  background:var(--cyan-bg);border:1.5px solid var(--cyan-border);
+  border-left:4px solid var(--cyan);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.blue-box .cb-title{font-weight:800;color:#155e75;font-size:14px;margin-bottom:.4rem}
+
+.red-box{
+  background:var(--red-bg);border:1.5px solid var(--red-border);
+  border-left:4px solid var(--red);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+
+.indigo-box{
+  background:var(--indigo-bg);border:1.5px solid var(--indigo-border);
+  border-left:4px solid var(--indigo);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.indigo-box .cb-title{font-weight:800;color:#3730a3;font-size:14px;margin-bottom:.4rem}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:var(--radius);border:1.5px solid var(--blu-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  background:var(--blu-tint2);padding:10px 14px;
+  text-align:left;font-weight:800;font-size:11px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--blu-dark);
+}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6;vertical-align:top}
+tbody tr:hover td{background:var(--blu-tint)}
+
+/* ── FLOW ── */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0;font-size:13px}
+.flow-box{
+  background:#fff;border:1.5px solid var(--blu-border);
+  border-radius:8px;padding:7px 12px;
+  font-weight:700;color:var(--blu-dark);text-align:center;font-size:12px;line-height:1.4;
+}
+.flow-arrow{color:var(--blu-main);font-size:18px;font-weight:900}
+
+/* ── POINT CARDS ── */
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:.8rem 0}
+.point-card{
+  background:#fff;border:1.5px solid var(--blu-border);
+  border-radius:var(--radius);padding:1rem;text-align:center;
+  transition:border-color .2s,box-shadow .2s;
+}
+.point-card:hover{border-color:var(--blu-main);box-shadow:0 4px 12px rgba(37,99,235,.12)}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--blu-main);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ── HIGHLIGHT TEXT ── */
+.hp{color:var(--blu-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--cyan);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.hi{color:var(--indigo);font-weight:800}
+
+/* ── FORMULA BOX ── */
+.formula-box{
+  background:linear-gradient(135deg,var(--blu-tint),var(--blu-tint2));
+  border:2px solid var(--blu-border);border-radius:var(--radius-lg);
+  padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center;
+}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--blu-dark);letter-spacing:-.01em;font-style:italic}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* ── STEP CARDS ── */
+.steps{display:flex;flex-direction:column;gap:8px;margin:.8rem 0}
+.step-item{
+  display:flex;align-items:flex-start;gap:12px;
+  background:#fff;border:1.5px solid #e5e7eb;
+  border-radius:var(--radius);padding:.9rem 1.1rem;
+  transition:border-color .2s;
+}
+.step-item:hover{border-color:var(--blu-border)}
+.step-num{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--blu-main);color:#fff;
+  font-size:13px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px}
+.step-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+/* ── QUIZ ── */
+.quiz-wrap{
+  background:linear-gradient(135deg,var(--blu-tint2),var(--blu-tint));
+  border:1.5px solid var(--blu-border);
+  border-radius:var(--radius-lg);
+  padding:1.2rem 1.4rem;margin-top:1.6rem;
+}
+.quiz-label{font-size:11px;font-weight:800;color:var(--blu-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{
+  background:var(--blu-main);color:#fff;border:none;
+  border-radius:20px;padding:7px 18px;
+  font-size:12px;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:background .15s;
+}
+.quiz-toggle:hover{background:var(--blu-dark)}
+.quiz-ans{
+  display:none;margin-top:.8rem;padding:.9rem 1rem;
+  background:rgba(255,255,255,.85);border-radius:10px;
+  font-size:13.5px;color:var(--text);line-height:1.75;
+  border:1px solid var(--blu-border);
+}
+
+/* ── TAG CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:.6rem 0}
+.chip{
+  padding:4px 12px;border-radius:20px;
+  font-size:11px;font-weight:700;
+  background:var(--blu-tint2);color:var(--blu-dark);
+  border:1px solid var(--blu-border);
+}
+.chip-g{background:var(--green-bg);color:#065f46;border-color:var(--green-border)}
+.chip-a{background:var(--amber-bg);color:#92400e;border-color:var(--amber-border)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.45rem}
+  .hero-desc{font-size:13px}
+  .hero-eyebrow{font-size:10px;padding:4px 11px}
+
+  .hero-stats{gap:7px}
+  .hero-stat-card{min-width:68px;padding:.75rem .9rem}
+  .hs-num{font-size:1.45rem}
+  .hs-lbl{font-size:9px}
+
+  .tabs-inner{justify-content:flex-start;gap:0;padding:0 .5rem}
+  .tab-btn{padding:11px 13px;font-size:11.5px;border-radius:6px 6px 0 0}
+
+  .content-wrap{padding:1.2rem .85rem 4rem}
+
+  .unit-banner{flex-direction:column;gap:.75rem;padding:1.1rem}
+  .ub-emoji{font-size:2.1rem}
+  .ub-title{font-size:1.1rem}
+
+  .acc-header{padding:.95rem 1rem;gap:10px}
+  .acc-num{width:30px;height:30px;font-size:12px;border-radius:8px}
+  .acc-htitle{font-size:14px}
+  .acc-hdesc{font-size:11.5px}
+  .acc-body{padding:0 1rem 1.4rem}
+
+  .point-box{grid-template-columns:1fr 1fr}
+  .steps{gap:7px}
+  .step-item{padding:.8rem .95rem}
+
+  table{font-size:12px}
+  thead th{font-size:10px;padding:8px 10px}
+  tbody td{padding:8px 10px}
+
+  .concept-box,.green-box,.amber-box,.blue-box,.red-box,.indigo-box{
+    padding:.85rem 1rem;font-size:13px}
+  .concept-box .cb-title,.green-box .cb-title,.amber-box .cb-title,
+  .blue-box .cb-title,.red-box .cb-title,.indigo-box .cb-title{font-size:13px}
+
+  .formula-box{padding:1rem 1.1rem}
+  .formula-text{font-size:1.15rem}
+
+  .quiz-wrap{padding:1rem 1.1rem}
+  .quiz-q{font-size:13px}
+}
+
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .hero-deco,.hero-deco2{display:none}
+
+  .hero{padding:1.7rem .9rem 1.5rem}
+  .hero-title{font-size:1.28rem;letter-spacing:-.025em}
+  .hero-desc{font-size:12.5px;margin-bottom:1.4rem}
+  .breadcrumb{gap:4px;margin-bottom:.9rem}
+  .bc-item,.bc-current,.bc-sep{font-size:11px}
+
+  .hero-stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;width:100%;max-width:280px;margin:0 auto;
+  }
+  .hero-stat-card{min-width:0;padding:.7rem .5rem}
+  .hs-num{font-size:1.3rem}
+  .hs-lbl{font-size:9px}
+
+  .tabs-inner{padding:0 .3rem}
+  .tab-btn{padding:10px 11px;font-size:11px;white-space:nowrap}
+
+  .ub-title{font-size:1rem}
+  .ub-desc{font-size:12px}
+
+  .acc-header{padding:.85rem .9rem;gap:8px}
+  .acc-htitle{font-size:13.5px}
+  .acc-hdesc{font-size:11px}
+  .acc-body{padding:0 .9rem 1.2rem}
+  .sec-title{font-size:11px}
+
+  .point-box{grid-template-columns:1fr}
+  .pc-icon{font-size:1.5rem}
+  .pc-title{font-size:12px}
+  .pc-desc{font-size:11.5px}
+
+  .step-num{width:26px;height:26px;font-size:12px;border-radius:7px;flex-shrink:0}
+  .step-title{font-size:12.5px}
+  .step-desc{font-size:12px}
+
+  .formula-text{font-size:1rem}
+  .formula-sub{font-size:11px}
+
+  .table-wrap{-webkit-overflow-scrolling:touch}
+
+  .quiz-q{font-size:12.5px}
+  .quiz-toggle{font-size:11.5px;padding:6px 15px}
+  .quiz-ans{font-size:13px}
+
+  .chip,.chip-g,.chip-a{font-size:10.5px;padding:3px 10px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"
+          stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-blu"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="middle-science3.html" class="bc-item">중학 과학 3</a><span class="bc-sep">›</span>
+      <span class="bc-current">🧬 Ⅴ. 생식과 유전</span>
+    </div>
+    <div class="hero-eyebrow">🧬 PART 03 · 중학 과학 3 · UNIT 05</div>
+    <div class="hero-title">Ⅴ. 생식과 유전</div>
+    <div class="hero-desc">생장과 세포 분열, 염색체, 체세포·생식세포 분열, 사람의 생식과 발생부터<br>멘델의 유전 원리와 사람의 유전까지 동아출판 교과서 핵심 개념을 학습합니다</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">2</div><div class="hs-lbl">중단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">13</div><div class="hs-lbl">핵심개념</div></div>
+      <div class="hero-stat-card"><div class="hs-num">9+</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">🌱 중단원1 · 생장과 생식</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">🧬 중단원2 · 유전</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ═══════════════════════════════════
+     중단원 1: 생장과 생식
+═══════════════════════════════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner">
+    <div class="ub-emoji">🌱</div>
+    <div>
+      <div class="ub-num">중단원 01 · Growth &amp; Reproduction</div>
+      <div class="ub-title">생장과 생식</div>
+      <div class="ub-desc">세포 분열을 통한 생장, 염색체와 유전자, 체세포 분열과 생식세포 분열, 그리고 사람의 생식과 발생 과정을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 생장과 세포 분열 -->
+    <div class="acc-item" id="acc-growth">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Cell Division · 생장의 원리</div>
+          <div class="acc-htitle">생물이 자란다는 것 — 생장과 세포 분열</div>
+          <div class="acc-hdesc">세포 수의 증가로 일어나는 생장 · 물질 교환과 세포 크기 · 세포 주기</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">생장은 어떻게 일어날까?</div>
+        <div class="concept-box">
+          <div class="cb-title">💡 생장 — 세포 수의 증가</div>
+          생물의 몸이 자라는 것을 <span class="hp">생장</span>이라고 한다. 생장은 세포의 크기가 커져서가 아니라, <span class="hp">세포가 분열하여 그 수가 늘어나기 때문</span>에 일어난다.<br><br>
+          예를 들어 강아지가 자라는 것은 몸을 이루는 세포의 크기가 커져서가 아니라 <span class="hp">세포의 수가 늘어났기 때문</span>이다. 코끼리와 쥐의 세포 크기는 거의 비슷하며, 코끼리가 쥐보다 더 많은 세포로 이루어져 있다.
+        </div>
+
+        <div class="sec-title">세포가 무한정 커지지 않는 까닭</div>
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 표면적과 부피의 관계</div>
+          세포가 커지면 표면적이 증가하는 비율보다 <span class="ha">부피가 증가하는 비율이 더 커진다.</span> 즉 부피에 대한 표면적의 비가 작아져 물질을 충분히 흡수하거나 배출하기 어려워진다.<br><br>
+          따라서 세포는 어느 정도 커지면 <span class="ha">분열하여 작은 세포로 나누어지는 것</span>이 물질 교환에 더 유리하다.
+        </div>
+
+        <div class="blue-box">
+          <div class="cb-title">🧪 우무 조각 실험으로 확인하기</div>
+          한 변 2 cm인 우무(A)와 이를 8등분한 한 변 1 cm 조각(B)을 수산화 나트륨 수용액에 담그면, <span class="hb">작은 조각 B는 중심까지 붉게 변하지만 큰 A는 겉만 변한다.</span><br>
+          부피는 같아도(8) 총 표면적은 A가 24, B가 48로 작은 세포일수록 표면적 비가 커서 물질 교환이 잘 일어난다.
+        </div>
+
+        <div class="sec-title">세포 분열과 세포 주기</div>
+        <div class="flow">
+          <div class="flow-box">모세포</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">세포 분열</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">딸세포 2개</div>
+        </div>
+        <p>세포 하나가 둘로 나누어지는 것이 <span class="hp">세포 분열</span>이며, 분열 전의 세포를 <span class="hp">모세포</span>, 분열로 생긴 새 세포를 <span class="hp">딸세포</span>라고 한다. 분열을 마친 세포가 자라서 다시 분열을 마치기까지를 <span class="hp">세포 주기</span>라 하고, 간기와 분열기로 구분한다.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>시기</th><th>특징</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">간기</span></td><td>세포가 생장하고 다음 분열을 준비하는 시기. 세포 주기의 약 90%를 차지하며, 이 시기에 <strong>유전 물질(DNA)이 복제</strong>된다.</td></tr>
+            <tr><td><span class="hp">분열기</span></td><td>세포가 분열하여 딸세포가 형성되는 시기. 핵분열과 세포질 분열로 진행된다.</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">세포가 어느 정도 커지면 더 커지는 대신 분열하여 작은 세포로 나누어지는 것이 생명 활동에 유리하다. 그 까닭을 '표면적'과 '부피'를 이용하여 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong> 세포가 커질수록 <strong>부피에 대한 표면적의 비(표면적/부피)가 작아지기</strong> 때문이다.<br><br>
+            세포가 커질 때 표면적은 부피보다 작은 비율로 증가하므로, 세포막을 통한 물질 교환 효율이 점점 낮아진다. 또한 세포 표면에서 중심까지의 거리가 멀어져 흡수한 물질이 중심까지 도달하기 어려워진다. 따라서 세포 분열로 작은 세포를 만드는 것이 물질 교환에 유리하다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 염색체와 유전자 -->
+    <div class="acc-item" id="acc-chromosome">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Chromosome &amp; Gene · 유전 정보</div>
+          <div class="acc-htitle">염색체에 유전 정보가 있어</div>
+          <div class="acc-hdesc">염색체 · DNA · 유전자 · 염색 분체 · 상동 염색체 · 상염색체와 성염색체</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">염색체 · DNA · 유전자</div>
+        <div class="concept-box">
+          <div class="cb-title">🧬 유전 정보의 저장</div>
+          생물의 생명 활동에 필요한 유전 정보는 <span class="hp">염색체</span>에 들어 있다. 염색체는 <span class="hp">간기</span>에는 핵 속에 실처럼 풀어져 있다가, <span class="hp">분열기</span>에는 응축되어 막대 모양으로 나타난다.<br><br>
+          염색체는 <span class="hp">DNA와 단백질</span>로 이루어져 있다. DNA는 유전 물질이며, DNA에서 생물의 특징을 결정하는 유전 정보가 담긴 부분을 <span class="hp">유전자</span>라고 한다.
+        </div>
+        <div class="flow">
+          <div class="flow-box">염색체</div>
+          <span class="flow-arrow">⊃</span>
+          <div class="flow-box">DNA<br>(유전 물질)</div>
+          <span class="flow-arrow">⊃</span>
+          <div class="flow-box">유전자<br>(유전 정보)</div>
+        </div>
+        <p><span class="hp">염색 분체</span>는 하나의 염색체를 이루는 각각의 가닥으로, 간기에 DNA가 복제되어 만들어진다. 세포가 분열할 때 각각의 딸세포로 나뉘어 들어간다.</p>
+
+        <div class="sec-title">상동 염색체 · 상염색체 · 성염색체</div>
+        <div class="green-box">
+          <div class="cb-title">👫 사람의 염색체 구성</div>
+          체세포에서 모양과 크기가 같은 염색체 쌍을 <span class="hg">상동 염색체</span>라 하며, 부모로부터 각각 하나씩 물려받는다. 사람의 체세포 한 개에는 <span class="hg">23쌍(46개)</span>의 상동 염색체가 들어 있다.<br><br>
+          • <span class="hg">상염색체</span>: 22쌍 — 성별에 관계없이 공통으로 들어 있음<br>
+          • <span class="hg">성염색체</span>: 1쌍 — 성을 결정 (여자 XX, 남자 XY)
+        </div>
+        <div class="blue-box">
+          <div class="cb-title">🔬 생물에 따라 다른 염색체 수</div>
+          체세포의 염색체 수와 모양은 생물 종마다 고유한 특징이다.<br>
+          사람 46개 · 침팬지 48개 · 개 78개 · 고양이 38개 · 옥수수 20개 · 완두 14개 · 초파리 8개 · 소나무 24개
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">사람의 체세포에 들어 있는 염색체 수와 그 구성을 쓰시오. 또한 성을 결정하는 염색체의 이름과 남녀의 구성을 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            • 사람의 체세포 염색체 수: <strong>23쌍(46개)</strong><br>
+            • 구성: <strong>상염색체 22쌍 + 성염색체 1쌍</strong><br>
+            • 성을 결정하는 염색체: <strong>성염색체</strong> → 여자 <strong>XX</strong>, 남자 <strong>XY</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 03: 체세포 분열 -->
+    <div class="acc-item" id="acc-mitosis">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Mitosis · 체세포 분열</div>
+          <div class="acc-htitle">체세포는 어떻게 만들어질까</div>
+          <div class="acc-hdesc">간기 → 전기 → 중기 → 후기 → 말기 → 세포질 분열 · 동물/식물 차이</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">체세포 분열의 과정</div>
+        <p>체세포 분열은 핵이 둘로 나누어지는 <span class="hp">핵분열</span>과 세포가 둘로 나누어지는 <span class="hp">세포질 분열</span>로 구분된다. 핵분열은 염색체의 모양과 움직임에 따라 전기·중기·후기·말기의 4단계로 나뉜다.</p>
+        <div class="steps">
+          <div class="step-item">
+            <div class="step-num">간</div>
+            <div class="step-content">
+              <div class="step-title">간기</div>
+              <div class="step-desc">핵막이 뚜렷하고 염색체가 핵 속에 실처럼 풀어져 있다. <span class="hp">DNA가 복제</span>되어 분열을 준비한다.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">전</div>
+            <div class="step-content">
+              <div class="step-title">전기</div>
+              <div class="step-desc">핵막이 사라지고, 염색체가 응축되어 막대 모양으로 나타난다. 방추사가 형성된다.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">중</div>
+            <div class="step-content">
+              <div class="step-title">중기</div>
+              <div class="step-desc"><span class="hp">염색체가 세포 중앙에 배열된다.</span> 염색체의 모양이 가장 뚜렷하게 관찰되는 시기이다.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">후</div>
+            <div class="step-content">
+              <div class="step-title">후기</div>
+              <div class="step-desc">염색 분체가 나뉘어 세포의 양극으로 이동한다.</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">말</div>
+            <div class="step-content">
+              <div class="step-title">말기 + 세포질 분열</div>
+              <div class="step-desc">응축되어 있던 염색체가 풀리고 핵막이 다시 생긴다. 이어서 세포질이 둘로 나뉜다.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-title">동물 세포와 식물 세포의 세포질 분열</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>세포질 분열 방식</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">동물 세포</span></td><td>세포질이 <strong>밖에서 안으로 잘록하게 들어가며</strong> 분리된다.</td></tr>
+            <tr><td><span class="hg">식물 세포</span></td><td>두 핵 사이에 <strong>세포판이 생기면서</strong> 분리된다.</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="green-box">
+          <div class="cb-title">✅ 체세포 분열의 결과와 의미</div>
+          모세포 1개로부터 <span class="hg">염색체 수와 유전 정보가 같은 딸세포 2개</span>가 만들어진다. 대부분의 생물은 체세포 분열로 세포 수를 늘려 <span class="hg">생장</span>하고, <span class="hg">상처를 재생</span>하며, 수명이 다한 세포를 보충한다.
+        </div>
+        <div class="blue-box">
+          <div class="cb-title">🔬 관찰 실험</div>
+          식물은 <span class="hb">생장점(뿌리·줄기 끝)</span>에서 체세포 분열이 활발하다. 양파 뿌리 끝을 <span class="hb">아세트산 카민 용액</span>으로 염색하면 염색체가 붉게 보여 분열 단계를 관찰할 수 있다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">체세포 분열 과정 중 ① 염색체가 세포 중앙에 배열하는 시기와, ② 체세포 분열 결과 생긴 딸세포의 염색체 수가 모세포와 어떤 관계인지 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            ① 염색체가 세포 중앙에 배열하는 시기 → <strong>중기</strong><br>
+            ② 딸세포의 염색체 수 → 모세포의 염색체 수<strong>와 같다.</strong> (체세포 분열에서는 염색체 수 변화 없음)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 04: 생식세포 분열 -->
+    <div class="acc-item" id="acc-meiosis">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">04</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Meiosis · 생식세포 분열</div>
+          <div class="acc-htitle">생식세포는 어떻게 만들어질까</div>
+          <div class="acc-hdesc">감수 분열 · 2가 염색체 · 감수 1분열과 2분열 · 체세포 분열과의 비교</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">생식세포 분열(감수 분열)</div>
+        <div class="concept-box">
+          <div class="cb-title">💡 왜 감수 분열이라고 할까?</div>
+          생식 기관에서 생식세포를 만들 때 일어나는 분열을 <span class="hp">생식세포 분열</span>이라고 한다. 만약 생식세포의 염색체 수가 체세포와 같다면 세대를 거듭할수록 염색체 수가 늘어날 것이다.<br><br>
+          그러나 생식세포의 염색체 수는 <span class="hp">체세포의 절반</span>이므로 세대를 거듭해도 염색체 수가 유지된다. 그래서 생식세포 분열을 <span class="hp">감수 분열</span>이라고도 한다.
+        </div>
+
+        <div class="sec-title">연속된 두 번의 분열</div>
+        <p>생식세포 분열은 <span class="hp">감수 1분열</span>과 <span class="hp">감수 2분열</span>이 연속해서 일어나며, DNA 복제는 <span class="hr">처음 한 번만</span> 일어난다.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>단계</th><th>특징</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">감수 1분열</span></td><td>전기에 상동 염색체가 접합한 <strong>2가 염색체</strong>가 나타난다. 후기에 상동 염색체가 분리되어 딸세포의 <strong>염색체 수가 절반</strong>이 된다.</td></tr>
+            <tr><td><span class="hp">감수 2분열</span></td><td>DNA 복제 없이 바로 시작된다. 체세포 분열처럼 <strong>염색 분체가 분리</strong>되므로 염색체 수는 변하지 않는다.</td></tr>
+          </tbody>
+        </table></div>
+        <div class="green-box">
+          <div class="cb-title">✅ 결과</div>
+          모세포 1개에서 염색체 수가 <span class="hg">모세포의 절반인 딸세포 4개</span>가 만들어진다. 그 결과 부모의 생식세포가 결합하여 생긴 자손의 염색체 수는 부모와 같게 유지된다.
+        </div>
+
+        <div class="sec-title">체세포 분열 vs 생식세포 분열</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>체세포 분열</th><th>생식세포 분열</th></tr></thead>
+          <tbody>
+            <tr><td>분열 횟수</td><td>1회</td><td><span class="hp">연속 2회</span></td></tr>
+            <tr><td>딸세포의 수</td><td>2개</td><td><span class="hp">4개</span></td></tr>
+            <tr><td>2가 염색체 형성</td><td>형성되지 않음</td><td><span class="hp">형성됨</span></td></tr>
+            <tr><td>염색체 수의 변화</td><td>변화 없음</td><td><span class="hp">절반으로 줄어듦</span></td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">① 상동 염색체가 접합한 2가 염색체가 관찰되는 시기는 언제인가? ② 생식세포 분열 결과 만들어진 딸세포 하나의 염색체 수는 모세포와 비교하여 어떠한가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            ① 2가 염색체가 관찰되는 시기 → <strong>감수 1분열 전기</strong><br>
+            ② 딸세포의 염색체 수 → 모세포의 <strong>절반</strong>이다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 05: 사람의 생식과 발생 -->
+    <div class="acc-item" id="acc-development">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">05</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Fertilization &amp; Development · 생식과 발생</div>
+          <div class="acc-htitle">정자와 난자가 만나 내가 되기까지</div>
+          <div class="acc-hdesc">생식 기관 · 정자와 난자 · 수정 · 난할 · 착상 · 발생</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">생식 기관과 생식세포</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>주요 기관과 역할</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">남자</span></td><td><strong>정소</strong>(정자 생성) · 부정소(정자 성숙) · 수정관(정자 이동 통로)</td></tr>
+            <tr><td><span class="hr">여자</span></td><td><strong>난소</strong>(난자 생성) · <strong>수란관</strong>(난자·수정란 이동, 수정 장소) · 자궁(태아가 자라는 곳)</td></tr>
+          </tbody>
+        </table></div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🏊</div>
+            <div class="pc-title">정자</div>
+            <div class="pc-desc">핵에 23개의 염색체, 꼬리로 스스로 이동</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🥚</div>
+            <div class="pc-title">난자</div>
+            <div class="pc-desc">핵에 23개의 염색체, 세포질에 많은 양분 저장</div>
+          </div>
+        </div>
+
+        <div class="sec-title">수정 → 난할 → 착상 → 발생</div>
+        <div class="flow">
+          <div class="flow-box">배란</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">수정<br>(수란관)</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">난할</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">착상</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">발생</div>
+        </div>
+        <div class="concept-box">
+          <div class="cb-title">📌 핵심 개념 정리</div>
+          • <span class="hp">수정</span>: 정자와 난자가 결합하는 것. 결합한 세포가 <span class="hp">수정란</span>. 수정 장소는 <span class="hp">수란관</span>이다.<br>
+          • <span class="hp">난할</span>: 수정란의 초기 세포 분열. 세포 크기가 커지는 시기 없이 빠르게 일어나 <span class="hp">세포 수는 늘고 세포 크기는 작아지며</span>, 배아 전체 크기는 수정란과 비슷하다.<br>
+          • <span class="hp">착상</span>: 수정 약 1주 후 포배가 자궁 안쪽 벽에 파고드는 것. 이때 임신되었다고 한다.<br>
+          • <span class="hp">발생</span>: 수정란이 조직과 기관을 갖춘 개체가 되는 과정. 약 266일(38주) 뒤 출산한다.
+        </div>
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 자주 하는 오개념</div>
+          남자의 <span class="ha">'수정관'은 정자가 이동하는 통로</span>일 뿐, 수정이 일어나는 곳이 아니다. 수정은 여자의 <span class="ha">수란관</span>에서 일어난다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">① 사람의 몸에서 수정이 일어나는 장소는 어디인가? ② 난할이 거듭될 때 배아 전체의 크기가 거의 변하지 않는 까닭을 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            ① 수정 장소 → <strong>수란관</strong><br>
+            ② 난할은 세포의 크기가 커지는 시기 없이 빠르게 일어나므로, <strong>세포 수는 늘어나지만 세포 하나의 크기는 점점 작아진다.</strong> 따라서 배아 전체의 크기는 수정란과 비슷하게 유지된다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ═══════════════════════════════════
+     중단원 2: 유전
+═══════════════════════════════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner">
+    <div class="ub-emoji">🧬</div>
+    <div>
+      <div class="ub-num">중단원 02 · Heredity</div>
+      <div class="ub-title">유전</div>
+      <div class="ub-desc">멘델의 유전 원리(우열·분리·독립), 사람의 유전 연구 방법, 상염색체 유전과 성염색체 유전(반성유전)을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- ACC 01: 멘델의 유전 원리 -->
+    <div class="acc-item" id="acc-mendel">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Mendel's Laws · 유전 원리</div>
+          <div class="acc-htitle">멘델의 유전 원리는</div>
+          <div class="acc-hdesc">형질과 대립 형질 · 우열의 원리 · 분리의 법칙 · 독립의 법칙</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">기본 용어 정리</div>
+        <div class="concept-box">
+          <div class="cb-title">📋 꼭 알아야 할 용어</div>
+          • <span class="hp">형질</span>: 색·모양·성질 등 생물이 가지는 특성 / <span class="hp">대립 형질</span>: 둥글다↔주름지다처럼 대비되는 형질<br>
+          • <span class="hp">유전</span>: 부모의 형질이 자손에게 전달되는 현상<br>
+          • <span class="hp">순종</span>: 자가 수분해도 같은 형질만 나오는 개체 / <span class="hp">잡종</span>: 대립 형질이 다른 순종끼리 교배한 자손<br>
+          • <span class="hp">유전자형</span>(RR, Rr, rr 등 기호) / <span class="hp">표현형</span>(둥근·주름진 등 겉으로 드러나는 형질)
+        </div>
+        <div class="blue-box">
+          <div class="cb-title">🌱 완두가 실험 재료로 적합한 까닭</div>
+          한 세대가 짧다 · 자손의 수가 많다 · <span class="hb">대립 형질이 뚜렷하다</span> · 자유롭게 교배할 수 있다 · 재배하기 쉽다.
+        </div>
+
+        <div class="sec-title">① 우열의 원리</div>
+        <div class="concept-box">
+          순종의 대립 형질끼리 교배하면 잡종 1대에서 <span class="hp">한 가지 형질만</span> 나타난다. 이때 나타나는 형질을 <span class="hp">우성</span>, 나타나지 않는 형질을 <span class="hp">열성</span>이라고 한다.<br><br>
+          예) 순종 둥근 완두(RR) × 순종 주름진 완두(rr) → 잡종 1대는 모두 <span class="hp">둥근 완두(Rr)</span> → 둥근 것이 우성.
+        </div>
+        <div class="red-box">
+          <div class="cb-title">❗ 오개념 주의 — 우성 ≠ 우수</div>
+          우성과 열성은 <span class="hr">잡종 1대에서 나타나는지의 여부</span>로 정해지는 것이지, '우수한 것'·'열등한 것'을 뜻하지 않는다. 열성 형질이 더 많거나 생존에 유리할 수도 있다.
+        </div>
+
+        <div class="sec-title">② 분리의 법칙</div>
+        <div class="concept-box">
+          생식세포를 만들 때 <span class="hp">한 쌍의 대립유전자가 분리</span>되어 서로 다른 생식세포로 나뉘어 들어가는 것을 분리의 법칙이라고 한다.<br><br>
+          잡종 1대(Rr)를 자가 수분하면 잡종 2대의 유전자형은 <span class="hp">RR : Rr : rr = 1 : 2 : 1</span>, 표현형은 둥근 완두 : 주름진 완두 = <span class="hp">3 : 1</span>로 나타난다.
+        </div>
+
+        <div class="sec-title">③ 독립의 법칙</div>
+        <div class="concept-box">
+          두 쌍 이상의 형질이 함께 유전될 때 각 형질이 서로 영향을 주지 않고 <span class="hp">독립적으로</span> 우열의 원리와 분리의 법칙을 따라 유전되는 것이다.<br><br>
+          둥글고 노란색 잡종(RrYy) 자가 수분 → 잡종 2대 표현형 <span class="hp">9 : 3 : 3 : 1</span>. 색깔과 관계없이 둥근 것 : 주름진 것 = 3 : 1로 나타난다.
+        </div>
+        <div class="chips">
+          <span class="chip">우열의 원리</span>
+          <span class="chip">분리의 법칙 — 잡종2대 3:1</span>
+          <span class="chip">독립의 법칙 — 잡종2대 9:3:3:1</span>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">순종의 둥글고 노란색인 완두와 순종의 주름지고 초록색인 완두를 교배하여 얻은 잡종 1대를 자가 수분하여 모두 400개의 잡종 2대를 얻었다. 이 중 둥근 완두는 이론상 몇 개인가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 300개</strong><br><br>
+            완두 모양은 둥근 것(우성) : 주름진 것(열성) = 3 : 1로 나타난다.<br>
+            따라서 둥근 완두는 400 × 3/4 = <strong>300개</strong>이다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 02: 사람의 유전 연구 -->
+    <div class="acc-item" id="acc-research">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Human Genetics Research · 연구 방법</div>
+          <div class="acc-htitle">사람의 유전은 어떻게 연구할까</div>
+          <div class="acc-hdesc">가계도 조사 · 쌍둥이 연구 · 통계 조사 · 염색체와 유전자 분석</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">사람의 유전 연구가 어려운 까닭</div>
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 완두와 다른 점</div>
+          사람은 ① 연구 목적에 따라 <span class="ha">자유롭게 교배할 수 없고</span>, ② <span class="ha">한 세대가 길어</span> 여러 세대를 관찰하기 어려우며, ③ <span class="ha">한 번에 낳는 자손 수가 적어</span> 결과 분석이 어렵다. 그래서 <strong>간접적인 방법</strong>으로 연구한다.
+        </div>
+
+        <div class="sec-title">사람의 유전 연구 방법</div>
+        <div class="point-box">
+          <div class="point-card">
+            <div class="pc-icon">🌳</div>
+            <div class="pc-title">가계도 조사</div>
+            <div class="pc-desc">특정 형질이 여러 세대에 걸쳐 어떻게 나타나는지 추적</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">👯</div>
+            <div class="pc-title">쌍둥이 연구</div>
+            <div class="pc-desc">유전과 환경의 영향 비교 (1란성은 유전자 동일)</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">📊</div>
+            <div class="pc-title">통계 조사</div>
+            <div class="pc-desc">많은 사람을 조사해 형질이 나타날 확률 분석</div>
+          </div>
+          <div class="point-card">
+            <div class="pc-icon">🧫</div>
+            <div class="pc-title">염색체·유전자 분석</div>
+            <div class="pc-desc">염색체 이상 진단, 유전자 직접 비교·분석</div>
+          </div>
+        </div>
+        <div class="blue-box">
+          <div class="cb-title">👯 쌍둥이 연구 더 알기</div>
+          <span class="hb">1란성 쌍둥이</span>는 하나의 수정란이 둘로 나뉘어 발생한 것으로 유전자 구성이 같다. <span class="hb">2란성 쌍둥이</span>는 난자 2개에 정자 2개가 각각 수정된 것으로 유전자 구성이 다르고 성별도 다를 수 있다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 7</div>
+          <div class="quiz-q">사람의 유전을 완두처럼 직접 교배 실험으로 연구하기 어려운 까닭을 두 가지 이상 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            ① 사람은 연구 목적에 따라 자유롭게 교배할 수 없다.<br>
+            ② 한 세대가 길어 여러 세대의 유전 현상을 관찰하기 어렵다.<br>
+            ③ 한 번에 낳는 자손의 수가 적어 통계적 분석이 어렵다.<br><br>
+            → 따라서 가계도 조사, 쌍둥이 연구, 통계 조사 등 <strong>간접적인 방법</strong>으로 연구한다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC 03: 사람의 유전 형질 -->
+    <div class="acc-item" id="acc-trait">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Human Traits · 사람의 유전 형질</div>
+          <div class="acc-htitle">사람의 형질은 어떻게 유전될까</div>
+          <div class="acc-hdesc">상염색체 유전(혀 말기·ABO식 혈액형) · 성염색체 유전(적록 색맹·반성유전)</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">상염색체 유전</div>
+        <div class="concept-box">
+          <div class="cb-title">🧬 성별과 관계없는 유전</div>
+          혀 말기, 이마 모양, ABO식 혈액형 등은 <span class="hp">상염색체에 있는 대립유전자</span>에 의해 결정된다. 따라서 성별에 따른 빈도 차이가 없고 멘델의 유전 원리를 따른다.<br><br>
+          • <span class="hp">혀 말기</span>: 한 쌍의 대립유전자, 가능(우성)·불가능(열성)<br>
+          • 가계도에서 <span class="hp">부모에게 없던 형질이 자손에게 나타나면</span> 부모의 형질이 우성이다.
+        </div>
+        <div class="green-box">
+          <div class="cb-title">🅰️ ABO식 혈액형 — 복대립·공동 우성</div>
+          ABO식 혈액형은 <span class="hg">A, B, O 세 가지 대립유전자</span>가 관여하는 <span class="hg">복대립 유전</span>이다. A와 B는 O에 대해 우성이고, A와 B 사이에는 우열이 없어 함께 표현된다(<span class="hg">공동 우성</span>).
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>표현형</th><th>A형</th><th>B형</th><th>AB형</th><th>O형</th></tr></thead>
+          <tbody>
+            <tr><td>유전자형</td><td>AA, AO</td><td>BB, BO</td><td>AB</td><td>OO</td></tr>
+          </tbody>
+        </table></div>
+        <p>→ 표현형은 <span class="hg">4가지</span>(A·B·AB·O), 유전자형은 <span class="hg">6가지</span>(AA·AO·BB·BO·AB·OO)이다.</p>
+
+        <div class="sec-title">성염색체 유전 — 반성유전</div>
+        <div class="red-box">
+          <div class="cb-title">🔴 적록 색맹</div>
+          적록 색맹 유전자는 <span class="hr">X 염색체</span>에 있으며 정상에 대해 <span class="hr">열성</span>이다.<br><br>
+          • 남자(XY): 색맹 유전자가 <span class="hr">하나(X′Y)만 있어도</span> 색맹<br>
+          • 여자(XX): 두 X 염색체에 <span class="hr">모두(X′X′)</span> 있어야 색맹<br>
+          → 따라서 적록 색맹은 <span class="hr">여자보다 남자에게 더 많이</span> 나타난다.
+        </div>
+        <div class="indigo-box">
+          <div class="cb-title">🧩 반성유전이란</div>
+          적록 색맹처럼 유전자가 <span class="hi">성염색체(X 염색체)</span>에 있어 <span class="hi">성별에 따라 형질이 나타나는 비율이 다른</span> 유전 현상을 반성유전이라고 한다. (예: 적록 색맹, 혈우병)
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 8</div>
+          <div class="quiz-q">① ABO식 혈액형의 표현형과 유전자형은 각각 몇 가지인가? ② 적록 색맹이 여자보다 남자에게 더 많이 나타나는 까닭을 성염색체와 관련지어 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답:</strong><br><br>
+            ① 표현형 <strong>4가지</strong>(A·B·AB·O), 유전자형 <strong>6가지</strong>(AA·AO·BB·BO·AB·OO)<br><br>
+            ② 적록 색맹 유전자는 X 염색체에 있는 열성 유전자이다. 남자(XY)는 X 염색체가 하나뿐이라 색맹 유전자가 <strong>하나(X′Y)만 있어도</strong> 색맹이 되지만, 여자(XX)는 <strong>두 X 염색체에 모두(X′X′)</strong> 있어야 색맹이 된다. 그래서 남자에게 더 많이 나타난다.
+          </div>
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">💡 서술형 심화</div>
+          <div class="quiz-q">정상인 부모 사이에서 적록 색맹인 아들이 태어났다. 이를 근거로 적록 색맹 형질의 우열 관계와 유전자의 위치(상염색체/성염색체)에 대해 알 수 있는 것을 서술하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">예시 답안 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안:</strong><br><br>
+            정상인 부모에게 없던 적록 색맹 형질이 자손에게 나타났으므로 <strong>적록 색맹은 열성</strong>이다.<br><br>
+            또한 적록 색맹은 남자에게 더 많이 나타나며, 어머니가 정상(보인자)일 때 아들에게서 색맹이 나타나는 점으로 보아 유전자가 <strong>성염색체인 X 염색체에 있는 반성유전</strong>임을 알 수 있다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+</div><!-- /content-wrap -->
+
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  document.querySelectorAll('.unit-section').forEach(el => el.classList.remove('visible'));
+  const target = document.getElementById('unit' + n);
+  if (target) target.classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => {
+      item.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }, 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+// Hash navigation
+const hashMap = {
+  '#unit1':1,'#acc-growth':1,'#acc-chromosome':1,'#acc-mitosis':1,'#acc-meiosis':1,'#acc-development':1,
+  '#unit2':2,'#acc-mendel':2,'#acc-research':2,'#acc-trait':2
+};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n-1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
