@@ -485,17 +485,22 @@ function matchSubj(t,key){if(key==='전체')return true;const g=nG(t.grade),s=t.
 function subjCnt(key){const f=d=>matchSubj(d.data(),key);return oxDocs.filter(f).length+muDocs.filter(f).length+masterDocs.filter(f).length;}
 function renderSubjFilter(){const wrap=document.getElementById('subjFilter');if(!wrap)return;wrap.innerHTML=SUBJ_TABS.map(k=>{const c=k==='전체'?(oxDocs.length+muDocs.length+masterDocs.length):subjCnt(k);const on=k===activeSubj?'on':'';return`<button class="subj-chip ${on}" onclick="selectSubj('${k.replace(/'/g,"\\'")}',this)"><span class="sc-name">${e(k)}</span><span class="sc-cnt">${c}</span></button>`;}).join('');}
 
-/* ── 단원 순서 정렬 (1단원이 위로, 같은 단원이면 ①②③… 순) ── */
+/* ── 단원 순서 정렬 (형식 무관 자연 정렬: 1단원→2단원, 1-1→1-2→…→10-1, ①②③… 모두 숫자 크기대로) ── */
 const CIRCLED_NUMS='①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳';
-function unitKey(name){
-  const s=String(name||'');
-  const um=s.match(/(\d+)\s*단원/);
-  const unit=um?parseInt(um[1],10):9999;
-  let sub=9999;
-  for(const ch of s){const i=CIRCLED_NUMS.indexOf(ch);if(i>=0){sub=i+1;break;}}
-  return{unit,sub,s};
+function normNum(s){let o='';for(const ch of String(s||'')){const i=CIRCLED_NUMS.indexOf(ch);o+= i>=0?String(i+1):ch;}return o;}
+function cmpUnit(n1,n2){
+  const a=normNum(n1),b=normNum(n2);
+  const ra=a.match(/\d+|\D+/g)||[],rb=b.match(/\d+|\D+/g)||[];
+  const len=Math.max(ra.length,rb.length);
+  for(let i=0;i<len;i++){
+    const x=ra[i],y=rb[i];
+    if(x===undefined)return -1;
+    if(y===undefined)return 1;
+    if(/^\d+$/.test(x)&&/^\d+$/.test(y)){const dx=parseInt(x,10),dy=parseInt(y,10);if(dx!==dy)return dx-dy;}
+    else{const c=x.localeCompare(y,'ko');if(c!==0)return c;}
+  }
+  return 0;
 }
-function cmpUnit(n1,n2){const a=unitKey(n1),b=unitKey(n2);if(a.unit!==b.unit)return a.unit-b.unit;if(a.sub!==b.sub)return a.sub-b.sub;return a.s.localeCompare(b.s,'ko');}
 function sortByUnit(docs,key){return docs.slice().sort((x,y)=>cmpUnit(x.data()[key],y.data()[key]));}
 
 function renderPanels(){const f=d=>matchSubj(d.data(),activeSubj);const ox=sortByUnit(oxDocs.filter(f),'title'),mu=sortByUnit(muDocs.filter(f),'title'),ma=sortByUnit(masterDocs.filter(f),'unitName');document.getElementById('cnt-ox').textContent=ox.length;document.getElementById('cnt-multi').textContent=mu.length;document.getElementById('cnt-master').textContent=ma.length;document.getElementById('tbody-ox').innerHTML=ox.length===0?EMPTY_ROW:ox.map(mTR).join('');document.getElementById('tbody-multi').innerHTML=mu.length===0?EMPTY_ROW:mu.map(mTR).join('');document.getElementById('tbody-master').innerHTML=ma.length===0?EMPTY_ROW:ma.map(mMR).join('');}
