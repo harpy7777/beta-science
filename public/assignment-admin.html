@@ -117,6 +117,20 @@ body {
 
 .hint { font-size: 11px; color: #aeaeb2; margin: 2px 0 10px; line-height:1.5; }
 
+/* ── 학생 선택 그리드 ── */
+.student-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+.stu-card {
+  background:#fff; border:1.5px solid #fce7f3; border-radius:12px;
+  padding:11px 10px; cursor:pointer; text-align:center; transition:all 0.15s;
+  -webkit-user-select:none; user-select:none;
+}
+.stu-card:active { transform:scale(0.97); }
+.stu-card.sel { border-color:#db2777; background:#fdf2f8; box-shadow:0 2px 8px rgba(219,39,119,0.12); }
+.stu-name { font-size:13px; font-weight:700; color:#1d1d1f; }
+.stu-sub { font-size:10px; color:#aeaeb2; margin-top:2px; }
+.stu-card.sel .stu-name { color:#be185d; }
+@media(max-width:520px){ .student-grid{ grid-template-columns:repeat(2,1fr); } }
+
 /* ── 추가 버튼들 ── */
 .add-row { display:flex; gap:6px; flex-wrap:wrap; margin: 4px 0 14px; }
 .add-btn {
@@ -268,14 +282,22 @@ body {
   <div class="panel">
     <div class="form-row">
       <div class="field">
-        <span class="fld-label">학생 이름</span>
-        <input class="form-input" id="studentName" placeholder="예: 홍길동">
+        <span class="fld-label">학년</span>
+        <select class="form-select" id="gradeSelect">
+          <option value="">학년 선택</option>
+          <option value="중1">중1</option><option value="중2">중2</option><option value="중3">중3</option>
+          <option value="고1">고1</option><option value="고2">고2</option><option value="고3">고3</option>
+        </select>
       </div>
       <div class="field">
-        <span class="fld-label">주차 / 범위</span>
-        <input class="form-input" id="weekLabel" placeholder="예: 6월 2주차 · 3단원">
+        <span class="fld-label">학습 범위</span>
+        <input class="form-input" id="rangeLabel" placeholder="예: 3단원 · 화학 반응">
       </div>
     </div>
+
+    <span class="fld-label" style="margin-top:4px;">학생 선택</span>
+    <div class="hint" id="studentHint">학년을 먼저 선택하세요.</div>
+    <div id="studentGrid" class="student-grid"></div>
 
     <span class="fld-label" style="margin-top:4px;">학습 내용</span>
     <div class="hint">기존에 올린 시험을 골라 담거나, 핵심내용·OX·객관식을 직접 추가하세요. 추가한 순서대로 학생에게 보입니다.</div>
@@ -315,10 +337,14 @@ body {
     </div>
     <div class="modal-filter">
       <span style="font-size:12px;font-weight:700;color:#6e6e73;">학년</span>
-      <select id="gradeFilter" class="form-select" style="width:auto;min-width:90px;">
+      <select id="gradeFilter" class="form-select" style="width:auto;min-width:80px;">
         <option value="">전체</option>
         <option value="중1">중1</option><option value="중2">중2</option><option value="중3">중3</option>
         <option value="고1">고1</option><option value="고2">고2</option><option value="고3">고3</option>
+      </select>
+      <span style="font-size:12px;font-weight:700;color:#6e6e73;">과목</span>
+      <select id="subjectFilter" class="form-select" style="width:auto;min-width:90px;">
+        <option value="">전체</option>
       </select>
     </div>
     <div class="modal-body" id="examList"><div class="list-empty">불러오는 중…</div></div>
@@ -466,20 +492,30 @@ async function openExamModal(){
       const snap=await getDocs(qy);
       examsCache=snap.docs.map(d=>({id:d.id, ...d.data()}));
     }catch(err){ $('examList').innerHTML='<div class="list-empty">시험 목록을 불러오지 못했습니다.</div>'; console.error(err); return; }
+    // 과목 드롭다운 채우기 (시험들에 들어있는 subject 모음)
+    const subjects=[...new Set(examsCache.map(e=>(e.subject||'').trim()).filter(Boolean))];
+    const sel=$('subjectFilter');
+    subjects.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); });
   }
+  // 학생이 선택돼 있으면 그 학년으로 자동 필터
+  if(selectedStudent && selectedStudent.grade){ $('gradeFilter').value=selectedStudent.grade; }
   renderExamList();
 }
 function renderExamList(){
   const g=$('gradeFilter').value.trim();
+  const subj=$('subjectFilter').value.trim();
   const box=$('examList'); box.innerHTML='';
-  const list=(examsCache||[]).filter(e=> !g || (e.grade||'').trim()===g);
+  const list=(examsCache||[]).filter(e=>
+    (!g || (e.grade||'').trim()===g) &&
+    (!subj || (e.subject||'').trim()===subj)
+  );
   if(list.length===0){ box.innerHTML='<div class="list-empty">해당하는 시험이 없습니다.</div>'; return; }
   list.forEach(exam=>{
     const cnt=Array.isArray(exam.questions)?exam.questions.length:0;
     const row=el('div','exam-row');
     const info=el('div','ex-info');
     info.appendChild(el('div','ex-title', exam.title||'(제목 없음)'));
-    info.appendChild(el('div','ex-meta', `${(exam.grade||'학년?')} · 문제 ${cnt}개`));
+    info.appendChild(el('div','ex-meta', `${(exam.grade||'학년?')}${exam.subject?' · '+exam.subject:''} · 문제 ${cnt}개`));
     const btn=el('button','ex-add','담기');
     btn.addEventListener('click',()=>{
       const items=examToItems(exam);
@@ -495,6 +531,39 @@ $('pickExamBtn').addEventListener('click', openExamModal);
 $('examModalClose').addEventListener('click',()=>$('examModal').classList.remove('open'));
 $('examModal').addEventListener('click',e=>{ if(e.target===$('examModal')) $('examModal').classList.remove('open'); });
 $('gradeFilter').addEventListener('change', renderExamList);
+$('subjectFilter').addEventListener('change', renderExamList);
+
+/* ── 학생 목록 (학년별) ── */
+let allStudents=null, selectedStudent=null;
+async function loadStudents(){
+  try{
+    const snap=await getDocs(collection(db,'students'));
+    allStudents=snap.docs.map(d=>({id:d.id, ...d.data()}));
+  }catch(err){ allStudents=[]; console.error(err); }
+}
+function renderStudentGrid(){
+  const grade=$('gradeSelect').value.trim();
+  const grid=$('studentGrid'); grid.innerHTML='';
+  selectedStudent=null;
+  if(!grade){ $('studentHint').textContent='학년을 먼저 선택하세요.'; return; }
+  if(allStudents===null){ $('studentHint').textContent='학생 목록을 불러오는 중…'; return; }
+  const list=allStudents.filter(s=>(s.grade||'').trim()===grade)
+    .sort((a,b)=>(a.name||'').localeCompare(b.name||'','ko'));
+  if(list.length===0){ $('studentHint').textContent=`${grade} 학생이 없습니다.`; return; }
+  $('studentHint').textContent='학생을 누르면 선택됩니다.';
+  list.forEach(s=>{
+    const card=el('div','stu-card');
+    card.appendChild(el('div','stu-name', s.name||s.id));
+    if(s.subject) card.appendChild(el('div','stu-sub', s.subject));
+    card.addEventListener('click',()=>{
+      document.querySelectorAll('.stu-card.sel').forEach(c=>c.classList.remove('sel'));
+      card.classList.add('sel');
+      selectedStudent={ name:s.name||s.id, grade:s.grade||grade };
+    });
+    grid.appendChild(card);
+  });
+}
+$('gradeSelect').addEventListener('change', renderStudentGrid);
 
 /* ── 수집 + 검증 ── */
 function collectItems(){
@@ -536,23 +605,26 @@ function collectItems(){
 
 /* ── 저장 ── */
 $('saveBtn').addEventListener('click', async ()=>{
-  const studentName=$('studentName').value.trim();
-  const weekLabel=$('weekLabel').value.trim();
-  if(!studentName){ toast('학생 이름을 입력하세요.'); return; }
+  if(!selectedStudent){ toast('학생을 선택하세요.'); return; }
+  const studentName=selectedStudent.name;
+  const studentGrade=selectedStudent.grade||'';
+  const weekLabel=$('rangeLabel').value.trim();
   let items;
   try{ items=collectItems(); }catch(msg){ toast(typeof msg==='string'?msg:'입력을 확인하세요.'); return; }
   const btn=$('saveBtn'); btn.disabled=true; btn.textContent='만드는 중…';
   const token=genToken();
   try{
     await setDoc(doc(db,'assignments',token),{
-      studentName, weekLabel, items,
+      studentName, studentGrade, weekLabel, items,
       createdAt: serverTimestamp(),
       createdBy: auth.currentUser ? auth.currentUser.uid : null
     });
     const link=`${location.origin}/assignment.html?t=${token}`;
     $('resultLink').value=link; $('result').classList.add('show');
     toast('학습 클리닉이 만들어졌습니다.');
-    $('studentName').value=''; $('weekLabel').value=''; $('items').innerHTML='';
+    $('rangeLabel').value=''; $('items').innerHTML='';
+    selectedStudent=null;
+    document.querySelectorAll('.stu-card.sel').forEach(c=>c.classList.remove('sel'));
     loadList();
   }catch(err){ toast('저장 실패 — 보안 규칙을 확인하세요.'); console.error(err); }
   finally{ btn.disabled=false; btn.textContent='🔗 클리닉 링크 만들기'; }
@@ -606,6 +678,7 @@ onAuthStateChanged(auth, async user=>{
   $('main').style.display='block';
   $('logoutBtn').style.display='inline-block';
   $('uidText').textContent=user.uid;
+  loadStudents().then(renderStudentGrid);
   loadList();
 });
 </script>
