@@ -204,8 +204,37 @@ body {
 .modal-title { font-size:15px; font-weight:700; }
 .modal-close { width:36px; height:36px; min-width:44px; min-height:44px; border-radius:50%; background:#f5f5f7; border:none; cursor:pointer; font-size:14px; color:#3c3c43; display:flex; align-items:center; justify-content:center; }
 .modal-close:hover { background:#fce7f3; color:#db2777; }
-.modal-filter { display:flex; align-items:center; gap:8px; padding:0 1.4rem 0.9rem; }
+.modal-filter { display:flex; align-items:center; gap:6px; padding:0 1.4rem 0.9rem; overflow-x:auto; -webkit-overflow-scrolling:touch; flex-wrap:nowrap; }
+.modal-filter::-webkit-scrollbar { display:none; }
+.subj-tab { padding:7px 14px; min-height:36px; border-radius:20px; font-size:12px; font-weight:700; border:1.5px solid #fce7f3; background:#fff; color:#6e6e73; cursor:pointer; font-family:inherit; white-space:nowrap; flex-shrink:0; }
+.subj-tab.on { background:#db2777; color:#fff; border-color:#db2777; }
 .modal-body { padding:0 1.4rem 1.4rem; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+
+/* 단원(시험) 행 */
+.test-card { border:1px solid #fce7f3; border-radius:14px; margin-bottom:.6rem; overflow:hidden; }
+.test-head { display:flex; align-items:center; gap:8px; padding:.9rem 1rem; cursor:pointer; transition:background 0.15s; }
+.test-head:hover { background:#fdf2f8; }
+.test-info { flex:1; min-width:0; }
+.test-title { font-size:13px; font-weight:700; color:#1d1d1f; line-height:1.4; }
+.test-meta { font-size:11px; color:#aeaeb2; margin-top:2px; }
+.test-allbtn { background:linear-gradient(135deg,#f472b6,#db2777); color:#fff; border:none; border-radius:8px; padding:7px 12px; font-size:11.5px; font-weight:700; white-space:nowrap; flex-shrink:0; cursor:pointer; }
+.test-chev { font-size:12px; color:#aeaeb2; transition:transform 0.2s; flex-shrink:0; }
+.test-card.open .test-chev { transform:rotate(180deg); }
+.test-body { display:none; padding:0 1rem 1rem; border-top:1px solid #fce7f3; }
+.test-card.open .test-body { display:block; }
+
+/* 문제 체크 항목 */
+.q-item { display:flex; align-items:flex-start; gap:9px; padding:10px 0; border-bottom:1px solid #f7f7f7; cursor:pointer; }
+.q-item:last-child { border-bottom:none; }
+.q-check { width:22px; height:22px; border-radius:6px; border:2px solid #fce7f3; flex-shrink:0; display:flex; align-items:center; justify-content:center; margin-top:1px; transition:all 0.15s; }
+.q-check.on { background:#db2777; border-color:#db2777; color:#fff; font-size:13px; font-weight:800; }
+.q-type { font-size:9px; font-weight:800; padding:2px 6px; border-radius:5px; flex-shrink:0; margin-top:2px; }
+.q-type.ox { background:#fef3c7; color:#92400e; }
+.q-type.mc { background:#dbeafe; color:#1e40af; }
+.q-text { font-size:12.5px; color:#3c3c43; line-height:1.5; flex:1; }
+.test-foot { display:flex; gap:8px; justify-content:flex-end; padding-top:.7rem; }
+.test-addsel { background:#059669; color:#fff; border:none; border-radius:9px; padding:9px 15px; font-size:12.5px; font-weight:700; cursor:pointer; }
+.test-addsel:disabled { opacity:.4; cursor:default; }
 .exam-row { display:flex; align-items:center; justify-content:space-between; gap:10px; border:1px solid #fce7f3; border-radius:14px; padding:.85rem 1rem; margin-bottom:.6rem; }
 .exam-row:hover { border-color:#fbcfe8; }
 .ex-info { min-width:0; }
@@ -333,22 +362,11 @@ body {
 <div class="modal-bg" id="examModal">
   <div class="modal-box">
     <div class="modal-head">
-      <span class="modal-title">📚 기존 시험에서 담기</span>
+      <span class="modal-title" id="examModalTitle">📚 문제 골라 담기</span>
       <button class="modal-close" id="examModalClose">✕</button>
     </div>
-    <div class="modal-filter">
-      <span style="font-size:12px;font-weight:700;color:#6e6e73;">학년</span>
-      <select id="gradeFilter" class="form-select" style="width:auto;min-width:80px;">
-        <option value="">전체</option>
-        <option value="중1">중1</option><option value="중2">중2</option><option value="중3">중3</option>
-        <option value="고1">고1</option><option value="고2">고2</option><option value="고3">고3</option>
-      </select>
-      <span style="font-size:12px;font-weight:700;color:#6e6e73;">과목</span>
-      <select id="subjectFilter" class="form-select" style="width:auto;min-width:90px;">
-        <option value="">전체</option>
-      </select>
-    </div>
-    <div class="modal-body" id="examList"><div class="list-empty">불러오는 중…</div></div>
+    <div class="modal-filter" id="subjTabs"></div>
+    <div class="modal-body" id="examBody"><div class="list-empty">불러오는 중…</div></div>
   </div>
 </div>
 
@@ -475,73 +493,113 @@ function addExamItemCard(item, examTitle){
   $('items').appendChild(card);
 }
 
-/* ── 시험 → item 변환 ── */
-function examToItems(exam){
-  const out=[];
-  (exam.questions||[]).forEach(q=>{
-    if(q.type==='ox'){
-      out.push({type:'ox', q:q.text||'', answer:normalizeAnswer(q.answer)==='O', explain:q.explanation||''});
-    } else if(q.type==='multiple'){
-      const opts=Array.isArray(q.options)?q.options.slice(0,8):[];
-      let idx=Number(normalizeAnswer(q.answer))-1;
-      if(!(idx>=0 && idx<opts.length)){ const f=opts.findIndex(o=>o===q.answer); idx=f>=0?f:0; }
-      out.push({type:'mc', q:q.text||'', choices:opts, answer:idx, explain:q.explanation||''});
-    }
+/* ── 시험 한 문제 → item 변환 ── */
+function questionToItem(q){
+  if(q.type==='ox'){
+    return {type:'ox', q:q.text||'', answer:normalizeAnswer(q.answer)==='O', explain:q.explanation||''};
+  }
+  const opts=Array.isArray(q.options)?q.options.slice(0,8):[];
+  let idx=Number(normalizeAnswer(q.answer))-1;
+  if(!(idx>=0 && idx<opts.length)){ const f=opts.findIndex(o=>o===q.answer); idx=f>=0?f:0; }
+  return {type:'mc', q:q.text||'', choices:opts, answer:idx, explain:q.explanation||''};
+}
+/* 시험의 questions 정리 (ox/multiple만, 중복 id 제거) */
+function getExamQuestions(exam){
+  const arr=Array.isArray(exam.questions)?exam.questions:[];
+  const seen=new Set(); const out=[];
+  arr.forEach(q=>{
+    if(q.type!=='ox' && q.type!=='multiple') return;
+    if(q.id && seen.has(q.id)) return;
+    if(q.id) seen.add(q.id);
+    out.push(q);
   });
   return out;
 }
 
 /* ── 시험 모달 ── */
-let examsCache=null;
+let examsCache=null, curSubj='전체';
 async function openExamModal(){
   $('examModal').classList.add('open');
   if(examsCache===null){
-    $('examList').innerHTML='<div class="list-empty">불러오는 중…</div>';
+    $('examBody').innerHTML='<div class="list-empty">불러오는 중…</div>';
     try{
       const qy=query(collection(db,'tests'), where('isPublished','==',true), orderBy('regDate','desc'));
       const snap=await getDocs(qy);
       examsCache=snap.docs.map(d=>({id:d.id, ...d.data()}));
-    }catch(err){ $('examList').innerHTML='<div class="list-empty">시험 목록을 불러오지 못했습니다.</div>'; console.error(err); return; }
-    // 과목 드롭다운 채우기 (시험들에 들어있는 subject 모음)
-    const subjects=[...new Set(examsCache.map(e=>(e.subject||'').trim()).filter(Boolean))];
-    const sel=$('subjectFilter');
-    subjects.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); });
+    }catch(err){ $('examBody').innerHTML='<div class="list-empty">시험 목록을 불러오지 못했습니다.</div>'; console.error(err); return; }
+    buildSubjTabs();
   }
-  // 학생이 선택돼 있으면 그 학년으로 자동 필터
-  if(selectedStudent && selectedStudent.grade){ $('gradeFilter').value=normalizeGrade(selectedStudent.grade); }
   renderExamList();
 }
+function buildSubjTabs(){
+  // 시험들에 들어있는 과목(subject) 순서 유지 수집
+  const subjects=[]; 
+  (examsCache||[]).forEach(e=>{ const s=(e.subject||'').trim(); if(s && !subjects.includes(s)) subjects.push(s); });
+  const tabs=$('subjTabs'); tabs.innerHTML='';
+  const mk=(label,val)=>{ const b=el('button','subj-tab'+(val===curSubj?' on':''),label); b.addEventListener('click',()=>{ curSubj=val; document.querySelectorAll('.subj-tab').forEach(t=>t.classList.remove('on')); b.classList.add('on'); renderExamList(); }); tabs.appendChild(b); };
+  mk('전체','전체');
+  subjects.forEach(s=>mk(s,s));
+}
 function renderExamList(){
-  const g=$('gradeFilter').value.trim();
-  const subj=$('subjectFilter').value.trim();
-  const box=$('examList'); box.innerHTML='';
-  const list=(examsCache||[]).filter(e=>
-    (!g || normalizeGrade(e.grade)===normalizeGrade(g)) &&
-    (!subj || (e.subject||'').trim()===subj)
-  );
-  if(list.length===0){ box.innerHTML='<div class="list-empty">해당하는 시험이 없습니다.</div>'; return; }
+  const box=$('examBody'); box.innerHTML='';
+  let list=(examsCache||[]);
+  if(curSubj!=='전체') list=list.filter(e=>(e.subject||'').trim()===curSubj);
+  if(list.length===0){ box.innerHTML='<div class="list-empty">해당 과목의 시험이 없습니다.</div>'; return; }
   list.forEach(exam=>{
-    const cnt=Array.isArray(exam.questions)?exam.questions.length:0;
-    const row=el('div','exam-row');
-    const info=el('div','ex-info');
-    info.appendChild(el('div','ex-title', exam.title||'(제목 없음)'));
-    info.appendChild(el('div','ex-meta', `${(exam.grade||'학년?')}${exam.subject?' · '+exam.subject:''} · 문제 ${cnt}개`));
-    const btn=el('button','ex-add','담기');
-    btn.addEventListener('click',()=>{
-      const items=examToItems(exam);
-      if(items.length===0){ toast('이 시험에는 담을 문제가 없습니다.'); return; }
-      items.forEach(it=>addExamItemCard(it, exam.title));
-      btn.textContent='담김 ✓'; btn.classList.add('added');
-      toast(`${items.length}문제를 담았습니다.`);
+    const qs=getExamQuestions(exam);
+    const nOX=qs.filter(q=>q.type==='ox').length;
+    const nMC=qs.filter(q=>q.type==='multiple').length;
+
+    const card=el('div','test-card');
+    const head=el('div','test-head');
+    const info=el('div','test-info');
+    info.appendChild(el('div','test-title', exam.title||'(제목 없음)'));
+    info.appendChild(el('div','test-meta', `${exam.subject||''}${exam.grade?' · '+exam.grade:''} · OX ${nOX} · 객관식 ${nMC}`));
+    const allBtn=el('button','test-allbtn','전체 담기');
+    allBtn.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      qs.forEach(q=>addExamItemCard(questionToItem(q), exam.title));
+      toast(`${qs.length}문제를 담았습니다.`);
     });
-    row.append(info,btn); box.appendChild(row);
+    const chev=el('span','test-chev','▾');
+    head.append(info, allBtn, chev);
+
+    const body=el('div','test-body');
+    const selected=new Set();
+    qs.forEach((q,i)=>{
+      const item=el('div','q-item');
+      const chk=el('div','q-check');
+      const tp=el('span','q-type '+(q.type==='ox'?'ox':'mc'), q.type==='ox'?'OX':'객관식');
+      const txt=el('div','q-text', (i+1)+'. '+(q.text||''));
+      item.append(chk,tp,txt);
+      item.addEventListener('click',()=>{
+        if(selected.has(i)){ selected.delete(i); chk.classList.remove('on'); chk.textContent=''; }
+        else { selected.add(i); chk.classList.add('on'); chk.textContent='✓'; }
+        addSelBtn.disabled = selected.size===0;
+        addSelBtn.textContent = selected.size? `선택한 ${selected.size}문제 담기` : '선택한 문제 담기';
+      });
+      body.appendChild(item);
+    });
+    const foot=el('div','test-foot');
+    const addSelBtn=el('button','test-addsel','선택한 문제 담기'); addSelBtn.disabled=true;
+    addSelBtn.addEventListener('click',()=>{
+      if(selected.size===0) return;
+      [...selected].sort((a,b)=>a-b).forEach(i=>addExamItemCard(questionToItem(qs[i]), exam.title));
+      toast(`${selected.size}문제를 담았습니다.`);
+      selected.clear();
+      body.querySelectorAll('.q-check.on').forEach(c=>{c.classList.remove('on');c.textContent='';});
+      addSelBtn.disabled=true; addSelBtn.textContent='선택한 문제 담기';
+    });
+    foot.appendChild(addSelBtn); body.appendChild(foot);
+
+    head.addEventListener('click',()=>card.classList.toggle('open'));
+    card.append(head, body);
+    box.appendChild(card);
   });
 }
 $('pickExamBtn').addEventListener('click', openExamModal);
 $('examModalClose').addEventListener('click',()=>$('examModal').classList.remove('open'));
 $('examModal').addEventListener('click',e=>{ if(e.target===$('examModal')) $('examModal').classList.remove('open'); });
-$('gradeFilter').addEventListener('change', renderExamList);
-$('subjectFilter').addEventListener('change', renderExamList);
 
 /* ── 학생 목록 (학년별) ── */
 let allStudents=null, selectedStudent=null;
