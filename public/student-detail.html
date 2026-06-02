@@ -598,6 +598,12 @@ body {
       <div class="p-right"><div class="p-overall-n" id="rp-overall">—</div><div class="p-overall-l">종합 평가</div></div>
     </div>
 
+    <!-- 학부모 공유 -->
+    <div id="share-box" style="background:#fff;border:1px solid #fce7f3;border-radius:16px;padding:1rem 1.2rem;margin-bottom:1rem;">
+      <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#db2777;margin-bottom:0.8rem;">🔗 학부모 공유 링크</div>
+      <div id="share-content"></div>
+    </div>
+
     <!-- ═══ 성적 현황 ═══ -->
     <div class="sect-title"><span class="sect-ico sect-grade">📊</span>성적 현황</div>
     <div class="mini-grid">
@@ -768,6 +774,8 @@ async function loadAll() {
   gcRender();
   rpRender();
   gcRenderFb();
+  renderShareUI();
+  if(stu.shareToken){ try{ await setDoc(doc(db,'shares',stu.shareToken), buildShareSnapshot()); }catch(e){} }
 }
 function showError(){ document.getElementById('loadingBox').style.display='none'; document.getElementById('errorBox').style.display='block'; }
 
@@ -846,6 +854,7 @@ window.gcDeleteRec=async(recId,name,typeLabel)=>{
     gcRender();
     if(keepWeek!==-1){ gcCurWeek=keepWeek; gcSetWeekActive(keepWeek); gcRenderRecs(keepWeek); }
     rpRender();
+    if(stu.shareToken){ try{ await setDoc(doc(db,'shares',stu.shareToken), buildShareSnapshot()); }catch(e){} }
   } catch(e){ alert('삭제 실패: '+e.message); }
 };
 
@@ -859,7 +868,71 @@ function gcRenderFb() {
   document.getElementById('fb-toggle').textContent='피드백 작성';
 }
 window.toggleFb=()=>{ const ta=document.getElementById('fb-ta'),sv=document.getElementById('fb-save-btn'),btn=document.getElementById('fb-toggle'); const open=ta.style.display==='block'; ta.style.display=open?'none':'block'; sv.style.display=open?'none':'inline-block'; btn.textContent=open?'피드백 작성':'취소'; };
-window.saveFb=async()=>{ const txt=document.getElementById('fb-ta').value.trim(); try { await setDoc(doc(db,'feedbacks',stu.uid),{text:txt,updatedAt:new Date()}); feedbackText=txt; gcRenderFb(); } catch(e){ alert('저장 실패: '+e.message); } };
+window.saveFb=async()=>{ const txt=document.getElementById('fb-ta').value.trim(); try { await setDoc(doc(db,'feedbacks',stu.uid),{text:txt,updatedAt:new Date()}); feedbackText=txt; gcRenderFb(); if(stu.shareToken){ try{ await setDoc(doc(db,'shares',stu.shareToken), buildShareSnapshot()); }catch(e){} } } catch(e){ alert('저장 실패: '+e.message); } };
+
+/* ════ 학부모 공유 (토큰 기반) ════ */
+function genToken(){ const a=new Uint8Array(24); crypto.getRandomValues(a); return Array.from(a,b=>b.toString(16).padStart(2,'0')).join(''); }
+function shareUrl(){ return location.origin + '/parent.html?t=' + (stu.shareToken||''); }
+function buildShareSnapshot(){
+  const base=enrollDate();
+  return {
+    v:1,
+    token: stu.shareToken||'',
+    studentName: stu.name||stu.displayName||'이름없음',
+    grade: stu.grade||stu.year||'—',
+    subject: (stu.subject&&stu.subject!=='-')?String(stu.subject):'',
+    enrollBase: base?base.getTime():null,
+    feedback: feedbackText||'',
+    records: recsAll.map(r=>({
+      id:r.id,
+      testType:r.testType||'mc',
+      testName:r.testName||'',
+      examTitle:r.examTitle||'',
+      score:(typeof r.score==='number'?r.score:(r.percentage||0)),
+      ts: toDate(r.timestamp).getTime(),
+      subject:r.subject||'',
+      answers: Array.isArray(r.answers)?r.answers.map(a=>({isCorrect: a.isCorrect!==undefined?!!a.isCorrect:(a.correct===true)})):null
+    })),
+    updatedAt: Date.now()
+  };
+}
+function renderShareUI(){
+  const el=document.getElementById('share-content'); if(!el) return;
+  if(stu.shareToken){
+    el.innerHTML=`
+      <div style="font-size:12px;color:#3c3c43;line-height:1.6;margin-bottom:8px;">아래 링크를 카카오톡·문자로 보내면 학부모가 <b>로그인 없이</b> 이 학생 성적만 볼 수 있습니다.</div>
+      <input readonly value="${shareUrl()}" onclick="this.select()" style="width:100%;padding:9px 12px;border:1px solid #fce7f3;border-radius:10px;font-size:12px;color:#6e6e73;background:#fafafa;font-family:inherit;margin-bottom:8px;">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button onclick="window.copyShareLink()" style="padding:9px 16px;background:#db2777;border:none;border-radius:9px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;min-height:40px;">링크 복사</button>
+        <button onclick="window.createOrRefreshShare()" style="padding:9px 16px;background:#fdf2f8;border:1px solid #fce7f3;border-radius:9px;font-size:12px;font-weight:600;color:#db2777;cursor:pointer;font-family:inherit;min-height:40px;">최신 성적으로 갱신</button>
+        <button onclick="window.disableShare()" style="padding:9px 16px;background:#fff;border:1.5px solid #fca5a5;border-radius:9px;font-size:12px;font-weight:600;color:#dc2626;cursor:pointer;font-family:inherit;min-height:40px;">링크 비활성화</button>
+      </div>`;
+  } else {
+    el.innerHTML=`
+      <div style="font-size:12px;color:#3c3c43;line-height:1.6;margin-bottom:10px;">학부모에게 보낼 읽기 전용 성적 링크를 만듭니다. 추측 불가능한 주소라 링크를 받은 사람만 볼 수 있습니다.</div>
+      <button onclick="window.createOrRefreshShare()" style="padding:10px 18px;background:#db2777;border:none;border-radius:9px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;min-height:44px;">학부모 공유 링크 만들기</button>`;
+  }
+}
+window.createOrRefreshShare=async()=>{
+  try{
+    if(!stu.shareToken){ stu.shareToken=genToken(); await setDoc(doc(db,'students',stu.uid),{shareToken:stu.shareToken},{merge:true}); }
+    await setDoc(doc(db,'shares',stu.shareToken), buildShareSnapshot());
+    renderShareUI(); alert('공유 링크가 생성/갱신되었습니다.');
+  }catch(e){ alert('공유 실패: '+e.message); }
+};
+window.disableShare=async()=>{
+  if(!stu.shareToken) return;
+  if(!confirm('학부모 공유 링크를 비활성화할까요?\n기존 링크는 더 이상 열리지 않습니다.')) return;
+  try{
+    await deleteDoc(doc(db,'shares',stu.shareToken));
+    await setDoc(doc(db,'students',stu.uid),{shareToken:''},{merge:true});
+    stu.shareToken=''; renderShareUI();
+  }catch(e){ alert('비활성화 실패: '+e.message); }
+};
+window.copyShareLink=()=>{
+  const url=shareUrl();
+  navigator.clipboard.writeText(url).then(()=>alert('링크가 복사되었습니다.')).catch(()=>prompt('아래 링크를 복사하세요',url));
+};
 
 /* ════ 분석 리포트 ════ */
 async function rpEnrichWithExamSubjects(records) {
