@@ -147,12 +147,29 @@ function CreateExamInner() {
   const [oxParsed, setOxParsed] = useState<Question[]>([]);
   const [mcParsed, setMcParsed] = useState<Question[]>([]);
 
+  // 인라인 수정 중인 문제 id (null이면 닫힘)
+  const [oxEditId, setOxEditId] = useState<string | null>(null);
+  const [mcEditId, setMcEditId] = useState<string | null>(null);
+
   // 입력칸 비우기 확인 모달 대상 ('ox' | 'multiple' | null)
   const [clearTarget, setClearTarget] = useState<'ox' | 'multiple' | null>(null);
 
   const handleGradeChange = (g: string) => { setGrade(g); setSubject(''); };
   const subjectList = grade ? (SUBJECTS[grade] ?? []) : [];
   const allQuestions = [...oxParsed, ...mcParsed];
+
+  // ── 인라인 수정 헬퍼 ──
+  const updateOx = (id: string, patch: Partial<Question>) =>
+    setOxParsed(prev => prev.map(q => (q.id === id ? { ...q, ...patch } : q)));
+  const updateMc = (id: string, patch: Partial<Question>) =>
+    setMcParsed(prev => prev.map(q => (q.id === id ? { ...q, ...patch } : q)));
+  const updateMcOption = (id: string, idx: number, val: string) =>
+    setMcParsed(prev => prev.map(q => {
+      if (q.id !== id) return q;
+      const options = [...(q.options ?? ['', '', '', ''])];
+      options[idx] = val;
+      return { ...q, options };
+    }));
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
@@ -178,24 +195,28 @@ function CreateExamInner() {
   const handleOxParse = useCallback(() => {
     const parsed = parseOXBulk(oxBulk);
     if (parsed.length === 0) { toast.error('형식을 확인해주세요'); return; }
-    setOxParsed(parsed);
-    toast.success(`OX 문제 ${parsed.length}개 불러옴`);
+    setOxParsed(prev => [...prev, ...parsed]);   // ★ 덮어쓰기 → 기존 목록에 추가
+    setOxBulk('');
+    toast.success(`OX 문제 ${parsed.length}개 추가됨`);
   }, [oxBulk]);
 
   const handleMcParse = useCallback(() => {
     const parsed = parseMCBulk(mcBulk);
     if (parsed.length === 0) { toast.error('형식을 확인해주세요'); return; }
-    setMcParsed(parsed);
-    toast.success(`4지선다 ${parsed.length}개 불러옴`);
+    setMcParsed(prev => [...prev, ...parsed]);   // ★ 덮어쓰기 → 기존 목록에 추가
+    setMcBulk('');
+    toast.success(`4지선다 ${parsed.length}개 추가됨`);
   }, [mcBulk]);
 
   // 입력칸 비우기 실행 (화면의 입력 내용만 비움 - 게시된 시험과 무관)
   function handleClearConfirm() {
     if (clearTarget === 'ox') {
       setOxParsed([]);
+      setOxEditId(null);
       toast.success('OX 입력칸을 비웠습니다');
     } else if (clearTarget === 'multiple') {
       setMcParsed([]);
+      setMcEditId(null);
       toast.success('4지선다 입력칸을 비웠습니다');
     }
     setClearTarget(null);
@@ -547,7 +568,7 @@ function CreateExamInner() {
 
                   <div className="flex items-center justify-between mt-3">
                     <span className="text-xs text-gray-400">
-                      {oxBulk.trim().split(/\n\s*\n/).filter(b => b.includes('문제:')).length}개 감지됨
+                      {oxBulk.trim().split(/\n\s*\n/).filter(b => b.includes('문제:')).length}개 감지됨 · 기존 목록에 추가됩니다
                     </span>
                     <button
                       onClick={handleOxParse}
@@ -561,28 +582,96 @@ function CreateExamInner() {
                   {oxParsed.length > 0 && (
                     <div className="mt-4 space-y-2">
                       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                        로드된 OX 문제 ({oxParsed.length}개)
+                        로드된 OX 문제 ({oxParsed.length}개) · 문제를 누르면 수정할 수 있어요
                       </div>
-                      {oxParsed.map((q, i) => (
-                        <div key={q.id} className="flex items-start gap-3 bg-gray-50 rounded-xl px-3 py-2.5">
-                          <span className="text-xs text-gray-400 mt-0.5 shrink-0">Q{i + 1}</span>
-                          <span className="flex-1 text-sm text-gray-700 line-clamp-1">{q.text}</span>
-                          <span className={`text-sm font-bold shrink-0 ${q.answer === 'O' ? 'text-green-600' : 'text-red-500'}`}>{q.answer}</span>
-                          <button
-                            onClick={() => setOxParsed(prev => prev.filter((_, idx) => idx !== i))}
-                            className="text-gray-300 hover:text-red-400 shrink-0 transition-colors"
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        </div>
-                      ))}
+                      {oxParsed.map((q, i) => {
+                        const open = oxEditId === q.id;
+                        return (
+                          <div key={q.id} className={`rounded-xl border ${open ? 'border-green-300 bg-white' : 'border-transparent bg-gray-50'}`}>
+                            <div className="flex items-start gap-3 px-3 py-2.5">
+                              <span className="text-xs text-gray-400 mt-0.5 shrink-0">Q{i + 1}</span>
+                              <button
+                                type="button"
+                                onClick={() => setOxEditId(open ? null : q.id)}
+                                className="flex-1 text-left text-sm text-gray-700 line-clamp-1 hover:text-green-700 transition-colors"
+                              >
+                                {q.text || <span className="text-red-400">⚠ 문제 미입력</span>}
+                              </button>
+                              <span className={`text-sm font-bold shrink-0 ${q.answer === 'O' ? 'text-green-600' : 'text-red-500'}`}>{q.answer}</span>
+                              <button
+                                onClick={() => { setOxParsed(prev => prev.filter((_, idx) => idx !== i)); if (open) setOxEditId(null); }}
+                                className="text-gray-300 hover:text-red-400 shrink-0 transition-colors"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
+                            {open && (
+                              <div className="px-3 pb-3 pt-1 space-y-2.5 border-t border-green-100">
+                                <div>
+                                  <label className="block text-[11px] font-semibold text-gray-500 mb-1">문제</label>
+                                  <textarea
+                                    className={`${inputCls} resize-none`}
+                                    rows={2}
+                                    value={q.text}
+                                    onChange={e => updateOx(q.id, { text: e.target.value })}
+                                    placeholder="문제를 입력하세요"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[11px] font-semibold text-gray-500 mb-1">정답</label>
+                                  <div className="flex gap-2">
+                                    {(['O', 'X'] as const).map(v => {
+                                      const sel = q.answer === v;
+                                      return (
+                                        <button
+                                          key={v}
+                                          type="button"
+                                          onClick={() => updateOx(q.id, { answer: v })}
+                                          className="px-5 py-2 rounded-lg text-sm font-bold border-2 transition-all"
+                                          style={sel
+                                            ? v === 'O'
+                                              ? { background: '#dcfce7', color: '#15803d', borderColor: '#86efac' }
+                                              : { background: '#fee2e2', color: '#dc2626', borderColor: '#fca5a5' }
+                                            : { background: '#f9fafb', color: '#9ca3af', borderColor: '#e5e7eb' }}
+                                        >
+                                          {v}
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="block text-[11px] font-semibold text-gray-500 mb-1">해설 (선택)</label>
+                                  <input
+                                    type="text"
+                                    className={inputCls}
+                                    value={q.explanation ?? ''}
+                                    onChange={e => updateOx(q.id, { explanation: e.target.value })}
+                                    placeholder="해설"
+                                  />
+                                </div>
+                                <div className="flex justify-end">
+                                  <button
+                                    type="button"
+                                    onClick={() => setOxEditId(null)}
+                                    className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white"
+                                    style={{ background: 'linear-gradient(135deg,#34d399,#15803d)' }}
+                                  >
+                                    완료
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
 
                   {/* OX 하단 버튼: 1개 추가 + 입력칸 비우기 */}
                   <div className="flex items-center gap-2 mt-3">
                     <button
-                      onClick={() => setOxParsed(prev => [...prev, makeQuestion('ox')])}
+                      onClick={() => { const nq = makeQuestion('ox'); setOxParsed(prev => [...prev, nq]); setOxEditId(nq.id); }}
                       className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border transition-colors"
                       style={{ borderColor: '#fce7f3', color: '#db2777' }}
                     >
@@ -641,7 +730,7 @@ function CreateExamInner() {
 
                   <div className="flex items-center justify-between mt-3">
                     <span className="text-xs text-gray-400">
-                      {mcBulk.trim().split(/\n\s*\n/).filter(b => b.includes('문제:')).length}개 감지됨
+                      {mcBulk.trim().split(/\n\s*\n/).filter(b => b.includes('문제:')).length}개 감지됨 · 기존 목록에 추가됩니다
                     </span>
                     <button
                       onClick={handleMcParse}
@@ -655,28 +744,103 @@ function CreateExamInner() {
                   {mcParsed.length > 0 && (
                     <div className="mt-4 space-y-2">
                       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                        로드된 4지선다 ({mcParsed.length}개)
+                        로드된 4지선다 ({mcParsed.length}개) · 문제를 누르면 수정할 수 있어요
                       </div>
-                      {mcParsed.map((q, i) => (
-                        <div key={q.id} className="flex items-start gap-3 bg-gray-50 rounded-xl px-3 py-2.5">
-                          <span className="text-xs text-gray-400 mt-0.5 shrink-0">Q{i + 1}</span>
-                          <span className="flex-1 text-sm text-gray-700 line-clamp-1">{q.text}</span>
-                          <span className="text-xs text-blue-600 font-semibold shrink-0">{q.answer}번</span>
-                          <button
-                            onClick={() => setMcParsed(prev => prev.filter((_, idx) => idx !== i))}
-                            className="text-gray-300 hover:text-red-400 shrink-0 transition-colors"
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        </div>
-                      ))}
+                      {mcParsed.map((q, i) => {
+                        const open = mcEditId === q.id;
+                        const validAns = ['1', '2', '3', '4'].includes(q.answer);
+                        return (
+                          <div key={q.id} className={`rounded-xl border ${open ? 'border-pink-300 bg-white' : 'border-transparent bg-gray-50'}`}>
+                            <div className="flex items-start gap-3 px-3 py-2.5">
+                              <span className="text-xs text-gray-400 mt-0.5 shrink-0">Q{i + 1}</span>
+                              <button
+                                type="button"
+                                onClick={() => setMcEditId(open ? null : q.id)}
+                                className="flex-1 text-left text-sm text-gray-700 line-clamp-1 hover:text-pink-600 transition-colors"
+                              >
+                                {q.text || <span className="text-red-400">⚠ 문제 미입력</span>}
+                              </button>
+                              <span className={`text-xs font-semibold shrink-0 ${validAns ? 'text-blue-600' : 'text-red-500'}`}>
+                                {validAns ? `${q.answer}번` : '⚠ 정답확인'}
+                              </span>
+                              <button
+                                onClick={() => { setMcParsed(prev => prev.filter((_, idx) => idx !== i)); if (open) setMcEditId(null); }}
+                                className="text-gray-300 hover:text-red-400 shrink-0 transition-colors"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
+                            {open && (
+                              <div className="px-3 pb-3 pt-1 space-y-2.5 border-t border-pink-100">
+                                <div>
+                                  <label className="block text-[11px] font-semibold text-gray-500 mb-1">문제</label>
+                                  <textarea
+                                    className={`${inputCls} resize-none`}
+                                    rows={2}
+                                    value={q.text}
+                                    onChange={e => updateMc(q.id, { text: e.target.value })}
+                                    placeholder="문제를 입력하세요"
+                                  />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <label className="block text-[11px] font-semibold text-gray-500">선택지 · 정답 (정답인 번호를 누르세요)</label>
+                                  {[0, 1, 2, 3].map(j => {
+                                    const isAns = q.answer === String(j + 1);
+                                    return (
+                                      <div key={j} className="flex items-center gap-2">
+                                        <button
+                                          type="button"
+                                          onClick={() => updateMc(q.id, { answer: String(j + 1) })}
+                                          className="w-7 h-7 rounded-lg text-xs font-bold border-2 shrink-0 transition-all"
+                                          style={isAns
+                                            ? { background: 'linear-gradient(135deg,#f472b6,#db2777)', color: '#fff', borderColor: '#db2777' }
+                                            : { background: '#fff', borderColor: '#e5e7eb', color: '#9ca3af' }}
+                                        >
+                                          {j + 1}
+                                        </button>
+                                        <input
+                                          type="text"
+                                          className={inputCls}
+                                          value={(q.options && q.options[j]) ?? ''}
+                                          onChange={e => updateMcOption(q.id, j, e.target.value)}
+                                          placeholder={`선택지 ${j + 1}`}
+                                        />
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                <div>
+                                  <label className="block text-[11px] font-semibold text-gray-500 mb-1">해설 (선택)</label>
+                                  <input
+                                    type="text"
+                                    className={inputCls}
+                                    value={q.explanation ?? ''}
+                                    onChange={e => updateMc(q.id, { explanation: e.target.value })}
+                                    placeholder="해설"
+                                  />
+                                </div>
+                                <div className="flex justify-end">
+                                  <button
+                                    type="button"
+                                    onClick={() => setMcEditId(null)}
+                                    className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white"
+                                    style={{ background: 'linear-gradient(135deg,#f472b6,#db2777)' }}
+                                  >
+                                    완료
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
 
                   {/* 4지선다 하단 버튼: 1개 추가 + 입력칸 비우기 */}
                   <div className="flex items-center gap-2 mt-3">
                     <button
-                      onClick={() => setMcParsed(prev => [...prev, makeQuestion('multiple')])}
+                      onClick={() => { const nq = makeQuestion('multiple'); setMcParsed(prev => [...prev, nq]); setMcEditId(nq.id); }}
                       className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border transition-colors"
                       style={{ borderColor: '#dbeafe', color: '#1d4ed8' }}
                     >
