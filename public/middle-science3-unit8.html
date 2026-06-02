@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel='icon' type='image/svg+xml' href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpolygon points='70,8 121,38 121,102 70,132 19,102 19,38' fill='none' stroke='%23E85D75' stroke-width='8' stroke-linejoin='round'/%3E%3Cpolygon points='70,38 97,53 97,87 70,102 43,87 43,53' fill='none' stroke='%23E85D75' stroke-width='4' stroke-linejoin='round' stroke-dasharray='10 6'/%3E%3Ccircle cx='70' cy='8' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='38' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='70' cy='132' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='38' r='10' fill='%23E85D75'/%3E%3C/svg%3E">
+<title>베타과학학원 · 과학기술과 인류 문명</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+:root {
+  --blu-dark:    #1e3a8a;
+  --blu-main:    #2563eb;
+  --blu-mid:     #3b82f6;
+  --blu-light:   #93c5fd;
+  --blu-tint:    #eff6ff;
+  --blu-tint2:   #dbeafe;
+  --blu-border:  #bfdbfe;
+  --blu-border2: #93c5fd;
+
+  --green:#059669; --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --cyan:#0891b2;  --cyan-bg:#ecfeff;   --cyan-border:#a5f3fc;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626;   --red-bg:#fef2f2;   --red-border:#fecaca;
+  --indigo:#4f46e5;--indigo-bg:#eef2ff;--indigo-border:#c7d2fe;
+
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#f5f8ff;   --white:#fff;
+
+  --radius-sm:10px; --radius:14px; --radius-lg:18px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+p{line-height:1.78;font-size:13.5px;margin:.4rem 0}
+
+.header{
+  background:#fff;
+  border-bottom:1px solid #e0edff;
+  padding:0 1rem;
+  padding-left:max(1rem,env(safe-area-inset-left));
+  padding-right:max(1rem,env(safe-area-inset-right));
+  height:54px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;top:0;z-index:500;
+  box-shadow:0 1px 0 #e0edff;
+}
+.header-left{display:flex;align-items:center;gap:9px;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{
+  width:30px;height:30px;
+  background:linear-gradient(135deg,var(--blu-mid) 0%,var(--blu-dark) 100%);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.brand-name{font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{
+  display:flex;align-items:center;gap:5px;
+  background:var(--blu-tint);border:1px solid var(--blu-border);
+  border-radius:20px;padding:4px 10px;
+  font-size:10px;font-weight:700;color:var(--blu-dark);
+  white-space:nowrap;
+}
+.dot-blu{width:5px;height:5px;background:var(--blu-mid);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{
+  padding:7px 14px;min-height:36px;
+  background:transparent;border:1.5px solid var(--blu-border);
+  border-radius:20px;font-size:12px;font-weight:700;color:var(--blu-dark);
+  cursor:pointer;white-space:nowrap;transition:background .15s;
+}
+.back-btn:hover{background:var(--blu-tint)}
+.back-btn:active{background:var(--blu-tint2)}
+
+.hero{
+  background:linear-gradient(135deg,var(--blu-dark) 0%,var(--blu-main) 55%,var(--blu-mid) 100%);
+  padding:2.8rem 1.5rem 2.2rem;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;right:-80px;top:-80px;
+  width:300px;height:300px;border-radius:50%;
+  background:rgba(255,255,255,.06);
+}
+.hero::after{
+  content:'';position:absolute;left:-50px;bottom:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:rgba(255,255,255,.04);
+}
+.hero-deco{
+  position:absolute;right:10%;top:15%;
+  width:120px;height:120px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.12);
+  pointer-events:none;
+}
+.hero-deco2{
+  position:absolute;right:18%;top:25%;
+  width:60px;height:60px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.1);
+  pointer-events:none;
+}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+
+.hero-eyebrow{
+  display:inline-block;
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:5px 14px;
+  font-size:11px;font-weight:700;color:#fff;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;
+}
+.hero-title{
+  font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;
+  color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem;
+}
+.hero-desc{
+  font-size:13.5px;color:rgba(255,255,255,.85);
+  line-height:1.7;max-width:580px;margin:0 auto 1.8rem;
+}
+
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{
+  background:rgba(255,255,255,.15);
+  border:1.5px solid rgba(255,255,255,.3);
+  border-radius:14px;padding:.9rem 1.4rem;
+  text-align:center;backdrop-filter:blur(6px);
+  min-width:80px;transition:background .2s;
+}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+.tabs-wrap{
+  background:#fff;border-bottom:2px solid var(--blu-border);
+  position:sticky;top:54px;z-index:400;
+}
+.tabs-inner{
+  max-width:1100px;margin:0 auto;
+  padding:0 1.5rem;display:flex;overflow-x:auto;
+  justify-content:center;gap:4px;
+  scrollbar-width:none;
+}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{
+  padding:13px 26px;font-size:13px;font-weight:700;
+  color:var(--muted);border:none;background:none;cursor:pointer;
+  font-family:inherit;border-bottom:3px solid transparent;
+  white-space:nowrap;transition:all .2s;
+  margin-bottom:-2px;border-radius:8px 8px 0 0;
+}
+.tab-btn:hover{color:var(--blu-main);background:var(--blu-tint)}
+.tab-btn.active{color:var(--blu-main);border-bottom-color:var(--blu-main)}
+
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}
+.unit-section.visible{display:block}
+
+.unit-banner{
+  border-radius:var(--radius-lg);
+  padding:1.4rem 1.8rem;margin-bottom:1.8rem;
+  display:flex;align-items:center;gap:1.2rem;
+  background:linear-gradient(135deg,var(--blu-tint),var(--blu-tint2));
+  border:2px solid var(--blu-border);
+}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blu-main);margin-bottom:4px}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{
+  background:#fff;border:1.5px solid #e5e7eb;
+  border-radius:var(--radius-lg);overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+}
+.acc-item.open{
+  border-color:var(--blu-border);
+  box-shadow:0 4px 20px rgba(37,99,235,.1);
+}
+.acc-header{
+  display:flex;align-items:center;gap:12px;
+  padding:1.2rem 1.5rem;cursor:pointer;user-select:none;
+  transition:background .15s;
+}
+.acc-header:hover{background:var(--blu-tint)}
+.acc-num{
+  width:32px;height:32px;border-radius:10px;
+  background:var(--blu-tint2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:900;color:var(--blu-dark);flex-shrink:0;
+  transition:background .2s;
+}
+.acc-item.open .acc-num{background:var(--blu-main);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--blu-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-item.open .acc-subtitle{color:var(--blu-main)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--blu-main)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--blu-tint2)}
+.acc-item.open .acc-body{display:block}
+
+.sec-title{
+  font-size:12px;font-weight:800;color:var(--blu-dark);
+  letter-spacing:.06em;text-transform:uppercase;
+  margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px;
+}
+.sec-title::before{
+  content:'';width:4px;height:16px;
+  background:var(--blu-main);border-radius:2px;display:block;flex-shrink:0;
+}
+
+.concept-box{
+  background:var(--blu-tint);border:1.5px solid var(--blu-border);
+  border-left:4px solid var(--blu-main);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.concept-box .cb-title{font-weight:800;color:var(--blu-dark);font-size:14px;margin-bottom:.4rem}
+
+.green-box{
+  background:var(--green-bg);border:1.5px solid var(--green-border);
+  border-left:4px solid var(--green);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+
+.amber-box{
+  background:var(--amber-bg);border:1.5px solid var(--amber-border);
+  border-left:4px solid var(--amber);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+
+.blue-box{
+  background:var(--cyan-bg);border:1.5px solid var(--cyan-border);
+  border-left:4px solid var(--cyan);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.blue-box .cb-title{font-weight:800;color:#155e75;font-size:14px;margin-bottom:.4rem}
+
+.red-box{
+  background:var(--red-bg);border:1.5px solid var(--red-border);
+  border-left:4px solid var(--red);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+
+.indigo-box{
+  background:var(--indigo-bg);border:1.5px solid var(--indigo-border);
+  border-left:4px solid var(--indigo);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.indigo-box .cb-title{font-weight:800;color:#3730a3;font-size:14px;margin-bottom:.4rem}
+
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:var(--radius);border:1.5px solid var(--blu-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  background:var(--blu-tint2);padding:10px 14px;
+  text-align:left;font-weight:800;font-size:11px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--blu-dark);
+}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6;vertical-align:top}
+tbody tr:hover td{background:var(--blu-tint)}
+
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0;font-size:13px}
+.flow-box{
+  background:#fff;border:1.5px solid var(--blu-border);
+  border-radius:8px;padding:7px 12px;
+  font-weight:700;color:var(--blu-dark);text-align:center;font-size:12px;line-height:1.4;
+}
+.flow-arrow{color:var(--blu-main);font-size:18px;font-weight:900}
+
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:.8rem 0}
+.point-card{
+  background:#fff;border:1.5px solid var(--blu-border);
+  border-radius:var(--radius);padding:1rem;text-align:center;
+  transition:border-color .2s,box-shadow .2s;
+}
+.point-card:hover{border-color:var(--blu-main);box-shadow:0 4px 12px rgba(37,99,235,.12)}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--blu-main);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+.hp{color:var(--blu-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--cyan);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.hi{color:var(--indigo);font-weight:800}
+
+.formula-box{
+  background:linear-gradient(135deg,var(--blu-tint),var(--blu-tint2));
+  border:2px solid var(--blu-border);border-radius:var(--radius-lg);
+  padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center;
+}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--blu-dark);letter-spacing:-.01em;font-style:italic}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+.steps{display:flex;flex-direction:column;gap:8px;margin:.8rem 0}
+.step-item{
+  display:flex;align-items:flex-start;gap:12px;
+  background:#fff;border:1.5px solid #e5e7eb;
+  border-radius:var(--radius);padding:.9rem 1.1rem;
+  transition:border-color .2s;
+}
+.step-item:hover{border-color:var(--blu-border)}
+.step-num{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--blu-main);color:#fff;
+  font-size:13px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px}
+.step-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+.quiz-wrap{
+  background:linear-gradient(135deg,var(--blu-tint2),var(--blu-tint));
+  border:1.5px solid var(--blu-border);
+  border-radius:var(--radius-lg);
+  padding:1.2rem 1.4rem;margin-top:1.6rem;
+}
+.quiz-label{font-size:11px;font-weight:800;color:var(--blu-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{
+  background:var(--blu-main);color:#fff;border:none;
+  border-radius:20px;padding:7px 18px;
+  font-size:12px;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:background .15s;
+}
+.quiz-toggle:hover{background:var(--blu-dark)}
+.quiz-ans{
+  display:none;margin-top:.8rem;padding:.9rem 1rem;
+  background:rgba(255,255,255,.85);border-radius:10px;
+  font-size:13.5px;color:var(--text);line-height:1.75;
+  border:1px solid var(--blu-border);
+}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:.6rem 0}
+.chip{
+  padding:4px 12px;border-radius:20px;
+  font-size:11px;font-weight:700;
+  background:var(--blu-tint2);color:var(--blu-dark);
+  border:1px solid var(--blu-border);
+}
+.chip-g{background:var(--green-bg);color:#065f46;border-color:var(--green-border)}
+.chip-a{background:var(--amber-bg);color:#92400e;border-color:var(--amber-border)}
+
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.45rem}
+  .hero-desc{font-size:13px}
+  .hero-eyebrow{font-size:10px;padding:4px 11px}
+  .hero-stats{gap:7px}
+  .hero-stat-card{min-width:68px;padding:.75rem .9rem}
+  .hs-num{font-size:1.45rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{justify-content:flex-start;gap:0;padding:0 .5rem}
+  .tab-btn{padding:11px 13px;font-size:11.5px;border-radius:6px 6px 0 0}
+  .content-wrap{padding:1.2rem .85rem 4rem}
+  .unit-banner{flex-direction:column;gap:.75rem;padding:1.1rem}
+  .ub-emoji{font-size:2.1rem}
+  .ub-title{font-size:1.1rem}
+  .acc-header{padding:.95rem 1rem;gap:10px}
+  .acc-num{width:30px;height:30px;font-size:12px;border-radius:8px}
+  .acc-htitle{font-size:14px}
+  .acc-hdesc{font-size:11.5px}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .steps{gap:7px}
+  .step-item{padding:.8rem .95rem}
+  table{font-size:12px}
+  thead th{font-size:10px;padding:8px 10px}
+  tbody td{padding:8px 10px}
+  .concept-box,.green-box,.amber-box,.blue-box,.red-box,.indigo-box{
+    padding:.85rem 1rem;font-size:13px}
+  .concept-box .cb-title,.green-box .cb-title,.amber-box .cb-title,
+  .blue-box .cb-title,.red-box .cb-title,.indigo-box .cb-title{font-size:13px}
+  .formula-box{padding:1rem 1.1rem}
+  .formula-text{font-size:1.15rem}
+  .quiz-wrap{padding:1rem 1.1rem}
+  .quiz-q{font-size:13px}
+}
+
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .hero-deco,.hero-deco2{display:none}
+  .hero{padding:1.7rem .9rem 1.5rem}
+  .hero-title{font-size:1.28rem;letter-spacing:-.025em}
+  .hero-desc{font-size:12.5px;margin-bottom:1.4rem}
+  .breadcrumb{gap:4px;margin-bottom:.9rem}
+  .bc-item,.bc-current,.bc-sep{font-size:11px}
+  .hero-stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;width:100%;max-width:280px;margin:0 auto;
+  }
+  .hero-stat-card{min-width:0;padding:.7rem .5rem}
+  .hs-num{font-size:1.3rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{padding:0 .3rem}
+  .tab-btn{padding:10px 11px;font-size:11px;white-space:nowrap}
+  .ub-title{font-size:1rem}
+  .ub-desc{font-size:12px}
+  .acc-header{padding:.85rem .9rem;gap:8px}
+  .acc-htitle{font-size:13.5px}
+  .acc-hdesc{font-size:11px}
+  .acc-body{padding:0 .9rem 1.2rem}
+  .sec-title{font-size:11px}
+  .point-box{grid-template-columns:1fr}
+  .pc-icon{font-size:1.5rem}
+  .pc-title{font-size:12px}
+  .pc-desc{font-size:11.5px}
+  .step-num{width:26px;height:26px;font-size:12px;border-radius:7px;flex-shrink:0}
+  .step-title{font-size:12.5px}
+  .step-desc{font-size:12px}
+  .formula-text{font-size:1rem}
+  .formula-sub{font-size:11px}
+  .table-wrap{-webkit-overflow-scrolling:touch}
+  .quiz-q{font-size:12.5px}
+  .quiz-toggle{font-size:11.5px;padding:6px 15px}
+  .quiz-ans{font-size:13px}
+  .chip,.chip-g,.chip-a{font-size:10.5px;padding:3px 10px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"
+          stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-blu"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="middle-science3.html" class="bc-item">중학 과학 3</a><span class="bc-sep">›</span>
+      <span class="bc-current">🔭 Ⅷ. 과학기술과 인류 문명</span>
+    </div>
+    <div class="hero-eyebrow">🔭 중학 과학 3 · UNIT 08 · 과학기술과 인류 문명</div>
+    <div class="hero-title">Ⅷ. 과학기술과 인류 문명</div>
+    <div class="hero-desc">불의 이용과 금속·산업 혁명으로 시작된 문명의 발달부터,<br>우리 생활을 편리하게 한 과학기술, 그리고 4차 산업 혁명이 만들어 갈 미래까지 동아출판 교과서 핵심 개념을 학습합니다</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">4</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">12</div><div class="hs-lbl">핵심개념</div></div>
+      <div class="hero-stat-card"><div class="hs-num">8+</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">🔥 문명의 발달</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">💡 생활과 미래</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner">
+    <div class="ub-emoji">🔥</div>
+    <div>
+      <div class="ub-num">PART 01 · Civilization</div>
+      <div class="ub-title">인류 문명과 과학기술의 발달</div>
+      <div class="ub-desc">불의 이용이 인류 생활에 미친 영향과 청동·철 등 금속의 이용, 그리고 증기 기관·산업 혁명을 비롯한 과학기술이 인류 문명에 미친 영향을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <div class="acc-item" id="acc-fire">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Fire &amp; Metal · 불과 금속</div>
+          <div class="acc-htitle">인류 문명의 시작과 불</div>
+          <div class="acc-hdesc">불을 얻는 방법 · 불의 이용이 미친 영향 · 토기 · 청동 · 철의 이용</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">불을 얻는 방법</div>
+        <div class="concept-box">
+          <div class="cb-title">🔥 자연의 불에서 만드는 불로</div>
+          인류는 처음에 화산 폭발·번개 등으로 <span class="hp">자연적으로 발생한 불</span>에서 불씨를 얻어 보존했다. 이후 나무를 마찰시키면 열이 나고 돌을 부딪치면 불꽃이 생기는 <span class="hp">과학 원리</span>를 알게 되어, 필요할 때 직접 불을 피울 수 있게 되었다.
+        </div>
+        <div class="sec-title">불의 이용이 미친 영향</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>용도</th><th>불을 이용한 후의 변화</th></tr></thead>
+          <tbody>
+            <tr><td>어둠 밝히기</td><td>밤에도 활동, 동굴 생활 가능 → 주거 환경 개선</td></tr>
+            <tr><td>추위 피하기</td><td>난방 가능 → 생활권이 <span class="hp">고위도</span>로 확대</td></tr>
+            <tr><td>맹수 쫓기</td><td>몸 보호, 지상 생활 → 다양한 생산 활동 가능</td></tr>
+            <tr><td>음식 조리</td><td>소화·흡수율 ↑, 질병 ↓ → 적게 먹고도 에너지 확보</td></tr>
+          </tbody>
+        </table></div>
+        <div class="sec-title">불을 이용한 도구 — 토기와 금속</div>
+        <div class="green-box">
+          <div class="cb-title">🏺 토기와 청동</div>
+          흙을 빚어 불로 가열하면 단단해지는 원리로 <span class="hg">토기</span>를 만들었다. 또 <span class="hg">청동</span>(구리+주석 합금)은 구리에 주석을 섞어 가열·용융한 뒤 거푸집에 부어 만들었다. 합금은 순수 금속보다 <span class="hg">녹는점이 낮아</span> 쉽게 녹일 수 있다.
+        </div>
+        <div class="blue-box">
+          <div class="cb-title">⚙️ 철의 이용</div>
+          철광석에서 철을 얻으려면 <span class="hb">더 높은 수준의 기술</span>이 필요해 철은 청동보다 늦게 쓰였다. 단단한 철의 사용으로 농기구가 발전해 농업이 크게 발달했고, 철은 현재에도 널리 쓰인다.
+        </div>
+        <div class="amber-box">
+          <div class="cb-title">⚖️ 거푸집을 크게 만드는 까닭</div>
+          금속은 <span class="ha">액체 → 고체로 굳을 때 부피가 줄고</span>, 다듬는 과정에서도 크기가 줄어든다. 그래서 거푸집은 만들 도구보다 약간 크게 만든다.
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">청동 도구를 만들 때 구리에 주석을 섞어 가열하면 순수한 구리만 가열할 때보다 어떤 점이 유리한지 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 녹는점이 낮아진다.</strong><br><br>
+            구리와 주석을 혼합하면 합금의 <strong>녹는점이 낮아져</strong> 더 낮은 온도에서도 쉽게 녹일 수 있다. 또한 혼합 비율을 달리하면 색·굳기가 달라져 용도에 맞는 도구를 만들 수 있다.
+          </div>
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">철이 청동보다 늦게 이용되기 시작한 까닭을 간단히 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답</strong><br><br>
+            철광석에서 철을 얻으려면 청동보다 <strong>더 높은 온도와 높은 수준의 기술</strong>이 필요하기 때문이다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item" id="acc-develop">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Steam &amp; Revolution · 산업 혁명</div>
+          <div class="acc-htitle">과학기술과 인류 문명의 발달</div>
+          <div class="acc-hdesc">항해 기술 · 증기 기관과 내연 기관 · 산업 혁명 · 에너지 전환</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">먼 바다로의 항해</div>
+        <div class="concept-box">
+          <div class="cb-title">🧭 항해를 가능하게 한 과학기술</div>
+          콜럼버스의 대항해처럼 먼 바다 항해가 가능했던 것은 튼튼한 <span class="hp">배 만드는 기술</span>, 길을 알려 주는 <span class="hp">지도</span>, 방향을 알려 주는 <span class="hp">나침반</span>, 천체 관측으로 위치를 아는 <span class="hp">항해 기술</span>이 있었기 때문이다.
+        </div>
+        <div class="sec-title">증기 기관과 산업 혁명</div>
+        <div class="green-box">
+          <div class="cb-title">🚂 증기 기관</div>
+          물을 끓여 만든 <span class="hg">수증기의 부피 증가</span>로 피스톤을 움직이는 장치다. 교통·기계의 동력원으로 쓰여 수공업 중심에서 <span class="hg">기계가 생산하는 산업 사회</span>로 변화시켰는데, 이 사회 전반의 변화가 <span class="hg">산업 혁명</span>이다.
+        </div>
+        <div class="blue-box">
+          <div class="cb-title">🔧 내연 기관</div>
+          연료의 연소가 기관 <span class="hb">내부</span>에서 일어나는 점이 증기 기관과의 가장 큰 차이다. 내연 기관의 등장으로 산업은 한 단계 더 발전했다.
+        </div>
+        <div class="sec-title">에너지 전환</div>
+        <div class="flow">
+          <div class="flow-box">연료의<br>화학 E</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">열 E +<br>역학적 E</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">바퀴의<br>역학적 E</div>
+        </div>
+        <div class="sec-title">인류 문명에 미친 영향</div>
+        <div class="point-box">
+          <div class="point-card"><div class="pc-icon">📖</div><div class="pc-title">인쇄·출판</div><div class="pc-desc">활판 인쇄술 →<br>지식의 대중화</div></div>
+          <div class="point-card"><div class="pc-icon">🚄</div><div class="pc-title">교통</div><div class="pc-desc">기차·자동차 →<br>대량·고속 운송</div></div>
+          <div class="point-card"><div class="pc-icon">📡</div><div class="pc-title">정보 통신</div><div class="pc-desc">무선 통신·인터넷 →<br>정보 동시 공유</div></div>
+          <div class="point-card"><div class="pc-icon">💊</div><div class="pc-title">의학</div><div class="pc-desc">우두법·항생제 →<br>평균 수명 ↑</div></div>
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">증기 기관과 내연 기관의 가장 큰 차이점은 무엇인지 '연소가 일어나는 위치'를 중심으로 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답</strong><br><br>
+            증기 기관은 <strong>외부</strong>에서 연료를 연소시켜 얻은 증기의 힘을 이용하지만, 내연 기관은 연료를 기관 <strong>내부</strong>에서 연소시켜 동력원으로 이용한다.
+          </div>
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">구텐베르크의 활판 인쇄술이 인류 문명에 미친 영향을 한 가지 이상 서술하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안</strong><br><br>
+            책을 싼값에 대량으로 보급할 수 있게 되어 <strong>지식의 대중화</strong>가 이루어졌고, 이는 르네상스·종교 개혁·과학 혁명 등에 큰 영향을 주었다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="unit2" class="unit-section">
+  <div class="unit-banner">
+    <div class="ub-emoji">💡</div>
+    <div>
+      <div class="ub-num">PART 02 · Life &amp; Future</div>
+      <div class="ub-title">우리 생활과 과학기술이 만들 미래</div>
+      <div class="ub-desc">과학기술이 우리 생활을 편리하게 한 모습과 과학 원리를 이용한 산출물 설계, 그리고 4차 산업 혁명과 미래 과학기술이 우리 생활에 미칠 영향을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <div class="acc-item" id="acc-life">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Convenient Life · 편리한 생활</div>
+          <div class="acc-htitle">우리를 편리하게 해 주는 과학기술</div>
+          <div class="acc-hdesc">생활 속 과학기술 · 자동화 · 과학 원리를 이용한 산출물 설계</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">생활을 바꾼 과학기술</div>
+        <div class="concept-box">
+          <div class="cb-title">🏠 다양한 분야의 과학기술</div>
+          전기·전자·정보 통신·화학 등 다양한 분야의 과학기술과 대량 생산되는 생활용품 덕분에, 우리는 과거와 비교할 수 없을 만큼 <span class="hp">편리하고 풍요로운 생활</span>을 누리고 있다. 의식주·교통 중 과학기술의 영향을 받지 않은 것을 찾기가 더 어렵다.
+        </div>
+        <div class="point-box">
+          <div class="point-card"><div class="pc-icon">🧺</div><div class="pc-title">가전제품</div><div class="pc-desc">다양한 기능으로<br>가사 노동 절감</div></div>
+          <div class="point-card"><div class="pc-icon">🍎</div><div class="pc-title">식품 기술</div><div class="pc-desc">재배·운송·저장 →<br>사계절 신선 식품</div></div>
+          <div class="point-card"><div class="pc-icon">🏭</div><div class="pc-title">생산 자동화</div><div class="pc-desc">기계·컴퓨터로<br>공정 자동화</div></div>
+          <div class="point-card"><div class="pc-icon">📱</div><div class="pc-title">스마트폰</div><div class="pc-desc">통화·촬영·결제 등<br>다양한 용도</div></div>
+        </div>
+        <div class="sec-title">과학 원리를 이용한 산출물 설계</div>
+        <div class="green-box">
+          <div class="cb-title">🪴 예시 — 물 줄 때를 알려 주는 화분</div>
+          불편함을 개선하는 산출물을 설계할 수 있다. 예를 들어 <span class="hg">모세관 현상</span>으로 아래 칸의 물을 심지가 빨아 올려 자동 급수하고, 물과 균형을 이루는 <span class="hg">추</span>와 둥근 바닥을 이용해 물이 줄면 화분이 기울어져 급수 시기를 알려 준다.
+        </div>
+        <div class="steps">
+          <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-title">필요한 기능 정리</div><div class="step-desc">불편한 점에서 산출물에 필요한 기능을 찾는다.</div></div></div>
+          <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-title">과학 원리 조사</div><div class="step-desc">기능 구현에 필요한 과학 원리·기술을 조사한다.</div></div></div>
+          <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">설계·디자인</div><div class="step-desc">원리가 반영되도록 디자인해 산출물을 설계한다.</div></div></div>
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">'물 줄 때를 알려 주는 화분'에서 아래 칸의 물을 식물 쪽으로 자동으로 올려 주기 위해 이용한 과학 원리는 무엇인가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 모세관 현상</strong><br><br>
+            심지가 아래 칸의 물을 <strong>모세관 현상</strong>으로 빨아 올려 위 칸의 식물에 자동으로 물을 공급한다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item" id="acc-future">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">04</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Future · 과학기술의 미래</div>
+          <div class="acc-htitle">과학기술이 만들어 갈 미래</div>
+          <div class="acc-hdesc">4차 산업 혁명 · 지능 정보 기술 · 미래 과학기술 · 직업의 변화</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">4차 산업 혁명</div>
+        <div class="concept-box">
+          <div class="cb-title">🤖 지능 정보 기술 중심의 변화</div>
+          18세기 후반 산업 혁명 이후 2·3차를 지나 오늘날은 <span class="hp">4차 산업 혁명</span>의 시기에 들어섰다. 이를 이끄는 핵심은 <span class="hp">지능 정보 기술</span>로, 인공 지능 기술과 데이터 활용 기술을 바탕으로 한다. 사람·사물·정보를 상호 연결해 기술과 사회의 융합을 가속한다.
+        </div>
+        <div class="blue-box">
+          <div class="cb-title">🚗 자율 주행 자동차</div>
+          운전자가 조작하지 않아도 스스로 주행하는 자동차가 보편화되면, 자동차 산업뿐 아니라 우리 생활에도 큰 변화가 일어날 것이다.
+        </div>
+        <div class="sec-title">미래 과학기술의 예</div>
+        <div class="point-box">
+          <div class="point-card"><div class="pc-icon">🚁</div><div class="pc-title">멀티콥터 드론</div><div class="pc-desc">정밀 제어·기동의<br>무인 항공기</div></div>
+          <div class="point-card"><div class="pc-icon">🦾</div><div class="pc-title">착용 보조 로봇</div><div class="pc-desc">운반·보행 능력<br>향상 로봇</div></div>
+          <div class="point-card"><div class="pc-icon">🕶️</div><div class="pc-title">가상·증강 현실</div><div class="pc-desc">실감 영상으로<br>실제 같은 경험</div></div>
+          <div class="point-card"><div class="pc-icon">🧬</div><div class="pc-title">유전자 치료</div><div class="pc-desc">유전자 기반의<br>맞춤 치료</div></div>
+        </div>
+        <div class="indigo-box">
+          <div class="cb-title">👩‍💻 과학기술과 직업의 변화</div>
+          산업 구조 변화로 새로운 직업이 확대된다. <span class="hi">인공 지능 전문가, 가상 현실 전문가, 빅 데이터 전문가, 사물 인터넷(IoT) 전문가</span> 등이 대표적이다.
+        </div>
+        <div class="amber-box">
+          <div class="cb-title">⚖️ 미래 사회를 위한 준비</div>
+          새로운 기술에는 빛과 그림자가 있다. 예를 들어 드론은 안전 대책·비행 구역·사생활 보호 등 <span class="ha">관련 법 규정과 사회적 윤리 의식</span>이 함께 마련되어야 한다.
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">4차 산업 혁명을 이끄는 핵심 기술인 '지능 정보 기술'의 바탕이 되는 두 가지 기술을 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 인공 지능 기술, 데이터 활용 기술</strong><br><br>
+            지능 정보 기술은 <strong>인공 지능 기술</strong>과 <strong>데이터 활용 기술</strong>을 바탕으로 사람·사물·정보를 상호 연결한다.
+          </div>
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 7 · 서술형</div>
+          <div class="quiz-q">멀티콥터 드론이 널리 쓰이는 미래 사회를 대비하기 위해 어떤 준비가 필요한지 한 가지 이상 서술하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">예시 답안</strong><br><br>
+            추락 사고를 방지할 <strong>안전 대책과 법 규정</strong>, 비행 구역·항로에 관한 법 규정이 필요하다. 또한 드론으로 인한 <strong>개인 사생활 보호</strong>에 관한 사회적 윤리 의식과 법 규정도 정비되어야 한다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div>
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  document.querySelectorAll('.unit-section').forEach(el => el.classList.remove('visible'));
+  const target = document.getElementById('unit' + n);
+  if (target) target.classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => {
+      item.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }, 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+const hashMap = {
+  '#unit1':1,'#acc-fire':1,'#acc-develop':1,
+  '#unit2':2,'#acc-life':2,'#acc-future':2
+};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n-1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
