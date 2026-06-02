@@ -119,10 +119,10 @@ textarea.txt{min-height:58px;line-height:1.6}
 <main class="wrap" id="main" style="display:none">
 
   <div class="card">
-    <div class="card-title">🔑 내 계정 (보안 규칙 설정용)</div>
+    <div class="card-title">✅ 보안 규칙 (처음 한 번만)</div>
     <div class="uid-box">
-      처음 한 번만, 아래 <strong>내 UID</strong>를 Firebase 보안 규칙에 넣어 주세요. 그래야 나만 처방을 만들고 지울 수 있습니다.<br>
-      내 UID: <code id="uidText">…</code><button class="uid-copy" id="uidCopy">복사</button>
+      이 페이지는 <strong>승인된 선생님 계정</strong>만 들어올 수 있습니다. Firebase 콘솔에서 아래 규칙을 한 번만 등록하면, 학생·학부모는 처방을 만들거나 지울 수 없습니다.<br>
+      참고용 내 UID: <code id="uidText">…</code><button class="uid-copy" id="uidCopy">복사</button>
     </div>
   </div>
 
@@ -171,7 +171,7 @@ textarea.txt{min-height:58px;line-height:1.6}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, deleteDoc, collection, query, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, query, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg = {
   apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
@@ -380,8 +380,14 @@ $('uidCopy').addEventListener('click',()=>{
 /* ── 로그인 가드 ── */
 $('logoutBtn').addEventListener('click',()=>{ signOut(auth).then(()=>location.replace('/login.html')); });
 
-onAuthStateChanged(auth, user=>{
+onAuthStateChanged(auth, async user=>{
   if(!user){ location.replace('/login.html'); return; }
+  try{
+    const snap=await getDoc(doc(db,'users',user.uid));
+    if(!snap.exists() || snap.data().status!=='approved'){
+      await signOut(auth); location.replace('/login.html'); return;
+    }
+  }catch(err){ location.replace('/login.html'); return; }
   $('gate').style.display='none';
   $('main').style.display='block';
   $('logoutBtn').style.display='inline-block';
