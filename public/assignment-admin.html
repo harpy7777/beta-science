@@ -196,11 +196,10 @@ body {
 .lr-btn.del:hover { background:#fee2e2; }
 
 /* ── 시험 선택 모달 ── */
-.modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:600; align-items:flex-end; justify-content:center; }
+.modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:1000; align-items:center; justify-content:center; padding:70px 0 0; }
 .modal-bg.open { display:flex; }
-.modal-box { background:#fff; border-radius:24px 24px 0 0; width:100%; max-width:600px; max-height:88vh; display:flex; flex-direction:column; box-shadow:0 -8px 40px rgba(0,0,0,0.18); padding-bottom:env(safe-area-inset-bottom); }
-@media(min-width:600px){ .modal-bg{ align-items:center; } .modal-box{ border-radius:24px; max-height:82vh; } }
-.modal-head { display:flex; align-items:center; justify-content:space-between; padding:1.2rem 1.4rem 0.9rem; flex-shrink:0; }
+.modal-box { background:#fff; border-radius:20px; width:100%; max-width:600px; max-height:calc(100vh - 90px); display:flex; flex-direction:column; box-shadow:0 8px 40px rgba(0,0,0,0.25); overflow:hidden; margin:0 12px; }
+.modal-head { display:flex; align-items:center; justify-content:space-between; padding:1.1rem 1.3rem 0.8rem; flex-shrink:0; }
 .modal-title { font-size:15px; font-weight:700; }
 .modal-close { width:36px; height:36px; min-width:44px; min-height:44px; border-radius:50%; background:#f5f5f7; border:none; cursor:pointer; font-size:14px; color:#3c3c43; display:flex; align-items:center; justify-content:center; }
 .modal-close:hover { background:#fce7f3; color:#db2777; }
@@ -658,6 +657,23 @@ function getExamQuestions(exam){
   return out;
 }
 
+/* 제목 앞 단원 번호로 정렬 키 생성 ("3-2. ..." → [3,2], "1-1. ..." → [1,1]) */
+function unitSortKey(title){
+  const m=String(title||'').match(/(\d+)\s*-\s*(\d+)/);
+  if(m) return [parseInt(m[1],10), parseInt(m[2],10), 0];
+  const m2=String(title||'').match(/(\d+)/);
+  if(m2) return [parseInt(m2[1],10), 0, 0];
+  return [999,999,0];
+}
+function sortExams(arr){
+  return arr.slice().sort((a,b)=>{
+    const ka=unitSortKey(a.title), kb=unitSortKey(b.title);
+    if(ka[0]!==kb[0]) return ka[0]-kb[0];
+    if(ka[1]!==kb[1]) return ka[1]-kb[1];
+    return String(a.title||'').localeCompare(String(b.title||''),'ko');
+  });
+}
+
 /* ── 시험 모달 ── */
 let examsCache=null, curSubj='전체';
 async function openExamModal(){
@@ -686,6 +702,7 @@ function renderExamList(){
   const box=$('examBody'); box.innerHTML='';
   let list=(examsCache||[]);
   if(curSubj!=='전체') list=list.filter(e=>(e.subject||'').trim()===curSubj);
+  list=sortExams(list);
   if(list.length===0){ box.innerHTML='<div class="list-empty">해당 과목의 시험이 없습니다.</div>'; return; }
   list.forEach(exam=>{
     const qs=getExamQuestions(exam);
