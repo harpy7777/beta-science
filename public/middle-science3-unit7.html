@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel='icon' type='image/svg+xml' href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cpolygon points='70,8 121,38 121,102 70,132 19,102 19,38' fill='none' stroke='%23E85D75' stroke-width='8' stroke-linejoin='round'/%3E%3Cpolygon points='70,38 97,53 97,87 70,102 43,87 43,53' fill='none' stroke='%23E85D75' stroke-width='4' stroke-linejoin='round' stroke-dasharray='10 6'/%3E%3Ccircle cx='70' cy='8' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='38' r='10' fill='%23E85D75'/%3E%3Ccircle cx='121' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='70' cy='132' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='102' r='10' fill='%23E85D75'/%3E%3Ccircle cx='19' cy='38' r='10' fill='%23E85D75'/%3E%3C/svg%3E">
+<title>베타과학학원 · 별과 우주</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+:root {
+  --blu-dark:    #1e3a8a;
+  --blu-main:    #2563eb;
+  --blu-mid:     #3b82f6;
+  --blu-light:   #93c5fd;
+  --blu-tint:    #eff6ff;
+  --blu-tint2:   #dbeafe;
+  --blu-border:  #bfdbfe;
+  --blu-border2: #93c5fd;
+
+  --green:#059669; --green-bg:#ecfdf5; --green-border:#a7f3d0;
+  --cyan:#0891b2;  --cyan-bg:#ecfeff;   --cyan-border:#a5f3fc;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626;   --red-bg:#fef2f2;   --red-border:#fecaca;
+  --indigo:#4f46e5;--indigo-bg:#eef2ff;--indigo-border:#c7d2fe;
+
+  --text:#1d1d1f; --muted:#6e6e73; --dim:#aeaeb2;
+  --bg:#f5f8ff;   --white:#fff;
+
+  --radius-sm:10px; --radius:14px; --radius-lg:18px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+p{line-height:1.78;font-size:13.5px;margin:.4rem 0}
+
+.header{
+  background:#fff;
+  border-bottom:1px solid #e0edff;
+  padding:0 1rem;
+  padding-left:max(1rem,env(safe-area-inset-left));
+  padding-right:max(1rem,env(safe-area-inset-right));
+  height:54px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;top:0;z-index:500;
+  box-shadow:0 1px 0 #e0edff;
+}
+.header-left{display:flex;align-items:center;gap:9px;cursor:pointer;transition:opacity .15s}
+.header-left:hover{opacity:.75}
+.logo-mark{
+  width:30px;height:30px;
+  background:linear-gradient(135deg,var(--blu-mid) 0%,var(--blu-dark) 100%);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.brand-name{font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.3px}
+.header-badge{
+  display:flex;align-items:center;gap:5px;
+  background:var(--blu-tint);border:1px solid var(--blu-border);
+  border-radius:20px;padding:4px 10px;
+  font-size:10px;font-weight:700;color:var(--blu-dark);
+  white-space:nowrap;
+}
+.dot-blu{width:5px;height:5px;background:var(--blu-mid);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.back-btn{
+  padding:7px 14px;min-height:36px;
+  background:transparent;border:1.5px solid var(--blu-border);
+  border-radius:20px;font-size:12px;font-weight:700;color:var(--blu-dark);
+  cursor:pointer;white-space:nowrap;transition:background .15s;
+}
+.back-btn:hover{background:var(--blu-tint)}
+.back-btn:active{background:var(--blu-tint2)}
+
+.hero{
+  background:linear-gradient(135deg,var(--blu-dark) 0%,var(--blu-main) 55%,var(--blu-mid) 100%);
+  padding:2.8rem 1.5rem 2.2rem;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;right:-80px;top:-80px;
+  width:300px;height:300px;border-radius:50%;
+  background:rgba(255,255,255,.06);
+}
+.hero::after{
+  content:'';position:absolute;left:-50px;bottom:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:rgba(255,255,255,.04);
+}
+.hero-deco{
+  position:absolute;right:10%;top:15%;
+  width:120px;height:120px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.12);
+  pointer-events:none;
+}
+.hero-deco2{
+  position:absolute;right:18%;top:25%;
+  width:60px;height:60px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.1);
+  pointer-events:none;
+}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-item{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;cursor:pointer;transition:color .15s}
+.bc-item:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,.4)}
+.bc-current{font-size:12px;color:#fff;font-weight:700}
+
+.hero-eyebrow{
+  display:inline-block;
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:5px 14px;
+  font-size:11px;font-weight:700;color:#fff;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;
+}
+.hero-title{
+  font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;
+  color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem;
+}
+.hero-desc{
+  font-size:13.5px;color:rgba(255,255,255,.85);
+  line-height:1.7;max-width:580px;margin:0 auto 1.8rem;
+}
+
+.hero-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.hero-stat-card{
+  background:rgba(255,255,255,.15);
+  border:1.5px solid rgba(255,255,255,.3);
+  border-radius:14px;padding:.9rem 1.4rem;
+  text-align:center;backdrop-filter:blur(6px);
+  min-width:80px;transition:background .2s;
+}
+.hero-stat-card:hover{background:rgba(255,255,255,.25)}
+.hs-num{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:10px;color:rgba(255,255,255,.8);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+.tabs-wrap{
+  background:#fff;border-bottom:2px solid var(--blu-border);
+  position:sticky;top:54px;z-index:400;
+}
+.tabs-inner{
+  max-width:1100px;margin:0 auto;
+  padding:0 1.5rem;display:flex;overflow-x:auto;
+  justify-content:center;gap:4px;
+  scrollbar-width:none;
+}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab-btn{
+  padding:13px 26px;font-size:13px;font-weight:700;
+  color:var(--muted);border:none;background:none;cursor:pointer;
+  font-family:inherit;border-bottom:3px solid transparent;
+  white-space:nowrap;transition:all .2s;
+  margin-bottom:-2px;border-radius:8px 8px 0 0;
+}
+.tab-btn:hover{color:var(--blu-main);background:var(--blu-tint)}
+.tab-btn.active{color:var(--blu-main);border-bottom-color:var(--blu-main)}
+
+.content-wrap{max-width:1100px;margin:0 auto;padding:1.8rem 1.5rem 5rem}
+.unit-section{display:none}
+.unit-section.visible{display:block}
+
+.unit-banner{
+  border-radius:var(--radius-lg);
+  padding:1.4rem 1.8rem;margin-bottom:1.8rem;
+  display:flex;align-items:center;gap:1.2rem;
+  background:linear-gradient(135deg,var(--blu-tint),var(--blu-tint2));
+  border:2px solid var(--blu-border);
+}
+.ub-emoji{font-size:2.6rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blu-main);margin-bottom:4px}
+.ub-title{font-size:1.25rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{
+  background:#fff;border:1.5px solid #e5e7eb;
+  border-radius:var(--radius-lg);overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+}
+.acc-item.open{
+  border-color:var(--blu-border);
+  box-shadow:0 4px 20px rgba(37,99,235,.1);
+}
+.acc-header{
+  display:flex;align-items:center;gap:12px;
+  padding:1.2rem 1.5rem;cursor:pointer;user-select:none;
+  transition:background .15s;
+}
+.acc-header:hover{background:var(--blu-tint)}
+.acc-num{
+  width:32px;height:32px;border-radius:10px;
+  background:var(--blu-tint2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:900;color:var(--blu-dark);flex-shrink:0;
+  transition:background .2s;
+}
+.acc-item.open .acc-num{background:var(--blu-main);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--blu-border2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-item.open .acc-subtitle{color:var(--blu-main)}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.acc-chevron{font-size:16px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--blu-main)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--blu-tint2)}
+.acc-item.open .acc-body{display:block}
+
+.sec-title{
+  font-size:12px;font-weight:800;color:var(--blu-dark);
+  letter-spacing:.06em;text-transform:uppercase;
+  margin:1.4rem 0 .75rem;display:flex;align-items:center;gap:8px;
+}
+.sec-title::before{
+  content:'';width:4px;height:16px;
+  background:var(--blu-main);border-radius:2px;display:block;flex-shrink:0;
+}
+
+.concept-box{
+  background:var(--blu-tint);border:1.5px solid var(--blu-border);
+  border-left:4px solid var(--blu-main);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.concept-box .cb-title{font-weight:800;color:var(--blu-dark);font-size:14px;margin-bottom:.4rem}
+
+.green-box{
+  background:var(--green-bg);border:1.5px solid var(--green-border);
+  border-left:4px solid var(--green);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+
+.amber-box{
+  background:var(--amber-bg);border:1.5px solid var(--amber-border);
+  border-left:4px solid var(--amber);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+
+.blue-box{
+  background:var(--cyan-bg);border:1.5px solid var(--cyan-border);
+  border-left:4px solid var(--cyan);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.blue-box .cb-title{font-weight:800;color:#155e75;font-size:14px;margin-bottom:.4rem}
+
+.red-box{
+  background:var(--red-bg);border:1.5px solid var(--red-border);
+  border-left:4px solid var(--red);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+
+.indigo-box{
+  background:var(--indigo-bg);border:1.5px solid var(--indigo-border);
+  border-left:4px solid var(--indigo);border-radius:var(--radius);
+  padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px;
+}
+.indigo-box .cb-title{font-weight:800;color:#3730a3;font-size:14px;margin-bottom:.4rem}
+
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:var(--radius);border:1.5px solid var(--blu-border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  background:var(--blu-tint2);padding:10px 14px;
+  text-align:left;font-weight:800;font-size:11px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--blu-dark);
+}
+tbody td{padding:10px 14px;border-top:1px solid #e5e7eb;line-height:1.6;vertical-align:top}
+tbody tr:hover td{background:var(--blu-tint)}
+
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0;font-size:13px}
+.flow-box{
+  background:#fff;border:1.5px solid var(--blu-border);
+  border-radius:8px;padding:7px 12px;
+  font-weight:700;color:var(--blu-dark);text-align:center;font-size:12px;line-height:1.4;
+}
+.flow-arrow{color:var(--blu-main);font-size:18px;font-weight:900}
+
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:.8rem 0}
+.point-card{
+  background:#fff;border:1.5px solid var(--blu-border);
+  border-radius:var(--radius);padding:1rem;text-align:center;
+  transition:border-color .2s,box-shadow .2s;
+}
+.point-card:hover{border-color:var(--blu-main);box-shadow:0 4px 12px rgba(37,99,235,.12)}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--blu-main);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+.hp{color:var(--blu-dark);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--cyan);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+.hi{color:var(--indigo);font-weight:800}
+
+.formula-box{
+  background:linear-gradient(135deg,var(--blu-tint),var(--blu-tint2));
+  border:2px solid var(--blu-border);border-radius:var(--radius-lg);
+  padding:1.2rem 1.4rem;margin:.8rem 0;text-align:center;
+}
+.formula-text{font-size:1.3rem;font-weight:900;color:var(--blu-dark);letter-spacing:-.01em;font-style:italic}
+.formula-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+.steps{display:flex;flex-direction:column;gap:8px;margin:.8rem 0}
+.step-item{
+  display:flex;align-items:flex-start;gap:12px;
+  background:#fff;border:1.5px solid #e5e7eb;
+  border-radius:var(--radius);padding:.9rem 1.1rem;
+  transition:border-color .2s;
+}
+.step-item:hover{border-color:var(--blu-border)}
+.step-num{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--blu-main);color:#fff;
+  font-size:13px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px}
+.step-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+.quiz-wrap{
+  background:linear-gradient(135deg,var(--blu-tint2),var(--blu-tint));
+  border:1.5px solid var(--blu-border);
+  border-radius:var(--radius-lg);
+  padding:1.2rem 1.4rem;margin-top:1.6rem;
+}
+.quiz-label{font-size:11px;font-weight:800;color:var(--blu-dark);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.65;margin-bottom:.7rem}
+.quiz-toggle{
+  background:var(--blu-main);color:#fff;border:none;
+  border-radius:20px;padding:7px 18px;
+  font-size:12px;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:background .15s;
+}
+.quiz-toggle:hover{background:var(--blu-dark)}
+.quiz-ans{
+  display:none;margin-top:.8rem;padding:.9rem 1rem;
+  background:rgba(255,255,255,.85);border-radius:10px;
+  font-size:13.5px;color:var(--text);line-height:1.75;
+  border:1px solid var(--blu-border);
+}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:.6rem 0}
+.chip{
+  padding:4px 12px;border-radius:20px;
+  font-size:11px;font-weight:700;
+  background:var(--blu-tint2);color:var(--blu-dark);
+  border:1px solid var(--blu-border);
+}
+.chip-g{background:var(--green-bg);color:#065f46;border-color:var(--green-border)}
+.chip-a{background:var(--amber-bg);color:#92400e;border-color:var(--amber-border)}
+
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 1.8rem}
+  .hero-title{font-size:1.45rem}
+  .hero-desc{font-size:13px}
+  .hero-eyebrow{font-size:10px;padding:4px 11px}
+  .hero-stats{gap:7px}
+  .hero-stat-card{min-width:68px;padding:.75rem .9rem}
+  .hs-num{font-size:1.45rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{justify-content:flex-start;gap:0;padding:0 .5rem}
+  .tab-btn{padding:11px 13px;font-size:11.5px;border-radius:6px 6px 0 0}
+  .content-wrap{padding:1.2rem .85rem 4rem}
+  .unit-banner{flex-direction:column;gap:.75rem;padding:1.1rem}
+  .ub-emoji{font-size:2.1rem}
+  .ub-title{font-size:1.1rem}
+  .acc-header{padding:.95rem 1rem;gap:10px}
+  .acc-num{width:30px;height:30px;font-size:12px;border-radius:8px}
+  .acc-htitle{font-size:14px}
+  .acc-hdesc{font-size:11.5px}
+  .acc-body{padding:0 1rem 1.4rem}
+  .point-box{grid-template-columns:1fr 1fr}
+  .steps{gap:7px}
+  .step-item{padding:.8rem .95rem}
+  table{font-size:12px}
+  thead th{font-size:10px;padding:8px 10px}
+  tbody td{padding:8px 10px}
+  .concept-box,.green-box,.amber-box,.blue-box,.red-box,.indigo-box{
+    padding:.85rem 1rem;font-size:13px}
+  .concept-box .cb-title,.green-box .cb-title,.amber-box .cb-title,
+  .blue-box .cb-title,.red-box .cb-title,.indigo-box .cb-title{font-size:13px}
+  .formula-box{padding:1rem 1.1rem}
+  .formula-text{font-size:1.15rem}
+  .quiz-wrap{padding:1rem 1.1rem}
+  .quiz-q{font-size:13px}
+}
+
+@media(max-width:520px){
+  .brand-name{font-size:13px}
+  .header-badge{font-size:9px;padding:3px 8px}
+  .hero-deco,.hero-deco2{display:none}
+  .hero{padding:1.7rem .9rem 1.5rem}
+  .hero-title{font-size:1.28rem;letter-spacing:-.025em}
+  .hero-desc{font-size:12.5px;margin-bottom:1.4rem}
+  .breadcrumb{gap:4px;margin-bottom:.9rem}
+  .bc-item,.bc-current,.bc-sep{font-size:11px}
+  .hero-stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;width:100%;max-width:280px;margin:0 auto;
+  }
+  .hero-stat-card{min-width:0;padding:.7rem .5rem}
+  .hs-num{font-size:1.3rem}
+  .hs-lbl{font-size:9px}
+  .tabs-inner{padding:0 .3rem}
+  .tab-btn{padding:10px 11px;font-size:11px;white-space:nowrap}
+  .ub-title{font-size:1rem}
+  .ub-desc{font-size:12px}
+  .acc-header{padding:.85rem .9rem;gap:8px}
+  .acc-htitle{font-size:13.5px}
+  .acc-hdesc{font-size:11px}
+  .acc-body{padding:0 .9rem 1.2rem}
+  .sec-title{font-size:11px}
+  .point-box{grid-template-columns:1fr}
+  .pc-icon{font-size:1.5rem}
+  .pc-title{font-size:12px}
+  .pc-desc{font-size:11.5px}
+  .step-num{width:26px;height:26px;font-size:12px;border-radius:7px;flex-shrink:0}
+  .step-title{font-size:12.5px}
+  .step-desc{font-size:12px}
+  .formula-text{font-size:1rem}
+  .formula-sub{font-size:11px}
+  .table-wrap{-webkit-overflow-scrolling:touch}
+  .quiz-q{font-size:12.5px}
+  .quiz-toggle{font-size:11.5px;padding:6px 15px}
+  .quiz-ans{font-size:13px}
+  .chip,.chip-g,.chip-a{font-size:10.5px;padding:3px 10px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"
+          stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="header-badge"><span class="dot-blu"></span>ONLINE</div>
+    <button class="back-btn" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html" class="bc-item">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="middle-science3.html" class="bc-item">중학 과학 3</a><span class="bc-sep">›</span>
+      <span class="bc-current">🌌 Ⅶ. 별과 우주</span>
+    </div>
+    <div class="hero-eyebrow">🌌 중학 과학 3 · UNIT 07 · 별과 우주</div>
+    <div class="hero-title">Ⅶ. 별과 우주</div>
+    <div class="hero-desc">연주 시차를 이용한 별까지의 거리, 별의 밝기·등급·색부터,<br>우리은하와 성단·성운, 우주의 팽창과 우주 탐사까지 동아출판 교과서 핵심 개념을 학습합니다</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">2</div><div class="hs-lbl">중단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">12</div><div class="hs-lbl">핵심개념</div></div>
+      <div class="hero-stat-card"><div class="hs-num">8+</div><div class="hs-lbl">확인 문제</div></div>
+      <div class="hero-stat-card"><div class="hs-num">2022</div><div class="hs-lbl">개정과정</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">⭐ 중단원1 · 별</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">🌌 중단원2 · 우주</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner">
+    <div class="ub-emoji">⭐</div>
+    <div>
+      <div class="ub-num">중단원 01 · Stars</div>
+      <div class="ub-title">별</div>
+      <div class="ub-desc">연주 시차를 이용해 별까지의 거리를 구하는 방법, 별의 밝기와 겉보기·절대 등급, 그리고 표면 온도에 따라 달라지는 별의 색을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <div class="acc-item" id="acc-distance">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Annual Parallax · 연주 시차</div>
+          <div class="acc-htitle">별은 얼마나 멀리 떨어져 있을까</div>
+          <div class="acc-hdesc">시차 · 연주 시차 · 별까지의 거리와의 관계 · 거리 단위 pc(파섹)</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">별까지의 거리는 제각각</div>
+        <div class="concept-box">
+          <div class="cb-title">💡 같은 거리처럼 보여도 실제 거리는 다르다</div>
+          지구에서 볼 때 별들은 같은 거리에 있는 것처럼 보이지만, 실제 <span class="hp">별까지의 거리는 제각각 다르다.</span> 북두칠성을 이루는 별들도 거리가 모두 다르지만, 매우 멀고 <span class="hp">같은 시선 방향</span>에 있어 같은 거리처럼 보일 뿐이다.
+        </div>
+        <div class="sec-title">시차와 연주 시차</div>
+        <div class="concept-box">
+          <div class="cb-title">📐 시차 · 연주 시차의 뜻</div>
+          <span class="hp">시차</span>: 관측하는 위치에 따라 가까이 있는 물체가 멀리 있는 배경에 대해 달라져 보이는 <span class="hp">각도.</span><br>
+          <span class="hp">연주 시차</span>: 지구의 공전을 이용해 <span class="hp">6개월 간격</span>으로 별을 관측해 측정한 시차의 <span class="hp">½.</span>
+        </div>
+        <div class="flow">
+          <div class="flow-box">지구 공전 이용</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">6개월 간격<br>시차 측정</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">시차 × ½<br>= 연주 시차</div>
+        </div>
+        <div class="sec-title">거리와의 관계</div>
+        <div class="green-box">
+          <div class="cb-title">🔗 연주 시차는 거리에 반비례</div>
+          시차는 관측자와 물체 사이의 거리가 <span class="hg">가까울수록 크고 멀수록 작다.</span> 같은 원리로 별까지의 거리가 멀수록 연주 시차가 작아지므로, <span class="hg">연주 시차는 별까지의 거리에 반비례</span>한다.
+        </div>
+        <div class="blue-box">
+          <div class="cb-title">📏 거리 단위 pc(파섹)</div>
+          별까지의 거리는 보통 <span class="hb">pc(파섹)</span>으로 나타낸다. <span class="hb">1 pc</span>은 연주 시차가 <span class="hb">1″(초)</span>인 별까지의 거리이다. (1° = 60′, 1′ = 60″)
+        </div>
+        <div class="red-box">
+          <div class="cb-title">❗ 자주 하는 오개념</div>
+          "연주 시차로 모든 별까지의 거리를 구할 수 있다"고 생각하기 쉽다. 하지만 연주 시차는 값이 매우 작아 <span class="hr">약 100 pc 이내의 비교적 가까운 별</span>까지만 이용하고, 더 먼 별은 다른 방법으로 측정한다.
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">별 X의 연주 시차가 0.1″, 별 Y의 연주 시차가 0.05″이다. 두 별 중 지구로부터 더 멀리 있는 별은 어느 것인지 쓰고, 그 까닭을 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 별 Y</strong><br><br>
+            연주 시차는 별까지의 거리에 <strong>반비례</strong>한다. 연주 시차가 더 작은 별 Y가 별 X보다 지구로부터 <strong>더 멀리</strong> 있다.
+          </div>
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">지구에서 6개월 간격으로 관측한 별 S의 시차가 0.2″였다. 이 별의 연주 시차는 몇 초(″)인가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 0.1″</strong><br><br>
+            연주 시차는 6개월 간격으로 측정한 시차의 <strong>½</strong>이다. 따라서 0.2″ × ½ = <strong>0.1″</strong>이다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item" id="acc-brightness">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Magnitude · 별의 등급</div>
+          <div class="acc-htitle">별의 밝기가 다른 까닭은</div>
+          <div class="acc-hdesc">밝기와 거리의 관계 · 겉보기 등급 · 절대 등급 · 거리 비교</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">밝기와 거리의 관계</div>
+        <div class="concept-box">
+          <div class="cb-title">💡 밝기를 결정하는 두 가지</div>
+          별의 밝기는 별이 실제로 <span class="hp">방출하는 빛의 양</span>과 지구에서 <span class="hp">별까지의 거리</span>에 따라 달라진다. 거리가 같다면 빛을 많이 내는 별이, 빛의 양이 같다면 가까운 별이 더 밝게 보인다.
+        </div>
+        <div class="formula-box">
+          <div class="formula-text">밝기 ∝ 1 / (거리)<sup>2</sup></div>
+          <div class="formula-sub">우리 눈에 보이는 별의 밝기는 별까지 거리의 제곱에 반비례한다</div>
+        </div>
+        <div class="green-box">
+          <div class="cb-title">🔢 거리에 따른 밝기 변화</div>
+          거리가 2배, 3배 멀어지면 빛을 받는 넓이는 2², 3²배로 넓어지고, 같은 넓이가 받는 빛의 양은 <span class="hg">1/2², 1/3²</span>로 줄어든다. 거리가 4배 멀어지면 밝기는 <span class="hg">1/16</span>로 어두워진다.
+        </div>
+        <div class="sec-title">겉보기 등급과 절대 등급</div>
+        <div class="concept-box">
+          <div class="cb-title">⭐ 두 가지 등급</div>
+          <span class="hp">겉보기 등급</span>: 우리 눈에 보이는 별의 밝기를 등급으로 나타낸 것.<br>
+          <span class="hp">절대 등급</span>: 모든 별이 <span class="hp">10 pc</span>의 거리에 있다고 가정했을 때의 밝기.
+        </div>
+        <div class="blue-box">
+          <div class="cb-title">📜 히파르코스의 등급</div>
+          가장 밝게 보이는 별을 <span class="hb">1등급</span>, 간신히 보이는 별을 <span class="hb">6등급</span>으로 정했다. 1등급은 6등급보다 약 <span class="hb">100배</span> 밝고, 한 등급마다 약 <span class="hb">2.5배</span> 차이가 난다.
+        </div>
+        <div class="amber-box">
+          <div class="cb-title">⚖️ 등급으로 거리 비교</div>
+          • 겉보기 등급 &lt; 절대 등급 → <span class="ha">10 pc보다 가까이</span> 있는 별<br>
+          • 겉보기 등급 &gt; 절대 등급 → <span class="ha">10 pc보다 멀리</span> 있는 별<br>
+          • 겉보기 등급 = 절대 등급 → 거리가 <span class="ha">10 pc</span>인 별
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>별</th><th>겉보기 등급</th><th>절대 등급</th><th>거리 판단</th></tr></thead>
+          <tbody>
+            <tr><td>시리우스</td><td>-1.44</td><td>1.5</td><td>10 pc 이내</td></tr>
+            <tr><td>베가</td><td>0.03</td><td>0.6</td><td>10 pc 이내</td></tr>
+            <tr><td>리겔</td><td>0.18</td><td><span class="hr">-6.7</span></td><td>10 pc보다 먼 별</td></tr>
+            <tr><td>베텔게우스</td><td>0.45</td><td>-5.1</td><td>10 pc보다 먼 별</td></tr>
+          </tbody>
+        </table></div>
+        <div class="red-box">
+          <div class="cb-title">❗ 자주 하는 오개념</div>
+          "밝게 보이면 실제로 밝은 별"이라고 착각하기 쉽다. 태양은 겉보기 등급이 -26.7로 매우 밝게 보이지만 절대 등급은 4.8로 <span class="hr">실제로는 비교적 어두운 별</span>이다. 또한 등급 숫자가 <span class="hr">작을수록 밝은</span> 별임을 헷갈리지 말자.
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">어떤 별까지의 거리가 처음보다 5배 멀어진다면, 이 별의 밝기는 처음의 몇 배가 되는가?</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 1/25 배</strong><br><br>
+            밝기는 거리의 제곱에 반비례하므로, 거리가 5배 멀어지면 밝기는 1/5<sup>2</sup> = <strong>1/25</strong>로 어두워진다.
+          </div>
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">위 표의 네 별 중 ⑴ 맨눈으로 가장 밝게 보이는 별과 ⑵ 실제로 가장 밝은 별을 각각 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ⑴ 시리우스　⑵ 리겔</strong><br><br>
+            ⑴ 겉보기 등급이 가장 작은 <strong>시리우스(-1.44)</strong>가 맨눈으로 가장 밝게 보인다.<br>
+            ⑵ 절대 등급이 가장 작은 <strong>리겔(-6.7)</strong>이 실제로 가장 밝다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item" id="acc-color">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Color &amp; Temperature · 색과 표면 온도</div>
+          <div class="acc-htitle">별의 색이 다른 까닭은</div>
+          <div class="acc-hdesc">표면 온도와 별의 색 · 색 → 온도 비교 · 파란색이 더 뜨겁다</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">온도에 따라 색이 달라진다</div>
+        <div class="concept-box">
+          <div class="cb-title">🌡️ 표면 온도가 색을 결정</div>
+          용암이 식으면서 노란색 → 붉은색 → 검붉은색으로 변하듯, 온도에 따라 색이 달라지는 현상은 별빛에서도 나타난다. 표면 온도가 <span class="hp">높은 별은 파란색</span>, <span class="hp">낮은 별은 붉은색</span>을 띤다. 온도가 높을수록 파란색 빛을 더 많이 방출하기 때문이다.
+        </div>
+        <div class="sec-title">색 → 표면 온도 (높은 순)</div>
+        <div class="flow">
+          <div class="flow-box">청색</div><span class="flow-arrow">›</span>
+          <div class="flow-box">청백색</div><span class="flow-arrow">›</span>
+          <div class="flow-box">백색</div><span class="flow-arrow">›</span>
+          <div class="flow-box">황백색</div><span class="flow-arrow">›</span>
+          <div class="flow-box">황색</div><span class="flow-arrow">›</span>
+          <div class="flow-box">주황색</div><span class="flow-arrow">›</span>
+          <div class="flow-box">적색</div>
+        </div>
+        <p style="text-align:center;font-size:12px;color:var(--muted)">← 표면 온도 높음　|　표면 온도 낮음 →</p>
+        <div class="green-box">
+          <div class="cb-title">🔭 예시 — 오리온자리</div>
+          오리온자리의 <span class="hg">리겔(청백색)</span>은 표면 온도가 높고, <span class="hg">베텔게우스(붉은색)</span>는 표면 온도가 낮다.
+        </div>
+        <div class="red-box">
+          <div class="cb-title">❗ 자주 하는 오개념</div>
+          일상에서 붉은색=뜨겁고 파란색=차갑다고 느끼기 쉽지만, 별은 <span class="hr">반대</span>이다. <span class="hr">파란색 별이 붉은색 별보다 더 뜨겁다.</span>
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">스피카(파란색), 카펠라(노란색), 알데바란(붉은색) 세 별을 표면 온도가 높은 것부터 순서대로 나열하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 스피카 → 카펠라 → 알데바란</strong><br><br>
+            별은 표면 온도가 높을수록 파란색을 띤다. 파란색에 가까운 <strong>스피카</strong>가 가장 뜨겁고, 노란색인 <strong>카펠라</strong>, 붉은색인 <strong>알데바란</strong> 순으로 표면 온도가 낮아진다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="unit2" class="unit-section">
+  <div class="unit-banner">
+    <div class="ub-emoji">🌌</div>
+    <div>
+      <div class="ub-num">중단원 02 · Universe</div>
+      <div class="ub-title">우주</div>
+      <div class="ub-desc">태양계가 속한 우리은하의 모양과 구성 천체(성단·성운), 외부 은하의 관측으로 알게 된 우주의 팽창, 그리고 우주 탐사의 성과와 의의를 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <div class="acc-item" id="acc-galaxy">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">04</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Milky Way Galaxy · 우리은하</div>
+          <div class="acc-htitle">태양계가 속한 우리은하</div>
+          <div class="acc-hdesc">은하수 · 성단(산개·구상) · 성운(암흑·방출·반사) · 우리은하의 모양과 크기</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">은하수와 은하</div>
+        <div class="concept-box">
+          <div class="cb-title">🌫️ 은하수의 정체</div>
+          맑은 밤하늘을 가로지르는 희미한 띠를 <span class="hp">은하수</span>(미리내, Milky Way)라고 한다. 망원경으로 보면 은하수는 사실 <span class="hp">수많은 별</span>로 이루어져 있다. 수많은 별·성단·성운이 모인 거대한 집단이 <span class="hp">은하</span>, 태양계가 속한 은하가 <span class="hp">우리은하</span>이다.
+        </div>
+        <div class="sec-title">성단 — 산개 성단 vs 구상 성단</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>산개 성단</th><th>구상 성단</th></tr></thead>
+          <tbody>
+            <tr><td>별 개수</td><td>수십~수만 개</td><td>수만~수십만 개</td></tr>
+            <tr><td>모양</td><td>엉성하게 모임</td><td>공 모양으로 빽빽</td></tr>
+            <tr><td>색 · 온도</td><td><span class="hb">파란색 고온별</span></td><td><span class="hr">붉은색 저온별</span></td></tr>
+            <tr><td>분포</td><td>나선팔</td><td>중심부 · 헤일로</td></tr>
+          </tbody>
+        </table></div>
+        <div class="sec-title">성운 — 암흑 · 방출 · 반사</div>
+        <div class="concept-box">
+          <div class="cb-title">☁️ 성간 물질과 성운</div>
+          별과 별 사이에 엷게 퍼진 가스·먼지가 <span class="hp">성간 물질</span>, 이것이 모여 구름처럼 보이는 것이 <span class="hp">성운</span>이다.
+        </div>
+        <div class="point-box">
+          <div class="point-card"><div class="pc-icon">🌑</div><div class="pc-title">암흑 성운</div><div class="pc-desc">뒤쪽 별빛을 차단해<br>어둡게 (말머리성운)</div></div>
+          <div class="point-card"><div class="pc-icon">🔴</div><div class="pc-title">방출 성운</div><div class="pc-desc">별빛 흡수·가열되어<br>스스로 빛 (불꽃 성운)</div></div>
+          <div class="point-card"><div class="pc-icon">🔵</div><div class="pc-title">반사 성운</div><div class="pc-desc">별빛을 반사해<br>밝게 (러닝맨 성운)</div></div>
+        </div>
+        <div class="sec-title">우리은하의 모양과 크기</div>
+        <div class="green-box">
+          <div class="cb-title">🌀 막대 나선 은하</div>
+          우리은하는 중심부가 볼록한 원반 모양으로, 중심에 <span class="hg">막대 모양 구조</span>가 있고 그 끝에서 <span class="hg">나선팔</span>이 휘감고 있다.
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>항목</th><th>값</th></tr></thead>
+          <tbody>
+            <tr><td>지름</td><td>약 30000 pc (약 10만 광년)</td></tr>
+            <tr><td>태양계 위치</td><td>중심에서 약 8500 pc 떨어진 나선팔</td></tr>
+            <tr><td>광년</td><td>빛이 1년간 이동한 거리 (3.26광년 ≈ 1 pc)</td></tr>
+          </tbody>
+        </table></div>
+        <div class="red-box">
+          <div class="cb-title">❗ 자주 하는 오개념</div>
+          은하수와 우리은하는 다른 것이 아니다. 태양계가 우리은하 중심에서 떨어진 은하면 안에 있어, <span class="hr">우리은하의 옆모습이 띠 모양의 은하수</span>로 보이는 것이다.
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">다음 설명에 해당하는 천체의 이름을 각각 쓰시오.<br>⑴ 수만~수십만 개의 붉은색 저온별이 공 모양으로 빽빽하게 모인 성단<br>⑵ 성간 물질이 뒤쪽 별빛을 차단하여 어둡게 보이는 성운</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ⑴ 구상 성단　⑵ 암흑 성운</strong><br><br>
+            ⑴ 공 모양으로 빽빽하고 붉은색 저온별이 많은 것은 <strong>구상 성단</strong>이며, 주로 우리은하 중심부와 헤일로에 분포한다.<br>
+            ⑵ 뒤쪽 별빛을 차단해 어둡게 보이는 성운은 <strong>암흑 성운</strong>(예: 말머리성운)이다.
+          </div>
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 7 · 서술형</div>
+          <div class="quiz-q">우리은하가 지구에서 희뿌연 띠 모양(은하수)으로 보이는 까닭을 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">모범 답안</strong><br><br>
+            태양계가 우리은하의 <strong>중심에서 떨어져 있고 은하면 안에 있기 때문</strong>이다. 그래서 지구에서 나선팔 방향을 보면 수많은 별이 겹쳐 보여 희뿌연 띠 모양의 은하수로 나타난다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item" id="acc-expand">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">05</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Expanding Universe · 우주 팽창</div>
+          <div class="acc-htitle">팽창하는 우주</div>
+          <div class="acc-hdesc">외부 은하 · 풍선 모형 실험 · 대폭발 우주론(빅뱅) · 팽창의 중심</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">외부 은하와 우주 팽창</div>
+        <div class="concept-box">
+          <div class="cb-title">🌌 외부 은하</div>
+          우주에는 우리은하 밖에도 수많은 은하가 있는데, 이를 <span class="hp">외부 은하</span>라고 한다. 과학자들이 관측한 결과 대부분의 외부 은하가 서로 <span class="hp">멀어지고 있다</span>는 사실이 밝혀졌다.
+        </div>
+        <div class="sec-title">풍선 모형 실험</div>
+        <div class="blue-box">
+          <div class="cb-title">🎈 풍선이 커지면 딱지가 멀어진다</div>
+          풍선에 붙임 딱지를 붙이고 불면, 풍선이 커질수록 <span class="hb">딱지 사이 거리가 멀어진다.</span> 이때 풍선 표면은 <span class="hb">우주</span>, 붙임 딱지는 <span class="hb">은하</span>에 비유된다.
+        </div>
+        <div class="flow">
+          <div class="flow-box">풍선 표면<br>= 우주</div>
+          <span class="flow-arrow">+</span>
+          <div class="flow-box">붙임 딱지<br>= 은하</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box">풍선 팽창 →<br>딱지 사이 거리 ↑</div>
+        </div>
+        <div class="sec-title">대폭발 우주론(빅뱅)</div>
+        <div class="green-box">
+          <div class="cb-title">💥 한 점에서 시작된 우주</div>
+          우주는 모든 물질과 에너지가 모인 <span class="hg">한 점에서 대폭발</span>로 시작했으며, 지금도 <span class="hg">특별한 중심 없이 모든 방향으로</span> 계속 팽창하고 있다. 이를 <span class="hg">대폭발 우주론(빅뱅)</span>이라고 한다.
+        </div>
+        <div class="red-box">
+          <div class="cb-title">❗ 자주 하는 오개념</div>
+          "대부분의 은하가 멀어지므로 우리은하가 우주의 중심"이라고 생각하기 쉽다. 하지만 <span class="hr">모든 은하가 서로 멀어지므로 특정 중심이 없다.</span> 어느 은하에서 보아도 다른 은하들이 멀어지는 것처럼 보인다.
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 8</div>
+          <div class="quiz-q">우주 팽창을 알아보는 풍선 실험에서 풍선 표면과 붙임 딱지는 각각 무엇에 비유되는지 쓰시오. 또한 이 실험으로 알 수 있는 사실을 함께 설명하시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: 풍선 표면 = 우주, 붙임 딱지 = 은하</strong><br><br>
+            풍선이 팽창할수록 붙임 딱지 사이의 거리가 멀어지듯이, <strong>우주가 팽창할수록 은하 사이의 거리가 멀어진다.</strong> 또한 팽창의 특별한 중심이 없다는 것도 알 수 있다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item" id="acc-explore">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">06</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">Space Exploration · 우주 탐사</div>
+          <div class="acc-htitle">미래에 대한 도전, 우주 탐사</div>
+          <div class="acc-hdesc">망원경·인공위성·탐사선 · 우리나라의 우주 개발 · 탐사의 의의와 생활 속 기술</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">우주를 탐사하는 도구</div>
+        <div class="concept-box">
+          <div class="cb-title">🔭 망원경에서 탐사선까지</div>
+          1609년 갈릴레이가 최초로 망원경으로 천체를 관측한 이후, 인류는 가시광선뿐 아니라 적외선·전파 망원경, 우주 망원경까지 동원해 우주를 탐사하고 있다.<br>
+          • <span class="hp">인공위성</span>: 천체 주위를 돌도록 만든 인공 장치 (허블·스피처 우주 망원경 포함)<br>
+          • <span class="hp">우주 탐사선</span>: 다른 천체를 탐사하러 쏘아 올린 물체
+        </div>
+        <div class="sec-title">우주 탐사의 역사</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>연도</th><th>사건</th></tr></thead>
+          <tbody>
+            <tr><td>1957</td><td>스푸트니크 1호 — 인류 최초의 인공위성</td></tr>
+            <tr><td>1977</td><td>보이저 1호 — 태양계 탐사선</td></tr>
+            <tr><td>2009</td><td>나로 우주 센터 완공 (전남 고흥)</td></tr>
+            <tr><td>2013</td><td>나로호 로켓 발사</td></tr>
+            <tr><td>2016</td><td>주노호 — 목성 궤도 도착</td></tr>
+          </tbody>
+        </table></div>
+        <div class="sec-title">탐사의 의의</div>
+        <div class="point-box">
+          <div class="point-card"><div class="pc-icon">🪐</div><div class="pc-title">지식·자원</div><div class="pc-desc">우주와 지구를<br>더 깊이 이해</div></div>
+          <div class="point-card"><div class="pc-icon">📚</div><div class="pc-title">학문·기술 발전</div><div class="pc-desc">천문학·물리·공학<br>융합 발달</div></div>
+          <div class="point-card"><div class="pc-icon">👩‍🚀</div><div class="pc-title">새로운 직업</div><div class="pc-desc">위성 개발자·관제<br>연구원 등 탄생</div></div>
+        </div>
+        <div class="sec-title">생활 속 우주 기술</div>
+        <div class="indigo-box">
+          <div class="cb-title">🛰️ 우리 생활에 적용된 우주 기술</div>
+          • 우주 환경용 기술 → <span class="hi">정수기, 에어쿠션 운동화, 가벼운 운동용품 소재</span><br>
+          • 인공위성 활용 → <span class="hi">일기 예보·태풍 경로 예측, 방송 통신, 길 찾기(GPS)</span>
+        </div>
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 9</div>
+          <div class="quiz-q">다음 ⑴~⑵에 알맞은 말을 쓰시오.<br>⑴ 1957년에 발사된 인류 최초의 인공위성은 ( )이다.<br>⑵ 우리나라가 운영하고 있으며 나로호를 발사한 우주 센터는 ( )이다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans">
+            <strong class="hp">정답: ⑴ 스푸트니크 1호　⑵ 나로 우주 센터</strong><br><br>
+            ⑴ 1957년 구소련이 발사한 <strong>스푸트니크 1호</strong>가 인류 최초의 인공위성이다.<br>
+            ⑵ 전남 고흥에 있는 <strong>나로 우주 센터</strong>에서 2013년 나로호 로켓을 발사하였다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div>
+<script type="module">
+  import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  const cfg = {
+    apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+    authDomain:"beta-science.firebaseapp.com",
+    projectId:"beta-science",
+    storageBucket:"beta-science.firebasestorage.app",
+    messagingSenderId:"650652155367",
+    appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+  };
+  const app  = initializeApp(cfg);
+  const auth = getAuth(app);
+  onAuthStateChanged(auth, user => {
+    if (!user) { location.replace('/login.html'); }
+  });
+</script>
+
+<script>
+function showUnit(n, btn) {
+  document.querySelectorAll('.unit-section').forEach(el => el.classList.remove('visible'));
+  const target = document.getElementById('unit' + n);
+  if (target) target.classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  window.scrollTo({top: document.querySelector('.tabs-wrap').offsetTop - 10, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) {
+    item.classList.add('open');
+    setTimeout(() => {
+      item.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }, 50);
+  }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+const hashMap = {
+  '#unit1':1,'#acc-distance':1,'#acc-brightness':1,'#acc-color':1,
+  '#unit2':2,'#acc-galaxy':2,'#acc-expand':2,'#acc-explore':2
+};
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n-1];
+    if (btn) showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const hdr = el.querySelector('.acc-header');
+        if (hdr) hdr.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
