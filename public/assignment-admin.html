@@ -288,6 +288,7 @@ body {
           <option value="중1">중1</option><option value="중2">중2</option><option value="중3">중3</option>
           <option value="고1">고1</option><option value="고2">고2</option><option value="고3">고3</option>
         </select>
+        <!-- 학년 값은 normalizeGrade로 비교하므로 "중등1학년","중1" 등 형식 차이 무관 -->
       </div>
       <div class="field">
         <span class="fld-label">학습 범위</span>
@@ -396,6 +397,15 @@ function normalizeAnswer(val){
   const m=str.match(/\d+/); if(m) return m[0];
   return str;
 }
+/* 학년 정규화: "중등1학년","중1","중등 1" → "중1" / "고등2학년","고2" → "고2" */
+function normalizeGrade(val){
+  const s=String(val||'').trim();
+  const num=(s.match(/\d/)||[''])[0];
+  if(!num) return s;
+  if(/중/.test(s)) return '중'+num;
+  if(/고/.test(s)) return '고'+num;
+  return s;
+}
 
 /* ── 직접 입력 카드 ── */
 function addCard(type){
@@ -498,7 +508,7 @@ async function openExamModal(){
     subjects.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); });
   }
   // 학생이 선택돼 있으면 그 학년으로 자동 필터
-  if(selectedStudent && selectedStudent.grade){ $('gradeFilter').value=selectedStudent.grade; }
+  if(selectedStudent && selectedStudent.grade){ $('gradeFilter').value=normalizeGrade(selectedStudent.grade); }
   renderExamList();
 }
 function renderExamList(){
@@ -506,7 +516,7 @@ function renderExamList(){
   const subj=$('subjectFilter').value.trim();
   const box=$('examList'); box.innerHTML='';
   const list=(examsCache||[]).filter(e=>
-    (!g || (e.grade||'').trim()===g) &&
+    (!g || normalizeGrade(e.grade)===normalizeGrade(g)) &&
     (!subj || (e.subject||'').trim()===subj)
   );
   if(list.length===0){ box.innerHTML='<div class="list-empty">해당하는 시험이 없습니다.</div>'; return; }
@@ -547,7 +557,7 @@ function renderStudentGrid(){
   selectedStudent=null;
   if(!grade){ $('studentHint').textContent='학년을 먼저 선택하세요.'; return; }
   if(allStudents===null){ $('studentHint').textContent='학생 목록을 불러오는 중…'; return; }
-  const list=allStudents.filter(s=>(s.grade||'').trim()===grade)
+  const list=allStudents.filter(s=>normalizeGrade(s.grade)===normalizeGrade(grade))
     .sort((a,b)=>(a.name||'').localeCompare(b.name||'','ko'));
   if(list.length===0){ $('studentHint').textContent=`${grade} 학생이 없습니다.`; return; }
   $('studentHint').textContent='학생을 누르면 선택됩니다.';
@@ -559,6 +569,7 @@ function renderStudentGrid(){
       document.querySelectorAll('.stu-card.sel').forEach(c=>c.classList.remove('sel'));
       card.classList.add('sel');
       selectedStudent={ name:s.name||s.id, grade:s.grade||grade };
+      toast((s.name||s.id)+' 선택됨');
     });
     grid.appendChild(card);
   });
