@@ -452,17 +452,19 @@ function renderRecentAttempts(){
   if(!tb)return;
   if(!lastGradeDocs||lastGradeDocs.length===0){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
   const gm={'중1':'g-mid1','중2':'g-mid2','중3':'g-mid3','고1':'g-high1','고2':'g-high2','고3':'g-high3','중등1학년':'g-mid1','중등2학년':'g-mid2','중등3학년':'g-mid3','고등1학년':'g-high1','고등2학년':'g-high2','고등3학년':'g-high3'};
-  // 문서 1개 = 한 줄
+  // 응시 1건이 OX+4지선다를 함께 가지면 각 유형을 별도 줄로 분리 (마스터는 한 줄)
   const rows=[];
   lastGradeDocs.forEach(d=>{const r=d.data(),sid=r.studentId||'';
     if(aIds.size>0&&!aIds.has(sid))return;
     const ts=tD(r.timestamp||r.submittedTimestamp||r.date).getTime();
-    rows.push({r,sid,ts});
+    const types=recTypes(r);
+    if(types.length===1&&types[0]==='master'){rows.push({r,sid,ts,type:'master'});}
+    else{types.forEach(t=>rows.push({r,sid,ts,type:t}));}
   });
   if(!rows.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
   rows.sort((x,y)=>y.ts-x.ts);
   const ds=rows.slice(0,10);
-  tb.innerHTML=ds.map(({r,sid})=>{
+  tb.innerHTML=ds.map(({r,sid,type})=>{
     // 응시일: 26.05.04 형식 (연도 2자리.월.일, 0채움)
     let dt='-';
     {const x=r.timestamp?tD(r.timestamp):(r.submittedTimestamp?tD(r.submittedTimestamp):pRD(r.date));
@@ -474,8 +476,9 @@ function renderRecentAttempts(){
     const sn=r.studentName||'-',sf=sn.replace(/'/g,"\\'");
     const nc=sid?`<span class="student-name-link" onclick="openSCC('${sid}','${sf}')">${e(sn)}</span>`:e(sn);
     const tname=r.testName||r.examTitle||r.unitName||'-';
-    // 한 응시가 OX+4지선다면 배지 둘 다, 마스터면 마스터 배지 하나
-    const badges=recTypes(r).map(t=>{const ti=TYPE_INFO[t]||TYPE_INFO.ox;return`<span class="type-badge ${ti.cls}">${ti.label}</span>`;}).join('');
+    // 이 줄의 유형 배지 하나만 표시 (OX·4지선다는 이미 별도 줄로 분리됨)
+    const ti=TYPE_INFO[type]||TYPE_INFO.ox;
+    const badges=`<span class="type-badge ${ti.cls}">${ti.label}</span>`;
     const testCell=`<div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap"><span style="display:flex;gap:4px">${badges}</span><span class="test-name-cell" title="${e(tname)}">${e(tname)}</span></div>`;
     return `<tr><td style="color:#aeaeb2;font-size:11px;white-space:nowrap">${dt}</td><td><span class="sid-text">${e(sid||'-')}</span></td><td style="font-weight:700;color:#1d1d1f">${nc}</td><td>${gb}</td><td>${sb}</td><td>${testCell}</td></tr>`;
   }).join('');
