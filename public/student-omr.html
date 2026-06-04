@@ -2,97 +2,101 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8"><script src="/favicon.js"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>베타과학학원 · 마스터테스트 OMR</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-  background: #f0fdf4; color: #1d1d1f; min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  background: #fafafa; color: #1d1d1f; min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 .header {
-  background: #fff; border-bottom: 1px solid #bbf7d0;
+  background: #fff; border-bottom: 1px solid #fce7f3;
   padding: 0 1.5rem; height: 54px;
   display: flex; align-items: center; justify-content: center;
 }
 .header-inner { display: flex; align-items: center; gap: 10px; }
-.logo { width: 32px; height: 32px; background: #16a34a; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-.brand { font-size: 15px; font-weight: 700; color: #14532d; }
-.brand-sub { font-size: 11px; color: #16a34a; font-weight: 500; }
-.card {
-  background: #fff; border: 1px solid #bbf7d0; border-radius: 20px;
-  padding: 2rem; max-width: 520px; margin: 2rem auto;
-  box-shadow: 0 4px 24px rgba(22,163,74,0.08);
+.logo {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg,#f472b6,#db2777);
+  border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.entry-title { font-size: 1.1rem; font-weight: 700; color: #14532d; margin-bottom: 1.4rem; display: flex; align-items: center; gap: 8px; }
-.field-label { font-size: 11px; font-weight: 700; color: #16a34a; letter-spacing: 0.05em; margin-bottom: 6px; display: block; }
+.brand { font-size: 15px; font-weight: 700; color: #1d1d1f; }
+.brand-sub { font-size: 11px; color: #db2777; font-weight: 600; }
+.card {
+  background: #fff; border: 1px solid #fce7f3; border-radius: 18px;
+  padding: 2rem; max-width: 520px; margin: 2rem auto;
+  box-shadow: 0 4px 24px rgba(219,39,119,0.08);
+}
+.entry-title { font-size: 1.1rem; font-weight: 700; color: #1d1d1f; margin-bottom: 1.4rem; display: flex; align-items: center; gap: 8px; }
+.field-label { font-size: 11px; font-weight: 700; color: #db2777; letter-spacing: 0.05em; margin-bottom: 6px; display: block; }
 .field-group { margin-bottom: 14px; }
 .inp {
-  width: 100%; padding: 11px 14px; border: 1.5px solid #bbf7d0;
-  border-radius: 12px; font-size: 14px; font-family: inherit;
+  width: 100%; padding: 11px 14px; border: 1.5px solid #fce7f3;
+  border-radius: 12px; font-size: 16px; font-family: inherit;
   color: #1d1d1f; outline: none; background: #fff; transition: border 0.15s;
 }
-.inp:focus { border-color: #16a34a; }
+.inp:focus { border-color: #db2777; }
 .inp-hint { font-size: 11px; color: #aeaeb2; margin-top: 5px; }
 .error-msg { font-size: 12px; color: #dc2626; margin-top: 6px; display: none; }
 .grade-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
 .grade-btn {
-  padding: 10px; border: 1.5px solid #bbf7d0; border-radius: 10px;
+  padding: 10px; border: 1.5px solid #fce7f3; border-radius: 10px;
   background: #fff; font-size: 13px; font-weight: 600; color: #6e6e73;
-  cursor: pointer; font-family: inherit; transition: all 0.15s; text-align: center;
+  cursor: pointer; font-family: inherit; transition: all 0.15s; text-align: center; min-height: 44px;
 }
-.grade-btn.sel { background: #16a34a; color: #fff; border-color: #16a34a; }
-.grade-btn:hover:not(.sel) { border-color: #16a34a; color: #16a34a; }
+.grade-btn.sel { background: linear-gradient(135deg,#f472b6,#db2777); color: #fff; border-color: #db2777; }
+.grade-btn:hover:not(.sel) { border-color: #fbcfe8; color: #db2777; }
 .enter-btn {
-  width: 100%; padding: 14px; background: #16a34a;
+  width: 100%; padding: 14px; background: linear-gradient(135deg,#f472b6,#db2777);
   border: none; border-radius: 14px; font-size: 15px; font-weight: 700;
   color: #fff; cursor: pointer; font-family: inherit; margin-top: 1.2rem;
-  transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: opacity 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px;
 }
-.enter-btn:hover { background: #15803d; }
-.enter-btn:disabled { background: #bbf7d0; color: #fff; cursor: not-allowed; }
+.enter-btn:hover { opacity: 0.88; }
+.enter-btn:disabled { background: #fce7f3; color: #fff; cursor: not-allowed; }
 .student-badge {
-  background: #dcfce7; border: 1px solid #bbf7d0; border-radius: 10px;
-  padding: 6px 14px; font-size: 12px; font-weight: 700; color: #14532d;
+  background: #fdf2f8; border: 1px solid #fce7f3; border-radius: 10px;
+  padding: 6px 14px; font-size: 12px; font-weight: 700; color: #db2777;
   display: inline-block; margin-bottom: 14px;
 }
 .test-list { display: flex; flex-direction: column; gap: 10px; }
 .test-item {
-  padding: 14px 16px; border: 1.5px solid #bbf7d0; border-radius: 14px;
-  background: #f0fdf4; cursor: pointer; transition: all 0.15s;
+  padding: 14px 16px; border: 1.5px solid #fce7f3; border-radius: 14px;
+  background: #fff; cursor: pointer; transition: all 0.15s;
   display: flex; align-items: center; justify-content: space-between;
 }
-.test-item:hover { border-color: #16a34a; background: #dcfce7; }
-.test-name { font-size: 14px; font-weight: 700; color: #14532d; }
-.test-meta { font-size: 11px; color: #16a34a; margin-top: 3px; }
-.test-arrow { font-size: 18px; color: #16a34a; }
+.test-item:hover { border-color: #fbcfe8; background: #fdf2f8; }
+.test-name { font-size: 14px; font-weight: 700; color: #1d1d1f; }
+.test-meta { font-size: 11px; color: #db2777; margin-top: 3px; }
+.test-arrow { font-size: 18px; color: #db2777; }
 .back-btn {
   background: none; border: none; font-size: 12px; font-weight: 600;
   color: #6e6e73; cursor: pointer; font-family: inherit; padding: 0;
   margin-bottom: 14px; display: flex; align-items: center; gap: 4px;
-  transition: color 0.15s;
+  transition: color 0.15s; min-height: 36px;
 }
-.back-btn:hover { color: #16a34a; }
+.back-btn:hover { color: #db2777; }
 .omr-wrap { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
 .omr-header-card {
-  background: #fff; border: 1px solid #bbf7d0; border-radius: 18px;
+  background: #fff; border: 1px solid #fce7f3; border-radius: 18px;
   padding: 1.2rem 1.6rem; margin-bottom: 1.2rem;
   display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
 }
-.omr-title { font-size: 1rem; font-weight: 700; color: #14532d; }
-.omr-meta { font-size: 12px; color: #16a34a; margin-top: 3px; }
+.omr-title { font-size: 1rem; font-weight: 700; color: #1d1d1f; }
+.omr-meta { font-size: 12px; color: #db2777; margin-top: 3px; }
 .omr-student-badge {
-  background: #dcfce7; border: 1px solid #bbf7d0; border-radius: 10px;
-  padding: 6px 14px; font-size: 12px; font-weight: 700; color: #14532d;
+  background: #fdf2f8; border: 1px solid #fce7f3; border-radius: 10px;
+  padding: 6px 14px; font-size: 12px; font-weight: 700; color: #db2777;
 }
 .omr-section {
-  background: #fff; border: 1px solid #bbf7d0; border-radius: 16px;
+  background: #fff; border: 1px solid #fce7f3; border-radius: 16px;
   padding: 1.2rem 1.4rem; margin-bottom: 10px;
 }
 .omr-section-title {
-  font-size: 13px; font-weight: 700; color: #14532d; margin-bottom: 12px;
-  padding-bottom: 8px; border-bottom: 1px solid #f0fdf4;
+  font-size: 13px; font-weight: 700; color: #1d1d1f; margin-bottom: 12px;
+  padding-bottom: 8px; border-bottom: 1px solid #fdf2f8;
   display: flex; align-items: center; gap: 6px;
 }
 .omr-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
@@ -103,38 +107,38 @@ body {
 .omr-q-num { font-size: 10px; font-weight: 700; color: #6e6e73; }
 .omr-choices { display: flex; flex-direction: column; gap: 3px; }
 .omr-choice {
-  width: 34px; height: 34px; border-radius: 50%; border: 2px solid #bbf7d0;
-  background: #f0fdf4; display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 50%; border: 2px solid #fce7f3;
+  background: #fff; display: flex; align-items: center; justify-content: center;
   font-size: 11px; font-weight: 700; color: #6e6e73; cursor: pointer;
   transition: all 0.12s; user-select: none;
 }
-.omr-choice:hover { border-color: #16a34a; color: #16a34a; }
-.omr-choice.sel { background: #16a34a; border-color: #16a34a; color: #fff; }
-.progress-bar-wrap { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; }
-.progress-label { font-size: 11px; font-weight: 700; color: #16a34a; margin-bottom: 6px; display: flex; justify-content: space-between; }
-.progress-track { height: 8px; background: #dcfce7; border-radius: 99px; overflow: hidden; }
-.progress-fill { height: 100%; background: linear-gradient(90deg, #16a34a, #4ade80); border-radius: 99px; transition: width 0.3s ease; }
+.omr-choice:hover { border-color: #fbcfe8; color: #db2777; }
+.omr-choice.sel { background: linear-gradient(135deg,#f472b6,#db2777); border-color: #db2777; color: #fff; }
+.progress-bar-wrap { background: #fff; border: 1px solid #fce7f3; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; }
+.progress-label { font-size: 11px; font-weight: 700; color: #db2777; margin-bottom: 6px; display: flex; justify-content: space-between; }
+.progress-track { height: 8px; background: #fce7f3; border-radius: 99px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg,#f472b6,#db2777); border-radius: 99px; transition: width 0.3s ease; }
 .submit-btn {
-  width: 100%; padding: 16px; background: #16a34a;
+  width: 100%; padding: 16px; background: linear-gradient(135deg,#f472b6,#db2777);
   border: none; border-radius: 16px; font-size: 16px; font-weight: 700;
   color: #fff; cursor: pointer; font-family: inherit; margin-top: 1rem;
-  transition: background 0.15s; box-shadow: 0 4px 16px rgba(22,163,74,0.25);
+  transition: opacity 0.15s; box-shadow: 0 4px 16px rgba(219,39,119,0.25);
 }
-.submit-btn:hover { background: #15803d; }
-.submit-btn:disabled { background: #bbf7d0; cursor: not-allowed; box-shadow: none; }
+.submit-btn:hover { opacity: 0.88; }
+.submit-btn:disabled { background: #fce7f3; cursor: not-allowed; box-shadow: none; }
 .result-card {
-  background: #fff; border: 1px solid #bbf7d0; border-radius: 20px;
+  background: #fff; border: 1px solid #fce7f3; border-radius: 20px;
   padding: 2.5rem 2rem; max-width: 520px; margin: 2rem auto; text-align: center;
-  box-shadow: 0 4px 24px rgba(22,163,74,0.1);
+  box-shadow: 0 4px 24px rgba(219,39,119,0.1);
 }
 .result-emoji { font-size: 3rem; margin-bottom: 1rem; }
-.result-title { font-size: 1.3rem; font-weight: 700; color: #14532d; margin-bottom: 6px; }
+.result-title { font-size: 1.3rem; font-weight: 700; color: #1d1d1f; margin-bottom: 6px; }
 .result-sub { font-size: 13px; color: #6e6e73; margin-bottom: 1.8rem; }
 .result-score-box {
-  background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px;
+  background: #fdf2f8; border: 1px solid #fce7f3; border-radius: 16px;
   padding: 1.4rem; margin-bottom: 1.4rem;
 }
-.result-score-num { font-size: 2.5rem; font-weight: 700; color: #16a34a; letter-spacing: -0.05em; }
+.result-score-num { font-size: 2.5rem; font-weight: 700; color: #db2777; letter-spacing: -0.05em; }
 .result-score-lbl { font-size: 12px; color: #6e6e73; margin-top: 4px; }
 .result-task-box {
   background: #fef9c3; border: 1px solid #fde68a; border-radius: 14px;
@@ -143,14 +147,14 @@ body {
 .result-task-title { font-size: 11px; font-weight: 700; color: #854d0e; margin-bottom: 6px; }
 .result-task-text { font-size: 13px; color: #1d1d1f; line-height: 1.6; }
 .home-btn {
-  display: inline-block; padding: 12px 28px; background: #16a34a;
+  display: inline-block; padding: 12px 28px; background: linear-gradient(135deg,#f472b6,#db2777);
   border: none; border-radius: 14px; font-size: 14px; font-weight: 700;
   color: #fff; cursor: pointer; font-family: inherit; text-decoration: none;
-  transition: background 0.15s;
+  transition: opacity 0.15s;
 }
-.home-btn:hover { background: #15803d; }
-.loading { text-align: center; padding: 3rem; color: #16a34a; font-size: 13px; }
-.spinner { width: 32px; height: 32px; border: 3px solid #bbf7d0; border-top-color: #16a34a; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+.home-btn:hover { opacity: 0.88; }
+.loading { text-align: center; padding: 3rem; color: #db2777; font-size: 13px; }
+.spinner { width: 32px; height: 32px; border: 3px solid #fce7f3; border-top-color: #db2777; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .empty-hint { font-size: 13px; color: #aeaeb2; padding: 2rem; text-align: center; }
 .screen { display: none; }
@@ -161,7 +165,12 @@ body {
 
 <header class="header">
   <div class="header-inner">
-    <div class="logo">🧪</div>
+    <div class="logo">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
     <div>
       <div class="brand">베타과학학원</div>
       <div class="brand-sub">마스터테스트 OMR</div>
@@ -275,10 +284,6 @@ const auth = getAuth(app);
 
 // ──────────────────────────────────────────────
 // ★ 학생 인증 보장 (선생님 로그인은 건드리지 않음)
-//   1) Firebase가 초기 인증 상태를 복원할 때까지 기다린 뒤
-//   2) 그래도 로그인한 사람이 없을 때만(= 학생) 익명 로그인.
-//   3) 실패해도 throw 안 함 → 보안 규칙이 아직 열려 있어 기존 동작 유지.
-//   이 페이지(OMR)는 로그인 없이 열리므로 사실상 항상 익명 로그인이 걸림.
 // ──────────────────────────────────────────────
 let _authReady = null;
 function waitForAuthReady() {
@@ -301,7 +306,6 @@ async function ensureAuth() {
 
 // ──────────────────────────────────────────────
 // 학년 정규화 테이블
-// Firebase에 저장된 다양한 학년 표기 → UI 표기(고1, 중2 …)
 // ──────────────────────────────────────────────
 const GRADE_VARIANTS = {
   '중1': ['중1','중1학년','중학1학년','중학교1학년','중학교 1학년','중 1학년'],
@@ -312,7 +316,6 @@ const GRADE_VARIANTS = {
   '고3': ['고3','고3학년','고등3학년','고등학교3학년','고등학교 3학년','고 3학년'],
 };
 
-// 공백 제거 후 매핑
 function normalizeGrade(raw) {
   const s = String(raw || '').replace(/\s/g, '');
   for (const [uiGrade, variants] of Object.entries(GRADE_VARIANTS)) {
@@ -324,7 +327,7 @@ function normalizeGrade(raw) {
 // ── 상태 ──
 let studentName  = '';
 let studentId    = '';
-let studentGrade = '';   // 항상 UI 표기 (고1, 중2 등)
+let studentGrade = '';
 let selectedTest = null;
 let answers      = {};
 let allTests     = [];
@@ -366,7 +369,7 @@ window.doEnter = async () => {
   btn.textContent = '확인 중...';
 
   try {
-    await ensureAuth(); // ★ 학생 경로: 데이터 조회 전 인증 보장
+    await ensureAuth();
     const student = await getStudentById(inputId);
     if (!student) {
       idErr.style.display = 'block';
@@ -390,8 +393,6 @@ window.doEnter = async () => {
 
 // ──────────────────────────────────────────────
 // 테스트 목록 불러오기
-// 전략: studentGrade의 모든 변형으로 병렬 쿼리
-//       → 그래도 없으면 전체 조회 후 클라이언트 정규화 필터
 // ──────────────────────────────────────────────
 async function loadTests() {
   const wrap = document.getElementById('test-list-wrap');
@@ -402,7 +403,6 @@ async function loadTests() {
     const seen = new Set();
     let docs = [];
 
-    // 1단계: 변형별 병렬 쿼리
     const snaps = await Promise.all(
       variants.map(v =>
         getDocs(query(collection(db, 'master-tests'), where('grade', '==', v))).catch(() => null)
@@ -415,7 +415,6 @@ async function loadTests() {
       });
     });
 
-    // 2단계: 여전히 없으면 전체 조회 후 클라이언트 정규화 필터 (fallback)
     if (docs.length === 0) {
       const allSnap = await getDocs(collection(db, 'master-tests'));
       allSnap.forEach(d => {
@@ -427,7 +426,6 @@ async function loadTests() {
       });
     }
 
-    // regDate 내림차순 정렬
     docs.sort((a, b) => {
       const da = a.regDate ? new Date(a.regDate) : new Date(0);
       const db2 = b.regDate ? new Date(b.regDate) : new Date(0);
@@ -477,8 +475,6 @@ window.selectTest = (fireId) => {
 
 // ──────────────────────────────────────────────
 // OMR 구성 — 5지선다
-// part.answers의 정답 최댓값으로 선택지 수 자동 감지
-// 기본값: 5지선다 (①②③④⑤)
 // ──────────────────────────────────────────────
 function buildOMR() {
   document.getElementById('omr-test-title').textContent    = selectedTest.unitName || '—';
@@ -494,14 +490,12 @@ function buildOMR() {
       .sort((a, b) => Number(a.replace('q','')) - Number(b.replace('q','')));
     if (!qNums.length) return;
 
-    // 정답 중 최댓값으로 선택지 수 결정 (4 또는 5)
-    const maxAns = Math.max(...Object.values(part.answers || {}).map(v => Number(v)));
-    const choiceCount = (isFinite(maxAns) && maxAns >= 5) ? 5 : 5; // 기본 5지선다
+    const choiceCount = 5; // 기본 5지선다
     const symbols = ['①','②','③','④','⑤'].slice(0, choiceCount);
 
     html += `<div class="omr-section">
       <div class="omr-section-title">
-        <span style="background:#dcfce7;color:#16a34a;font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;">
+        <span style="background:#fdf2f8;color:#db2777;font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;">
           ${pi+1}부 · ${esc(part.range || '')}번
         </span>
         ${part.sectionName ? `<span>${esc(part.sectionName)}</span>` : ''}
@@ -574,15 +568,22 @@ window.submitOMR = async () => {
 
   let correct = 0, wrong = 0;
   const wrongNums = [];
+  // 문항별 상세 (통일 구조: answers 배열)
+  const answersDetail = [];
   Object.entries(correctMap).forEach(([qno, correctAns]) => {
     const sa = answers[qno];
-    if (!sa || sa !== correctAns) {
-      wrong++;
-      wrongNums.push(Number(qno.replace('q','')));
-    } else {
-      correct++;
-    }
+    const isCorrect = sa === correctAns;
+    if (isCorrect) correct++; else { wrong++; wrongNums.push(Number(qno.replace('q',''))); }
+    answersDetail.push({
+      question:      `Q${qno.replace('q','')}`,
+      studentAnswer: sa || null,
+      correctAnswer: correctAns,
+      isCorrect,
+      type:          'master'
+    });
   });
+  // 문항 번호 순 정렬
+  answersDetail.sort((a,b) => Number(a.question.replace('Q','')) - Number(b.question.replace('Q','')));
 
   const score = total > 0 ? Math.round((correct/total)*100) : 0;
 
@@ -591,30 +592,40 @@ window.submitOMR = async () => {
   let taskText = '';
   if (fp) taskText = wrong<=2 ? (fp.taskLow||'') : wrong<=4 ? (fp.taskMid||'') : (fp.taskHigh||'');
 
-  // Firebase 저장
+  // ── Firebase 저장 (통일 구조: grades/{자동ID}, 1회 응시 = 문서 1개) ──
   try {
-    await ensureAuth(); // ★ 학생 경로: 답안 제출 전 인증 보장
-    await addDoc(collection(db, 'answers'), {
-      testId:        selectedTest.testId    || '',
-      testFireId:    selectedTest.fireId,
-      unitName:      selectedTest.unitName  || '',
-      subject:       selectedTest.subject   || '',
-      testGrade:     selectedTest.grade     || '',
-      testGradeNorm: normalizeGrade(selectedTest.grade || ''),
+    await ensureAuth();
+    await addDoc(collection(db, 'grades'), {
+      // ── 식별 ──
       studentId,
       studentName,
-      studentGrade,
-      answers: Object.entries(answers).map(([qno, val]) => ({
-        question:      `Q${qno.replace('q','')}`,
-        studentAnswer: val,
-        isCorrect:     val === correctMap[qno],
-      })),
+      grade: studentGrade,
+      subject: selectedTest.subject || '',
+      examId: selectedTest.fireId,                       // master-tests 문서 id (대시보드 삭제 연동 키)
+      testName: selectedTest.unitName || '마스터테스트 OMR',
+      category: 'master',                                // 마스터 OMR
+      // ── 파트별 점수 (마스터는 객관식 → multiple에, ox는 null) ──
+      ox: null,
+      multiple: { correct, total, score },
+      // ── 대표 점수/집계 ──
       score,
-      testType:  'master',
+      totalCorrect: correct,
+      totalQuestions: total,
+      // ── 문항별 상세 ──
+      answers: answersDetail,
+      wrongNums,
+      // ── 시간 (읽는 쪽이 timestamp로 정렬) ──
+      timestamp: serverTimestamp(),
+      // ── 구버전 읽기 호환용 보조 필드 ──
+      testType: 'master',
+      testId: selectedTest.testId || '',
+      testFireId: selectedTest.fireId,
+      unitName: selectedTest.unitName || '',
       examTitle: selectedTest.unitName || '마스터테스트 OMR',
-      correct, wrong, wrongNums, total,
-      submittedAt: serverTimestamp(),
-      regDate: new Date().toLocaleString(),
+      testGrade: selectedTest.grade || '',
+      testGradeNorm: normalizeGrade(selectedTest.grade || ''),
+      studentGrade,
+      correct, wrong, total
     });
   } catch(e) {
     alert('제출 실패: ' + e.message);
