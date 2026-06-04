@@ -320,11 +320,11 @@ body {
 .period-tabs::-webkit-scrollbar { display: none; }
 .ptab { padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; font-family: inherit; border: 1px solid #fce7f3; background: #fff; color: #6e6e73; cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; min-height: 36px; }
 .ptab.on { background: #db2777; color: #fff; border-color: #db2777; }
-.subject-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 8px; border-radius: 8px; overflow: hidden; border: 1px solid #fce7f3; }
+.subject-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid #fce7f3; }
 .subject-table thead tr { background: #fdf2f8; }
-.subject-table th { padding: 5px 10px; text-align: left; font-weight: 700; color: #db2777; font-size: 10px; }
-.subject-table th:first-child { width: 80px; border-right: 1px solid #fce7f3; }
-.subject-table td { padding: 5px 10px; border-bottom: 1px solid #fdf2f8; color: #3c3c43; font-size: 11px; }
+.subject-table th { padding: 13px 14px; text-align: center; font-weight: 700; color: #db2777; font-size: 12px; }
+.subject-table th:first-child { width: 120px; border-right: 1px solid #fce7f3; }
+.subject-table td { padding: 13px 14px; border-bottom: 1px solid #fdf2f8; color: #3c3c43; font-size: 13px; text-align: center; line-height: 1.6; word-break: break-word; }
 .subject-table tr:last-child td { border-bottom: none; }
 .subject-table td:first-child { color: #5b21b6; font-weight: 600; border-right: 1px solid #fdf2f8; }
 .analysis-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; align-items: stretch; }
@@ -862,7 +862,13 @@ function gcRenderExamSelector() {
 window.gcSelectExam=(key,el)=>{ gcCurExamKey=key; document.querySelectorAll('.exam-sel-btn').forEach(b=>b.classList.remove('on')); if(el) el.classList.add('on'); gcRenderRecs(gcCurWeek); };
 function gcRenderChart(fr) {
   const base=enrollDate();
-  document.getElementById('d-chart').innerHTML=[0,1,2,3].map(w=>{
+  // 데이터가 존재하는 가장 최근 주차를 끝으로 최근 4주를 표시
+  // (기존엔 무조건 1~4주차만 그려서, 입학 후 한참 뒤에 응시한 경우 차트가 비어 보이던 버그 수정)
+  let maxW=0;
+  if(base){ fr.forEach(r=>{ const wi=enrollWeekIndex(r,base); if(wi!=null&&wi>maxW) maxW=wi; }); }
+  const startW=Math.max(0, maxW-3);
+  const weeks=[startW, startW+1, startW+2, startW+3];
+  document.getElementById('d-chart').innerHTML=weeks.map(w=>{
     const wr=base?fr.filter(r=>enrollWeekIndex(r,base)===w):[];
     const avgV=(arr,kind)=>{ const v=arr.filter(r=>hasType(r,kind)); return v.length?Math.round(v.map(r=>typeScore(r,kind)).reduce((s,x)=>s+x,0)/v.length):null; };
     const oxA=avgV(wr,'ox'), mcA=avgV(wr,'mc'), msA=avgV(wr,'master');
