@@ -16,9 +16,9 @@ const db = getFirestore();
 interface Part {
   id: number;
   range: string;
-  sectionName: string;
-  sectionContent: string;
-  answers: Record<string, string>;
+  // sectionName / sectionContent 는 제거했지만, 학생 OMR 페이지가 읽어도
+  // 깨지지 않도록 저장 시 빈 문자열로 채워 보낸다(하위호환).
+  answers: Record<string, string>;   // 미입력은 '' (빈 값)
   taskLow: string;
   taskMid: string;
   taskHigh: string;
@@ -30,11 +30,13 @@ interface MasterTest {
   subject: string;
   grade: string;
   unitName: string;
+  subUnit?: string;
   parts: Part[];
   regDate: string;
 }
 
-const SUBJECTS = ['통합과학', '물리', '화학', '생물', '내신대비'];
+// ★ 통합과학 → 통합과학1 / 통합과학2 로 분리
+const SUBJECTS = ['통합과학1', '통합과학2', '물리', '화학', '생물', '내신대비'];
 const GRADES = ['중등1학년', '중등2학년', '중등3학년', '고등1학년', '고등2학년', '고등3학년'];
 const ANSWER_OPTIONS = ['1', '2', '3', '4', '5'];
 
@@ -42,17 +44,24 @@ function makePart(id: number): Part {
   const start = (id - 1) * 10 + 1;
   const end = id * 10;
   const answers: Record<string, string> = {};
-  for (let i = start; i <= end; i++) answers[`q${i}`] = '1';
+  // ★ 기본값을 '1'이 아니라 ''(미입력)으로 둔다 → 안 채우면 저장이 막힘
+  for (let i = start; i <= end; i++) answers[`q${i}`] = '';
   return {
     id,
     range: `${start}-${end}`,
-    sectionName: '',
-    sectionContent: '',
     answers,
     taskLow: '시험지에 오답문제 정리해오기',
     taskMid: '수업노트 필기 다시하고 오답문제 정리하기',
     taskHigh: '동영상 수업 내용복습, 수업노트 필기, 오답정리해오기',
   };
+}
+
+// ★ 한 부(part)의 정답들을 "3214553142" 같은 문자열로 변환 (미입력은 공백)
+function answersToString(answers: Record<string, string>): string {
+  const qnos = Object.keys(answers).sort(
+    (a, b) => Number(a.replace('q', '')) - Number(b.replace('q', ''))
+  );
+  return qnos.map(q => answers[q] || ' ').join('');
 }
 
 export default function MasterTestPage() {
@@ -64,7 +73,8 @@ export default function MasterTestPage() {
   const [subject, setSubject] = useState('');
   const [grade, setGrade] = useState('');
   const [unitName, setUnitName] = useState('');
-  const [parts, setParts] = useState<Part[]>([makePart(1), makePart(2), makePart(3)]);
+  const [subUnit, setSubUnit] = useState('');   // ★ 소단원명 (새 필드)
+  const [parts, setParts] = useState<Part[]>([makePart(1)]);  // ★ 기본 1개 부
   const [saving, setSaving] = useState(false);
 
   const [tests, setTests] = useState<MasterTest[]>([]);
@@ -102,10 +112,26 @@ export default function MasterTestPage() {
     setParts(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
   }
 
+  // ★ 버튼(드롭다운)으로 한 문항 정답 변경
   function updateAnswer(partId: number, qno: string, value: string) {
     setParts(prev => prev.map(p =>
       p.id === partId ? { ...p, answers: { ...p.answers, [qno]: value } } : p
     ));
+  }
+
+  // ★ 타이핑 칸: "3214553142" 입력 → 각 문항에 1자리씩 배분
+  //    1~5 외 문자는 무시(빈칸 처리). 길이가 모자라면 나머지는 미입력으로 둠.
+  function applyAnswerString(partId: number, raw: string) {
+    setParts(prev => prev.map(p => {
+      if (p.id !== partId) return p;
+      const qnos = Object.keys(p.answers).sort(
+        (a, b) => Number(a.replace('q', '')) - Number(b.replace('q', ''))
+      );
+      const chars = raw.replace(/[^1-5]/g, '').split(''); // 1~5만 남김
+      const next: Record<string, string> = {};
+      qnos.forEach((q, i) => { next[q] = chars[i] ?? ''; });
+      return { ...p, answers: next };
+    }));
   }
 
   function addPart() {
@@ -119,12 +145,40 @@ export default function MasterTestPage() {
 
   async function handleSave() {
     if (!subject || !grade) { toast.error('과목과 학년을 선택해주세요'); return; }
+
+    // ★ 정답 미입력 검사: 안 채운 문항이 있으면 저장 차단 (1번 기본값 사고 방지)
+    const blanks: number[] = [];
+    parts.forEach(p => {
+      Object.keys(p.answers).forEach(q => {
+        if (!p.answers[q]) blanks.push(Number(q.replace('q', '')));
+      });
+    });
+    if (blanks.length > 0) {
+      blanks.sort((a, b) => a - b);
+      const preview = blanks.slice(0, 8).join(', ');
+      toast.error(`정답을 입력하지 않은 문항이 있습니다: ${preview}${blanks.length > 8 ? ' …' : ''}번`);
+      return;
+    }
+
     setSaving(true);
     try {
+      // 학생 OMR/대시보드 하위호환: sectionName·sectionContent 는 빈 값으로 채워 저장
+      const partsToSave = parts.map(p => ({
+        id: p.id,
+        range: p.range,
+        sectionName: subUnit || '',     // 소단원명을 섹션명 자리에도 넣어 화면 표시 호환
+        sectionContent: '',
+        answers: p.answers,
+        taskLow: p.taskLow,
+        taskMid: p.taskMid,
+        taskHigh: p.taskHigh,
+      }));
+
       await addDoc(collection(db, 'master-tests'), {
         testId, subject, grade,
         unitName: unitName || '미지정 단원',
-        parts,
+        subUnit: subUnit || '',          // ★ 소단원명 별도 저장
+        parts: partsToSave,
         regDate: new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }),
       });
       toast.success('저장되었습니다!');
@@ -249,16 +303,6 @@ export default function MasterTestPage() {
             기본 정보
           </h2>
 
-          <div className="mb-3">
-            <label className="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">테스트 ID</label>
-            <input
-              type="text"
-              value={testId}
-              readOnly
-              className="w-full bg-gray-50 border border-pink-50 rounded-xl px-3 py-2.5 text-xs text-gray-400 cursor-default"
-            />
-          </div>
-
           <div className="grid grid-cols-2 gap-3 mb-3">
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
@@ -286,20 +330,35 @@ export default function MasterTestPage() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">단원명</label>
-            <input
-              type="text"
-              value={unitName}
-              onChange={e => setUnitName(e.target.value)}
-              placeholder="예: 알칼리금속과 할로젠"
-              className={inputCls}
-            />
+          {/* ★ 단원명 + 소단원명 나란히 */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">단원명</label>
+              <input
+                type="text"
+                value={unitName}
+                onChange={e => setUnitName(e.target.value)}
+                placeholder="예: 1단원"
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">소단원명</label>
+              <input
+                type="text"
+                value={subUnit}
+                onChange={e => setSubUnit(e.target.value)}
+                placeholder="예: 1-1 진화와 생물다양성"
+                className={inputCls}
+              />
+            </div>
           </div>
         </div>
 
         {/* ── 섹션별 문항 ── */}
-        {parts.map((part) => (
+        {parts.map((part) => {
+          const answerStr = answersToString(part.answers);
+          return (
           <div key={part.id} className="bg-white border border-pink-100 rounded-2xl p-5 mb-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -321,35 +380,31 @@ export default function MasterTestPage() {
               </button>
             </div>
 
-            <div className="space-y-3 mb-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">섹션명</label>
-                <input
-                  type="text"
-                  value={part.sectionName}
-                  onChange={e => updatePart(part.id, 'sectionName', e.target.value)}
-                  placeholder="예: 알칼리금속"
-                  className={inputCls}
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">핵심 내용</label>
-                <input
-                  type="text"
-                  value={part.sectionContent}
-                  onChange={e => updatePart(part.id, 'sectionContent', e.target.value)}
-                  placeholder="이 섹션의 핵심 개념을 입력하세요..."
-                  className={inputCls}
-                />
-              </div>
+            {/* ★ 빠른 정답 입력 (타이핑) */}
+            <div className="mb-4">
+              <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                빠른 정답 입력 <span className="text-gray-400 font-normal normal-case">— 정답을 순서대로 한 번에 (예: 3214553142)</span>
+              </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={answerStr.replace(/ /g, '')}
+                onChange={e => applyAnswerString(part.id, e.target.value)}
+                placeholder="1~5 숫자만 순서대로 입력 (아래 표에 자동 반영)"
+                className={inputCls + ' tracking-[0.3em] font-bold text-pink-700'}
+              />
             </div>
 
             <div className="mb-4">
               <p className="text-xs font-bold text-gray-700 mb-3 uppercase tracking-wide">
-                정답 입력 <span className="text-gray-400 font-normal normal-case">({part.range}번)</span>
+                정답 확인/수정 <span className="text-gray-400 font-normal normal-case">({part.range}번)</span>
               </p>
               <div className="grid grid-cols-5 gap-2">
-                {Object.keys(part.answers).map(qno => (
+                {Object.keys(part.answers)
+                  .sort((a, b) => Number(a.replace('q','')) - Number(b.replace('q','')))
+                  .map(qno => {
+                  const filled = !!part.answers[qno];
+                  return (
                   <div key={qno} className="flex flex-col items-center gap-1.5">
                     <span className="text-xs font-semibold text-gray-400">
                       {qno.replace('q', '')}
@@ -358,13 +413,17 @@ export default function MasterTestPage() {
                       <select
                         value={part.answers[qno]}
                         onChange={e => updateAnswer(part.id, qno, e.target.value)}
-                        className="w-full appearance-none border border-pink-100 rounded-lg text-center text-sm py-2 px-1 bg-white focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition-colors"
+                        className={`w-full appearance-none border rounded-lg text-center text-sm py-2 px-1 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition-colors ${
+                          filled ? 'border-pink-100 bg-white' : 'border-red-200 bg-red-50 text-red-400'
+                        }`}
                       >
+                        <option value="">·</option>
                         {ANSWER_OPTIONS.map(o => <option key={o}>{o}</option>)}
                       </select>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -394,7 +453,8 @@ export default function MasterTestPage() {
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
 
         {/* 섹션 추가 버튼 */}
         <button
@@ -526,6 +586,7 @@ export default function MasterTestPage() {
                           >
                             <td className="px-6 py-5">
                               <span className="font-bold text-gray-900 text-sm">{t.unitName}</span>
+                              {t.subUnit ? <span className="text-xs text-gray-400 ml-2">{t.subUnit}</span> : null}
                             </td>
                             <td className="px-4 py-5 text-center">
                               <span className="text-xs text-gray-600 font-medium whitespace-nowrap">
@@ -587,6 +648,7 @@ export default function MasterTestPage() {
                       <div className="flex items-start justify-between gap-2 mb-3">
                         <span className="font-bold text-gray-900 text-sm leading-snug flex-1">
                           {t.unitName}
+                          {t.subUnit ? <span className="block text-xs font-normal text-gray-400 mt-0.5">{t.subUnit}</span> : null}
                         </span>
                         <span className="flex-shrink-0 inline-block text-xs px-2.5 py-1 rounded-full font-semibold bg-green-100 text-green-700">
                           등록됨
