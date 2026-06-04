@@ -259,6 +259,7 @@ import {
   getFirestore, collection, getDocs, addDoc,
   query, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const cfg = {
   apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
@@ -270,6 +271,33 @@ const cfg = {
 };
 const app = initializeApp(cfg);
 const db  = getFirestore(app);
+const auth = getAuth(app);
+
+// ──────────────────────────────────────────────
+// ★ 학생 인증 보장 (선생님 로그인은 건드리지 않음)
+//   1) Firebase가 초기 인증 상태를 복원할 때까지 기다린 뒤
+//   2) 그래도 로그인한 사람이 없을 때만(= 학생) 익명 로그인.
+//   3) 실패해도 throw 안 함 → 보안 규칙이 아직 열려 있어 기존 동작 유지.
+//   이 페이지(OMR)는 로그인 없이 열리므로 사실상 항상 익명 로그인이 걸림.
+// ──────────────────────────────────────────────
+let _authReady = null;
+function waitForAuthReady() {
+  if (_authReady) return _authReady;
+  _authReady = new Promise((resolve) => {
+    const unsub = onAuthStateChanged(auth, () => { unsub(); resolve(); });
+  });
+  return _authReady;
+}
+async function ensureAuth() {
+  try {
+    await waitForAuthReady();
+    if (!auth.currentUser) {
+      await signInAnonymously(auth);
+    }
+  } catch (e) {
+    console.warn('[OMR] ensureAuth skipped:', e);
+  }
+}
 
 // ──────────────────────────────────────────────
 // 학년 정규화 테이블
@@ -338,6 +366,7 @@ window.doEnter = async () => {
   btn.textContent = '확인 중...';
 
   try {
+    await ensureAuth(); // ★ 학생 경로: 데이터 조회 전 인증 보장
     const student = await getStudentById(inputId);
     if (!student) {
       idErr.style.display = 'block';
@@ -564,6 +593,7 @@ window.submitOMR = async () => {
 
   // Firebase 저장
   try {
+    await ensureAuth(); // ★ 학생 경로: 답안 제출 전 인증 보장
     await addDoc(collection(db, 'answers'), {
       testId:        selectedTest.testId    || '',
       testFireId:    selectedTest.fireId,
