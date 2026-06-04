@@ -174,6 +174,48 @@ body {
 .state { text-align:center; color:#aeaeb2; font-size:14px; padding:4rem 1rem; line-height:1.9; }
 .state .big { font-size:2.4rem; display:block; margin-bottom:.7rem; }
 
+/* ── 시험 바로가기 카드 ── */
+.exam-link {
+  display:flex; align-items:center; gap:12px; width:100%;
+  border:1.5px solid #fce7f3; border-radius:16px; background:#fff;
+  padding:1.05rem 1.15rem; margin-bottom:.8rem; cursor:pointer;
+  text-decoration:none; color:inherit; font-family:inherit; text-align:left;
+  transition:border-color .15s, background .15s;
+}
+.exam-link:active { transform:scale(0.995); }
+.exam-link.ox { border-left:4px solid #059669; }
+.exam-link.mc { border-left:4px solid #2563eb; }
+.exam-link.master { border-left:4px solid #db2777; }
+.exam-link .el-icon {
+  width:42px; height:42px; border-radius:12px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:20px;
+}
+.exam-link.ox .el-icon { background:#ecfdf5; }
+.exam-link.mc .el-icon { background:#eff6ff; }
+.exam-link.master .el-icon { background:#fdf2f8; }
+.exam-link .el-body { flex:1; min-width:0; }
+.exam-link .el-badge {
+  display:inline-block; font-size:10px; font-weight:800; letter-spacing:.03em;
+  padding:2px 8px; border-radius:20px; margin-bottom:4px;
+}
+.exam-link.ox .el-badge { background:#ecfdf5; color:#059669; }
+.exam-link.mc .el-badge { background:#eff6ff; color:#2563eb; }
+.exam-link.master .el-badge { background:#fdf2f8; color:#be185d; }
+.exam-link .el-title { font-size:14px; font-weight:700; color:#1d1d1f; line-height:1.4; }
+.exam-link .el-sub { font-size:11.5px; color:#aeaeb2; margin-top:3px; }
+.exam-link .el-go {
+  flex-shrink:0; display:flex; align-items:center; justify-content:center; gap:4px;
+  font-size:12.5px; font-weight:700; color:#fff; white-space:nowrap;
+  padding:9px 14px; min-height:40px; border-radius:11px;
+}
+.exam-link.ox .el-go { background:linear-gradient(135deg,#34d399,#059669); }
+.exam-link.mc .el-go { background:linear-gradient(135deg,#60a5fa,#2563eb); }
+.exam-link.master .el-go { background:linear-gradient(135deg,#f472b6,#db2777); }
+@media (max-width: 520px) {
+  .exam-link .el-go { padding:8px 11px; font-size:12px; }
+  .exam-link .el-icon { width:38px; height:38px; font-size:18px; }
+}
+
 /* ── Toast ── */
 .toast { position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:#1d1d1f; color:#fff; font-size:13px; font-weight:600; padding:11px 20px; border-radius:24px; opacity:0; transition:all 0.25s; z-index:900; pointer-events:none; max-width:90%; text-align:center; }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
@@ -317,6 +359,38 @@ function renderLink(it){
   left.appendChild(el('div',null,'눌러서 단원 정리를 확인하세요')).style.cssText='font-size:12px;color:#6e6e73;margin-top:3px';
   const arrow=el('div',null,'›'); arrow.style.cssText='font-size:22px;color:#2563eb;font-weight:700;flex-shrink:0';
   a.append(left,arrow);
+  return a;
+}
+
+/* ── 시험 바로가기 (온라인 테스트 / 마스터테스트) ── */
+let clinicStudentId = '';   // 클리닉 문서의 studentId (load에서 설정)
+function buildExamHref(it){
+  if(it.source==='master'){
+    const sidPart = clinicStudentId ? ('&sid='+encodeURIComponent(clinicStudentId)) : '';
+    return '/student-omr.html?testId='+encodeURIComponent(it.examId||'')+sidPart;
+  }
+  // online: /student/{examId}?type=ox|multiple
+  const typePart = it.examType ? ('?type='+encodeURIComponent(it.examType)) : '';
+  return '/student/'+encodeURIComponent(it.examId||'')+typePart;
+}
+function renderExamLink(it){
+  const kind = it.source==='master' ? 'master' : (it.examType==='ox' ? 'ox' : 'mc');
+  const a=document.createElement('a');
+  a.className='exam-link '+kind;
+  a.href=buildExamHref(it);
+
+  let icon, badge;
+  if(kind==='master'){ icon='📝'; badge='마스터테스트 OMR'; }
+  else if(kind==='ox'){ icon='⭕'; badge='OX 시험'; }
+  else { icon='📝'; badge='4지선다 시험'; }
+
+  const ic=el('div','el-icon', icon);
+  const body=el('div','el-body');
+  body.appendChild(el('span','el-badge', badge));
+  body.appendChild(el('div','el-title', it.title||'시험'));
+  body.appendChild(el('div','el-sub', '눌러서 시험을 풀면 점수가 자동 기록돼요'));
+  const go=el('div','el-go','▶ 풀러 가기');
+  a.append(ic, body, go);
   return a;
 }
 
@@ -501,13 +575,22 @@ async function load(){
 
   const data=snap.data();
   const items=Array.isArray(data.items)?data.items:[];
+  clinicStudentId = data.studentId || '';
   $('heroTitle').textContent = (data.studentName||'') + ' 학생';
   $('heroSub').textContent = data.weekLabel ? '📅 '+data.weekLabel : '이번 주 학습 클리닉';
+
+  // 시험 자동 로그인을 위해 학생 정보를 브라우저에 심어둠 (응시 페이지가 읽어 이름 입력을 건너뜀)
+  try{
+    if(data.studentName) localStorage.setItem('studentName', data.studentName);
+    if(clinicStudentId)  localStorage.setItem('studentId', clinicStudentId);
+  }catch(e){}
 
   const nC=items.filter(i=>i.type==='concept'||i.type==='link').length;
   const nO=items.filter(i=>i.type==='ox').length;
   const nM=items.filter(i=>i.type==='mc').length;
+  const nE=items.filter(i=>i.type==='examlink').length;
   const row=$('countRow');
+  if(nE) row.appendChild(el('span','count-chip','📋 시험 '+nE));
   if(nC) row.appendChild(el('span','count-chip','📖 핵심내용 '+nC));
   if(nO) row.appendChild(el('span','count-chip','⭕ OX '+nO));
   if(nM) row.appendChild(el('span','count-chip','📝 객관식 '+nM));
@@ -516,6 +599,7 @@ async function load(){
   items.forEach(it=>{
     if(it.type==='concept') box.appendChild(renderConcept(it));
     else if(it.type==='link') box.appendChild(renderLink(it));
+    else if(it.type==='examlink') box.appendChild(renderExamLink(it));
     else if(it.type==='ox') box.appendChild(renderOX(it, ++oxN));
     else if(it.type==='mc') box.appendChild(renderMC(it, ++mcN));
   });
