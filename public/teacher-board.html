@@ -905,8 +905,8 @@ body {
         <span class="cc-label">시험 점수 (입력한 항목만 저장됩니다)</span>
         <div class="cc-score-grid">
           <div class="cc-score-cell"><span class="cc-score-cell-lbl">OX</span><input class="cc-inp cc-score-mini" type="number" id="cc-score-ox" placeholder="–" min="0" max="100"></div>
-          <div class="cc-score-cell"><span class="cc-score-cell-lbl">4지선다</span><input class="cc-inp cc-score-mini" type="number" id="cc-score-mc" placeholder="–" min="0" max="100"></div>
-          <div class="cc-score-cell"><span class="cc-score-cell-lbl">OMR</span><input class="cc-inp cc-score-mini" type="number" id="cc-score-omr" placeholder="–" min="0" max="100"></div>
+          <div class="cc-score-cell"><span class="cc-score-cell-lbl">사지선다</span><input class="cc-inp cc-score-mini" type="number" id="cc-score-mc" placeholder="–" min="0" max="100"></div>
+          <div class="cc-score-cell"><span class="cc-score-cell-lbl">마스터</span><input class="cc-inp cc-score-mini" type="number" id="cc-score-master" placeholder="–" min="0" max="100"></div>
           <label class="cc-score-no"><input type="checkbox" id="cc-score-none" onchange="toggleScoreNone()"> 테스트 없음</label>
         </div>
       </div>
@@ -1250,8 +1250,8 @@ function ccScoreField(c){
     if (v != null) parts.push(`<span class="cc-score-part"><b>${label}</b>${v}점</span>`);
   };
   push('OX', c.ox);
-  push('4지선다', c.multiple != null ? c.multiple : c.four);
-  push('OMR', c.omr != null ? c.omr : c.master);
+  push('사지선다', c.multiple != null ? c.multiple : c.four);
+  push('마스터', c.master != null ? c.master : c.omr);
   if (parts.length) return `<span class="cc-score-parts">${parts.join('')}</span>`;
   if (c.scoreNone) return `<span class="cc-v-gray">테스트 없음</span>`;
   if (typeof c.score === 'number') return `<span class="${c.score >= 70 ? 'cc-v-green' : 'cc-v-red'}">${c.score}점</span>`;
@@ -1320,7 +1320,7 @@ window.toggleCCForm = () => {
 };
 window.toggleScoreNone = () => {
   const checked = document.getElementById('cc-score-none').checked;
-  ['cc-score-ox','cc-score-mc','cc-score-omr'].forEach(id => {
+  ['cc-score-ox','cc-score-mc','cc-score-master'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     el.disabled = checked;
@@ -1347,8 +1347,8 @@ window.saveClassCard = async () => {
   };
   const ox       = scoreNone ? null : readScore('cc-score-ox');
   const multiple = scoreNone ? null : readScore('cc-score-mc');
-  const omr      = scoreNone ? null : readScore('cc-score-omr');
-  const filled = [ox, multiple, omr].filter(v => typeof v === 'number');
+  const master   = scoreNone ? null : readScore('cc-score-master');
+  const filled = [ox, multiple, master].filter(v => typeof v === 'number');
   const score = scoreNone ? null : (filled.length ? Math.round(filled.reduce((a,v)=>a+v,0)/filled.length) : null);
   const homework = document.getElementById('cc-hw').value;
   const attitude = document.getElementById('cc-attitude').value;
@@ -1361,10 +1361,10 @@ window.saveClassCard = async () => {
   try {
     await addDoc(collection(db,'classCards'), {
       studentId, studentName, studentGrade, subject, teacher, classDate,
-      content, score, scoreNone, ox, multiple, omr, homework, attitude,
+      content, score, scoreNone, ox, multiple, master, homework, attitude,
       homeworkDone, homeworkContent, createdAt: serverTimestamp()
     });
-    ['cc-score-ox','cc-score-mc','cc-score-omr'].forEach(id => {
+    ['cc-score-ox','cc-score-mc','cc-score-master'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
       el.value = ''; el.disabled = false; el.style.opacity = '1';
