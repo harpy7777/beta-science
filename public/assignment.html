@@ -43,8 +43,8 @@ body {
 /* ── Layout ── */
 .wrap {
   max-width: 760px; margin: 0 auto;
-  padding: 1.2rem 0.9rem 4rem;
-  padding-bottom: max(4rem, calc(3rem + env(safe-area-inset-bottom)));
+  padding: 1.2rem 0.9rem 5.5rem;
+  padding-bottom: max(5.5rem, calc(4.5rem + env(safe-area-inset-bottom)));
   padding-left: max(0.9rem, env(safe-area-inset-left));
   padding-right: max(0.9rem, env(safe-area-inset-right));
 }
@@ -83,10 +83,14 @@ body {
 
 /* ── 퀴즈 박스 ── */
 .quiz-box { background:#fff; border:1px solid #fce7f3; border-radius:16px; padding:1.2rem 1.3rem; margin-bottom:.8rem; }
-.quiz-label { font-size:10px; font-weight:700; color:#db2777; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:.7rem; }
+.quiz-box.locked { opacity:1; }
+.quiz-label { font-size:10px; font-weight:700; color:#db2777; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:.7rem; display:flex; align-items:center; gap:7px; }
+.quiz-badge { font-size:10px; font-weight:800; border-radius:20px; padding:2px 9px; letter-spacing:0; }
+.quiz-badge.ok { background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; }
+.quiz-badge.no { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; }
 .quiz-q { font-size:14.5px; font-weight:600; color:#1d1d1f; line-height:1.7; margin-bottom:.9rem; white-space:pre-line; }
 
-.choices { display:flex; flex-direction:column; gap:8px; margin-bottom:.9rem; }
+.choices { display:flex; flex-direction:column; gap:8px; margin-bottom:.3rem; }
 .choice {
   display:flex; align-items:flex-start; gap:10px;
   background:#fafafa; border:1.5px solid #fce7f3; border-radius:11px;
@@ -96,11 +100,14 @@ body {
 .choice.selected { border-color:#db2777; background:#fdf2f8; }
 .choice.correct { border-color:#059669; background:#ecfdf5; }
 .choice.wrong { border-color:#dc2626; background:#fef2f2; }
+.choice.locked { cursor:default; }
+.choice.locked:active { transform:none; }
 .choice-mark { width:22px; height:22px; border-radius:7px; background:#fce7f3; color:#be185d; font-weight:800; font-size:12px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+.choice.selected .choice-mark { background:#f9a8d4; color:#831843; }
 .choice.correct .choice-mark { background:#a7f3d0; color:#065f46; }
 .choice.wrong .choice-mark { background:#fecaca; color:#991b1b; }
 
-.ox-btns { display:flex; gap:9px; margin-bottom:.9rem; }
+.ox-btns { display:flex; gap:9px; margin-bottom:.3rem; }
 .ox-btn {
   flex:1; background:#fafafa; border:1.5px solid #fce7f3; border-radius:12px;
   padding:14px 0; font-size:18px; font-weight:800; color:#be185d; transition:all 0.15s; cursor:pointer; font-family:inherit;
@@ -109,14 +116,10 @@ body {
 .ox-btn.selected { border-color:#db2777; background:#fdf2f8; }
 .ox-btn.correct { border-color:#059669; background:#ecfdf5; color:#059669; }
 .ox-btn.wrong { border-color:#dc2626; background:#fef2f2; color:#dc2626; }
+.ox-btn.locked { cursor:default; }
+.ox-btn.locked:active { transform:none; }
 
-.quiz-toggle {
-  background: linear-gradient(135deg,#f472b6,#db2777); color:#fff; border:none;
-  border-radius:20px; padding:9px 20px; min-height:40px;
-  font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;
-  box-shadow:0 2px 8px rgba(219,39,119,0.25); transition:opacity 0.15s;
-}
-.quiz-toggle:active { opacity:0.8; }
+/* ── 해설 (채점 후에만 노출) ── */
 .quiz-ans {
   display:none; margin-top:.9rem; padding:1rem 1.1rem;
   background:#fafafa; border:1px solid #f0e8ed; border-radius:12px;
@@ -127,13 +130,48 @@ body {
 .quiz-ans .res.o { color:#059669; }
 .quiz-ans .res.x { color:#dc2626; }
 
+/* ── 채점 바 ── */
+.grade-zone { margin-top:1.6rem; }
+.grade-btn {
+  width:100%; padding:16px 0; min-height:52px;
+  background: linear-gradient(135deg,#f472b6,#db2777); border:none; border-radius:14px;
+  font-size:16px; font-weight:700; color:#fff; cursor:pointer; font-family:inherit;
+  box-shadow:0 4px 14px rgba(219,39,119,0.3); transition:opacity 0.15s, transform 0.1s;
+}
+.grade-btn:active { opacity:0.9; transform:scale(0.99); }
+.grade-btn:disabled { opacity:0.45; cursor:default; box-shadow:none; }
+.grade-hint { text-align:center; font-size:12px; color:#aeaeb2; margin-top:.7rem; line-height:1.6; }
+
+/* ── 결과 카드 ── */
+.score-card {
+  display:none; margin-top:1.4rem; text-align:center;
+  background:linear-gradient(135deg,#fff0f7 0%, #fdf2f8 60%, #f0f9ff 100%);
+  border:1px solid #fce7f3; border-radius:18px; padding:1.6rem 1.4rem;
+}
+.score-card.show { display:block; }
+.score-emoji { font-size:2.6rem; display:block; margin-bottom:.4rem; }
+.score-big { font-size:1.9rem; font-weight:800; color:#be185d; letter-spacing:-0.02em; }
+.score-big .total { color:#aeaeb2; font-size:1.2rem; font-weight:700; }
+.score-sub { font-size:13px; color:#6e6e73; margin-top:.5rem; font-weight:500; }
+.score-pct { font-size:12px; color:#db2777; margin-top:.3rem; font-weight:700; }
+.retry-btn {
+  margin-top:1.1rem; background:#fff; border:1.5px solid #f4c8d4; color:#db2777;
+  border-radius:24px; padding:11px 26px; min-height:44px;
+  font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; transition:background 0.15s;
+}
+.retry-btn:active { background:#fce7f3; }
+
 .footer { text-align:center; color:#c7c7cc; font-size:11px; margin-top:2.5rem; line-height:1.7; }
 
 .state { text-align:center; color:#aeaeb2; font-size:14px; padding:4rem 1rem; line-height:1.9; }
 .state .big { font-size:2.4rem; display:block; margin-bottom:.7rem; }
 
+/* ── Toast ── */
+.toast { position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:#1d1d1f; color:#fff; font-size:13px; font-weight:600; padding:11px 20px; border-radius:24px; opacity:0; transition:all 0.25s; z-index:900; pointer-events:none; max-width:90%; text-align:center; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
 @media (max-width: 520px) {
-  .wrap { padding: 1rem 0.75rem 3.5rem; }
+  .wrap { padding: 1rem 0.75rem 4.5rem; }
   .brand-name { font-size: 13px; }
   .header-badge .dot-green { display:none; }
   .welcome-bar { padding: 1.1rem 1.1rem; }
@@ -173,9 +211,25 @@ body {
     </div>
     <div class="count-row" id="countRow"></div>
     <div id="items"></div>
+
+    <div class="grade-zone" id="gradeZone" style="display:none">
+      <button class="grade-btn" id="gradeBtn">📝 채점하기</button>
+      <div class="grade-hint" id="gradeHint"></div>
+    </div>
+
+    <div class="score-card" id="scoreCard">
+      <span class="score-emoji" id="scoreEmoji">🎉</span>
+      <div class="score-big"><span id="scoreNum">0</span><span class="total"> / <span id="scoreTotal">0</span>문제</span></div>
+      <div class="score-pct" id="scorePct"></div>
+      <div class="score-sub" id="scoreSub">채점이 완료되었습니다. 아래에서 정답과 해설을 확인하세요.</div>
+      <button class="retry-btn" id="retryBtn">↺ 다시 풀기</button>
+    </div>
+
     <div class="footer">베타과학학원 · 이 페이지는 학생 본인을 위한 주간 학습 클리닉입니다.</div>
   </div>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -195,6 +249,12 @@ const db  = getFirestore(app);
 const $ = id => document.getElementById(id);
 function el(tag, cls, text){ const e=document.createElement(tag); if(cls)e.className=cls; if(text!=null)e.textContent=text; return e; }
 
+let toastTimer=null;
+function toast(msg){
+  const t=$('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),1900);
+}
+
 function showError(msg){
   $('loading').style.display='none';
   const e=$('error'); e.innerHTML='';
@@ -202,6 +262,10 @@ function showError(msg){
   e.appendChild(document.createTextNode(msg));
   e.style.display='block';
 }
+
+/* 채점 대상 문제들의 상태를 모아두는 배열 */
+const quizzes = [];
+let graded = false;
 
 function renderConcept(it){
   const box=el('div','concept-box');
@@ -221,52 +285,152 @@ function renderLink(it){
   a.append(left,arrow);
   return a;
 }
+
+/* ── OX 문제: 정답/해설은 채점 전 절대 노출 안 함 ── */
 function renderOX(it, idx){
   const w=el('div','quiz-box');
-  w.appendChild(el('div','quiz-label', 'OX 문제 '+idx));
+  const label=el('div','quiz-label', 'OX 문제 '+idx);
+  w.appendChild(label);
   w.appendChild(el('div','quiz-q', it.q||''));
+
   const btns=el('div','ox-btns');
   const oBtn=el('button','ox-btn','O'), xBtn=el('button','ox-btn','X');
-  let picked=null;
-  oBtn.addEventListener('click',()=>{picked=true;oBtn.classList.add('selected');xBtn.classList.remove('selected')});
-  xBtn.addEventListener('click',()=>{picked=false;xBtn.classList.add('selected');oBtn.classList.remove('selected')});
+  const state={ picked:null };
+
+  function pick(val){
+    if(graded) return;
+    state.picked=val;
+    oBtn.classList.toggle('selected', val===true);
+    xBtn.classList.toggle('selected', val===false);
+  }
+  oBtn.addEventListener('click',()=>pick(true));
+  xBtn.addEventListener('click',()=>pick(false));
   btns.append(oBtn,xBtn); w.appendChild(btns);
-  const toggle=el('button','quiz-toggle','정답 확인 ▼');
+
   const ans=el('div','quiz-ans');
-  ans.appendChild(el('span','res '+(it.answer?'o':'x'), '정답: '+(it.answer?'O':'X')));
-  if(it.explain) ans.appendChild(document.createTextNode(it.explain));
-  toggle.addEventListener('click',()=>{
-    const open=ans.classList.toggle('show');
-    toggle.textContent= open?'정답 닫기 ▲':'정답 확인 ▼';
-    if(open){ (it.answer?oBtn:xBtn).classList.add('correct'); if(picked!==null && picked!==it.answer)(picked?oBtn:xBtn).classList.add('wrong'); }
-  });
-  w.append(toggle,ans); return w;
+
+  function reveal(){
+    // 정답 표시
+    const correctBtn = it.answer ? oBtn : xBtn;
+    correctBtn.classList.add('correct');
+    const isCorrect = state.picked!==null && state.picked===it.answer;
+    if(state.picked!==null && !isCorrect){
+      (state.picked ? oBtn : xBtn).classList.add('wrong');
+    }
+    // 클릭 잠금
+    [oBtn,xBtn].forEach(b=>{ b.classList.add('locked'); b.classList.remove('selected'); });
+    // 채점 배지
+    const badge=el('span','quiz-badge '+(isCorrect?'ok':'no'), isCorrect?'정답':(state.picked===null?'미응답':'오답'));
+    label.appendChild(badge);
+    // 해설
+    ans.innerHTML='';
+    ans.appendChild(el('span','res '+(it.answer?'o':'x'), '정답: '+(it.answer?'O':'X')));
+    if(it.explain) ans.appendChild(document.createTextNode(it.explain));
+    ans.classList.add('show');
+    return isCorrect;
+  }
+  function reset(){
+    state.picked=null;
+    [oBtn,xBtn].forEach(b=>{ b.classList.remove('selected','correct','wrong','locked'); });
+    const b=label.querySelector('.quiz-badge'); if(b) b.remove();
+    ans.classList.remove('show'); ans.innerHTML='';
+  }
+  w.appendChild(ans);
+  quizzes.push({ answered:()=>state.picked!==null, reveal, reset });
+  return w;
 }
+
+/* ── 객관식: 정답/해설은 채점 전 절대 노출 안 함 ── */
 function renderMC(it, idx){
   const w=el('div','quiz-box');
-  w.appendChild(el('div','quiz-label', '객관식 '+idx));
+  const label=el('div','quiz-label', '객관식 '+idx);
+  w.appendChild(label);
   w.appendChild(el('div','quiz-q', it.q||''));
-  const list=el('div','choices'); const choiceEls=[]; let picked=null;
+
+  const list=el('div','choices'); const choiceEls=[];
+  const state={ picked:null };
   (it.choices||[]).forEach((c,i)=>{
     const ch=el('div','choice');
     ch.appendChild(el('div','choice-mark', String(i+1)));
     ch.appendChild(el('div',null,c));
-    ch.addEventListener('click',()=>{ picked=i; choiceEls.forEach(x=>x.classList.remove('selected')); ch.classList.add('selected'); });
+    ch.addEventListener('click',()=>{
+      if(graded) return;
+      state.picked=i;
+      choiceEls.forEach(x=>x.classList.remove('selected'));
+      ch.classList.add('selected');
+    });
     choiceEls.push(ch); list.appendChild(ch);
   });
   w.appendChild(list);
-  const toggle=el('button','quiz-toggle','정답 확인 ▼');
+
   const ans=el('div','quiz-ans');
-  ans.appendChild(el('span','res o', '정답: '+(Number(it.answer)+1)+'번'));
-  if(it.explain) ans.appendChild(document.createTextNode(it.explain));
-  toggle.addEventListener('click',()=>{
-    const open=ans.classList.toggle('show');
-    toggle.textContent= open?'정답 닫기 ▲':'정답 확인 ▼';
-    if(open){ const a=Number(it.answer); choiceEls.forEach(x=>x.classList.remove('selected'));
-      if(choiceEls[a]) choiceEls[a].classList.add('correct');
-      if(picked!==null && picked!==a && choiceEls[picked]) choiceEls[picked].classList.add('wrong'); }
-  });
-  w.append(toggle,ans); return w;
+  const correctIdx=Number(it.answer);
+
+  function reveal(){
+    if(choiceEls[correctIdx]) choiceEls[correctIdx].classList.add('correct');
+    const isCorrect = state.picked!==null && state.picked===correctIdx;
+    if(state.picked!==null && !isCorrect && choiceEls[state.picked]){
+      choiceEls[state.picked].classList.add('wrong');
+    }
+    choiceEls.forEach(x=>{ x.classList.add('locked'); x.classList.remove('selected'); });
+    const badge=el('span','quiz-badge '+(isCorrect?'ok':'no'), isCorrect?'정답':(state.picked===null?'미응답':'오답'));
+    label.appendChild(badge);
+    ans.innerHTML='';
+    ans.appendChild(el('span','res o', '정답: '+(correctIdx+1)+'번'));
+    if(it.explain) ans.appendChild(document.createTextNode(it.explain));
+    ans.classList.add('show');
+    return isCorrect;
+  }
+  function reset(){
+    state.picked=null;
+    choiceEls.forEach(x=>{ x.classList.remove('selected','correct','wrong','locked'); });
+    const b=label.querySelector('.quiz-badge'); if(b) b.remove();
+    ans.classList.remove('show'); ans.innerHTML='';
+  }
+  w.appendChild(ans);
+  quizzes.push({ answered:()=>state.picked!==null, reveal, reset });
+  return w;
+}
+
+/* ── 채점 ── */
+function doGrade(){
+  if(graded) return;
+  const total=quizzes.length;
+  const unanswered=quizzes.filter(q=>!q.answered()).length;
+  if(unanswered>0){
+    if(!confirm(`아직 풀지 않은 문제가 ${unanswered}개 있습니다.\n그래도 채점할까요? (안 푼 문제는 오답 처리됩니다)`)) return;
+  }
+  graded=true;
+  let correct=0;
+  quizzes.forEach(q=>{ if(q.reveal()) correct++; });
+
+  $('gradeBtn').disabled=true;
+  $('gradeBtn').textContent='✅ 채점 완료';
+  $('gradeHint').textContent='각 문제 아래에서 정답과 해설을 확인하세요.';
+
+  const pct = total? Math.round(correct/total*100) : 0;
+  $('scoreNum').textContent=correct;
+  $('scoreTotal').textContent=total;
+  $('scorePct').textContent='정답률 '+pct+'%';
+  let emoji='💪', sub='틀린 문제의 해설을 꼼꼼히 확인해 보세요.';
+  if(pct===100){ emoji='🏆'; sub='완벽해요! 모든 문제를 맞혔습니다.'; }
+  else if(pct>=80){ emoji='🎉'; sub='아주 잘했어요! 틀린 문제만 다시 확인해요.'; }
+  else if(pct>=60){ emoji='👍'; sub='좋아요! 해설을 보며 부족한 부분을 채워봐요.'; }
+  $('scoreEmoji').textContent=emoji;
+  $('scoreSub').textContent=sub;
+  $('scoreCard').classList.add('show');
+  $('scoreCard').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+/* ── 다시 풀기 ── */
+function doRetry(){
+  graded=false;
+  quizzes.forEach(q=>q.reset());
+  $('gradeBtn').disabled=false;
+  $('gradeBtn').textContent='📝 채점하기';
+  $('gradeHint').textContent='모든 문제를 푼 뒤 채점하기를 누르세요.';
+  $('scoreCard').classList.remove('show');
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
 async function load(){
@@ -299,6 +463,14 @@ async function load(){
     else if(it.type==='mc') box.appendChild(renderMC(it, ++mcN));
   });
   if(items.length===0) box.appendChild(el('div','state','등록된 학습 내용이 없습니다.'));
+
+  // 채점할 문제가 1개 이상일 때만 채점 영역 표시
+  if(quizzes.length>0){
+    $('gradeZone').style.display='block';
+    $('gradeHint').textContent='모든 문제를 푼 뒤 채점하기를 누르세요.';
+    $('gradeBtn').addEventListener('click', doGrade);
+    $('retryBtn').addEventListener('click', doRetry);
+  }
 
   $('loading').style.display='none';
   $('content').style.display='block';
