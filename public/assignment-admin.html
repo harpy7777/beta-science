@@ -210,39 +210,13 @@ body {
 .subj-tab.on { background:#db2777; color:#fff; border-color:#db2777; }
 .modal-body { padding:0 1.4rem 1.4rem; overflow-y:auto; -webkit-overflow-scrolling:touch; flex:1 1 auto; min-height:0; }
 
-/* 단원(시험) 행 */
-.test-card { border:1px solid #fce7f3; border-radius:14px; margin-bottom:.6rem; overflow:hidden; }
-.test-head { display:flex; align-items:center; gap:8px; padding:.9rem 1rem; cursor:pointer; transition:background 0.15s; }
-.test-head:hover { background:#fdf2f8; }
-.test-info { flex:1; min-width:0; }
-.test-title { font-size:13px; font-weight:700; color:#1d1d1f; line-height:1.4; }
-.test-meta { font-size:11px; color:#aeaeb2; margin-top:2px; }
-.test-allbtn { background:linear-gradient(135deg,#f472b6,#db2777); color:#fff; border:none; border-radius:8px; padding:7px 12px; font-size:11.5px; font-weight:700; white-space:nowrap; flex-shrink:0; cursor:pointer; }
-.test-allbtn.added { background:#059669; pointer-events:none; }
-.test-chev { font-size:12px; color:#aeaeb2; transition:transform 0.2s; flex-shrink:0; }
-.test-card.open .test-chev { transform:rotate(180deg); }
-.test-body { display:none; padding:0 1rem 1rem; border-top:1px solid #fce7f3; }
-.test-card.open .test-body { display:block; }
-
-/* 문제 체크 항목 */
-.q-item { display:flex; align-items:flex-start; gap:9px; padding:10px 0; border-bottom:1px solid #f7f7f7; cursor:pointer; }
-.q-item:last-child { border-bottom:none; }
-.q-check { width:22px; height:22px; border-radius:6px; border:2px solid #fce7f3; flex-shrink:0; display:flex; align-items:center; justify-content:center; margin-top:1px; transition:all 0.15s; }
-.q-check.on { background:#db2777; border-color:#db2777; color:#fff; font-size:13px; font-weight:800; }
-.q-type { font-size:9px; font-weight:800; padding:2px 6px; border-radius:5px; flex-shrink:0; margin-top:2px; }
-.q-type.ox { background:#fef3c7; color:#92400e; }
-.q-type.mc { background:#dbeafe; color:#1e40af; }
-.q-text { font-size:12.5px; color:#3c3c43; line-height:1.5; flex:1; }
-.test-foot { display:flex; gap:8px; justify-content:flex-end; padding-top:.7rem; }
-.test-addsel { background:#059669; color:#fff; border:none; border-radius:9px; padding:9px 15px; font-size:12.5px; font-weight:700; cursor:pointer; }
-.test-addsel:disabled { opacity:.4; cursor:default; }
-.test-addsel.added { background:#059669; }
 .exam-row { display:flex; align-items:center; justify-content:space-between; gap:10px; border:1px solid #fce7f3; border-radius:14px; padding:.85rem 1rem; margin-bottom:.6rem; }
 .exam-row:hover { border-color:#fbcfe8; }
-.ex-info { min-width:0; }
+.ex-info { min-width:0; flex:1; }
 .ex-title { font-size:13.5px; font-weight:700; }
 .ex-meta { font-size:11.5px; color:#aeaeb2; margin-top:2px; }
-.ex-add { background:linear-gradient(135deg,#f472b6,#db2777); color:#fff; border:none; border-radius:9px; padding:9px 15px; min-height:40px; font-size:12.5px; font-weight:700; white-space:nowrap; flex-shrink:0; cursor:pointer; }
+.ex-btns { display:flex; gap:6px; flex-shrink:0; flex-wrap:wrap; justify-content:flex-end; }
+.ex-add { background:linear-gradient(135deg,#f472b6,#db2777); color:#fff; border:none; border-radius:9px; padding:9px 13px; min-height:40px; font-size:12px; font-weight:700; white-space:nowrap; cursor:pointer; }
 .ex-add.added { background:#059669; pointer-events:none; }
 
 /* ── Toast ── */
@@ -292,7 +266,7 @@ body {
     <div class="welcome-avatar">🩺</div>
     <div>
       <div class="welcome-greeting">주간 학습 클리닉</div>
-      <div class="welcome-sub">학생별 OX·4지선다·핵심내용 링크 만들기</div>
+      <div class="welcome-sub">학생별 시험 바로가기 · 핵심내용 링크 만들기</div>
     </div>
   </div>
 
@@ -327,10 +301,15 @@ body {
     <div id="studentGrid" class="student-grid"></div>
 
     <span class="fld-label" style="margin-top:4px;">학습 내용</span>
-    <div class="hint">기존에 올린 시험을 골라 담거나, 핵심내용·OX·4지선다를 직접 추가하세요. 추가한 순서대로 학생에게 보입니다.</div>
+    <div class="hint">시험을 담으면 학생이 눌러서 <strong>실제 시험을 풀러 가고, 점수는 성적에 자동 기록</strong>됩니다. 핵심내용·OX·4지선다는 직접 추가할 수도 있어요. 추가한 순서대로 학생에게 보입니다.</div>
     <div class="add-row">
-      <button class="add-btn primary" id="pickExamBtn">📚 기존 시험에서 담기</button>
+      <button class="add-btn primary" id="pickExamBtn">📚 시험 담기 (풀러 가기)</button>
       <button class="add-btn primary" id="pickConceptBtn" style="background:linear-gradient(135deg,#60a5fa,#2563eb);">📖 핵심내용 담기</button>
+    </div>
+    <div class="add-row" style="margin-top:-6px;">
+      <button class="add-btn" data-add="ox">⭕ OX 직접 추가</button>
+      <button class="add-btn" data-add="mc">📝 4지선다 직접 추가</button>
+      <button class="add-btn" data-add="concept">📄 핵심내용 직접 추가</button>
     </div>
     <div id="items"></div>
 
@@ -357,9 +336,10 @@ body {
 <div class="modal-bg" id="examModal">
   <div class="modal-box">
     <div class="modal-head">
-      <span class="modal-title" id="examModalTitle">📚 문제 골라 담기</span>
+      <span class="modal-title" id="examModalTitle">📚 시험 담기 (풀러 가기)</span>
       <button class="modal-close" id="examModalClose">✕</button>
     </div>
+    <div class="modal-filter" id="srcTabs"></div>
     <div class="modal-filter" id="subjTabs"></div>
     <div class="modal-body" id="examBody"><div class="list-empty">불러오는 중…</div></div>
   </div>
@@ -415,13 +395,6 @@ function genToken(len=24){
   let s=''; for(const b of arr) s+=chars[b % chars.length]; return s;
 }
 function el(tag, cls, text){ const e=document.createElement(tag); if(cls)e.className=cls; if(text!=null)e.textContent=text; return e; }
-function normalizeAnswer(val){
-  if(val===undefined||val===null) return '';
-  const str=String(val).trim();
-  if(/^[oOxX]$/.test(str)) return str.toUpperCase();
-  const m=str.match(/\d+/); if(m) return m[0];
-  return str;
-}
 /* 학년 정규화: "중등1학년","중1","중등 1" → "중1" / "고등2학년","고2" → "고2" */
 function normalizeGrade(val){
   const s=String(val||'').trim();
@@ -432,7 +405,7 @@ function normalizeGrade(val){
   return s;
 }
 
-/* ── 직접 입력 카드 ── */
+/* ── 직접 입력 카드 (OX·4지선다·핵심내용) ── */
 function addCard(type){
   const id=++cardSeq;
   const card=document.createElement('div');
@@ -471,28 +444,24 @@ function addCard(type){
 }
 document.querySelectorAll('.add-btn[data-add]').forEach(b=>b.addEventListener('click',()=>addCard(b.dataset.add)));
 
-/* ── 시험에서 담은 문제 카드 (편집불가) ── */
-function addExamItemCard(item, examTitle){
+/* ── 시험 바로가기 카드 (담긴 시험) ── */
+function addExamLinkCard(payload){
   const card=document.createElement('div');
   card.className='item-card from-exam';
-  card.dataset.type = item.type==='ox' ? 'ox' : 'mc';
-  card.dataset.fromExam='1';
-  card.dataset.payload=JSON.stringify(item);
+  card.dataset.type='examlink';
+  card.dataset.payload=JSON.stringify(payload);
 
   const head=el('div','item-head');
-  head.appendChild(el('span','item-tag', item.type==='ox'?'⭕ OX (시험)':'📝 4지선다 (시험)'));
+  let tagText;
+  if(payload.source==='master') tagText='📝 마스터테스트 OMR';
+  else tagText = payload.examType==='ox' ? '⭕ OX 시험 (풀러 가기)' : '📝 4지선다 시험 (풀러 가기)';
+  head.appendChild(el('span','item-tag', tagText));
   const ctrls=el('div','item-ctrls');
   const up=el('button','icbtn','↑'), down=el('button','icbtn','↓'), del=el('button','icbtn del','✕');
   ctrls.append(up,down,del); head.append(ctrls); card.appendChild(head);
 
-  const qp=el('div',null,item.q); qp.style.cssText='font-size:13.5px;font-weight:700;line-height:1.6;margin-bottom:.3rem;white-space:pre-line'; card.appendChild(qp);
-  if(item.type==='mc'){
-    (item.choices||[]).forEach((c,i)=>{
-      const line=el('div','exline'+(i===item.answer?' correct':''), `${i+1}. ${c}`); card.appendChild(line);
-    });
-  }
-  const ans=el('div','exline correct','정답: '+(item.type==='ox'?(item.answer?'O':'X'):(item.answer+1)+'번')); ans.style.marginTop='.4rem'; card.appendChild(ans);
-  if(examTitle){ const s=el('div',null,'출처: '+examTitle); s.style.cssText='font-size:11px;color:#aeaeb2;margin-top:2px'; card.appendChild(s); }
+  const t=el('div',null,payload.title||'(제목 없음)'); t.style.cssText='font-size:13.5px;font-weight:700;line-height:1.5'; card.appendChild(t);
+  const s=el('div',null,'학생이 누르면 실제 시험으로 이동해 풀고, 점수가 성적에 기록됩니다'); s.style.cssText='font-size:11px;color:#aeaeb2;margin-top:3px'; card.appendChild(s);
 
   del.addEventListener('click',()=>card.remove());
   up.addEventListener('click',()=>{const p=card.previousElementSibling; if(p) card.parentNode.insertBefore(card,p);});
@@ -632,30 +601,7 @@ function autofillRange(title){
   if(inp && !inp.value.trim() && title){ inp.value=title; }
 }
 
-/* ── 시험 한 문제 → item 변환 ── */
-function questionToItem(q){
-  if(q.type==='ox'){
-    return {type:'ox', q:q.text||'', answer:normalizeAnswer(q.answer)==='O', explain:q.explanation||''};
-  }
-  const opts=Array.isArray(q.options)?q.options.slice(0,8):[];
-  let idx=Number(normalizeAnswer(q.answer))-1;
-  if(!(idx>=0 && idx<opts.length)){ const f=opts.findIndex(o=>o===q.answer); idx=f>=0?f:0; }
-  return {type:'mc', q:q.text||'', choices:opts, answer:idx, explain:q.explanation||''};
-}
-/* 시험의 questions 정리 (ox/multiple만, 중복 id 제거) */
-function getExamQuestions(exam){
-  const arr=Array.isArray(exam.questions)?exam.questions:[];
-  const seen=new Set(); const out=[];
-  arr.forEach(q=>{
-    if(q.type!=='ox' && q.type!=='multiple') return;
-    if(q.id && seen.has(q.id)) return;
-    if(q.id) seen.add(q.id);
-    out.push(q);
-  });
-  return out;
-}
-
-/* 제목 앞 단원 번호로 정렬 키 생성 ("3-2. ..." → [3,2], "1-1. ..." → [1,1]) */
+/* 제목 앞 단원 번호로 정렬 키 ("3-2. ..." → [3,2], "1단원" → [1,0]) */
 function unitSortKey(title){
   const m=String(title||'').match(/(\d+)\s*-\s*(\d+)/);
   if(m) return [parseInt(m[1],10), parseInt(m[2],10), 0];
@@ -663,98 +609,121 @@ function unitSortKey(title){
   if(m2) return [parseInt(m2[1],10), 0, 0];
   return [999,999,0];
 }
-function sortExams(arr){
+
+/* ── 시험 모달 (온라인 테스트 + 마스터테스트, 바로가기로 담기) ── */
+let onlineCache=null, masterCache=null, curSource='online', curSubj='전체';
+
+function examTypes(exam){
+  const qs=Array.isArray(exam.questions)?exam.questions:[];
+  return { hasOX: qs.some(q=>q.type==='ox'), hasMC: qs.some(q=>q.type==='multiple') };
+}
+function curList(){ return curSource==='online' ? (onlineCache||[]) : (masterCache||[]); }
+function examSubject(e){ return (e.subject||'').trim(); }
+function examTitle(e){ return curSource==='online' ? (e.title||'(제목 없음)') : (e.unitName||'(제목 없음)'); }
+function sortByUnit(arr){
   return arr.slice().sort((a,b)=>{
-    const ka=unitSortKey(a.title), kb=unitSortKey(b.title);
+    const ka=unitSortKey(examTitle(a)), kb=unitSortKey(examTitle(b));
     if(ka[0]!==kb[0]) return ka[0]-kb[0];
     if(ka[1]!==kb[1]) return ka[1]-kb[1];
-    return String(a.title||'').localeCompare(String(b.title||''),'ko');
+    return examTitle(a).localeCompare(examTitle(b),'ko');
   });
 }
 
-/* ── 시험 모달 ── */
-let examsCache=null, curSubj='전체';
 async function openExamModal(){
   $('examModal').classList.add('open');
-  if(examsCache===null){
+  if(onlineCache===null || masterCache===null){
     $('examBody').innerHTML='<div class="list-empty">불러오는 중…</div>';
-    try{
-      const qy=query(collection(db,'tests'), where('isPublished','==',true), orderBy('regDate','desc'));
-      const snap=await getDocs(qy);
-      examsCache=snap.docs.map(d=>({id:d.id, ...d.data()}));
-    }catch(err){ $('examBody').innerHTML='<div class="list-empty">시험 목록을 불러오지 못했습니다.</div>'; console.error(err); return; }
-    buildSubjTabs();
+    if(onlineCache===null){
+      try{
+        const qy=query(collection(db,'tests'), where('isPublished','==',true), orderBy('regDate','desc'));
+        const snap=await getDocs(qy);
+        onlineCache=snap.docs.map(d=>({id:d.id, ...d.data()}));
+      }catch(err){ onlineCache=[]; console.error('online load',err); }
+    }
+    if(masterCache===null){
+      try{
+        const snap=await getDocs(collection(db,'master-tests'));
+        masterCache=snap.docs.map(d=>({id:d.id, ...d.data()}));
+      }catch(err){ masterCache=[]; console.error('master load',err); }
+    }
   }
+  buildSrcTabs();
+  buildSubjTabs();
   renderExamList();
 }
+function buildSrcTabs(){
+  const tabs=$('srcTabs'); tabs.innerHTML='';
+  const mk=(label,val)=>{
+    const b=el('button','subj-tab'+(val===curSource?' on':''),label);
+    b.addEventListener('click',()=>{ curSource=val; curSubj='전체'; buildSrcTabs(); buildSubjTabs(); renderExamList(); });
+    tabs.appendChild(b);
+  };
+  mk('🧪 온라인 테스트','online');
+  mk('📝 마스터테스트','master');
+}
 function buildSubjTabs(){
-  // 시험들에 들어있는 과목(subject) 순서 유지 수집
-  const subjects=[]; 
-  (examsCache||[]).forEach(e=>{ const s=(e.subject||'').trim(); if(s && !subjects.includes(s)) subjects.push(s); });
+  const subjects=[];
+  curList().forEach(e=>{ const s=examSubject(e); if(s && !subjects.includes(s)) subjects.push(s); });
   const tabs=$('subjTabs'); tabs.innerHTML='';
-  const mk=(label,val)=>{ const b=el('button','subj-tab'+(val===curSubj?' on':''),label); b.addEventListener('click',()=>{ curSubj=val; document.querySelectorAll('#subjTabs .subj-tab').forEach(t=>t.classList.remove('on')); b.classList.add('on'); renderExamList(); }); tabs.appendChild(b); };
+  const mk=(label,val)=>{
+    const b=el('button','subj-tab'+(val===curSubj?' on':''),label);
+    b.addEventListener('click',()=>{ curSubj=val; document.querySelectorAll('#subjTabs .subj-tab').forEach(t=>t.classList.remove('on')); b.classList.add('on'); renderExamList(); });
+    tabs.appendChild(b);
+  };
   mk('전체','전체');
   subjects.forEach(s=>mk(s,s));
 }
 function renderExamList(){
   const box=$('examBody'); box.innerHTML='';
-  let list=(examsCache||[]);
-  if(curSubj!=='전체') list=list.filter(e=>(e.subject||'').trim()===curSubj);
-  list=sortExams(list);
+  let list=curList();
+  if(curSubj!=='전체') list=list.filter(e=>examSubject(e)===curSubj);
+  list=sortByUnit(list);
   if(list.length===0){ box.innerHTML='<div class="list-empty">해당 과목의 시험이 없습니다.</div>'; return; }
-  list.forEach(exam=>{
-    const qs=getExamQuestions(exam);
-    const nOX=qs.filter(q=>q.type==='ox').length;
-    const nMC=qs.filter(q=>q.type==='multiple').length;
 
-    const card=el('div','test-card');
-    const head=el('div','test-head');
-    const info=el('div','test-info');
-    info.appendChild(el('div','test-title', exam.title||'(제목 없음)'));
-    info.appendChild(el('div','test-meta', `${exam.subject||''}${exam.grade?' · '+exam.grade:''} · OX ${nOX} · 4지선다 ${nMC}`));
-    const allBtn=el('button','test-allbtn','전체 담기');
-    allBtn.addEventListener('click',(e)=>{
-      e.stopPropagation();
-      qs.forEach(q=>addExamItemCard(questionToItem(q), exam.title));
-      autofillRange(exam.title);
-      allBtn.textContent='담김 ✓'; allBtn.classList.add('added');
-      toast(`${qs.length}문제를 담았습니다.`);
+  if(curSource==='online'){
+    list.forEach(exam=>{
+      const {hasOX,hasMC}=examTypes(exam);
+      const row=el('div','exam-row');
+      const info=el('div','ex-info');
+      info.appendChild(el('div','ex-title', exam.title||'(제목 없음)'));
+      info.appendChild(el('div','ex-meta', `${exam.subject||''}${exam.grade?' · '+exam.grade:''}`));
+      const btns=el('div','ex-btns');
+      if(hasOX){
+        const b=el('button','ex-add','⭕ OX 담기');
+        b.addEventListener('click',()=>{
+          addExamLinkCard({type:'examlink', source:'online', examId:exam.id, examType:'ox', title:exam.title||'', subject:exam.subject||''});
+          autofillRange(exam.title); b.textContent='담김 ✓'; b.classList.add('added'); toast('OX 시험을 담았습니다.');
+        });
+        btns.appendChild(b);
+      }
+      if(hasMC){
+        const b=el('button','ex-add','📝 4지선다 담기');
+        b.addEventListener('click',()=>{
+          addExamLinkCard({type:'examlink', source:'online', examId:exam.id, examType:'multiple', title:exam.title||'', subject:exam.subject||''});
+          autofillRange(exam.title); b.textContent='담김 ✓'; b.classList.add('added'); toast('4지선다 시험을 담았습니다.');
+        });
+        btns.appendChild(b);
+      }
+      if(!hasOX && !hasMC){ info.appendChild(el('div','ex-meta','담을 수 있는 문제(OX·4지선다)가 없습니다')); }
+      row.append(info,btns); box.appendChild(row);
     });
-    const chev=el('span','test-chev','▾');
-    head.append(info, allBtn, chev);
-
-    const body=el('div','test-body');
-    const selected=new Set();
-    qs.forEach((q,i)=>{
-      const item=el('div','q-item');
-      const chk=el('div','q-check');
-      const tp=el('span','q-type '+(q.type==='ox'?'ox':'mc'), q.type==='ox'?'OX':'4지선다');
-      const txt=el('div','q-text', (i+1)+'. '+(q.text||''));
-      item.append(chk,tp,txt);
-      item.addEventListener('click',()=>{
-        if(selected.has(i)){ selected.delete(i); chk.classList.remove('on'); chk.textContent=''; }
-        else { selected.add(i); chk.classList.add('on'); chk.textContent='✓'; }
-        addSelBtn.classList.remove('added');
-        addSelBtn.disabled = selected.size===0;
-        addSelBtn.textContent = selected.size? `선택한 ${selected.size}문제 담기` : '선택한 문제 담기';
+  } else {
+    list.forEach(exam=>{
+      let totalQ=0; (exam.parts||[]).forEach(p=>totalQ+=Object.keys(p.answers||{}).length); totalQ=Math.min(totalQ,30);
+      const row=el('div','exam-row');
+      const info=el('div','ex-info');
+      info.appendChild(el('div','ex-title', exam.unitName||'(제목 없음)'));
+      info.appendChild(el('div','ex-meta', `${exam.subject||''}${exam.grade?' · '+exam.grade:''} · ${totalQ}문제`));
+      const btns=el('div','ex-btns');
+      const b=el('button','ex-add','📝 OMR 담기');
+      b.addEventListener('click',()=>{
+        addExamLinkCard({type:'examlink', source:'master', examId:exam.id, title:exam.unitName||'', subject:exam.subject||''});
+        autofillRange(exam.unitName); b.textContent='담김 ✓'; b.classList.add('added'); toast('마스터테스트를 담았습니다.');
       });
-      body.appendChild(item);
+      btns.appendChild(b);
+      row.append(info,btns); box.appendChild(row);
     });
-    const foot=el('div','test-foot');
-    const addSelBtn=el('button','test-addsel','선택한 문제 담기'); addSelBtn.disabled=true;
-    addSelBtn.addEventListener('click',()=>{
-      if(selected.size===0) return;
-      [...selected].sort((a,b)=>a-b).forEach(i=>addExamItemCard(questionToItem(qs[i]), exam.title));
-      autofillRange(exam.title);
-      toast(`${selected.size}문제를 담았습니다.`);
-      addSelBtn.textContent='담김 ✓'; addSelBtn.classList.add('added'); addSelBtn.disabled=true;
-    });
-    foot.appendChild(addSelBtn); body.appendChild(foot);
-
-    head.addEventListener('click',()=>card.classList.toggle('open'));
-    card.append(head, body);
-    box.appendChild(card);
-  });
+  }
 }
 $('pickExamBtn').addEventListener('click', openExamModal);
 $('examModalClose').addEventListener('click',()=>$('examModal').classList.remove('open'));
@@ -765,7 +734,8 @@ let allStudents=null, selectedStudent=null;
 async function loadStudents(){
   try{
     const snap=await getDocs(collection(db,'students'));
-    allStudents=snap.docs.map(d=>({id:d.id, ...d.data()}));
+    // ★ 문서 데이터의 id(=학생ID, h01001 등)를 보존. 문서ID는 fireId로 따로 보관.
+    allStudents=snap.docs.map(d=>({ fireId:d.id, ...d.data() }));
   }catch(err){ allStudents=[]; console.error(err); }
 }
 function renderStudentGrid(){
@@ -780,13 +750,14 @@ function renderStudentGrid(){
   $('studentHint').textContent='학생을 누르면 선택됩니다.';
   list.forEach(s=>{
     const card=el('div','stu-card');
-    card.appendChild(el('div','stu-name', s.name||s.id));
-    if(s.subject) card.appendChild(el('div','stu-sub', s.subject));
+    card.appendChild(el('div','stu-name', s.name||'(이름 없음)'));
+    const subText = s.id ? s.id : (s.subject||'');
+    if(subText) card.appendChild(el('div','stu-sub', subText));
     card.addEventListener('click',()=>{
       document.querySelectorAll('.stu-card.sel').forEach(c=>c.classList.remove('sel'));
       card.classList.add('sel');
-      selectedStudent={ name:s.name||s.id, grade:s.grade||grade };
-      toast((s.name||s.id)+' 선택됨');
+      selectedStudent={ studentId:s.id||'', name:s.name||'', grade:s.grade||grade };
+      toast((s.name||'학생')+' 선택됨');
     });
     grid.appendChild(card);
   });
@@ -800,8 +771,8 @@ function collectItems(){
   const items=[];
   cards.forEach((c,idx)=>{
     const n=idx+1;
-    if(c.dataset.fromExam==='1'){
-      try{ items.push(JSON.parse(c.dataset.payload)); }catch(e){ throw `${n}번째 시험 문제를 읽지 못했습니다.`; }
+    if(c.dataset.type==='examlink'){
+      try{ items.push(JSON.parse(c.dataset.payload)); }catch(e){ throw `${n}번째 시험 바로가기를 읽지 못했습니다.`; }
       return;
     }
     if(c.dataset.type==='link'){
@@ -840,6 +811,7 @@ $('saveBtn').addEventListener('click', async ()=>{
   if(!selectedStudent){ toast('학생을 선택하세요.'); return; }
   const studentName=selectedStudent.name;
   const studentGrade=selectedStudent.grade||'';
+  const studentId=selectedStudent.studentId||'';
   const weekLabel=$('rangeLabel').value.trim();
   let items;
   try{ items=collectItems(); }catch(msg){ toast(typeof msg==='string'?msg:'입력을 확인하세요.'); return; }
@@ -847,7 +819,7 @@ $('saveBtn').addEventListener('click', async ()=>{
   const token=genToken();
   try{
     await setDoc(doc(db,'assignments',token),{
-      studentName, studentGrade, weekLabel, items,
+      studentName, studentGrade, studentId, weekLabel, items,
       createdAt: serverTimestamp(),
       createdBy: auth.currentUser ? auth.currentUser.uid : null
     });
