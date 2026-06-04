@@ -3,7 +3,40 @@ import {
   collection, addDoc, getDocs, doc, getDoc,
   updateDoc, query, where, orderBy, Timestamp, serverTimestamp, deleteDoc
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import { db, auth } from './firebase';
+
+// ─────────────────────────────────────────────
+// ★ 학생 인증 보장 (선생님 로그인은 절대 건드리지 않음)
+// 동작 원리:
+//   1) Firebase가 초기 인증 상태를 복원할 때까지 기다린다 (waitForAuthReady).
+//      - 이 대기를 생략하면, 페이지 로드 직후 선생님이 아직 복원되기 전
+//        currentUser가 잠깐 null로 보여서 익명 로그인이 잘못 걸릴 수 있음.
+//   2) 그 뒤에도 로그인한 사람이 아무도 없을 때만(= 학생) 익명 로그인.
+//      - 선생님은 이미 이메일로 로그인된 상태이므로 익명 로그인이 걸리지 않음.
+//   3) 익명 로그인이 실패해도 throw하지 않음. (현재 보안 규칙이 열려 있어
+//      기존 동작이 그대로 유지되도록. 규칙을 잠그는 건 이후 단계에서 진행)
+let authReadyPromise: Promise<void> | null = null;
+function waitForAuthReady(): Promise<void> {
+  if (authReadyPromise) return authReadyPromise;
+  authReadyPromise = new Promise<void>((resolve) => {
+    const unsub = onAuthStateChanged(auth, () => { unsub(); resolve(); });
+  });
+  return authReadyPromise;
+}
+
+async function ensureAuth(): Promise<void> {
+  try {
+    await waitForAuthReady();
+    if (!auth.currentUser) {
+      await signInAnonymously(auth);
+    }
+  } catch (e) {
+    // 익명 로그인 실패 시에도 기존 흐름을 막지 않음 (규칙은 아직 열려 있음)
+    console.warn('[examService] ensureAuth skipped:', e);
+  }
+}
+// ─────────────────────────────────────────────
 
 // ─────────────────────────────────────────────
 // ★ 채점 정규화: "선택지3","3번","3" → "3" / "O","X" → 대문자 통일
@@ -191,6 +224,7 @@ export async function getExamsByTeacher(teacherId: string): Promise<Exam[]> {
 }
 
 export async function getExamsByGrade(grade: string): Promise<Exam[]> {
+  await ensureAuth(); // ★ 학생 경로: 로그인 없으면 익명 인증 (선생님은 영향 없음)
   const target = (grade ?? '').trim();
   const q = query(
     collection(db, 'tests'),
@@ -241,6 +275,7 @@ export async function submitStudentAnswers(payload: {
   totalQuestions: number;
   grade?: string;
 }): Promise<string> {
+  await ensureAuth(); // ★ 학생 경로: 답안 제출 전 인증 보장
   const exam = await getExam(payload.examId);
 
   const oxQuestions       = (exam?.questions ?? []).filter(q => q.type === 'ox');
@@ -308,6 +343,7 @@ export function calculateScore(
 }
 
 export async function saveResult(result: Omit<Result, 'id'>): Promise<string> {
+  await ensureAuth(); // ★ 학생 경로: 응시 시작 기록 전 인증 보장
   const ref = await addDoc(collection(db, 'results'), {
     ...result,
     createdAt: serverTimestamp(),
@@ -325,6 +361,7 @@ export async function getAllResults(): Promise<Result[]> {
 }
 
 export async function getStudentById(studentId: string): Promise<{ fireId: string; id: string; name: string; grade: string } | null> {
+  await ensureAuth(); // ★ 학생 경로: 본인 정보 조회 전 인증 보장
   const q = query(
     collection(db, 'students'),
     where('id', '==', studentId.toLowerCase())
