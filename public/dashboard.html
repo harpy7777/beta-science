@@ -387,19 +387,36 @@ function tD(ts){if(!ts)return new Date(0);if(ts&&typeof ts==='object'&&ts.second
 function cSC(docs){const n=new Date(),y=n.getFullYear(),m=n.getMonth(),sT=new Date(y,m,1),sL=new Date(y,m-1,1),eL=new Date(y,m,0,23,59,59);let tN=0,lN=0;docs.forEach(d=>{const dt=pRD(d.data().regDate);if(!dt)return;if(dt>=sT)tN++;else if(dt>=sL&&dt<=eL)lN++;});const el=document.getElementById('stat-student-change');if(!el)return;const d=tN-lN;if(d>0){el.textContent=`+${d}명`;el.className='stat-sub up';}else if(d<0){el.textContent=`${d}명`;el.className='stat-sub down';}else{el.textContent='변동 없음';el.className='stat-sub same';}}
 function cSc(r){let o,mu,ma;if(r.oxScore!=null)o=+r.oxScore;else if(Array.isArray(r.oxAnswers)&&Array.isArray(r.oxCorrect)){let c=0;r.oxAnswers.forEach((a,i)=>{if(a===r.oxCorrect[i])c++;});o=Math.round(c/r.oxCorrect.length*100);}else if(r.testType==='ox'&&r.score!=null)o=+r.score;if(r.multiScore!=null)mu=+r.multiScore;else if(Array.isArray(r.multiAnswers)&&Array.isArray(r.multiCorrect)){let c=0;r.multiAnswers.forEach((a,i)=>{if(a===r.multiCorrect[i])c++;});mu=Math.round(c/r.multiCorrect.length*100);}else if(r.testType==='multiple'&&r.score!=null)mu=+r.score;if(r.testType==='master'&&r.score!=null)ma=+r.score;else if(r.masterScore!=null)ma=+r.masterScore;if(o==null&&mu==null&&ma==null){if(r.testType==='ox')o=+(r.score||0);else if(r.testType==='multiple')mu=+(r.score||0);}return{oxScore:o,multiScore:mu,masterScore:ma};}
 
-/* ── 응시 기록(grades) 타입 분해: 한 문서가 OX/4지선다/마스터 여러 개를 품을 수 있으므로 응시 "건"별로 쪼갬 ── */
-function splitAttempts(r){
-  const{oxScore:o,multiScore:mu,masterScore:ma}=cSc(r);
-  const out=[];
-  if(o!=null) out.push({type:'ox',score:o});
-  if(mu!=null) out.push({type:'multi',score:mu});
-  if(ma!=null) out.push({type:'master',score:ma});
-  if(out.length===0){
-    // 점수 추출 실패 시 testType으로라도 1건 처리
-    const t=r.testType==='multiple'?'multi':(r.testType==='master'?'master':'ox');
-    const rs=+r.score;out.push({type:t,score:isNaN(rs)?null:rs});
+/* ── 응시 기록(grades) 파트별 점수 {ox, multi, master} (없으면 null) ──
+   새 구조(ox/multiple/category) 우선, 없으면 옛 구조(cSc) 폴백. 문서 1개 = 응시 1건 유지 */
+function partScores(r){
+  // 새 구조 - 마스터
+  if(r.category==='master'||r.testType==='master'){
+    const sc=(r.multiple&&typeof r.multiple==='object'&&r.multiple.score!=null)?+r.multiple.score:(r.score!=null?+r.score:null);
+    return {ox:null,multi:null,master:sc};
   }
-  return out;
+  // 새 구조 - 일반(OX/4지선다)
+  const hasOx=r.ox&&typeof r.ox==='object'&&r.ox.total;
+  const hasMu=r.multiple&&typeof r.multiple==='object'&&r.multiple.total;
+  if(hasOx||hasMu){
+    return {
+      ox: hasOx?(r.ox.score!=null?+r.ox.score:0):null,
+      multi: hasMu?(r.multiple.score!=null?+r.multiple.score:0):null,
+      master:null
+    };
+  }
+  // 옛 구조 폴백
+  const{oxScore:o,multiScore:mu,masterScore:ma}=cSc(r);
+  return {ox:o==null?null:o, multi:mu==null?null:mu, master:ma==null?null:ma};
+}
+// 이 기록이 가진 타입들 (배지 표시용). 마스터면 ['master'], 일반이면 존재하는 ox/multi
+function recTypes(r){
+  const p=partScores(r);
+  if(p.master!=null)return['master'];
+  const ts=[];
+  if(p.ox!=null)ts.push('ox');
+  if(p.multi!=null)ts.push('multi');
+  return ts.length?ts:['ox'];
 }
 
 function iStats(){
@@ -409,8 +426,9 @@ function iStats(){
     s.forEach(d=>{const r=d.data(),sid=r.studentId||'';
       if(aIds.size===0||aIds.has(sid)){
         v++;
-        // 50점 이하가 하나라도 있으면 그 학생을 집중관리 대상에 추가(중복 제거)
-        splitAttempts(r).forEach(a=>{if(a.score!=null&&a.score<=50&&sid)lowSet.add(sid);});
+        // 50점 이하 파트가 하나라도 있으면 그 학생을 집중관리 대상에 추가(중복 제거)
+        const p=partScores(r);
+        [p.ox,p.multi,p.master].forEach(sc=>{if(sc!=null&&sc<=50&&sid)lowSet.add(sid);});
       }
     });
     document.getElementById('stat-total-grades').textContent=v;
@@ -425,7 +443,7 @@ function updateTotalTests(){
 
 function sBadge(s){if(s==null)return'<span style="color:#aeaeb2">-</span>';const c=s>=80?'score-high':s>=60?'score-mid':'score-low';return`<span class="score-badge ${c}">${s}점</span>`;}
 
-/* ── 최근 응시 학생 (제출 건별로 한 줄, 점수 없음) ── */
+/* ── 최근 응시 학생 (응시 1건 = 한 줄. OX·4지선다가 한 문서에 있으면 배지 둘 다 표시) ── */
 const TYPE_INFO={ox:{cls:'type-ox',label:'OX'},multi:{cls:'type-multi',label:'4지선다'},master:{cls:'type-master',label:'마스터'}};
 let lastGradeDocs=null;
 function iRG(){onSnapshot(query(collection(db,"grades"),orderBy("timestamp","asc")),s=>{lastGradeDocs=s.docs;renderRecentAttempts();});}
@@ -434,30 +452,31 @@ function renderRecentAttempts(){
   if(!tb)return;
   if(!lastGradeDocs||lastGradeDocs.length===0){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
   const gm={'중1':'g-mid1','중2':'g-mid2','중3':'g-mid3','고1':'g-high1','고2':'g-high2','고3':'g-high3','중등1학년':'g-mid1','중등2학년':'g-mid2','중등3학년':'g-mid3','고등1학년':'g-high1','고등2학년':'g-high2','고등3학년':'g-high3'};
-  // 제출 건별로 펼치기
+  // 문서 1개 = 한 줄
   const rows=[];
   lastGradeDocs.forEach(d=>{const r=d.data(),sid=r.studentId||'';
     if(aIds.size>0&&!aIds.has(sid))return;
-    const ts=tD(r.timestamp).getTime();
-    splitAttempts(r).forEach(a=>{rows.push({r,a,sid,ts});});
+    const ts=tD(r.timestamp||r.submittedTimestamp||r.date).getTime();
+    rows.push({r,sid,ts});
   });
   if(!rows.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
   rows.sort((x,y)=>y.ts-x.ts);
   const ds=rows.slice(0,10);
-  tb.innerHTML=ds.map(({r,a,sid})=>{
+  tb.innerHTML=ds.map(({r,sid})=>{
     // 응시일: 26.05.04 형식 (연도 2자리.월.일, 0채움)
     let dt='-';
-    {const src=r.timestamp||r.date;const x=r.timestamp?tD(r.timestamp):pRD(r.date);
-     if(x&&!isNaN(x)){const yy=String(x.getFullYear()).slice(-2),mm=String(x.getMonth()+1).padStart(2,'0'),dd=String(x.getDate()).padStart(2,'0');dt=`${yy}.${mm}.${dd}`;}}
+    {const x=r.timestamp?tD(r.timestamp):(r.submittedTimestamp?tD(r.submittedTimestamp):pRD(r.date));
+     if(x&&!isNaN(x)&&x.getTime()>0){const yy=String(x.getFullYear()).slice(-2),mm=String(x.getMonth()+1).padStart(2,'0'),dd=String(x.getDate()).padStart(2,'0');dt=`${yy}.${mm}.${dd}`;}}
     const g=r.studentGrade||r.grade||'',gc=gm[g]||'',gs=g.replace('등','').replace('학년','')||g;
     const gb=g?`<span class="grade-badge ${gc}">${gs}</span>`:'<span style="color:#aeaeb2">-</span>';
     const subj=resolveSubject(r);
     const sb=subj?`<span class="subj-badge ${sC(subj)}">${e(subj)}</span>`:'<span style="color:#aeaeb2">-</span>';
     const sn=r.studentName||'-',sf=sn.replace(/'/g,"\\'");
     const nc=sid?`<span class="student-name-link" onclick="openSCC('${sid}','${sf}')">${e(sn)}</span>`:e(sn);
-    const ti=TYPE_INFO[a.type]||TYPE_INFO.ox;
-    const tname=r.testName||r.examTitle||'-';
-    const testCell=`<div style="display:flex;align-items:center;justify-content:center;gap:6px"><span class="type-badge ${ti.cls}">${ti.label}</span><span class="test-name-cell" title="${e(tname)}">${e(tname)}</span></div>`;
+    const tname=r.testName||r.examTitle||r.unitName||'-';
+    // 한 응시가 OX+4지선다면 배지 둘 다, 마스터면 마스터 배지 하나
+    const badges=recTypes(r).map(t=>{const ti=TYPE_INFO[t]||TYPE_INFO.ox;return`<span class="type-badge ${ti.cls}">${ti.label}</span>`;}).join('');
+    const testCell=`<div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap"><span style="display:flex;gap:4px">${badges}</span><span class="test-name-cell" title="${e(tname)}">${e(tname)}</span></div>`;
     return `<tr><td style="color:#aeaeb2;font-size:11px;white-space:nowrap">${dt}</td><td><span class="sid-text">${e(sid||'-')}</span></td><td style="font-weight:700;color:#1d1d1f">${nc}</td><td>${gb}</td><td>${sb}</td><td>${testCell}</td></tr>`;
   }).join('');
 }
@@ -512,7 +531,12 @@ window.switchTab=(tp,btn)=>{document.querySelectorAll('.test-tab-btn').forEach(b
 window.editExam=id=>{window.location.href=`/teacher/create?edit=${id}`;};
 window.editMaster=id=>{window.location.href=`/teacher/master?edit=${id}`;};
 window.deleteExam=async(id,t,g)=>{if(!confirm(`"${t}" 테스트를 삭제하시겠습니까?\n이 테스트의 성적 기록도 함께 삭제됩니다.`))return;try{const b=writeBatch(db);b.delete(doc(db,"tests",id));const gs=await getDocs(query(collection(db,"grades"),where("examId","==",id)));gs.forEach(g=>b.delete(doc(db,"grades",g.id)));await b.commit();}catch(e){alert('삭제 오류: '+e.message);}};
-window.deleteMaster=async(id,t,g)=>{if(!confirm(`"${t}" 마스터 테스트를 삭제하시겠습니까?\n이 테스트의 성적 기록도 함께 삭제됩니다.`))return;try{const b=writeBatch(db);b.delete(doc(db,"master-tests",id));const gs=await getDocs(query(collection(db,"grades"),where("testType","==","master"),where("testId","==",id)));gs.forEach(g=>b.delete(doc(db,"grades",g.id)));await b.commit();}catch(e){alert('삭제 오류: '+e.message);}};
+window.deleteMaster=async(id,t,g)=>{if(!confirm(`"${t}" 마스터 테스트를 삭제하시겠습니까?\n이 테스트의 성적 기록도 함께 삭제됩니다.`))return;try{const b=writeBatch(db);b.delete(doc(db,"master-tests",id));const seen=new Set();
+// 새 구조: examId 기준
+const gs1=await getDocs(query(collection(db,"grades"),where("examId","==",id)));gs1.forEach(g=>{if(!seen.has(g.id)){seen.add(g.id);b.delete(doc(db,"grades",g.id));}});
+// 옛 구조: testType==master + testId 기준
+const gs2=await getDocs(query(collection(db,"grades"),where("testType","==","master"),where("testId","==",id)));gs2.forEach(g=>{if(!seen.has(g.id)){seen.add(g.id);b.delete(doc(db,"grades",g.id));}});
+await b.commit();}catch(e){alert('삭제 오류: '+e.message);}};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeClassCardModal();});
 </script>
 </body>
