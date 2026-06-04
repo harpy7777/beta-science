@@ -178,6 +178,11 @@ body {
   </div>
 </header>
 
+<!-- ⓪ 자동 진입 로딩 (클리닉 링크로 들어올 때) -->
+<div class="screen" id="screen-autoload">
+  <div class="loading" style="padding:5rem 2rem;"><div class="spinner"></div>시험을 여는 중...</div>
+</div>
+
 <!-- ① 입장 화면 -->
 <div class="screen active" id="screen-entry">
   <div class="card">
@@ -265,7 +270,7 @@ body {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getFirestore, collection, getDocs, addDoc,
+  getFirestore, collection, getDocs, addDoc, doc, getDoc,
   query, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -648,6 +653,65 @@ window.submitOMR = async () => {
 };
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ──────────────────────────────────────────────
+// ★ 클리닉 링크 자동 진입: ?testId=문서ID&sid=학생ID
+//   - 입장 화면을 건너뛰고 해당 마스터테스트를 바로 OMR로 띄움
+//   - sid로 학생을 자동 조회(이름·학년 채움) → 점수가 그 학생에게 기록됨
+//   - testId가 없거나 학생/시험 조회 실패 시 → 기존 입장 화면 그대로
+// ──────────────────────────────────────────────
+async function getMasterTestById(testId) {
+  try {
+    const snap = await getDoc(doc(db, 'master-tests', testId));
+    if (snap.exists()) return { fireId: snap.id, ...snap.data() };
+  } catch (e) {
+    console.warn('[OMR] master-test load fail:', e);
+  }
+  return null;
+}
+
+async function initFromURL() {
+  const params = new URLSearchParams(location.search);
+  const testId = (params.get('testId') || '').trim();
+  const sid    = (params.get('sid') || '').trim().toLowerCase();
+  if (!testId) return; // 일반 입장 화면 유지
+
+  // 자동 진입 로딩 화면
+  showScreen('autoload');
+
+  try {
+    await ensureAuth();
+
+    // 학생 자동 조회 (sid 필수: 점수를 학생에게 연결하려면 필요)
+    let student = null;
+    if (sid) student = await getStudentById(sid);
+    if (!student) {
+      // 학생을 못 찾으면 일반 입장 화면으로 되돌림
+      showScreen('entry');
+      return;
+    }
+    studentId    = student.id;
+    studentName  = student.name;
+    studentGrade = normalizeGrade(student.grade);
+
+    // 시험 문서 직접 로드 (학년 목록을 거치지 않고 콕 집어 열기)
+    const test = await getMasterTestById(testId);
+    if (!test) {
+      alert('시험을 찾을 수 없습니다. 선생님께 문의하세요.');
+      showScreen('entry');
+      return;
+    }
+
+    selectedTest = test;
+    answers = {};
+    buildOMR();
+    showScreen('omr');
+  } catch (e) {
+    console.warn('[OMR] initFromURL error:', e);
+    showScreen('entry'); // 실패 시 일반 입장 화면
+  }
+}
+initFromURL();
 </script>
 </body>
 </html>
