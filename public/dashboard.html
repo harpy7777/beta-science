@@ -457,7 +457,7 @@ function renderRecentAttempts(){
     const nc=sid?`<span class="student-name-link" onclick="openSCC('${sid}','${sf}')">${e(sn)}</span>`:e(sn);
     const ti=TYPE_INFO[a.type]||TYPE_INFO.ox;
     const tname=r.testName||r.examTitle||'-';
-    const testCell=`<div style="display:flex;align-items:center;justify-content:flex-start;gap:6px"><span class="type-badge ${ti.cls}">${ti.label}</span><span class="test-name-cell" title="${e(tname)}">${e(tname)}</span></div>`;
+    const testCell=`<div style="display:flex;align-items:center;justify-content:center;gap:6px"><span class="type-badge ${ti.cls}">${ti.label}</span><span class="test-name-cell" title="${e(tname)}">${e(tname)}</span></div>`;
     return `<tr><td style="color:#aeaeb2;font-size:11px;white-space:nowrap">${dt}</td><td><span class="sid-text">${e(sid||'-')}</span></td><td style="font-weight:700;color:#1d1d1f">${nc}</td><td>${gb}</td><td>${sb}</td><td>${testCell}</td></tr>`;
   }).join('');
 }
@@ -481,7 +481,7 @@ function mMR(d){const t=d.data();return`<tr><td><span class="grade-badge ${gC(t.
 const SUBJ_TABS=['전체','중1과학','중2과학','중3과학','통합과학1','통합과학2','화학','물질과 에너지','화학 반응의 세계'];
 const EMPTY_ROW='<tr><td colspan="5" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 테스트가 없습니다.</td></tr>';
 let oxDocs=[],muDocs=[],masterDocs=[],activeSubj='전체';
-function matchSubj(t,key){if(key==='전체')return true;const g=nG(t.grade),s=t.subject||'';if(key==='중1과학')return g==='중1';if(key==='중2과학')return g==='중2';if(key==='중3과학')return g==='중3';if(key==='통합과학1')return s==='통합과학1';if(key==='통합과학2')return s==='통합과학2';if(key==='화학')return s==='화학'||s==='화학1';if(key==='물질과 에너지')return s==='물질과 에너지';if(key==='화학 반응의 세계')return s==='화학 반응의 세계';return false;}
+function matchSubj(t,key){if(key==='전체')return true;const g=nG(t.grade),s=t.subject||'';if(key==='중1과학')return g==='중1';if(key==='중2과학')return g==='중2';if(key==='중3과학')return g==='중3';if(key==='통합과학1')return s==='통합과학1'||s==='통합과학';if(key==='통합과학2')return s==='통합과학2'||s==='통합과학';if(key==='화학')return s==='화학'||s==='화학1';if(key==='물질과 에너지')return s==='물질과 에너지';if(key==='화학 반응의 세계')return s==='화학 반응의 세계';return false;}
 function subjCnt(key){const f=d=>matchSubj(d.data(),key);return oxDocs.filter(f).length+muDocs.filter(f).length+masterDocs.filter(f).length;}
 function renderSubjFilter(){const wrap=document.getElementById('subjFilter');if(!wrap)return;wrap.innerHTML=SUBJ_TABS.map(k=>{const c=k==='전체'?(oxDocs.length+muDocs.length+masterDocs.length):subjCnt(k);const on=k===activeSubj?'on':'';return`<button class="subj-chip ${on}" onclick="selectSubj('${k.replace(/'/g,"\\'")}',this)"><span class="sc-name">${e(k)}</span><span class="sc-cnt">${c}</span></button>`;}).join('');}
 
