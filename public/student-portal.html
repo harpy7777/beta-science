@@ -127,24 +127,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .info-card p{text-align:center;font-size:14px;color:var(--mt);line-height:1.9;font-weight:400}
 .info-card strong{color:var(--tx);font-weight:600}
 
+/* ══ 수업 기록 카드 ══ */
 .cc-item{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
-.cc-head{padding:16px;cursor:pointer;display:flex;align-items:flex-start;gap:12px}
-.cc-head:hover{background:#fdf2f8}
-.cc-date{min-width:52px;text-align:center;background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:10px;padding:8px 4px;flex-shrink:0}
+.cc-head{padding:18px;cursor:default;display:flex;align-items:flex-start;gap:14px}
+.cc-head[onclick]{cursor:pointer}
+.cc-head[onclick]:hover{background:#fdf2f8}
+.cc-date{min-width:54px;text-align:center;background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:10px;padding:8px 4px;flex-shrink:0}
 .cc-date-m{font-size:11px;color:var(--pink);font-weight:600}
 .cc-date-d{font-size:20px;font-weight:700;color:var(--pink-dk);line-height:1.1}
-.cc-info{flex:1;min-width:0}
-.cc-subj{font-size:15px;font-weight:600;margin-bottom:6px}
-.chips{display:flex;flex-wrap:wrap;gap:4px}
-.chip{font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;white-space:nowrap}
-.chip-blue{background:#dbeafe;color:#1e40af}.chip-green{background:#d1fae5;color:#065f46}
-.chip-red{background:#fee2e2;color:#991b1b}.chip-yellow{background:#fef9c3;color:#854d0e}
-.chip-gray{background:#f5f5f7;color:#6e6e73}.chip-pink{background:var(--pink-lt);color:var(--pink-dk)}
-.cc-arrow{color:var(--mt);font-size:14px;flex-shrink:0;transition:transform .25s;margin-top:2px}
+.cc-main{flex:1;min-width:0}
+.cc-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.cc-subj{font-size:16px;font-weight:700;color:var(--tx)}
+.cc-arrow{color:var(--mt);font-size:14px;flex-shrink:0;transition:transform .25s;margin-top:1px}
 .cc-item.open .cc-arrow{transform:rotate(180deg)}
+.cc-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 18px}
+.cc-field{display:flex;flex-direction:column;gap:5px;min-width:0;padding:10px 12px;background:#fbf7fa;border:1px solid #f3e8f0;border-radius:10px}
+.cc-f-lbl{font-size:11px;font-weight:600;color:var(--mt);letter-spacing:.02em}
+.cc-f-val{font-size:14px;font-weight:700;color:var(--tx);word-break:keep-all;line-height:1.4}
+.cc-v-green{color:#059669}.cc-v-red{color:#dc2626}.cc-v-blue{color:#2563eb}.cc-v-yellow{color:#b45309}.cc-v-pink{color:var(--pink-dk)}.cc-v-gray{color:var(--mt);font-weight:600}
+.cc-score-parts{display:flex;flex-direction:column;gap:3px}
+.cc-score-part{font-size:13px;font-weight:700;color:var(--tx);display:flex;align-items:baseline;gap:6px}
+.cc-score-part b{color:var(--mt);font-weight:600;font-size:11px;min-width:46px}
 .cc-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
-.cc-item.open .cc-body{max-height:600px}
-.cc-body-inner{padding:4px 16px 16px;border-top:1px solid #fce7f3}
+.cc-item.open .cc-body{max-height:700px}
+.cc-body-inner{padding:4px 18px 18px;border-top:1px solid #fce7f3}
 .cc-body-lbl{font-size:11px;font-weight:600;color:#a21caf;letter-spacing:.05em;margin:12px 0 5px}
 .cc-body-txt{font-size:14px;color:var(--tx);line-height:1.9;white-space:pre-wrap;word-break:break-word}
 
@@ -193,6 +199,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .stat-num{font-size:20px}
   .stat-lbl{font-size:11px}
   .section{padding-top:2px}
+  .cc-fields{grid-template-columns:1fr 1fr;gap:10px}
+  .cc-head{padding:14px}
+  .cc-field{padding:9px 10px}
 }
 @media(min-width:769px){
   .mobile-only{display:none!important}
@@ -295,7 +304,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,query,where,getDocs,orderBy}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,collection,query,where,getDocs}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
 const app=initializeApp(fc);const db=getFirestore(app);
@@ -355,7 +364,7 @@ function buildSections(){
       <div class="stat-box green"><div class="stat-num" id="ms-best">—</div><div class="stat-lbl">최고 점수</div></div>
     </div>
     <div class="sec-label">단원별 결과</div>
-    <div id="masterTestList"><div class="empty-box"><div class="empty-icon">🚧</div><strong style="color:var(--tx);display:block;margin-bottom:6px;font-size:16px">준비 중입니다</strong>마스터테스트 결과가 곧 추가됩니다.</div></div>
+    <div id="masterTestList"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
   </div>`;
 }
 
@@ -375,23 +384,21 @@ async function loadPortal(sid){
     document.getElementById('loadingScreen').style.display='none';
     document.getElementById('portalApp').style.display='block';
     loadClassCards(student.fireId,sid);
-    loadOxResults(sid);
-    loadTestResults(sid);
-    loadMasterTests(sid);
+    loadGrades(sid,student.fireId);
   }catch(err){showError();}
 }
 
+/* ════════════════════════════════════════════════
+   수업 기록 (classCards)
+════════════════════════════════════════════════ */
 async function loadClassCards(fireId,sid){
   try{
-    let cards=[];
-    async function tryQ(q){try{const s=await getDocs(q);s.forEach(d=>cards.push({id:d.id,...d.data()}));}catch(e){}}
-    try{await tryQ(query(collection(db,'classCards'),where('studentId','==',fireId),orderBy('classDate','desc')));}
-    catch(e){await tryQ(query(collection(db,'classCards'),where('studentId','==',fireId)));}
-    if(sid!==fireId){
-      const ex=new Set(cards.map(c=>c.id));
-      try{const s2=await getDocs(query(collection(db,'classCards'),where('studentId','==',sid),orderBy('classDate','desc')));s2.forEach(d=>{if(!ex.has(d.id))cards.push({id:d.id,...d.data()});});}
-      catch(e){const s2b=await getDocs(query(collection(db,'classCards'),where('studentId','==',sid)));s2b.forEach(d=>{if(!ex.has(d.id))cards.push({id:d.id,...d.data()});});}
+    let cards=[];const ex=new Set();
+    async function tryQ(field,val){
+      try{const s=await getDocs(query(collection(db,'classCards'),where(field,'==',val)));s.forEach(d=>{if(!ex.has(d.id)){ex.add(d.id);cards.push({id:d.id,...d.data()});}});}catch(e){}
     }
+    await tryQ('studentId',fireId);
+    if(sid!==fireId)await tryQ('studentId',sid);
     cards.sort((a,b)=>(b.classDate||'').localeCompare(a.classDate||''));
     const now=new Date();const tm=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
     const mc=cards.filter(c=>(c.classDate||'').startsWith(tm)).length;
@@ -400,99 +407,180 @@ async function loadClassCards(fireId,sid){
     document.querySelectorAll('#cs-total').forEach(el=>el.textContent=cards.length+'건');
     document.querySelectorAll('#cs-month').forEach(el=>el.textContent=mc+'건');
     document.querySelectorAll('#cs-avg').forEach(el=>el.textContent=avg!==null?avg+'점':'—');
-    const html=!cards.length?'<div class="empty-box"><div class="empty-icon">📭</div>아직 수업 기록이 없습니다.</div>':cards.map(c=>renderCC(c)).join('');
+    const html=!cards.length?emptyBox('📭','아직 수업 기록이 없습니다.'):cards.map(c=>renderCC(c)).join('');
     document.querySelectorAll('#classCardList').forEach(el=>el.innerHTML=html);
   }catch(err){document.querySelectorAll('#classCardList').forEach(el=>el.innerHTML='<div class="empty-box">수업 기록을 불러오지 못했습니다.</div>');}
 }
 
+function hwColor(v){if(v==='높음')return'cc-v-green';if(v==='낮음')return'cc-v-red';return'cc-v-yellow';}
+function attColor(v){if(v==='적극적')return'cc-v-blue';if(v==='산만')return'cc-v-pink';return'cc-v-yellow';}
+
+/* 시험 점수 섹션: ox/multiple/omr 같은 구조가 있으면 항목별, 없으면 단일 점수 */
+function ccScoreField(c){
+  const parts=[];
+  const pushPart=(label,obj)=>{
+    if(obj==null)return;
+    let v=null;
+    if(typeof obj==='number')v=obj;
+    else if(typeof obj==='object'&&obj.score!=null)v=obj.score;
+    if(v!=null)parts.push(`<span class="cc-score-part"><b>${label}</b>${v}점</span>`);
+  };
+  pushPart('OX',c.ox);
+  pushPart('4지선다',c.multiple!=null?c.multiple:c.four);
+  pushPart('OMR',c.omr!=null?c.omr:c.master);
+  if(parts.length)return`<span class="cc-score-parts">${parts.join('')}</span>`;
+  if(c.scoreNone)return`<span class="cc-v-gray">테스트 없음</span>`;
+  if(typeof c.score==='number')return`<span class="${c.score>=70?'cc-v-green':'cc-v-red'}">${c.score}점</span>`;
+  return`<span class="cc-v-gray">—</span>`;
+}
+
 function renderCC(c){
-  const sc=typeof c.score==='number'?c.score:-1;
-  const sCls=c.scoreNone?'chip-gray':(sc>=70?'chip-green':sc>=0?'chip-red':'chip-gray');
-  const sTxt=c.scoreNone?'테스트없음':(sc>=0?sc+'점':'—');
-  const hwCls=c.homework==='높음'?'chip-green':c.homework==='낮음'?'chip-red':'chip-yellow';
-  const attCls=c.attitude==='적극적'?'chip-blue':c.attitude==='산만'?'chip-pink':'chip-yellow';
-  const[mo,dy]=parseDate(c.classDate);const hasBody=!!(c.content||c.unit);
-  return`<div class="cc-item"${hasBody?` id="cci-${c.id}"`:''}><div class="cc-head"${hasBody?` onclick="toggleCC('${c.id}')"`:''}><div class="cc-date"><div class="cc-date-m">${mo}</div><div class="cc-date-d">${dy}</div></div><div class="cc-info"><div class="cc-subj">${e(c.subject||'수업')}</div><div class="chips">${c.teacher?`<span class="chip chip-blue">${e(c.teacher)}</span>`:''}<span class="chip ${sCls}">${sTxt}</span>${c.homework&&c.homework!=='-'?`<span class="chip ${hwCls}">과제 ${e(c.homework)}</span>`:''} ${c.attitude?`<span class="chip ${attCls}">${e(c.attitude)}</span>`:''}</div></div>${hasBody?'<span class="cc-arrow">▾</span>':''}</div>${hasBody?`<div class="cc-body"><div class="cc-body-inner">${c.unit?`<div class="cc-body-lbl">학습 단원</div><div class="cc-body-txt">${e(c.unit)}</div>`:''} ${c.content?`<div class="cc-body-lbl">수업 내용</div><div class="cc-body-txt">${e(c.content)}</div>`:''}</div></div>`:''}</div>`;
+  const[mo,dy]=parseDate(c.classDate);
+  const hasBody=!!(c.content||c.unit);
+  const subj=e(c.subject||'수업');
+  const teacher=c.teacher?e(c.teacher):'—';
+  const teacherCls=c.teacher?'':'cc-v-gray';
+  const hwTxt=(c.homework&&c.homework!=='-')?e(c.homework):'—';
+  const hwCls=(c.homework&&c.homework!=='-')?hwColor(c.homework):'cc-v-gray';
+  const attTxt=c.attitude?e(c.attitude):'—';
+  const attCls=c.attitude?attColor(c.attitude):'cc-v-gray';
+  const fields=`
+    <div class="cc-field"><span class="cc-f-lbl">수강 과목</span><span class="cc-f-val">${subj}</span></div>
+    <div class="cc-field"><span class="cc-f-lbl">담당 선생님</span><span class="cc-f-val ${teacherCls}">${teacher}</span></div>
+    <div class="cc-field"><span class="cc-f-lbl">시험 점수</span><span class="cc-f-val">${ccScoreField(c)}</span></div>
+    <div class="cc-field"><span class="cc-f-lbl">과제 수행</span><span class="cc-f-val ${hwCls}">${hwTxt}</span></div>
+    <div class="cc-field"><span class="cc-f-lbl">수업 태도</span><span class="cc-f-val ${attCls}">${attTxt}</span></div>`;
+  return`<div class="cc-item"${hasBody?` id="cci-${c.id}"`:''}>
+    <div class="cc-head"${hasBody?` onclick="toggleCC('${c.id}')"`:''}>
+      <div class="cc-date"><div class="cc-date-m">${mo}</div><div class="cc-date-d">${dy}</div></div>
+      <div class="cc-main">
+        <div class="cc-title-row"><span class="cc-subj">${subj}</span>${hasBody?'<span class="cc-arrow">▾</span>':''}</div>
+        <div class="cc-fields">${fields}</div>
+      </div>
+    </div>
+    ${hasBody?`<div class="cc-body"><div class="cc-body-inner">${c.unit?`<div class="cc-body-lbl">학습 단원</div><div class="cc-body-txt">${e(c.unit)}</div>`:''}${c.content?`<div class="cc-body-lbl">수업 내용</div><div class="cc-body-txt">${e(c.content)}</div>`:''}</div></div>`:''}
+  </div>`;
 }
 
-async function loadOxResults(sid){
+/* ════════════════════════════════════════════════
+   시험 기록 (grades) — 관리자 페이지와 동일 컬렉션
+════════════════════════════════════════════════ */
+function normalizeGrade(id,r){
+  return{
+    id,
+    testName:r.testName||r.examTitle||r.unitName||'',
+    examTitle:r.examTitle||r.testName||r.unitName||'',
+    subject:r.subject||r.studentSubject||'',
+    category:r.category||(r.testType==='master'?'master':''),
+    ox:(r.ox&&typeof r.ox==='object')?r.ox:null,
+    multiple:(r.multiple&&typeof r.multiple==='object')?r.multiple:null,
+    score:(typeof r.score==='number')?r.score:(typeof r.percentage==='number'?r.percentage:null),
+    totalQuestions:(r.totalQuestions!=null?r.totalQuestions:(r.totalQ!=null?r.totalQ:(r.total!=null?r.total:null))),
+    timestamp:r.timestamp||r.submittedTimestamp||r.submittedAt||r.date||null,
+    testType:r.testType||null
+  };
+}
+
+/* 이 기록의 파트별 점수(%) {ox, mc, master} — 점수 없으면 null(=제외) */
+function partScores(r){
+  if(r.category==='master'||r.testType==='master'){
+    const sc=(r.multiple&&r.multiple.score!=null)?r.multiple.score:(r.score!=null?r.score:null);
+    return{ox:null,mc:null,master:sc};
+  }
+  const hasOx=r.ox&&r.ox.total,hasMc=r.multiple&&r.multiple.total;
+  if(hasOx||hasMc){
+    return{
+      ox:(hasOx&&r.ox.score!=null)?r.ox.score:null,
+      mc:(hasMc&&r.multiple.score!=null)?r.multiple.score:null,
+      master:null
+    };
+  }
+  const sc=r.score!=null?r.score:null;
+  if(sc==null)return{ox:null,mc:null,master:null};
+  if(r.testType==='ox')return{ox:sc,mc:null,master:null};
+  return{ox:null,mc:sc,master:null};
+}
+
+function gradeTime(r){
+  const t=r.timestamp;
+  if(!t)return 0;
+  if(typeof t==='object'){if(t.seconds!=null)return t.seconds*1000;if(typeof t.toMillis==='function'){try{return t.toMillis();}catch(e){}}return 0;}
+  const d=new Date(t);return isNaN(d.getTime())?0:d.getTime();
+}
+function gradeDateStr(r){
+  const t=r.timestamp;
+  if(typeof t==='string'){const m=t.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return`${m[1]}-${m[2]}-${m[3]}`;}
+  const ms=gradeTime(r);if(!ms)return'';
+  const d=new Date(ms);
+  return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+async function loadGrades(sid,fireId){
   try{
-    let results=[];
-    const s=await getDocs(query(collection(db,'results'),where('studentId','==',sid)));
-    s.forEach(d=>{const data={id:d.id,...d.data()};const sub=(data.subType||'').toLowerCase();const ext=(data.examType||'').toLowerCase();if(sub==='ox'||ext==='ox')results.push(data);});
-    results.sort((a,b)=>(b.startedAt||'').localeCompare(a.startedAt||''));
-    const completed=results.filter(r=>typeof r.score==='number'&&r.score!==null);
-    const pcts=completed.map(r=>r.totalQuestions>0?Math.round((r.score/r.totalQuestions)*100):r.score);
-    const avg=pcts.length?Math.round(pcts.reduce((a,v)=>a+v,0)/pcts.length):null;
-    const best=pcts.length?Math.max(...pcts):null;
-    document.querySelectorAll('#ox-total').forEach(el=>el.textContent=results.length+'회');
-    document.querySelectorAll('#ox-avg').forEach(el=>el.textContent=avg!==null?avg+'%':'—');
-    document.querySelectorAll('#ox-best').forEach(el=>el.textContent=best!==null?best+'%':'—');
-    const html=!results.length?'<div class="empty-box"><div class="empty-icon">⭕</div>아직 응시한 OX 퀴즈가 없습니다.</div>':results.map(r=>renderTestItem(r,'ox')).join('');
-    document.querySelectorAll('#oxResultList').forEach(el=>el.innerHTML=html);
-  }catch(err){document.querySelectorAll('#oxResultList').forEach(el=>el.innerHTML='<div class="empty-box">OX 퀴즈 결과를 불러오지 못했습니다.</div>');}
-}
-
-async function loadTestResults(sid){
-  try{
-    let results=[];
-    const s=await getDocs(query(collection(db,'results'),where('studentId','==',sid)));
-    s.forEach(d=>{const data={id:d.id,...d.data()};const sub=(data.subType||'').toLowerCase();const ext=(data.examType||'').toLowerCase();if(sub==='multiple'||ext==='multiple'||(sub!=='ox'&&ext!=='ox'))results.push(data);});
-    results.sort((a,b)=>(b.startedAt||'').localeCompare(a.startedAt||''));
-    const completed=results.filter(r=>typeof r.score==='number'&&r.score!==null);
-    const pcts=completed.map(r=>r.totalQuestions>0?Math.round((r.score/r.totalQuestions)*100):r.score);
-    const avg=pcts.length?Math.round(pcts.reduce((a,v)=>a+v,0)/pcts.length):null;
-    const best=pcts.length?Math.max(...pcts):null;
-    document.querySelectorAll('#ts-total').forEach(el=>el.textContent=results.length+'회');
-    document.querySelectorAll('#ts-avg').forEach(el=>el.textContent=avg!==null?avg+'%':'—');
-    document.querySelectorAll('#ts-best').forEach(el=>el.textContent=best!==null?best+'%':'—');
-    const html=!results.length?'<div class="empty-box"><div class="empty-icon">📝</div>아직 응시한 4지선다 테스트가 없습니다.</div>':results.map(r=>renderTestItem(r,'multiple')).join('');
-    document.querySelectorAll('#testResultList').forEach(el=>el.innerHTML=html);
-  }catch(err){document.querySelectorAll('#testResultList').forEach(el=>el.innerHTML='<div class="empty-box">테스트 결과를 불러오지 못했습니다.</div>');}
-}
-
-function renderTestItem(r,type){
-  const hasScore=typeof r.score==='number'&&r.score!==null;
-  const pct=hasScore&&r.totalQuestions>0?Math.round((r.score/r.totalQuestions)*100):(hasScore?r.score:-1);
-  const cls=!hasScore?'sc-none':pct>=80?'sc-high':pct>=60?'sc-mid':'sc-low';
-  const disp=!hasScore?'응시중':(pct+'%');
-  const dt=r.startedAt?r.startedAt.substring(0,10):'';
-  const wrong=typeof r.wrongCount==='number'&&r.wrongCount!==null?r.wrongCount:null;
-  const barClass=type==='ox'?'ox-bar-bg':'test-bar-bg';
-  const fillClass=type==='ox'?'ox-bar-fill':'test-bar-fill';
-  return`<div class="test-item"><div class="test-head"><div class="score-circle ${cls}"><div class="sc-pct">${disp}</div>${hasScore&&r.totalQuestions?`<div class="sc-unit">${r.score}/${r.totalQuestions}</div>`:''}</div><div class="test-info"><div class="test-title">${e(r.examTitle||'테스트')}</div><div class="test-meta">${r.subject?`<span>${e(r.subject)}</span>`:''} ${dt?`<span>${dt}</span>`:''} ${wrong!==null?`<span>❌ 오답 ${wrong}개</span>`:''}</div></div></div>${hasScore&&r.totalQuestions>0?`<div class="${barClass}"><div class="${fillClass}" style="width:${pct}%"></div></div><div class="test-bar-info">${r.score}문항 정답 / 전체 ${r.totalQuestions}문항</div>`:''}</div>`;
-}
-
-async function loadMasterTests(sid){
-  try{
-    let tests=[];
-    try{
-      const s=await getDocs(query(collection(db,'answers'),where('studentId','==',sid),where('testType','==','master')));
-      s.forEach(d=>tests.push({id:d.id,...d.data()}));
-    }catch(e){
-      const s=await getDocs(query(collection(db,'answers'),where('studentId','==',sid)));
-      s.forEach(d=>{const data={id:d.id,...d.data()};if(data.testType==='master')tests.push(data);});
+    let docs=[];const seen=new Set();
+    async function q(field,val){
+      try{const s=await getDocs(query(collection(db,'grades'),where(field,'==',val)));s.forEach(d=>{if(!seen.has(d.id)){seen.add(d.id);docs.push(normalizeGrade(d.id,d.data()));}});}catch(e){}
     }
-    tests.sort((a,b)=>(b.submittedAt?.seconds||0)-(a.submittedAt?.seconds||0));
-    if(!tests.length)return;
-    const withScore=tests.filter(t=>typeof t.score==='number'&&t.score!==null);
-    const scores=withScore.map(t=>t.score);
-    const avg=scores.length?Math.round(scores.reduce((a,v)=>a+v,0)/scores.length):null;
-    const best=scores.length?Math.max(...scores):null;
-    document.querySelectorAll('#ms-total').forEach(el=>el.textContent=tests.length+'회');
-    document.querySelectorAll('#ms-avg').forEach(el=>el.textContent=avg!==null?avg+'%':'—');
-    document.querySelectorAll('#ms-best').forEach(el=>el.textContent=best!==null?best+'%':'—');
-    const html=`<div class="master-wrap">${tests.map((t,i)=>{
-      const pct=typeof t.score==='number'?t.score:0;
-      const name=e(t.unitName||t.examTitle||t.subject||'단원테스트');
-      const sub=t.subject?`<span style="font-size:11px;color:var(--mt);font-weight:400"> · ${e(t.subject)}</span>`:'';
-      const wrongTxt=typeof t.wrong==='number'?`<span style="font-size:11px;color:#ef4444;margin-left:8px">❌ ${t.wrong}개</span>`:'';
-      return`<div class="master-item"><div class="master-rank">${i+1}</div><div class="master-name">${name}${sub}${wrongTxt}</div><div class="master-bar-col"><div class="master-bar-bg"><div class="master-bar-fill" style="width:${pct}%"></div></div></div><div class="master-score">${pct}%</div></div>`;
-    }).join('')}</div>`;
-    document.querySelectorAll('#masterTestList').forEach(el=>el.innerHTML=html);
-  }catch(err){document.querySelectorAll('#masterTestList').forEach(el=>el.innerHTML='<div class="empty-box">마스터테스트 결과를 불러오지 못했습니다.</div>');}
+    await q('studentId',sid);
+    if(fireId&&fireId!==sid)await q('studentId',fireId);
+    docs.sort((a,b)=>gradeTime(b)-gradeTime(a));
+    renderOx(docs);
+    renderMultiple(docs);
+    renderMaster(docs);
+  }catch(err){
+    ['#oxResultList','#testResultList','#masterTestList'].forEach(sel=>document.querySelectorAll(sel).forEach(el=>el.innerHTML='<div class="empty-box">기록을 불러오지 못했습니다.</div>'));
+  }
 }
 
+function setStats(prefix,count,scores){
+  const avg=scores.length?Math.round(scores.reduce((a,v)=>a+v,0)/scores.length):null;
+  const best=scores.length?Math.max(...scores):null;
+  document.querySelectorAll('#'+prefix+'-total').forEach(el=>el.textContent=count+'회');
+  document.querySelectorAll('#'+prefix+'-avg').forEach(el=>el.textContent=avg!==null?avg+'%':'—');
+  document.querySelectorAll('#'+prefix+'-best').forEach(el=>el.textContent=best!==null?best+'%':'—');
+}
+
+function renderOx(docs){
+  const items=docs.filter(r=>partScores(r).ox!=null);
+  setStats('ox',items.length,items.map(r=>partScores(r).ox));
+  const html=!items.length?emptyBox('⭕','아직 응시한 OX 퀴즈가 없습니다.'):items.map(r=>renderResultItem(r,'ox')).join('');
+  document.querySelectorAll('#oxResultList').forEach(el=>el.innerHTML=html);
+}
+function renderMultiple(docs){
+  const items=docs.filter(r=>partScores(r).mc!=null);
+  setStats('ts',items.length,items.map(r=>partScores(r).mc));
+  const html=!items.length?emptyBox('📝','아직 응시한 4지선다 테스트가 없습니다.'):items.map(r=>renderResultItem(r,'mc')).join('');
+  document.querySelectorAll('#testResultList').forEach(el=>el.innerHTML=html);
+}
+function renderMaster(docs){
+  const items=docs.filter(r=>partScores(r).master!=null);
+  setStats('ms',items.length,items.map(r=>partScores(r).master));
+  if(!items.length){document.querySelectorAll('#masterTestList').forEach(el=>el.innerHTML=emptyBox('🎯','아직 응시한 마스터테스트가 없습니다.'));return;}
+  const html=`<div class="master-wrap">${items.map((r,i)=>{
+    const pct=partScores(r).master;
+    const name=e(r.testName||r.examTitle||r.subject||'단원테스트');
+    const sub=r.subject?`<span style="font-size:11px;color:var(--mt);font-weight:400"> · ${e(r.subject)}</span>`:'';
+    const dt=gradeDateStr(r);
+    const dtTxt=dt?`<span style="font-size:11px;color:var(--mt);margin-left:8px">${dt}</span>`:'';
+    return`<div class="master-item"><div class="master-rank">${i+1}</div><div class="master-name">${name}${sub}${dtTxt}</div><div class="master-bar-col"><div class="master-bar-bg"><div class="master-bar-fill" style="width:${pct}%"></div></div></div><div class="master-score">${pct}%</div></div>`;
+  }).join('')}</div>`;
+  document.querySelectorAll('#masterTestList').forEach(el=>el.innerHTML=html);
+}
+
+function renderResultItem(r,kind){
+  const p=partScores(r);
+  const pct=kind==='ox'?p.ox:p.mc;
+  const cls=pct>=80?'sc-high':pct>=60?'sc-mid':'sc-low';
+  const dt=gradeDateStr(r);
+  const part=kind==='ox'?r.ox:r.multiple;
+  const total=(part&&part.total)?part.total:(r.totalQuestions||null);
+  const correct=(total!=null)?Math.round(pct/100*total):null;
+  const barClass=kind==='ox'?'ox-bar-bg':'test-bar-bg';
+  const fillClass=kind==='ox'?'ox-bar-fill':'test-bar-fill';
+  return`<div class="test-item"><div class="test-head"><div class="score-circle ${cls}"><div class="sc-pct">${pct}%</div>${(total!=null&&correct!=null)?`<div class="sc-unit">${correct}/${total}</div>`:''}</div><div class="test-info"><div class="test-title">${e(r.testName||r.examTitle||'테스트')}</div><div class="test-meta">${r.subject?`<span>${e(r.subject)}</span>`:''} ${dt?`<span>${dt}</span>`:''}</div></div></div><div class="${barClass}"><div class="${fillClass}" style="width:${pct}%"></div></div>${(total!=null&&correct!=null)?`<div class="test-bar-info">정답 ${correct}문항 / 전체 ${total}문항</div>`:''}</div>`;
+}
+
+function emptyBox(icon,msg){return`<div class="empty-box"><div class="empty-icon">${icon}</div>${msg}</div>`;}
 function parseDate(ds){if(!ds)return['—','—'];const p=ds.split('-');return p.length>=3?[p[1]+'월',parseInt(p[2])+'일']:['—','—'];}
 function showError(){document.getElementById('loadingScreen').style.display='none';document.getElementById('errorScreen').style.display='flex';}
 function e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
