@@ -392,6 +392,22 @@ body {
   .cc-score-grid .cc-score-no { grid-column: 1 / -1; }
 }
 
+/* 시험 기록에서 불러오기(picker) */
+.cc-pick-box { margin-top: 10px; border: 1.5px dashed #e9d5ff; border-radius: 11px; padding: 9px 10px; background: #fdfafe; }
+.cc-pick-title { font-size: 11px; font-weight: 700; color: #a21caf; margin-bottom: 7px; display: flex; align-items: center; gap: 6px; }
+.cc-pick-list { display: flex; flex-direction: column; gap: 6px; max-height: 210px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.cc-pick-row { display: flex; align-items: center; gap: 10px; padding: 9px 11px; background: #fff; border: 1px solid #f3e8ff; border-radius: 9px; cursor: pointer; transition: border-color .12s, background .12s, transform .08s; }
+.cc-pick-row:hover { border-color: #e879f9; background: #fdf4ff; }
+.cc-pick-row:active { transform: scale(0.99); }
+.cc-pick-date { font-size: 11px; font-weight: 700; color: #a21caf; min-width: 66px; flex-shrink: 0; }
+.cc-pick-name { flex: 1; font-size: 12px; font-weight: 600; color: #1d1d1f; min-width: 0; word-break: keep-all; line-height: 1.35; }
+.cc-pick-scores { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0; }
+.cc-pick-sc { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 5px; white-space: nowrap; }
+.cc-pick-sc-ox  { background: #fdf2f8; color: #be185d; }
+.cc-pick-sc-mc  { background: #eff6ff; color: #2563eb; }
+.cc-pick-sc-omr { background: #ecfdf5; color: #059669; }
+.cc-pick-hint { font-size: 11px; color: #aeaeb2; padding: 6px 4px; text-align: center; line-height: 1.6; }
+
 .cc-textarea {
   width: 100%; padding: 10px 12px; min-height: 44px;
   border: 1.5px solid #f3e8ff;
@@ -909,6 +925,10 @@ body {
           <div class="cc-score-cell"><span class="cc-score-cell-lbl">OMR</span><input class="cc-inp cc-score-mini" type="number" id="cc-score-omr" placeholder="–" min="0" max="100"></div>
           <label class="cc-score-no"><input type="checkbox" id="cc-score-none" onchange="toggleScoreNone()"> 테스트 없음</label>
         </div>
+        <div class="cc-pick-box" id="cc-pick-box" style="display:none;">
+          <div class="cc-pick-title">📋 이 학생의 시험 기록에서 불러오기 <span style="font-weight:500;color:#aeaeb2;">— 탭하면 점수가 채워집니다</span></div>
+          <div id="cc-pick-list"></div>
+        </div>
       </div>
       <div class="cc-form-grid2">
         <div>
@@ -1175,7 +1195,7 @@ async function loadStudentList() {
   try {
     const snap = await getDocs(query(collection(db,'students'), orderBy('name','asc')));
     studentList = [];
-    snap.forEach(d => studentList.push({id:d.id, ...d.data()}));
+    snap.forEach(d => studentList.push({id:d.id, ...d.data(), fireId:d.id}));
     const sel = document.getElementById('cc-student');
     if (!studentList.length) {
       sel.innerHTML = '<option value="">등록된 학생 없음</option>';
@@ -1186,7 +1206,7 @@ async function loadStudentList() {
       const subject = s.subject || '';
       const displayName = s.name || s.id;
       const label = grade ? `${displayName} (${grade})` : displayName;
-      return `<option value="${s.id}" data-grade="${esc(grade)}" data-subject="${esc(subject)}" data-name="${esc(displayName)}">${esc(label)}</option>`;
+      return `<option value="${s.id}" data-grade="${esc(grade)}" data-subject="${esc(subject)}" data-name="${esc(displayName)}" data-fireid="${esc(s.fireId||'')}">${esc(label)}</option>`;
     }).join('');
     onStudentChange();
   } catch(e) {
@@ -1199,16 +1219,123 @@ window.onStudentChange = function() {
   const opt = sel.options[sel.selectedIndex];
   const grade   = opt ? (opt.getAttribute('data-grade')   || '') : '';
   const subject = opt ? (opt.getAttribute('data-subject') || '') : '';
+  const fireId  = opt ? (opt.getAttribute('data-fireid')  || '') : '';
+  const value   = sel.value || '';
   const display = document.getElementById('cc-student-grade-display');
-  if (!display) return;
-  if (grade || subject) {
-    display.style.display = 'flex';
-    display.innerHTML =
-      (grade   ? `<span style="font-size:11px;margin-right:2px;">📚</span><strong>${esc(grade)}</strong>` : '') +
-      (subject ? `<span style="margin-left:6px;color:#a21caf;font-size:11px;">${esc(subject)}</span>` : '');
-  } else {
-    display.style.display = 'none';
+  if (display) {
+    if (grade || subject) {
+      display.style.display = 'flex';
+      display.innerHTML =
+        (grade   ? `<span style="font-size:11px;margin-right:2px;">📚</span><strong>${esc(grade)}</strong>` : '') +
+        (subject ? `<span style="margin-left:6px;color:#a21caf;font-size:11px;">${esc(subject)}</span>` : '');
+    } else {
+      display.style.display = 'none';
+    }
   }
+  loadStudentGrades(value, fireId);
+};
+
+/* ── 시험 기록에서 불러오기 (grades 컬렉션, 포털과 동일) ── */
+let pickRecords = [];
+function gradeDocDate(r){
+  const t = r.timestamp || r.submittedTimestamp || r.submittedAt || r.date || null;
+  if (!t) return { ms:0, str:'' };
+  if (typeof t === 'string') {
+    const m = t.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    const d = new Date(t);
+    return { ms: isNaN(d.getTime())?0:d.getTime(), str: m ? `${m[1].slice(2)}.${m[2]}.${m[3]}` : '' };
+  }
+  let ms = 0;
+  if (typeof t === 'object') {
+    if (t.seconds != null) ms = t.seconds * 1000;
+    else if (typeof t.toMillis === 'function') { try { ms = t.toMillis(); } catch(e){} }
+  } else { const d = new Date(t); ms = isNaN(d.getTime())?0:d.getTime(); }
+  if (!ms) return { ms:0, str:'' };
+  const d = new Date(ms);
+  return { ms, str:`${String(d.getFullYear()).slice(2)}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}` };
+}
+/* 기록 한 건 → {ox, mc, omr} (OMR = 마스터 테스트) */
+function gradeToParts(r){
+  let ox=null, mc=null, omr=null;
+  const isMaster = r.category === 'master' || r.testType === 'master';
+  if (isMaster) {
+    omr = (r.multiple && r.multiple.score != null) ? r.multiple.score
+        : (typeof r.score === 'number' ? r.score : null);
+  } else {
+    if (r.ox && typeof r.ox === 'object' && r.ox.score != null) ox = r.ox.score;
+    if (r.multiple && typeof r.multiple === 'object' && r.multiple.score != null) mc = r.multiple.score;
+    if (ox == null && mc == null) {
+      const sc = (typeof r.score === 'number') ? r.score : (typeof r.percentage === 'number' ? r.percentage : null);
+      if (sc != null) { if (r.testType === 'ox') ox = sc; else mc = sc; }
+    }
+  }
+  return { ox, mc, omr };
+}
+async function loadStudentGrades(value, fireId){
+  const box = document.getElementById('cc-pick-box');
+  const listEl = document.getElementById('cc-pick-list');
+  if (!box || !listEl) return;
+  pickRecords = [];
+  if (!value && !fireId) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  listEl.innerHTML = '<div class="cc-pick-hint">불러오는 중...</div>';
+  try {
+    const seen = new Set();
+    const rows = [];
+    const q = async (val) => {
+      if (!val) return;
+      try {
+        const s = await getDocs(query(collection(db,'grades'), where('studentId','==',val)));
+        s.forEach(d => { if (!seen.has(d.id)) { seen.add(d.id); rows.push({ id:d.id, ...d.data() }); } });
+      } catch(e) {}
+    };
+    await q(value);
+    if (fireId && fireId !== value) await q(fireId);
+    rows.forEach(r => { const dt = gradeDocDate(r); r._ms = dt.ms; r._dstr = dt.str; r._parts = gradeToParts(r); });
+    // 점수가 하나라도 있는 기록만, 최신순, 최근 12개
+    pickRecords = rows
+      .filter(r => r._parts.ox != null || r._parts.mc != null || r._parts.omr != null)
+      .sort((a,b) => b._ms - a._ms)
+      .slice(0, 12);
+    renderGradePicker();
+  } catch(e) {
+    listEl.innerHTML = '<div class="cc-pick-hint">기록을 불러오지 못했습니다.</div>';
+  }
+}
+function renderGradePicker(){
+  const listEl = document.getElementById('cc-pick-list');
+  if (!listEl) return;
+  if (!pickRecords.length) {
+    listEl.innerHTML = '<div class="cc-pick-hint">이 학생의 시험 점수 기록이 없습니다.<br>아래 칸에 직접 입력하세요.</div>';
+    return;
+  }
+  listEl.innerHTML = pickRecords.map((r, i) => {
+    const name = esc(r.testName || r.examTitle || r.unitName || r.subject || '시험');
+    const dstr = r._dstr || '날짜없음';
+    const chips = [];
+    if (r._parts.ox  != null) chips.push(`<span class="cc-pick-sc cc-pick-sc-ox">OX ${r._parts.ox}</span>`);
+    if (r._parts.mc  != null) chips.push(`<span class="cc-pick-sc cc-pick-sc-mc">4지선다 ${r._parts.mc}</span>`);
+    if (r._parts.omr != null) chips.push(`<span class="cc-pick-sc cc-pick-sc-omr">OMR ${r._parts.omr}</span>`);
+    return `<div class="cc-pick-row" onclick="pickGrade(${i})">
+      <span class="cc-pick-date">${dstr}</span>
+      <span class="cc-pick-name">${name}</span>
+      <span class="cc-pick-scores">${chips.join('')}</span>
+    </div>`;
+  }).join('');
+}
+window.pickGrade = function(i){
+  const r = pickRecords[i];
+  if (!r) return;
+  const noneEl = document.getElementById('cc-score-none');
+  if (noneEl && noneEl.checked) { noneEl.checked = false; toggleScoreNone(); }
+  const setIf = (id, val) => {
+    if (val == null) return;
+    const el = document.getElementById(id);
+    if (el) { el.value = val; el.disabled = false; el.style.opacity = '1'; }
+  };
+  setIf('cc-score-ox',  r._parts.ox);
+  setIf('cc-score-mc',  r._parts.mc);
+  setIf('cc-score-omr', r._parts.omr);
 };
 async function loadClassCards() {
   document.getElementById('cc-list-wrap').innerHTML = '<div class="cc-loading">불러오는 중...</div>';
