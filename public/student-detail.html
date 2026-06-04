@@ -840,13 +840,12 @@ function renderProfile() {
 /* ════ 성적 현황 ════ */
 /* 시험(문서)별 첫 응시만 — 키는 시험 단위 */
 function examKey(r){ return r.examId||r.testId||r.testName||'?'; }
-function gcFirstRecs(list){ const m=new Map(); list.slice().sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp)).forEach(r=>{ const k=examKey(r); if(!m.has(k)) m.set(k,r); }); return Array.from(m.values()); }
 function gcExamList(list){ const m=new Map(); list.forEach(r=>{ const k=examKey(r); if(!m.has(k)) m.set(k,{key:k,name:r.testName||r.examTitle||k,type:recTypeLabel(r)}); }); return Array.from(m.values()); }
 function recs90(){ return recsAll.slice(); }
 
 function gcRender() {
   gcCurWeek=-1;
-  const frAll=gcFirstRecs(recs90());
+  const frAll=recs90().slice().sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp));
   const fil=gcCurExamKey?frAll.filter(r=>examKey(r)===gcCurExamKey):frAll;
   const avg=(arr,kind)=>{ const v=arr.filter(r=>hasType(r,kind)); return v.length?Math.round(v.map(r=>typeScore(r,kind)).reduce((s,x)=>s+x,0)/v.length):null; };
   setTxt('d-cnt',frAll.length);
@@ -865,16 +864,17 @@ function gcRenderChart(fr) {
   const base=enrollDate();
   document.getElementById('d-chart').innerHTML=[0,1,2,3].map(w=>{
     const wr=base?fr.filter(r=>enrollWeekIndex(r,base)===w):[];
-    const avgV=(arr,kind)=>{ const v=arr.filter(r=>hasType(r,kind)); return v.length?Math.round(v.map(r=>typeScore(r,kind)).reduce((s,x)=>s+x,0)/v.length):0; };
+    const avgV=(arr,kind)=>{ const v=arr.filter(r=>hasType(r,kind)); return v.length?Math.round(v.map(r=>typeScore(r,kind)).reduce((s,x)=>s+x,0)/v.length):null; };
     const oxA=avgV(wr,'ox'), mcA=avgV(wr,'mc'), msA=avgV(wr,'master');
-    const segs=[oxA,mcA,msA].filter(v=>v>0);
-    const tot=segs.length?Math.round(segs.reduce((s,v)=>s+v,0)/segs.length):0;
-    return `<div class="chart-col"><div class="chart-wpct">${tot?tot+'점':'—'}</div><div class="chart-bars"><div class="cbar" style="height:${oxA}%;background:#1e40af;"></div><div class="cbar" style="height:${mcA}%;background:#5b21b6;"></div><div class="cbar" style="height:${msA}%;background:#db2777;"></div></div><div class="chart-wlbl">${w+1}주차</div></div>`;
+    const segs=[oxA,mcA,msA].filter(v=>v!=null);
+    const tot=segs.length?Math.round(segs.reduce((s,v)=>s+v,0)/segs.length):null;
+    const barH=v=>v==null?0:Math.max(v,3); // 응시했으면 0점이라도 최소 3% 높이로 보이게
+    return `<div class="chart-col"><div class="chart-wpct">${tot!=null?tot+'점':'—'}</div><div class="chart-bars"><div class="cbar" style="height:${barH(oxA)}%;background:#1e40af;"></div><div class="cbar" style="height:${barH(mcA)}%;background:#5b21b6;"></div><div class="cbar" style="height:${barH(msA)}%;background:#db2777;"></div></div><div class="chart-wlbl">${w+1}주차</div></div>`;
   }).join('');
 }
 function gcRenderRecs(wi) {
   const base=enrollDate();
-  let wr=gcFirstRecs(recs90());
+  let wr=recs90().slice().sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp));
   if(wi===-1){ wr=wr.slice().sort((a,b)=>toDate(b.timestamp)-toDate(a.timestamp)); }
   else { wr=wr.filter(r=>enrollWeekIndex(r,base)===wi); }
   if(gcCurExamKey) wr=wr.filter(r=>examKey(r)===gcCurExamKey);
@@ -1013,8 +1013,8 @@ function attemptInfoFor(list){
 
 function rpRender() {
   const filtered=rpFilterByPeriod(recsAll,rpCurPeriod);
-  // 첫 응시만(시험 단위)로 과목·평균 집계
-  const firstOnly=gcFirstRecs(filtered);
+  // 전체 응시(재시험 포함)로 과목·평균 집계
+  const firstOnly=filtered.slice().sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp));
   const subMap=new Map();
   firstOnly.forEach(r=>{ const subj=r.subject||'과목미지정', content=r.testName||r.examTitle||''; if(content){ if(!subMap.has(subj)) subMap.set(subj,new Set()); subMap.get(subj).add(content); } });
   const subEl=document.getElementById('rp-subject-table');
