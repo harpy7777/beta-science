@@ -73,6 +73,15 @@ body {
 /* ── 섹션 라벨 ── */
 .section-label { font-size: 10px; font-weight: 700; color: #aeaeb2; letter-spacing: 0.1em; text-transform: uppercase; margin: 1.4rem 0 0.7rem; }
 
+/* ── 이어풀기 안내 ── */
+.resume-bar {
+  display:none; align-items:center; gap:9px;
+  background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px;
+  padding:.8rem 1rem; margin-bottom:1rem; font-size:12.5px; color:#1e40af; line-height:1.5;
+}
+.resume-bar.show { display:flex; }
+.resume-bar .ic { font-size:16px; flex-shrink:0; }
+
 /* ── 핵심내용 박스 ── */
 .concept-box {
   background:#fff; border:1px solid #fce7f3; border-left:3px solid #db2777;
@@ -83,7 +92,6 @@ body {
 
 /* ── 퀴즈 박스 ── */
 .quiz-box { background:#fff; border:1px solid #fce7f3; border-radius:16px; padding:1.2rem 1.3rem; margin-bottom:.8rem; }
-.quiz-box.locked { opacity:1; }
 .quiz-label { font-size:10px; font-weight:700; color:#db2777; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:.7rem; display:flex; align-items:center; gap:7px; }
 .quiz-badge { font-size:10px; font-weight:800; border-radius:20px; padding:2px 9px; letter-spacing:0; }
 .quiz-badge.ok { background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; }
@@ -210,6 +218,12 @@ body {
       </div>
     </div>
     <div class="count-row" id="countRow"></div>
+
+    <div class="resume-bar" id="resumeBar">
+      <span class="ic">💾</span>
+      <span id="resumeText">이전에 풀던 내용을 불러왔어요. 이어서 풀 수 있습니다.</span>
+    </div>
+
     <div id="items"></div>
 
     <div class="grade-zone" id="gradeZone" style="display:none">
@@ -222,7 +236,7 @@ body {
       <div class="score-big"><span id="scoreNum">0</span><span class="total"> / <span id="scoreTotal">0</span>문제</span></div>
       <div class="score-pct" id="scorePct"></div>
       <div class="score-sub" id="scoreSub">채점이 완료되었습니다. 아래에서 정답과 해설을 확인하세요.</div>
-      <button class="retry-btn" id="retryBtn">↺ 다시 풀기</button>
+      <button class="retry-btn" id="retryBtn">↺ 처음부터 다시 풀기</button>
     </div>
 
     <div class="footer">베타과학학원 · 이 페이지는 학생 본인을 위한 주간 학습 클리닉입니다.</div>
@@ -263,9 +277,29 @@ function showError(msg){
   e.style.display='block';
 }
 
-/* 채점 대상 문제들의 상태를 모아두는 배열 */
-const quizzes = [];
+/* ── 저장: 토큰별로 풀이/채점 상태를 브라우저에 보관 ── */
+let storeKey = null;            // 'clinic_state_' + token
+const quizzes = [];             // 채점 대상 문제들의 핸들
 let graded = false;
+
+function saveState(){
+  if(!storeKey) return;
+  try{
+    const picks = quizzes.map(q=>q.getPicked());
+    localStorage.setItem(storeKey, JSON.stringify({ picks, graded, v:1 }));
+  }catch(e){ /* 시크릿모드 등 저장 불가 시 무시 */ }
+}
+function loadState(){
+  if(!storeKey) return null;
+  try{
+    const s=localStorage.getItem(storeKey);
+    return s ? JSON.parse(s) : null;
+  }catch(e){ return null; }
+}
+function clearState(){
+  if(!storeKey) return;
+  try{ localStorage.removeItem(storeKey); }catch(e){}
+}
 
 function renderConcept(it){
   const box=el('div','concept-box');
@@ -286,7 +320,7 @@ function renderLink(it){
   return a;
 }
 
-/* ── OX 문제: 정답/해설은 채점 전 절대 노출 안 함 ── */
+/* ── OX 문제 ── */
 function renderOX(it, idx){
   const w=el('div','quiz-box');
   const label=el('div','quiz-label', 'OX 문제 '+idx);
@@ -297,11 +331,13 @@ function renderOX(it, idx){
   const oBtn=el('button','ox-btn','O'), xBtn=el('button','ox-btn','X');
   const state={ picked:null };
 
-  function pick(val){
+  function paintSelection(){
+    oBtn.classList.toggle('selected', state.picked===true);
+    xBtn.classList.toggle('selected', state.picked===false);
+  }
+  function pick(val){            // 학생 클릭
     if(graded) return;
-    state.picked=val;
-    oBtn.classList.toggle('selected', val===true);
-    xBtn.classList.toggle('selected', val===false);
+    state.picked=val; paintSelection(); saveState();
   }
   oBtn.addEventListener('click',()=>pick(true));
   xBtn.addEventListener('click',()=>pick(false));
@@ -309,20 +345,17 @@ function renderOX(it, idx){
 
   const ans=el('div','quiz-ans');
 
-  function reveal(){
-    // 정답 표시
+  function reveal(){             // 채점 시 정답·해설 공개 + 잠금
     const correctBtn = it.answer ? oBtn : xBtn;
     correctBtn.classList.add('correct');
     const isCorrect = state.picked!==null && state.picked===it.answer;
     if(state.picked!==null && !isCorrect){
       (state.picked ? oBtn : xBtn).classList.add('wrong');
     }
-    // 클릭 잠금
     [oBtn,xBtn].forEach(b=>{ b.classList.add('locked'); b.classList.remove('selected'); });
-    // 채점 배지
-    const badge=el('span','quiz-badge '+(isCorrect?'ok':'no'), isCorrect?'정답':(state.picked===null?'미응답':'오답'));
-    label.appendChild(badge);
-    // 해설
+    if(!label.querySelector('.quiz-badge')){
+      label.appendChild(el('span','quiz-badge '+(isCorrect?'ok':'no'), isCorrect?'정답':(state.picked===null?'미응답':'오답')));
+    }
     ans.innerHTML='';
     ans.appendChild(el('span','res '+(it.answer?'o':'x'), '정답: '+(it.answer?'O':'X')));
     if(it.explain) ans.appendChild(document.createTextNode(it.explain));
@@ -336,11 +369,16 @@ function renderOX(it, idx){
     ans.classList.remove('show'); ans.innerHTML='';
   }
   w.appendChild(ans);
-  quizzes.push({ answered:()=>state.picked!==null, reveal, reset });
+  quizzes.push({
+    answered:()=>state.picked!==null,
+    getPicked:()=>state.picked,
+    setPicked:(v)=>{ state.picked=(v===true||v===false)?v:null; paintSelection(); },
+    reveal, reset
+  });
   return w;
 }
 
-/* ── 객관식: 정답/해설은 채점 전 절대 노출 안 함 ── */
+/* ── 객관식 ── */
 function renderMC(it, idx){
   const w=el('div','quiz-box');
   const label=el('div','quiz-label', '객관식 '+idx);
@@ -349,22 +387,24 @@ function renderMC(it, idx){
 
   const list=el('div','choices'); const choiceEls=[];
   const state={ picked:null };
+  const correctIdx=Number(it.answer);
+
+  function paintSelection(){
+    choiceEls.forEach((x,i)=>x.classList.toggle('selected', i===state.picked));
+  }
   (it.choices||[]).forEach((c,i)=>{
     const ch=el('div','choice');
     ch.appendChild(el('div','choice-mark', String(i+1)));
     ch.appendChild(el('div',null,c));
     ch.addEventListener('click',()=>{
       if(graded) return;
-      state.picked=i;
-      choiceEls.forEach(x=>x.classList.remove('selected'));
-      ch.classList.add('selected');
+      state.picked=i; paintSelection(); saveState();
     });
     choiceEls.push(ch); list.appendChild(ch);
   });
   w.appendChild(list);
 
   const ans=el('div','quiz-ans');
-  const correctIdx=Number(it.answer);
 
   function reveal(){
     if(choiceEls[correctIdx]) choiceEls[correctIdx].classList.add('correct');
@@ -373,8 +413,9 @@ function renderMC(it, idx){
       choiceEls[state.picked].classList.add('wrong');
     }
     choiceEls.forEach(x=>{ x.classList.add('locked'); x.classList.remove('selected'); });
-    const badge=el('span','quiz-badge '+(isCorrect?'ok':'no'), isCorrect?'정답':(state.picked===null?'미응답':'오답'));
-    label.appendChild(badge);
+    if(!label.querySelector('.quiz-badge')){
+      label.appendChild(el('span','quiz-badge '+(isCorrect?'ok':'no'), isCorrect?'정답':(state.picked===null?'미응답':'오답')));
+    }
     ans.innerHTML='';
     ans.appendChild(el('span','res o', '정답: '+(correctIdx+1)+'번'));
     if(it.explain) ans.appendChild(document.createTextNode(it.explain));
@@ -388,21 +429,21 @@ function renderMC(it, idx){
     ans.classList.remove('show'); ans.innerHTML='';
   }
   w.appendChild(ans);
-  quizzes.push({ answered:()=>state.picked!==null, reveal, reset });
+  quizzes.push({
+    answered:()=>state.picked!==null,
+    getPicked:()=>state.picked,
+    setPicked:(v)=>{ state.picked=(Number.isInteger(v)&&v>=0&&v<choiceEls.length)?v:null; paintSelection(); },
+    reveal, reset
+  });
   return w;
 }
 
-/* ── 채점 ── */
-function doGrade(){
-  if(graded) return;
-  const total=quizzes.length;
-  const unanswered=quizzes.filter(q=>!q.answered()).length;
-  if(unanswered>0){
-    if(!confirm(`아직 풀지 않은 문제가 ${unanswered}개 있습니다.\n그래도 채점할까요? (안 푼 문제는 오답 처리됩니다)`)) return;
-  }
+/* ── 채점 결과 화면 적용 (확인창·저장·스크롤 없음) ── */
+function applyGrade(){
   graded=true;
   let correct=0;
   quizzes.forEach(q=>{ if(q.reveal()) correct++; });
+  const total=quizzes.length;
 
   $('gradeBtn').disabled=true;
   $('gradeBtn').textContent='✅ 채점 완료';
@@ -419,13 +460,27 @@ function doGrade(){
   $('scoreEmoji').textContent=emoji;
   $('scoreSub').textContent=sub;
   $('scoreCard').classList.add('show');
+}
+
+/* ── 채점 버튼 클릭 ── */
+function doGrade(){
+  if(graded) return;
+  const unanswered=quizzes.filter(q=>!q.answered()).length;
+  if(unanswered>0){
+    if(!confirm(`아직 풀지 않은 문제가 ${unanswered}개 있습니다.\n그래도 채점할까요? (안 푼 문제는 오답 처리됩니다)`)) return;
+  }
+  applyGrade();
+  saveState();
   $('scoreCard').scrollIntoView({behavior:'smooth', block:'center'});
 }
 
-/* ── 다시 풀기 ── */
+/* ── 처음부터 다시 풀기 (저장 내용까지 초기화) ── */
 function doRetry(){
+  if(!confirm('지금까지 푼 답과 채점 결과가 모두 지워집니다. 처음부터 다시 풀까요?')) return;
   graded=false;
   quizzes.forEach(q=>q.reset());
+  clearState();
+  $('resumeBar').classList.remove('show');
   $('gradeBtn').disabled=false;
   $('gradeBtn').textContent='📝 채점하기';
   $('gradeHint').textContent='모든 문제를 푼 뒤 채점하기를 누르세요.';
@@ -437,6 +492,8 @@ async function load(){
   const params=new URLSearchParams(location.search);
   const token=params.get('t');
   if(!token){ showError('잘못된 접근입니다. 선생님이 보내주신 링크로 다시 접속해 주세요.'); return; }
+  storeKey='clinic_state_'+token;
+
   let snap;
   try{ snap=await getDoc(doc(db,'assignments',token)); }
   catch(err){ showError('내용을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'); return; }
@@ -464,12 +521,31 @@ async function load(){
   });
   if(items.length===0) box.appendChild(el('div','state','등록된 학습 내용이 없습니다.'));
 
-  // 채점할 문제가 1개 이상일 때만 채점 영역 표시
   if(quizzes.length>0){
     $('gradeZone').style.display='block';
     $('gradeHint').textContent='모든 문제를 푼 뒤 채점하기를 누르세요.';
     $('gradeBtn').addEventListener('click', doGrade);
     $('retryBtn').addEventListener('click', doRetry);
+
+    // ── 저장된 풀이/채점 상태 복원 (문항 수가 같을 때만) ──
+    const saved=loadState();
+    if(saved && Array.isArray(saved.picks) && saved.picks.length===quizzes.length){
+      saved.picks.forEach((p,i)=>quizzes[i].setPicked(p));
+      if(saved.graded){
+        applyGrade();                       // 채점 결과 그대로 복원 (스크롤 X)
+        $('resumeText').textContent='채점한 결과를 그대로 불러왔어요. 정답과 해설을 다시 확인할 수 있습니다.';
+        $('resumeBar').classList.add('show');
+      } else {
+        const answered=saved.picks.filter(p=>p!==null && p!==undefined).length;
+        if(answered>0){
+          $('resumeText').textContent=`이전에 풀던 내용(${answered}문제)을 불러왔어요. 이어서 풀 수 있습니다.`;
+          $('resumeBar').classList.add('show');
+        }
+      }
+    } else if(saved){
+      // 선생님이 문제를 바꿔 문항 수가 달라진 경우: 옛 기록 폐기
+      clearState();
+    }
   }
 
   $('loading').style.display='none';
