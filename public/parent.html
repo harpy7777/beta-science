@@ -79,18 +79,20 @@ body {
 .rt-head { display: grid; padding: 0.6rem 1rem; background: #fdf2f8; border-bottom: 1px solid #fce7f3; font-size: 10px; font-weight: 700; color: #c9a8bc; letter-spacing: 0.1em; text-transform: uppercase; }
 .rt-row { display: grid; padding: 0.7rem 1rem; border-bottom: 1px solid #fdf2f8; align-items: center; }
 .rt-row:last-child { border-bottom: none; }
-.gt-base { grid-template-columns: 1.4fr 84px 80px 70px 92px; }
+.gt-base { grid-template-columns: minmax(150px,1.6fr) 110px 96px 96px minmax(90px,1fr); }
 .rt-head > div, .rt-row > div { display: flex; align-items: center; }
-.cell-name { font-size: 12px; font-weight: 500; color: #1d1d1f; }
-.cell-date { font-size: 11px; color: #aeaeb2; }
-.cell-score { font-size: 13px; font-weight: 700; }
+.cell-name { font-size: 12px; font-weight: 500; color: #1d1d1f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cell-date { font-size: 11px; color: #aeaeb2; white-space: nowrap; }
+.cell-attempt { gap: 5px; white-space: nowrap; }
+.cell-attempt .cnt { font-size: 10px; color: #aeaeb2; white-space: nowrap; }
+.cell-score { font-size: 13px; font-weight: 700; white-space: nowrap; gap: 6px; }
 .cs-ox{color:#1e40af} .cs-mc{color:#5b21b6} .cs-ms{color:#db2777}
 .bar-wrap { display: flex; align-items: center; gap: 6px; width: 100%; }
-.bar-track { flex: 1; height: 5px; background: #f5f5f7; border-radius: 3px; overflow: hidden; }
+.bar-track { flex: 1; height: 5px; background: #f5f5f7; border-radius: 3px; overflow: hidden; min-width: 40px; }
 .bar-fill { height: 100%; border-radius: 3px; }
-.attempt-badge { display: inline-flex; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+.attempt-badge { display: inline-flex; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
 .ab-first{background:#dbeafe;color:#1e40af} .ab-retry1{background:#ede9fe;color:#5b21b6} .ab-retry2{background:#fef9c3;color:#854d0e} .ab-retry{background:#fee2e2;color:#991b1b}
-.fb-chip { display: inline-flex; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 6px; margin-left:6px; }
+.fb-chip { display: inline-flex; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
 .fb-g{background:#dcfce7;color:#166534} .fb-a{background:#fef9c3;color:#854d0e} .fb-w{background:#fee2e2;color:#991b1b}
 
 .fb-wrap { background: #fff; border: 1px solid #fce7f3; border-radius: 14px; padding: 1rem 1.2rem; margin-top: 1rem; }
@@ -112,8 +114,8 @@ body {
   .mini-grid { grid-template-columns: repeat(2,1fr); gap: 7px; }
   .p-right { margin-left: 0; text-align: left; width: 100%; }
   .result-table { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .rt-head, .rt-row { min-width: 460px; }
-  .gt-base { grid-template-columns: 1.4fr 66px 70px 56px 76px; }
+  .rt-head, .rt-row { min-width: 545px; }
+  .gt-base { grid-template-columns: minmax(140px,1.5fr) 104px 92px 90px minmax(84px,1fr); }
   .cell-name { font-size: 11px; }
 }
 </style>
@@ -317,7 +319,7 @@ function renderResults(ai){
       return `<div class="rt-row gt-base">
         <div class="cell-name">${esc(r.testName||r.examTitle||'—')}</div>
         <div class="cell-date">${fmtDateShort(r.ts)}</div>
-        <div>${attemptBadge(info)}${attempts>1?`<span style="font-size:10px;color:#aeaeb2;margin-left:4px;">총 ${attempts}회</span>`:''}</div>
+        <div class="cell-attempt">${attemptBadge(info)}${attempts>1?`<span class="cnt">총 ${attempts}회</span>`:''}</div>
         <div class="cell-score ${scClass}">${sc}점${chip}</div>
         <div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:${Math.max(0,Math.min(100,sc))}%;background:${barColor};"></div></div></div>
       </div>`;
