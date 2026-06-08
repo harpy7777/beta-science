@@ -75,7 +75,7 @@ function DeleteConfirmModal({
   );
 }
 
-const FIXED_SUBJECTS = ['전체', '중1과학', '중2과학', '중3과학', '통합과학1', '통합과학2', '화학', '물질과 에너지', '화학 반응의 세계'];
+const FIXED_SUBJECTS = ['전체', '과학내신', '통합과학1', '통합과학2', '화학', '물질과 에너지', '화학 반응의 세계'];
 
 export default function TeacherPage() {
   const router = useRouter();
