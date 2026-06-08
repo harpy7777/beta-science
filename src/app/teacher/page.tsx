@@ -75,7 +75,18 @@ function DeleteConfirmModal({
   );
 }
 
-const FIXED_SUBJECTS = ['전체', '과학내신', '통합과학1', '통합과학2', '화학', '물질과 에너지', '화학 반응의 세계'];
+const FIXED_SUBJECTS = ['전체', '중1과학', '중2과학', '중3과학', '통합과학1', '통합과학2', '화학', '물질과 에너지', '화학 반응의 세계'];
+
+// 탭(라벨)과 시험(exam)이 매칭되는지 판정.
+// 중등 탭(중1과학/중2과학/중3과학)은 학년+과목(과학내신) 조합으로 매칭하고,
+// 고등 과목 탭은 과목명만으로 매칭한다.
+function matchSubjectTab(exam: Exam, tab: string): boolean {
+  if (tab === '전체') return true;
+  if (tab === '중1과학') return exam.grade === '중1' && exam.subject === '과학내신';
+  if (tab === '중2과학') return exam.grade === '중2' && exam.subject === '과학내신';
+  if (tab === '중3과학') return exam.grade === '중3' && exam.subject === '과학내신';
+  return exam.subject === tab;
+}
 
 export default function TeacherPage() {
   const router = useRouter();
@@ -205,7 +216,7 @@ export default function TeacherPage() {
     const hasMulti = e.questions.some(q => q.type === 'multiple');
     return a + (hasOx ? 1 : 0) + (hasMulti ? 1 : 0);
   }, 0);
-  const filteredExams  = selectedSubject === '전체' ? exams : exams.filter(e => e.subject === selectedSubject);
+  const filteredExams  = selectedSubject === '전체' ? exams : exams.filter(e => matchSubjectTab(e, selectedSubject));
 
   const now = new Date();
   const dateStr = now.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -309,7 +320,7 @@ export default function TeacherPage() {
           {!examsLoading && (
             <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2 mb-4">
               {FIXED_SUBJECTS.map((subject, idx) => {
-                const count    = subject === '전체' ? exams.length : exams.filter(e => e.subject === subject).length;
+                const count    = subject === '전체' ? exams.length : exams.filter(e => matchSubjectTab(e, subject)).length;
                 const isActive = selectedSubject === subject;
                 return (
                   <button
