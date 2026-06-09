@@ -1,29 +1,49 @@
 'use client';
 // src/app/teacher/audit/page.tsx
-// 모든 시험(임시저장 포함)을 검사하여 "정말로 채점이 안 되는 4지선다 문제"만 찾아내는 관리자 도구 (읽기 전용)
-// ※ "선택지3" 처럼 저장돼도 새 채점 로직(isAnswerCorrect)에서 정상 채점되므로 더 이상 오류로 보지 않음
+// 모든 시험(임시저장 포함)을 검사하여 "정말로 채점이 안 되는 문제"만 찾아내는 관리자 도구 (읽기 전용)
+// ※ 4지선다 + OX 모두 검사. "선택지3" 처럼 저장돼도 새 채점 로직(isAnswerCorrect)에서 정상 채점되므로 오류로 보지 않음
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { getAllPublishedExams, getExamsByTeacher, isAnswerCorrect, Exam, Question } from '@/lib/examService';
+import { getAllPublishedExams, getExamsByTeacher, isAnswerCorrect, Exam, Question, QuestionType } from '@/lib/examService';
 import { ArrowLeft, AlertTriangle, CheckCircle, Search, FlaskConical, ChevronDown, ChevronUp } from 'lucide-react';
 
 type Issue = {
   qIndex: number;
+  type: QuestionType;   // ★ 어떤 유형(ox/multiple)에서 난 오류인지
   text: string;
   answer: string;
   options: string[];
   suggestion: string;
 };
 
-// ★ 새 채점 기준으로 검사: 정답이 보기 중 하나와 매칭되면 정상
-// "선택지3", "3번", "3", 보기내용("유리") 등은 모두 정상으로 판정됨
+// ★ 새 채점 기준으로 검사 (데이터 변경 없음)
+// - 4지선다: 정답이 보기 번호(1~n) 중 하나로 채점되거나, 보기 내용과 정확히 일치하면 정상
+//            "선택지3","3번","3", 보기내용("유리") 등은 모두 정상으로 판정됨
+// - OX     : 정답이 O 또는 X로 채점되면 정상 (대소문자 무관)
+//            학생은 O/X로 응시하므로, "참"/"맞음"/"○"/"1"/빈값 등은 전원 오답이 되는 진짜 오류
 function auditQuestion(q: Question): { broken: boolean; suggestion: string } {
+  const a = (q.answer ?? '').trim();
+
+  // ── OX 문제 검사 ──
+  if (q.type === 'ox') {
+    // 정답이 비어있으면 채점 불가 → 진짜 오류
+    if (a === '') {
+      return { broken: true, suggestion: '⚠ 정답이 비어 있음 — O 또는 X 입력 필요' };
+    }
+    // 학생은 O/X로 응시하므로 정답도 O/X로 채점돼야 정상
+    if (isAnswerCorrect('O', a) || isAnswerCorrect('X', a)) {
+      return { broken: false, suggestion: '' };
+    }
+    // O/X 어느 쪽으로도 채점되지 않음 → 전원 오답이 되는 진짜 오류
+    return { broken: true, suggestion: "⚠ OX 정답이 'O' 또는 'X'가 아님 — O 또는 X로 수정 필요" };
+  }
+
+  // ── 4지선다 문제 검사 ──
   if (q.type !== 'multiple') return { broken: false, suggestion: '' };
   const opts = q.options ?? [];
   const n = opts.length || 4;
-  const a = (q.answer ?? '').trim();
 
   // 정답이 비어있으면 채점 불가 → 진짜 오류
   if (a === '') {
@@ -33,7 +53,7 @@ function auditQuestion(q: Question): { broken: boolean; suggestion: string } {
   // 새 채점 로직 기준으로, 보기 1~n번 중 정답으로 채점되는 번호가 있는지 확인
   for (let i = 1; i <= n; i++) {
     if (isAnswerCorrect(String(i), a)) {
-      // 정상 채점됨 (어떤 번호가 정답인지도 확인됨)
+      // 정상 채점됨
       return { broken: false, suggestion: '' };
     }
   }
@@ -106,6 +126,7 @@ export default function AuditPage() {
           if (broken) {
             issues.push({
               qIndex: i + 1,
+              type: q.type,
               text: q.text || '(문제 미입력)',
               answer: q.answer ?? '(없음)',
               options: q.options ?? [],
@@ -169,10 +190,12 @@ export default function AuditPage() {
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
         <div className="rounded-2xl border border-pink-100 p-4 sm:p-5 mb-6"
              style={{ background: 'linear-gradient(135deg,#fff0f7 0%,#fdf2f8 60%,#f0f9ff 100%)' }}>
-          <div className="font-bold text-gray-900 text-sm sm:text-base mb-1">4지선다 정답 검사</div>
+          <div className="font-bold text-gray-900 text-sm sm:text-base mb-1">정답 검사 (4지선다 + OX)</div>
           <p className="text-xs text-gray-600 leading-relaxed">
-            <b>정말로 채점이 불가능한 4지선다 문제</b>만 찾아냅니다.
-            (정답이 비어 있거나, 어떤 보기와도 맞지 않는 경우) &quot;선택지3&quot;처럼 저장된 정답은 <b>정상적으로 채점</b>되므로 더 이상 오류로 표시되지 않습니다. 이 검사는 <b>데이터를 변경하지 않습니다.</b>
+            <b>정말로 채점이 불가능한 문제</b>만 찾아냅니다.
+            4지선다는 정답이 비어 있거나 어떤 보기와도 맞지 않는 경우,
+            OX는 정답이 비어 있거나 <b>O/X가 아닌 값</b>(예: &quot;참&quot;, &quot;○&quot;, &quot;1&quot;)으로 저장돼 학생 답과 채점되지 않는 경우를 잡아냅니다.
+            &quot;선택지3&quot;처럼 저장된 4지선다 정답은 <b>정상적으로 채점</b>되므로 오류로 표시되지 않습니다. 이 검사는 <b>데이터를 변경하지 않습니다.</b>
           </p>
 
           <div className="mt-4">
@@ -227,7 +250,7 @@ export default function AuditPage() {
                   <div className="font-bold text-sm" style={{ color: '#15803d' }}>문제 없음 🎉</div>
                   <div className="text-xs text-gray-600 mt-0.5">
                     검사한 {totalExams}개 시험
-                    {scannedScope === 'all' ? '(임시저장 포함)' : '(게시본)'}의 모든 4지선다가 정상적으로 채점됩니다.
+                    {scannedScope === 'all' ? '(임시저장 포함)' : '(게시본)'}의 모든 문제(4지선다·OX)가 정상적으로 채점됩니다.
                   </div>
                 </div>
               </div>
@@ -288,6 +311,13 @@ export default function AuditPage() {
                       <div className="flex items-start gap-2">
                         <span className="shrink-0 text-xs font-bold px-2 py-0.5 rounded mt-0.5"
                               style={{ background: '#fef3c7', color: '#92400e' }}>{iss.qIndex}번</span>
+                        {/* ★ 유형 배지: OX / 4지선다 */}
+                        <span className="shrink-0 text-xs font-bold px-2 py-0.5 rounded mt-0.5"
+                              style={iss.type === 'ox'
+                                ? { background: '#dbeafe', color: '#1d4ed8' }
+                                : { background: '#f3e8ff', color: '#7e22ce' }}>
+                          {iss.type === 'ox' ? 'OX' : '4지선다'}
+                        </span>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-gray-800 font-medium leading-relaxed break-words">{iss.text}</p>
                           <div className="text-xs text-gray-600 mt-1.5 space-y-1">
@@ -320,7 +350,7 @@ export default function AuditPage() {
 
         {done && totalIssues > 0 && (
           <p className="text-xs text-center text-gray-400 pb-6 leading-relaxed">
-            각 시험의 &quot;수정하기&quot;를 눌러 STEP 2에서 4지선다 정답을 다시 확인해 주세요.
+            각 시험의 &quot;수정하기&quot;를 눌러 4지선다·OX 정답을 다시 확인해 주세요.
           </p>
         )}
       </main>
