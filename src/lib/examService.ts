@@ -177,8 +177,13 @@ export async function saveExam(
     throw new Error('학년이 올바르지 않습니다. 학년을 다시 선택하세요.');
   }
   const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+  // ★ 방어: 혹시 호출부에서 id가 섞여 들어와도 문서 안에 stale id가 저장되지 않도록 제거
+  //   (이 id 박제가 바로 "중복 시험지 하나 지웠더니 둘 다 사라지는" 버그의 원인이었음)
+  const { id: _ignoredId, ...examWithoutId } = exam as Exam;
+
   const data = removeUndefined({
-    ...exam,
+    ...examWithoutId,
     grade: g, // ★ 공백 제거된 정확한 학년으로 저장
     accessCode: code,
     regDate: Timestamp.now(),
@@ -199,7 +204,9 @@ export async function updateExam(
     }
     exam = { ...exam, grade: g };
   }
-  const data = removeUndefined(exam);
+  // ★ 방어: 업데이트 페이로드에 id가 섞여 들어와도 문서 안에 저장되지 않도록 제거
+  const { id: _ignoredId, ...examWithoutId } = exam as Partial<Exam>;
+  const data = removeUndefined(examWithoutId);
   await updateDoc(doc(db, 'tests', examId), data as object);
 }
 
@@ -210,7 +217,9 @@ export async function getExamsByTeacher(teacherId: string): Promise<Exam[]> {
     orderBy('regDate', 'desc')  // desc 유지 (인덱스 오류 방지)
   );
   const snap = await getDocs(q);
-  const exams = snap.docs.map(d => ({ id: d.id, ...d.data() }) as Exam);
+  // ★ 핵심 수정: d.data()를 먼저 펼치고 진짜 문서 ID를 마지막에 덮어쓴다.
+  //   이렇게 해야 문서 안에 stale한 id 필드가 있어도 항상 실제 문서 ID가 이긴다.
+  const exams = snap.docs.map(d => ({ ...d.data(), id: d.id }) as Exam);
   // 프론트에서 오름차순 정렬 (먼저 만든 것이 위로)
   return exams.sort((a, b) => {
     const getTime = (ts: any): number => {
@@ -233,7 +242,7 @@ export async function getExamsByGrade(grade: string): Promise<Exam[]> {
     orderBy('regDate', 'desc')
   );
   const snap = await getDocs(q);
-  const exams = snap.docs.map(d => ({ id: d.id, ...d.data() }) as Exam);
+  const exams = snap.docs.map(d => ({ ...d.data(), id: d.id }) as Exam);
   // ★ 안전장치: 학년이 정확히 일치하는 것만 통과시킴 (학년 섞임 방지)
   return exams.filter(e => (e.grade ?? '').trim() === target);
 }
@@ -245,13 +254,13 @@ export async function getAllPublishedExams(): Promise<Exam[]> {
     orderBy('regDate', 'desc')
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }) as Exam);
+  return snap.docs.map(d => ({ ...d.data(), id: d.id }) as Exam);
 }
 
 export async function getExam(examId: string): Promise<Exam | null> {
   const snap = await getDoc(doc(db, 'tests', examId));
   if (!snap.exists()) return null;
-  return { id: snap.id, ...snap.data() } as Exam;
+  return { ...snap.data(), id: snap.id } as Exam;
 }
 
 export async function getExamByCode(code: string): Promise<Exam | null> {
@@ -263,7 +272,7 @@ export async function getExamByCode(code: string): Promise<Exam | null> {
   const snap = await getDocs(q);
   if (snap.empty) return null;
   const d = snap.docs[0];
-  return { id: d.id, ...d.data() } as Exam;
+  return { ...d.data(), id: d.id } as Exam;
 }
 
 export async function submitStudentAnswers(payload: {
@@ -320,7 +329,7 @@ export async function getAnswersByExam(examId: string): Promise<StudentAnswer[]>
     orderBy('timestamp', 'desc')
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }) as StudentAnswer);
+  return snap.docs.map(d => ({ ...d.data(), id: d.id }) as StudentAnswer);
 }
 
 export async function getAnswersByStudent(studentName: string): Promise<StudentAnswer[]> {
@@ -330,7 +339,7 @@ export async function getAnswersByStudent(studentName: string): Promise<StudentA
     orderBy('timestamp', 'desc')
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }) as StudentAnswer);
+  return snap.docs.map(d => ({ ...d.data(), id: d.id }) as StudentAnswer);
 }
 
 export function calculateScore(
@@ -355,8 +364,8 @@ export async function getAllResults(): Promise<Result[]> {
   const q = query(collection(db, 'results'), orderBy('createdAt', 'desc'));
   const snap = await getDocs(q);
   return snap.docs.map(d => ({
-    id: d.id,
     ...(d.data() as Omit<Result, 'id'>),
+    id: d.id,
   }));
 }
 
@@ -369,7 +378,9 @@ export async function getStudentById(studentId: string): Promise<{ fireId: strin
   const snap = await getDocs(q);
   if (snap.empty) return null;
   const d = snap.docs[0];
-  return { fireId: d.id, ...d.data() } as { fireId: string; id: string; name: string; grade: string };
+  // 주의: students 문서의 'id'는 학생 로그인 ID(필드)이고, fireId는 실제 문서 ID이다.
+  // data()를 먼저 펼쳐 학생 id 필드를 살리고, fireId는 마지막에 실제 문서 ID로 덮어쓴다.
+  return { ...d.data(), fireId: d.id } as { fireId: string; id: string; name: string; grade: string };
 }
 
 export async function deleteExam(examId: string): Promise<void> {
