@@ -82,6 +82,82 @@ export function formatCorrectAnswer(question: {
 }
 // ─────────────────────────────────────────────
 
+// ─────────────────────────────────────────────
+// ★ 단원 자연 정렬: 제목에서 단원 번호를 뽑아 만든 순서와 무관하게 정렬한다.
+// 지원 형식:
+//   "7-1. 별의 특성 (① 별까지의 거리)"  → [7, 1, 1]
+//   "8-2. 과학과 기술의 활용 (① ...)"   → [8, 2, 1]
+//   "3단원 ... ②"                       → [3, 0, 2]
+//   "(2) ..." / "2) ..."                → 소단원 2 로 인식
+// 동그라미 숫자(①~⑳)와 (1)/1) 형식 모두 인식.
+
+// 동그라미 숫자 → 정수. 동그라미가 아니면 0.
+function circledToNumber(ch: string): number {
+  const code = ch.codePointAt(0) ?? 0;
+  // ① ~ ⑳ : U+2460 ~ U+2473
+  if (code >= 0x2460 && code <= 0x2473) return code - 0x2460 + 1;
+  return 0;
+}
+
+const ORDER_MAX = Number.MAX_SAFE_INTEGER;
+
+// 제목 → [대단원, 중단원, 소단원]. 번호가 없으면 큰 값으로 두어 맨 뒤로 보냄.
+function getUnitOrder(title: string): [number, number, number] {
+  const t = (title ?? '').trim();
+
+  let major = ORDER_MAX;
+  let minor = ORDER_MAX;
+
+  // 1) "N-M" (예: 7-1, 8-2) — 제목 맨 앞의 단원 표기
+  const dash = t.match(/(\d+)\s*-\s*(\d+)/);
+  if (dash) {
+    major = parseInt(dash[1], 10);
+    minor = parseInt(dash[2], 10);
+  } else {
+    // 2) "N단원" 형식
+    const danwon = t.match(/(\d+)\s*단원/);
+    if (danwon) {
+      major = parseInt(danwon[1], 10);
+      minor = 0;
+    }
+  }
+
+  // 3) 소단원(동그라미 숫자) — 제목 어디에 있어도 첫 번째 것을 사용
+  let sub = ORDER_MAX;
+  for (const ch of t) {
+    const n = circledToNumber(ch);
+    if (n > 0) { sub = n; break; }
+  }
+  // 동그라미가 없으면 (1) / 1) 형식 fallback
+  if (sub === ORDER_MAX) {
+    const paren = t.match(/[(（]\s*(\d+)\s*[)）]/);
+    if (paren) sub = parseInt(paren[1], 10);
+  }
+
+  return [major, minor, sub];
+}
+
+// Timestamp/seconds/문자열 등 어떤 형태든 밀리초로 변환 (정렬 동점 처리용)
+function tsToMillis(ts: any): number {
+  if (!ts) return 0;
+  if (typeof ts.toDate === 'function') return ts.toDate().getTime();
+  if (typeof ts.seconds === 'number') return ts.seconds * 1000;
+  return new Date(ts).getTime();
+}
+
+// 단원 순서 → 같은 단원이면 만든 순서(오름차순)로 정렬
+function sortExamsByUnit(exams: Exam[]): Exam[] {
+  return [...exams].sort((a, b) => {
+    const oa = getUnitOrder(a.title);
+    const ob = getUnitOrder(b.title);
+    if (oa[0] !== ob[0]) return oa[0] - ob[0];
+    if (oa[1] !== ob[1]) return oa[1] - ob[1];
+    if (oa[2] !== ob[2]) return oa[2] - ob[2];
+    return tsToMillis(a.regDate) - tsToMillis(b.regDate);
+  });
+}
+// ─────────────────────────────────────────────
+
 export type QuestionType = 'ox' | 'multiple';
 
 export interface Question {
@@ -179,7 +255,7 @@ export async function saveExam(
   const code = Math.random().toString(36).substring(2, 8).toUpperCase();
 
   // ★ 방어: 혹시 호출부에서 id가 섞여 들어와도 문서 안에 stale id가 저장되지 않도록 제거
-  //   (이 id 박제가 바로 "중복 시험지 하나 지웠더니 둘 다 사라지는" 버그의 원인이었음)
+  //   (이 id 박제가 "중복 시험지 하나 지웠더니 둘 다 사라지는" 버그의 원인이었음)
   const { id: _ignoredId, ...examWithoutId } = exam as Exam;
 
   const data = removeUndefined({
@@ -217,19 +293,10 @@ export async function getExamsByTeacher(teacherId: string): Promise<Exam[]> {
     orderBy('regDate', 'desc')  // desc 유지 (인덱스 오류 방지)
   );
   const snap = await getDocs(q);
-  // ★ 핵심 수정: d.data()를 먼저 펼치고 진짜 문서 ID를 마지막에 덮어쓴다.
-  //   이렇게 해야 문서 안에 stale한 id 필드가 있어도 항상 실제 문서 ID가 이긴다.
+  // ★ 핵심: d.data()를 먼저 펼치고 진짜 문서 ID를 마지막에 덮어쓴다 (stale id 무력화).
   const exams = snap.docs.map(d => ({ ...d.data(), id: d.id }) as Exam);
-  // 프론트에서 오름차순 정렬 (먼저 만든 것이 위로)
-  return exams.sort((a, b) => {
-    const getTime = (ts: any): number => {
-      if (!ts) return 0;
-      if (typeof ts.toDate === 'function') return ts.toDate().getTime();
-      if (typeof ts.seconds === 'number') return ts.seconds * 1000;
-      return new Date(ts).getTime();
-    };
-    return getTime(a.regDate) - getTime(b.regDate);
-  });
+  // ★ 단원 순서대로 정렬 (만든 순서와 무관하게 7-1 → 7-2 → 8-1 → 8-2 ...)
+  return sortExamsByUnit(exams);
 }
 
 export async function getExamsByGrade(grade: string): Promise<Exam[]> {
@@ -244,7 +311,9 @@ export async function getExamsByGrade(grade: string): Promise<Exam[]> {
   const snap = await getDocs(q);
   const exams = snap.docs.map(d => ({ ...d.data(), id: d.id }) as Exam);
   // ★ 안전장치: 학년이 정확히 일치하는 것만 통과시킴 (학년 섞임 방지)
-  return exams.filter(e => (e.grade ?? '').trim() === target);
+  const filtered = exams.filter(e => (e.grade ?? '').trim() === target);
+  // ★ 학생 화면도 동일하게 단원 순서로 정렬
+  return sortExamsByUnit(filtered);
 }
 
 export async function getAllPublishedExams(): Promise<Exam[]> {
@@ -254,7 +323,9 @@ export async function getAllPublishedExams(): Promise<Exam[]> {
     orderBy('regDate', 'desc')
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ ...d.data(), id: d.id }) as Exam);
+  const exams = snap.docs.map(d => ({ ...d.data(), id: d.id }) as Exam);
+  // ★ 전체 목록도 단원 순서로 정렬
+  return sortExamsByUnit(exams);
 }
 
 export async function getExam(examId: string): Promise<Exam | null> {
