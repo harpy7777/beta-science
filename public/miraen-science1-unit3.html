@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><script src="/favicon.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>미래엔 · 통합과학1 · Ⅲ. 시스템과 상호작용 상세 학습</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --p900:#4c1d95;--p800:#5b21b6;--p700:#6d28d9;--p600:#7c3aed;
+  --p500:#8b5cf6;--p400:#a78bfa;--p300:#c4b5fd;--p200:#ddd6fe;
+  --p100:#ede9fe;--p50:#faf5ff;
+  --text:#1d1d1f;--muted:#6e6e73;--dim:#aeaeb2;
+  --bg:#fafafa;--white:#fff;
+  --border:#e5e7eb;--border-p:#ddd6fe;
+  --green:#059669;--green-bg:#ecfdf5;--green-border:#a7f3d0;
+  --blue:#2563eb;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
+  --amber:#d97706;--amber-bg:#fffbeb;--amber-border:#fde68a;
+  --red:#dc2626;--red-bg:#fef2f2;--red-border:#fecaca;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+.header{background:var(--white);border-bottom:2px solid var(--p200);padding:0 1.5rem;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:500}
+.header-brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--p500),var(--p800));border-radius:8px;display:flex;align-items:center;justify-content:center}
+.brand-name{font-size:14px;font-weight:700;color:var(--text)}
+.pub-chip{background:var(--p100);border:1px solid var(--p200);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--p600)}
+.back-btn{padding:7px 14px;background:transparent;border:1.5px solid var(--p200);border-radius:20px;font-size:12px;font-weight:700;color:var(--p600);cursor:pointer;font-family:inherit;text-decoration:none;transition:background .15s}
+.back-btn:hover{background:var(--p50)}
+
+.hero{background:linear-gradient(135deg,var(--p800) 0%,var(--p600) 50%,#a855f7 100%);padding:3rem 1.5rem 2.5rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,0.06)}
+.hero::after{content:'';position:absolute;left:-50px;bottom:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.04)}
+.hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;text-align:center}
+.hero-bc{display:flex;align-items:center;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center}
+.bc-a{font-size:12px;color:rgba(255,255,255,0.65);text-decoration:none;font-weight:500}.bc-a:hover{color:#fff}
+.bc-sep{font-size:12px;color:rgba(255,255,255,0.4)}.bc-cur{font-size:12px;color:#fff;font-weight:700}
+.hero-eyebrow{display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#fff;letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+.hero-title{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.2;margin-bottom:.6rem}
+.hero-desc{font-size:14px;color:rgba(255,255,255,.8);line-height:1.7;max-width:600px;margin-bottom:2rem;margin-left:auto;margin-right:auto}
+.hero-stats{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:.5rem}
+.hero-stat-card{background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:16px;padding:1rem 1.6rem;text-align:center;min-width:90px;transition:background .2s}
+.hero-stat-card:hover{background:rgba(255,255,255,0.25)}
+.hs-num{font-size:2rem;font-weight:900;color:#fff;line-height:1}
+.hs-lbl{font-size:11px;color:rgba(255,255,255,.8);margin-top:5px;font-weight:600;letter-spacing:.04em}
+
+.tabs-wrap{background:var(--white);border-bottom:2px solid var(--p200);position:sticky;top:54px;z-index:400}
+.tabs-inner{max-width:1100px;margin:0 auto;padding:0 1.5rem;display:flex;overflow-x:auto;justify-content:center;gap:8px}
+.tab-btn{padding:14px 32px;font-size:14px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;margin-bottom:-2px;border-radius:8px 8px 0 0}
+.tab-btn:hover{color:var(--p600);background:var(--p50)}.tab-btn.active{color:var(--p600);border-bottom-color:var(--p600)}
+
+.content-wrap{max-width:1100px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.unit-section{display:none}.unit-section.visible{display:block}
+
+.unit-banner{border-radius:18px;padding:1.6rem 2rem;margin-bottom:2rem;display:flex;align-items:center;gap:1.2rem;position:relative;overflow:hidden}
+.ub-earth{background:linear-gradient(135deg,var(--blue-bg),#dbeafe);border:2px solid var(--blue-border)}
+.ub-force{background:linear-gradient(135deg,var(--p50),var(--p100));border:2px solid var(--p200)}
+.ub-life{background:linear-gradient(135deg,var(--green-bg),#d1fae5);border:2px solid var(--green-border)}
+.ub-emoji{font-size:2.8rem;flex-shrink:0}
+.ub-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.ub-num-blue{color:var(--blue)}.ub-num-purple{color:var(--p600)}.ub-num-green{color:var(--green)}
+.ub-title{font-size:1.3rem;font-weight:900;color:var(--text);letter-spacing:-.02em;margin-bottom:5px}
+.ub-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+.acc-list{display:flex;flex-direction:column;gap:12px}
+.acc-item{background:var(--white);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .2s}
+.acc-item.open{border-color:var(--p300);box-shadow:0 4px 20px rgba(124,58,237,.08)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:1.2rem 1.5rem;cursor:pointer;user-select:none;transition:background .15s}
+.acc-header:hover{background:var(--p50)}
+.acc-num{width:32px;height:32px;border-radius:10px;background:var(--p100);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--p600);flex-shrink:0}
+.acc-item.open .acc-num{background:var(--p600);color:#fff}
+.acc-head-info{flex:1}
+.acc-subtitle{font-size:10px;font-weight:700;color:var(--p400);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.acc-htitle{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.acc-hdesc{font-size:12px;color:var(--muted);margin-top:2px}
+.acc-chevron{font-size:18px;color:var(--dim);transition:transform .25s;flex-shrink:0}
+.acc-item.open .acc-chevron{transform:rotate(180deg);color:var(--p600)}
+.acc-body{display:none;padding:0 1.5rem 1.8rem;border-top:1px solid var(--p100)}
+.acc-item.open .acc-body{display:block}
+
+.sec-title{font-size:13px;font-weight:800;color:var(--p700);letter-spacing:.06em;text-transform:uppercase;margin:1.5rem 0 .8rem;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--p500);border-radius:2px;display:block;flex-shrink:0}
+
+.concept-box{background:var(--p50);border:1.5px solid var(--p200);border-left:4px solid var(--p500);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.concept-box .cb-title{font-weight:800;color:var(--p700);font-size:14px;margin-bottom:.4rem}
+.green-box{background:var(--green-bg);border:1.5px solid var(--green-border);border-left:4px solid var(--green);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.green-box .cb-title{font-weight:800;color:#065f46;font-size:14px;margin-bottom:.4rem}
+.amber-box{background:var(--amber-bg);border:1.5px solid var(--amber-border);border-left:4px solid var(--amber);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.amber-box .cb-title{font-weight:800;color:#92400e;font-size:14px;margin-bottom:.4rem}
+.blue-box{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-left:4px solid var(--blue);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.blue-box .cb-title{font-weight:800;color:#1e40af;font-size:14px;margin-bottom:.4rem}
+.red-box{background:var(--red-bg);border:1.5px solid var(--red-border);border-left:4px solid var(--red);border-radius:12px;padding:1rem 1.2rem;margin:.6rem 0;line-height:1.75;font-size:13.5px}
+.red-box .cb-title{font-weight:800;color:#991b1b;font-size:14px;margin-bottom:.4rem}
+
+.card-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin:.8rem 0}
+.mini-card{background:var(--white);border:1.5px solid var(--border-p);border-radius:12px;padding:.9rem 1rem}
+.mc-label{font-size:10px;font-weight:700;color:var(--p400);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.mc-value{font-size:13px;font-weight:600;line-height:1.55;color:var(--text)}
+
+.table-wrap{overflow-x:auto;margin:.8rem 0;border-radius:12px;border:1.5px solid var(--border-p)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--p100);padding:10px 14px;text-align:left;font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--p700)}
+tbody td{padding:10px 14px;border-top:1px solid var(--border);line-height:1.6}
+tbody tr:hover td{background:var(--p50)}
+
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:.8rem 0;font-size:13px}
+.flow-box{background:var(--white);border:1.5px solid var(--p200);border-radius:8px;padding:6px 12px;font-weight:700;color:var(--p700)}
+.flow-arrow{color:var(--p400);font-size:20px;font-weight:900}
+
+.point-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:.8rem 0}
+.point-card{background:var(--white);border:1.5px solid var(--border-p);border-radius:12px;padding:1rem;text-align:center}
+.pc-icon{font-size:1.8rem;margin-bottom:6px}
+.pc-title{font-size:13px;font-weight:800;color:var(--p600);margin-bottom:4px}
+.pc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+.hp{color:var(--p600);font-weight:800}
+.hg{color:var(--green);font-weight:800}
+.ha{color:var(--amber);font-weight:800}
+.hb{color:var(--blue);font-weight:800}
+.hr{color:var(--red);font-weight:800}
+
+.quiz-wrap{background:linear-gradient(135deg,var(--p100),var(--p50));border:1.5px solid var(--p200);border-radius:14px;padding:1.2rem 1.4rem;margin-top:1.8rem}
+.quiz-label{font-size:11px;font-weight:800;color:var(--p600);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.quiz-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.6;margin-bottom:.6rem}
+.quiz-choices{display:flex;flex-direction:column;gap:5px;margin-bottom:.8rem}
+.choice{font-size:13px;color:var(--muted);padding:4px 0;line-height:1.55}
+.quiz-toggle{background:var(--p600);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.quiz-toggle:hover{background:var(--p700)}
+.quiz-ans{display:none;margin-top:.8rem;padding:.9rem 1rem;background:rgba(255,255,255,.75);border-radius:10px;font-size:13.5px;color:var(--text);line-height:1.75}
+.quiz-ans strong,.quiz-ans .hp{color:var(--p600)}
+
+body p{line-height:1.75;font-size:13.5px;margin:.4rem 0}
+
+@media(max-width:768px){
+  .hero{padding:2rem 1rem 2rem}
+  .hero-title{font-size:1.6rem}
+  .hero-desc{font-size:13px}
+  .hero-stats{gap:8px}
+  .hero-stat-card{min-width:70px;padding:.8rem 1rem}
+  .hs-num{font-size:1.5rem}
+  .tabs-inner{justify-content:flex-start;gap:0}
+  .tab-btn{padding:12px 16px;font-size:13px}
+  .content-wrap{padding:1.2rem .9rem 4rem}
+  .unit-banner{flex-direction:column;gap:.8rem;padding:1.2rem;text-align:center}
+  .acc-header{padding:1rem}
+  .acc-body{padding:0 1rem 1.4rem}
+  .card-row{grid-template-columns:1fr}
+  .point-box{grid-template-columns:1fr}
+  .hero-bc{gap:4px}
+}
+@media(max-width:420px){
+  .hero-stat-card{min-width:60px;padding:.7rem .8rem}
+  .hs-num{font-size:1.3rem}
+  .hs-lbl{font-size:10px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="science1.html" class="header-brand">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="pub-chip">미래엔 · 통합과학1</div>
+    <a href="science1.html" class="back-btn">← 목록으로</a>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-bc">
+      <a href="index.html" class="bc-a">🏠 홈</a><span class="bc-sep">›</span>
+      <a href="science1.html" class="bc-a">통합과학1</a><span class="bc-sep">›</span>
+      <a href="science1.html#pub-mirae" class="bc-a">미래엔</a><span class="bc-sep">›</span>
+      <span class="bc-cur">Ⅲ. 시스템과 상호작용</span>
+    </div>
+    <div class="hero-eyebrow">📘 미래엔 · 2022개정 · 통합과학1</div>
+    <div class="hero-title">Ⅲ. 시스템과 상호작용<br>완벽 상세 학습 가이드</div>
+    <div class="hero-desc">지구시스템의 권역과 물질 순환·에너지 흐름, 중력에 의한 운동과 운동량·충격량,<br>세포의 화학 반응·물질 출입·유전정보의 흐름까지 3개 시스템을 완벽하게 학습합니다</div>
+    <div class="hero-stats">
+      <div class="hero-stat-card"><div class="hs-num">3</div><div class="hs-lbl">중단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">7</div><div class="hs-lbl">소단원</div></div>
+      <div class="hero-stat-card"><div class="hs-num">45+</div><div class="hs-lbl">핵심 개념</div></div>
+      <div class="hero-stat-card"><div class="hs-num">7</div><div class="hs-lbl">확인 문제</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showUnit(1,this)">🌍 1단원 · 지구시스템</button>
+    <button class="tab-btn" onclick="showUnit(2,this)">⚡ 2단원 · 역학 시스템</button>
+    <button class="tab-btn" onclick="showUnit(3,this)">🧬 3단원 · 생명 시스템</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ══════════ 1단원: 지구시스템 ══════════ -->
+<div id="unit1" class="unit-section visible">
+  <div class="unit-banner ub-earth">
+    <div class="ub-emoji">🌍</div>
+    <div>
+      <div class="ub-num ub-num-blue">중단원 01</div>
+      <div class="ub-title">지구시스템</div>
+      <div class="ub-desc">기권·수권·지권·생물권의 성층 구조와 상호작용, 물질 순환과 에너지 흐름, 판 구조론에 의한 지권의 변화까지 완벽하게 이해합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01 지구시스템의 구성과 상호작용 -->
+    <div class="acc-item" id="unit1-compose">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">소단원 01 · Earth System</div>
+          <div class="acc-htitle">지구시스템의 구성과 상호작용</div>
+          <div class="acc-hdesc">4권역 성층 구조 · 에너지원 · 물·탄소 순환 · 상호작용과 균형</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">지구시스템이란?</div>
+        <div class="concept-box">
+          <div class="cb-title">🌐 지구시스템(Earth System)의 정의</div>
+          지구는 생명체를 비롯한 여러 요소가 서로 영향을 주고받으며 시스템을 이루는데, 이를 <span class="hp">지구시스템</span>이라고 합니다. 지구시스템은 <span class="hp">태양계의 구성 요소</span>이면서, 그 자체로도 상호작용 하는 여러 요소로 이루어진 작은 시스템으로 <strong>기권, 수권, 지권, 생물권</strong> 등으로 이루어져 있습니다.<br><br>
+          생명체가 존재하려면 안정적으로 에너지를 공급하는 <strong>별(태양)</strong>과 <strong>액체 상태의 물</strong>이 있어야 합니다. 지구는 태양으로부터 적당한 거리에 있어 풍부한 액체 상태의 물과 대기를 갖추고 있습니다.
+        </div>
+
+        <div class="sec-title">지구시스템의 4가지 구성 요소</div>
+        <div class="point-box">
+          <div class="point-card"><div class="pc-icon">☁️</div><div class="pc-title">기권</div><div class="pc-desc">지표를 둘러싼 대기. 여러 기체로 이루어지며 기상 현상이 나타남</div></div>
+          <div class="point-card"><div class="pc-icon">🌊</div><div class="pc-title">수권</div><div class="pc-desc">바닷물·강물·지하수·빙하 등 지구의 물. 생명 유지에 필수</div></div>
+          <div class="point-card"><div class="pc-icon">⛰️</div><div class="pc-title">지권</div><div class="pc-desc">지표와 지구 내부를 포함한 영역. 생명체에게 서식 공간 제공</div></div>
+          <div class="point-card"><div class="pc-icon">🦌</div><div class="pc-title">생물권</div><div class="pc-desc">지구상 모든 생명체. 기권·수권·지권에 걸쳐 분포</div></div>
+        </div>
+
+        <div class="sec-title">기권의 층상 구조 (높이에 따른 기온 분포 기준)</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>층</th><th>특징</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">대류권</span></td><td>대류 현상과 기상 현상(구름·비·눈)이 일어남</td></tr>
+            <tr><td><span class="hp">성층권</span></td><td>위로 갈수록 기온 상승. 높이 20~30km에 <span class="ha">오존층</span> 존재(안정한 층)</td></tr>
+            <tr><td><span class="hp">중간권</span></td><td>대류는 일어나지만 수증기가 거의 없어 기상 현상 없음</td></tr>
+            <tr><td><span class="hp">열권</span></td><td>공기가 매우 희박. 밤낮의 기온 차가 매우 큼</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">수권과 지권의 층상 구조</div>
+        <div class="card-row">
+          <div class="mini-card"><div class="mc-label">수권 (해수)</div><div class="mc-value"><strong>혼합층</strong>(태양·바람으로 수온 높고 일정) → <strong>수온약층</strong>(급격히 하강, 안정) → <strong>심해층</strong>(수온 변화 거의 없음)</div></div>
+          <div class="mini-card"><div class="mc-label">지권</div><div class="mc-value"><strong>지각</strong>(대륙·해양) → <strong>맨틀</strong>(부피 대부분, 유동성) → <strong>외핵</strong>(액체) → <strong>내핵</strong>(고체). 핵은 철·니켈</div></div>
+        </div>
+        <div class="amber-box">
+          <div class="cb-title">💧 해수 분포</div>
+          수권의 물은 <span class="ha">해수가 97% 이상</span>, 육수는 3% 이하입니다. 혼합층의 두께는 바람이 강하게 불수록 두꺼워집니다.
+        </div>
+
+        <div class="sec-title">지구시스템의 에너지원</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>에너지원</th><th>근원</th><th>주요 작용</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">태양 에너지</span></td><td>태양 복사(가장 많은 양)</td><td>대기·물 순환, 생명활동 에너지 공급</td></tr>
+            <tr><td><span class="hp">지구 내부 에너지</span></td><td>탄생 시 축적된 열 + 방사성 붕괴열</td><td>대륙 이동, 지진·화산 활동</td></tr>
+            <tr><td><span class="hp">조력 에너지</span></td><td>지구·태양·달 사이 인력</td><td>밀물·썰물, 해수면 변화, 해안 지형·생태계 영향</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">물의 순환과 탄소의 순환</div>
+        <div class="blue-box">
+          <div class="cb-title">🌧️ 물의 순환 (태양 에너지가 원동력)</div>
+          수권의 물이 태양 에너지를 흡수 → 증발해 수증기로 기권 이동 → 응결(에너지 방출)해 구름·비·눈 → 지표로 이동(지형 변화, 물질을 바다로 운반) → 다시 증발하거나 생물에 흡수. 이 과정에서 <span class="hb">물질 순환과 에너지 흐름이 함께</span> 일어납니다.
+        </div>
+        <div class="green-box">
+          <div class="cb-title">♻️ 탄소의 순환</div>
+          탄소는 기권(CO₂·메테인), 지권(탄산칼슘·화석연료), 수권(탄산 이온), 생물권(유기물)으로 형태를 바꾸며 순환합니다. <span class="hg">분포량이 가장 많은 곳은 지권의 석회암</span>입니다. 광합성·호흡·연소·용해·화산 활동을 통해 각 권역을 이동합니다.
+        </div>
+
+        <div class="sec-title">지구시스템의 상호작용과 균형</div>
+        <div class="concept-box">
+          <div class="cb-title">⚖️ 상호작용과 연쇄 영향</div>
+          각 권역은 서로 밀접하게 상호작용 하며 균형을 이룹니다. 한 권역의 변화는 다른 권역에 <span class="hp">연쇄적으로 영향</span>을 줍니다. 예) 대기 대순환의 바람 → 해류 발생(수권) → 에너지·물질 이동 → 주변 기후 변화 → 생물·인간에 영향.<br><br>
+          최근 지구 온난화·환경오염 등 인간 활동이 균형을 위협하므로, 인류는 지구시스템을 최적 상태로 보전해야 합니다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 1</div>
+          <div class="quiz-q">다음 중 비생물 환경이 생물에 영향을 준 것이 아닌 사례를 고르고, 물의 순환을 일으키는 에너지원을 쓰시오.<br>
+          ㄱ. 식물의 증산 작용으로 주변 기온이 낮아진다. &nbsp; ㄴ. 기온이 낮아지면 개구리가 겨울잠을 잔다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: ㄱ (생물→비생물 방향이므로 해당 아님)</strong><br><br>
+            ㄴ은 온도(비생물)가 개구리(생물)에 영향을 준 사례입니다. ㄱ은 생물이 환경에 영향을 준 경우입니다.<br>
+            물의 순환을 일으키는 에너지원은 <span class="hp">태양 에너지</span>입니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 지권의 변화와 판 구조론 -->
+    <div class="acc-item" id="unit1-plate">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">소단원 02 · Plate Tectonics</div>
+          <div class="acc-htitle">지권의 변화와 판 구조론</div>
+          <div class="acc-hdesc">지진대·화산대 · 암석권·연약권 · 판의 경계 3종 · 지권 변화의 영향</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">지진대와 화산대</div>
+        <div class="concept-box">
+          <div class="cb-title">🌋 지각 변동</div>
+          지권의 변화는 지진·화산처럼 <strong>갑자기</strong> 일어나기도, 대륙 이동·습곡 산맥 형성처럼 <strong>서서히</strong> 일어나기도 합니다. 모두 <span class="hp">지구 내부 에너지</span>를 지표로 방출하며 일어납니다.<br><br>
+          지진이 자주 발생하는 지역을 <span class="hp">지진대</span>, 화산 활동이 잦은 지역을 <span class="hp">화산대</span>라고 합니다. 전 세계에 고르게 분포하지 않고 <strong>특정 지역에 띠 모양</strong>(판의 경계)으로 분포합니다.
+        </div>
+
+        <div class="sec-title">판 구조론 — 암석권과 연약권</div>
+        <div class="card-row">
+          <div class="mini-card"><div class="mc-label">암석권 (판)</div><div class="mc-value">지각 + 맨틀 윗부분의 단단한 암석. 여러 조각으로 나뉜 것이 <strong>판</strong>(약 10여 개)</div></div>
+          <div class="mini-card"><div class="mc-label">연약권</div><div class="mc-value">암석권 아래 맨틀 일부가 녹아 유동성을 띰. <strong>맨틀 대류</strong>가 일어남</div></div>
+        </div>
+        <div class="concept-box">
+          <div class="cb-title">🧩 판 구조론(Plate Tectonics)</div>
+          판들이 서로 다른 방향·속도로 움직이며 충돌·분리·어긋남 → 판의 경계에서 지진·화산·습곡 산맥 등 다양한 지각 변동이 일어난다는 이론. 판의 경계는 두 판의 상대적 이동 방향에 따라 <strong>발산형·보존형·수렴형</strong>으로 구분합니다.
+        </div>
+
+        <div class="sec-title">판의 경계 3가지 유형</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>경계</th><th>판의 이동</th><th>형성 지형 · 활동</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">발산형 경계</span></td><td>두 판이 서로 <strong>멀어짐</strong></td><td>마그마 상승 → 새 지각 생성. <span class="hb">해령·열곡대</span> (예: 동태평양 해령, 동아프리카 열곡대)</td></tr>
+            <tr><td><span class="hp">보존형 경계</span></td><td>두 판이 <strong>어긋나게</strong> 이동</td><td>생성·소멸 없음. <span class="hb">변환 단층</span> (예: 산안드레아스 단층). 지진 잦고 화산 거의 없음</td></tr>
+            <tr><td><span class="hp">수렴형 경계</span></td><td>두 판이 <strong>가까워짐</strong>(충돌·섭입)</td><td><span class="hb">습곡 산맥·해구·호상열도</span> (예: 히말라야산맥, 안데스산맥, 마리아나 해구)</td></tr>
+          </tbody>
+        </table></div>
+        <div class="amber-box">
+          <div class="cb-title">⚠️ 수렴형 경계 세부 구분</div>
+          • 대륙판+대륙판 충돌 → 습곡 산맥(히말라야), 지진은 잦으나 <span class="ha">화산 활동 없음</span><br>
+          • 해양판이 대륙판 아래로 섭입 → 안데스산맥(습곡 산맥+화산+해구)<br>
+          • 해양판이 다른 해양판 아래로 섭입 → 마리아나 해구 + 호상열도
+        </div>
+
+        <div class="sec-title">지권의 변화가 지구시스템에 미치는 영향</div>
+        <div class="green-box">
+          <div class="cb-title">🌐 부정적 영향과 긍정적 영향</div>
+          <strong>지진:</strong> 건물·도로 붕괴, 산사태·화재(간접), 해저 지진은 지진 해일 유발. 단, 지진파로 <span class="hg">지구 내부 구조·지하자원 탐사</span> 가능.<br>
+          <strong>화산:</strong> 화산재가 햇빛 차단해 기후 변화, 화산 가스가 산성비 유발. 단, 분출물 풍화 시 <span class="hg">비옥한 토양</span>, 화산 지대는 온천·관광 자원.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 2</div>
+          <div class="quiz-q">지진과 화산 활동에 대한 설명으로 옳지 <u>않은</u> 것을 고르시오.<br>
+          ① 화산 가스는 산성비를 내리게 한다. &nbsp; ② 지진파로 지구 내부 구조를 파악할 수 있다.<br>
+          ③ 화산 활동이 활발한 지역에서는 지진이 일어나지 않는다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: ③</strong><br>
+            화산 활동은 <strong>대체로 지진과 함께</strong> 발생합니다. 지진대와 화산대는 대부분 판의 경계를 따라 겹쳐 분포하므로, 화산 활동이 활발한 지역에서는 지진도 자주 발생합니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit1 -->
+
+<!-- ══════════ 2단원: 역학 시스템 ══════════ -->
+<div id="unit2" class="unit-section">
+  <div class="unit-banner ub-force">
+    <div class="ub-emoji">⚡</div>
+    <div>
+      <div class="ub-num ub-num-purple">중단원 02</div>
+      <div class="ub-title">역학 시스템</div>
+      <div class="ub-desc">중력에 의한 자유 낙하·수평 방향 운동과 지구 주위 원운동을 이해하고, 관성·운동량·충격량을 일상 안전장치와 연결해 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01 중력의 작용 -->
+    <div class="acc-item" id="unit2-gravity">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">소단원 01 · Gravity</div>
+          <div class="acc-htitle">중력의 작용</div>
+          <div class="acc-hdesc">속도·가속도 · 자유 낙하 · 중력 가속도 · 수평 던지기 · 원운동</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">속도와 가속도</div>
+        <div class="concept-box">
+          <div class="cb-title">🚗 속도와 가속도의 정의</div>
+          <span class="hp">속도</span>: 물체의 속력과 운동 방향을 함께 나타낸 것 (단위 m/s, km/h).<br>
+          <span class="hp">가속도</span>: 단위 시간 동안의 속도 변화량. <strong>가속도 = 속도 변화량 ÷ 걸린 시간</strong> (단위 m/s²).<br><br>
+          속도가 빨라질 때 → 가속도 방향이 속도 방향과 <span class="hg">같음</span> / 느려질 때 → <span class="hr">반대</span>.
+        </div>
+
+        <div class="sec-title">자유 낙하 운동과 중력 가속도</div>
+        <div class="blue-box">
+          <div class="cb-title">⬇️ 자유 낙하 운동</div>
+          물체가 중력만 받아 아래로 떨어지는 운동. 속력이 1초마다 약 <span class="hb">9.8 m/s씩 일정하게 증가</span>합니다. 이때 가속도의 크기(약 9.8 m/s²)를 <strong>중력 가속도</strong>라고 합니다.<br><br>
+          ✅ 질량이 달라도 중력 가속도의 크기는 같으므로, 같은 높이에서 가만히 놓은 모든 물체는 질량에 관계없이 <strong>지표면에 동시에 도달</strong>합니다.
+        </div>
+
+        <div class="sec-title">수평 방향으로 던진 물체의 운동</div>
+        <div class="flow">
+          <div class="flow-box">수평 방향</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">등속 운동(힘 없음)</div>
+          <div class="flow-arrow">+</div>
+          <div class="flow-box">연직 방향</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">자유 낙하(가속도 운동)</div>
+        </div>
+        <div class="amber-box">
+          <div class="cb-title">📐 핵심 정리</div>
+          공기 저항을 무시하면 연직 방향으로는 중력만 작용 → <span class="ha">연직 운동은 자유 낙하와 동일</span>. 따라서 같은 높이에서 자유 낙하 하는 물체와 매 순간 높이가 같습니다. 수평 속력이 클수록 더 멀리 떨어지는 <strong>포물선 운동</strong>을 하지만, 바닥에 닿는 시간은 동일합니다.
+        </div>
+
+        <div class="sec-title">지구 주위의 원운동과 중력</div>
+        <div class="concept-box">
+          <div class="cb-title">🌙 뉴턴의 사고 실험</div>
+          높은 곳에서 물체를 빠르게 던질수록 더 멀리 떨어지고, 특정 속력 이상이면 지표면에 닿지 않고 <span class="hp">지구 주위를 원운동</span>합니다. 뉴턴은 달이 떨어지지 않고 공전하는 것도, 자유 낙하도 <strong>모두 중력에 의한 운동</strong>임을 밝혔습니다.<br><br>
+          인공위성은 속력은 일정하지만 방향이 계속 변하는 가속도 운동을 하며, 가속도 방향은 <strong>지구 중심 방향</strong>(중력 방향)입니다.
+        </div>
+        <div class="green-box">
+          <div class="cb-title">🌑 달에서의 중력</div>
+          달도 질량이 있어 주위 물체에 중력을 작용합니다. 달 표면의 중력은 지구의 약 <span class="hg">1/6</span>이므로, 같은 물체가 지구에서보다 느리게 떨어집니다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 3</div>
+          <div class="quiz-q">같은 높이에서 가만히 놓은 물체 A와 수평 방향으로 던진 물체 B가 기준선 P를 동시에 지난다. A와 B가 낙하하는 동안 크기가 같은 물리량을 모두 고르시오. (공기 저항 무시)<br>
+          ㄱ. P에서 속력 &nbsp; ㄴ. 가속도의 크기 &nbsp; ㄷ. P까지 운동하는 데 걸린 시간</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: ㄴ, ㄷ</strong><br><br>
+            두 물체 모두 연직 방향으로 <strong>중력 가속도(9.8 m/s²)</strong>가 작용하므로 가속도 크기가 같고(ㄴ), 같은 높이에서 시작해 동시에 떨어지므로 걸린 시간도 같습니다(ㄷ).<br>
+            단, B는 수평 속도 성분이 있어 P에서의 <strong>속력은 B가 더 큽니다</strong>(ㄱ 제외).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 역학 시스템과 안전 -->
+    <div class="acc-item" id="unit2-safety">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">소단원 02 · Momentum & Impulse</div>
+          <div class="acc-htitle">역학 시스템과 안전</div>
+          <div class="acc-hdesc">관성 · 운동량 · 충격량 · 충격량=운동량 변화량 · 안전장치</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">관성</div>
+        <div class="concept-box">
+          <div class="cb-title">🚌 관성(Inertia)</div>
+          외부에서 힘이 작용하지 않을 때, 정지한 물체는 계속 정지하려 하고 운동하던 물체는 계속 일정한 속도로 운동하려는 성질. 예) 버스가 갑자기 출발하면 몸이 뒤로, 멈추면 앞으로 쏠림.<br><br>
+          물체가 외부와 상호작용 하지 않으면 운동 상태가 일정하고, 상호작용 하면 변합니다. <span class="hp">역학 시스템</span>은 여러 힘이 작용하며 일정한 질서를 유지하는 운동 체계입니다.
+        </div>
+
+        <div class="sec-title">운동량</div>
+        <div class="concept-box">
+          <div class="cb-title">📦 운동량(Momentum)</div>
+          물체의 질량과 속도를 곱한 물리량. <strong>운동량 = 질량 × 속도</strong> (단위 kg·m/s). 방향은 속도 방향과 같습니다.<br><br>
+          질량이 크고 속도가 빠를수록 운동량이 큽니다. 달리는 고속 열차는 운동량이 크지만, 정지한 열차는 속도가 0이므로 운동량도 0입니다.
+        </div>
+
+        <div class="sec-title">충격량</div>
+        <div class="blue-box">
+          <div class="cb-title">💥 충격량(Impulse)</div>
+          물체가 받는 힘과 작용 시간을 곱한 물리량. <strong>충격량 = 힘 × 시간</strong> (단위 N·s). 방향은 힘의 방향과 같습니다. 힘-시간 그래프 <span class="hb">아랫부분의 넓이</span>가 충격량입니다.<br><br>
+          힘이 크고 작용 시간이 길수록 충격량이 큽니다. 운동 경기에서 공을 빠르게 보내려면 큰 힘을 긴 시간 작용시킵니다.
+        </div>
+        <div class="amber-box">
+          <div class="cb-title">⚡ 충격량 = 운동량의 변화량</div>
+          물체에 힘이 작용하면 운동량이 변합니다. <strong>힘 × 시간 = 질량 × 속도 변화량</strong>. 즉 물체가 받은 충격량만큼 운동량이 변합니다.
+        </div>
+
+        <div class="sec-title">충격량이 같을 때 힘을 줄이는 방법</div>
+        <div class="green-box">
+          <div class="cb-title">🥚 달걀 실험과 안전장치</div>
+          같은 높이에서 떨어진 달걀은 충격량이 같지만, 방석에 떨어지면 <span class="hg">충돌 시간이 길어져 받는 힘이 작아</span> 깨지지 않습니다.<br><br>
+          <strong>충격량 일정 → 충돌 시간 ↑ → 힘 ↓</strong><br>
+          예) 자동차 범퍼·에어백, 도로 보호 난간, 운동 경기 안전 매트, 무릎 보호대·안전모, 점프 후 무릎 굽히기 등.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 4</div>
+          <div class="quiz-q">질량 3 kg, 속력 5 m/s인 물체의 운동량 크기를 구하고, 안전을 위한 장치 중 원리가 <u>다른</u> 것을 고르시오.<br>
+          ① 자동차 에어백 &nbsp; ② 도로에서 자동차 속력을 낮춤 &nbsp; ③ 자전거 안전모</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: 운동량 = 15 kg·m/s, 원리가 다른 것 = ②</strong><br><br>
+            운동량 = 3 kg × 5 m/s = <strong>15 kg·m/s</strong>.<br>
+            ①·③은 <strong>충돌 시간을 길게 하여 힘을 줄이는</strong> 원리이지만, ②는 처음부터 <strong>속력(운동량)을 줄여</strong> 충돌 자체의 피해를 줄이는 방법이므로 원리가 다릅니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit2 -->
+
+<!-- ══════════ 3단원: 생명 시스템 ══════════ -->
+<div id="unit3" class="unit-section">
+  <div class="unit-banner ub-life">
+    <div class="ub-emoji">🧬</div>
+    <div>
+      <div class="ub-num ub-num-green">중단원 03</div>
+      <div class="ub-title">생명 시스템</div>
+      <div class="ub-desc">생명 시스템의 기본 단위인 세포에서 일어나는 물질대사와 효소 작용, 세포막을 통한 물질 출입, 유전자로부터 단백질이 만들어지는 정보의 흐름을 학습합니다.</div>
+    </div>
+  </div>
+  <div class="acc-list">
+
+    <!-- 01 생명 시스템에서의 화학 반응 -->
+    <div class="acc-item" id="unit3-reaction">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">01</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">소단원 01 · Metabolism & Enzyme</div>
+          <div class="acc-htitle">생명 시스템에서의 화학 반응</div>
+          <div class="acc-hdesc">세포·세포소기관 · 물질대사 · 효소 · 활성화에너지</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">생명 시스템을 구성하는 세포</div>
+        <div class="concept-box">
+          <div class="cb-title">🔬 세포 — 생명 시스템의 기본 단위</div>
+          생명체가 외부 환경과 상호작용 하며 이루는 정교한 체계를 <span class="hp">생명 시스템</span>이라 하며, 그 기본 단위이자 화학 반응이 일어나는 기능적 단위가 <strong>세포</strong>입니다.<br><br>
+          세포는 핵·세포막·세포질로 이루어지며, 세포질에는 고유 기능을 하는 <strong>세포소기관</strong>이 있습니다.
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>세포소기관</th><th>기능</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">핵</span></td><td>유전물질 DNA가 있으며 생명활동 조절</td></tr>
+            <tr><td><span class="hp">마이토콘드리아</span></td><td>세포호흡 — 생명활동 에너지 생성</td></tr>
+            <tr><td><span class="hp">엽록체</span>(식물)</td><td>광합성 — 빛에너지 흡수해 포도당 합성</td></tr>
+            <tr><td><span class="hp">라이보솜</span></td><td>아미노산을 연결해 단백질 합성</td></tr>
+            <tr><td><span class="hp">세포막</span></td><td>주변과 세포를 구분, 물질 출입 조절</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="sec-title">물질대사</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>구분</th><th>반응</th><th>에너지</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hp">합성 반응</span></td><td>작고 간단한 물질 → 크고 복잡한 물질 (예: 아미노산 → 단백질)</td><td><span class="hb">흡수</span></td></tr>
+            <tr><td><span class="hp">분해 반응</span></td><td>크고 복잡한 물질 → 작고 간단한 물질 (예: 세포호흡)</td><td><span class="hr">방출</span></td></tr>
+          </tbody>
+        </table></div>
+        <div class="concept-box">
+          <div class="cb-title">🧪 물질대사(Metabolism)</div>
+          생명체에서 일어나는 모든 화학 반응. 생명 시스템 유지를 위해 물질과 에너지가 끊임없이 공급되어야 하므로 물질대사가 원활히 일어나야 합니다.
+        </div>
+
+        <div class="sec-title">효소와 활성화에너지</div>
+        <div class="green-box">
+          <div class="cb-title">⚙️ 효소(Enzyme)의 원리</div>
+          화학 반응이 일어나는 데 필요한 최소한의 에너지를 <span class="hg">활성화에너지</span>라고 합니다. 효소는 <strong>생체촉매</strong>로, <span class="hg">활성화에너지를 낮춰</span> 화학 반응이 빠르게 일어나게 합니다.<br><br>
+          효소는 그 구조에 맞는 <strong>특정 반응물</strong>과만 결합합니다(예: 카탈레이스 ↔ 과산화 수소). 반응 후에는 원래 상태로 돌아가 <strong>재사용</strong>됩니다.
+        </div>
+        <div class="amber-box">
+          <div class="cb-title">🧴 효소의 활용</div>
+          효소는 생명체 밖에서도 작용하여 세제(지방·단백질 분해), 의약품(소화제), 식품(시럽), 렌즈 세정제, 플라스틱 분해 등 다양한 분야에 활용됩니다. 위험성이 적고 경제적·친환경적입니다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 5</div>
+          <div class="quiz-q">물질대사에 대한 설명으로 옳지 <u>않은</u> 것을 고르시오.<br>
+          ① 효소가 관여한다. &nbsp; ② 물질을 합성할 때 에너지를 흡수한다.<br>
+          ③ 물질을 분해할 때 에너지를 방출한다. &nbsp; ④ 생명체 밖에서 일어나는 모든 화학 반응이다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: ④</strong><br>
+            물질대사는 <strong>생명체 안</strong>에서 일어나는 모든 화학 반응입니다. 효소는 생명체 밖에서도 작용할 수 있지만, '물질대사'라는 용어 자체는 생명체 내부의 화학 반응을 가리킵니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 세포막을 통한 물질 출입 -->
+    <div class="acc-item" id="unit3-membrane">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">02</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">소단원 02 · Cell Membrane</div>
+          <div class="acc-htitle">세포막을 통한 물질 출입</div>
+          <div class="acc-hdesc">인지질 이중층 · 선택적 투과성 · 확산 · 삼투</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">세포막의 구조</div>
+        <div class="concept-box">
+          <div class="cb-title">🧱 세포막의 구조 — 인지질 이중층</div>
+          세포막은 <span class="hp">인지질과 단백질</span>로 구성됩니다. 인지질의 <strong>친수성 부위</strong>는 물과 접하는 바깥쪽에, <strong>소수성 부위</strong>는 안쪽으로 마주 보고 배열되어 <span class="hp">인지질 이중층</span>을 이룹니다. 막단백질은 이중층 곳곳에 박혀 있습니다.
+        </div>
+
+        <div class="sec-title">선택적 투과성</div>
+        <div class="blue-box">
+          <div class="cb-title">🚪 선택적 투과성과 물질 이동</div>
+          물질의 종류·크기에 따라 이동 방식이 다른 세포막의 특성을 <span class="hb">선택적 투과성</span>이라 합니다.<br><br>
+          • <strong>확산:</strong> 산소·이산화 탄소 등 크기가 작은 기체 분자는 인지질 이중층을 <span class="hb">직접 통과</span>, 농도가 높은 곳 → 낮은 곳으로 이동.<br>
+          • 포도당·이온·아미노산 등은 직접 통과가 어려워 <strong>막단백질을 통해</strong> 이동.
+        </div>
+
+        <div class="sec-title">삼투 (식물 세포 예시)</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>용액 농도 조건</th><th>물의 이동</th><th>세포 변화</th></tr></thead>
+          <tbody>
+            <tr><td>세포 안보다 <span class="hb">낮은</span> 용액</td><td>물이 세포 안으로 들어옴</td><td>부피가 커짐</td></tr>
+            <tr><td>세포 안과 <span class="hg">같은</span> 용액</td><td>안팎 이동량이 같음</td><td>부피 변화 없음</td></tr>
+            <tr><td>세포 안보다 <span class="hr">높은</span> 용액</td><td>물이 세포 밖으로 나감</td><td>세포막과 세포벽 분리</td></tr>
+          </tbody>
+        </table></div>
+        <div class="concept-box">
+          <div class="cb-title">💧 삼투(Osmosis)</div>
+          용질 입자가 커서 막을 통과할 수 없을 때, 물 분자가 세포막을 통해 <span class="hp">용질 농도가 낮은 곳 → 높은 곳</span>으로 이동하는 현상. 세포 안과 농도가 같은 용액에서는 형태가 유지되어 생명활동을 원활히 수행할 수 있습니다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 6</div>
+          <div class="quiz-q">세포막에 대한 설명으로 옳은 것을 모두 고르시오.<br>
+          ㄱ. 세포막은 인지질과 단백질로 구성된다. &nbsp; ㄴ. 인지질은 이중층 구조를 형성한다.<br>
+          ㄷ. 이산화 탄소는 세포막의 막단백질을 통해 이동한다.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: ㄱ, ㄴ</strong><br><br>
+            세포막은 인지질과 단백질로 구성되며(ㄱ), 인지질은 이중층을 형성합니다(ㄴ).<br>
+            ㄷ은 틀림 — 이산화 탄소는 크기가 작은 기체 분자라 <strong>인지질 이중층을 직접 통과(확산)</strong>합니다. 막단백질을 통과하는 것은 포도당·이온 등입니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 세포 내 정보의 흐름 -->
+    <div class="acc-item" id="unit3-info">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-num">03</div>
+        <div class="acc-head-info">
+          <div class="acc-subtitle">소단원 03 · Flow of Genetic Information</div>
+          <div class="acc-htitle">세포 내 정보의 흐름</div>
+          <div class="acc-hdesc">유전자와 단백질 · 전사·번역 · 3염기조합·코돈</div>
+        </div>
+        <div class="acc-chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="sec-title">유전자와 단백질</div>
+        <div class="concept-box">
+          <div class="cb-title">🧬 형질·유전자·단백질의 관계</div>
+          생물이 나타내는 특징을 <span class="hp">형질</span>이라 하며, 유전형질은 DNA의 유전정보로 결정됩니다. DNA에서 각 형질의 유전정보가 저장된 특정 부위가 <span class="hp">유전자</span>입니다.<br><br>
+          각 유전자에는 특정 <strong>단백질</strong>을 만드는 정보가 담겨 있고, 그 단백질의 작용으로 형질이 나타납니다.
+        </div>
+        <div class="flow">
+          <div class="flow-box">유전자</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">단백질 합성</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">형질 발현</div>
+        </div>
+
+        <div class="sec-title">세포 내 유전정보의 흐름 — 전사와 번역</div>
+        <div class="flow">
+          <div class="flow-box">DNA</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">전사</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">RNA</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">번역</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">단백질</div>
+        </div>
+        <div class="card-row">
+          <div class="mini-card"><div class="mc-label">전사 (Transcription)</div><div class="mc-value">'옮겨 적다'. DNA의 정보를 이용해 RNA를 만드는 과정 (핵 안)</div></div>
+          <div class="mini-card"><div class="mc-label">번역 (Translation)</div><div class="mc-value">'다른 언어로 옮기다'. RNA 정보로 단백질을 만드는 과정 (라이보솜)</div></div>
+        </div>
+
+        <div class="sec-title">3염기조합과 코돈</div>
+        <div class="blue-box">
+          <div class="cb-title">🔤 유전부호 — 3염기조합과 코돈</div>
+          DNA 염기는 4종류, 아미노산은 약 20종류입니다. 1·2개 염기로는 부족하고(4¹=4, 4²=16), <strong>3개 염기 조합(4³=64)</strong>이면 20종류 이상을 충분히 암호화할 수 있습니다.<br><br>
+          • <span class="hb">3염기조합:</span> 1개의 아미노산을 암호화하는 DNA의 연속된 3개 염기<br>
+          • <span class="hb">코돈(Codon):</span> 1개의 아미노산을 지정하는 RNA의 연속된 3개 염기<br><br>
+          전사 시 DNA의 A·G·C·T는 각각 RNA의 U·C·G·A로 대응되므로, 코돈에는 T 대신 <strong>U(유라실)</strong>이 있습니다.
+        </div>
+
+        <div class="quiz-wrap">
+          <div class="quiz-label">✏️ 확인 문제 7</div>
+          <div class="quiz-q">전사에 사용되는 DNA 가닥의 염기 배열이 <strong>T-A-C</strong>일 때, 전사되어 만들어지는 RNA 코돈을 쓰고, 세포 내 유전정보의 흐름 순서를 쓰시오.</div>
+          <button class="quiz-toggle" onclick="toggleQuiz(this)">정답 확인 ▼</button>
+          <div class="quiz-ans"><strong class="hp">정답: RNA 코돈 = A-U-G, 흐름 = DNA → RNA → 단백질</strong><br><br>
+            DNA 가닥의 T·A·C는 각각 RNA의 <strong>A·U·G</strong>로 대응됩니다 (T→A, A→U, C→G).<br>
+            유전정보는 <strong>DNA → (전사) → RNA → (번역) → 단백질</strong> 순으로 흐릅니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /unit3 -->
+
+</div><!-- /content-wrap -->
+
+<script>
+function showUnit(n, btn) {
+  ['unit1','unit2','unit3'].forEach(id => document.getElementById(id).classList.remove('visible'));
+  document.getElementById('unit'+n).classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  window.scrollTo({top: document.querySelector('.content-wrap').offsetTop - 60, behavior:'smooth'});
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) { item.classList.add('open'); item.scrollIntoView({behavior:'smooth', block:'nearest'}); }
+}
+
+function toggleQuiz(btn) {
+  const ans = btn.nextElementSibling;
+  const open = ans.style.display === 'block';
+  ans.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '정답 확인 ▼' : '정답 닫기 ▲';
+}
+
+const hashMap = {
+  '#unit1':1, '#unit1-compose':1, '#unit1-plate':1,
+  '#unit2':2, '#unit2-gravity':2, '#unit2-safety':2,
+  '#unit3':3, '#unit3-reaction':3, '#unit3-membrane':3, '#unit3-info':3
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = location.hash;
+  if (hash && hashMap[hash]) {
+    const n = hashMap[hash];
+    const btn = document.querySelectorAll('.tab-btn')[n-1];
+    showUnit(n, btn);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        const header = el.querySelector('.acc-header');
+        if (header) header.click();
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }, 400);
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.acc-item.open').forEach(el => el.classList.remove('open'));
+});
+</script>
+</body>
+</html>
