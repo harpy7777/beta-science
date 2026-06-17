@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><script src="/favicon.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="탐구 설계서 — 항목만 채우면 동기·질문·가설·변인·방법·후속 계획이 담긴 설계서 초안이 자동으로 정리되는 도구 | 베타과학학원">
+<title>탐구 설계서 · 베타과학학원</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  background: #fafafa; color: #1d1d1f; min-height: 100vh;
+  -webkit-font-smoothing: antialiased; overscroll-behavior: none;
+}
+
+/* ── Header ── */
+.header {
+  background: #ffffff; border-bottom: 1px solid #f0e8ed;
+  height: 54px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1rem;
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  position: sticky; top: 0; z-index: 300;
+}
+.header-left { display: flex; align-items: center; gap: 9px; text-decoration: none; color: inherit; }
+.logo-mark {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, #f472b6 0%, #db2777 100%);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.brand-name { font-size: 14px; font-weight: 600; color: #1d1d1f; letter-spacing: -0.3px; }
+.back-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #fdf2f8; border: 1px solid #fbcfe8; border-radius: 20px;
+  padding: 6px 13px; font-size: 12px; font-weight: 600; color: #db2777;
+  text-decoration: none; white-space: nowrap; transition: background 0.15s;
+}
+.back-link:hover { background: #fce7f3; }
+.back-link:active { transform: scale(0.97); }
+
+/* ── Layout ── */
+.wrap {
+  max-width: 860px; margin: 0 auto;
+  padding: 1.2rem 0.9rem 4rem;
+  padding-bottom: max(4rem, calc(3rem + env(safe-area-inset-bottom)));
+  padding-left: max(0.9rem, env(safe-area-inset-left));
+  padding-right: max(0.9rem, env(safe-area-inset-right));
+}
+
+/* ── Page hero ── */
+.phero {
+  background: linear-gradient(135deg, #db2777 0%, #ec4899 50%, #f472b6 100%);
+  border-radius: 22px; padding: 1.9rem 1.6rem; margin-bottom: 1.9rem;
+  color: #fff; position: relative; overflow: hidden;
+  box-shadow: 0 14px 36px rgba(219,39,119,0.26);
+}
+.phero::before {
+  content: ''; position: absolute; top: -50px; right: -40px;
+  width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,0.12);
+}
+.phero-tag {
+  display: inline-block; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 700; margin-bottom: 12px;
+  position: relative; z-index: 1;
+}
+.phero-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; position: relative; z-index: 1; line-height: 1.3; }
+.phero-sub { font-size: 0.92rem; font-weight: 500; line-height: 1.75; margin-top: 14px; color: #ffffff; position: relative; z-index: 1; word-break: keep-all; }
+
+/* ── Intro ── */
+.intro {
+  background: #fff; border: 1px solid #fce7f3; border-radius: 16px;
+  padding: 1.3rem 1.4rem; margin-bottom: 2.4rem;
+  font-size: 0.92rem; color: #3c3c43; line-height: 1.85; word-break: keep-all;
+}
+.intro b { color: #db2777; font-weight: 700; }
+
+/* ── Section title ── */
+.sec-title {
+  font-size: 1.08rem; font-weight: 800; color: #1d1d1f; letter-spacing: -0.02em;
+  margin: 0 0 1.3rem; display: flex; align-items: center; gap: 8px;
+}
+.sec-title .bar { width: 4px; height: 18px; border-radius: 3px; background: linear-gradient(180deg,#f472b6,#db2777); }
+
+/* ── Form ── */
+.form-card {
+  background: #fff; border: 1px solid #fce7f3; border-radius: 18px;
+  padding: 1.5rem 1.6rem; margin-bottom: 2.2rem;
+}
+.field { margin-bottom: 18px; }
+.field:last-child { margin-bottom: 0; }
+.field-label { font-size: 13px; font-weight: 700; color: #1d1d1f; margin-bottom: 7px; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.field-num {
+  flex-shrink: 0; width: 20px; height: 20px; border-radius: 6px; font-size: 11px; font-weight: 800;
+  background: linear-gradient(135deg,#f472b6,#db2777); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.field-hint { font-size: 11.5px; color: #aeaeb2; font-weight: 500; margin: 4px 0 8px; line-height: 1.5; word-break: keep-all; }
+.field input, .field textarea, .field select {
+  width: 100%; border: 1px solid #fce7f3; border-radius: 12px; padding: 11px 13px;
+  font-size: 13.5px; font-family: inherit; color: #1d1d1f; background: #fff;
+  -webkit-appearance: none; appearance: none; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.field input::placeholder, .field textarea::placeholder { color: #cdcdd2; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: #db2777; box-shadow: 0 0 0 3px rgba(219,39,119,0.1); }
+.field textarea { resize: vertical; min-height: 64px; line-height: 1.65; }
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23db2777' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; padding-right: 34px; cursor: pointer;
+}
+.var-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+/* ── Buttons ── */
+.btn-row { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  border-radius: 13px; padding: 13px 20px; font-size: 14px; font-weight: 700;
+  cursor: pointer; border: none; font-family: inherit; transition: opacity 0.15s, transform 0.1s;
+}
+.btn:active { transform: scale(0.98); }
+.btn-gen { flex: 1; min-width: 160px; background: linear-gradient(135deg,#f472b6,#db2777); color: #fff; box-shadow: 0 6px 18px rgba(219,39,119,0.25); }
+.btn-gen:hover { opacity: 0.92; }
+.btn-sub { background: #fdf2f8; color: #db2777; border: 1px solid #fbcfe8; }
+.btn-sub:hover { background: #fce7f3; }
+
+/* ── Output ── */
+.output-card {
+  background: #fff; border: 1px solid #fce7f3; border-radius: 18px;
+  padding: 1.5rem 1.6rem; margin-bottom: 2.2rem;
+}
+.output-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.output-title { font-size: 14px; font-weight: 800; color: #1d1d1f; display: flex; align-items: center; gap: 7px; }
+.copy-btns { display: flex; gap: 8px; }
+.mini-btn {
+  border: 1px solid #fbcfe8; background: #fdf2f8; color: #db2777;
+  border-radius: 10px; padding: 8px 14px; font-size: 12.5px; font-weight: 700; cursor: pointer;
+  font-family: inherit; transition: background 0.15s;
+}
+.mini-btn:hover { background: #fce7f3; }
+.mini-btn:active { transform: scale(0.97); }
+#output {
+  width: 100%; min-height: 320px; border: 1px solid #f0e8ed; border-radius: 13px;
+  padding: 15px 16px; font-size: 13px; line-height: 1.75; color: #1d1d1f; background: #fafafa;
+  font-family: 'SF Mono', ui-monospace, 'Menlo', monospace; resize: vertical; outline: none; white-space: pre-wrap;
+}
+#output:focus { border-color: #fbcfe8; }
+.empty-note { font-size: 12.5px; color: #aeaeb2; line-height: 1.6; word-break: keep-all; }
+
+/* ── 작성 팁 ── */
+.tips {
+  background: linear-gradient(135deg,#fff0f7,#fdf2f8); border: 1px solid #fce7f3;
+  border-radius: 18px; padding: 1.5rem 1.6rem;
+}
+.tip-item { display: flex; gap: 12px; align-items: flex-start; padding: 13px 0; border-top: 1px solid #fbe3ee; }
+.tip-item:first-of-type { border-top: none; padding-top: 0; }
+.tip-mark {
+  flex-shrink: 0; width: 22px; height: 22px; border-radius: 7px;
+  background: #db2777; color: #fff; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800;
+}
+.tip-text { font-size: 13px; color: #3c3c43; line-height: 1.7; word-break: keep-all; }
+.tip-text b { color: #db2777; font-weight: 700; }
+
+/* ── Footer nav ── */
+.foot-nav { display: flex; justify-content: center; margin-top: 1.8rem; }
+.foot-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: linear-gradient(135deg,#f472b6,#db2777); color: #fff;
+  border-radius: 14px; padding: 13px 24px; font-size: 14px; font-weight: 700;
+  text-decoration: none; box-shadow: 0 6px 18px rgba(219,39,119,0.25); transition: opacity 0.15s;
+}
+.foot-btn:hover { opacity: 0.9; }
+.foot-btn:active { transform: scale(0.98); }
+.foot { text-align: center; font-size: 11px; color: #c7c7cc; margin-top: 1.6rem; line-height: 1.7; }
+.foot b { color: #db2777; }
+
+/* ── Toast ── */
+.toast {
+  position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px);
+  background: #1d1d1f; color: #fff; font-size: 13px; font-weight: 600;
+  padding: 11px 20px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 500;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 520px) {
+  .wrap { padding: 1rem 0.75rem 3rem; }
+  .phero { padding: 1.4rem 1.2rem; }
+  .phero-title { font-size: 1.35rem; }
+  .form-card, .output-card { padding: 1.2rem 1.1rem; }
+  .var-grid { grid-template-columns: 1fr; }
+  .btn-gen { flex: 1 1 100%; }
+  .brand-name { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="science-studio.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <a href="science-studio.html" class="back-link">← 스튜디오</a>
+</header>
+
+<div class="wrap">
+
+  <!-- Hero -->
+  <section class="phero">
+    <span class="phero-tag">STEP 08 · 탐구 설계서</span>
+    <h1 class="phero-title">항목만 채우면 설계서가 정리됩니다</h1>
+    <p class="phero-sub">
+      앞에서 배운 흐름을 <b style="color:#fff;">한 장의 설계서</b>로 모으는 도구입니다.
+      칸을 채우고 버튼을 누르면 동기·질문·가설·변인·방법·후속 계획이 자동으로 정리됩니다.
+    </p>
+  </section>
+
+  <!-- Intro -->
+  <div class="intro">
+    아래 항목을 차근차근 채워 보세요. 빈칸이 있어도 괜찮습니다 —
+    나중에 채울 곳은 <b>(작성 필요)</b>로 표시되어 무엇이 빠졌는지 한눈에 보입니다.
+    완성된 초안은 그대로 복사하거나 파일로 내려받아 다듬으면 됩니다.
+    <b>모든 입력은 이 기기에서만 처리되며 어디에도 저장·전송되지 않습니다.</b>
+  </div>
+
+  <!-- Form -->
+  <div class="sec-title"><span class="bar"></span>설계서 항목 작성</div>
+  <div class="form-card">
+
+    <div class="field">
+      <label class="field-label" for="f-title"><span class="field-num">1</span>탐구 제목</label>
+      <div class="field-hint">바꾸는 것과 재는 것이 드러나게. 예) 촉매 종류에 따른 과산화수소 분해 속도 비교</div>
+      <input id="f-title" type="text" placeholder="탐구 제목을 입력하세요">
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="f-motive"><span class="field-num">2</span>탐구 동기</label>
+      <div class="field-hint">수업의 어느 지점에서 어떤 질문이 생겼는지로 시작하세요.</div>
+      <textarea id="f-motive" placeholder="예) 통합과학에서 촉매가 반응 속도를 높인다는 것을 배우고, 천연 물질도 촉매가 될 수 있을지 궁금했다."></textarea>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="f-question"><span class="field-num">3</span>탐구 질문</label>
+      <div class="field-hint">"무엇을 바꾸면 무엇이 어떻게 달라질까?" 형태로.</div>
+      <textarea id="f-question" placeholder="예) 촉매 종류(이산화망간·감자즙)를 바꾸면 산소 발생 속도는 어떻게 달라질까?"></textarea>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="f-hypothesis"><span class="field-num">4</span>가설</label>
+      <div class="field-hint">예상되는 결과와 그렇게 생각한 이유를 함께.</div>
+      <textarea id="f-hypothesis" placeholder="예) 무기 촉매인 이산화망간이 더 빠를 것이다. 반응성이 더 클 것이라 예상했기 때문이다."></textarea>
+    </div>
+
+    <div class="field">
+      <label class="field-label"><span class="field-num">5</span>변인 설계</label>
+      <div class="field-hint">바꾸는 것 1개, 고정하는 것, 재는 것을 분명히 나누세요.</div>
+      <div class="var-grid">
+        <input id="f-iv" type="text" placeholder="조작변인 (바꾸는 것)">
+        <input id="f-cv" type="text" placeholder="통제변인 (고정하는 것)">
+        <input id="f-dv" type="text" placeholder="종속변인 (재는 것)">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="f-method"><span class="field-num">6</span>탐구 방법</label>
+      <div class="field-hint">질문에 맞는 기법을 고르고, 절차를 간단히 적으세요.</div>
+      <select id="f-method">
+        <option value="">기법 선택…</option>
+        <option value="실험 탐구">실험 탐구 (변인을 직접 조작)</option>
+        <option value="관측·측정 탐구">관측·측정 탐구 (자연 현상 기록)</option>
+        <option value="데이터 분석 탐구">데이터 분석 탐구 (공개 데이터)</option>
+        <option value="모델링·시뮬레이션">모델링·시뮬레이션 (수식·프로그램)</option>
+        <option value="문헌·비교 탐구">문헌·비교 탐구 (선행 자료 종합)</option>
+      </select>
+      <textarea id="f-procedure" placeholder="예) ① 같은 농도의 과산화수소를 준비한다 ② 촉매를 각각 같은 양 넣는다 ③ 1분간 발생한 산소 부피를 3회 반복 측정해 평균을 낸다" style="margin-top:10px;"></textarea>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="f-measure"><span class="field-num">7</span>측정 · 자료 수집</label>
+      <div class="field-hint">무엇을 어떤 단위로, 몇 번 잴지. 데이터면 출처·수집일도.</div>
+      <textarea id="f-measure" placeholder="예) 산소 발생량을 mL 단위로 1분간 측정, 조건마다 3회 반복해 평균과 편차를 기록."></textarea>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="f-expect"><span class="field-num">8</span>예상 결과</label>
+      <div class="field-hint">그래프 모양이나 경향으로 예상해 보세요.</div>
+      <textarea id="f-expect" placeholder="예) 촉매를 넣은 조건이 넣지 않은 조건보다 산소 발생 속도가 뚜렷이 클 것이다."></textarea>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="f-safety"><span class="field-num">9</span>안전 · 윤리 고려</label>
+      <div class="field-hint">사용하는 물질·도구의 안전 수칙과 주의점.</div>
+      <textarea id="f-safety" placeholder="예) 과산화수소는 보안경·장갑을 착용하고 다루며, 환기되는 곳에서 실험한다."></textarea>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="f-next"><span class="field-num">10</span>후속 탐구 계획</label>
+      <div class="field-hint">이 탐구가 끝난 뒤 더 깊게 가고 싶은 방향.</div>
+      <textarea id="f-next" placeholder="예) 온도와 효소 농도를 추가 변인으로 두고 최적 조건을 찾는 실험으로 확장하고 싶다."></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" class="btn btn-gen" onclick="generatePlan()">✨ 설계서 초안 생성</button>
+      <button type="button" class="btn btn-sub" onclick="resetForm()">↺ 초기화</button>
+    </div>
+
+  </div>
+
+  <!-- Output -->
+  <div class="sec-title"><span class="bar"></span>생성된 설계서 초안</div>
+  <div class="output-card">
+    <div class="output-head">
+      <div class="output-title">📄 탐구 설계서 초안</div>
+      <div class="copy-btns">
+        <button type="button" class="mini-btn" onclick="copyPlan()">복사</button>
+        <button type="button" class="mini-btn" onclick="downloadPlan()">파일로 저장</button>
+      </div>
+    </div>
+    <textarea id="output" readonly placeholder="위 항목을 채우고 '설계서 초안 생성'을 누르면 여기에 정리된 초안이 나타납니다."></textarea>
+    <p class="empty-note" style="margin-top:10px;">생성 후 이 칸에서 직접 다듬을 수도 있습니다. (다듬은 내용도 복사·저장에 반영됩니다)</p>
+  </div>
+
+  <!-- 작성 팁 -->
+  <div class="sec-title"><span class="bar"></span>잘 쓰기 위한 팁</div>
+  <div class="tips">
+    <div class="tip-item">
+      <div class="tip-mark">✓</div>
+      <div class="tip-text">제목과 질문에는 반드시 <b>바꾸는 것과 재는 것</b>이 함께 들어가게 하세요.</div>
+    </div>
+    <div class="tip-item">
+      <div class="tip-mark">✓</div>
+      <div class="tip-text">조작변인은 <b>하나만</b> 두고 나머지는 통제하면 결과 해석이 깔끔해집니다.</div>
+    </div>
+    <div class="tip-item">
+      <div class="tip-mark">✓</div>
+      <div class="tip-text">측정은 한 번이 아니라 <b>반복·평균</b>으로 계획해 신뢰도를 높이세요.</div>
+    </div>
+    <div class="tip-item">
+      <div class="tip-mark">✓</div>
+      <div class="tip-text">후속 계획까지 적으면 면접에서 <b>발전 가능성</b>을 보여 줄 수 있습니다.</div>
+    </div>
+  </div>
+
+  <div class="foot-nav">
+    <a href="science-studio.html" class="foot-btn">← 다른 탐구 메뉴 보기</a>
+  </div>
+
+  <div class="foot">
+    <b>베타과학학원</b> · 과학 심화탐구 설계 스튜디오 · 탐구 설계서
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  function val(id) {
+    var el = document.getElementById(id);
+    return el ? el.value.trim() : "";
+  }
+  function or(text, ph) {
+    return text ? text : (ph || "(작성 필요)");
+  }
+
+  function showToast(msg) {
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function () { t.classList.remove("show"); }, 1800);
+  }
+
+  window.generatePlan = function () {
+    var title = val("f-title");
+    var method = val("f-method");
+
+    var iv = val("f-iv"), cv = val("f-cv"), dv = val("f-dv");
+    var varBlock =
+      "- 조작변인 (바꾸는 것): " + or(iv) + "\n" +
+      "- 통제변인 (고정하는 것): " + or(cv) + "\n" +
+      "- 종속변인 (재는 것): " + or(dv);
+
+    var methodLine = method ? ("기법: " + method) : "기법: (작성 필요)";
+    var procedure = or(val("f-procedure"));
+
+    var lines = [];
+    lines.push("【 탐구 설계서 】");
+    lines.push("");
+    lines.push("제목: " + or(title, "(제목 미작성)"));
+    lines.push("작성: 베타과학학원 과학 심화탐구 설계 스튜디오");
+    lines.push("");
+    lines.push("─────────────────────");
+    lines.push("");
+    lines.push("1. 탐구 동기");
+    lines.push(or(val("f-motive")));
+    lines.push("");
+    lines.push("2. 탐구 질문");
+    lines.push(or(val("f-question")));
+    lines.push("");
+    lines.push("3. 가설");
+    lines.push(or(val("f-hypothesis")));
+    lines.push("");
+    lines.push("4. 변인 설계");
+    lines.push(varBlock);
+    lines.push("");
+    lines.push("5. 탐구 방법");
+    lines.push(methodLine);
+    lines.push("절차: " + procedure);
+    lines.push("");
+    lines.push("6. 측정 및 자료 수집");
+    lines.push(or(val("f-measure")));
+    lines.push("");
+    lines.push("7. 예상 결과");
+    lines.push(or(val("f-expect")));
+    lines.push("");
+    lines.push("8. 안전 · 윤리 고려사항");
+    lines.push(or(val("f-safety")));
+    lines.push("");
+    lines.push("9. 후속 탐구 계획");
+    lines.push(or(val("f-next")));
+    lines.push("");
+    lines.push("─────────────────────");
+
+    var out = document.getElementById("output");
+    out.value = lines.join("\n");
+    out.scrollIntoView({ behavior: "smooth", block: "start" });
+    showToast("설계서 초안이 생성되었습니다");
+  };
+
+  window.copyPlan = function () {
+    var out = document.getElementById("output");
+    if (!out.value.trim()) { showToast("먼저 초안을 생성하세요"); return; }
+    var done = function () { showToast("복사되었습니다"); };
+    var fail = function () {
+      // fallback
+      out.removeAttribute("readonly");
+      out.focus();
+      out.select();
+      try {
+        document.execCommand("copy");
+        showToast("복사되었습니다");
+      } catch (e) {
+        showToast("복사를 지원하지 않는 환경입니다");
+      }
+      out.setAttribute("readonly", "readonly");
+      window.getSelection && window.getSelection().removeAllRanges();
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(out.value).then(done, fail);
+    } else {
+      fail();
+    }
+  };
+
+  window.downloadPlan = function () {
+    var out = document.getElementById("output");
+    if (!out.value.trim()) { showToast("먼저 초안을 생성하세요"); return; }
+    var titleRaw = val("f-title") || "탐구설계서";
+    var fname = titleRaw.replace(/[\\/:*?"<>|]/g, "_").slice(0, 40) + ".txt";
+    try {
+      var blob = new Blob([out.value], { type: "text/plain;charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = fname;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      showToast("파일을 저장했습니다");
+    } catch (e) {
+      showToast("저장을 지원하지 않는 환경입니다");
+    }
+  };
+
+  window.resetForm = function () {
+    var ids = ["f-title","f-motive","f-question","f-hypothesis","f-iv","f-cv","f-dv","f-procedure","f-measure","f-expect","f-safety","f-next"];
+    for (var i = 0; i < ids.length; i++) {
+      var el = document.getElementById(ids[i]);
+      if (el) el.value = "";
+    }
+    document.getElementById("f-method").value = "";
+    document.getElementById("output").value = "";
+    showToast("모두 비웠습니다");
+  };
+})();
+</script>
+
+</body>
+</html>
