@@ -2,9 +2,10 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8"><script src="/favicon.js"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>베타과학학원 · 통합과학 수행평가 AI 작성 도우미</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>베타과학학원 · 통합과학 수행평가 보고서</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
 <style>
 :root{
@@ -12,182 +13,123 @@
   --bg-tint:#eff6ff;--bg-tint2:#dbeafe;--border:#bfdbfe;--border-soft:#e0eaff;
   --green:#16a34a;--green-bg:#f0fdf4;--green-bd:#bbf7d0;
   --amber:#d97706;--amber-bg:#fffbeb;--amber-bd:#fde68a;
-  --violet:#7c3aed;--violet-bg:#faf5ff;--violet-bd:#ddd6fe;
-  --red:#dc2626;
+  --violet:#7c3aed;
+  --safe-b:env(safe-area-inset-bottom);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif;background:#fafafa;color:#1d1d1f;min-height:100vh;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
 
 /* Header */
-.header{background:#fff;border-bottom:1px solid var(--border-soft);padding:0 1.2rem;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300}
+.header{background:#fff;border-bottom:1px solid var(--border-soft);padding:0 1rem;padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right));height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300}
 .header-left{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit;cursor:pointer;transition:opacity .15s}
 .header-left:hover{opacity:.75}
 .logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--blue-mid),var(--navy));border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.brand-name{font-size:14px;font-weight:600;color:#1d1d1f;letter-spacing:-.3px}
+.brand-name{font-size:14px;font-weight:600;letter-spacing:-.3px}
 .header-badge{display:flex;align-items:center;gap:5px;background:var(--green-bg);border:1px solid var(--green-bd);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;color:var(--green);white-space:nowrap}
 .dot-green{width:5px;height:5px;background:#22c55e;border-radius:50%;animation:blink 2s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.icon-btn{padding:7px 12px;min-height:36px;background:transparent;border:1.5px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap}
-.icon-btn:hover{background:var(--bg-tint)}
-.icon-btn:active{background:var(--bg-tint2)}
 
-.wrap{max-width:1100px;margin:0 auto;padding:1.2rem 0.9rem 5rem;padding-bottom:max(5rem,calc(4rem + env(safe-area-inset-bottom)))}
-.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1.1rem;flex-wrap:wrap}
-.bc-item{font-size:12px;color:#aeaeb2;font-weight:500;text-decoration:none;cursor:pointer;transition:color .15s}
+.wrap{max-width:920px;margin:0 auto;padding:1.1rem 0.9rem;padding-left:max(.9rem,env(safe-area-inset-left));padding-right:max(.9rem,env(safe-area-inset-right));padding-bottom:calc(7rem + var(--safe-b))}
+
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.bc-item{font-size:12px;color:#aeaeb2;font-weight:500;text-decoration:none;cursor:pointer}
 .bc-item:hover{color:var(--royal)}
 .bc-sep{font-size:12px;color:#d1d1d6}
-.bc-current{font-size:12px;color:#1d1d1f;font-weight:700}
+.bc-current{font-size:12px;font-weight:700}
 
-.welcome-bar{background:linear-gradient(135deg,var(--bg-tint) 0%,#eef4ff 60%,#f0f7ff 100%);border:1px solid var(--border);border-radius:18px;padding:1.2rem 1.4rem;margin-bottom:1.4rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.welcome-left{display:flex;align-items:center;gap:14px}
-.welcome-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--blue-mid),var(--navy));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 4px 14px rgba(30,58,138,.25)}
-.welcome-title{font-size:1.1rem;font-weight:800;color:#1d1d1f;letter-spacing:-.03em}
-.welcome-sub{font-size:12px;color:#6e6e73;margin-top:4px;line-height:1.5}
-.welcome-tag{display:inline-flex;align-items:center;gap:6px;background:var(--bg-tint2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--navy)}
+.welcome-bar{background:linear-gradient(135deg,var(--bg-tint) 0%,#eef4ff 60%,#f0f7ff 100%);border:1px solid var(--border);border-radius:18px;padding:1.1rem 1.3rem;margin-bottom:1.3rem;display:flex;align-items:center;gap:13px}
+.welcome-avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--blue-mid),var(--navy));display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;box-shadow:0 4px 14px rgba(30,58,138,.25)}
+.welcome-title{font-size:1.05rem;font-weight:800;letter-spacing:-.03em}
+.welcome-sub{font-size:12px;color:#6e6e73;margin-top:4px;line-height:1.55}
 
 .section-heading{font-size:11px;font-weight:700;color:#aeaeb2;letter-spacing:.09em;text-transform:uppercase;margin-bottom:.8rem}
 
-/* Buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 20px;border-radius:12px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;border:1.5px solid transparent;transition:all .15s;white-space:nowrap}
-.btn-primary{background:linear-gradient(135deg,var(--royal),var(--navy));color:#fff;box-shadow:0 4px 12px rgba(30,58,138,.22)}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(30,58,138,.3)}
-.btn-primary:active{transform:scale(.98)}
-.btn-primary:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
-.btn-ghost{background:#fff;color:var(--navy);border-color:var(--border)}
-.btn-ghost:hover{background:var(--bg-tint)}
-.btn-sm{padding:8px 14px;font-size:12px;border-radius:10px}
-.btn-danger{background:#fff;color:var(--red);border-color:#fecaca}
-.btn-danger:hover{background:#fef2f2}
-
 /* Tabs */
-.tabs{display:flex;gap:8px;margin-bottom:1.2rem;flex-wrap:wrap}
-.tab{padding:9px 18px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid var(--border-soft);background:#fff;color:#6e6e73;transition:all .15s}
+.tabs{display:flex;gap:8px;margin-bottom:1.2rem}
+.tab{flex:1;text-align:center;padding:11px 10px;border-radius:13px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid var(--border-soft);background:#fff;color:#6e6e73;transition:all .15s;min-height:46px;display:flex;align-items:center;justify-content:center;gap:6px}
 .tab.active{border-color:var(--royal);background:var(--bg-tint);color:var(--navy)}
 
-/* Project list */
-.list-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:10px;flex-wrap:wrap}
-.proj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.proj-card{background:#fff;border:1px solid var(--border-soft);border-radius:16px;padding:1.1rem 1.2rem;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;display:flex;flex-direction:column;gap:8px}
-.proj-card:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(30,58,138,.1);border-color:var(--border)}
-.proj-top{display:flex;align-items:flex-start;gap:10px}
-.proj-ic{width:40px;height:40px;border-radius:10px;background:var(--bg-tint);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.proj-title{font-size:14px;font-weight:700;color:#1d1d1f;line-height:1.35}
-.proj-meta{font-size:11px;color:#aeaeb2;margin-top:3px}
-.proj-foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:8px;border-top:1px solid var(--border-soft)}
-.proj-prog{font-size:11px;font-weight:700;color:var(--royal)}
-.empty{background:#fff;border:1px dashed var(--border);border-radius:16px;padding:2.6rem 1rem;text-align:center;color:#aeaeb2;font-size:13px}
+/* Topic grid */
+.topic-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+.topic-card{background:#fff;border:1px solid var(--border-soft);border-radius:18px;overflow:hidden;cursor:pointer;transition:transform .18s,box-shadow .18s;display:flex;flex-direction:column}
+.topic-card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(30,58,138,.13)}
+.topic-card:active{transform:scale(.985)}
+.tc-banner{height:84px;display:flex;align-items:center;justify-content:space-between;padding:0 1.1rem;position:relative;overflow:hidden}
+.tc-banner::before{content:'';position:absolute;right:-26px;bottom:-26px;width:96px;height:96px;border-radius:50%;background:rgba(255,255,255,.12)}
+.tb-a{background:linear-gradient(135deg,#22c55e,#15803d)}
+.tb-b{background:linear-gradient(135deg,#a78bfa,#6d28d9)}
+.tb-c{background:linear-gradient(135deg,#fb923c,#c2410c)}
+.tc-unit{font-size:11px;font-weight:800;color:rgba(255,255,255,.92);letter-spacing:-.01em;position:relative;z-index:1;line-height:1.3}
+.tc-emoji{font-size:30px;position:relative;z-index:1}
+.tc-body{padding:.95rem 1.05rem 1.05rem;flex:1;display:flex;flex-direction:column;gap:9px}
+.tc-title{font-size:13.5px;font-weight:700;line-height:1.4;letter-spacing:-.01em}
+.tc-tags{display:flex;flex-wrap:wrap;gap:5px}
+.tg{font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;background:var(--bg-tint);color:var(--navy);white-space:nowrap}
+.tc-go{margin-top:auto;font-size:12px;font-weight:700;color:var(--royal);display:flex;justify-content:flex-end;gap:5px}
 
-/* Wizard */
-.wiz{display:grid;grid-template-columns:230px 1fr;gap:18px;align-items:start}
-.stepnav{background:#fff;border:1px solid var(--border-soft);border-radius:16px;padding:.7rem;position:sticky;top:70px}
-.stepnav-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;cursor:pointer;transition:background .15s;margin-bottom:2px}
-.stepnav-item:hover{background:var(--bg-tint)}
-.stepnav-item.active{background:var(--bg-tint2)}
-.sn-num{width:24px;height:24px;border-radius:7px;background:#f0f0f3;color:#aeaeb2;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.stepnav-item.active .sn-num{background:linear-gradient(135deg,var(--royal),var(--navy));color:#fff}
-.sn-done .sn-num{background:var(--green);color:#fff}
-.sn-label{font-size:12px;font-weight:600;color:#1d1d1f}
-.stepnav-item.active .sn-label{color:var(--navy);font-weight:700}
+.empty{background:#fff;border:1px dashed var(--border);border-radius:18px;padding:2.6rem 1rem;text-align:center;color:#aeaeb2;font-size:13px;line-height:1.7}
 
-.panel{background:#fff;border:1px solid var(--border-soft);border-radius:18px;padding:1.5rem 1.6rem;min-height:340px}
-.panel-title{font-size:1.05rem;font-weight:800;color:#1d1d1f;letter-spacing:-.02em;display:flex;align-items:center;gap:9px}
-.panel-desc{font-size:12.5px;color:#6e6e73;margin-top:6px;line-height:1.6;margin-bottom:1.3rem}
-.step-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:1.6rem;padding-top:1.2rem;border-top:1px solid var(--border-soft);flex-wrap:wrap}
+/* Report view */
+.rep-head{border-radius:18px;padding:1.3rem 1.4rem;margin-bottom:1.1rem;color:#fff;position:relative;overflow:hidden}
+.rep-head::before{content:'';position:absolute;right:-30px;bottom:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.12)}
+.rh-a{background:linear-gradient(135deg,#22c55e,#15803d)}
+.rh-b{background:linear-gradient(135deg,#a78bfa,#6d28d9)}
+.rh-c{background:linear-gradient(135deg,#fb923c,#c2410c)}
+.rep-unit{font-size:11px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:.04em;position:relative;z-index:1}
+.rep-title{font-size:1.25rem;font-weight:800;letter-spacing:-.02em;margin:7px 0 10px;line-height:1.35;position:relative;z-index:1}
+.rep-tags{display:flex;flex-wrap:wrap;gap:6px;position:relative;z-index:1}
+.rep-tags .tg{background:rgba(255,255,255,.22);color:#fff}
 
-/* Fields */
-.field{margin-bottom:1rem}
-.field-label{display:block;font-size:12px;font-weight:700;color:#1d1d1f;margin-bottom:6px}
-.field-label .req{color:var(--red);margin-left:3px}
-.input,.textarea,select.input{width:100%;padding:11px 13px;border:1.5px solid var(--border-soft);border-radius:11px;font-size:13px;font-family:inherit;color:#1d1d1f;background:#fff;transition:border-color .15s;outline:none}
-.input:focus,.textarea:focus,select.input:focus{border-color:var(--royal)}
-.textarea{resize:vertical;min-height:90px;line-height:1.6}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-.hint{font-size:11px;color:#aeaeb2;margin-top:5px;line-height:1.5}
+.name-row{background:#fff;border:1px solid var(--border-soft);border-radius:14px;padding:.9rem 1rem;margin-bottom:1.1rem}
+.name-row label{font-size:11px;font-weight:700;color:#6e6e73;display:block;margin-bottom:6px}
 
-/* Topic cards */
-.topic-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:.4rem}
-.topic-col-head{font-size:11px;font-weight:800;letter-spacing:.05em;text-align:center;padding:7px;border-radius:9px;margin-bottom:8px}
-.tch-1{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd)}
-.tch-2{background:var(--bg-tint);color:var(--royal);border:1px solid var(--border)}
-.tch-3{background:var(--violet-bg);color:var(--violet);border:1px solid var(--violet-bd)}
-.topic-card{background:#fff;border:1px solid var(--border-soft);border-radius:12px;padding:.9rem;margin-bottom:8px;cursor:pointer;transition:all .15s}
-.topic-card:hover{border-color:var(--royal);box-shadow:0 4px 12px rgba(30,58,138,.1)}
-.topic-card.picked{border-color:var(--royal);background:var(--bg-tint)}
-.tc-title{font-size:13px;font-weight:700;color:#1d1d1f;line-height:1.4;margin-bottom:7px}
-.tc-rate{display:flex;justify-content:space-between;font-size:10.5px;color:#6e6e73;margin-top:3px}
-.tc-stars{color:var(--amber);font-size:10px;letter-spacing:1px}
+.rep-sec{background:#fff;border:1px solid var(--border-soft);border-radius:14px;padding:1rem 1.1rem;margin-bottom:11px}
+.sec-label{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:800;color:var(--navy);margin-bottom:9px}
+.sec-no{width:22px;height:22px;border-radius:7px;background:var(--bg-tint2);color:var(--navy);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 
-/* Report */
-.rep-sec{margin-bottom:1rem}
-.rep-sec .field-label{display:flex;align-items:center;gap:7px}
-.rep-no{width:20px;height:20px;border-radius:6px;background:var(--bg-tint2);color:var(--navy);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.input,.textarea{width:100%;padding:11px 12px;border:1.5px solid var(--border-soft);border-radius:11px;font-size:15px;font-family:inherit;color:#1d1d1f;background:#fcfdff;outline:none;line-height:1.75;transition:border-color .15s;word-break:break-word}
+.input:focus,.textarea:focus{border-color:var(--royal)}
+.textarea{resize:vertical;min-height:70px}
 
-/* SAET / Career */
-.out-block{border:1px solid var(--border-soft);border-radius:13px;padding:1rem 1.1rem;margin-bottom:11px;background:#fcfdff}
-.out-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.out-tag{font-size:11px;font-weight:800;padding:3px 11px;border-radius:20px}
-.ot-basic{background:#f5f5f7;color:#6e6e73}
-.ot-good{background:var(--bg-tint2);color:var(--navy)}
-.ot-top{background:#fef3c7;color:#92400e}
-.out-text{font-size:13px;color:#1d1d1f;line-height:1.7}
-.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.chip{font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:8px;background:var(--bg-tint);color:var(--navy);border:1px solid var(--border-soft)}
+.saet-block{background:var(--amber-bg);border:1px solid var(--amber-bd);border-radius:14px;padding:1rem 1.1rem;margin-bottom:11px}
+.saet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;flex-wrap:wrap;gap:8px}
+.saet-title{font-size:13.5px;font-weight:800;color:#92400e;display:flex;align-items:center;gap:7px}
+.saet-block .textarea{background:#fff;border-color:var(--amber-bd)}
 
-/* Eval */
-.score-big{text-align:center;padding:1.2rem;background:linear-gradient(135deg,var(--bg-tint),#eef4ff);border:1px solid var(--border);border-radius:16px;margin-bottom:1.2rem}
-.score-num{font-size:2.6rem;font-weight:900;color:var(--navy);letter-spacing:-.03em;line-height:1}
-.score-lbl{font-size:12px;color:#6e6e73;margin-top:4px;font-weight:600}
-.eval-row{margin-bottom:11px}
-.eval-top{display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;margin-bottom:5px}
-.eval-bar-bg{height:9px;background:#f0f0f3;border-radius:20px;overflow:hidden}
-.eval-bar{height:100%;background:linear-gradient(90deg,var(--blue-mid),var(--navy));border-radius:20px;transition:width .5s}
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 18px;border-radius:13px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;border:1.5px solid transparent;transition:all .15s;min-height:46px}
+.btn-primary{background:linear-gradient(135deg,var(--royal),var(--navy));color:#fff;box-shadow:0 4px 12px rgba(30,58,138,.22)}
+.btn-primary:active{transform:scale(.97)}
+.btn-ghost{background:#fff;color:var(--navy);border-color:var(--border)}
+.btn-ghost:active{background:var(--bg-tint)}
+.btn-sm{padding:8px 13px;font-size:12px;min-height:38px;border-radius:10px}
 
-/* misc */
-.spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
-.spinner-dark{border:2px solid var(--border);border-top-color:var(--royal)}
-@keyframes spin{to{transform:rotate(360deg)}}
-.msg{font-size:12px;padding:9px 12px;border-radius:10px;margin-top:10px;line-height:1.5;display:none}
-.msg.err{display:block;background:#fef2f2;color:var(--red);border:1px solid #fecaca}
-.msg.ok{display:block;background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd)}
-.note-box{background:var(--amber-bg);border:1px solid var(--amber-bd);border-radius:11px;padding:.8rem 1rem;font-size:12px;color:#92400e;line-height:1.6;margin-bottom:1rem}
+.back-bar{display:flex;align-items:center;margin-bottom:1rem}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--navy);cursor:pointer;padding:8px 4px}
 
-/* Modal */
-.modal{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;z-index:500;padding:1rem}
-.modal.open{display:flex}
-.modal-card{background:#fff;border-radius:18px;padding:1.6rem;max-width:440px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25)}
-.modal-title{font-size:1.05rem;font-weight:800;margin-bottom:6px}
-.modal-sub{font-size:12px;color:#6e6e73;line-height:1.6;margin-bottom:1.1rem}
+/* 하단 고정 액션바 (모바일 핵심) */
+.action-dock{position:fixed;left:0;right:0;bottom:0;z-index:200;background:rgba(255,255,255,.96);backdrop-filter:saturate(180%) blur(10px);border-top:1px solid var(--border-soft);padding:.7rem .9rem;padding-bottom:calc(.7rem + var(--safe-b));display:none;gap:8px}
+.action-dock.show{display:flex}
+.action-dock .btn{flex:1;padding:13px 8px;font-size:13.5px}
 
-/* upload */
-.drop{border:1.5px dashed var(--border);border-radius:12px;padding:1.4rem;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg-tint)}
-.drop:hover{border-color:var(--royal);background:var(--bg-tint2)}
-.drop-ic{font-size:1.8rem}
-.drop-t{font-size:12.5px;font-weight:700;color:var(--navy);margin-top:6px}
-.drop-s{font-size:11px;color:#aeaeb2;margin-top:3px}
-.preview-img{max-width:100%;border-radius:10px;margin-top:10px;border:1px solid var(--border-soft)}
+.toast{position:fixed;left:50%;bottom:calc(86px + var(--safe-b));transform:translateX(-50%) translateY(20px);background:#1d1d1f;color:#fff;font-size:13px;font-weight:600;padding:11px 20px;border-radius:24px;z-index:400;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-.footer{background:#fff;border-top:1px solid var(--border-soft);padding:1.8rem 1.5rem;margin-top:2rem;text-align:center}
+.footer{background:#fff;border-top:1px solid var(--border-soft);padding:1.6rem 1rem;text-align:center;margin-top:1.5rem}
 .footer-logo{font-size:14px;font-weight:800;letter-spacing:-.02em}
 .footer-logo span{color:var(--royal)}
 .footer-copy{font-size:11px;color:#aeaeb2;margin-top:6px}
 
-@media(max-width:820px){
-  .wiz{grid-template-columns:1fr}
-  .stepnav{position:static;display:grid;grid-template-columns:repeat(2,1fr);gap:4px}
-  .stepnav-item{margin-bottom:0}
-}
-@media(max-width:600px){
-  .wrap{padding:1rem .75rem 4rem}
-  .proj-grid{grid-template-columns:1fr}
-  .grid2,.grid3{grid-template-columns:1fr}
-  .topic-cols{grid-template-columns:1fr}
-  .welcome-bar{flex-direction:column;align-items:flex-start}
-  .stepnav{grid-template-columns:1fr}
-  .panel{padding:1.2rem}
+.hidden{display:none!important}
+
+@media(max-width:560px){
+  .topic-grid{grid-template-columns:1fr}
+  .welcome-bar{align-items:flex-start}
+  .rep-title{font-size:1.12rem}
+  .wrap{padding:1rem .8rem;padding-bottom:calc(7rem + var(--safe-b))}
   .header-badge .dot-green{display:none}
 }
-.hidden{display:none!important}
 </style>
 </head>
 <body>
@@ -202,488 +144,254 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
     </div>
     <span class="brand-name">베타과학학원</span>
   </a>
-  <div style="display:flex;align-items:center;gap:8px">
-    <div class="header-badge"><span class="dot-green"></span>AI</div>
-    <button class="icon-btn" onclick="openSettings()">⚙️ 설정</button>
-  </div>
+  <div class="header-badge"><span class="dot-green"></span>통합과학 수행평가</div>
 </header>
 
 <div class="wrap">
   <div class="breadcrumb">
     <a class="bc-item" onclick="goList()">🏠 홈</a>
     <span class="bc-sep">›</span>
-    <span class="bc-current" id="bc-tail">🔬 통합과학 수행평가</span>
+    <span class="bc-current" id="bc-tail">📝 수행평가 보고서</span>
   </div>
 
-  <div class="welcome-bar">
-    <div class="welcome-left">
+  <!-- ════ 목록 ════ -->
+  <section id="view-list">
+    <div class="welcome-bar">
       <div class="welcome-avatar">📝</div>
       <div>
-        <div class="welcome-title">통합과학 수행평가 AI 작성 도우미</div>
-        <div class="welcome-sub" id="welcome-sub">주제 추천부터 탐구 보고서·세특 문장·진로 분석·평가·PDF까지 한 번에<br>통합과학 1·2 · 학생부종합전형 · 세부능력특기사항 대응</div>
+        <div class="welcome-title">통합과학 수행평가 보고서</div>
+        <div class="welcome-sub">영상 주제를 고르면 모범 탐구 보고서를 바로 확인할 수 있어요<br>내용을 복사하거나 수정해서 제출용으로 활용하세요</div>
       </div>
     </div>
-    <div class="welcome-tag" id="welcome-date">📅 —</div>
-  </div>
 
-  <!-- ════════ 프로젝트 목록 ════════ -->
-  <section id="view-list">
-    <div class="section-heading">SUBJECT</div>
     <div class="tabs">
-      <div class="tab active" data-subj="통합과학1" onclick="setSubjectTab('통합과학1')">⚗️ 통합과학 1</div>
-      <div class="tab" data-subj="통합과학2" onclick="setSubjectTab('통합과학2')">🧬 통합과학 2</div>
+      <div class="tab active" data-subj="통합과학1" onclick="setTab('통합과학1')">⚗️ 통합과학 1</div>
+      <div class="tab" data-subj="통합과학2" onclick="setTab('통합과학2')">🧬 통합과학 2</div>
     </div>
 
-    <div class="list-head">
-      <div class="section-heading" style="margin:0">내 수행평가 보고서</div>
-      <button class="btn btn-primary btn-sm" onclick="newProject()">+ 새 수행평가 시작</button>
-    </div>
-    <div id="proj-grid" class="proj-grid"></div>
-    <div id="proj-empty" class="empty">아직 저장된 보고서가 없어요. <b>새 수행평가 시작</b>을 눌러 첫 보고서를 만들어 보세요.</div>
+    <div class="section-heading" id="list-count">주제</div>
+    <div id="topic-grid" class="topic-grid"></div>
+    <div id="topic-empty" class="empty hidden">이 과목 자료는 곧 추가됩니다 📚</div>
   </section>
 
-  <!-- ════════ 위저드 ════════ -->
-  <section id="view-wizard" class="hidden">
-    <div class="wiz">
-      <nav class="stepnav" id="stepnav"></nav>
-      <div id="panel-host"></div>
-    </div>
+  <!-- ════ 보고서 ════ -->
+  <section id="view-report" class="hidden">
+    <div class="back-bar"><span class="back-link" onclick="goList()">← 주제 목록</span></div>
+    <div id="report-host"></div>
   </section>
 </div>
+
+<!-- 하단 고정 액션바 -->
+<div class="action-dock" id="dock">
+  <button class="btn btn-primary" onclick="copyAll()">📋 전체 복사</button>
+  <button class="btn btn-ghost" onclick="printReport()">🖨️ 인쇄</button>
+  <button class="btn btn-ghost" onclick="exportPDF()">⬇️ PDF</button>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <footer class="footer">
   <div class="footer-logo">베타과학학원 · <span>Beta Science Academy</span></div>
-  <div class="footer-copy">© 2026 베타과학학원 · 통합과학 수행평가 AI 작성 도우미</div>
+  <div class="footer-copy">© 2026 베타과학학원 · 통합과학 수행평가 보고서</div>
 </footer>
 
-<!-- 설정 모달 -->
-<div class="modal" id="settings-modal">
-  <div class="modal-card">
-    <div class="modal-title">⚙️ AI 설정</div>
-    <div class="modal-sub">AI 기능(주제 추천·보고서·세특·진로·평가)을 쓰려면 OpenRouter API 키가 필요합니다. 키는 이 기기 브라우저에만 저장되며 코드에는 포함되지 않습니다.</div>
-    <div class="field">
-      <label class="field-label">OpenRouter API Key</label>
-      <input class="input" id="set-key" type="password" placeholder="sk-or-v1-...">
-      <div class="hint">openrouter.ai → Keys 에서 발급</div>
-    </div>
-    <div class="field">
-      <label class="field-label">모델</label>
-      <input class="input" id="set-model" placeholder="openai/gpt-4o-mini">
-      <div class="hint">기본값 openai/gpt-4o-mini · 더 좋은 품질은 anthropic/claude-3.5-sonnet 등으로 변경</div>
-    </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
-      <button class="btn btn-ghost btn-sm" onclick="closeSettings()">닫기</button>
-      <button class="btn btn-primary btn-sm" onclick="saveSettings()">저장</button>
-    </div>
-  </div>
-</div>
-
 <script>
-/* ══════════════ 저장소 ══════════════ */
-var LS_PROJ='beta_suhaeng_projects', LS_KEY='beta_openrouter_key', LS_MODEL='beta_openrouter_model';
-var state={projects:[],currentId:null,subjectTab:'통합과학1',step:0};
-var CAREERS=['의대','치대','한의대','약대','수의대','공대','자연과학','생명과학','화학','물리학','환경공학','기타'];
-var STEPS=[
-  {n:1,label:'기본 정보'},{n:2,label:'양식 분석'},{n:3,label:'주제 추천'},{n:4,label:'주제 입력'},{n:5,label:'자료 입력'},
-  {n:6,label:'보고서 생성'},{n:7,label:'세특 문장'},{n:8,label:'진로 연계'},{n:9,label:'AI 평가'},{n:10,label:'PDF 출력'}
+/* ════════ 데이터 ════════ */
+var TOPICS=[
+{
+  id:'misi-geosi', subject:'통합과학1', accent:'a', emoji:'🔭',
+  unit:'Ⅰ. 과학의 기초 · 과학의 기본량',
+  title:'미시 세계와 거시 세계의 규모(scale)에 따른 차이점 분석',
+  tags:['통합과학1','가상실험','미시세계','거시세계'],
+  sections:[
+    {label:'탐구 동기', body:'우리가 배우는 과학은 눈에 보이지 않을 만큼 작은 수소 원자부터 상상하기 어려울 만큼 거대한 우리은하까지 모두를 다룬다. 같은 자연을 탐구하더라도 대상의 크기가 이렇게까지 다르다면 측정하고 분석하는 방법도 달라지지 않을까 하는 의문이 들어 이 탐구를 시작하게 되었다.'},
+    {label:'탐구 목적', body:'미시 세계와 거시 세계를 대표하는 대상의 규모(scale) 차이를 비교하고, 규모가 달라질 때 측정 방법, 시간 규모, 측정 오차가 어떻게 달라지는지 분석하여 규모에 따른 과학적 탐구 방법의 차이를 이해한다.'},
+    {label:'관련 과학 개념', body:'· 규모(scale): 대상의 크기나 변화하는 시간의 정도를 나타내는 척도이다.\n· 미시 세계: 원자·분자처럼 매우 작은 영역으로, 대표적인 예는 수소 원자(약 10⁻¹⁰ m)이다.\n· 거시 세계: 천체처럼 매우 큰 영역으로, 대표적인 예는 우리은하(약 10²¹ m)이다.\n· 기본량과 단위: 길이(m), 시간(s)처럼 측정의 기준이 되는 양이다.\n· 측정 오차: 측정값과 참값의 차이로, 측정 방법과 대상에 따라 그 의미와 허용 범위가 달라진다.'},
+    {label:'탐구 과정 (시뮬레이션 분석)', body:'물체의 크기 비교 시뮬레이션을 이용하여 수소 원자부터 우리은하까지 여러 대상을 크기 순서로 배열하며 관찰하였다. 가장 작은 대상으로 수소 원자가, 가장 큰 대상으로 우리은하가 제시되었으며, 그 사이에 다양한 규모의 물체가 폭넓게 분포함을 확인하였다.'},
+    {label:'결과 분석', body:'규모가 달라지면 단순히 크기만 변하는 것이 아니라 탐구 방식 전반이 달라졌다.\n(1) 측정 방법의 가변성 — 미시 세계와 거시 세계는 같은 도구나 단위로 잴 수 없으며, 각 규모에 맞는 측정 체계가 필요하다.\n(2) 시간 규모의 차이 — 규모에 따라 변화가 일어나고 관찰되는 시간의 단위가 달라진다.\n(3) 측정 오차 범위의 차이 — 같은 크기의 오차라도 미시 세계와 거시 세계에서 갖는 의미가 다르므로, 오차를 해석하는 기준도 규모에 맞게 다시 정해야 한다.'},
+    {label:'결론', body:'자연 현상은 수소 원자에서 우리은하까지 극도로 다양한 규모를 가진다. 성공적인 과학적 분석을 위해서는 먼저 대상의 규모를 파악하고, 그 규모에 맞는 측정 방법·시간 관점·오차 기준을 적용해야 한다. 즉 규모의 변화는 곧 탐구 패러다임의 변화를 의미한다.'},
+    {label:'느낀 점', body:'같은 \u2018측정\u2019이라는 말도 대상의 크기에 따라 완전히 다른 방법과 기준을 요구한다는 점이 인상 깊었다. 앞으로 어떤 현상을 탐구할 때 \u2018이 대상은 어느 정도 규모인가\u2019를 먼저 생각하는 습관을 기르게 되었다.'}
+  ],
+  saet:'미시 세계와 거시 세계의 규모 비교 시뮬레이션을 분석하여 수소 원자와 우리은하를 양 극단의 사례로 제시하고, 규모의 차이가 측정 방법·시간 규모·측정 오차의 차이로 이어짐을 논리적으로 설명함. 규모에 따라 과학적 탐구 방법이 달라진다는 점을 스스로 도출하여 통합적 과학 사고력을 보임.'
+},
+{
+  id:'smart-measure', subject:'통합과학1', accent:'a', emoji:'📱',
+  unit:'Ⅰ. 과학의 기초 · 과학의 기본량',
+  title:'스마트 기기를 활용한 기본량(길이·거리·시간) 측정',
+  tags:['통합과학1','실험영상','기본량','측정'],
+  sections:[
+    {label:'탐구 동기', body:'늘 가지고 다니는 스마트폰이 단순한 통신 기기를 넘어 자, 줄자, 초시계 같은 측정 도구를 대신할 수 있을지 궁금하였다. 첨단 센서가 들어 있는 스마트 기기로 기본 물리량을 얼마나 빠르고 정확하게 잴 수 있는지 직접 확인해 보고자 하였다.'},
+    {label:'탐구 목적', body:'스마트 기기의 측정 애플리케이션을 이용하여 과학의 기초가 되는 기본량인 길이·거리·시간을 측정하는 원리와 방법을 익히고, 측정 도구로서의 유용성과 한계를 분석한다.'},
+    {label:'관련 과학 개념', body:'· 기본량: 모든 측정의 바탕이 되는 물리량이다. 국제단위계(SI)에서 길이는 미터(m), 시간은 초(s), 질량은 킬로그램(kg)을 기본 단위로 한다.\n· 길이·거리 측정 원리: 카메라로 들어온 영상 정보와 자이로스코프·가속도 센서, 일부 기기의 라이다(LiDAR) 센서를 결합하여 증강현실(AR) 기술로 공간을 3차원으로 인식하고 두 점 사이의 거리를 계산한다.\n· 시간 측정 원리: 기기 내부의 정밀한 디지털 발진기를 이용해 밀리초(ms) 단위까지 시간을 측정한다.'},
+    {label:'준비물', body:'스마트폰(또는 태블릿), 길이 측정용 물체(종이 상자), 거리 측정용 물체(화분), 길이·거리·시간 측정 애플리케이션'},
+    {label:'탐구 과정', body:'1) 앱 마켓에서 길이·거리·시간 측정 앱을 각각 설치한다.\n2) [길이] 길이 측정 앱을 켜고 화면의 점을 물체의 시작점에 맞춘 뒤, 기기를 천천히 움직여 끝점에 맞추고 버튼을 눌러 길이를 확인한다.\n3) [거리] 거리 측정 앱을 켜고 화면의 십자선을 목표물이 놓인 바닥에 맞춘 뒤 버튼을 눌러 나와 목표물 사이의 직선거리를 측정한다.\n4) [시간] 스톱워치 앱으로 시작·정지 버튼을 조작하여 시간을 측정한다.'},
+    {label:'관찰 결과 및 분석', body:'줄자를 대지 않고 카메라로 비추는 것만으로 종이 상자의 길이가 화면에 약 10 cm로 표시되었다. 직접 재기 어려운 화분까지의 거리도 약 3.8 m로 즉시 측정되었으나, 기기가 흔들릴 때 수치가 3.5~3.9 m 사이에서 미세하게 변동하였다. 시간은 10.09초처럼 0.01초 단위까지 정밀하게 측정되었다. 즉 스마트 기기는 접촉 없이도 길이·거리를 잴 수 있어 매우 편리하지만, 손떨림·조명·바닥 인식 상태에 따라 오차가 생길 수 있음을 알 수 있었다.'},
+    {label:'결론', body:'스마트 기기는 카메라와 내장 센서, AR 기술을 결합하여 훌륭한 과학 측정 도구로 활용될 수 있다. 휴대성이 뛰어나고 직접 닿기 어려운 곳의 거리도 쉽게 잴 수 있다는 장점이 있다.'},
+    {label:'느낀 점', body:'스마트폰 하나로 기본량을 모두 잴 수 있다는 점이 흥미로웠다. 다만 거리 측정에서 수치가 변동하는 것을 보며 측정 오차의 존재를 깨달았다. 더 정확한 측정을 위해서는 기기를 삼각대에 고정해 흔들림을 줄이거나, 줄자로 잰 값과 비교하여 정확도를 검증하는 추가 실험이 필요하다고 생각한다.'}
+  ],
+  saet:'스마트 기기의 측정 앱으로 길이·거리·시간을 직접 측정하며 AR과 센서 기반 측정 원리를 이해하고, 측정값이 손떨림·환경에 따라 변동함을 관찰하여 측정 오차의 개념과 통제 방법(삼각대 고정, 기준 도구와의 비교 검증)을 스스로 제안함. 일상 도구를 과학 탐구에 연결하는 융합적 사고가 돋보임.'
+},
+{
+  id:'spectrum', subject:'통합과학1', accent:'b', emoji:'🌈',
+  unit:'Ⅱ. 물질과 규칙성 · 원소의 생성과 규칙성',
+  title:'분광기를 활용한 다양한 물질의 스펙트럼 관찰 및 비교',
+  tags:['통합과학1','실험영상','스펙트럼','원소'],
+  sections:[
+    {label:'탐구 동기', body:'통합과학 시간에 우주 초기에 만들어진 원소들이 우주 곳곳에 분포한다는 것을 배웠다. 직접 갈 수 없는 수억 광년 떨어진 별의 구성 원소를 과학자들이 어떻게 알아냈는지 궁금하여, 원소가 내는 빛을 분석하는 스펙트럼 관찰 실험을 진행하게 되었다.'},
+    {label:'탐구 목적', body:'간이 분광기를 만들어 백열등, 수소·헬륨 기체 방전관에서 나오는 빛의 스펙트럼을 관찰하고, 물질에 따라 나타나는 스펙트럼의 종류와 특징을 비교하여 원소 분석의 원리를 이해한다.'},
+    {label:'관련 과학 개념', body:'· 스펙트럼: 빛이 분광기를 지날 때 파장에 따라 나뉘어 나타나는 색의 띠이다.\n· 연속 스펙트럼: 백열등처럼 고온·고밀도 광원에서 나오는, 끊김 없이 이어지는 무지개색 띠이다.\n· 방출(선) 스펙트럼: 고온의 기체에서 특정 파장의 빛만 방출되어 검은 바탕에 밝은 선으로 나타나는 띠이다. 원소마다 전자의 에너지 준위가 달라 고유한 선 스펙트럼을 가진다.'},
+    {label:'준비물 및 안전', body:'기체 방전관 전원 장치, 수소·헬륨 방전관, 간이 분광기 도안, 분광 필름, 양면테이프, 백열등, 스마트 기기, 실험복, 내열 장갑\n※ 안전: 방전관은 점등 시 매우 뜨겁고 고전압이 흐르므로 반드시 내열 장갑을 착용하고, 전원을 끄고 식은 뒤 교체하며, 젖은 손으로 만지지 않는다.'},
+    {label:'탐구 과정', body:'1) 분광 필름을 도안에 붙이고 접어 간이 분광기를 완성한다.\n2) 분광기를 스마트 기기 카메라에 밀착시켜 백열등 빛의 스펙트럼을 촬영한다.\n3) 전원 장치에 수소 방전관을 연결·점등하고 같은 방법으로 스펙트럼을 촬영한다.\n4) 내열 장갑을 끼고 전원을 차단한 뒤 수소 방전관을 헬륨 방전관으로 교체한다.\n5) 헬륨 방전관을 점등하여 스펙트럼을 촬영하고 수소의 결과와 비교한다.'},
+    {label:'관찰 결과 및 분석', body:'백열등에서는 빨강부터 보라까지 끊김 없이 이어지는 연속 스펙트럼이 관찰되었다. 수소 방전관에서는 검은 바탕에 몇 개의 밝은 선만 나타나는 선 스펙트럼이 관찰되었고, 헬륨 방전관에서도 선 스펙트럼이 나타났으나 선의 개수·색·위치가 수소와 명확히 달랐다. 이는 원소의 종류에 따라 선 스펙트럼이 달라짐을, 즉 선 스펙트럼이 원소의 \u2018지문\u2019 역할을 함을 보여 준다.'},
+    {label:'결론', body:'기체 상태의 원소는 종류에 따라 고유한 선 스펙트럼을 방출한다. 따라서 별빛의 스펙트럼을 지구에서 알고 있는 수소·헬륨 등의 스펙트럼과 비교하면, 그 별이 어떤 원소로 이루어져 있는지 알아낼 수 있다.'},
+    {label:'느낀 점', body:'종이와 분광 필름으로 만든 간이 분광기로도 원소의 고유한 특징을 눈으로 확인할 수 있어 신기했다. 수소와 헬륨이 전혀 다른 선을 만드는 것을 보며 \u2018선 스펙트럼은 원소의 지문\u2019이라는 비유를 완전히 이해하게 되었고, 빛의 분석이 우주를 탐구하는 강력한 도구임을 깨달았다.'}
+  ],
+  saet:'간이 분광기를 직접 제작하여 백열등과 수소·헬륨 방전관의 스펙트럼을 비교 관찰하고, 연속 스펙트럼과 선 스펙트럼의 차이를 전자의 에너지 준위와 연결지어 설명함. 원소마다 고유한 선 스펙트럼을 가진다는 점에서 별의 구성 원소 분석 원리까지 확장하여 이해하는 우수한 탐구 역량을 보임.'
+},
+{
+  id:'alkali', subject:'통합과학1', accent:'b', emoji:'🧪',
+  unit:'Ⅱ. 물질과 규칙성 · 원소의 생성과 규칙성',
+  title:'같은 족 원소(알칼리 금속)의 유사성 탐구 실험 설계',
+  tags:['통합과학1','가상실험','주기율표','알칼리금속'],
+  sections:[
+    {label:'탐구 동기', body:'주기율표에서 같은 족에 속한 원소들이 성질이 비슷하다고 배웠다. 특히 1족 알칼리 금속이 정말로 비슷한 성질을 보이는지 직접 실험으로 확인하고 싶어 이 탐구를 설계하게 되었다.'},
+    {label:'탐구 목적', body:'알칼리 금속(리튬·나트륨·칼륨)의 산소와의 반응성, 물과의 반응성과 수용액의 액성 변화를 관찰하여 같은 족 원소가 공통된 화학적 성질을 가짐을 확인한다.'},
+    {label:'관련 과학 개념', body:'· 주기율표의 족: 세로줄을 말하며, 같은 족 원소는 원자가 전자 수가 같아 화학적 성질이 비슷하다.\n· 알칼리 금속(1족): 원자가 전자가 1개여서 반응성이 매우 크다. 공기 중 산소와 빠르게 반응해 광택을 잃고, 물과 격렬히 반응하며 수소 기체를 발생시키고 염기성 수용액을 만든다.\n· 페놀프탈레인: 염기성에서 분홍색으로 변하는 지시약이다.'},
+    {label:'준비물 및 안전', body:'알칼리 금속(리튬·나트륨·칼륨), 핀셋, 칼, 페트리접시, 수조, 물, 페놀프탈레인 용액, 보안경, 면장갑·고무장갑, 실험복\n※ 안전: 반응이 격렬하고 튐·화상 위험이 있으므로 보호 장비를 반드시 착용하고, 금속은 핀셋으로만 다루며 작게 잘라 사용한다.'},
+    {label:'탐구 과정', body:'1) [산소와의 반응] 보관 용기에서 핀셋으로 알칼리 금속을 꺼내 페트리접시에 올리고 칼로 자른다. 자른 단면의 색과 광택이 변하는 모습과 속도를 관찰한다.\n2) [물과의 반응] 수조에 물을 채우고 페놀프탈레인 용액을 2~3방울 떨어뜨린다.\n3) 작게 자른 금속을 핀셋으로 물에 넣고 반응하는 모습과 격렬함을 관찰한다.\n4) 반응이 끝난 뒤 수용액의 색 변화를 확인한다.'},
+    {label:'관찰 결과 및 분석', body:'칼로 자른 직후 은백색으로 빛나던 단면이 곧 광택을 잃고 흐려졌다. 이는 공기 중 산소와 빠르게 반응했음을 뜻한다. 물에 넣자 금속이 물 위를 돌아다니며 격렬하게 반응하였고, 반응이 끝난 수용액은 무색에서 분홍색으로 변하여 염기성을 띠게 되었음을 확인하였다. 세 금속 모두 같은 현상을 보였으며, 일반적으로 리튬보다 나트륨, 나트륨보다 칼륨의 반응이 더 격렬한 경향이 나타난다.'},
+    {label:'결론', body:'알칼리 금속은 모두 공기 중 산소와 빠르게 반응하고, 물과 격렬히 반응하며 염기성 수용액을 만든다. 이러한 공통된 성질은 알칼리 금속이 주기율표에서 같은 족에 속하고 원자가 전자가 1개로 같은 전자 배치를 가지기 때문임을 보여 준다.'},
+    {label:'느낀 점', body:'같은 족 원소가 성질이 비슷하다는 교과서 내용을 실제 반응으로 직접 확인하니 이해가 훨씬 깊어졌다. 특히 페놀프탈레인이 분홍색으로 변하는 순간 염기성이 생성됨을 눈으로 확인할 수 있어 인상 깊었다. 반응성이 큰 만큼 안전 수칙이 매우 중요함도 함께 느꼈다.'}
+  ],
+  saet:'주기율표 같은 족 원소의 유사성을 검증하기 위해 알칼리 금속의 산소·물 반응 실험을 체계적으로 설계하고, 단면의 광택 변화와 페놀프탈레인 색 변화를 근거로 산화와 염기성 생성을 논리적으로 분석함. 공통 성질을 원자가 전자 배치와 연결지어 설명하고 안전 수칙의 중요성까지 강조하는 등 탐구 설계 능력과 안전 의식이 우수함.'
+}
 ];
 
-function loadProjects(){try{state.projects=JSON.parse(localStorage.getItem(LS_PROJ)||'[]')}catch(e){state.projects=[]}}
-function saveAll(){try{localStorage.setItem(LS_PROJ,JSON.stringify(state.projects))}catch(e){}}
-function P(){return state.projects.find(function(p){return p.id===state.currentId})||null}
-function getKey(){return (localStorage.getItem(LS_KEY)||'').trim()}
-function getModel(){return (localStorage.getItem(LS_MODEL)||'').trim()||'openai/gpt-4o-mini'}
-
-function uid(){return 'sp_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+/* ════════ 상태 ════════ */
+var curTab='통합과학1', curTopic=null;
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function nl2br(s){return esc(s).replace(/\n/g,'<br>')}
-function nowStr(){var d=new Date();return d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0')}
+function $(id){return document.getElementById(id)}
 
-function newProjectObj(subject){
-  return {id:uid(),subject:subject,
-    info:{school:'',grade:'',classNo:'',subjectName:subject,title:'',dueDate:'',career:''},
-    formAnalysis:null, topics:null, pickedTopic:'',
-    topic:{title:'',purpose:'',motivation:''},
-    sources:{article:'',paper:'',youtube:'',pdf:'',direct:''},
-    report:null, saet:null, careerOut:null, evalOut:null,
-    createdAt:nowStr(), updatedAt:nowStr()};
-}
-
-/* ══════════════ AI ══════════════ */
-async function callAI(opt){
-  var key=getKey();
-  if(!key){openSettings();throw new Error('OpenRouter API 키를 먼저 설정하세요. (우상단 ⚙️ 설정)');}
-  var userContent=opt.user;
-  if(opt.image){userContent=[{type:'text',text:opt.user},{type:'image_url',image_url:{url:opt.image}}];}
-  var messages=[];
-  if(opt.system)messages.push({role:'system',content:opt.system});
-  messages.push({role:'user',content:userContent});
-  var res=await fetch('https://openrouter.ai/api/v1/chat/completions',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,'HTTP-Referer':location.origin,'X-Title':'Beta Suhaeng'},
-    body:JSON.stringify({model:getModel(),messages:messages,temperature:opt.temp||0.6})
-  });
-  if(!res.ok){var t=await res.text();throw new Error('API 오류 '+res.status+': '+t.slice(0,180));}
-  var data=await res.json();
-  var text=(data&&data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'';
-  if(opt.json){
-    var clean=text.replace(/```json/gi,'').replace(/```/g,'').trim();
-    var s=clean.indexOf('{'),e=clean.lastIndexOf('}');
-    if(s>=0&&e>=0)clean=clean.slice(s,e+1);
-    return JSON.parse(clean);
-  }
-  return text;
-}
-var SYS_BASE='너는 대한민국 고등학교 통합과학 수행평가 지도교사다. 모든 출력은 고등학생 수준의 정확하고 자연스러운 한국어 격식체로 작성한다. 통합과학 교육과정과 연계하고, 과학적 근거에 기반하며, 과장이나 허위 없이 실제 학교에 제출 가능한 수준으로 작성한다. 학생부종합전형과 세부능력특기사항 활용을 고려한다.';
-
-/* ══════════════ 라우팅 ══════════════ */
-function goList(){state.currentId=null;document.getElementById('view-wizard').classList.add('hidden');document.getElementById('view-list').classList.remove('hidden');document.getElementById('bc-tail').textContent='🔬 통합과학 수행평가';renderList();window.scrollTo(0,0);}
-function setSubjectTab(s){state.subjectTab=s;document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.getAttribute('data-subj')===s)});renderList();}
-function newProject(){var o=newProjectObj(state.subjectTab);state.projects.unshift(o);saveAll();openProject(o.id);}
-function openProject(id){state.currentId=id;state.step=0;document.getElementById('view-list').classList.add('hidden');document.getElementById('view-wizard').classList.remove('hidden');var p=P();document.getElementById('bc-tail').textContent=(p.info.title||'새 보고서');renderStepnav();renderPanel();window.scrollTo(0,0);}
-function deleteProject(id,ev){ev.stopPropagation();if(!confirm('이 보고서를 삭제할까요? 되돌릴 수 없습니다.'))return;state.projects=state.projects.filter(function(p){return p.id!==id});saveAll();renderList();}
-
-/* ══════════════ 목록 렌더 ══════════════ */
-function progressOf(p){var done=0;if(p.info.school&&p.info.title)done++;if(p.formAnalysis)done++;if(p.topics)done++;if(p.topic.title)done++;if(p.sources.article||p.sources.direct||p.sources.paper||p.sources.youtube||p.sources.pdf)done++;if(p.report)done++;if(p.saet)done++;if(p.careerOut)done++;if(p.evalOut)done++;return Math.round(done/9*100);}
+/* ════════ 목록 ════════ */
+function setTab(s){curTab=s;document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('active',t.getAttribute('data-subj')===s)});renderList();}
 function renderList(){
-  var grid=document.getElementById('proj-grid'),empty=document.getElementById('proj-empty');
-  var list=state.projects.filter(function(p){return p.subject===state.subjectTab});
+  var list=TOPICS.filter(function(t){return t.subject===curTab});
+  var grid=$('topic-grid'),empty=$('topic-empty');
+  $('list-count').textContent='주제 '+list.length+'개';
   if(!list.length){grid.innerHTML='';empty.classList.remove('hidden');return;}
   empty.classList.add('hidden');
-  grid.innerHTML=list.map(function(p){
-    return '<div class="proj-card" onclick="openProject(\''+p.id+'\')">'+
-      '<div class="proj-top"><div class="proj-ic">'+(p.subject==='통합과학1'?'⚗️':'🧬')+'</div>'+
-      '<div style="flex:1;min-width:0"><div class="proj-title">'+esc(p.info.title||'(제목 미입력)')+'</div>'+
-      '<div class="proj-meta">'+esc(p.info.school||'학교 미입력')+' · '+esc(p.topic.title||'주제 미정')+'</div></div></div>'+
-      '<div class="proj-foot"><span class="proj-prog">진행 '+progressOf(p)+'%</span>'+
-      '<button class="btn btn-danger btn-sm" onclick="deleteProject(\''+p.id+'\',event)">삭제</button></div></div>';
+  grid.innerHTML=list.map(function(t){
+    return '<div class="topic-card" onclick="openTopic(\''+t.id+'\')">'+
+      '<div class="tc-banner tb-'+t.accent+'"><span class="tc-unit">'+esc(t.unit.split(' · ')[0])+'</span><span class="tc-emoji">'+t.emoji+'</span></div>'+
+      '<div class="tc-body"><div class="tc-title">'+esc(t.title)+'</div>'+
+      '<div class="tc-tags">'+t.tags.map(function(g){return '<span class="tg">'+esc(g)+'</span>'}).join('')+'</div>'+
+      '<div class="tc-go">보고서 보기 →</div></div></div>';
   }).join('');
 }
 
-/* ══════════════ 스텝 네비 ══════════════ */
-function stepDone(p,i){var n=i+1;
-  if(n===1)return!!(p.info.school&&p.info.title);
-  if(n===2)return!!p.formAnalysis; if(n===3)return!!p.topics; if(n===4)return!!p.topic.title;
-  if(n===5)return!!(p.sources.article||p.sources.direct||p.sources.paper||p.sources.youtube||p.sources.pdf);
-  if(n===6)return!!p.report; if(n===7)return!!p.saet; if(n===8)return!!p.careerOut; if(n===9)return!!p.evalOut;
-  return false;}
-function renderStepnav(){
-  var p=P();
-  document.getElementById('stepnav').innerHTML=STEPS.map(function(s,i){
-    var done=stepDone(p,i),active=i===state.step;
-    return '<div class="stepnav-item'+(active?' active':'')+(done?' sn-done':'')+'" onclick="gotoStep('+i+')">'+
-      '<div class="sn-num">'+(done&&!active?'✓':s.n)+'</div><div class="sn-label">'+s.label+'</div></div>';
-  }).join('');
+/* ════════ 보고서 ════════ */
+function openTopic(id){
+  curTopic=TOPICS.find(function(t){return t.id===id});if(!curTopic)return;
+  $('view-list').classList.add('hidden');
+  $('view-report').classList.remove('hidden');
+  $('dock').classList.add('show');
+  $('bc-tail').textContent='📄 '+curTopic.title;
+  renderReport();
+  window.scrollTo(0,0);
 }
-function gotoStep(i){state.step=i;renderStepnav();renderPanel();window.scrollTo(0,0);}
-function nextStep(){if(state.step<9){state.step++;renderStepnav();renderPanel();window.scrollTo(0,0);}}
-function prevStep(){if(state.step>0){state.step--;renderStepnav();renderPanel();window.scrollTo(0,0);}}
+function goList(){
+  curTopic=null;
+  $('view-report').classList.add('hidden');
+  $('view-list').classList.remove('hidden');
+  $('dock').classList.remove('show');
+  $('bc-tail').textContent='📝 수행평가 보고서';
+  renderList();window.scrollTo(0,0);
+}
+function autoRows(text){var lines=String(text).split('\n').length;var wrap=Math.ceil(String(text).length/38);return Math.min(22,Math.max(3,lines+wrap-Math.floor(lines/2)));}
+function renderReport(){
+  var t=curTopic;
+  var secs=t.sections.map(function(s,i){
+    return '<div class="rep-sec"><div class="sec-label"><span class="sec-no">'+(i+1)+'</span>'+esc(s.label)+'</div>'+
+      '<textarea class="textarea" data-sec="'+i+'" rows="'+autoRows(s.body)+'">'+esc(s.body)+'</textarea></div>';
+  }).join('');
+  var saet='<div class="saet-block"><div class="saet-head"><span class="saet-title">🏆 세특 문장 (교사 기록용)</span>'+
+    '<button class="btn btn-ghost btn-sm" onclick="copySaet()">📋 세특만 복사</button></div>'+
+    '<textarea class="textarea" id="saet-area" rows="'+autoRows(t.saet)+'">'+esc(t.saet)+'</textarea></div>';
+  $('report-host').innerHTML=
+    '<div class="rep-head rh-'+t.accent+'"><div class="rep-unit">'+esc(t.unit)+'</div>'+
+    '<div class="rep-title">'+esc(t.title)+'</div>'+
+    '<div class="rep-tags">'+t.tags.map(function(g){return '<span class="tg">'+esc(g)+'</span>'}).join('')+'</div></div>'+
+    '<div class="name-row"><label>학번 / 이름 (직접 입력)</label><input class="input" id="stu-name" placeholder="1학년 O반 O번 / 이름"></div>'+
+    secs+saet;
+}
 
-/* 공통: 입력 바인딩 */
-function bindInputs(){
-  document.querySelectorAll('[data-bind]').forEach(function(el){
-    el.addEventListener('input',function(){
-      var path=el.getAttribute('data-bind').split('.');var p=P();var o=p;
-      for(var i=0;i<path.length-1;i++)o=o[path[i]];
-      o[path[path.length-1]]=el.value;p.updatedAt=nowStr();saveAll();
-      if(path[1]==='title'){document.getElementById('bc-tail').textContent=p.info.title||'새 보고서';}
-    });
+/* ════════ 텍스트 조립 ════════ */
+function buildText(){
+  var t=curTopic;if(!t)return '';
+  var name=($('stu-name')&&$('stu-name').value.trim())||'';
+  var out='[통합과학 수행평가 탐구 보고서]\n';
+  if(name)out+='학번 / 이름: '+name+'\n';
+  out+='탐구 주제: '+t.title+'\n\n';
+  document.querySelectorAll('[data-sec]').forEach(function(ta){
+    var i=parseInt(ta.getAttribute('data-sec'),10);
+    out+=(i+1)+'. '+t.sections[i].label+'\n'+ta.value.trim()+'\n\n';
   });
+  return out.trim();
 }
-function actionBar(showNext){
-  return '<div class="step-actions">'+
-    '<button class="btn btn-ghost btn-sm" onclick="prevStep()" '+(state.step===0?'disabled':'')+'>← 이전</button>'+
-    (showNext!==false?'<button class="btn btn-primary btn-sm" onclick="nextStep()">다음 →</button>':'<span></span>')+
-    '</div>';
-}
-function loadBtn(id,label,fn){return '<button class="btn btn-primary" id="'+id+'" onclick="'+fn+'">✨ '+label+'</button>';}
-function setLoading(btnId,on,label){var b=document.getElementById(btnId);if(!b)return;if(on){b.disabled=true;b.innerHTML='<span class="spinner"></span> 생성 중...';}else{b.disabled=false;b.innerHTML='✨ '+label;}}
-function showMsg(id,type,text){var m=document.getElementById(id);if(!m)return;m.className='msg '+type;m.textContent=text;}
+function buildSaetText(){var a=$('saet-area');return a?a.value.trim():(curTopic?curTopic.saet:'');}
 
-/* ══════════════ 패널 렌더 ══════════════ */
-function renderPanel(){
-  var fns=[panel1,panel2,panel3,panel4,panel5,panel6,panel7,panel8,panel9,panel10];
-  document.getElementById('panel-host').innerHTML=fns[state.step]();
-  bindInputs();
-  if(state.step===2)renderTopics();
-  if(state.step===5)afterStep5();
-  if(state.step===6)renderReport();
-  if(state.step===7)renderSaet();
-  if(state.step===8)renderCareer();
-  if(state.step===9)renderEval();
+/* ════════ 복사 ════════ */
+function doCopy(text,okMsg){
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(text).then(function(){toast(okMsg)}).catch(function(){fallbackCopy(text,okMsg)});
+  }else{fallbackCopy(text,okMsg);}
 }
+function fallbackCopy(text,okMsg){
+  var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.top='-1000px';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');toast(okMsg);}catch(e){toast('복사 실패 — 길게 눌러 직접 복사하세요');}
+  document.body.removeChild(ta);
+}
+function copyAll(){doCopy(buildText(),'보고서 전체를 복사했어요 📋');}
+function copySaet(){doCopy(buildSaetText(),'세특 문장을 복사했어요 📋');}
 
-/* 화면1 기본정보 */
-function panel1(){var p=P();
-  var careerOpts=CAREERS.map(function(c){return '<option value="'+c+'"'+(p.info.career===c?' selected':'')+'>'+c+'</option>'}).join('');
-  return '<div class="panel"><div class="panel-title">📋 기본 정보</div>'+
-    '<div class="panel-desc">수행평가 표지·문맥에 쓰일 기본 정보를 입력하세요.</div>'+
-    '<div class="note-box">💡 처음이라면 아래 <b>예시 채우기</b>로 미시세계·거시세계 샘플을 불러와 전체 흐름을 체험해 보세요.<br><button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="loadExample()">🧪 예시 채우기 (미시세계·거시세계)</button></div>'+
-    '<div class="grid2">'+
-    '<div class="field"><label class="field-label">학교명<span class="req">*</span></label><input class="input" data-bind="info.school" value="'+esc(p.info.school)+'" placeholder="○○고등학교"></div>'+
-    '<div class="field"><label class="field-label">수행평가 제목<span class="req">*</span></label><input class="input" data-bind="info.title" value="'+esc(p.info.title)+'" placeholder="통합과학 탐구 보고서"></div>'+
-    '</div><div class="grid3">'+
-    '<div class="field"><label class="field-label">학년</label><input class="input" data-bind="info.grade" value="'+esc(p.info.grade)+'" placeholder="1"></div>'+
-    '<div class="field"><label class="field-label">반</label><input class="input" data-bind="info.classNo" value="'+esc(p.info.classNo)+'" placeholder="3"></div>'+
-    '<div class="field"><label class="field-label">제출일</label><input class="input" type="date" data-bind="info.dueDate" value="'+esc(p.info.dueDate)+'"></div>'+
-    '</div><div class="grid2">'+
-    '<div class="field"><label class="field-label">과목명</label><input class="input" data-bind="info.subjectName" value="'+esc(p.info.subjectName)+'"></div>'+
-    '<div class="field"><label class="field-label">희망 진로</label><select class="input" data-bind="info.career"><option value="">선택</option>'+careerOpts+'</select></div>'+
-    '</div>'+actionBar()+'</div>';
+/* ════════ 인쇄 / PDF ════════ */
+function buildPrintHTML(){
+  var t=curTopic;var name=($('stu-name')&&$('stu-name').value.trim())||'';
+  var body='<div style="text-align:center;border-bottom:2px solid #1e3a8a;padding-bottom:14px;margin-bottom:18px">'+
+    '<div style="font-size:12px;color:#2563eb;font-weight:700;letter-spacing:1px">통합과학 수행평가 탐구 보고서</div>'+
+    '<div style="font-size:20px;font-weight:800;color:#1e3a8a;margin-top:8px;line-height:1.4">'+esc(t.title)+'</div>'+
+    (name?'<div style="font-size:13px;color:#444;margin-top:8px">학번 / 이름: '+esc(name)+'</div>':'')+'</div>';
+  document.querySelectorAll('[data-sec]').forEach(function(ta){
+    var i=parseInt(ta.getAttribute('data-sec'),10);
+    body+='<div style="margin-bottom:14px"><div style="font-size:14px;font-weight:800;color:#1e3a8a;margin-bottom:5px">'+(i+1)+'. '+esc(t.sections[i].label)+'</div>'+
+      '<div style="font-size:13px;line-height:1.85;color:#222;white-space:pre-wrap">'+esc(ta.value.trim())+'</div></div>';
+  });
+  body+='<div style="margin-top:8px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px"><div style="font-size:13px;font-weight:800;color:#92400e;margin-bottom:5px">🏆 세특 문장</div>'+
+    '<div style="font-size:13px;line-height:1.85;color:#222;white-space:pre-wrap">'+esc(buildSaetText())+'</div></div>';
+  return '<div style="max-width:680px;margin:0 auto;padding:24px;font-family:-apple-system,Arial,sans-serif">'+body+
+    '<div style="text-align:center;font-size:11px;color:#aaa;margin-top:24px;border-top:1px solid #eee;padding-top:10px">베타과학학원 · 통합과학 수행평가</div></div>';
 }
-function loadExample(){var p=P();
-  p.info.school='베타고등학교';p.info.grade='1';p.info.classNo='3';p.info.title='미시 세계와 거시 세계의 규모별 특성 탐구';p.info.career='자연과학';
-  p.topic.title='미시 세계와 거시 세계의 규모(scale)에 따른 과학적 탐구 방법의 차이';
-  p.topic.purpose='수소 원자에서 우리은하에 이르는 규모 차이가 측정 방법·시간 규모·측정 오차에 어떤 차이를 만드는지 분석한다.';
-  p.topic.motivation='같은 자연 현상이라도 규모에 따라 탐구 방법이 달라진다는 점에 흥미를 느껴 탐구를 시작하였다.';
-  p.sources.direct='미시 세계의 최소 단위로 수소 원자, 거시 세계의 최대 단위로 우리은하가 제시된다. 규모의 차이는 (1) 측정 방법의 가변성 — 동일한 도구·단위로 측정 불가, (2) 시간 규모의 차이 — 변화가 관찰되는 시간 단위가 다름, (3) 측정 오차의 범위 — 미시/거시에서 오차의 물리적 의미와 허용 범위가 다름 으로 나타난다. 규모의 변화는 곧 탐구 패러다임의 변화를 의미한다.';
-  p.updatedAt=nowStr();saveAll();renderStepnav();renderPanel();
+function printReport(){
+  var w=window.open('','_blank');
+  if(!w){toast('팝업이 차단됐어요. 복사 기능을 이용하세요');return;}
+  w.document.write('<html><head><meta charset="utf-8"><title>'+esc(curTopic.title)+'</title></head><body>'+buildPrintHTML()+'</body></html>');
+  w.document.close();w.focus();setTimeout(function(){w.print();},350);
 }
-
-/* 화면2 양식 분석 */
-function panel2(){var p=P();
-  return '<div class="panel"><div class="panel-title">📎 수행평가 양식 분석</div>'+
-    '<div class="panel-desc">학교에서 받은 양식(이미지)을 올리거나 텍스트로 붙여넣으면, AI가 요구 항목·분량·평가 기준을 자동으로 추출합니다.</div>'+
-    '<div class="field"><label class="field-label">양식 이미지 (JPG/PNG)</label>'+
-    '<div class="drop" onclick="document.getElementById(\'form-file\').click()"><div class="drop-ic">📄</div><div class="drop-t">이미지 업로드</div><div class="drop-s">클릭하여 선택</div></div>'+
-    '<input id="form-file" type="file" accept="image/*" style="display:none" onchange="onFormImage(event)">'+
-    '<img id="form-preview" class="preview-img hidden">'+
-    '</div>'+
-    '<div class="field"><label class="field-label">또는 양식 내용 붙여넣기</label><textarea class="textarea" id="form-text" placeholder="수행평가 안내문/요구사항을 붙여넣으세요">'+esc(p._formText||'')+'</textarea></div>'+
-    loadBtn('btn-form','양식 분석하기','runFormAnalysis()')+
-    '<div class="msg" id="msg-form"></div>'+
-    '<div id="form-result" style="margin-top:1rem"></div>'+
-    actionBar()+'</div>';
-}
-var _formImage=null;
-function onFormImage(ev){var f=ev.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){_formImage=r.result;var img=document.getElementById('form-preview');img.src=_formImage;img.classList.remove('hidden');};r.readAsDataURL(f);}
-async function runFormAnalysis(){var p=P();var txt=document.getElementById('form-text').value.trim();p._formText=txt;saveAll();
-  if(!_formImage&&!txt){showMsg('msg-form','err','이미지를 올리거나 양식 내용을 붙여넣어 주세요.');return;}
-  setLoading('btn-form',true);showMsg('msg-form','','');
-  try{
-    var res=await callAI({system:SYS_BASE,image:_formImage,json:true,
-      user:'다음 통합과학 수행평가 양식을 분석해 JSON만 출력하라. 형식: {"requirements":["요구 항목들"],"length":"요구 분량 설명","criteria":["평가 기준들"]}. 양식 내용: '+(txt||'(첨부 이미지 참조)')});
-    p.formAnalysis=res;p.updatedAt=nowStr();saveAll();renderStepnav();renderFormResult();showMsg('msg-form','ok','분석 완료!');
-  }catch(e){showMsg('msg-form','err',e.message);}
-  setLoading('btn-form',false,'양식 분석하기');
-}
-function renderFormResult(){var p=P();var el=document.getElementById('form-result');if(!el||!p.formAnalysis)return;var f=p.formAnalysis;
-  el.innerHTML='<div class="out-block"><div class="field-label">📌 요구 항목</div><div class="chip-row">'+(f.requirements||[]).map(function(x){return '<span class="chip">'+esc(x)+'</span>'}).join('')+'</div></div>'+
-    '<div class="out-block"><div class="field-label">📏 분량</div><div class="out-text">'+nl2br(f.length||'')+'</div></div>'+
-    '<div class="out-block"><div class="field-label">✅ 평가 기준</div><div class="chip-row">'+(f.criteria||[]).map(function(x){return '<span class="chip">'+esc(x)+'</span>'}).join('')+'</div></div>';
+function exportPDF(){
+  if(typeof html2pdf==='undefined'){toast('PDF 로드 실패 — 인쇄를 이용하세요');return;}
+  toast('PDF 만드는 중...');
+  var holder=document.createElement('div');holder.innerHTML=buildPrintHTML();
+  var name=curTopic.title.replace(/[^\w가-힣]/g,'_').slice(0,40)+'.pdf';
+  html2pdf().set({margin:8,filename:name,image:{type:'jpeg',quality:0.96},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(holder).save().catch(function(){toast('PDF 오류 — 인쇄를 이용하세요');});
 }
 
-/* 화면3 주제 추천 */
-function panel3(){var p=P();
-  return '<div class="panel"><div class="panel-title">💡 탐구 주제 추천</div>'+
-    '<div class="panel-desc">관심 분야를 입력하면 난이도별(쉬움·보통·심화)로 주제를 추천하고, 항목별 평가를 표시합니다.</div>'+
-    '<div class="field"><label class="field-label">관심 분야</label><input class="input" id="interest" value="'+esc(p._interest||'')+'" placeholder="예: 생명과학, 신소재, 에너지, 천체 등"></div>'+
-    loadBtn('btn-topic','주제 추천받기','runTopics()')+
-    '<div class="msg" id="msg-topic"></div>'+
-    '<div id="topic-result" style="margin-top:1.1rem"></div>'+
-    actionBar()+'</div>';
-}
-async function runTopics(){var p=P();var iv=document.getElementById('interest').value.trim();p._interest=iv;saveAll();
-  if(!iv){showMsg('msg-topic','err','관심 분야를 입력하세요.');return;}
-  setLoading('btn-topic',true);showMsg('msg-topic','','');
-  try{
-    var res=await callAI({system:SYS_BASE,json:true,temp:0.7,
-      user:'관심 분야 "'+iv+'"에 대해 고등학교 통합과학 수행평가 탐구 주제를 난이도별로 추천하라. 각 난이도마다 3개씩. JSON만 출력. 형식: {"easy":[{"title":"주제","difficulty":1,"feasibility":5,"saet":3,"career":4}],"normal":[...],"advanced":[...]}. difficulty/feasibility/saet/career 는 각각 난이도/탐구가능성/세특활용도/진로연계도를 1~5 정수로. 통합과학1 또는 통합과학2('+p.subject+') 범위와 연계.'});
-    p.topics=res;p.updatedAt=nowStr();saveAll();renderStepnav();renderTopics();showMsg('msg-topic','ok','추천 완료! 마음에 드는 주제를 클릭하면 4번 단계에 자동 입력됩니다.');
-  }catch(e){showMsg('msg-topic','err',e.message);}
-  setLoading('btn-topic',false,'주제 추천받기');
-}
-function stars(n){n=Math.max(0,Math.min(5,n||0));return '★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n);}
-function topicCardHtml(t){return '<div class="topic-card'+(P().pickedTopic===t.title?' picked':'')+'" onclick="pickTopic(\''+esc(t.title).replace(/'/g,"\\'")+'\')">'+
-  '<div class="tc-title">'+esc(t.title)+'</div>'+
-  '<div class="tc-rate"><span>난이도</span><span class="tc-stars">'+stars(t.difficulty)+'</span></div>'+
-  '<div class="tc-rate"><span>탐구가능성</span><span class="tc-stars">'+stars(t.feasibility)+'</span></div>'+
-  '<div class="tc-rate"><span>세특활용도</span><span class="tc-stars">'+stars(t.saet)+'</span></div>'+
-  '<div class="tc-rate"><span>진로연계도</span><span class="tc-stars">'+stars(t.career)+'</span></div></div>';}
-function renderTopics(){var p=P();var el=document.getElementById('topic-result');if(!el)return;if(!p.topics){el.innerHTML='';return;}
-  var t=p.topics;
-  el.innerHTML='<div class="topic-cols">'+
-    '<div><div class="topic-col-head tch-1">쉬움</div>'+(t.easy||[]).map(topicCardHtml).join('')+'</div>'+
-    '<div><div class="topic-col-head tch-2">보통</div>'+(t.normal||[]).map(topicCardHtml).join('')+'</div>'+
-    '<div><div class="topic-col-head tch-3">심화</div>'+(t.advanced||[]).map(topicCardHtml).join('')+'</div></div>';
-}
-function pickTopic(title){var p=P();p.pickedTopic=title;p.topic.title=title;saveAll();renderTopics();showMsg('msg-topic','ok','"'+title+'" 선택됨 → 4번 단계 주제에 입력되었습니다.');}
+/* ════════ 토스트 ════════ */
+var toastTimer=null;
+function toast(msg){var el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.remove('show')},2000);}
 
-/* 화면4 주제 입력 */
-function panel4(){var p=P();
-  return '<div class="panel"><div class="panel-title">🎯 탐구 주제 입력</div>'+
-    '<div class="panel-desc">탐구 주제·목적·동기를 작성하세요. 보고서 생성의 핵심 토대가 됩니다.</div>'+
-    '<div class="field"><label class="field-label">탐구 주제<span class="req">*</span></label><input class="input" data-bind="topic.title" value="'+esc(p.topic.title)+'"></div>'+
-    '<div class="field"><label class="field-label">탐구 목적</label><textarea class="textarea" data-bind="topic.purpose">'+esc(p.topic.purpose)+'</textarea></div>'+
-    '<div class="field"><label class="field-label">탐구 동기</label><textarea class="textarea" data-bind="topic.motivation">'+esc(p.topic.motivation)+'</textarea></div>'+
-    actionBar()+'</div>';
-}
-
-/* 화면5 자료 입력 */
-function panel5(){var p=P();
-  return '<div class="panel"><div class="panel-title">📚 자료 입력</div>'+
-    '<div class="panel-desc">NotebookLM 등으로 정리한 자료를 붙여넣으세요. 보고서의 근거 자료로 활용됩니다.</div>'+
-    '<div class="field"><label class="field-label">📰 기사 요약</label><textarea class="textarea" data-bind="sources.article">'+esc(p.sources.article)+'</textarea></div>'+
-    '<div class="field"><label class="field-label">📄 논문 요약</label><textarea class="textarea" data-bind="sources.paper">'+esc(p.sources.paper)+'</textarea></div>'+
-    '<div class="field"><label class="field-label">▶️ 유튜브 요약</label><textarea class="textarea" data-bind="sources.youtube">'+esc(p.sources.youtube)+'</textarea></div>'+
-    '<div class="field"><label class="field-label">📕 PDF 요약</label><textarea class="textarea" data-bind="sources.pdf">'+esc(p.sources.pdf)+'</textarea></div>'+
-    '<div class="field"><label class="field-label">🔍 직접 조사 내용</label><textarea class="textarea" data-bind="sources.direct">'+esc(p.sources.direct)+'</textarea></div>'+
-    actionBar()+'</div>';
-}
-function afterStep5(){}
-
-/* 화면6 보고서 생성 */
-function panel6(){var p=P();
-  return '<div class="panel"><div class="panel-title">📝 탐구 보고서 생성</div>'+
-    '<div class="panel-desc">입력한 주제·자료를 바탕으로 9개 항목의 보고서를 생성합니다. 생성 후 직접 수정할 수 있습니다.</div>'+
-    loadBtn('btn-report','보고서 생성하기','runReport()')+' <button class="btn btn-ghost btn-sm" onclick="runReport()">↻ 재생성</button>'+
-    '<div class="msg" id="msg-report"></div>'+
-    '<div id="report-result" style="margin-top:1.2rem"></div>'+
-    actionBar()+'</div>';
-}
-var REP_FIELDS=[['motivation','탐구 동기'],['purpose','탐구 목적'],['concepts','관련 과학 개념'],['research','자료 조사'],['process','탐구 과정'],['result','결과 분석'],['conclusion','결론'],['reflection','느낀 점'],['references','참고문헌']];
-async function runReport(){var p=P();
-  if(!p.topic.title){showMsg('msg-report','err','4번 단계에서 탐구 주제를 먼저 입력하세요.');return;}
-  setLoading('btn-report',true);showMsg('msg-report','','');
-  try{
-    var ctx='주제: '+p.topic.title+'\n목적: '+p.topic.purpose+'\n동기: '+p.topic.motivation+
-      '\n[자료]\n기사:'+p.sources.article+'\n논문:'+p.sources.paper+'\n유튜브:'+p.sources.youtube+'\nPDF:'+p.sources.pdf+'\n직접조사:'+p.sources.direct+
-      '\n과목:'+p.subject+' / 희망진로:'+p.info.career;
-    var res=await callAI({system:SYS_BASE,json:true,temp:0.7,
-      user:'다음 정보로 고등학교 통합과학 수행평가 탐구 보고서를 작성하라. 각 항목은 충실하지만 과장 없이, 실제 제출 가능한 수준으로. JSON만 출력. 형식: {"motivation":"","purpose":"","concepts":"","research":"","process":"","result":"","conclusion":"","reflection":"","references":""}. references는 형식을 갖춘 참고문헌 목록.\n\n'+ctx});
-    p.report=res;p.updatedAt=nowStr();saveAll();renderStepnav();renderReport();showMsg('msg-report','ok','보고서 생성 완료! 아래에서 수정 가능합니다.');
-  }catch(e){showMsg('msg-report','err',e.message);}
-  setLoading('btn-report',false,'보고서 생성하기');
-}
-function renderReport(){var p=P();var el=document.getElementById('report-result');if(!el)return;if(!p.report){el.innerHTML='';return;}
-  el.innerHTML=REP_FIELDS.map(function(f,i){
-    return '<div class="rep-sec"><label class="field-label"><span class="rep-no">'+(i+1)+'</span>'+f[1]+'</label>'+
-      '<textarea class="textarea" data-rep="'+f[0]+'">'+esc(p.report[f[0]]||'')+'</textarea></div>';
-  }).join('');
-  el.querySelectorAll('[data-rep]').forEach(function(t){t.addEventListener('input',function(){P().report[t.getAttribute('data-rep')]=t.value;P().updatedAt=nowStr();saveAll();});});
-}
-
-/* 화면7 세특 */
-function panel7(){var p=P();
-  return '<div class="panel"><div class="panel-title">🏆 세특 문장 생성</div>'+
-    '<div class="panel-desc">보고서를 바탕으로 교사가 학생부에 기록할 수 있는 형태의 문장을 3가지 수준으로 생성합니다.</div>'+
-    loadBtn('btn-saet','세특 문장 생성','runSaet()')+
-    '<div class="msg" id="msg-saet"></div>'+
-    '<div id="saet-result" style="margin-top:1.2rem"></div>'+actionBar()+'</div>';
-}
-async function runSaet(){var p=P();if(!p.report){showMsg('msg-saet','err','6번 단계에서 보고서를 먼저 생성하세요.');return;}
-  setLoading('btn-saet',true);showMsg('msg-saet','','');
-  try{
-    var res=await callAI({system:SYS_BASE,json:true,
-      user:'다음 탐구 보고서를 바탕으로 교사용 세부능력특기사항(세특) 문장을 3가지 수준으로 작성하라. 학생을 주어로 한 관찰 기록 형태(예: "~을 탐구하여 ~을 도출함."). JSON만 출력. 형식:{"basic":"기본형 2~3문장","good":"우수형 3~4문장","top":"최상위권형 4~5문장 심화"}. 주제:'+p.topic.title+'\n결론:'+(p.report.conclusion||'')+'\n개념:'+(p.report.concepts||'')});
-    p.saet=res;p.updatedAt=nowStr();saveAll();renderStepnav();renderSaet();showMsg('msg-saet','ok','세특 문장 생성 완료!');
-  }catch(e){showMsg('msg-saet','err',e.message);}
-  setLoading('btn-saet',false,'세특 문장 생성');
-}
-function renderSaet(){var p=P();var el=document.getElementById('saet-result');if(!el)return;if(!p.saet){el.innerHTML='';return;}var s=p.saet;
-  el.innerHTML=
-    '<div class="out-block"><div class="out-head"><span class="out-tag ot-basic">기본형</span></div><div class="out-text">'+nl2br(s.basic||'')+'</div></div>'+
-    '<div class="out-block"><div class="out-head"><span class="out-tag ot-good">우수형</span></div><div class="out-text">'+nl2br(s.good||'')+'</div></div>'+
-    '<div class="out-block"><div class="out-head"><span class="out-tag ot-top">최상위권형</span></div><div class="out-text">'+nl2br(s.top||'')+'</div></div>';
-}
-
-/* 화면8 진로 */
-function panel8(){var p=P();
-  return '<div class="panel"><div class="panel-title">🧭 진로 연계 분석</div>'+
-    '<div class="panel-desc">탐구 주제를 기반으로 관련 학과·직업·전공 추천과 추가 탐구 주제를 분석합니다.</div>'+
-    loadBtn('btn-career','진로 연계 분석','runCareer()')+
-    '<div class="msg" id="msg-career"></div>'+
-    '<div id="career-result" style="margin-top:1.2rem"></div>'+actionBar()+'</div>';
-}
-async function runCareer(){var p=P();if(!p.topic.title){showMsg('msg-career','err','탐구 주제를 먼저 입력하세요.');return;}
-  setLoading('btn-career',true);showMsg('msg-career','','');
-  try{
-    var res=await callAI({system:SYS_BASE,json:true,
-      user:'탐구 주제 "'+p.topic.title+'" (희망진로:'+(p.info.career||'미정')+')를 기반으로 진로 연계를 분석하라. JSON만 출력. 형식:{"majors":["관련 학과"],"jobs":["관련 직업"],"recommend":["대학 전공 추천(이유 포함 짧게)"],"more":["추가 탐구 주제 추천"]}'});
-    p.careerOut=res;p.updatedAt=nowStr();saveAll();renderStepnav();renderCareer();showMsg('msg-career','ok','진로 연계 분석 완료!');
-  }catch(e){showMsg('msg-career','err',e.message);}
-  setLoading('btn-career',false,'진로 연계 분석');
-}
-function renderCareer(){var p=P();var el=document.getElementById('career-result');if(!el)return;if(!p.careerOut){el.innerHTML='';return;}var c=p.careerOut;
-  function blk(t,arr,chip){return '<div class="out-block"><div class="field-label">'+t+'</div>'+(chip?'<div class="chip-row">'+(arr||[]).map(function(x){return '<span class="chip">'+esc(x)+'</span>'}).join('')+'</div>':'<div class="out-text">'+(arr||[]).map(function(x){return '• '+esc(x)}).join('<br>')+'</div>')+'</div>';}
-  el.innerHTML=blk('🎓 관련 학과',c.majors,true)+blk('💼 관련 직업',c.jobs,true)+blk('📘 대학 전공 추천',c.recommend,false)+blk('🔎 추가 탐구 주제',c.more,false);
-}
-
-/* 화면9 평가 */
-function panel9(){var p=P();
-  return '<div class="panel"><div class="panel-title">📊 AI 수행평가 평가</div>'+
-    '<div class="panel-desc">보고서를 6개 항목으로 평가하고 총점·강점·보완점·수정 추천을 제시합니다.</div>'+
-    loadBtn('btn-eval','보고서 평가하기','runEval()')+
-    '<div class="msg" id="msg-eval"></div>'+
-    '<div id="eval-result" style="margin-top:1.2rem"></div>'+actionBar()+'</div>';
-}
-var EVAL_KEYS=['탐구성','창의성','과학적타당성','자료활용도','논리성','진로연계성'];
-async function runEval(){var p=P();if(!p.report){showMsg('msg-eval','err','6번 단계에서 보고서를 먼저 생성하세요.');return;}
-  setLoading('btn-eval',true);showMsg('msg-eval','','');
-  try{
-    var body=REP_FIELDS.map(function(f){return f[1]+': '+(p.report[f[0]]||'')}).join('\n');
-    var res=await callAI({system:SYS_BASE,json:true,
-      user:'다음 통합과학 수행평가 보고서를 평가하라. 각 항목 0~100점, 총점 0~100점. JSON만 출력. 형식:{"scores":{"탐구성":0,"창의성":0,"과학적타당성":0,"자료활용도":0,"논리성":0,"진로연계성":0},"total":0,"strengths":["강점"],"improvements":["보완점"],"suggestions":["수정 추천 문장"]}\n\n'+body});
-    p.evalOut=res;p.updatedAt=nowStr();saveAll();renderStepnav();renderEval();showMsg('msg-eval','ok','평가 완료!');
-  }catch(e){showMsg('msg-eval','err',e.message);}
-  setLoading('btn-eval',false,'보고서 평가하기');
-}
-function renderEval(){var p=P();var el=document.getElementById('eval-result');if(!el)return;if(!p.evalOut){el.innerHTML='';return;}var v=p.evalOut;
-  var rows=EVAL_KEYS.map(function(k){var sc=(v.scores&&v.scores[k])||0;return '<div class="eval-row"><div class="eval-top"><span>'+k+'</span><span>'+sc+'점</span></div><div class="eval-bar-bg"><div class="eval-bar" style="width:'+sc+'%"></div></div></div>';}).join('');
-  function list(t,arr){return '<div class="out-block"><div class="field-label">'+t+'</div><div class="out-text">'+(arr||[]).map(function(x){return '• '+esc(x)}).join('<br>')+'</div></div>';}
-  el.innerHTML='<div class="score-big"><div class="score-num">'+(v.total||0)+'</div><div class="score-lbl">/ 100점</div></div>'+rows+
-    list('💪 강점',v.strengths)+list('🔧 보완점',v.improvements)+list('✍️ 수정 추천 문장',v.suggestions);
-}
-
-/* 화면10 PDF */
-function panel10(){var p=P();
-  var ready=p.report?'':'<div class="note-box">⚠️ 보고서(6번)가 아직 생성되지 않았습니다. 보고서 없이도 입력된 내용만 출력됩니다.</div>';
-  return '<div class="panel"><div class="panel-title">📄 PDF 출력</div>'+
-    '<div class="panel-desc">표지·보고서·참고문헌·세특·진로 분석·AI 평가를 하나의 PDF로 출력합니다.</div>'+ready+
-    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
-    '<button class="btn btn-primary" onclick="exportPDF()">⬇️ PDF 다운로드</button>'+
-    '<button class="btn btn-ghost" onclick="printReport()">🖨️ 인쇄</button></div>'+
-    '<div class="msg" id="msg-pdf"></div>'+
-    '<div style="margin-top:1.2rem;border:1px solid var(--border-soft);border-radius:14px;overflow:hidden">'+
-    '<div id="print-root" style="background:#fff">'+buildPrintable()+'</div></div>'+
-    actionBar(false)+'</div>';
-}
-function pdfSec(no,title,text){if(!text)return '';return '<div style="margin-bottom:16px"><div style="font-size:13px;font-weight:800;color:#1e3a8a;margin-bottom:5px">'+no+'. '+title+'</div><div style="font-size:12px;line-height:1.8;color:#222;white-space:pre-wrap">'+esc(text)+'</div></div>';}
-function buildPrintable(){var p=P();var i=p.info;
-  var cover='<div style="text-align:center;padding:40px 24px;border-bottom:2px solid #1e3a8a;margin-bottom:24px">'+
-    '<div style="font-size:12px;color:#2563eb;font-weight:700;letter-spacing:2px">'+esc(i.subjectName||p.subject)+' 수행평가</div>'+
-    '<div style="font-size:24px;font-weight:900;color:#1e3a8a;margin:14px 0;letter-spacing:-.5px">'+esc(i.title||'탐구 보고서')+'</div>'+
-    '<div style="font-size:13px;color:#444;margin-top:18px;line-height:1.9">'+
-    esc(i.school||'')+' / '+esc(i.grade||'')+'학년 '+esc(i.classNo||'')+'반<br>주제: '+esc(p.topic.title||'')+'<br>희망 진로: '+esc(i.career||'-')+' &nbsp;|&nbsp; 제출일: '+esc(i.dueDate||'-')+'</div></div>';
-  var rep='';if(p.report){rep='<div style="font-size:15px;font-weight:800;color:#1e3a8a;margin:18px 0 10px;border-left:4px solid #2563eb;padding-left:8px">탐구 보고서</div>';REP_FIELDS.forEach(function(f,idx){rep+=pdfSec(idx+1,f[1],p.report[f[0]]);});}
-  var saet='';if(p.saet){saet='<div style="font-size:15px;font-weight:800;color:#1e3a8a;margin:18px 0 10px;border-left:4px solid #2563eb;padding-left:8px">세특 문장</div>'+
-    pdfSec('','기본형',p.saet.basic)+pdfSec('','우수형',p.saet.good)+pdfSec('','최상위권형',p.saet.top);}
-  var car='';if(p.careerOut){var c=p.careerOut;car='<div style="font-size:15px;font-weight:800;color:#1e3a8a;margin:18px 0 10px;border-left:4px solid #2563eb;padding-left:8px">진로 연계 분석</div>'+
-    pdfSec('','관련 학과',(c.majors||[]).join(', '))+pdfSec('','관련 직업',(c.jobs||[]).join(', '))+pdfSec('','대학 전공 추천',(c.recommend||[]).join('\n'))+pdfSec('','추가 탐구 주제',(c.more||[]).join('\n'));}
-  var ev='';if(p.evalOut){var v=p.evalOut;ev='<div style="font-size:15px;font-weight:800;color:#1e3a8a;margin:18px 0 10px;border-left:4px solid #2563eb;padding-left:8px">AI 평가 결과 (총점 '+(v.total||0)+'/100)</div>'+
-    pdfSec('','세부 점수',EVAL_KEYS.map(function(k){return k+': '+((v.scores&&v.scores[k])||0)+'점';}).join('\n'))+
-    pdfSec('','강점',(v.strengths||[]).join('\n'))+pdfSec('','보완점',(v.improvements||[]).join('\n'));}
-  return '<div style="padding:28px;max-width:720px;margin:0 auto;font-family:-apple-system,Arial,sans-serif">'+cover+rep+saet+car+ev+
-    '<div style="text-align:center;font-size:11px;color:#aaa;margin-top:30px;border-top:1px solid #eee;padding-top:12px">베타과학학원 · 통합과학 수행평가 AI 작성 도우미</div></div>';
-}
-function exportPDF(){var p=P();var el=document.getElementById('print-root');showMsg('msg-pdf','ok','PDF 생성 중...');
-  if(typeof html2pdf==='undefined'){showMsg('msg-pdf','err','PDF 라이브러리 로드 실패 — 인쇄 기능을 사용하세요.');return;}
-  var name=(p.info.title||'수행평가보고서').replace(/[^\w가-힣]/g,'_')+'.pdf';
-  html2pdf().set({margin:8,filename:name,image:{type:'jpeg',quality:0.96},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(el).save().then(function(){showMsg('msg-pdf','ok','다운로드 완료!');}).catch(function(e){showMsg('msg-pdf','err','오류: '+e.message);});}
-function printReport(){var html=document.getElementById('print-root').innerHTML;var w=window.open('','_blank');w.document.write('<html><head><title>수행평가</title></head><body>'+html+'</body></html>');w.document.close();w.focus();setTimeout(function(){w.print();},300);}
-
-/* ══════════════ 설정 모달 ══════════════ */
-function openSettings(){document.getElementById('set-key').value=getKey();document.getElementById('set-model').value=getModel();document.getElementById('settings-modal').classList.add('open');}
-function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
-function saveSettings(){localStorage.setItem(LS_KEY,document.getElementById('set-key').value.trim());localStorage.setItem(LS_MODEL,document.getElementById('set-model').value.trim());closeSettings();}
-document.getElementById('settings-modal').addEventListener('click',function(e){if(e.target===this)closeSettings();});
-
-/* ══════════════ 시작 ══════════════ */
-(function init(){
-  var d=new Date();var days=['일','월','화','수','목','금','토'];
-  document.getElementById('welcome-date').textContent='📅 '+nowStr()+' ('+days[d.getDay()]+')';
-  loadProjects();renderList();
-})();
+/* ════════ 시작 ════════ */
+renderList();
 </script>
 </body>
 </html>
