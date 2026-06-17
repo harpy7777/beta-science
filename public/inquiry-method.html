@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><script src="/favicon.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="탐구 기법 — 실험·관측·데이터·모델링·문헌, 다섯 가지 탐구 방법과 각 방법을 깊게 만드는 전략 | 베타과학학원">
+<title>탐구 기법 · 베타과학학원</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  background: #fafafa; color: #1d1d1f; min-height: 100vh;
+  -webkit-font-smoothing: antialiased; overscroll-behavior: none;
+}
+
+/* ── Header ── */
+.header {
+  background: #ffffff; border-bottom: 1px solid #f0e8ed;
+  height: 54px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1rem;
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  position: sticky; top: 0; z-index: 300;
+}
+.header-left { display: flex; align-items: center; gap: 9px; text-decoration: none; color: inherit; }
+.logo-mark {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, #f472b6 0%, #db2777 100%);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.brand-name { font-size: 14px; font-weight: 600; color: #1d1d1f; letter-spacing: -0.3px; }
+.back-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #fdf2f8; border: 1px solid #fbcfe8; border-radius: 20px;
+  padding: 6px 13px; font-size: 12px; font-weight: 600; color: #db2777;
+  text-decoration: none; white-space: nowrap; transition: background 0.15s;
+}
+.back-link:hover { background: #fce7f3; }
+.back-link:active { transform: scale(0.97); }
+
+/* ── Layout ── */
+.wrap {
+  max-width: 860px; margin: 0 auto;
+  padding: 1.2rem 0.9rem 4rem;
+  padding-bottom: max(4rem, calc(3rem + env(safe-area-inset-bottom)));
+  padding-left: max(0.9rem, env(safe-area-inset-left));
+  padding-right: max(0.9rem, env(safe-area-inset-right));
+}
+
+/* ── Page hero ── */
+.phero {
+  background: linear-gradient(135deg, #db2777 0%, #ec4899 50%, #f472b6 100%);
+  border-radius: 22px; padding: 1.9rem 1.6rem; margin-bottom: 1.9rem;
+  color: #fff; position: relative; overflow: hidden;
+  box-shadow: 0 14px 36px rgba(219,39,119,0.26);
+}
+.phero::before {
+  content: ''; position: absolute; top: -50px; right: -40px;
+  width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,0.12);
+}
+.phero-tag {
+  display: inline-block; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 700; margin-bottom: 12px;
+  position: relative; z-index: 1;
+}
+.phero-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; position: relative; z-index: 1; line-height: 1.3; }
+.phero-sub { font-size: 0.92rem; font-weight: 500; line-height: 1.75; margin-top: 14px; color: #ffffff; position: relative; z-index: 1; word-break: keep-all; }
+
+/* ── Intro ── */
+.intro {
+  background: #fff; border: 1px solid #fce7f3; border-radius: 16px;
+  padding: 1.3rem 1.4rem; margin-bottom: 2.4rem;
+  font-size: 0.92rem; color: #3c3c43; line-height: 1.85; word-break: keep-all;
+}
+.intro b { color: #db2777; font-weight: 700; }
+
+/* ── Section title ── */
+.sec-title {
+  font-size: 1.08rem; font-weight: 800; color: #1d1d1f; letter-spacing: -0.02em;
+  margin: 0 0 1.3rem; display: flex; align-items: center; gap: 8px;
+}
+.sec-title .bar { width: 4px; height: 18px; border-radius: 3px; background: linear-gradient(180deg,#f472b6,#db2777); }
+
+/* ── 탐구 기법 카드 ── */
+.methods { display: flex; flex-direction: column; gap: 16px; margin-bottom: 2.8rem; }
+.mcard {
+  background: #fff; border: 1px solid #fce7f3; border-radius: 18px;
+  padding: 1.5rem 1.6rem; border-left: 5px solid #f9a8d4;
+}
+.mcard.m2 { border-left-color: #ec4899; }
+.mcard.m3 { border-left-color: #db2777; }
+.mcard.m4 { border-left-color: #c026d3; }
+.mcard.m5 { border-left-color: #a21caf; }
+.mcard-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.micon {
+  width: 44px; height: 44px; border-radius: 13px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.m1 .micon { background: #fdf2f8; }
+.m2 .micon { background: #fce7f3; }
+.m3 .micon { background: #fbcfe8; }
+.m4 .micon { background: #fae8ff; }
+.m5 .micon { background: #f3e8ff; }
+.mtitle-wrap { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.mtitle { font-size: 1.05rem; font-weight: 800; color: #1d1d1f; letter-spacing: -0.02em; }
+.mtag { font-size: 11.5px; font-weight: 600; color: #aeaeb2; line-height: 1.4; word-break: keep-all; }
+.mrow { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-top: 1px solid #f5f0f3; }
+.mrow:first-of-type { border-top: none; padding-top: 0; }
+.mrow-label {
+  flex-shrink: 0; width: 64px; font-size: 11px; font-weight: 700; color: #be185d;
+  letter-spacing: 0.02em; padding-top: 1px;
+}
+.mrow-text { flex: 1; min-width: 0; font-size: 13px; color: #3c3c43; line-height: 1.7; word-break: keep-all; }
+.mrow-text b { color: #db2777; font-weight: 700; }
+.mdeep {
+  margin-top: 12px; background: #fafafa; border: 1px dashed #fbcfe8; border-radius: 12px;
+  padding: 11px 14px; font-size: 12.5px; color: #6e6e73; line-height: 1.7; word-break: keep-all;
+}
+.mdeep b { color: #be185d; font-weight: 700; }
+
+/* ── 기법 선택 가이드 ── */
+.guide-map { display: flex; flex-direction: column; gap: 12px; margin-bottom: 2.8rem; }
+.grow {
+  display: flex; gap: 12px; align-items: stretch;
+  background: #fff; border: 1px solid #fce7f3; border-radius: 16px; padding: 14px 16px;
+}
+.gq { flex: 1; min-width: 0; align-self: center; }
+.gq-label { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #be185d; margin-bottom: 5px; }
+.gq-text { font-size: 13px; color: #1d1d1f; line-height: 1.55; font-weight: 600; word-break: keep-all; }
+.garrow { flex-shrink: 0; align-self: center; font-size: 18px; color: #db2777; font-weight: 800; }
+.gm {
+  flex: 0 0 36%; display: flex; align-items: center; gap: 8px;
+  background: #fff7fb; border: 1px solid #fbcfe8; border-radius: 12px; padding: 10px 13px;
+}
+.gm-icon { font-size: 17px; flex-shrink: 0; }
+.gm-name { font-size: 13px; font-weight: 800; color: #db2777; word-break: keep-all; line-height: 1.4; }
+
+/* ── 얕은 적용 vs 깊은 적용 ── */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 2.8rem; }
+.ccard { border-radius: 18px; padding: 1.4rem 1.4rem; }
+.ccard.weak { background: #f9fafb; border: 1px solid #e5e7eb; }
+.ccard.good { background: linear-gradient(135deg,#fff0f7,#fdf2f8); border: 1px solid #fce7f3; }
+.chead { font-size: 0.95rem; font-weight: 800; margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
+.weak .chead { color: #6b7280; }
+.good .chead { color: #db2777; }
+.cline { font-size: 12.5px; line-height: 1.6; padding: 9px 0; border-top: 1px dashed #e5e7eb; word-break: keep-all; }
+.cline:first-of-type { border-top: none; padding-top: 0; }
+.weak .cline { color: #9ca3af; }
+.good .cline { color: #3c3c43; }
+.good .cline b { color: #db2777; font-weight: 700; }
+
+/* ── 공통 체크 ── */
+.checks {
+  background: linear-gradient(135deg,#fff0f7,#fdf2f8); border: 1px solid #fce7f3;
+  border-radius: 18px; padding: 1.5rem 1.6rem;
+}
+.check-item { display: flex; gap: 12px; align-items: flex-start; padding: 13px 0; border-top: 1px solid #fbe3ee; }
+.check-item:first-of-type { border-top: none; padding-top: 0; }
+.check-mark {
+  flex-shrink: 0; width: 22px; height: 22px; border-radius: 7px;
+  background: #db2777; color: #fff; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800;
+}
+.check-text { font-size: 13px; color: #3c3c43; line-height: 1.7; word-break: keep-all; }
+.check-text b { color: #db2777; font-weight: 700; }
+
+/* ── Footer nav ── */
+.foot-nav { display: flex; justify-content: center; margin-top: 1.8rem; }
+.foot-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: linear-gradient(135deg,#f472b6,#db2777); color: #fff;
+  border-radius: 14px; padding: 13px 24px; font-size: 14px; font-weight: 700;
+  text-decoration: none; box-shadow: 0 6px 18px rgba(219,39,119,0.25); transition: opacity 0.15s;
+}
+.foot-btn:hover { opacity: 0.9; }
+.foot-btn:active { transform: scale(0.98); }
+.foot { text-align: center; font-size: 11px; color: #c7c7cc; margin-top: 1.6rem; line-height: 1.7; }
+.foot b { color: #db2777; }
+
+@media (max-width: 520px) {
+  .wrap { padding: 1rem 0.75rem 3rem; }
+  .phero { padding: 1.4rem 1.2rem; }
+  .phero-title { font-size: 1.35rem; }
+  .mcard { padding: 1.1rem 1.1rem; }
+  .grow { flex-direction: column; gap: 8px; }
+  .garrow { align-self: center; transform: rotate(90deg); }
+  .gm { flex: none; }
+  .compare { grid-template-columns: 1fr; }
+  .brand-name { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="science-studio.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <a href="science-studio.html" class="back-link">← 스튜디오</a>
+</header>
+
+<div class="wrap">
+
+  <!-- Hero -->
+  <section class="phero">
+    <span class="phero-tag">STEP 03 · 탐구 기법</span>
+    <h1 class="phero-title">방법이 탐구의 깊이를 가른다</h1>
+    <p class="phero-sub">
+      좋은 주제를 골랐어도 <b style="color:#fff;">어떻게 파고드느냐</b>에 따라 깊이가 완전히 달라집니다.
+      실험·관측·데이터·모델링·문헌, 다섯 가지 기법과 각각을 깊게 만드는 방법을 정리했습니다.
+    </p>
+  </section>
+
+  <!-- Intro -->
+  <div class="intro">
+    평가자는 화려한 결과보다 <b>방법이 질문에 맞았는지</b>를 봅니다.
+    질문에 어울리는 기법을 고르고, 그 기법을 끝까지 정밀하게 밀고 갔는지가
+    탐구의 신뢰도를 결정합니다. 기법을 먼저 알면 같은 주제도 훨씬 깊게 설계할 수 있습니다.
+  </div>
+
+  <!-- 다섯 가지 탐구 기법 -->
+  <div class="sec-title"><span class="bar"></span>다섯 가지 탐구 기법</div>
+  <div class="methods">
+
+    <div class="mcard m1">
+      <div class="mcard-head">
+        <div class="micon">🧪</div>
+        <div class="mtitle-wrap">
+          <div class="mtitle">실험 탐구</div>
+          <div class="mtag">변인을 직접 조작해 원인과 결과를 확인</div>
+        </div>
+      </div>
+      <div class="mrow">
+        <div class="mrow-label">무엇인가</div>
+        <div class="mrow-text">내가 조건(변인)을 직접 바꾸고 그 결과를 <b>반복 측정</b>하는, 가장 기본이 되는 탐구입니다.</div>
+      </div>
+      <div class="mrow">
+        <div class="mrow-label">언제 쓰나</div>
+        <div class="mrow-text">"A를 바꾸면 B가 어떻게 달라질까"처럼 원인–결과를 직접 확인하고 싶을 때.</div>
+      </div>
+      <div class="mdeep">💡 <b>깊이 더하기</b> — 한 번이 아니라 반복 측정·평균을 내고, 통제 변인을 분명히 적은 뒤 결과를 그래프의 경향으로 설명하세요.</div>
+    </div>
+
+    <div class="mcard m2">
+      <div class="mcard-head">
+        <div class="micon">🔭</div>
+        <div class="mtitle-wrap">
+          <div class="mtitle">관측·측정 탐구</div>
+          <div class="mtag">조작 없이 자연 현상을 정밀하게 기록</div>
+        </div>
+      </div>
+      <div class="mrow">
+        <div class="mrow-label">무엇인가</div>
+        <div class="mrow-text">조건을 바꾸기 어려운 대상을 <b>일정한 기준</b>으로 꾸준히 재고 기록하는 탐구입니다.</div>
+      </div>
+      <div class="mrow">
+        <div class="mrow-label">언제 쓰나</div>
+        <div class="mrow-text">날씨·별·생물 개체 수·지역 환경처럼 사람이 통제할 수 없는 대상일 때.</div>
+      </div>
+      <div class="mdeep">💡 <b>깊이 더하기</b> — 측정 간격과 기준을 끝까지 고정하고, 충분히 긴 기간의 데이터로 추세나 주기를 찾아내세요.</div>
+    </div>
+
+    <div class="mcard m3">
+      <div class="mcard-head">
+        <div class="micon">📊</div>
+        <div class="mtitle-wrap">
+          <div class="mtitle">데이터 분석 탐구</div>
+          <div class="mtag">공개 데이터에서 관계를 발견</div>
+        </div>
+      </div>
+      <div class="mrow">
+        <div class="mrow-label">무엇인가</div>
+        <div class="mrow-text">기상청·공공데이터·논문 부록처럼 <b>이미 존재하는 큰 데이터</b>를 분석하는 탐구입니다.</div>
+      </div>
+      <div class="mrow">
+        <div class="mrow-label">언제 쓰나</div>
+        <div class="mrow-text">직접 측정이 불가능한 큰 규모·긴 기간·넓은 지역의 문제를 다룰 때.</div>
+      </div>
+      <div class="mdeep">💡 <b>깊이 더하기</b> — 출처·수집일·전처리 기준을 반드시 밝히고, 상관과 인과를 구분하며 회귀로 경향을 정량화하세요.</div>
+    </div>
+
+    <div class="mcard m4">
+      <div class="mcard-head">
+        <div class="micon">🧮</div>
+        <div class="mtitle-wrap">
+          <div class="mtitle">모델링·시뮬레이션</div>
+          <div class="mtag">수식·프로그램으로 현상을 재현·예측</div>
+        </div>
+      </div>
+      <div class="mrow">
+        <div class="mrow-label">무엇인가</div>
+        <div class="mrow-text">현상을 <b>수식이나 코드</b>로 표현해 조건을 바꿔 가며 예측하는 탐구입니다.</div>
+      </div>
+      <div class="mrow">
+        <div class="mrow-label">언제 쓰나</div>
+        <div class="mrow-text">실험이 위험·고비용·장시간이거나, 이론값과 비교하고 싶을 때.</div>
+      </div>
+      <div class="mdeep">💡 <b>깊이 더하기</b> — 모델이 깔고 있는 가정을 분명히 드러내고, 실제값·이론값과 비교해 오차와 한계를 함께 분석하세요.</div>
+    </div>
+
+    <div class="mcard m5">
+      <div class="mcard-head">
+        <div class="micon">📚</div>
+        <div class="mtitle-wrap">
+          <div class="mtitle">문헌·비교 탐구</div>
+          <div class="mtag">선행 자료를 모아 종합하고 재해석</div>
+        </div>
+      </div>
+      <div class="mrow">
+        <div class="mrow-label">무엇인가</div>
+        <div class="mrow-text">여러 논문·자료를 모아 비교하고 <b>나만의 기준</b>으로 정리하는 탐구입니다.</div>
+      </div>
+      <div class="mrow">
+        <div class="mrow-label">언제 쓰나</div>
+        <div class="mrow-text">실험 전 배경을 조사하거나, 서로 상반된 주장을 비교해 검증할 때.</div>
+      </div>
+      <div class="mdeep">💡 <b>깊이 더하기</b> — 단순 요약에서 멈추지 말고 비교 기준표를 만들어 합의점·쟁점·빈틈을 짚어 내세요.</div>
+    </div>
+
+  </div>
+
+  <!-- 기법 선택 가이드 -->
+  <div class="sec-title"><span class="bar"></span>질문에 맞는 기법 고르기</div>
+  <div class="guide-map">
+
+    <div class="grow">
+      <div class="gq">
+        <div class="gq-label">이런 질문이라면</div>
+        <div class="gq-text">조건을 내가 직접 바꿀 수 있다</div>
+      </div>
+      <div class="garrow">→</div>
+      <div class="gm"><span class="gm-icon">🧪</span><span class="gm-name">실험 탐구</span></div>
+    </div>
+
+    <div class="grow">
+      <div class="gq">
+        <div class="gq-label">이런 질문이라면</div>
+        <div class="gq-text">대상을 통제할 수 없다 (자연·환경·생물)</div>
+      </div>
+      <div class="garrow">→</div>
+      <div class="gm"><span class="gm-icon">🔭</span><span class="gm-name">관측·측정 탐구</span></div>
+    </div>
+
+    <div class="grow">
+      <div class="gq">
+        <div class="gq-label">이런 질문이라면</div>
+        <div class="gq-text">규모가 너무 크거나 기간이 너무 길다</div>
+      </div>
+      <div class="garrow">→</div>
+      <div class="gm"><span class="gm-icon">📊</span><span class="gm-name">데이터 분석 탐구</span></div>
+    </div>
+
+    <div class="grow">
+      <div class="gq">
+        <div class="gq-label">이런 질문이라면</div>
+        <div class="gq-text">실험이 위험하거나 비용·시간이 많이 든다</div>
+      </div>
+      <div class="garrow">→</div>
+      <div class="gm"><span class="gm-icon">🧮</span><span class="gm-name">모델링·시뮬레이션</span></div>
+    </div>
+
+    <div class="grow">
+      <div class="gq">
+        <div class="gq-label">이런 질문이라면</div>
+        <div class="gq-text">먼저 배경과 선행 연구부터 알아야 한다</div>
+      </div>
+      <div class="garrow">→</div>
+      <div class="gm"><span class="gm-icon">📚</span><span class="gm-name">문헌·비교 탐구</span></div>
+    </div>
+
+  </div>
+
+  <!-- 얕은 적용 vs 깊은 적용 -->
+  <div class="sec-title"><span class="bar"></span>얕은 적용 vs 깊은 적용</div>
+  <div class="compare">
+
+    <div class="ccard weak">
+      <div class="chead">✕ 얕은 적용</div>
+      <div class="cline">한 번만 측정하고 결과를 그대로 적음</div>
+      <div class="cline">통제 변인을 따로 정하지 않음</div>
+      <div class="cline">데이터 출처·수집일이 없음</div>
+      <div class="cline">모델의 가정을 밝히지 않음</div>
+      <div class="cline">문헌을 줄거리만 요약하고 끝</div>
+    </div>
+
+    <div class="ccard good">
+      <div class="chead">✓ 깊은 적용</div>
+      <div class="cline"><b>반복 측정·평균</b>으로 경향을 확인함</div>
+      <div class="cline">바꾼 것·고정한 것을 <b>명확히 구분</b></div>
+      <div class="cline">출처·수집일·<b>전처리 기준</b>을 함께 기록</div>
+      <div class="cline">가정과 <b>오차·한계</b>를 스스로 분석</div>
+      <div class="cline"><b>비교 기준표</b>로 쟁점과 빈틈을 짚음</div>
+    </div>
+
+  </div>
+
+  <!-- 공통 체크 -->
+  <div class="sec-title"><span class="bar"></span>기법을 정할 때 항상 확인할 것</div>
+  <div class="checks">
+    <div class="check-item">
+      <div class="check-mark">✓</div>
+      <div class="check-text">기법이 <b>질문의 성격</b>에 맞는가 — 통제 가능 여부·규모·위험도를 먼저 따졌는가</div>
+    </div>
+    <div class="check-item">
+      <div class="check-mark">✓</div>
+      <div class="check-text">결과를 <b>숫자와 그래프</b>로 나타낼 수 있도록 측정 방법을 정했는가</div>
+    </div>
+    <div class="check-item">
+      <div class="check-mark">✓</div>
+      <div class="check-text">반복·통제·출처·전처리 등 <b>신뢰도를 높이는 장치</b>를 미리 넣었는가</div>
+    </div>
+    <div class="check-item">
+      <div class="check-mark">✓</div>
+      <div class="check-text">예상과 다른 결과가 나왔을 때 <b>그 원인을 설명할 준비</b>가 되어 있는가</div>
+    </div>
+  </div>
+
+  <div class="foot-nav">
+    <a href="science-studio.html" class="foot-btn">← 다른 탐구 메뉴 보기</a>
+  </div>
+
+  <div class="foot">
+    <b>베타과학학원</b> · 과학 심화탐구 설계 스튜디오 · 탐구 기법
+  </div>
+
+</div>
+
+</body>
+</html>
