@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="베타과학학원 과학 심화탐구 설계 스튜디오 — 학년별 전략, 교과-탐구 연결, 탐구 기법, 주제 라이브러리, 증거화 전략, 세특 기록, 면접 대비, 탐구 설계서를 한 곳에서">
+<title>과학 심화탐구 설계 스튜디오 · 베타과학학원</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  background: #fafafa; color: #1d1d1f; min-height: 100vh;
+  -webkit-font-smoothing: antialiased; overscroll-behavior: none;
+}
+
+/* ── Header ── */
+.header {
+  background: #ffffff; border-bottom: 1px solid #f0e8ed;
+  height: 54px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1rem;
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  position: sticky; top: 0; z-index: 300;
+}
+.header-left { display: flex; align-items: center; gap: 9px; text-decoration: none; color: inherit; cursor: pointer; transition: opacity 0.15s; }
+.header-left:hover { opacity: 0.75; }
+.logo-mark {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, #f472b6 0%, #db2777 100%);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.brand-name { font-size: 14px; font-weight: 600; color: #1d1d1f; letter-spacing: -0.3px; }
+.header-badge {
+  display: flex; align-items: center; gap: 5px;
+  background: #fdf2f8; border: 1px solid #fbcfe8; border-radius: 20px;
+  padding: 4px 11px; font-size: 10px; font-weight: 700; color: #db2777; white-space: nowrap;
+}
+
+/* ── Layout ── */
+.wrap {
+  max-width: 1080px; margin: 0 auto;
+  padding: 1.2rem 0.9rem 5rem;
+  padding-bottom: max(5rem, calc(4rem + env(safe-area-inset-bottom)));
+  padding-left: max(0.9rem, env(safe-area-inset-left));
+  padding-right: max(0.9rem, env(safe-area-inset-right));
+}
+
+/* ── Hero ── */
+.hero {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #db2777 0%, #ec4899 45%, #f472b6 100%);
+  border-radius: 24px; padding: 2rem 1.6rem; margin-bottom: 1.4rem;
+  color: #fff; box-shadow: 0 16px 40px rgba(219,39,119,0.28);
+}
+.hero::before {
+  content: ''; position: absolute; top: -60px; right: -50px;
+  width: 220px; height: 220px; border-radius: 50%;
+  background: rgba(255,255,255,0.14); pointer-events: none;
+}
+.hero::after {
+  content: ''; position: absolute; bottom: -80px; left: -40px;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); pointer-events: none;
+}
+.hero-kicker {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px; padding: 5px 12px; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.02em; margin-bottom: 14px; position: relative; z-index: 1;
+}
+.hero-title {
+  font-size: 1.85rem; font-weight: 800; letter-spacing: -0.04em;
+  line-height: 1.25; position: relative; z-index: 1; word-break: keep-all;
+}
+.hero-sub {
+  font-size: 0.92rem; line-height: 1.65; margin-top: 12px;
+  color: rgba(255,255,255,0.92); position: relative; z-index: 1; max-width: 640px; word-break: keep-all;
+}
+.hero-flow {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; position: relative; z-index: 1;
+}
+.flow-chip {
+  background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 9px; padding: 6px 11px; font-size: 11px; font-weight: 600; white-space: nowrap;
+}
+.flow-arrow { align-self: center; font-size: 11px; color: rgba(255,255,255,0.6); }
+
+/* ── Section heading ── */
+.section-heading {
+  font-size: 11px; font-weight: 700; color: #aeaeb2;
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.85rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-heading::after { content: ''; flex: 1; height: 1px; background: #f0e8ed; }
+
+/* ── Nav grid ── */
+.nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.8rem; }
+.nav-card {
+  background: #ffffff; border: 1px solid #fce7f3; border-radius: 18px;
+  padding: 1.2rem 1rem; cursor: pointer; position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 8px;
+  text-decoration: none; color: inherit;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  -webkit-user-select: none; user-select: none; min-height: 132px;
+}
+.nav-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  border-radius: 0 0 18px 18px; opacity: 0; transition: opacity 0.18s;
+}
+.nav-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(219,39,119,0.14); border-color: #fbcfe8; }
+.nav-card:hover::after { opacity: 1; }
+.nav-card:active { transform: scale(0.97); }
+.nav-step {
+  position: absolute; top: 12px; right: 14px;
+  font-size: 11px; font-weight: 800; color: #f0d4e0; letter-spacing: 0.04em;
+}
+.nav-icon {
+  width: 44px; height: 44px; border-radius: 13px;
+  display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+}
+.nav-title { font-size: 13px; font-weight: 700; color: #1d1d1f; letter-spacing: -0.02em; }
+.nav-desc { font-size: 11px; color: #aeaeb2; line-height: 1.45; flex: 1; }
+.nav-go { font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 3px; }
+
+/* per-card accent colors */
+.c1 .nav-icon { background: #fdf2f8; } .c1::after { background: linear-gradient(90deg,#f472b6,#db2777); } .c1 .nav-go { color: #db2777; }
+.c2 .nav-icon { background: #eff6ff; } .c2::after { background: linear-gradient(90deg,#60a5fa,#2563eb); } .c2 .nav-go { color: #2563eb; }
+.c3 .nav-icon { background: #fef3c7; } .c3::after { background: linear-gradient(90deg,#fbbf24,#d97706); } .c3 .nav-go { color: #d97706; }
+.c4 .nav-icon { background: #f0fdf4; } .c4::after { background: linear-gradient(90deg,#4ade80,#16a34a); } .c4 .nav-go { color: #16a34a; }
+.c5 .nav-icon { background: #f5f3ff; } .c5::after { background: linear-gradient(90deg,#a78bfa,#7c3aed); } .c5 .nav-go { color: #7c3aed; }
+.c6 .nav-icon { background: #fff7ed; } .c6::after { background: linear-gradient(90deg,#fb923c,#ea580c); } .c6 .nav-go { color: #ea580c; }
+.c7 .nav-icon { background: #f0f9ff; } .c7::after { background: linear-gradient(90deg,#38bdf8,#0284c7); } .c7 .nav-go { color: #0284c7; }
+.c8 .nav-icon { background: #fdf4ff; } .c8::after { background: linear-gradient(90deg,#e879f9,#a21caf); } .c8 .nav-go { color: #a21caf; }
+
+/* ── 안내 카드 ── */
+.guide-card {
+  background: #ffffff; border: 1px solid #fce7f3; border-radius: 18px;
+  padding: 1.3rem 1.4rem; margin-bottom: 1.4rem;
+}
+.guide-title { font-size: 14px; font-weight: 700; color: #1d1d1f; margin-bottom: 12px; display: flex; align-items: center; gap: 7px; }
+.guide-list { display: flex; flex-direction: column; gap: 11px; }
+.guide-item { display: flex; gap: 11px; align-items: flex-start; }
+.guide-num {
+  width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0;
+  background: linear-gradient(135deg,#f472b6,#db2777); color: #fff;
+  font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+}
+.guide-text { font-size: 12.5px; color: #3c3c43; line-height: 1.6; }
+.guide-text b { color: #db2777; font-weight: 700; }
+
+/* ── 푸터 ── */
+.foot {
+  text-align: center; font-size: 11px; color: #c7c7cc; line-height: 1.7;
+  padding-top: 1.4rem; border-top: 1px solid #f0e8ed;
+}
+.foot b { color: #db2777; font-weight: 700; }
+
+/* ── 반응형 ── */
+@media (max-width: 760px) {
+  .nav-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 520px) {
+  .wrap { padding: 1rem 0.75rem 4rem; }
+  .hero { padding: 1.6rem 1.3rem; border-radius: 20px; }
+  .hero-title { font-size: 1.5rem; }
+  .hero-sub { font-size: 0.86rem; }
+  .nav-card { min-height: 120px; padding: 1.1rem 0.9rem; }
+  .nav-icon { width: 40px; height: 40px; font-size: 18px; }
+}
+@media (max-width: 360px) {
+  .nav-grid { gap: 8px; }
+  .nav-card { min-height: 112px; padding: 1rem 0.8rem; }
+  .nav-title { font-size: 12.5px; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">베타과학학원</span>
+  </a>
+  <div class="header-badge">🔬 심화탐구 설계</div>
+</header>
+
+<div class="wrap">
+
+  <!-- Hero -->
+  <section class="hero">
+    <span class="hero-kicker">✦ 학생부종합전형 · 이공계 탐구 설계</span>
+    <h1 class="hero-title">과학 심화탐구<br>설계 스튜디오</h1>
+    <p class="hero-sub">
+      수업에서 생긴 한 줄 호기심을, 측정 가능한 질문과 데이터로 발전시키고
+      세특·면접까지 이어지는 하나의 탐구로 완성하도록 돕는 공간입니다.
+      화려한 결과보다 <b style="color:#fff;">학생이 생각하고 고쳐 나간 과정</b>을 남기는 것에 집중했습니다.
+    </p>
+    <div class="hero-flow">
+      <span class="flow-chip">수업 개념</span><span class="flow-arrow">→</span>
+      <span class="flow-chip">질문 설계</span><span class="flow-arrow">→</span>
+      <span class="flow-chip">데이터·분석</span><span class="flow-arrow">→</span>
+      <span class="flow-chip">세특·면접</span>
+    </div>
+  </section>
+
+  <!-- Nav -->
+  <div class="section-heading">탐구 메뉴</div>
+  <div class="nav-grid">
+
+    <a class="nav-card c1" href="inquiry-grade.html">
+      <span class="nav-step">01</span>
+      <div class="nav-icon">📈</div>
+      <div class="nav-title">학년별 전략</div>
+      <div class="nav-desc">1·2·3학년 위계에 맞춘 탐구 깊이 설계</div>
+      <div class="nav-go">시작하기 →</div>
+    </a>
+
+    <a class="nav-card c2" href="inquiry-course.html">
+      <span class="nav-step">02</span>
+      <div class="nav-icon">🔗</div>
+      <div class="nav-title">교과–탐구 연결</div>
+      <div class="nav-desc">수업 개념을 탐구 질문으로 바꾸는 연결 지도</div>
+      <div class="nav-go">시작하기 →</div>
+    </a>
+
+    <a class="nav-card c3" href="inquiry-method.html">
+      <span class="nav-step">03</span>
+      <div class="nav-icon">🧪</div>
+      <div class="nav-title">탐구 기법</div>
+      <div class="nav-desc">실험·데이터·모델링 등 깊이를 만드는 방법</div>
+      <div class="nav-go">시작하기 →</div>
+    </a>
+
+    <a class="nav-card c4" href="inquiry-library.html">
+      <span class="nav-step">04</span>
+      <div class="nav-icon">📚</div>
+      <div class="nav-title">주제 라이브러리</div>
+      <div class="nav-desc">분야·학년별 실천형 탐구 주제 모음</div>
+      <div class="nav-go">시작하기 →</div>
+    </a>
+
+    <a class="nav-card c5" href="inquiry-evidence.html">
+      <span class="nav-step">05</span>
+      <div class="nav-icon">🧩</div>
+      <div class="nav-title">증거화 전략</div>
+      <div class="nav-desc">수업–탐구–세특–면접을 하나의 흐름으로</div>
+      <div class="nav-go">시작하기 →</div>
+    </a>
+
+    <a class="nav-card c6" href="inquiry-record.html">
+      <span class="nav-step">06</span>
+      <div class="nav-icon">✍️</div>
+      <div class="nav-title">세특 기록</div>
+      <div class="nav-desc">결과가 아닌 사고 과정을 남기는 기록법</div>
+      <div class="nav-go">시작하기 →</div>
+    </a>
+
+    <a class="nav-card c7" href="inquiry-interview.html">
+      <span class="nav-step">07</span>
+      <div class="nav-icon">🎤</div>
+      <div class="nav-title">면접 대비</div>
+      <div class="nav-desc">외운 답이 아닌 판단 근거로 말하기</div>
+      <div class="nav-go">시작하기 →</div>
+    </a>
+
+    <a class="nav-card c8" href="inquiry-builder.html">
+      <span class="nav-step">08</span>
+      <div class="nav-icon">📝</div>
+      <div class="nav-title">탐구 설계서</div>
+      <div class="nav-desc">항목만 채우면 설계서 초안이 자동 정리</div>
+      <div class="nav-go">시작하기 →</div>
+    </a>
+
+  </div>
+
+  <!-- 사용 안내 -->
+  <div class="guide-card">
+    <div class="guide-title">🧭 이렇게 활용하세요</div>
+    <div class="guide-list">
+      <div class="guide-item">
+        <div class="guide-num">1</div>
+        <div class="guide-text"><b>학년별 전략</b>으로 지금 학년에서 기대되는 탐구 수준을 먼저 확인합니다.</div>
+      </div>
+      <div class="guide-item">
+        <div class="guide-num">2</div>
+        <div class="guide-text"><b>교과–탐구 연결</b>과 <b>주제 라이브러리</b>에서 출발할 수업 개념과 후보 주제를 고릅니다.</div>
+      </div>
+      <div class="guide-item">
+        <div class="guide-num">3</div>
+        <div class="guide-text"><b>탐구 기법</b>으로 주제에 맞는 방법을 정하고, <b>탐구 설계서</b>에 초안을 작성합니다.</div>
+      </div>
+      <div class="guide-item">
+        <div class="guide-num">4</div>
+        <div class="guide-text"><b>증거화 전략·세특 기록·면접 대비</b>로 같은 탐구를 기록과 답변까지 연결합니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <b>베타과학학원</b> · 과학 심화탐구 설계 스튜디오<br>
+    수업에서 출발한 질문이 전공 탐구력으로 자라도록 설계한 학습 도구입니다.
+  </div>
+
+</div>
+
+</body>
+</html>
