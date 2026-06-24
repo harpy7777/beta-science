@@ -364,14 +364,25 @@ function renderLink(it){
 
 /* ── 시험 바로가기 (온라인 테스트 / 마스터테스트) ── */
 let clinicStudentId = '';   // 클리닉 문서의 studentId (load에서 설정)
+let clinicReturnHref = '';  // 시험 끝낸 뒤 돌아올 이 클리닉 첫 페이지 주소 (load에서 설정)
 function buildExamHref(it){
+  // 시험을 끝낸 학생이 "시험 목록으로" 누르면 이 클리닉 첫 페이지로 돌아오도록 from 전달
+  const fromPart = clinicReturnHref ? ('from='+encodeURIComponent(clinicReturnHref)) : '';
   if(it.source==='master'){
-    const sidPart = clinicStudentId ? ('&sid='+encodeURIComponent(clinicStudentId)) : '';
-    return '/student-omr.html?testId='+encodeURIComponent(it.examId||'')+sidPart;
+    const qs=[];
+    if(clinicStudentId) qs.push('sid='+encodeURIComponent(clinicStudentId));
+    if(fromPart) qs.push(fromPart);
+    let url='/student-omr.html?testId='+encodeURIComponent(it.examId||'');
+    if(qs.length) url += '&'+qs.join('&');
+    return url;
   }
   // online: /student/{examId}?type=ox|multiple
-  const typePart = it.examType ? ('?type='+encodeURIComponent(it.examType)) : '';
-  return '/student/'+encodeURIComponent(it.examId||'')+typePart;
+  const qs=[];
+  if(it.examType) qs.push('type='+encodeURIComponent(it.examType));
+  if(fromPart) qs.push(fromPart);
+  let url='/student/'+encodeURIComponent(it.examId||'');
+  if(qs.length) url += '?'+qs.join('&');
+  return url;
 }
 function renderExamLink(it){
   const kind = it.source==='master' ? 'master' : (it.examType==='ox' ? 'ox' : 'mc');
@@ -576,6 +587,9 @@ async function load(){
   const data=snap.data();
   const items=Array.isArray(data.items)?data.items:[];
   clinicStudentId = data.studentId || '';
+  // 시험을 끝낸 학생이 돌아올 이 클리닉 첫 페이지 주소 (토큰 포함)
+  clinicReturnHref = location.pathname + '?t=' + encodeURIComponent(token);
+  try{ localStorage.setItem('clinicReturn', clinicReturnHref); }catch(e){}
   $('heroTitle').textContent = (data.studentName||'') + ' 학생';
   $('heroSub').textContent = data.weekLabel ? '📅 '+data.weekLabel : '이번 주 학습 클리닉';
 
