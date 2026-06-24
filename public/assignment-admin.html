@@ -497,20 +497,26 @@ const CONCEPT_PAGES = {
     {f:"middle-science3-unit8.html", t:"8단원 - 과학기술과 인류 문명"}
   ],
   "통합과학1": [
-    {f:"unit1-01.html", t:"1단원 - 미시 세계와 거시 세계"},
-    {f:"unit1-02.html", t:"1단원 - 미시 세계와 거시 세계 완벽대비"},
-    {f:"unit1-03.html", t:"1단원 - 측정 표준 활용 사례 탐색"},
-    {f:"unit1-04.html", t:"1단원 - 신호와 정보"},
-    {f:"unit2-01.html", t:"2단원 - 멘델레예프 주기율표 만들기"},
-    {f:"science-performance.html", t:"통합과학 수행평가"},
-    {f:"science-inquiry-performance.html", t:"탐구활동 보고서"}
+    {f:"miraen-science1-unit1.html", t:"[미래엔] Ⅰ. 과학의 기초"},
+    {f:"miraen-science1-unit2.html", t:"[미래엔] Ⅱ. 물질과 규칙성"},
+    {f:"miraen-science1-unit3.html", t:"[미래엔] Ⅲ. 시스템과 상호작용"},
+    {f:"donga-science1-unit1.html", t:"[동아출판] Ⅰ. 과학의 기초"},
+    {f:"donga-science1-unit2.html", t:"[동아출판] Ⅱ. 물질과 규칙성"},
+    {f:"donga-science1-unit3.html", t:"[동아출판] Ⅲ. 시스템과 상호작용"},
+    {f:"visang-science1-unit1.html", t:"[비상교육] Ⅰ. 과학의 기초"},
+    {f:"visang-science1-unit2.html", t:"[비상교육] Ⅱ. 물질과 규칙성"},
+    {f:"visang-science1-unit3.html", t:"[비상교육] Ⅲ. 시스템과 상호작용"}
   ],
   "통합과학2": [
-    {f:"science2-inquiry2528.html", t:"탐구 25~28 - 환경 변화와 생물다양성"},
-    {f:"science2-inquiry2932.html", t:"탐구 29~32 - 우리 주변의 변화"},
-    {f:"science2-inquiry3336.html", t:"탐구 33~36 - 생태계와 환경"},
-    {f:"science2-inquiry3740.html", t:"탐구 37~40 - 환경과 에너지"},
-    {f:"science2-inquiry4146.html", t:"탐구 41~46 - 과학과 미래 사회"}
+    {f:"miraen-science2-unit1.html", t:"[미래엔] Ⅰ. 변화와 다양성"},
+    {f:"miraen-science2-unit2.html", t:"[미래엔] Ⅱ. 환경과 에너지"},
+    {f:"miraen-science2-unit3.html", t:"[미래엔] Ⅲ. 과학과 미래 사회"},
+    {f:"donga-science2-unit1.html", t:"[동아출판] Ⅰ. 변화와 다양성"},
+    {f:"donga-science2-unit2.html", t:"[동아출판] Ⅱ. 환경과 에너지"},
+    {f:"donga-science2-unit3.html", t:"[동아출판] Ⅲ. 과학과 미래 사회"},
+    {f:"visang-science2-unit1.html", t:"[비상교육] Ⅰ. 변화와 다양성"},
+    {f:"visang-science2-unit2.html", t:"[비상교육] Ⅱ. 환경과 에너지"},
+    {f:"visang-science2-unit3.html", t:"[비상교육] Ⅲ. 과학과 미래 사회"}
   ],
   "화학": [
     {f:"chemistry1-unit1.html", t:"1단원 - 생활 속 화학과 물질의 양"},
@@ -661,9 +667,17 @@ function buildSrcTabs(){
   mk('🧪 온라인 테스트','online');
   mk('📝 마스터테스트','master');
 }
+const SUBJECT_ORDER=['중1과학','중2과학','중3과학','통합과학1','통합과학2','화학','물질과 에너지','화학 반응의 세계'];
 function buildSubjTabs(){
   const subjects=[];
   curList().forEach(e=>{ const s=examSubject(e); if(s && !subjects.includes(s)) subjects.push(s); });
+  // 지정한 순서대로 정렬 (목록에 없는 과목은 뒤에 한글순)
+  subjects.sort((a,b)=>{
+    const ia=SUBJECT_ORDER.indexOf(a), ib=SUBJECT_ORDER.indexOf(b);
+    const ka=ia===-1?999:ia, kb=ib===-1?999:ib;
+    if(ka!==kb) return ka-kb;
+    return a.localeCompare(b,'ko');
+  });
   const tabs=$('subjTabs'); tabs.innerHTML='';
   const mk=(label,val)=>{
     const b=el('button','subj-tab'+(val===curSubj?' on':''),label);
