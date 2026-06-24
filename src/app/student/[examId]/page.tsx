@@ -14,6 +14,8 @@ function StudentExamInner() {
   const isPreview = searchParams.get('preview') === '1';
   // ★ type 파라미터: 'ox' | 'multiple' | null(전체)
   const typeFilter = searchParams.get('type') as 'ox' | 'multiple' | null;
+  // ★ from 파라미터: 시험을 끝낸 뒤 돌아갈 주소(클리닉 첫 페이지 등)
+  const fromParam = searchParams.get('from');
   const router = useRouter();
 
   const [exam, setExam] = useState<Exam | null>(null);
@@ -139,6 +141,29 @@ function StudentExamInner() {
     setCurrent(0);
   }
 
+  // ★ 사이트 내부 경로만 허용 (오픈 리다이렉트 방지)
+  function safeReturnPath(p: string | null): string | null {
+    if (!p) return null;
+    if (p.startsWith('/') && !p.startsWith('//')) return p;
+    return null;
+  }
+
+  // ★ "시험 목록으로": 클리닉에서 들어왔으면 클리닉 첫 페이지로, 아니면 시험 목록으로
+  function goToList() {
+    let target = safeReturnPath(fromParam);
+    if (!target) {
+      try { target = safeReturnPath(localStorage.getItem('clinicReturn')); } catch {}
+    }
+    if (target) window.location.href = target;
+    else router.push('/student-test');
+  }
+
+  // ★ 같은 시험의 다른 유형(OX↔4지선다)으로 이동할 때 from 파라미터를 유지
+  function crossTypeHref(t: 'ox' | 'multiple') {
+    const base = `/student/${examId}?type=${t}`;
+    return fromParam ? `${base}&from=${encodeURIComponent(fromParam)}` : base;
+  }
+
   function prev() {
     if (current > 0) setCurrent(c => c - 1);
   }
@@ -212,33 +237,41 @@ function StudentExamInner() {
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex flex-col">
       {/* Header */}
       <header className="bg-white border-b border-green-100 sticky top-0 z-50">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+        <div className="max-w-2xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center shrink-0">
               <FlaskConical size={16} className="text-white" />
             </div>
-            <div>
-              <div className="font-bold text-green-900 text-sm">베타과학학원</div>
-              {(phase === 'exam' || isRetryMode) && (
-                <div className="text-xs text-green-600 flex items-center gap-1.5">
-                  {studentName}
-                  {typeLabel && (
-                    <span className={`${typeLabel.bg} ${typeLabel.color} font-bold px-1.5 py-0.5 rounded text-[10px]`}>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="font-bold text-green-900 text-sm whitespace-nowrap">베타과학학원</span>
+                {(phase === 'exam' || isRetryMode) && (
+                  <span className="text-xs text-green-600 whitespace-nowrap">· {studentName}</span>
+                )}
+                {(phase === 'exam' || isRetryMode) && (
+                  isRetryMode ? (
+                    <span className="bg-orange-100 text-orange-700 font-bold px-1.5 py-0.5 rounded text-[10px] whitespace-nowrap">
+                      오답 재풀기
+                    </span>
+                  ) : typeLabel ? (
+                    <span className={`${typeLabel.bg} ${typeLabel.color} font-bold px-1.5 py-0.5 rounded text-[10px] whitespace-nowrap`}>
                       {typeLabel.text}
                     </span>
-                  )}
-                  {isRetryMode ? ' · 오답 재풀기' : ` · ${examDisplayTitle}`}
-                </div>
+                  ) : null
+                )}
+              </div>
+              {phase === 'exam' && !isRetryMode && (
+                <div className="text-[11px] text-green-600/80 truncate mt-0.5">{examDisplayTitle}</div>
               )}
             </div>
           </div>
           {(phase === 'exam' || isRetryMode) && (
-            <div className="text-sm text-gray-500">
+            <div className="text-xs text-gray-500 shrink-0 whitespace-nowrap">
               <span className="font-bold text-green-600">{answered}</span>/{questions.length} 답변
             </div>
           )}
           {isPreview && (
-            <button onClick={() => router.back()} className="btn-ghost text-xs flex items-center gap-1">
+            <button onClick={() => router.back()} className="btn-ghost text-xs flex items-center gap-1 shrink-0">
               <ArrowLeft size={14} />미리보기 종료
             </button>
           )}
@@ -525,7 +558,7 @@ function StudentExamInner() {
                 {typeFilter === 'ox' && (
                   <button
                     onClick={() => {
-                      window.location.href = `/student/${examId}?type=multiple`;
+                      window.location.href = crossTypeHref('multiple');
                     }}
                     className="btn-primary w-full"
                     style={{ background: 'linear-gradient(135deg, #1a3fc4, #3b5bdb)' }}
@@ -536,7 +569,7 @@ function StudentExamInner() {
                 {typeFilter === 'multiple' && (
                   <button
                     onClick={() => {
-                      window.location.href = `/student/${examId}?type=ox`;
+                      window.location.href = crossTypeHref('ox');
                     }}
                     className="btn-primary w-full"
                     style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}
@@ -544,7 +577,7 @@ function StudentExamInner() {
                     OX퀴즈 풀기 →
                   </button>
                 )}
-                <button onClick={() => router.push('/student-test')} className="btn-secondary w-full">
+                <button onClick={goToList} className="btn-secondary w-full">
                   시험 목록으로
                 </button>
               </div>
