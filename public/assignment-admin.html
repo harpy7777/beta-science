@@ -625,6 +625,18 @@ function examTypes(exam){
 }
 function curList(){ return curSource==='online' ? (onlineCache||[]) : (masterCache||[]); }
 function examSubject(e){ return (e.subject||'').trim(); }
+/* 과목 탭 그룹: '과학내신' 중등 시험은 학년별(중1과학/중2과학/중3과학)로 분리 */
+function examGroup(e){
+  const subj=examSubject(e);
+  if(subj.replace(/\s/g,'')==='과학내신'){
+    const g=normalizeGrade(e.grade);
+    if(g==='중1') return '중1과학';
+    if(g==='중2') return '중2과학';
+    if(g==='중3') return '중3과학';
+    return subj; // 학년 불명 시 그대로 표시
+  }
+  return subj;
+}
 function examTitle(e){ return curSource==='online' ? (e.title||'(제목 없음)') : (e.unitName||'(제목 없음)'); }
 function sortByUnit(arr){
   return arr.slice().sort((a,b)=>{
@@ -670,7 +682,7 @@ function buildSrcTabs(){
 const SUBJECT_ORDER=['중1과학','중2과학','중3과학','통합과학1','통합과학2','화학','물질과 에너지','화학 반응의 세계'];
 function buildSubjTabs(){
   const subjects=[];
-  curList().forEach(e=>{ const s=examSubject(e); if(s && !subjects.includes(s)) subjects.push(s); });
+  curList().forEach(e=>{ const s=examGroup(e); if(s && !subjects.includes(s)) subjects.push(s); });
   // 지정한 순서대로 정렬 (목록에 없는 과목은 뒤에 한글순)
   subjects.sort((a,b)=>{
     const ia=SUBJECT_ORDER.indexOf(a), ib=SUBJECT_ORDER.indexOf(b);
@@ -690,7 +702,7 @@ function buildSubjTabs(){
 function renderExamList(){
   const box=$('examBody'); box.innerHTML='';
   let list=curList();
-  if(curSubj!=='전체') list=list.filter(e=>examSubject(e)===curSubj);
+  if(curSubj!=='전체') list=list.filter(e=>examGroup(e)===curSubj);
   list=sortByUnit(list);
   if(list.length===0){ box.innerHTML='<div class="list-empty">해당 과목의 시험이 없습니다.</div>'; return; }
 
