@@ -263,7 +263,7 @@ body {
       <div class="result-task-title">📌 이번 과제</div>
       <div class="result-task-text" id="result-task-text">—</div>
     </div>
-    <a href="/student-omr.html" class="home-btn">홈으로 돌아가기</a>
+    <a href="/student-omr.html" id="omr-home-btn" class="home-btn">홈으로 돌아가기</a>
   </div>
 </div>
 
@@ -674,6 +674,15 @@ async function initFromURL() {
   const params = new URLSearchParams(location.search);
   const testId = (params.get('testId') || '').trim();
   const sid    = (params.get('sid') || '').trim().toLowerCase();
+
+  // 클리닉에서 들어왔으면 결과 화면의 "홈으로 돌아가기"를 클리닉 첫 페이지로 연결
+  // (사이트 내부 경로만 허용 — 오픈 리다이렉트 방지)
+  const fromRaw = params.get('from') || '';
+  if (fromRaw && fromRaw.startsWith('/') && !fromRaw.startsWith('//')) {
+    const homeBtn = document.getElementById('omr-home-btn');
+    if (homeBtn) { homeBtn.setAttribute('href', fromRaw); homeBtn.textContent = '← 클리닉으로 돌아가기'; }
+  }
+
   if (!testId) return; // 일반 입장 화면 유지
 
   // 자동 진입 로딩 화면
