@@ -187,6 +187,10 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
   thead th,tbody td{padding:8px 9px;font-size:11px}
   .test-tab-btn{padding:8px 12px;font-size:12px}
   .test-name-cell{max-width:130px}
+  /* 최근 응시 표: 모바일에서 관리(삭제) 열이 눌리지 않도록 최소 너비 확보 */
+  #recentAttemptsTable{min-width:520px}
+  /* 모바일에서 삭제버튼 터치 영역 키우기 (44px 권장 터치 타깃) */
+  #recentAttemptsBody .action-btn{width:38px;height:38px;font-size:15px}
 }
 </style>
 </head>
@@ -282,10 +286,10 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
       <a href="https://beta-science.vercel.app/grade-check.html" class="view-all">전체보기 ›</a>
     </div>
     <div class="table-wrap">
-      <table id="recentAttemptsTable" style="min-width:560px">
-        <colgroup><col style="width:10%"><col style="width:10%"><col style="width:9%"><col style="width:8%"><col style="width:11%"><col style="width:52%"></colgroup>
-        <thead><tr><th>응시일</th><th>아이디</th><th>이름</th><th>학년</th><th>과목</th><th>응시한 시험</th></tr></thead>
-        <tbody id="recentAttemptsBody"><tr><td colspan="6" style="text-align:center;padding:2.5rem;color:#aeaeb2">데이터를 불러오는 중...</td></tr></tbody>
+      <table id="recentAttemptsTable" style="min-width:620px">
+        <colgroup><col style="width:10%"><col style="width:10%"><col style="width:9%"><col style="width:8%"><col style="width:11%"><col style="width:44%"><col style="width:8%"></colgroup>
+        <thead><tr><th>응시일</th><th>아이디</th><th>이름</th><th>학년</th><th>과목</th><th>응시한 시험</th><th>관리</th></tr></thead>
+        <tbody id="recentAttemptsBody"><tr><td colspan="7" style="text-align:center;padding:2.5rem;color:#aeaeb2">데이터를 불러오는 중...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -350,7 +354,7 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc,collection,onSnapshot,query,orderBy,writeBatch,getDocs,where,Timestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,deleteDoc,collection,onSnapshot,query,orderBy,writeBatch,getDocs,where,Timestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
 const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app);
 
@@ -450,7 +454,7 @@ function iRG(){onSnapshot(query(collection(db,"grades"),orderBy("timestamp","asc
 function renderRecentAttempts(){
   const tb=document.getElementById('recentAttemptsBody');
   if(!tb)return;
-  if(!lastGradeDocs||lastGradeDocs.length===0){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
+  if(!lastGradeDocs||lastGradeDocs.length===0){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
   const gm={'중1':'g-mid1','중2':'g-mid2','중3':'g-mid3','고1':'g-high1','고2':'g-high2','고3':'g-high3','중등1학년':'g-mid1','중등2학년':'g-mid2','중등3학년':'g-mid3','고등1학년':'g-high1','고등2학년':'g-high2','고등3학년':'g-high3'};
   // 응시 1건이 OX+4지선다를 함께 가지면 각 유형을 별도 줄로 분리 (마스터는 한 줄)
   const rows=[];
@@ -458,13 +462,13 @@ function renderRecentAttempts(){
     if(aIds.size>0&&!aIds.has(sid))return;
     const ts=tD(r.timestamp||r.submittedTimestamp||r.date).getTime();
     const types=recTypes(r);
-    if(types.length===1&&types[0]==='master'){rows.push({r,sid,ts,type:'master'});}
-    else{types.forEach(t=>rows.push({r,sid,ts,type:t}));}
+    if(types.length===1&&types[0]==='master'){rows.push({docId:d.id,r,sid,ts,type:'master'});}
+    else{types.forEach(t=>rows.push({docId:d.id,r,sid,ts,type:t}));}
   });
-  if(!rows.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
+  if(!rows.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
   rows.sort((x,y)=>y.ts-x.ts);
   const ds=rows.slice(0,10);
-  tb.innerHTML=ds.map(({r,sid,type})=>{
+  tb.innerHTML=ds.map(({docId,r,sid,type})=>{
     // 응시일: 26.05.04 형식 (연도 2자리.월.일, 0채움)
     let dt='-';
     {const x=r.timestamp?tD(r.timestamp):(r.submittedTimestamp?tD(r.submittedTimestamp):pRD(r.date));
@@ -480,9 +484,27 @@ function renderRecentAttempts(){
     const ti=TYPE_INFO[type]||TYPE_INFO.ox;
     const badges=`<span class="type-badge ${ti.cls}">${ti.label}</span>`;
     const testCell=`<div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap"><span style="display:flex;gap:4px">${badges}</span><span class="test-name-cell" title="${e(tname)}">${e(tname)}</span></div>`;
-    return `<tr><td style="color:#aeaeb2;font-size:11px;white-space:nowrap">${dt}</td><td><span class="sid-text">${e(sid||'-')}</span></td><td style="font-weight:700;color:#1d1d1f">${nc}</td><td>${gb}</td><td>${sb}</td><td>${testCell}</td></tr>`;
+    const tnameSafe=String(tname).replace(/'/g,"\\'");
+    const delCell=`<div class="action-icons"><button class="action-btn del" title="이 응시 기록 삭제" onclick="deleteAttempt('${docId}','${sf}','${tnameSafe}')">🗑️</button></div>`;
+    return `<tr><td style="color:#aeaeb2;font-size:11px;white-space:nowrap">${dt}</td><td><span class="sid-text">${e(sid||'-')}</span></td><td style="font-weight:700;color:#1d1d1f">${nc}</td><td>${gb}</td><td>${sb}</td><td>${testCell}</td><td>${delCell}</td></tr>`;
   }).join('');
 }
+
+/* ── 응시 기록(grades) 한 건 삭제 ──
+   주의: grades 문서 1개가 OX+4지선다를 함께 담고 있으면, 표에서는 두 줄로 보여도
+   문서는 하나라서 삭제 시 두 유형이 함께 사라진다. 확인창에서 이 점을 안내한다.
+   시험지(tests/master-tests)는 절대 건드리지 않는다. */
+window.deleteAttempt=async function(docId,studentName,testName){
+  if(!docId){alert('삭제할 기록을 찾지 못했습니다.');return;}
+  const msg=`'${studentName}' 학생의 응시 기록을 삭제할까요?\n\n시험: ${testName}\n\n※ 이 응시 1건(점수 기록)만 삭제됩니다. 시험지 자체는 지워지지 않습니다.\n※ OX와 4지선다를 함께 본 기록이면 두 점수가 같이 삭제됩니다.\n되돌릴 수 없습니다.`;
+  if(!confirm(msg))return;
+  try{
+    await deleteDoc(doc(db,"grades",docId));
+    // onSnapshot 실시간 구독이라 목록은 자동으로 갱신됨
+  }catch(e){
+    alert('삭제 오류: '+e.message);
+  }
+};
 
 window.openSCC=async function(sid,sn){const fi=sfMap[sid];if(!fi){try{const s=await getDocs(query(collection(db,"students"),where("id","==",sid)));if(s.empty){alert('학생 정보를 찾을 수 없습니다.');return;}oCCM(s.docs[0].id,sn);}catch(e){alert('오류: '+e.message);}return;}oCCM(fi,sn);};
 async function oCCM(fi,sn){document.getElementById('ccModalTitle').textContent=`${sn} · 수업카드`;['cc-total','cc-month','cc-avg'].forEach(id=>document.getElementById(id).textContent='—');document.getElementById('ccListScroll').innerHTML='<div class="cc-loading">불러오는 중...</div>';document.getElementById('classCardModal').classList.add('open');try{const s=await getDocs(query(collection(db,"classCards"),where("studentId","==",fi),orderBy("classDate","desc")));const cs=s.docs.map(d=>({id:d.id,...d.data()}));rCCS(cs);rCCL(cs);}catch(e){document.getElementById('ccListScroll').innerHTML=`<div class="cc-empty">로드 실패: ${e.message}</div>`;}}
