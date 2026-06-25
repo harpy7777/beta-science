@@ -386,9 +386,10 @@ function buildExamHref(it){
     if(qs.length) url += '&'+qs.join('&');
     return url;
   }
-  // online: /student/{examId}?type=ox|multiple
+ // online: /student/{examId}?type=ox|multiple&sid=학생ID
   const qs=[];
   if(it.examType) qs.push('type='+encodeURIComponent(it.examType));
+  if(clinicStudentId) qs.push('sid='+encodeURIComponent(clinicStudentId)); // ★ 마스터(OMR)와 동일하게 학생ID를 링크에 실어 보냄 → 성적이 그 학생에게 정확히 기록
   if(fromPart) qs.push(fromPart);
   let url='/student/'+encodeURIComponent(it.examId||'');
   if(qs.length) url += '?'+qs.join('&');
