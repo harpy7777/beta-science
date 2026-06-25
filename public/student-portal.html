@@ -154,6 +154,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .test-meta{font-size:12px;color:var(--mt);display:flex;gap:10px;flex-wrap:wrap}
 .sc-detail{font-size:12.5px;color:var(--mt);margin-top:8px;font-weight:500}
 .sc-detail b{color:var(--tx);font-weight:700}
+.sc-rows{display:flex;flex-direction:column;gap:8px}
+.sc-row{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;line-height:1.45}
+.sc-row-lbl{flex-shrink:0;width:62px;font-size:12px;font-weight:600;color:var(--mt);padding-top:1px}
+.sc-row-val{flex:1;min-width:0;font-weight:700;color:var(--tx);word-break:keep-all}
+.sc-row-val b{font-weight:800}
 
 .empty-box{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);text-align:center;padding:56px 24px;color:var(--mt);font-size:14px;line-height:2}
 .empty-icon{font-size:48px;margin-bottom:14px}
@@ -517,24 +522,23 @@ function renderMaster(docs){
   document.querySelectorAll('#masterTestList').forEach(el=>el.innerHTML=html);
 }
 
-/* OX / 4지선다 / 마스터 공통 카드 — 왼쪽 동그라미는 점수(OOO점), 막대그래프 제거 */
+/* OX / 4지선다 / 마스터 공통 카드 — 왼쪽 점수(OOO점) + 라벨형 정보 */
 function renderScoreCard(r,sec){
   const val=sec.score;
   const cls=val>=80?'sc-high':val>=60?'sc-mid':'sc-low';
-  const dt=gradeDateStr(r);
+  const dt=gradeDateStr(r)||'—';
   const total=sec.total!=null?sec.total:null;
   const correct=(sec.correct!=null)?sec.correct:((total!=null)?Math.round(val/100*total):null);
   const title=e(r.testName||r.subject||'테스트');
-  const meta=`${r.subject?`<span>${e(r.subject)}</span>`:''}${dt?`<span>${dt}</span>`:''}`;
-  const detail=(total!=null&&correct!=null)?`<div class="sc-detail">정답 <b>${correct}</b>문항 / 전체 ${total}문항</div>`:'';
+  const rows=[];
+  rows.push(`<div class="sc-row"><span class="sc-row-lbl">단원명</span><span class="sc-row-val">${title}</span></div>`);
+  if(r.subject)rows.push(`<div class="sc-row"><span class="sc-row-lbl">과목</span><span class="sc-row-val">${e(r.subject)}</span></div>`);
+  rows.push(`<div class="sc-row"><span class="sc-row-lbl">응시 날짜</span><span class="sc-row-val">${dt}</span></div>`);
+  if(total!=null&&correct!=null)rows.push(`<div class="sc-row"><span class="sc-row-lbl">총 문항 수</span><span class="sc-row-val">정답 <b>${correct}</b>문항 / 전체 ${total}문항</span></div>`);
   return`<div class="test-item">
     <div class="test-head">
       <div class="score-circle ${cls}"><div class="sc-pct">${val}점</div></div>
-      <div class="test-info">
-        <div class="test-title">${title}</div>
-        <div class="test-meta">${meta}</div>
-        ${detail}
-      </div>
+      <div class="test-info"><div class="sc-rows">${rows.join('')}</div></div>
     </div>
   </div>`;
 }
