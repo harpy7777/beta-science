@@ -41,14 +41,17 @@ function StudentExamInner() {
       setExam(e);
       setLoading(false);
     });
-    const savedName = localStorage.getItem('studentName');
+   const savedName = localStorage.getItem('studentName');
     const savedId   = localStorage.getItem('studentId');
+    const urlSid    = searchParams.get('sid'); // ★ 클리닉 링크가 실어 보낸 학생ID (OMR과 동일 방식)
     if (savedName) {
       setStudentName(savedName);
       setPhase('exam');
       setCurrent(0);
     }
-    if (savedId) setStudentId(savedId);
+    // ★ studentId 우선순위: URL의 sid > localStorage > '' → 성적이 정확한 학생에게 기록되어 학부모 보고서에 표시됨
+    if (urlSid) setStudentId(urlSid);
+    else if (savedId) setStudentId(savedId);
   }, [examId]);
 
   // ★ typeFilter에 따라 실제로 풀 문제 목록 결정
