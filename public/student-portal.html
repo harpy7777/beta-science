@@ -166,7 +166,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .sc-row-val b{font-weight:800}
 .sc-row-title{margin-bottom:2px}
 .sc-row-title .sc-row-lbl{padding-top:5px}
-.sc-row-title .sc-row-val{font-size:18px;font-weight:700;line-height:1.35;letter-spacing:-.01em;color:#3f4854}
+.sc-row-title .sc-row-val{font-size:16.5px;font-weight:700;line-height:1.35;letter-spacing:-.01em;color:#3f4854}
+.sc-date{color:#aeb6c2;font-weight:600}
 .sc-correct{color:#0d9488;font-weight:800}
 .sc-total{color:#1d4ed8;font-weight:800}
 
@@ -498,10 +499,10 @@ function gradeTime(r){
 }
 function gradeDateStr(r){
   const t=r.timestamp;
-  if(typeof t==='string'){const m=t.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return`${m[1]}-${m[2]}-${m[3]}`;}
+  if(typeof t==='string'){const m=t.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return`${m[1].slice(2)}/${m[2]}/${m[3]}`;}
   const ms=gradeTime(r);if(!ms)return'';
   const d=new Date(ms);
-  return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  return`${String(d.getFullYear()).slice(2)}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
 }
 
 async function loadGrades(sid,fireId){
@@ -560,7 +561,7 @@ function renderScoreCard(r,sec){
   const rows=[];
   rows.push(`<div class="sc-row sc-row-title"><span class="sc-row-lbl">단원명</span><span class="sc-row-val">${title}</span></div>`);
   if(r.subject)rows.push(`<div class="sc-row"><span class="sc-row-lbl">과목</span><span class="sc-row-val">${e(r.subject)}</span></div>`);
-  rows.push(`<div class="sc-row"><span class="sc-row-lbl">응시 날짜</span><span class="sc-row-val">${dt}</span></div>`);
+  rows.push(`<div class="sc-row"><span class="sc-row-lbl">응시 날짜</span><span class="sc-row-val sc-date">${dt}</span></div>`);
   if(total!=null&&correct!=null)rows.push(`<div class="sc-row"><span class="sc-row-lbl">총 문항 수</span><span class="sc-row-val">정답 <b class="sc-correct">${correct}</b>문항 / 전체 <b class="sc-total">${total}</b>문항</span></div>`);
   return`<div class="test-item">
     <div class="test-head">
