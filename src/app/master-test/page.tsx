@@ -244,7 +244,7 @@ export default function MasterTestPage() {
                   stroke="rgba(255,255,255,0.9)" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
               </svg>
             </div>
-            <div className="font-[500] text-gray-900 text-sm leading-tight">베타과학학원</div>
+            <div className="font-[500] text-gray-900 text-sm leading-tight">인후쌤의 과학 수업 관리 시스템</div>
           </div>
 
           <div className="flex items-center gap-2">
