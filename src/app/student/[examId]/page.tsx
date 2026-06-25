@@ -247,7 +247,7 @@ function StudentExamInner() {
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="font-bold text-green-900 text-sm whitespace-nowrap">베타과학학원</span>
+                <span className="font-bold text-green-900 text-sm whitespace-nowrap">인후쌤의 과학 수업 관리 시스템</span>
                 {(phase === 'exam' || isRetryMode) && (
                   <span className="text-xs text-green-600 whitespace-nowrap">· {studentName}</span>
                 )}

@@ -4,8 +4,8 @@ import './globals.css';
 import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
-  title: '베타과학 | 온라인 시험지 생성기',
-  description: '베타과학학원 온라인 시험지 생성 및 응시 플랫폼',
+  title: '인후쌤 과학 | 온라인 시험지 생성기',
+  description: '인후쌤의 과학 수업 관리 시스템 온라인 시험지 생성 및 응시 플랫폼',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

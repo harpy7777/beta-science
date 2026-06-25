@@ -176,7 +176,7 @@ export default function TeacherPage() {
               </svg>
             </div>
             <div>
-              <div className="font-bold text-gray-900 text-sm">베타과학학원</div>
+              <div className="font-bold text-gray-900 text-sm">인후쌤의 과학 수업 관리 시스템</div>
               <div className="text-xs text-pink-500">선생님 로그인</div>
             </div>
           </div>
@@ -245,7 +245,7 @@ export default function TeacherPage() {
                   <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
                 </svg>
               </div>
-              <span className="font-bold text-gray-900 text-sm">베타과학학원</span>
+              <span className="font-bold text-gray-900 text-sm">인후쌤의 과학 수업 관리 시스템</span>
             </div>
             <div className="flex items-center gap-2">
               <button onClick={() => router.push('/teacher/audit')}

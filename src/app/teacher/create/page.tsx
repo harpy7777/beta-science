@@ -332,7 +332,7 @@ function CreateExamInner() {
                 {editId ? '시험지 수정' : '시험지 만들기'}
               </div>
               <div className="text-xs" style={{ color: '#db2777' }}>
-                {grade && subject ? `${grade} · ${subject}` : title || '베타과학학원'}
+                {grade && subject ? `${grade} · ${subject}` : title || '인후쌤의 과학 수업 관리 시스템'}
               </div>
             </div>
           </div>

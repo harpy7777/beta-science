@@ -170,7 +170,7 @@ function TopHeader() {
         <FlaskConical size={16} className="text-white" />
       </div>
       <div>
-        <div className="font-black text-green-900 text-sm leading-none">베타과학학원</div>
+        <div className="font-black text-green-900 text-sm leading-none">인후쌤의 과학 수업 관리 시스템</div>
         <div className="text-xs text-green-500 mt-0.5">온라인 테스트</div>
       </div>
     </div>
