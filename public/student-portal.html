@@ -130,6 +130,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .cc-main{flex:1;min-width:0}
 .cc-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
 .cc-subj{font-size:16px;font-weight:700;color:#3f4854}
+.cc-date-lbl{font-size:12px;font-weight:600;color:var(--mt);letter-spacing:.02em;margin-right:10px}
+.cc-date-val{font-size:16px;font-weight:700;color:var(--pink-dk)}
 .cc-arrow{color:var(--mt);font-size:14px;flex-shrink:0;transition:transform .25s;margin-top:1px}
 .cc-toggle-wrap{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:999px;padding:5px 11px}
 .cc-head[onclick]:hover .cc-toggle-wrap{background:#fce7f3}
@@ -138,9 +140,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .cc-item.open .cc-toggle::after{content:'접기'}
 .cc-item.open .cc-arrow{transform:rotate(180deg)}
 .cc-fields{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.cc-field{display:flex;align-items:center;gap:16px;min-width:0;padding:13px 16px;background:#fbf7fa;border:1px solid #f3e8f0;border-radius:10px}
+.cc-field{display:flex;align-items:baseline;gap:12px;min-width:0;padding:13px 16px;background:#fbf7fa;border:1px solid #f3e8f0;border-radius:10px}
 .cc-f-lbl{flex-shrink:0;font-size:12px;font-weight:600;color:var(--mt);letter-spacing:.02em}
-.cc-f-val{flex:1;min-width:0;text-align:left;font-size:14.5px;font-weight:700;color:#5b6573;word-break:keep-all;line-height:1.4}
+.cc-f-val{flex:1;min-width:0;text-align:right;font-size:14.5px;font-weight:700;color:#5b6573;word-break:keep-all;line-height:1.4}
 .cc-v-green{color:#059669}.cc-v-red{color:#dc2626}.cc-v-blue{color:#2563eb}.cc-v-yellow{color:#b45309}.cc-v-pink{color:var(--pink-dk)}.cc-v-gray{color:var(--mt);font-weight:600}
 .cc-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
 .cc-item.open .cc-body{max-height:700px}
@@ -408,7 +410,7 @@ function hwColor(v){if(v==='높음')return'cc-v-green';if(v==='낮음')return'cc
 function attColor(v){if(v==='적극적')return'cc-v-blue';if(v==='산만')return'cc-v-pink';return'cc-v-yellow';}
 
 function renderCC(c){
-  const[mo,dy]=parseDate(c.classDate);
+  const dateText=fullDate(c.classDate);
   const hasBody=!!(c.content||c.unit);
   const subj=e(c.subject||'수업');
   const teacher=c.teacher?e(c.teacher):'—';
@@ -424,9 +426,8 @@ function renderCC(c){
     <div class="cc-field"><span class="cc-f-lbl">수업 태도</span><span class="cc-f-val ${attCls}">${attTxt}</span></div>`;
   return`<div class="cc-item"${hasBody?` id="cci-${c.id}"`:''}>
     <div class="cc-head"${hasBody?` onclick="toggleCC('${c.id}')"`:''}>
-      <div class="cc-date"><div class="cc-date-m">${mo}</div><div class="cc-date-d">${dy}</div></div>
       <div class="cc-main">
-        <div class="cc-title-row"><span class="cc-subj">${subj}</span>${hasBody?'<span class="cc-toggle-wrap"><span class="cc-toggle"></span><span class="cc-arrow">▾</span></span>':''}</div>
+        <div class="cc-title-row"><span class="cc-subj"><span class="cc-date-lbl">수업 날짜</span><span class="cc-date-val">${dateText||'—'}</span></span>${hasBody?'<span class="cc-toggle-wrap"><span class="cc-toggle"></span><span class="cc-arrow">▾</span></span>':''}</div>
         <div class="cc-fields">${fields}</div>
       </div>
     </div>
@@ -574,6 +575,7 @@ function renderScoreCard(r,sec){
 
 function emptyBox(icon,msg){return`<div class="empty-box"><div class="empty-icon">${icon}</div>${msg}</div>`;}
 function parseDate(ds){if(!ds)return['—','—'];const p=ds.split('-');return p.length>=3?[p[1]+'월',parseInt(p[2])+'일']:['—','—'];}
+function fullDate(ds){if(!ds)return'';const p=ds.split('-');if(p.length<3)return'';const mo=parseInt(p[1],10),dy=parseInt(p[2],10);if(isNaN(mo)||isNaN(dy))return'';return`${mo}월 ${dy}일`;}
 function showError(){document.getElementById('loadingScreen').style.display='none';document.getElementById('errorScreen').style.display='flex';}
 function e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
