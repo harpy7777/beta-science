@@ -403,42 +403,51 @@ function renderCC(c){
 /* ════════════════════════════════════════════════
    시험 기록 (grades) — 관리자 페이지와 동일 컬렉션
 ════════════════════════════════════════════════ */
+function toNum(v){return(typeof v==='number')?v:(v!=null&&v!==''&&!isNaN(Number(v))?Number(v):null);}
 function normalizeGrade(id,r){
   return{
     id,
     testName:r.testName||r.examTitle||r.unitName||'',
-    examTitle:r.examTitle||r.testName||r.unitName||'',
     subject:r.subject||r.studentSubject||'',
-    category:r.category||(r.testType==='master'?'master':''),
-    ox:(r.ox&&typeof r.ox==='object')?r.ox:null,
-    multiple:(r.multiple&&typeof r.multiple==='object')?r.multiple:null,
-    score:(typeof r.score==='number')?r.score:(typeof r.percentage==='number'?r.percentage:null),
-    totalQuestions:(r.totalQuestions!=null?r.totalQuestions:(r.totalQ!=null?r.totalQ:(r.total!=null?r.total:null))),
-    timestamp:r.timestamp||r.submittedTimestamp||r.submittedAt||r.date||null,
-    testType:r.testType||null
+    grade:r.grade||'',
+    /* 실제 Firestore 평면 필드 */
+    oxScore:toNum(r.oxScore!=null?r.oxScore:(r.ox&&r.ox.score)),
+    oxCount:toNum(r.oxCount!=null?r.oxCount:(r.ox&&r.ox.total)),
+    multiScore:toNum(r.multiScore!=null?r.multiScore:(r.multiple&&r.multiple.score)),
+    multiCount:toNum(r.multiCount!=null?r.multiCount:(r.multiple&&r.multiple.total)),
+    masterScore:toNum(r.masterScore!=null?r.masterScore:null),
+    score:toNum(r.score!=null?r.score:(r.percentage!=null?r.percentage:null)),
+    totalQuestions:toNum(r.totalQuestions!=null?r.totalQuestions:(r.totalQ!=null?r.totalQ:r.total)),
+    testType:String(r.testType||r.category||'').toLowerCase(),
+    timestamp:r.timestamp||r.submittedTimestamp||r.submittedAt||r.date||null
   };
 }
 
-/* 이 기록의 파트별 점수 {ox, mc, master} — 점수 없으면 null(=제외)
-   * .total 이 없어도 .score 만 있으면 인식하도록 완화 (OX 연동 누락 방지) */
-function partScores(r){
-  if(r.category==='master'||r.testType==='master'){
-    const sc=(r.multiple&&r.multiple.score!=null)?r.multiple.score:(r.score!=null?r.score:null);
-    return{ox:null,mc:null,master:sc};
-  }
-  const oxObj=(r.ox&&typeof r.ox==='object')?r.ox:null;
-  const mcObj=(r.multiple&&typeof r.multiple==='object')?r.multiple:null;
-  const hasOx=oxObj&&oxObj.score!=null;
-  const hasMc=mcObj&&mcObj.score!=null;
-  if(hasOx||hasMc){
-    return{ox:hasOx?oxObj.score:null,mc:hasMc?mcObj.score:null,master:null};
-  }
-  const sc=r.score!=null?r.score:null;
-  if(sc==null)return{ox:null,mc:null,master:null};
-  const tt=String(r.testType||'').toLowerCase();
-  if(tt==='ox')return{ox:sc,mc:null,master:null};
-  if(tt==='master')return{ox:null,mc:null,master:sc};
-  return{ox:null,mc:sc,master:null};
+/* ── 한 기록에서 섹션별 결과 추출 {score,total} 또는 null ──
+   점수는 백분율(0~100)로 저장되어 있고, 화면에서는 "OO점" 으로 표기.
+   한 시험에 OX·4지선다 점수 칸이 둘 다 있어도, 실제로 응시하지 않은
+   0점짜리 빈 섹션(상대 섹션만 채점된 경우)은 유령 항목으로 보이지 않게 거른다. */
+function isMasterRec(r){return r.testType==='master'||r.masterScore!=null;}
+function oxOf(r){
+  if(isMasterRec(r))return null;
+  if(!(r.oxCount>0&&r.oxScore!=null))return null;
+  const scoredMC=(r.multiCount>0&&r.multiScore!=null&&r.multiScore>0);
+  if(!(r.oxScore>0||!scoredMC))return null;
+  return{score:r.oxScore,total:r.oxCount};
+}
+function mcOf(r){
+  if(isMasterRec(r))return null;
+  if(!(r.multiCount>0&&r.multiScore!=null))return null;
+  const scoredOX=(r.oxCount>0&&r.oxScore!=null&&r.oxScore>0);
+  if(!(r.multiScore>0||!scoredOX))return null;
+  return{score:r.multiScore,total:r.multiCount};
+}
+function masterOf(r){
+  if(!isMasterRec(r))return null;
+  const score=r.masterScore!=null?r.masterScore:(r.score!=null?r.score:(r.multiScore!=null?r.multiScore:null));
+  if(score==null)return null;
+  const total=r.totalQuestions||r.multiCount||r.oxCount||null;
+  return{score,total};
 }
 
 function gradeTime(r){
@@ -482,35 +491,32 @@ function setStats(prefix,count,scores){
 }
 
 function renderOx(docs){
-  const items=docs.filter(r=>partScores(r).ox!=null);
-  setStats('ox',items.length,items.map(r=>partScores(r).ox));
-  const html=!items.length?emptyBox('⭕','아직 응시한 OX 퀴즈가 없습니다.'):items.map(r=>renderScoreCard(r,'ox')).join('');
+  const items=docs.map(r=>({r,sec:oxOf(r)})).filter(x=>x.sec);
+  setStats('ox',items.length,items.map(x=>x.sec.score));
+  const html=!items.length?emptyBox('⭕','아직 응시한 OX 퀴즈가 없습니다.'):items.map(x=>renderScoreCard(x.r,x.sec)).join('');
   document.querySelectorAll('#oxResultList').forEach(el=>el.innerHTML=html);
 }
 function renderMultiple(docs){
-  const items=docs.filter(r=>partScores(r).mc!=null);
-  setStats('ts',items.length,items.map(r=>partScores(r).mc));
-  const html=!items.length?emptyBox('📝','아직 응시한 4지선다 테스트가 없습니다.'):items.map(r=>renderScoreCard(r,'mc')).join('');
+  const items=docs.map(r=>({r,sec:mcOf(r)})).filter(x=>x.sec);
+  setStats('ts',items.length,items.map(x=>x.sec.score));
+  const html=!items.length?emptyBox('📝','아직 응시한 4지선다 테스트가 없습니다.'):items.map(x=>renderScoreCard(x.r,x.sec)).join('');
   document.querySelectorAll('#testResultList').forEach(el=>el.innerHTML=html);
 }
 function renderMaster(docs){
-  const items=docs.filter(r=>partScores(r).master!=null);
-  setStats('ms',items.length,items.map(r=>partScores(r).master));
-  const html=!items.length?emptyBox('🎯','아직 응시한 마스터테스트가 없습니다.'):items.map(r=>renderScoreCard(r,'master')).join('');
+  const items=docs.map(r=>({r,sec:masterOf(r)})).filter(x=>x.sec);
+  setStats('ms',items.length,items.map(x=>x.sec.score));
+  const html=!items.length?emptyBox('🎯','아직 응시한 마스터테스트가 없습니다.'):items.map(x=>renderScoreCard(x.r,x.sec)).join('');
   document.querySelectorAll('#masterTestList').forEach(el=>el.innerHTML=html);
 }
 
 /* OX / 4지선다 / 마스터 공통 카드 — 왼쪽 동그라미는 점수(OOO점), 막대그래프 제거 */
-function renderScoreCard(r,kind){
-  const p=partScores(r);
-  const val=kind==='ox'?p.ox:(kind==='mc'?p.mc:p.master);
+function renderScoreCard(r,sec){
+  const val=sec.score;
   const cls=val>=80?'sc-high':val>=60?'sc-mid':'sc-low';
   const dt=gradeDateStr(r);
-  let total=null;
-  if(kind==='ox')total=(r.ox&&r.ox.total!=null)?r.ox.total:(r.totalQuestions!=null?r.totalQuestions:null);
-  else total=(r.multiple&&r.multiple.total!=null)?r.multiple.total:(r.totalQuestions!=null?r.totalQuestions:null);
+  const total=sec.total!=null?sec.total:null;
   const correct=(total!=null)?Math.round(val/100*total):null;
-  const title=e(r.testName||r.examTitle||r.subject||'테스트');
+  const title=e(r.testName||r.subject||'테스트');
   const meta=`${r.subject?`<span>${e(r.subject)}</span>`:''}${dt?`<span>${dt}</span>`:''}`;
   const detail=(total!=null&&correct!=null)?`<div class="sc-detail">정답 <b>${correct}</b>문항 / 전체 ${total}문항</div>`:'';
   return`<div class="test-item">
