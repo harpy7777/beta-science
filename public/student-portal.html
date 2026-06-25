@@ -418,6 +418,7 @@ function normalizeGrade(id,r){
     masterScore:toNum(r.masterScore!=null?r.masterScore:null),
     score:toNum(r.score!=null?r.score:(r.percentage!=null?r.percentage:null)),
     totalQuestions:toNum(r.totalQuestions!=null?r.totalQuestions:(r.totalQ!=null?r.totalQ:r.total)),
+    totalCorrect:toNum(r.totalCorrect!=null?r.totalCorrect:(r.correct!=null?r.correct:null)),
     testType:String(r.testType||r.category||'').toLowerCase(),
     timestamp:r.timestamp||r.submittedTimestamp||r.submittedAt||r.date||null
   };
@@ -444,10 +445,17 @@ function mcOf(r){
 }
 function masterOf(r){
   if(!isMasterRec(r))return null;
-  const score=r.masterScore!=null?r.masterScore:(r.score!=null?r.score:(r.multiScore!=null?r.multiScore:null));
+  let score=null,total=null,correct=null;
+  if(r.totalQuestions>0&&r.totalCorrect!=null){
+    total=r.totalQuestions;correct=r.totalCorrect;
+    score=Math.round(r.totalCorrect/r.totalQuestions*100);
+  }else if(r.masterScore!=null){
+    score=r.masterScore;total=r.totalQuestions||null;
+  }else if(r.score!=null){
+    score=r.score;total=r.totalQuestions||null;
+  }
   if(score==null)return null;
-  const total=r.totalQuestions||r.multiCount||r.oxCount||null;
-  return{score,total};
+  return{score,total,correct};
 }
 
 function gradeTime(r){
@@ -515,7 +523,7 @@ function renderScoreCard(r,sec){
   const cls=val>=80?'sc-high':val>=60?'sc-mid':'sc-low';
   const dt=gradeDateStr(r);
   const total=sec.total!=null?sec.total:null;
-  const correct=(total!=null)?Math.round(val/100*total):null;
+  const correct=(sec.correct!=null)?sec.correct:((total!=null)?Math.round(val/100*total):null);
   const title=e(r.testName||r.subject||'테스트');
   const meta=`${r.subject?`<span>${e(r.subject)}</span>`:''}${dt?`<span>${dt}</span>`:''}`;
   const detail=(total!=null&&correct!=null)?`<div class="sc-detail">정답 <b>${correct}</b>문항 / 전체 ${total}문항</div>`:'';
