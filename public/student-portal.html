@@ -337,10 +337,9 @@ function buildSections(){
   return`
   <div class="section active" id="sec0">
     <br>
-    <div class="stat-row">
+    <div class="stat-row" style="grid-template-columns:repeat(2,1fr)">
       <div class="stat-box"><div class="stat-num" id="cs-total">—</div><div class="stat-lbl">전체 수업</div></div>
       <div class="stat-box"><div class="stat-num" id="cs-month">—</div><div class="stat-lbl">이번달</div></div>
-      <div class="stat-box"><div class="stat-num" id="cs-avg">—</div><div class="stat-lbl">평균 점수</div></div>
     </div>
     <div class="sec-label">수업 기록</div>
     <div id="classCardList"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
@@ -411,11 +410,8 @@ async function loadClassCards(fireId,sid){
     cards.sort((a,b)=>(b.classDate||'').localeCompare(a.classDate||''));
     const now=new Date();const tm=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
     const mc=cards.filter(c=>(c.classDate||'').startsWith(tm)).length;
-    const sc=cards.filter(c=>typeof c.score==='number'&&c.score>=0&&!c.scoreNone);
-    const avg=sc.length?Math.round(sc.reduce((a,c)=>a+c.score,0)/sc.length):null;
     document.querySelectorAll('#cs-total').forEach(el=>el.textContent=cards.length+'건');
     document.querySelectorAll('#cs-month').forEach(el=>el.textContent=mc+'건');
-    document.querySelectorAll('#cs-avg').forEach(el=>el.textContent=avg!==null?avg+'점':'—');
     const html=!cards.length?emptyBox('📭','아직 수업 기록이 없습니다.'):cards.map(c=>renderCC(c)).join('');
     document.querySelectorAll('#classCardList').forEach(el=>el.innerHTML=html);
   }catch(err){document.querySelectorAll('#classCardList').forEach(el=>el.innerHTML='<div class="empty-box">수업 기록을 불러오지 못했습니다.</div>');}
