@@ -493,7 +493,7 @@ body {
 .cc-del-btn:hover { background: #fee2e2; border-color: #fca5a5; }
 
 /* 수업카드 통계 */
-.cc-mini-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 12px; }
+.cc-mini-stats { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 12px; }
 .cc-mini-stat { background: #fff; border: 1.5px solid #f3e8ff; border-radius: 12px; padding: 10px 12px; text-align: center; }
 .cc-mini-stat-num { font-size: 1.2rem; font-weight: 700; color: #a21caf; letter-spacing: -0.03em; }
 .cc-mini-stat-lbl { font-size: 10px; color: #aeaeb2; font-weight: 500; margin-top: 2px; }
@@ -868,16 +868,14 @@ body {
     <div class="cc-mini-stats" id="cc-mini-stats">
       <div class="cc-mini-stat"><div class="cc-mini-stat-num" id="cc-stat-total">—</div><div class="cc-mini-stat-lbl">전체 수업카드</div></div>
       <div class="cc-mini-stat"><div class="cc-mini-stat-num" id="cc-stat-month">—</div><div class="cc-mini-stat-lbl">이번달</div></div>
-      <div class="cc-mini-stat"><div class="cc-mini-stat-num" id="cc-stat-avg">—</div><div class="cc-mini-stat-lbl">평균 점수</div></div>
     </div>
     <div class="cc-filter-bar">
       <button class="cc-tab on" onclick="setCCSubjFilter('전체',this)">전체</button>
+      <button class="cc-tab" onclick="setCCSubjFilter('내신',this)">내신</button>
       <button class="cc-tab" onclick="setCCSubjFilter('통합과학',this)">통합과학</button>
       <button class="cc-tab" onclick="setCCSubjFilter('화학',this)">화학</button>
-      <button class="cc-tab" onclick="setCCSubjFilter('생물',this)">생물</button>
-      <button class="cc-tab" onclick="setCCSubjFilter('물리',this)">물리</button>
-      <button class="cc-tab" onclick="setCCSubjFilter('지학',this)">지학</button>
-      <button class="cc-tab" onclick="setCCSubjFilter('내신',this)">내신</button>
+      <button class="cc-tab" onclick="setCCSubjFilter('물질과 에너지',this)">물질과 에너지</button>
+      <button class="cc-tab" onclick="setCCSubjFilter('화학 반응의 세계',this)">화학 반응의 세계</button>
       <input class="cc-search-inp" type="text" id="cc-search" placeholder="학생명 검색..." oninput="renderClassCards()">
       <button class="cc-write-btn" onclick="toggleCCForm()">+ 작성</button>
     </div>
@@ -895,8 +893,8 @@ body {
         <div>
           <span class="cc-label">과목 *</span>
           <select class="cc-sel" id="cc-subj">
-            <option>통합과학</option><option>화학</option><option>생물</option>
-            <option>물리</option><option>지학</option><option>내신</option>
+            <option>내신</option><option>통합과학</option><option>화학</option>
+            <option>물질과 에너지</option><option>화학 반응의 세계</option>
           </select>
         </div>
         <div>
@@ -915,19 +913,6 @@ body {
             <option value="높음">높음</option><option value="보통" selected>보통</option>
             <option value="낮음">낮음</option><option value="-">-</option>
           </select>
-        </div>
-      </div>
-      <div style="margin-bottom:8px;">
-        <span class="cc-label">시험 점수 (입력한 항목만 저장됩니다)</span>
-        <div class="cc-score-grid">
-          <div class="cc-score-cell"><span class="cc-score-cell-lbl">OX</span><input class="cc-inp cc-score-mini" type="number" id="cc-score-ox" placeholder="–" min="0" max="100"></div>
-          <div class="cc-score-cell"><span class="cc-score-cell-lbl">4지선다</span><input class="cc-inp cc-score-mini" type="number" id="cc-score-mc" placeholder="–" min="0" max="100"></div>
-          <div class="cc-score-cell"><span class="cc-score-cell-lbl">OMR</span><input class="cc-inp cc-score-mini" type="number" id="cc-score-omr" placeholder="–" min="0" max="100"></div>
-          <label class="cc-score-no"><input type="checkbox" id="cc-score-none" onchange="toggleScoreNone()"> 테스트 없음</label>
-        </div>
-        <div class="cc-pick-box" id="cc-pick-box" style="display:none;">
-          <div class="cc-pick-title">📋 이 학생의 시험 기록에서 불러오기 <span style="font-weight:500;color:#aeaeb2;">— 탭하면 점수가 채워집니다</span></div>
-          <div id="cc-pick-list"></div>
         </div>
       </div>
       <div class="cc-form-grid2">
@@ -1323,20 +1308,7 @@ function renderGradePicker(){
     </div>`;
   }).join('');
 }
-window.pickGrade = function(i){
-  const r = pickRecords[i];
-  if (!r) return;
-  const noneEl = document.getElementById('cc-score-none');
-  if (noneEl && noneEl.checked) { noneEl.checked = false; toggleScoreNone(); }
-  const setIf = (id, val) => {
-    if (val == null) return;
-    const el = document.getElementById(id);
-    if (el) { el.value = val; el.disabled = false; el.style.opacity = '1'; }
-  };
-  setIf('cc-score-ox',  r._parts.ox);
-  setIf('cc-score-mc',  r._parts.mc);
-  setIf('cc-score-omr', r._parts.omr);
-};
+window.pickGrade = function(){};
 async function loadClassCards() {
   document.getElementById('cc-list-wrap').innerHTML = '<div class="cc-loading">불러오는 중...</div>';
   try {
@@ -1356,34 +1328,10 @@ function updateCCStats() {
   const monthStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
   const monthCards = ccData.filter(c => (c.classDate||'').startsWith(monthStr));
   setTxt('cc-stat-month', monthCards.length+'건');
-  const scored = ccData.filter(c => typeof c.score === 'number' && c.score >= 0);
-  if (scored.length) {
-    const avg = Math.round(scored.reduce((a,c) => a+c.score, 0) / scored.length);
-    setTxt('cc-stat-avg', avg+'점');
-  } else {
-    setTxt('cc-stat-avg', '—');
-  }
 }
 // 과제/태도 색상 클래스
 function ccHwColor(v){ return v==='높음'?'cc-v-green':v==='낮음'?'cc-v-red':'cc-v-yellow'; }
 function ccAttColor(v){ return v==='적극적'?'cc-v-blue':v==='산만'?'cc-v-pink':'cc-v-yellow'; }
-// 시험 점수 섹션: OX/4지선다/OMR 가 있으면 항목별, 없으면 단일 score 폴백
-function ccScoreField(c){
-  const parts = [];
-  const push = (label, val) => {
-    let v = null;
-    if (typeof val === 'number') v = val;
-    else if (val && typeof val === 'object' && val.score != null) v = val.score;
-    if (v != null) parts.push(`<span class="cc-score-part"><b>${label}</b>${v}점</span>`);
-  };
-  push('OX', c.ox);
-  push('4지선다', c.multiple != null ? c.multiple : c.four);
-  push('OMR', c.omr != null ? c.omr : c.master);
-  if (parts.length) return `<span class="cc-score-parts">${parts.join('')}</span>`;
-  if (c.scoreNone) return `<span class="cc-v-gray">테스트 없음</span>`;
-  if (typeof c.score === 'number') return `<span class="${c.score >= 70 ? 'cc-v-green' : 'cc-v-red'}">${c.score}점</span>`;
-  return `<span class="cc-v-gray">—</span>`;
-}
 window.renderClassCards = function() {
   const search = (document.getElementById('cc-search')?.value || '').trim().toLowerCase();
   let list = ccData;
@@ -1415,7 +1363,6 @@ window.renderClassCards = function() {
             <div class="cc-field"><span class="cc-f-lbl">수강 과목</span><span class="cc-f-val">${subj}</span></div>
             <div class="cc-field"><span class="cc-f-lbl">담당 선생님</span><span class="cc-f-val ${teacherCls}">${teacher}</span></div>
             <div class="cc-field"><span class="cc-f-lbl">수업 날짜</span><span class="cc-f-val">${dateTxt}</span></div>
-            <div class="cc-field"><span class="cc-f-lbl">시험 점수</span><span class="cc-f-val">${ccScoreField(c)}</span></div>
             <div class="cc-field"><span class="cc-f-lbl">과제 완성도</span><span class="cc-f-val ${hwCls}">${hwTxt}</span></div>
             <div class="cc-field"><span class="cc-f-lbl">수업 태도</span><span class="cc-f-val ${attCls}">${attTxt}</span></div>
           </div>
@@ -1445,16 +1392,7 @@ window.toggleCCForm = () => {
   box.style.display = ccFormOpen ? 'block' : 'none';
   if (ccFormOpen) setTimeout(() => box.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
 };
-window.toggleScoreNone = () => {
-  const checked = document.getElementById('cc-score-none').checked;
-  ['cc-score-ox','cc-score-mc','cc-score-omr'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.disabled = checked;
-    el.style.opacity = checked ? '0.4' : '1';
-    if (checked) el.value = '';
-  });
-};
+window.toggleScoreNone = () => {};
 window.saveClassCard = async () => {
   const studentSel = document.getElementById('cc-student');
   const studentId = studentSel.value;
@@ -1465,18 +1403,8 @@ window.saveClassCard = async () => {
   const teacher = document.getElementById('cc-teacher').value.trim();
   const classDate = document.getElementById('cc-date').value;
   const content = document.getElementById('cc-content').value.trim();
-  const scoreNone = document.getElementById('cc-score-none').checked;
-  const readScore = id => {
-    const v = document.getElementById(id).value;
-    if (v === '') return null;
-    const n = Number(v);
-    return isNaN(n) ? null : n;
-  };
-  const ox       = scoreNone ? null : readScore('cc-score-ox');
-  const multiple = scoreNone ? null : readScore('cc-score-mc');
-  const omr      = scoreNone ? null : readScore('cc-score-omr');
-  const filled = [ox, multiple, omr].filter(v => typeof v === 'number');
-  const score = scoreNone ? null : (filled.length ? Math.round(filled.reduce((a,v)=>a+v,0)/filled.length) : null);
+  const scoreNone = false;
+  const ox = null, multiple = null, omr = null, score = null;
   const homework = document.getElementById('cc-hw').value;
   const attitude = document.getElementById('cc-attitude').value;
   const homeworkDone = document.getElementById('cc-homework-done').value;
@@ -1491,12 +1419,6 @@ window.saveClassCard = async () => {
       content, score, scoreNone, ox, multiple, omr, homework, attitude,
       homeworkDone, homeworkContent, createdAt: serverTimestamp()
     });
-    ['cc-score-ox','cc-score-mc','cc-score-omr'].forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.value = ''; el.disabled = false; el.style.opacity = '1';
-    });
-    document.getElementById('cc-score-none').checked = false;
     document.getElementById('cc-content').value = '';
     document.getElementById('cc-homework').value = '';
     document.getElementById('cc-teacher').value = '';
