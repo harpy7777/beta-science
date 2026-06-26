@@ -109,7 +109,7 @@ body{
 .spinner{width:36px;height:36px;border:3px solid var(--bd);border-top-color:var(--pink);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-center{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--mt)}
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e293b;color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;z-index:9999;transition:transform .3s ease;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e293b;color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;z-index:9999;transition:transform .3s ease;pointer-events:none;max-width:calc(100vw - 32px);text-align:center;line-height:1.5;word-break:keep-all;box-shadow:0 4px 16px rgba(0,0,0,.2)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
 /* ══ 모바일 ══ */
@@ -154,7 +154,8 @@ body{
 .m-search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--mt)}
 .m-search-input{width:100%;padding:11px 12px 11px 37px;border:1px solid var(--bd);border-radius:10px;font-size:16px;font-family:inherit;color:var(--tx);background:var(--bg);outline:none;-webkit-appearance:none;min-height:44px;}
 .m-search-input:focus{border-color:var(--pink);background:var(--wh)}
-.m-filter-bottom{display:flex;align-items:center;gap:8px}
+.m-filter-selects{display:flex;gap:8px;margin-bottom:10px}
+.m-filter-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .m-filter-select{flex:1;padding:10px 30px 10px 12px;border:1px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit;color:var(--tx);background:var(--bg);cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236e6e73' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;min-height:44px;}
 .m-filter-select:focus{border-color:var(--pink)}
 .m-count{font-size:12px;color:var(--mt);white-space:nowrap;flex-shrink:0}
@@ -182,6 +183,10 @@ body{
 @media(max-width:768px){.desktop-only{display:none!important}.mobile-only{display:block!important}}
 @media(min-width:769px){.mobile-only{display:none!important}.desktop-only{display:block!important}}
 @media(min-width:769px) and (max-width:1024px){.card-grid{grid-template-columns:repeat(2,1fr)}.main{padding:20px 24px}}
+/* ★ 초협소 화면(아이폰 SE 등): 학년·과목 셀렉트가 좁아지지 않게 세로로 */
+@media(max-width:360px){.m-filter-selects{flex-direction:column}}
+/* ★ 폰 가로모드: 넓고 짧은 화면을 살려 카드 2단으로 */
+@media(max-width:768px) and (orientation:landscape){.m-card-list{display:grid;grid-template-columns:1fr 1fr;align-items:start}.m-card-list .m-empty{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -225,7 +230,7 @@ body{
       <div class="guide-icon">💡</div>
       <div class="guide-txt">
         <strong style="font-size:15px;">보기 전용 · 로그인 불필요 · 수업기록·테스트 자동 연동</strong><br>
-        학생마다 고유 링크가 생성됩니다. 문자 버튼을 누르면 문자 앱이 바로 열립니다.
+        학생마다 고유 링크가 생성됩니다. 휴대폰에서는 문자 버튼으로 문자 앱이 열리고, PC에서는 문자 내용이 클립보드에 복사됩니다.
         <span class="guide-url" id="d-baseUrlDisplay">불러오는 중...</span>
       </div>
     </div>
@@ -239,6 +244,9 @@ body{
         <option value="">전체 학년</option>
         <option value="중등1학년">중등1학년</option><option value="중등2학년">중등2학년</option><option value="중등3학년">중등3학년</option>
         <option value="고등1학년">고등1학년</option><option value="고등2학년">고등2학년</option><option value="고등3학년">고등3학년</option>
+      </select>
+      <select class="filter-select" id="d-subjectFilter" onchange="filterStudents()">
+        <option value="">전체 과목</option>
       </select>
       <span class="count-txt">총 <strong id="d-countDisplay">0</strong>명</span>
       <button class="bulk-btn" onclick="copyAllLinks()">
@@ -276,7 +284,7 @@ body{
   <div class="m-title-bar">
     <div class="m-title-avatar">📊</div>
     <div class="m-title-text">
-      <h1>학생 포털 관리</h1>
+      <h1>학생 개별 학습 리포트</h1>
       <p>링크를 복사해 문자로 학부모님께 공유하세요.</p>
     </div>
   </div>
@@ -298,12 +306,17 @@ body{
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input class="m-search-input" type="text" id="m-searchInput" placeholder="이름 또는 ID 검색..." oninput="filterStudents()">
     </div>
-    <div class="m-filter-bottom">
+    <div class="m-filter-selects">
       <select class="m-filter-select" id="m-gradeFilter" onchange="filterStudents()">
         <option value="">전체 학년</option>
         <option value="중등1학년">중등1학년</option><option value="중등2학년">중등2학년</option><option value="중등3학년">중등3학년</option>
         <option value="고등1학년">고등1학년</option><option value="고등2학년">고등2학년</option><option value="고등3학년">고등3학년</option>
       </select>
+      <select class="m-filter-select" id="m-subjectFilter" onchange="filterStudents()">
+        <option value="">전체 과목</option>
+      </select>
+    </div>
+    <div class="m-filter-bottom">
       <span class="m-count">총 <strong id="m-countDisplay">0</strong>명</span>
       <button class="m-bulk-btn" onclick="copyAllLinks()">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -321,7 +334,7 @@ body{
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc,collection,query,orderBy,getDocs}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,collection,getDocs}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
 const app=initializeApp(fc);const auth=getAuth(app);const db=getFirestore(app);
@@ -345,9 +358,19 @@ window.doLogout=async()=>{await signOut(auth);window.location.replace('/login.ht
 
 async function loadStudents(){
   try{
-    const snap=await getDocs(query(collection(db,'students'),orderBy('regDate','desc')));
+    const snap=await getDocs(collection(db,'students'));
     allStudents=snap.docs.map(d=>({fireId:d.id,...d.data()}));
+    // regDate 없는 학생도 누락되지 않도록 JS에서 정렬 (없으면 맨 뒤 → 이름순)
+    allStudents.sort((a,b)=>{
+      const va=regVal(a),vb=regVal(b);
+      if(va==null&&vb==null)return (a.name||'').localeCompare(b.name||'','ko');
+      if(va==null)return 1;
+      if(vb==null)return -1;
+      if(typeof va==='number'&&typeof vb==='number')return vb-va;
+      return String(vb).localeCompare(String(va));
+    });
     ['d-statTotal','m-statTotal'].forEach(id=>setTxt(id,allStudents.length));
+    populateSubjects();
     filterStudents();
   }catch(err){
     document.getElementById('d-cardGrid').innerHTML='<div class="empty-state">학생 정보를 불러오지 못했습니다.</div>';
@@ -359,7 +382,8 @@ window.filterStudents=function(){
   const isMobile=window.innerWidth<=768;
   const kw=isMobile?document.getElementById('m-searchInput').value.trim().toLowerCase():document.getElementById('d-searchInput').value.trim().toLowerCase();
   const gr=isMobile?document.getElementById('m-gradeFilter').value:document.getElementById('d-gradeFilter').value;
-  filtered=allStudents.filter(s=>(!kw||(s.name||'').toLowerCase().includes(kw)||(s.id||'').toLowerCase().includes(kw))&&(!gr||s.grade===gr));
+  const sub=isMobile?document.getElementById('m-subjectFilter').value:document.getElementById('d-subjectFilter').value;
+  filtered=allStudents.filter(s=>(!kw||(s.name||'').toLowerCase().includes(kw)||(s.id||'').toLowerCase().includes(kw))&&(!gr||s.grade===gr)&&(!sub||s.subject===sub));
   const cnt=filtered.length;
   ['d-countDisplay','m-countDisplay'].forEach(id=>setTxt(id,cnt));
   ['d-statFiltered','m-statFiltered'].forEach(id=>setTxt(id,cnt));
@@ -387,7 +411,7 @@ function renderDesktop(){
   grid.innerHTML=filtered.map(s=>{
     const url=BASE_URL+(s.id||s.fireId),grade=s.grade||'';
     const gradeCls={'중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3','고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3'}[grade]||'grade-mid1';
-    const initial=(s.name||'?').charAt(0),shortUrl=url.length>38?url.substring(0,38)+'…':url;
+    const initial=(s.name||'?').charAt(0),shortUrl=url;
     const fid=e(s.fireId),safeUrl=e(url),safeName=e(s.name||''),safeGrade=e(grade);
     return`<div class="portal-card">
       <div class="card-head">
@@ -424,7 +448,7 @@ function renderMobile(){
   list.innerHTML=filtered.map(s=>{
     const url=BASE_URL+(s.id||s.fireId),grade=s.grade||'';
     const gradeCls={'중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3','고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3'}[grade]||'grade-mid1';
-    const initial=(s.name||'?').charAt(0),shortUrl=url.length>34?url.substring(0,34)+'…':url;
+    const initial=(s.name||'?').charAt(0),shortUrl=url;
     const fid=e(s.fireId),safeUrl=e(url),safeName=e(s.name||''),safeGrade=e(grade);
     return`<div class="m-portal-card">
       <div class="m-card-head">
@@ -472,6 +496,29 @@ window.copyAllLinks=async function(){
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 function setTxt(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
 function e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+// regDate 값을 비교 가능한 형태로 변환 (Timestamp / Date / 숫자 / 문자열 모두 대응)
+function regVal(s){
+  const r=s&&s.regDate;
+  if(r==null||r==='')return null;
+  if(typeof r==='object'){
+    if(typeof r.toMillis==='function')return r.toMillis();
+    if(r.seconds!=null)return r.seconds*1000;
+    if(r instanceof Date)return r.getTime();
+  }
+  if(typeof r==='number')return r;
+  if(typeof r==='string'){const t=Date.parse(r);return isNaN(t)?r:t;}
+  return r;
+}
+// 학생 데이터에서 과목을 자동 추출해 과목 필터 드롭다운 구성
+function populateSubjects(){
+  const subjects=[...new Set(allStudents.map(s=>s.subject).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko'));
+  ['d-subjectFilter','m-subjectFilter'].forEach(id=>{
+    const sel=document.getElementById(id);if(!sel)return;
+    const cur=sel.value;
+    sel.innerHTML='<option value="">전체 과목</option>'+subjects.map(s=>`<option value="${e(s)}">${e(s)}</option>`).join('');
+    if(subjects.includes(cur))sel.value=cur;
+  });
+}
 </script>
 </body>
 </html>
