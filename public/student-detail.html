@@ -525,6 +525,7 @@ let stu=null, sid=null, recsAll=[], feedbackText='';
 let radarInst=null, trendInst=null;
 let gradesUnsub=null, started=false;
 let testById=new Map(), testByTitle=new Map();
+let testsLoaded=false;   // tests 과목 매핑을 이미 받았는지 (불필요한 재다운로드 방지)
 
 onAuthStateChanged(auth, async user => {
   if(!user){ if(gradesUnsub){ gradesUnsub(); gradesUnsub=null; } location.replace('/login.html'); return; }
@@ -542,26 +543,24 @@ window.addEventListener('beforeunload', ()=>{ if(gradesUnsub){ gradesUnsub(); gr
 
 async function startRealtime() {
   if(!idParam){ showError(); return; }
-  // 1) 학생 정보 (1회)
-  try {
-    const ss=await getDocs(collection(db,'students'));
-    ss.forEach(d=>{ const data=d.data(); if(!stu && (data.id===idParam || d.id===idParam)) stu={uid:d.id,...data}; });
-  } catch {}
+  // 1) 학생 정보 — id 필드 직접 조회 → 문서 id 폴백 (students 컬렉션 전체 다운로드 제거)
+  stu = await findStudent(idParam);
   if(!stu){ showError(); return; }
   sid=stu.id||stu.uid;
-  // 2) 피드백 (1회)
+  // 2) 피드백 (가벼운 단일 문서 1회)
   try { const fs=await getDoc(doc(db,'feedbacks',stu.uid)); feedbackText=fs.exists()?(fs.data().text||''):''; } catch { feedbackText=''; }
-  // 3) tests 과목 매핑 캐시 (1회)
-  await loadTestSubjMap();
 
-  // 4) grades 실시간 구독 — 시험이 들어오면 자동 갱신 (새로고침 불필요)
+  // 3) grades 실시간 구독 — 화면을 곧바로 표시.
+  //    과목(tests) 매핑은 subject가 비어있는 기록이 있을 때만 1회 지연 로드 → 평상시엔 tests 전체를 받지 않음
   if(gradesUnsub){ gradesUnsub(); gradesUnsub=null; }
   let firstSnap=true;
   gradesUnsub = onSnapshot(
     query(collection(db,'grades'),where('studentId','==',sid)),
-    (snap)=>{
+    async (snap)=>{
       // 새 구조(ox/multiple/category) + 옛 구조 둘 다 읽어서 필드명 정규화 (문서 1개 = 응시 1건)
       recsAll = snap.docs.map(d=>normalizeDoc(d.id,d.data())).sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp));
+      // subject가 빠진 기록이 있을 때만 tests 매핑을 1회 로드
+      if(!testsLoaded && recsAll.some(r=>!r.subject)){ await loadTestSubjMap(); testsLoaded=true; }
       recsAll = enrichSubjectsSync(recsAll);
       if(firstSnap){
         document.getElementById('loadingBox').style.display='none';
@@ -582,6 +581,20 @@ async function startRealtime() {
     }
   );
 }
+
+/* 학생 1명만 조회 — id 필드 우선, 없으면 문서 id로 폴백 (students 전체 스캔 제거) */
+async function findStudent(idp){
+  try {
+    const qs=await getDocs(query(collection(db,'students'),where('id','==',idp)));
+    if(!qs.empty){ const d=qs.docs[0]; return {uid:d.id,...d.data()}; }
+  } catch {}
+  try {
+    const ds=await getDoc(doc(db,'students',idp));
+    if(ds.exists()) return {uid:ds.id,...ds.data()};
+  } catch {}
+  return null;
+}
+
 async function loadTestSubjMap(){
   try {
     const snap=await getDocs(collection(db,'tests'));
@@ -822,7 +835,7 @@ function rpRenderAnalysis(oxA,mcA,msA,total) {
   document.getElementById('rp-analysis-items').innerHTML=[{label:'OX 테스트',val:oxA},{label:'4지선다',val:mcA},{label:'마스터테스트',val:msA}].map(r=>{ if(r.val===null) return `<div class="analysis-item"><span class="ai-label">${r.label}</span><span class="ai-val" style="color:#aeaeb2;">데이터 없음</span></div>`; const cls=r.val>=80?'c-good':r.val>=60?'c-avg':'c-warn', lbl=r.val>=80?`양호 (${r.val}점)`:r.val>=60?`보통 (${r.val}점)`:`주의 (${r.val}점)`; return `<div class="analysis-item"><span class="ai-label">${r.label}</span><span class="ai-val ${cls}">${lbl}</span></div>`; }).join('');
   const com=document.getElementById('rp-comment'); if(total===null){com.textContent='아직 데이터가 없습니다.';return;} const low=[],high=[]; if(oxA!==null){if(oxA>=80)high.push('OX');else if(oxA<60)low.push('OX');} if(mcA!==null){if(mcA>=80)high.push('4지선다');else if(mcA<60)low.push('4지선다');} if(msA!==null){if(msA>=80)high.push('마스터');else if(msA<60)low.push('마스터');} const nm=stu.name||stu.displayName||'학생'; let txt=nm+' 학생'; if(total>=80) txt+='은 전반적으로 양호한 수준입니다. '; else if(total>=60) txt+='은 보통 수준이며 일부 영역 보완이 필요합니다. '; else txt+='은 전반적인 기초 개념 복습이 필요합니다. '; if(high.length) txt+=high.join(', ')+' 영역은 우수한 성과를 보이고 있습니다. '; if(low.length) txt+=`특히 ${low.join(', ')} 영역의 집중 학습을 권장합니다.`; com.textContent=txt;
 }
-function rpDrawRadar(oxA,mcA,msA){ const ctx=document.getElementById('rp-radar').getContext('2d'); if(radarInst) radarInst.destroy(); radarInst=new Chart(ctx,{type:'radar',data:{labels:['OX 테스트','4지선다','마스터테스트'],datasets:[{data:[oxA||0,mcA||0,msA||0],backgroundColor:'rgba(219,39,119,0.15)',borderColor:'#db2777',borderWidth:2,pointBackgroundColor:'#db2777',pointRadius:4}]},options:{responsive:false,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{size:9},color:'#aeaeb2'},grid:{color:'#fce7f3'},pointLabels:{font:{size:10},color:'#6e6e73'},angleLines:{color:'#fce7f3'}}}}}); }
+function rpDrawRadar(oxA,mcA,msA){ const ctx=document.getElementById('rp-radar').getContext('2d'); if(radarInst) radarInst.destroy(); radarInst=new Chart(ctx,{type:'radar',data:{labels:['OX 테스트','4지선다','마스터테스트'],datasets:[{data:[oxA||0,mcA||0,msA||0],backgroundColor:'rgba(219,39,119,0.15)',borderColor:'#db2777',borderWidth:2,pointBackgroundColor:'#db2777',pointRadius:4}]},options:{responsive:false,animation:false,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{size:9},color:'#aeaeb2'},grid:{color:'#fce7f3'},pointLabels:{font:{size:10},color:'#6e6e73'},angleLines:{color:'#fce7f3'}}}}}); }
 
 /* 점수 추이 — 유형(OX/4지선다/마스터)별로 각각 회차를 매김.
    각 유형은 그 유형의 응시 순서대로 1회차,2회차…(날짜 오름차순).
@@ -877,7 +890,7 @@ function rpDrawTrend(filtered) {
   else{badge.textContent='보합세';badge.className='trend-badge tb-fl';}
 
   const ctx=canvas.getContext('2d');
-  trendInst=new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{stepSize:25,font:{size:10},color:'#aeaeb2'},grid:{color:'#f5f5f7'}},x:{ticks:{font:{size:10},color:'#aeaeb2'},grid:{display:false}}}}});
+  trendInst=new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{stepSize:25,font:{size:10},color:'#aeaeb2'},grid:{color:'#f5f5f7'}},x:{ticks:{font:{size:10},color:'#aeaeb2'},grid:{display:false}}}}});
 }
 function rpRenderQAnalysis(msRecs){ const sec=document.getElementById('rp-q-section'); if(!msRecs.length){sec.style.display='none';return;} const sorted=msRecs.slice().sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp)); const latest=sorted[sorted.length-1], answers=partAnswers(latest,'master')||[]; if(!answers.length){sec.style.display='none';return;} sec.style.display='block'; document.getElementById('rp-q-grid').innerHTML=answers.map((a,i)=>{ const ok=a.isCorrect!==undefined?a.isCorrect:a.correct===true; return `<div class="q-bubble ${ok?'q-o':'q-x'}">${i+1}</div>`; }).join(''); const correct=answers.filter(a=>a.isCorrect!==undefined?a.isCorrect:a.correct===true).length; document.getElementById('rp-q-stat').innerHTML=`총 <b>${answers.length}</b>문항 &nbsp;|&nbsp; 정답 <b style="color:#166534;">${correct}</b>개 &nbsp;|&nbsp; 오답 <b style="color:#991b1b;">${answers.length-correct}</b>개 &nbsp;|&nbsp; 정답률 <b>${Math.round(correct/answers.length*100)}%</b>`; }
 
