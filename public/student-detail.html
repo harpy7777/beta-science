@@ -862,14 +862,16 @@ function gcRenderExamSelector() {
 window.gcSelectExam=(key,el)=>{ gcCurExamKey=key; document.querySelectorAll('.exam-sel-btn').forEach(b=>b.classList.remove('on')); if(el) el.classList.add('on'); gcRenderRecs(gcCurWeek); };
 function gcRenderChart(fr) {
   const base=enrollDate();
-  // 데이터가 존재하는 가장 최근 주차를 끝으로 최근 4주를 표시
-  // (기존엔 무조건 1~4주차만 그려서, 입학 후 한참 뒤에 응시한 경우 차트가 비어 보이던 버그 수정)
-  let maxW=0;
-  if(base){ fr.forEach(r=>{ const wi=enrollWeekIndex(r,base); if(wi!=null&&wi>maxW) maxW=wi; }); }
-  const startW=Math.max(0, maxW-3);
-  const weeks=[startW, startW+1, startW+2, startW+3];
-  document.getElementById('d-chart').innerHTML=weeks.map(w=>{
-    const wr=base?fr.filter(r=>enrollWeekIndex(r,base)===w):[];
+  const chartEl=document.getElementById('d-chart');
+  if(!base){ chartEl.innerHTML='<div style="width:100%;text-align:center;color:#aeaeb2;font-size:12px;padding:1rem 0;">표시할 성적 데이터가 없습니다.</div>'; return; }
+  // 실제로 응시 기록이 있는 주차만 모아 가장 최근 4개 주차만 표시
+  // (학생마다 입학·응시 주차가 달라 빈 주차가 섞여 그래프가 비어 보이던 문제 해결)
+  const weekMap=new Map();
+  fr.forEach(r=>{ const wi=enrollWeekIndex(r,base); if(wi==null) return; if(!weekMap.has(wi)) weekMap.set(wi,[]); weekMap.get(wi).push(r); });
+  const weeks=[...weekMap.keys()].sort((a,b)=>a-b).slice(-4);
+  if(!weeks.length){ chartEl.innerHTML='<div style="width:100%;text-align:center;color:#aeaeb2;font-size:12px;padding:1rem 0;">표시할 성적 데이터가 없습니다.</div>'; return; }
+  chartEl.innerHTML=weeks.map(w=>{
+    const wr=weekMap.get(w)||[];
     const avgV=(arr,kind)=>{ const v=arr.filter(r=>hasType(r,kind)); return v.length?Math.round(v.map(r=>typeScore(r,kind)).reduce((s,x)=>s+x,0)/v.length):null; };
     const oxA=avgV(wr,'ox'), mcA=avgV(wr,'mc'), msA=avgV(wr,'master');
     const segs=[oxA,mcA,msA].filter(v=>v!=null);
@@ -1037,7 +1039,7 @@ function rpRenderAnalysis(oxA,mcA,msA,total) {
   document.getElementById('rp-analysis-items').innerHTML=[{label:'OX 테스트',val:oxA},{label:'4지선다',val:mcA},{label:'마스터테스트',val:msA}].map(r=>{ if(r.val===null) return `<div class="analysis-item"><span class="ai-label">${r.label}</span><span class="ai-val" style="color:#aeaeb2;">데이터 없음</span></div>`; const cls=r.val>=80?'c-good':r.val>=60?'c-avg':'c-warn', lbl=r.val>=80?`양호 (${r.val}점)`:r.val>=60?`보통 (${r.val}점)`:`주의 (${r.val}점)`; return `<div class="analysis-item"><span class="ai-label">${r.label}</span><span class="ai-val ${cls}">${lbl}</span></div>`; }).join('');
   const com=document.getElementById('rp-comment'); if(total===null){com.textContent='아직 데이터가 없습니다.';return;} const low=[],high=[]; if(oxA!==null){if(oxA>=80)high.push('OX');else if(oxA<60)low.push('OX');} if(mcA!==null){if(mcA>=80)high.push('4지선다');else if(mcA<60)low.push('4지선다');} if(msA!==null){if(msA>=80)high.push('마스터');else if(msA<60)low.push('마스터');} const nm=stu.name||stu.displayName||'학생'; let txt=nm+' 학생'; if(total>=80) txt+='은 전반적으로 양호한 수준입니다. '; else if(total>=60) txt+='은 보통 수준이며 일부 영역 보완이 필요합니다. '; else txt+='은 전반적인 기초 개념 복습이 필요합니다. '; if(high.length) txt+=high.join(', ')+' 영역은 우수한 성과를 보이고 있습니다. '; if(low.length) txt+=`특히 ${low.join(', ')} 영역의 집중 학습을 권장합니다.`; com.textContent=txt;
 }
-function rpDrawRadar(oxA,mcA,msA){ const ctx=document.getElementById('rp-radar').getContext('2d'); if(radarInst) radarInst.destroy(); radarInst=new Chart(ctx,{type:'radar',data:{labels:['OX 테스트','4지선다','마스터테스트','수업 테스트','과제 성취도'],datasets:[{data:[oxA||0,mcA||0,msA||0,0,0],backgroundColor:'rgba(219,39,119,0.15)',borderColor:'#db2777',borderWidth:2,pointBackgroundColor:'#db2777',pointRadius:4}]},options:{responsive:false,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{size:9},color:'#aeaeb2'},grid:{color:'#fce7f3'},pointLabels:{font:{size:10},color:'#6e6e73'},angleLines:{color:'#fce7f3'}}}}}); }
+function rpDrawRadar(oxA,mcA,msA){ const ctx=document.getElementById('rp-radar').getContext('2d'); if(radarInst) radarInst.destroy(); radarInst=new Chart(ctx,{type:'radar',data:{labels:['OX 테스트','4지선다','마스터테스트'],datasets:[{data:[oxA||0,mcA||0,msA||0],backgroundColor:'rgba(219,39,119,0.15)',borderColor:'#db2777',borderWidth:2,pointBackgroundColor:'#db2777',pointRadius:4}]},options:{responsive:false,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{size:9},color:'#aeaeb2'},grid:{color:'#fce7f3'},pointLabels:{font:{size:10},color:'#6e6e73'},angleLines:{color:'#fce7f3'}}}}}); }
 function rpDrawTrend(filtered) {
   const ctx=document.getElementById('rp-trend').getContext('2d'); if(trendInst) trendInst.destroy();
   // 타입별 {ts, score} 모음 (한 문서가 ox·mc 둘 다면 각각 기여)
