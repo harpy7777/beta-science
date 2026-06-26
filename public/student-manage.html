@@ -646,8 +646,27 @@ body {
 .logout-btn:hover, .logout-btn:active { background: #fceef2; }
 
 /* ── 학생 관리 전용 추가 스타일 ── */
-.sm-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:1rem; }
-.sm-search { flex:1; min-width:150px; }
+.sm-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:0.9rem; }
+.sm-search { flex:0 1 440px; max-width:440px; min-width:150px; }
+
+/* 학년 필터 버튼 — 균등 분할 그리드 (양옆 균형) */
+.grade-filter-row { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-bottom:1.1rem; }
+.gf-btn {
+  padding:11px 0; min-height:44px;
+  border:1.5px solid #fce7f3; background:#fff; color:#6e6e73;
+  border-radius:12px; font-size:13px; font-weight:600; font-family:inherit;
+  cursor:pointer; white-space:nowrap;
+  transition:transform .12s, background .15s, border-color .15s, box-shadow .15s;
+  -webkit-user-select:none; user-select:none;
+}
+.gf-btn:hover { border-color:#fbcfe8; background:#fdf2f8; }
+.gf-btn:active { transform:scale(0.97); }
+.gf-btn.on {
+  background:linear-gradient(135deg,#f472b6,#db2777);
+  border-color:#db2777; color:#fff;
+  box-shadow:0 3px 10px rgba(219,39,119,0.25);
+}
+
 .sm-count { font-size:11px; color:#aeaeb2; margin-bottom:0.8rem; }
 .sm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
 .sm-card { background:#fff; border:1px solid #fce7f3; border-radius:16px; padding:1.1rem 1.2rem; transition:transform .18s, box-shadow .18s, border-color .18s; }
@@ -685,8 +704,13 @@ body {
 .sm-modal-footer { display:flex; gap:8px; margin-top:1.3rem; }
 .sm-modal-footer button { flex:1; min-height:46px; }
 @media (max-width:600px) {
+  .sm-search { flex:1 1 100%; max-width:none; }
+  .grade-filter-row { grid-template-columns:repeat(3,1fr); }
   .sm-grid { grid-template-columns:1fr; }
   .sm-modal { border-radius:18px; padding:1.2rem 1.1rem; }
+}
+@media (max-width:360px) {
+  .gf-btn { font-size:12px; padding:10px 0; }
 }
 </style>
 </head>
@@ -723,11 +747,14 @@ body {
   <div class="section-heading">학생 명단</div>
   <div class="sm-toolbar">
     <input class="cc-inp sm-search" id="sm-search" type="text" placeholder="학생 이름 또는 ID로 검색..." oninput="renderCards()" autocomplete="off">
-    <select class="cc-sel" id="sm-grade-filter" style="max-width:150px;" onchange="renderCards()">
-      <option value="">전체 학년</option>
-      <option value="중등1학년">중1</option><option value="중등2학년">중2</option><option value="중등3학년">중3</option>
-      <option value="고등1학년">고1</option><option value="고등2학년">고2</option><option value="고등3학년">고3</option>
-    </select>
+  </div>
+  <div class="grade-filter-row" id="grade-filter-row">
+    <button class="gf-btn on" data-grade="" onclick="setGradeFilter(this,'')">전체</button>
+    <button class="gf-btn" data-grade="중등1학년" onclick="setGradeFilter(this,'중등1학년')">중1</button>
+    <button class="gf-btn" data-grade="중등2학년" onclick="setGradeFilter(this,'중등2학년')">중2</button>
+    <button class="gf-btn" data-grade="중등3학년" onclick="setGradeFilter(this,'중등3학년')">중3</button>
+    <button class="gf-btn" data-grade="고등1학년" onclick="setGradeFilter(this,'고등1학년')">고1</button>
+    <button class="gf-btn" data-grade="고등2학년" onclick="setGradeFilter(this,'고등2학년')">고2</button>
   </div>
   <div class="sm-count" id="sm-count">불러오는 중...</div>
   <div class="sm-grid" id="sm-grid"><div class="sm-empty">학생 데이터를 불러오는 중입니다...</div></div>
@@ -802,6 +829,7 @@ const GSHORT = {'중등1학년':'중1','중등2학년':'중2','중등3학년':'�
 let students = [];
 let editId = null;          // 수정 중인 학생의 Firestore 문서 id (null이면 신규)
 let editPhotoUrl = '';      // 수정 시 기존 사진 url 보존
+let gradeFilter = '';       // 현재 선택된 학년 필터 ('' = 전체)
 
 // 인증
 onAuthStateChanged(auth, async u => {
@@ -825,10 +853,18 @@ function initStudents() {
   });
 }
 
+// 학년 필터 버튼
+window.setGradeFilter = function(btn, val) {
+  gradeFilter = val;
+  document.querySelectorAll('.gf-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderCards();
+};
+
 // 카드 렌더 (검색 + 학년 필터)
 window.renderCards = function() {
   const kw = (document.getElementById('sm-search').value || '').trim().toLowerCase();
-  const gf = document.getElementById('sm-grade-filter').value;
+  const gf = gradeFilter;
   const list = students.filter(s =>
     (!kw || (s.name && s.name.toLowerCase().includes(kw)) || (s.id && String(s.id).toLowerCase().includes(kw))) &&
     (!gf || (s.grade || '') === gf)
