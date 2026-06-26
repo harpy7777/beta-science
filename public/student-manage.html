@@ -685,7 +685,8 @@ body {
 .sm-btn:hover { border-color:#fbcfe8; }
 .sm-btn.primary { border-color:#db2777; color:#db2777; background:#fdf2f8; }
 .sm-btn.primary:hover { background:#fce7f3; }
-.sm-btn.danger { color:#dc2626; border-color:#fca5a5; flex:0 0 auto; padding:9px 12px; }
+.sm-btn.icon { flex:0 0 auto; padding:9px 13px; }
+.sm-btn.danger { color:#dc2626; border-color:#fca5a5; flex:0 0 auto; padding:9px 13px; }
 .sm-btn.danger:hover { background:#fef2f2; }
 .sm-empty { padding:3rem 1rem; text-align:center; color:#aeaeb2; font-size:13px; background:#fff; border:1px solid #fce7f3; border-radius:16px; grid-column:1/-1; }
 
@@ -882,8 +883,8 @@ window.renderCards = function() {
     const teacher = (s.teacher && s.teacher !== '-') ? s.teacher : '미배정';
     const phone = (s.phone && s.phone !== '-') ? s.phone : '-';
     const gradeBtn = sid
-      ? `<a class="sm-btn primary" href="student-detail.html?id=${encodeURIComponent(sid)}">📊 성적</a>`
-      : `<button class="sm-btn" disabled style="opacity:0.5;">📊 성적</button>`;
+      ? `<a class="sm-btn primary" href="student-detail.html?id=${encodeURIComponent(sid)}">📊 테스트 결과</a>`
+      : `<button class="sm-btn" disabled style="opacity:0.5;">📊 테스트 결과</button>`;
     return `<div class="sm-card">
       <div class="sm-card-top">
         <div class="sm-av" style="background:${bg};color:${col};">${esc(short)}</div>
@@ -896,8 +897,8 @@ window.renderCards = function() {
       <div class="sm-meta"><span class="ml">선생님</span> ${esc(teacher)}<br><span class="ml">연락처</span> ${esc(phone)}</div>
       <div class="sm-actions">
         ${gradeBtn}
-        <button class="sm-btn" onclick="openEdit('${esc(s.fireId)}')">✏️ 수정</button>
-        <button class="sm-btn danger" onclick="delStudent('${esc(s.fireId)}','${esc(name)}')">🗑</button>
+        <button class="sm-btn icon" title="수정" onclick="openEdit('${esc(s.fireId)}')">✏️</button>
+        <button class="sm-btn danger" title="삭제" onclick="delStudent('${esc(s.fireId)}','${esc(name)}')">🗑</button>
       </div>
     </div>`;
   }).join('');
