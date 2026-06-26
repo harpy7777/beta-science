@@ -264,32 +264,6 @@ body {
 .tb-up{background:#dcfce7;color:#166534} .tb-dn{background:#fee2e2;color:#991b1b} .tb-fl{background:#f5f5f7;color:#6e6e73}
 .trend-canvas-wrap { position: relative; height: 160px; }
 .trend-empty { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-size:13px; color:#aeaeb2; line-height:1.8; }
-.exam-tabs { display: flex; gap: 6px; margin-bottom: 1rem; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; scrollbar-width: none; }
-.exam-tabs::-webkit-scrollbar { display: none; }
-.etab { padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 500; font-family: inherit; border: 1px solid #fce7f3; background: #fff; color: #6e6e73; cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; min-height: 36px; }
-.etab.on { background: #db2777; color: #fff; border-color: #db2777; }
-.result-section { margin-bottom: 1rem; }
-.result-section-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-.rs-dot { width: 8px; height: 8px; border-radius: 50%; }
-.result-table { background: #fff; border: 1px solid #fce7f3; border-radius: 14px; overflow: hidden; }
-.rt-head { display: grid; padding: 0.6rem 1rem; background: #fdf2f8; border-bottom: 1px solid #fce7f3; font-size: 10px; font-weight: 700; color: #c9a8bc; letter-spacing: 0.1em; text-transform: uppercase; }
-.rt-row { display: grid; padding: 0.7rem 1rem; border-bottom: 1px solid #fdf2f8; align-items: center; }
-.rt-row:last-child { border-bottom: none; }
-.rt-row:hover { background: #fffbfe; }
-.gt-base { grid-template-columns: 1fr 84px 84px 70px 92px 58px; }
-.rt-del-btn { font-size:13px; background:#fff; border:1.5px solid #fca5a5; border-radius:8px; padding:6px 8px; cursor:pointer; min-height:34px; line-height:1; color:#dc2626; font-family:inherit; }
-.rt-del-btn:hover { background:#fef2f2; }
-.cell-name { font-size: 12px; font-weight: 500; color: #1d1d1f; }
-.cell-date { font-size: 11px; color: #aeaeb2; }
-.cell-score { font-size: 13px; font-weight: 700; }
-.cs-ox{color:#1e40af} .cs-mc{color:#5b21b6} .cs-ms{color:#db2777}
-.bar-wrap { display: flex; align-items: center; gap: 6px; }
-.bar-track { flex: 1; height: 5px; background: #f5f5f7; border-radius: 3px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 3px; }
-.attempt-badge { display: inline-flex; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
-.ab-first{background:#dbeafe;color:#1e40af} .ab-retry1{background:#ede9fe;color:#5b21b6} .ab-retry2{background:#fef9c3;color:#854d0e} .ab-retry3{background:#fee2e2;color:#991b1b} .ab-retry{background:#f5f5f7;color:#6e6e73}
-.fb-chip { display: inline-flex; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 6px; }
-.fb-g{background:#dcfce7;color:#166534} .fb-a{background:#fef9c3;color:#854d0e} .fb-w{background:#fee2e2;color:#991b1b}
 .q-section { background: #fff; border: 1px solid #fce7f3; border-radius: 16px; padding: 1.1rem 1.2rem; margin-bottom: 1rem; }
 .q-section-title { font-size: 13px; font-weight: 600; color: #db2777; margin-bottom: 1rem; display: flex; align-items: center; gap: 6px; }
 .q-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); gap: 5px; }
@@ -372,11 +346,6 @@ body {
   .analysis-row { grid-template-columns: 1fr; }
   .trend-canvas-wrap { height: 150px; }
   .trend-empty { font-size: 12px; }
-
-  .result-table { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .rt-head, .rt-row { min-width: 500px; }
-  .gt-base { grid-template-columns: 1fr 66px 70px 56px 72px 52px; }
-  .cell-name { font-size: 11px; }
 
   #modal-custom-ta { font-size: 16px !important; }
 
@@ -513,13 +482,6 @@ body {
         <div class="trend-empty" id="rp-trend-empty" style="display:none;"></div>
       </div>
     </div>
-    <div class="exam-tabs">
-      <button class="etab on" onclick="rpPickExam('all',this)">전체</button>
-      <button class="etab" onclick="rpPickExam('ox',this)">OX 문제</button>
-      <button class="etab" onclick="rpPickExam('mc',this)">4지선다</button>
-      <button class="etab" onclick="rpPickExam('master',this)">마스터테스트</button>
-    </div>
-    <div id="rp-result-wrap"></div>
     <div class="q-section" id="rp-q-section" style="display:none;">
       <div class="q-section-title">마스터테스트 최근 문항별 분석</div>
       <div class="q-grid" id="rp-q-grid"></div>
@@ -539,7 +501,7 @@ body {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, getDoc, setDoc, doc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, getDoc, setDoc, doc, deleteDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg = {
   apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
@@ -560,44 +522,82 @@ const params=new URLSearchParams(location.search);
 const idParam=params.get('id');
 
 let stu=null, sid=null, recsAll=[], feedbackText='';
-let rpCurExam='all';
 let radarInst=null, trendInst=null;
+let gradesUnsub=null, started=false;
+let testById=new Map(), testByTitle=new Map();
 
 onAuthStateChanged(auth, async user => {
-  if(!user){ location.replace('/login.html'); return; }
+  if(!user){ if(gradesUnsub){ gradesUnsub(); gradesUnsub=null; } location.replace('/login.html'); return; }
   try {
     const s=await getDoc(doc(db,'users',user.uid));
     if(!s.exists()||s.data().status!=='approved'){ await signOut(auth); location.replace('/login.html'); return; }
     document.body.style.visibility='visible';
-    await loadAll();
+    if(started) return;     // 중복 구독 방지 (토큰 갱신 등으로 재호출될 수 있음)
+    started=true;
+    await startRealtime();
   } catch { location.replace('/login.html'); }
 });
-window.doLogout=async()=>{ await signOut(auth); location.replace('/login.html'); };
+window.doLogout=async()=>{ if(gradesUnsub){ gradesUnsub(); gradesUnsub=null; } await signOut(auth); location.replace('/login.html'); };
+window.addEventListener('beforeunload', ()=>{ if(gradesUnsub){ gradesUnsub(); gradesUnsub=null; } });
 
-async function loadAll() {
+async function startRealtime() {
   if(!idParam){ showError(); return; }
+  // 1) 학생 정보 (1회)
   try {
     const ss=await getDocs(collection(db,'students'));
     ss.forEach(d=>{ const data=d.data(); if(!stu && (data.id===idParam || d.id===idParam)) stu={uid:d.id,...data}; });
   } catch {}
   if(!stu){ showError(); return; }
   sid=stu.id||stu.uid;
-  try {
-    const snap=await getDocs(query(collection(db,'grades'),where('studentId','==',sid)));
-    // 새 구조(ox/multiple/category) + 옛 구조 둘 다 읽어서 필드명 정규화 (문서 1개 = 응시 1건 유지)
-    recsAll=snap.docs.map(d=>normalizeDoc(d.id,d.data())).sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp));
-    recsAll=await rpEnrichWithExamSubjects(recsAll);
-  } catch { recsAll=[]; }
+  // 2) 피드백 (1회)
   try { const fs=await getDoc(doc(db,'feedbacks',stu.uid)); feedbackText=fs.exists()?(fs.data().text||''):''; } catch { feedbackText=''; }
+  // 3) tests 과목 매핑 캐시 (1회)
+  await loadTestSubjMap();
 
-  document.getElementById('loadingBox').style.display='none';
-  document.getElementById('content').style.display='block';
-  renderProfile();
-  gcRender();
-  rpRender();
-  gcRenderFb();
-  renderShareUI();
-  if(stu.shareToken){ try{ await setDoc(doc(db,'shares',stu.shareToken), buildShareSnapshot()); }catch(e){} }
+  // 4) grades 실시간 구독 — 시험이 들어오면 자동 갱신 (새로고침 불필요)
+  if(gradesUnsub){ gradesUnsub(); gradesUnsub=null; }
+  let firstSnap=true;
+  gradesUnsub = onSnapshot(
+    query(collection(db,'grades'),where('studentId','==',sid)),
+    (snap)=>{
+      // 새 구조(ox/multiple/category) + 옛 구조 둘 다 읽어서 필드명 정규화 (문서 1개 = 응시 1건)
+      recsAll = snap.docs.map(d=>normalizeDoc(d.id,d.data())).sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp));
+      recsAll = enrichSubjectsSync(recsAll);
+      if(firstSnap){
+        document.getElementById('loadingBox').style.display='none';
+        document.getElementById('content').style.display='block';
+        renderProfile();
+        gcRenderFb();
+        renderShareUI();
+        firstSnap=false;
+      }
+      gcRender();
+      rpRender();
+      // 학부모 공유 링크가 켜져 있으면 최신 성적으로 자동 동기화
+      if(stu.shareToken){ setDoc(doc(db,'shares',stu.shareToken), buildShareSnapshot()).catch(()=>{}); }
+    },
+    (err)=>{
+      console.error('grades onSnapshot error:', err);
+      if(firstSnap){ showError(); }
+    }
+  );
+}
+async function loadTestSubjMap(){
+  try {
+    const snap=await getDocs(collection(db,'tests'));
+    testById=new Map(); testByTitle=new Map();
+    snap.forEach(d=>{ const data=d.data(); testById.set(d.id,data); if(data.title) testByTitle.set(data.title,data); });
+  } catch { testById=new Map(); testByTitle=new Map(); }
+}
+function enrichSubjectsSync(records){
+  return records.map(r=>{
+    if(r.subject) return r;
+    const eid=r.examId||r.testId;
+    if(eid && testById.has(eid)){ const s=testById.get(eid).subject; if(s) return {...r,subject:s}; }
+    const title=r.testName||r.examTitle;
+    if(title && testByTitle.has(title)){ const s=testByTitle.get(title).subject; if(s) return {...r,subject:s}; }
+    return r;
+  });
 }
 function showError(){ document.getElementById('loadingBox').style.display='none'; document.getElementById('errorBox').style.display='block'; }
 
@@ -661,8 +661,6 @@ function partAnswers(r,kind){
   if(kind==='ox')     return r.answers.filter(a=>a.type==='ox');
   return r.answers.filter(a=>a.type==='multiple' || a.type==='mc');
 }
-/* 시험(문서) 식별 키 — 재시험 집계용 */
-function examKey(r){ return r.examId||r.testId||r.testName||'?'; }
 
 function renderProfile() {
   const name=stu.name||stu.displayName||'이름없음', grade=stu.grade||stu.year||'—';
@@ -715,13 +713,9 @@ function gcRenderTable(list){
 window.gcDeleteRec=async(recId,name)=>{
   if(!recId){ alert('기록 정보를 찾을 수 없습니다.'); return; }
   if(!confirm(`"${name||'이 기록'}" 응시 기록을 삭제할까요?\n삭제하면 되돌릴 수 없습니다.`)) return;
-  try {
-    await deleteDoc(doc(db,'grades',recId));
-    recsAll=recsAll.filter(r=>r.id!==recId);
-    gcRender();
-    rpRender();
-    if(stu.shareToken){ try{ await setDoc(doc(db,'shares',stu.shareToken), buildShareSnapshot()); }catch(e){} }
-  } catch(e){ alert('삭제 실패: '+e.message); }
+  // 삭제만 하면 grades 실시간 구독이 표·요약·추이·공유 스냅샷을 자동 갱신합니다.
+  try { await deleteDoc(doc(db,'grades',recId)); }
+  catch(e){ alert('삭제 실패: '+e.message); }
 };
 
 /* 피드백 */
@@ -808,19 +802,6 @@ window.copyShareLink=()=>{
 };
 
 /* ════ 분석 리포트 ════ */
-async function rpEnrichWithExamSubjects(records) {
-  try { const snap=await getDocs(collection(db,'tests')); const byId=new Map(), byTitle=new Map(); snap.forEach(d=>{ const data=d.data(); byId.set(d.id,data); if(data.title) byTitle.set(data.title,data); }); return records.map(r=>{ if(r.subject) return r; const eid=r.examId||r.testId; if(eid&&byId.has(eid)){const s=byId.get(eid).subject;if(s) return{...r,subject:s};} const title=r.testName||r.examTitle; if(title&&byTitle.has(title)){const s=byTitle.get(title).subject;if(s) return{...r,subject:s};} return r; }); } catch { return records; }
-}
-
-/* 타입별 응시 횟수/재시험 정보 (시험 단위로 시간순 인덱싱) */
-function attemptInfoFor(list){
-  const sorted=list.slice().sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp));
-  const counts=new Map(), info=new Map();
-  sorted.forEach(r=>{ const k=examKey(r); const c=counts.get(k)||0; info.set(r.id,{index:c,key:k}); counts.set(k,c+1); });
-  info.forEach(v=>{ v.total=counts.get(v.key); v.isRetry=v.index>0; });
-  return info;
-}
-
 function rpRender() {
   // 기간(4주) 필터 제거 → 실제 응시한 전체 시험 데이터로 분석
   const filtered=recsAll;
@@ -835,7 +816,7 @@ function rpRender() {
   const vals=[oxA,mcA,msA].filter(v=>v!==null), total=vals.length?Math.round(vals.reduce((a,v)=>a+v,0)/vals.length):null;
   const oel=document.getElementById('rp-overall');
   if(total!==null){ if(total>=80){oel.textContent=`양호 (${total}점)`;oel.className='p-overall-n c-good';} else if(total>=60){oel.textContent=`보통 (${total}점)`;oel.className='p-overall-n c-avg';} else{oel.textContent=`주의 (${total}점)`;oel.className='p-overall-n c-warn';} } else { oel.textContent='—'; oel.className='p-overall-n'; }
-  rpRenderAnalysis(oxA,mcA,msA,total); rpDrawRadar(oxA,mcA,msA); rpDrawTrend(filtered); rpRenderResults(filtered,rpCurExam); rpRenderQAnalysis(filtered.filter(r=>hasType(r,'master')));
+  rpRenderAnalysis(oxA,mcA,msA,total); rpDrawRadar(oxA,mcA,msA); rpDrawTrend(filtered); rpRenderQAnalysis(filtered.filter(r=>hasType(r,'master')));
 }
 function rpRenderAnalysis(oxA,mcA,msA,total) {
   document.getElementById('rp-analysis-items').innerHTML=[{label:'OX 테스트',val:oxA},{label:'4지선다',val:mcA},{label:'마스터테스트',val:msA}].map(r=>{ if(r.val===null) return `<div class="analysis-item"><span class="ai-label">${r.label}</span><span class="ai-val" style="color:#aeaeb2;">데이터 없음</span></div>`; const cls=r.val>=80?'c-good':r.val>=60?'c-avg':'c-warn', lbl=r.val>=80?`양호 (${r.val}점)`:r.val>=60?`보통 (${r.val}점)`:`주의 (${r.val}점)`; return `<div class="analysis-item"><span class="ai-label">${r.label}</span><span class="ai-val ${cls}">${lbl}</span></div>`; }).join('');
@@ -898,21 +879,7 @@ function rpDrawTrend(filtered) {
   const ctx=canvas.getContext('2d');
   trendInst=new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,ticks:{stepSize:25,font:{size:10},color:'#aeaeb2'},grid:{color:'#f5f5f7'}},x:{ticks:{font:{size:10},color:'#aeaeb2'},grid:{display:false}}}}});
 }
-function rpAttemptBadge(info){ if(!info) return ''; if(info.index===0) return `<span class="attempt-badge ab-first">첫시험</span>`; const cls=info.index===1?'ab-retry1':info.index===2?'ab-retry2':info.index===3?'ab-retry3':'ab-retry'; return `<span class="attempt-badge ${cls}">재시험${info.index}</span>`; }
-function rpRenderResults(filtered,examType) {
-  const wrap=document.getElementById('rp-result-wrap');
-  const oxR=filtered.filter(r=>hasType(r,'ox')), mcR=filtered.filter(r=>hasType(r,'mc')), msR=filtered.filter(r=>hasType(r,'master'));
-  const aiOx=attemptInfoFor(oxR), aiMc=attemptInfoFor(mcR), aiMs=attemptInfoFor(msR);
-  let html='';
-  function delBtn(r,label){ return `<div style="display:flex;justify-content:center;"><button class="rt-del-btn" onclick="window.gcDeleteRec('${esc(r.id)}','${esc(r.testName||r.examTitle||'')}')">🗑</button></div>`; }
-  function makeRows(recs,kind,scClass,barColor,label,ai){ return recs.map(r=>{ const sc=typeScore(r,kind),info=ai.get(r.id),attempts=info?info.total:1; return `<div class="rt-row gt-base"><div class="cell-name">${esc2(r.testName||r.examTitle||'—')}</div><div class="cell-date">${fmtDateShort(r.timestamp)}</div><div>${rpAttemptBadge(info)}${attempts>1?`<span style="font-size:10px;color:#aeaeb2;">총 ${attempts}회</span>`:''}</div><div class="cell-score ${scClass}">${sc}점</div><div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:${sc}%;background:${barColor};"></div></div></div>${delBtn(r,label)}</div>`; }).join(''); }
-  if((examType==='all'||examType==='ox')&&oxR.length) html+=`<div class="result-section"><div class="result-section-title"><span class="rs-dot" style="background:#1e40af;"></span><span style="color:#1e40af;">OX 문제</span><span style="font-size:11px;color:#aeaeb2;font-weight:400;">(${oxR.length}회)</span></div><div class="result-table"><div class="rt-head gt-base"><div>단원명</div><div>시험일</div><div>응시횟수</div><div>점수</div><div>점수 바</div><div>삭제</div></div>${makeRows(oxR,'ox','cs-ox','#1e40af','OX 문제',aiOx)}</div></div>`;
-  if((examType==='all'||examType==='mc')&&mcR.length) html+=`<div class="result-section"><div class="result-section-title"><span class="rs-dot" style="background:#5b21b6;"></span><span style="color:#5b21b6;">4지선다</span><span style="font-size:11px;color:#aeaeb2;font-weight:400;">(${mcR.length}회)</span></div><div class="result-table"><div class="rt-head gt-base"><div>단원명</div><div>시험일</div><div>응시횟수</div><div>점수</div><div>점수 바</div><div>삭제</div></div>${makeRows(mcR,'mc','cs-mc','#5b21b6','4지선다',aiMc)}</div></div>`;
-  if((examType==='all'||examType==='master')&&msR.length) html+=`<div class="result-section"><div class="result-section-title"><span class="rs-dot" style="background:#db2777;"></span><span style="color:#db2777;">마스터테스트</span><span style="font-size:11px;color:#aeaeb2;font-weight:400;">(${msR.length}회)</span></div><div class="result-table"><div class="rt-head gt-base"><div>단원명</div><div>시험일</div><div>응시횟수</div><div>점수</div><div>점수 바</div><div>삭제</div></div>${msR.map(r=>{ const sc=typeScore(r,'master'),info=aiMs.get(r.id),attempts=info?info.total:1,fb=sc>=80?`<span class="fb-chip fb-g">양호</span>`:sc>=60?`<span class="fb-chip fb-a">보통</span>`:`<span class="fb-chip fb-w">주의</span>`; return `<div class="rt-row gt-base"><div class="cell-name">${esc2(r.testName||r.examTitle||'—')}</div><div class="cell-date">${fmtDateShort(r.timestamp)}</div><div style="display:flex;align-items:center;gap:4px;">${rpAttemptBadge(info)}${attempts>1?`<span style="font-size:10px;color:#aeaeb2;">총 ${attempts}회</span>`:''}</div><div class="cell-score cs-ms">${sc}점 ${fb}</div><div class="bar-wrap"><div class="bar-track"><div class="bar-fill" style="width:${sc}%;background:#db2777;"></div></div></div>${delBtn(r,'마스터테스트')}</div>`; }).join('')}</div></div>`;
-  wrap.innerHTML=html||`<div class="result-table"><div class="empty-state">해당 조건의 시험 기록이 없습니다.</div></div>`;
-}
 function rpRenderQAnalysis(msRecs){ const sec=document.getElementById('rp-q-section'); if(!msRecs.length){sec.style.display='none';return;} const sorted=msRecs.slice().sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp)); const latest=sorted[sorted.length-1], answers=partAnswers(latest,'master')||[]; if(!answers.length){sec.style.display='none';return;} sec.style.display='block'; document.getElementById('rp-q-grid').innerHTML=answers.map((a,i)=>{ const ok=a.isCorrect!==undefined?a.isCorrect:a.correct===true; return `<div class="q-bubble ${ok?'q-o':'q-x'}">${i+1}</div>`; }).join(''); const correct=answers.filter(a=>a.isCorrect!==undefined?a.isCorrect:a.correct===true).length; document.getElementById('rp-q-stat').innerHTML=`총 <b>${answers.length}</b>문항 &nbsp;|&nbsp; 정답 <b style="color:#166534;">${correct}</b>개 &nbsp;|&nbsp; 오답 <b style="color:#991b1b;">${answers.length-correct}</b>개 &nbsp;|&nbsp; 정답률 <b>${Math.round(correct/answers.length*100)}%</b>`; }
-window.rpPickExam=(e,el)=>{ rpCurExam=e; document.querySelectorAll('.etab').forEach(t=>t.classList.remove('on')); if(el) el.classList.add('on'); rpRenderResults(recsAll,rpCurExam); };
 
 /* 유틸 */
 function toDate(ts){if(!ts)return new Date(0);if(typeof ts==='object'&&ts.seconds)return new Date(ts.seconds*1000);if(ts&&typeof ts.toDate==='function')return ts.toDate();return new Date(ts);}
