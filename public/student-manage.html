@@ -807,10 +807,69 @@ body {
   </div>
 </div>
 
+<!-- 수업카드 작성 모달 -->
+<div class="sm-modal-bg" id="cc-modal-bg">
+  <div class="sm-modal">
+    <div class="sm-modal-title" id="cc-modal-title">📝 수업카드 작성</div>
+    <div class="student-grade-info" id="cc-stu-info" style="margin-top:0;margin-bottom:1rem;">학생</div>
+    <div class="sm-field">
+      <span class="cc-label">수업 날짜 <span class="req">*</span></span>
+      <input class="cc-inp" id="cc-w-date" type="date">
+    </div>
+    <div class="sm-field">
+      <span class="cc-label">수강 과목 <span class="req">*</span></span>
+      <select class="cc-sel" id="cc-w-subj">
+        <option>내신</option><option>통합과학</option><option>화학</option>
+        <option>물질과 에너지</option><option>화학 반응의 세계</option>
+      </select>
+    </div>
+    <div class="sm-field">
+      <span class="cc-label">담당 선생님 <span class="req">*</span></span>
+      <input class="cc-inp" id="cc-w-teacher" type="text" placeholder="선생님 이름" autocomplete="off">
+    </div>
+    <div class="sm-field">
+      <span class="cc-label">학습 단원 (선택)</span>
+      <input class="cc-inp" id="cc-w-unit" type="text" placeholder="예: 화학 1단원 - 원자의 구조" autocomplete="off">
+    </div>
+    <div class="sm-field">
+      <span class="cc-label">과제 완성도</span>
+      <select class="cc-sel" id="cc-w-hw">
+        <option value="높음">높음</option><option value="보통" selected>보통</option>
+        <option value="낮음">낮음</option><option value="-">-</option>
+      </select>
+    </div>
+    <div class="sm-field">
+      <span class="cc-label">수업 태도</span>
+      <select class="cc-sel" id="cc-w-attitude">
+        <option value="적극적">적극적</option><option value="보통" selected>보통</option><option value="산만">산만</option>
+      </select>
+    </div>
+    <div class="sm-field">
+      <span class="cc-label">숙제 완료</span>
+      <select class="cc-sel" id="cc-w-homework-done">
+        <option value="-">-</option><option value="완료">완료</option>
+        <option value="미완료">미완료</option><option value="부분완료">부분완료</option>
+      </select>
+    </div>
+    <div class="sm-field">
+      <span class="cc-label">수업 내용 <span class="req">*</span></span>
+      <textarea class="cc-textarea" id="cc-w-content" placeholder="오늘 진행한 수업 내용을 작성해주세요..."></textarea>
+    </div>
+    <div class="sm-field">
+      <span class="cc-label">과제 내용 (선택)</span>
+      <textarea class="cc-textarea" id="cc-w-homework" placeholder="오늘 부여한 과제 내용을 작성해주세요..." style="min-height:56px;"></textarea>
+    </div>
+    <div class="sm-modal-footer">
+      <button class="btn-secondary" onclick="closeCCModal()">취소</button>
+      <button class="cc-write-btn" id="cc-w-save-btn" onclick="saveClassCard()">수업카드 저장</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, addDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, addDoc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg = {
   apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
@@ -832,6 +891,7 @@ let students = [];
 let editId = null;          // 수정 중인 학생의 Firestore 문서 id (null이면 신규)
 let editPhotoUrl = '';      // 수정 시 기존 사진 url 보존
 let gradeFilter = '';       // 현재 선택된 학년 필터 ('' = 전체)
+let ccStudent = null;       // 수업카드 작성 대상 학생
 
 // 인증
 onAuthStateChanged(auth, async u => {
@@ -901,6 +961,7 @@ window.renderCards = function() {
         <button class="sm-btn icon" title="수정" onclick="openEdit('${esc(s.fireId)}')">✏️</button>
         <button class="sm-btn danger" title="삭제" onclick="delStudent('${esc(s.fireId)}','${esc(name)}')">🗑</button>
       </div>
+      <button class="sm-btn primary" style="width:100%;margin-top:6px;" title="수업카드 작성" onclick="openClassCard('${esc(s.fireId)}')">📝 수업카드 작성</button>
     </div>`;
   }).join('');
 };
@@ -986,9 +1047,80 @@ window.delStudent = async function(fireId, name) {
   catch (e) { alert('삭제 오류: ' + e.message); }
 };
 
+/* ════════════════════════════════════════════
+   수업카드 작성 (teacher-board 와 동일한 classCards 스키마로 저장)
+   → 저장하면 학부모 리포트(student-portal / parent)의 '수업 내용'에 반영됨
+════════════════════════════════════════════ */
+window.openClassCard = function(fireId) {
+  const s = students.find(x => x.fireId === fireId);
+  if (!s) return;
+  if (!s.id) { alert('이 학생은 학생 ID가 없어 수업카드를 연동할 수 없습니다.\n먼저 학생 정보를 수정해 ID를 부여해주세요.'); return; }
+  ccStudent = s;
+  document.getElementById('cc-modal-title').textContent = `📝 ${s.name || '학생'} · 수업카드 작성`;
+  document.getElementById('cc-stu-info').innerHTML =
+    `<span style="font-size:11px;">📚</span><strong>${esc(s.name || '학생')}</strong>` +
+    (s.grade ? `<span style="margin-left:6px;color:#a21caf;">${esc(s.grade)}</span>` : '');
+  // 날짜 = 오늘
+  const t = new Date();
+  document.getElementById('cc-w-date').value =
+    `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+  // 담당 선생님 = 학생 담당쌤 자동 채움 (수정 가능)
+  document.getElementById('cc-w-teacher').value = (s.teacher && s.teacher !== '-') ? s.teacher : '';
+  // 수강 과목 = 학생 첫 과목이 옵션에 있으면 선택
+  const subs = (s.subject && s.subject !== '-') ? String(s.subject).split(',').map(x => x.trim()).filter(Boolean) : [];
+  const subjSel = document.getElementById('cc-w-subj');
+  if (subs.length) { const opt = [...subjSel.options].find(o => o.value === subs[0] || o.text === subs[0]); if (opt) subjSel.value = opt.value; }
+  // 나머지 초기화
+  document.getElementById('cc-w-unit').value = '';
+  document.getElementById('cc-w-hw').value = '보통';
+  document.getElementById('cc-w-attitude').value = '보통';
+  document.getElementById('cc-w-homework-done').value = '-';
+  document.getElementById('cc-w-content').value = '';
+  document.getElementById('cc-w-homework').value = '';
+  document.getElementById('cc-modal-bg').classList.add('open');
+};
+window.closeCCModal = function() { document.getElementById('cc-modal-bg').classList.remove('open'); };
+
+window.saveClassCard = async function() {
+  if (!ccStudent) return;
+  const subject = document.getElementById('cc-w-subj').value;
+  const teacher = document.getElementById('cc-w-teacher').value.trim();
+  const classDate = document.getElementById('cc-w-date').value;
+  const unit = document.getElementById('cc-w-unit').value.trim();
+  const content = document.getElementById('cc-w-content').value.trim();
+  const homework = document.getElementById('cc-w-hw').value;
+  const attitude = document.getElementById('cc-w-attitude').value;
+  const homeworkDone = document.getElementById('cc-w-homework-done').value;
+  const homeworkContent = document.getElementById('cc-w-homework').value.trim();
+  if (!teacher) { alert('담당 선생님을 입력하세요'); return; }
+  if (!classDate) { alert('수업 날짜를 선택하세요'); return; }
+  if (!content) { alert('수업 내용을 입력하세요'); return; }
+  const studentId = (ccStudent.id && ccStudent.id !== '') ? ccStudent.id : ccStudent.fireId;
+  const btn = document.getElementById('cc-w-save-btn');
+  btn.disabled = true; btn.textContent = '저장 중...';
+  try {
+    await addDoc(collection(db,'classCards'), {
+      studentId,
+      studentName: ccStudent.name || '',
+      studentGrade: ccStudent.grade || '',
+      subject, teacher, classDate, unit, content,
+      score: null, scoreNone: false, ox: null, multiple: null, omr: null,
+      homework, attitude, homeworkDone, homeworkContent,
+      createdAt: serverTimestamp()
+    });
+    closeCCModal();
+    alert('수업카드가 저장되었습니다.\n학부모 리포트에 바로 반영됩니다.');
+  } catch (e) {
+    alert('저장 오류: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '수업카드 저장';
+  }
+};
+
 // 배경 클릭 / ESC 로 닫기
 document.getElementById('sm-modal-bg').addEventListener('click', ev => { if (ev.target === ev.currentTarget) closeModal(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.getElementById('cc-modal-bg').addEventListener('click', ev => { if (ev.target === ev.currentTarget) closeCCModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeCCModal(); } });
 
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 </script>
