@@ -200,6 +200,16 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
 .btn-modal-close{padding:9px 18px;min-height:38px;border:1.5px solid #fce7f3;border-radius:10px;background:#fff;font-size:13px;color:#1d1d1f;cursor:pointer;font-family:inherit;font-weight:500;transition:background .15s}
 .btn-modal-close:hover{background:#fdf2f8}
 
+/* ── Class Card 작성 폼 (모달 내부) ── */
+.cc-write-form{flex:1;overflow-y:auto;padding:12px 1.2rem 8px;-webkit-overflow-scrolling:touch}
+.cc-write-stu{font-size:12px;color:#a21caf;font-weight:700;background:#fdf4ff;border:1px solid #f3e8ff;border-radius:10px;padding:9px 12px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.cc-write-form .form-group{margin-bottom:.75rem}
+.cc-write-form textarea{width:100%;padding:11px 13px;min-height:70px;border:1.5px solid #fce7f3;border-radius:10px;font-size:16px;color:#1d1d1f;outline:none;transition:border .15s;font-family:inherit;line-height:1.6;resize:vertical;background:#fff;-webkit-appearance:none}
+.cc-write-form textarea:focus{border-color:#db2777}
+.cc-save-btn{padding:9px 18px;min-height:38px;border:none;border-radius:10px;background:linear-gradient(135deg,#e879f9,#a21caf);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s;white-space:nowrap}
+.cc-save-btn:hover{opacity:.88}
+.cc-save-btn:disabled{opacity:.5;cursor:not-allowed}
+
 /* ── Responsive ── */
 @media(max-width:600px){
   .wrap{padding:.9rem .85rem}
@@ -373,14 +383,50 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
 <div class="cc-modal-overlay" id="classCardModal">
   <div class="cc-modal">
     <div class="cc-modal-header"><h2 id="ccModalTitle">수업카드</h2><button class="modal-close" onclick="closeClassCardModal()">✕</button></div>
-    <div class="cc-stat-bar">
+    <div class="cc-stat-bar" id="ccStatBar">
       <div class="cc-stat-chip"><div class="num" id="cc-total">—</div><div class="lbl">전체</div></div>
       <div class="cc-stat-chip"><div class="num" id="cc-month">—</div><div class="lbl">이번달</div></div>
     </div>
     <div class="cc-list-scroll" id="ccListScroll"><div class="cc-loading">불러오는 중...</div></div>
-    <div class="cc-modal-footer">
-      <button class="cc-write-link" onclick="window.location.href='teacher-board.html'">🗂️ 수업카드 작성하기 →</button>
+
+    <!-- 수업카드 작성 폼 (티쳐보드와 동일 스키마로 저장 → 학부모 리포트 연동) -->
+    <div class="cc-write-form" id="ccWriteForm" style="display:none">
+      <div class="cc-write-stu" id="ccWriteStu">📝 수업카드 작성</div>
+      <div class="form-row">
+        <div class="form-group"><label>수업 날짜 <span style="color:#dc2626">*</span></label><input type="date" id="cc-w-date"></div>
+        <div class="form-group"><label>수강 과목 <span style="color:#dc2626">*</span></label>
+          <select id="cc-w-subj">
+            <option>내신</option><option>통합과학</option><option>화학</option>
+            <option>물질과 에너지</option><option>화학 반응의 세계</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>담당 선생님 <span style="color:#dc2626">*</span></label><input type="text" id="cc-w-teacher" placeholder="선생님 이름" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+        <div class="form-group"><label>학습 단원 (선택)</label><input type="text" id="cc-w-unit" placeholder="예: 화학 1단원 - 원자의 구조" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>과제 완성도</label>
+          <select id="cc-w-hw"><option value="높음">높음</option><option value="보통" selected>보통</option><option value="낮음">낮음</option><option value="-">-</option></select>
+        </div>
+        <div class="form-group"><label>수업 태도</label>
+          <select id="cc-w-attitude"><option value="적극적">적극적</option><option value="보통" selected>보통</option><option value="산만">산만</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>숙제 완료</label>
+        <select id="cc-w-homework-done"><option value="-">-</option><option value="완료">완료</option><option value="미완료">미완료</option><option value="부분완료">부분완료</option></select>
+      </div>
+      <div class="form-group"><label>수업 내용 <span style="color:#dc2626">*</span></label><textarea id="cc-w-content" placeholder="오늘 진행한 수업 내용을 작성해주세요..."></textarea></div>
+      <div class="form-group"><label>과제 내용 (선택)</label><textarea id="cc-w-homework" placeholder="오늘 부여한 과제 내용을 작성해주세요..." style="min-height:56px"></textarea></div>
+    </div>
+
+    <div class="cc-modal-footer" id="ccFooterList">
+      <button class="cc-write-link" onclick="toggleCCWrite(true)">✏️ 새 수업카드 작성</button>
       <button class="btn-modal-close" onclick="closeClassCardModal()">닫기</button>
+    </div>
+    <div class="cc-modal-footer" id="ccFooterWrite" style="display:none">
+      <button class="btn-modal-close" onclick="toggleCCWrite(false)">← 목록으로</button>
+      <button class="cc-save-btn" id="ccSaveBtn" onclick="saveClassCardNew()">수업카드 저장</button>
     </div>
   </div>
 </div>
@@ -388,7 +434,7 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc,collection,addDoc,updateDoc,deleteDoc,query,orderBy,onSnapshot,getDocs,where}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,collection,addDoc,updateDoc,deleteDoc,query,orderBy,onSnapshot,getDocs,where,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import{getStorage,ref,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
 const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app);
@@ -447,7 +493,12 @@ window.openEditModal=function(fi){eid=fi;const s=students.find(x=>x.fireId===fi)
 window.closeModal=function(){document.getElementById('studentModal').classList.remove('open');};
 window.saveStudent=async function(){const nm=document.getElementById('inputName').value.trim(),gr=document.getElementById('inputGrade').value,id=document.getElementById('inputId').value.trim()||`s${Date.now()}`,tc=document.getElementById('inputTeacher').value.trim()||'-',ph=document.getElementById('inputPhone').value.trim()||'-',checked=[...document.querySelectorAll('.subj-chk:checked')].map(c=>c.value),sb=checked.length?checked.join(','):'-';if(!nm||!gr){alert('이름과 학년을 입력해주세요.');return;}const saveBtn=document.getElementById('saveBtn');saveBtn.disabled=true;saveBtn.textContent='저장 중...';try{let photoUrl=currentPhotoUrl;if(selectedPhotoFile){const ext=selectedPhotoFile.name.split('.').pop();const storageRef=ref(storage,`studentPhotos/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`);await uploadBytes(storageRef,selectedPhotoFile);photoUrl=await getDownloadURL(storageRef);}if(!eid){const t=new Date();await addDoc(collection(db,"students"),{id,name:nm,grade:gr,subject:sb,phone:ph,teacher:tc,photoUrl:photoUrl||'',regDate:`${t.getFullYear()}. ${t.getMonth()+1}. ${t.getDate()}.`});}else{await updateDoc(doc(db,"students",eid),{name:nm,grade:gr,subject:sb,phone:ph,teacher:tc,photoUrl:photoUrl||''});}closeModal();}catch(er){alert("저장 오류: "+er.message);}finally{saveBtn.disabled=false;saveBtn.textContent='저장';}};
 window.deleteStudent=async function(fi,nm){if(!confirm(`"${nm}" 학생을 삭제하시겠습니까?`))return;try{await deleteDoc(doc(db,"students",fi));}catch(er){alert("삭제 오류: "+er.message);}};
-window.openClassCardModal=async function(fi,nm,sid){document.getElementById('ccModalTitle').textContent=`${nm} · 수업카드`;['cc-total','cc-month'].forEach(id=>document.getElementById(id).textContent='—');document.getElementById('ccListScroll').innerHTML='<div class="cc-loading">불러오는 중...</div>';document.getElementById('classCardModal').classList.add('open');try{const s1=await getDocs(query(collection(db,"classCards"),where("studentId","==",fi),orderBy("classDate","desc")));let cs=s1.docs.map(d=>({id:d.id,...d.data()}));if(sid&&sid!==fi){try{const s2=await getDocs(query(collection(db,"classCards"),where("studentId","==",sid),orderBy("classDate","desc")));const ex=new Set(cs.map(c=>c.id));s2.docs.forEach(d=>{if(!ex.has(d.id))cs.push({id:d.id,...d.data()});});cs.sort((a,b)=>(b.classDate||'').localeCompare(a.classDate||''));}catch(e2){}}rCCS(cs);rCCL(cs);}catch(er){document.getElementById('ccListScroll').innerHTML=`<div class="cc-empty">로드 실패: ${er.message}</div>`;}};
+let ccCur=null;
+function setCCView(mode){const isWrite=mode==='write';document.getElementById('ccStatBar').style.display=isWrite?'none':'flex';document.getElementById('ccListScroll').style.display=isWrite?'none':'block';document.getElementById('ccWriteForm').style.display=isWrite?'block':'none';document.getElementById('ccFooterList').style.display=isWrite?'none':'flex';document.getElementById('ccFooterWrite').style.display=isWrite?'flex':'none';}
+window.openClassCardModal=async function(fi,nm,sid){ccCur=students.find(x=>x.fireId===fi)||{fireId:fi,id:sid,name:nm,grade:'',subject:'',teacher:''};document.getElementById('ccModalTitle').textContent=`${nm} · 수업카드`;document.getElementById('classCardModal').classList.add('open');setCCView('list');await loadCCList(fi,sid);};
+async function loadCCList(fi,sid){['cc-total','cc-month'].forEach(id=>document.getElementById(id).textContent='—');document.getElementById('ccListScroll').innerHTML='<div class="cc-loading">불러오는 중...</div>';try{const s1=await getDocs(query(collection(db,"classCards"),where("studentId","==",fi),orderBy("classDate","desc")));let cs=s1.docs.map(d=>({id:d.id,...d.data()}));if(sid&&sid!==fi){try{const s2=await getDocs(query(collection(db,"classCards"),where("studentId","==",sid),orderBy("classDate","desc")));const ex=new Set(cs.map(c=>c.id));s2.docs.forEach(d=>{if(!ex.has(d.id))cs.push({id:d.id,...d.data()});});cs.sort((a,b)=>(b.classDate||'').localeCompare(a.classDate||''));}catch(e2){}}rCCS(cs);rCCL(cs);}catch(er){document.getElementById('ccListScroll').innerHTML=`<div class="cc-empty">로드 실패: ${er.message}</div>`;}}
+window.toggleCCWrite=function(show){if(show){if(!ccCur)return;const teacher=(ccCur.teacher&&ccCur.teacher!=='-')?ccCur.teacher:'';const subs=(ccCur.subject&&ccCur.subject!=='-')?String(ccCur.subject).split(',').map(x=>x.trim()).filter(Boolean):[];document.getElementById('ccWriteStu').innerHTML=`📝 <b>${e(ccCur.name||'학생')}</b>${ccCur.grade?` · ${e(ccCur.grade)}`:''} 수업카드 작성`;const t=new Date();document.getElementById('cc-w-date').value=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;const subjSel=document.getElementById('cc-w-subj');if(subs.length){const opt=[...subjSel.options].find(o=>o.value===subs[0]||o.text===subs[0]);if(opt)subjSel.value=opt.value;}document.getElementById('cc-w-teacher').value=teacher;document.getElementById('cc-w-unit').value='';document.getElementById('cc-w-hw').value='보통';document.getElementById('cc-w-attitude').value='보통';document.getElementById('cc-w-homework-done').value='-';document.getElementById('cc-w-content').value='';document.getElementById('cc-w-homework').value='';setCCView('write');}else{setCCView('list');}};
+window.saveClassCardNew=async function(){if(!ccCur)return;const subject=document.getElementById('cc-w-subj').value;const teacher=document.getElementById('cc-w-teacher').value.trim();const classDate=document.getElementById('cc-w-date').value;const unit=document.getElementById('cc-w-unit').value.trim();const content=document.getElementById('cc-w-content').value.trim();const homework=document.getElementById('cc-w-hw').value;const attitude=document.getElementById('cc-w-attitude').value;const homeworkDone=document.getElementById('cc-w-homework-done').value;const homeworkContent=document.getElementById('cc-w-homework').value.trim();if(!teacher){alert('담당 선생님을 입력하세요');return;}if(!classDate){alert('수업 날짜를 선택하세요');return;}if(!content){alert('수업 내용을 입력하세요');return;}const studentId=(ccCur.id&&ccCur.id!=='')?ccCur.id:ccCur.fireId;const btn=document.getElementById('ccSaveBtn');btn.disabled=true;btn.textContent='저장 중...';try{await addDoc(collection(db,"classCards"),{studentId,studentName:ccCur.name||'',studentGrade:ccCur.grade||'',subject,teacher,classDate,unit,content,score:null,scoreNone:false,ox:null,multiple:null,omr:null,homework,attitude,homeworkDone,homeworkContent,createdAt:serverTimestamp()});const fi=ccCur.fireId;if(!ccCache[fi])ccCache[fi]={count:0,teacher:''};ccCache[fi].count++;if(!ccCache[fi].teacher)ccCache[fi].teacher=teacher;renderTable();await loadCCList(ccCur.fireId,ccCur.id);setCCView('list');alert('수업카드가 저장되었습니다. 학부모 리포트에 바로 반영됩니다.');}catch(er){alert('저장 오류: '+er.message);}finally{btn.disabled=false;btn.textContent='수업카드 저장';}};
 function rCCS(cs){document.getElementById('cc-total').textContent=cs.length+'건';const n=new Date(),ms=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`;document.getElementById('cc-month').textContent=cs.filter(c=>(c.classDate||'').startsWith(ms)).length+'건';}
 function rCCL(cs){const w=document.getElementById('ccListScroll');if(!cs.length){w.innerHTML=`<div class="cc-empty"><p>아직 작성된 수업카드가 없습니다.</p></div>`;return;}w.innerHTML=cs.map(c=>{const hCls=c.homework==='높음'?'hw-high':c.homework==='낮음'?'hw-low':'hw-mid',aCls=c.attitude==='적극적'?'att-active':c.attitude==='산만'?'att-low':'att-mid';return`<div class="cc-item" id="cci-${c.id}"><div class="cc-item-head" onclick="toggleCC('${c.id}')"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#1d1d1f;margin-bottom:3px"><span class="cc-chip cc-chip-subj" style="margin-right:4px">${e(c.subject||'—')}</span>수업</div><div class="cc-item-meta"><span class="cc-chip cc-chip-teacher">${e(c.teacher||'—')}</span><span class="cc-chip cc-chip-date">${e(c.classDate||'—')}</span></div></div><div style="display:flex;align-items:center;gap:5px;flex-shrink:0">${c.homework&&c.homework!=='-'?`<span class="cc-hw-badge ${hCls}">과제 ${e(c.homework)}</span>`:''} ${c.attitude?`<span class="att-badge ${aCls}">${e(c.attitude)}</span>`:''}<span class="cc-expand">▾</span></div></div><div class="cc-item-body">${c.content?`<div class="cc-body-section"><div class="cc-body-label">수업 내용</div><div class="cc-body-text">${e(c.content)}</div></div>`:''}</div></div>`;}).join('');}
 window.toggleCC=id=>{document.getElementById('cci-'+id)?.classList.toggle('open');};
