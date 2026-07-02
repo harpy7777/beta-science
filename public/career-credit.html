@@ -34,7 +34,8 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
 .subhead::after { content:''; flex:1; height:1px; background:#eee; }
 
 .panel { background:#fff; border:1px solid #eee; border-radius:18px; padding:1.35rem 1.4rem; margin-bottom:1rem; }
-.panel h3 { font-size:14px; font-weight:800; color:#1d1d1f; margin-bottom:10px; display:flex; align-items:center; gap:7px; }
+.panel h3 { font-size:14px; font-weight:800; color:#1d1d1f; margin-bottom:10px; display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; }
+.panel h3 .sub { font-weight:600; color:#aeaeb2; font-size:11.5px; letter-spacing:0; }
 .lead { font-size:13.5px; color:#3c3c43; line-height:1.85; word-break:keep-all; }
 .lead b { color:var(--accent); font-weight:700; }
 
@@ -52,12 +53,33 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
 .info-table td b { color:#1d1d1f; font-weight:700; }
 .tag { display:inline-block; font-size:10px; font-weight:800; padding:2px 7px; border-radius:6px; background:var(--soft); color:var(--accent); }
 
+/* 공통 과목·필수 이수 학점 표 */
+.credit-table td:last-child, .credit-table th:last-child { text-align:center; font-weight:700; white-space:nowrap; }
+.credit-table tr.sum td { background:var(--soft); color:var(--accent); font-weight:800; }
+.credit-table tr.sum td b { color:var(--accent); }
+
 .callout { border-radius:14px; padding:1rem 1.1rem; margin:1rem 0 0; font-size:12.5px; line-height:1.72; word-break:keep-all; }
 .callout.point { background:var(--soft); border:1px solid var(--bd); color:#1e3a8a; }
 .callout.warn { background:#fff7ed; border:1px solid #fed7aa; color:#9a3412; }
 .callout.sci { background:#fdf2f8; border:1px solid #fbcfe8; color:#831843; }
+.callout.tip { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; }
+.callout.tip b { color:#15803d; font-weight:700; }
+.callout.star { background:#fffbeb; border:1px solid #fde68a; color:#92400e; }
+.callout.star b { color:#b45309; font-weight:700; }
 .callout .ct { display:block; font-weight:800; margin-bottom:5px; }
 .callout b { font-weight:700; }
+
+/* 2028 수능 6칸 카드 */
+.exam-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:.3rem 0 0; }
+.exam-card { border:1px solid #eee; border-radius:14px; padding:1rem 1.05rem; background:#fff; }
+.ec-top { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:9px; }
+.ec-title { font-size:15px; font-weight:800; color:#1d1d1f; letter-spacing:-.02em; }
+.ec-badge { font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:20px; white-space:nowrap; }
+.ec-badge.change { background:#fee2e2; color:#dc2626; }
+.ec-badge.keep { background:#f3f4f6; color:#6b7280; }
+.ec-desc { font-size:12.8px; color:#3c3c43; line-height:1.6; word-break:keep-all; }
+.ec-desc b { color:var(--accent); font-weight:700; }
+.ec-note { font-size:11.5px; color:#aeaeb2; line-height:1.55; margin-top:5px; word-break:keep-all; }
 
 .foot { text-align:center; font-size:11px; color:#c7c7cc; line-height:1.7; padding-top:1.4rem; border-top:1px solid #f0e8ed; margin-top:1.5rem; }
 .foot b { color:var(--accent); font-weight:700; }
@@ -66,7 +88,10 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
   .wrap { padding:1rem 0.75rem 4rem; }
   .hero { padding:1.6rem 1.3rem; border-radius:20px; }
   .hero-title { font-size:1.35rem; }
+  .panel { padding:1.1rem 1rem; }
 }
+@media (max-width:700px){ .exam-grid { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:440px){ .exam-grid { grid-template-columns:1fr; } }
 </style>
 <script>
 (function(){
@@ -105,7 +130,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
   <a href="career-design.html" class="backlink">← 디자인 랩으로</a>
 
   <section class="hero">
-    <span class="hero-kicker">02 · CREDIT & 2028</span>
+    <span class="hero-kicker">02 · CREDIT &amp; 2028</span>
     <h1 class="hero-title">제도를 알면 전략이 보입니다</h1>
     <p class="hero-sub">지금 고1·고2는 고교학점제와 2028 통합형 수능이 적용되는 세대입니다. 규칙을 정확히 알아야 과목 선택과 3년 계획을 제대로 세울 수 있습니다.</p>
   </section>
@@ -133,6 +158,30 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
     <div class="callout warn"><span class="ct">⚠ 이것만은 기억</span>세부 이수 기준·재이수 방법은 학교 <b>학업성적관리 시행지침</b>에 따라 조금씩 다를 수 있어요. 정확한 내용은 담임·교육과정부에 확인하는 것이 안전합니다.</div>
   </div>
 
+  <div class="panel">
+    <h3>📋 공통 과목과 필수 이수 학점 <span class="sub">(일반계 고등학교 기준)</span></h3>
+    <div class="table-scroll">
+      <table class="info-table credit-table">
+        <thead><tr><th>교과(군)</th><th>공통 과목</th><th>필수 이수 학점</th></tr></thead>
+        <tbody>
+          <tr><td><b>국어</b></td><td>공통국어1·2</td><td>8</td></tr>
+          <tr><td><b>수학</b></td><td>공통수학1·2</td><td>8</td></tr>
+          <tr><td><b>영어</b></td><td>공통영어1·2</td><td>8</td></tr>
+          <tr><td><b>사회</b>(역사/도덕 포함)</td><td>통합사회1·2</td><td>8</td></tr>
+          <tr><td><b>한국사</b></td><td>한국사1·2</td><td>6</td></tr>
+          <tr><td><b>과학</b></td><td>통합과학1·2, 과학탐구실험1·2</td><td>10</td></tr>
+          <tr><td><b>체육</b></td><td>—</td><td>10</td></tr>
+          <tr><td><b>예술</b></td><td>—</td><td>10</td></tr>
+          <tr><td><b>기술·가정/정보/제2외국어/한문/교양</b></td><td>—</td><td>16</td></tr>
+          <tr class="sum"><td>교과 필수 이수 학점</td><td>+ 자율 이수 90학점</td><td>84</td></tr>
+          <tr><td><b>창의적 체험활동</b></td><td>—</td><td>18</td></tr>
+          <tr class="sum"><td>총 이수 학점</td><td>졸업 기준</td><td>192</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout tip">🧩&nbsp; 1학년 때 <b>사회·과학 교과의 필수 이수 학점</b>을 다 채우지 못하면, 2·3학년 선택 과목에서 보충해야 해요. 3년간 누적 학점을 꾸준히 관리하는 것이 중요합니다.</div>
+  </div>
+
   <div class="subhead">내신 5등급제</div>
   <div class="panel">
     <h3>📊 9등급 → 5등급</h3>
@@ -156,21 +205,36 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
   <div class="panel">
     <h3>📝 선택과목 폐지, 모두 같은 문제로</h3>
     <p class="lead">2028학년도 수능(2027년 11월 시행)부터 국어·수학·탐구의 <b>선택과목이 전면 폐지</b>되고, 모든 수험생이 동일한 과목으로 응시합니다.</p>
-    <div class="table-scroll">
-      <table class="info-table">
-        <thead><tr><th>영역</th><th>출제 과목</th><th>문항·시간</th><th>평가</th></tr></thead>
-        <tbody>
-          <tr><td><b>국어</b></td><td>화법과 언어 / 독서와 작문 / 문학</td><td>45문항 · 80분</td><td>상대(9등급)</td></tr>
-          <tr><td><b>수학</b></td><td>대수 / 미적분Ⅰ / 확률과 통계 <span class="tag">심화수학 제외</span></td><td>30문항 · 100분</td><td>상대(9등급)</td></tr>
-          <tr><td><b>영어</b></td><td>공통</td><td>45문항 · 70분</td><td>절대(9등급)</td></tr>
-          <tr><td><b>한국사</b></td><td>공통(필수)</td><td>20문항 · 30분</td><td>절대(9등급)</td></tr>
-          <tr><td><b>탐구</b></td><td><b>통합사회 + 통합과학</b> (모두 응시)</td><td>각 25문항 · 40분</td><td>상대(9등급)</td></tr>
-          <tr><td><b>제2외국어/한문</b></td><td>선택</td><td>20문항 · 30분</td><td>절대(9등급)</td></tr>
-        </tbody>
-      </table>
+    <div class="exam-grid">
+      <div class="exam-card">
+        <div class="ec-top"><span class="ec-title">국어</span><span class="ec-badge change">변경</span></div>
+        <div class="ec-desc">선택과목 없이 <b>공통 출제</b></div>
+        <div class="ec-note">(화법과 언어·독서와 작문·문학)</div>
+      </div>
+      <div class="exam-card">
+        <div class="ec-top"><span class="ec-title">수학</span><span class="ec-badge change">변경</span></div>
+        <div class="ec-desc">선택과목 없이 <b>공통 출제</b></div>
+        <div class="ec-note">(대수·미적분Ⅰ·확률과 통계)</div>
+      </div>
+      <div class="exam-card">
+        <div class="ec-top"><span class="ec-title">탐구</span><span class="ec-badge change">변경</span></div>
+        <div class="ec-desc"><b>통합사회 + 통합과학</b></div>
+        <div class="ec-note">모두 응시 (문항·시간 증가)</div>
+      </div>
+      <div class="exam-card">
+        <div class="ec-top"><span class="ec-title">영어</span><span class="ec-badge keep">유지</span></div>
+        <div class="ec-desc">영어Ⅰ·Ⅱ (절대평가)</div>
+      </div>
+      <div class="exam-card">
+        <div class="ec-top"><span class="ec-title">한국사</span><span class="ec-badge keep">유지</span></div>
+        <div class="ec-desc">필수 응시</div>
+      </div>
+      <div class="exam-card">
+        <div class="ec-top"><span class="ec-title">제2외/한문</span><span class="ec-badge keep">유지</span></div>
+        <div class="ec-desc">9개 과목 중 택 1</div>
+      </div>
     </div>
-    <div class="callout sci"><span class="ct">🔬 과학이 중요해진 이유</span>이제 <b>계열과 무관하게 모든 수험생이 통합과학에 응시</b>합니다. 고1 통합과학의 기본 개념이 곧 수능 범위가 되므로, 1학년 때 과학 기초를 탄탄히 잡아 두는 것이 3년 내내 유리합니다.</div>
-    <div class="callout warn"><span class="ct">⚠ 확정 안 된 부분</span>탐구 문항별 배점 등 세부 사항과 최종 시행 세칙은 <b>2028학년도 수능 시행 기본계획(2027년 3월 공고 예정)</b>에서 확정됩니다.</div>
+    <div class="callout star"><b>⭐ 핵심!</b> 1학년 때 배우는 <b>통합사회·통합과학</b>이 수능 탐구 범위예요. <b>1학년 공통 과목</b>을 탄탄히 다져두세요.</div>
   </div>
 
   <div class="foot"><b>인후쌤의 과학 수업 관리 시스템</b> · 진로 학업 디자인 랩<br>제도를 이해했다면, 다음은 '과목 선택'입니다.</div>
