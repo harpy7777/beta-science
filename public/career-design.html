@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><script src="/favicon.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="인후쌤의 과학 수업 관리 시스템 진로·학업 설계 대시보드 — 자기이해(RIASEC), 고교학점제·2028수능, 과목 선택, 대입 큰그림, 월별 로드맵, 셀프 체크리스트를 한 곳에서">
+<title>진로·학업 설계 대시보드 · 인후쌤의 과학 수업 관리 시스템</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  background: #fafafa; color: #1d1d1f; min-height: 100vh;
+  -webkit-font-smoothing: antialiased; overscroll-behavior: none;
+}
+
+/* ── Header ── */
+.header {
+  background: #ffffff; border-bottom: 1px solid #f0e8ed;
+  height: 54px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1rem;
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  position: sticky; top: 0; z-index: 300;
+}
+.header-left { display: flex; align-items: center; gap: 9px; text-decoration: none; color: inherit; cursor: pointer; transition: opacity 0.15s; }
+.header-left:hover { opacity: 0.75; }
+.logo-mark {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, #f472b6 0%, #db2777 100%);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.brand-name { font-size: 14px; font-weight: 600; color: #1d1d1f; letter-spacing: -0.3px; }
+.header-badge {
+  display: flex; align-items: center; gap: 5px;
+  background: #fdf2f8; border: 1px solid #fbcfe8; border-radius: 20px;
+  padding: 4px 11px; font-size: 10px; font-weight: 700; color: #db2777; white-space: nowrap;
+}
+
+/* ── Layout ── */
+.wrap {
+  max-width: 1080px; margin: 0 auto;
+  padding: 1.2rem 0.9rem 5rem;
+  padding-bottom: max(5rem, calc(4rem + env(safe-area-inset-bottom)));
+  padding-left: max(0.9rem, env(safe-area-inset-left));
+  padding-right: max(0.9rem, env(safe-area-inset-right));
+}
+
+/* ── Hero ── */
+.hero {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #db2777 0%, #ec4899 45%, #f472b6 100%);
+  border-radius: 24px; padding: 2.3rem 1.8rem; margin-bottom: 2rem;
+  color: #fff; box-shadow: 0 16px 40px rgba(219,39,119,0.28);
+}
+.hero::before {
+  content: ''; position: absolute; top: -60px; right: -50px;
+  width: 220px; height: 220px; border-radius: 50%;
+  background: rgba(255,255,255,0.14); pointer-events: none;
+}
+.hero::after {
+  content: ''; position: absolute; bottom: -80px; left: -40px;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); pointer-events: none;
+}
+.hero-kicker {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px; padding: 5px 12px; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.02em; margin-bottom: 14px; position: relative; z-index: 1;
+}
+.hero-title {
+  font-size: 1.8rem; font-weight: 800; letter-spacing: -0.04em;
+  line-height: 1.3; position: relative; z-index: 1; word-break: keep-all;
+}
+.hero-sub {
+  font-size: 0.95rem; font-weight: 500; line-height: 1.8; margin-top: 16px;
+  color: #ffffff; position: relative; z-index: 1; max-width: none; word-break: keep-all;
+}
+.hero-flow {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 22px; position: relative; z-index: 1;
+}
+.flow-chip {
+  background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 9px; padding: 6px 11px; font-size: 11px; font-weight: 600; white-space: nowrap;
+}
+.flow-arrow { align-self: center; font-size: 11px; color: rgba(255,255,255,0.6); }
+
+/* ── Section heading ── */
+.section-heading {
+  font-size: 11px; font-weight: 700; color: #aeaeb2;
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.1rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-heading::after { content: ''; flex: 1; height: 1px; background: #f0e8ed; }
+
+/* ── Nav grid ── */
+.nav-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 2.2rem; }
+.nav-card {
+  background: #ffffff; border: 1px solid #fce7f3; border-radius: 18px;
+  padding: 1.2rem 1rem; cursor: pointer; position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 8px;
+  text-decoration: none; color: inherit;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  -webkit-user-select: none; user-select: none; min-height: 138px;
+}
+.nav-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  border-radius: 0 0 18px 18px; opacity: 0; transition: opacity 0.18s;
+}
+.nav-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(219,39,119,0.14); border-color: #fbcfe8; }
+.nav-card:hover::after { opacity: 1; }
+.nav-card:active { transform: scale(0.97); }
+.nav-step {
+  position: absolute; top: 12px; right: 14px;
+  font-size: 11px; font-weight: 800; color: #f0d4e0; letter-spacing: 0.04em;
+}
+.nav-icon {
+  width: 44px; height: 44px; border-radius: 13px;
+  display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+}
+.nav-title { font-size: 13px; font-weight: 700; color: #1d1d1f; letter-spacing: -0.02em; }
+.nav-desc { font-size: 11px; color: #aeaeb2; line-height: 1.45; flex: 1; }
+.nav-go { font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 3px; }
+
+/* per-card accent colors */
+.c1 .nav-icon { background: #fdf2f8; } .c1::after { background: linear-gradient(90deg,#f472b6,#db2777); } .c1 .nav-go { color: #db2777; }
+.c2 .nav-icon { background: #eff6ff; } .c2::after { background: linear-gradient(90deg,#60a5fa,#2563eb); } .c2 .nav-go { color: #2563eb; }
+.c3 .nav-icon { background: #fef3c7; } .c3::after { background: linear-gradient(90deg,#fbbf24,#d97706); } .c3 .nav-go { color: #d97706; }
+.c4 .nav-icon { background: #f5f3ff; } .c4::after { background: linear-gradient(90deg,#a78bfa,#7c3aed); } .c4 .nav-go { color: #7c3aed; }
+.c5 .nav-icon { background: #fff7ed; } .c5::after { background: linear-gradient(90deg,#fb923c,#ea580c); } .c5 .nav-go { color: #ea580c; }
+.c6 .nav-icon { background: #f0f9ff; } .c6::after { background: linear-gradient(90deg,#38bdf8,#0284c7); } .c6 .nav-go { color: #0284c7; }
+
+/* ── 안내 카드 ── */
+.guide-card {
+  background: #ffffff; border: 1px solid #fce7f3; border-radius: 18px;
+  padding: 1.5rem 1.6rem; margin-bottom: 1.6rem;
+}
+.guide-title { font-size: 14px; font-weight: 700; color: #1d1d1f; margin-bottom: 16px; display: flex; align-items: center; gap: 7px; }
+.guide-list { display: flex; flex-direction: column; gap: 14px; }
+.guide-item { display: flex; gap: 12px; align-items: flex-start; }
+.guide-num {
+  width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0;
+  background: linear-gradient(135deg,#f472b6,#db2777); color: #fff;
+  font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+}
+.guide-text { font-size: 12.5px; color: #3c3c43; line-height: 1.7; }
+.guide-text b { color: #db2777; font-weight: 700; }
+
+/* ── 푸터 ── */
+.foot {
+  text-align: center; font-size: 11px; color: #c7c7cc; line-height: 1.7;
+  padding-top: 1.4rem; border-top: 1px solid #f0e8ed;
+}
+.foot b { color: #db2777; font-weight: 700; }
+
+/* ── 반응형 ── */
+@media (max-width: 760px) {
+  .nav-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 520px) {
+  .wrap { padding: 1rem 0.75rem 4rem; }
+  .hero { padding: 1.6rem 1.3rem; border-radius: 20px; }
+  .hero-title { font-size: 1.5rem; }
+  .hero-sub { font-size: 0.86rem; }
+  .nav-card { min-height: 124px; padding: 1.1rem 0.9rem; }
+  .nav-icon { width: 40px; height: 40px; font-size: 18px; }
+}
+@media (max-width: 360px) {
+  .nav-grid { gap: 8px; }
+  .nav-card { min-height: 116px; padding: 1rem 0.8rem; }
+  .nav-title { font-size: 12.5px; }
+}
+</style>
+<script>
+/* ── 학생 잠금(?student=1): 진로·학업 설계 7개 페이지끼리만 이동 허용, 그 외 페이지로는 이동 차단 ── */
+(function(){
+  var ALLOW = ['career-design.html','career-riasec.html','career-credit.html','career-subject.html','career-admission.html','career-roadmap.html','career-checklist.html'];
+  if(new URLSearchParams(location.search).get('student')!=='1') return;
+  function fileOf(href){ try{ return new URL(href, location.href).pathname.split('/').pop(); }catch(e){ return null; } }
+  function inSet(a){ var f=fileOf(a.href); return f && ALLOW.indexOf(f)!==-1; }
+  function isPlain(a){ var raw=a.getAttribute('href'); if(!raw) return true; var t=raw.trim(); if(t.charAt(0)==='#') return true; if(/^(javascript:|mailto:|tel:|sms:)/i.test(t)) return true; return false; }
+  function lock(){
+    document.querySelectorAll('a[href]').forEach(function(a){
+      if(isPlain(a)) return;
+      if(a.target==='_blank') return;           // 외부 참고 링크(새 탭)는 페이지를 벗어나지 않으므로 허용
+      if(inSet(a)){                              // 시스템 내부 링크: student 플래그 유지
+        try{ var u=new URL(a.href, location.href); u.searchParams.set('student','1'); a.setAttribute('href', u.pathname.split('/').pop()+u.search+u.hash); }catch(e){}
+        return;
+      }
+      a.removeAttribute('href'); a.style.pointerEvents='none'; a.style.cursor='default'; a.setAttribute('aria-disabled','true');
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', lock); else lock();
+  document.addEventListener('click', function(e){
+    var a=e.target.closest?e.target.closest('a[href]'):null;
+    if(!a || isPlain(a) || a.target==='_blank') return;
+    if(!inSet(a)){ e.preventDefault(); e.stopPropagation(); }
+  }, true);
+})();
+</script></head>
+<body>
+
+<header class="header">
+  <a href="career-design.html" class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name" style="font-size:clamp(11px,3vw,14px);line-height:1.15">인후쌤의 과학 수업 관리 시스템</span>
+  </a>
+  <div class="header-badge">🧭 진로·학업 설계</div>
+</header>
+
+<div class="wrap">
+
+  <!-- Hero -->
+  <section class="hero">
+    <span class="hero-kicker">✦ 고1·고2를 위한 진로·학업 설계</span>
+    <h1 class="hero-title">진로·학업 설계 대시보드</h1>
+    <p class="hero-sub">
+      나를 이해하는 것에서 출발해, 고교학점제 속에서 과목을 고르고, 2028 대입까지 이어지는 3년의 큰 그림을 스스로 그려 보는 공간입니다.<br>
+      막연한 불안 대신 <b style="color:#fff;">지금 할 수 있는 다음 한 걸음</b>을 찾는 데 집중했습니다.
+    </p>
+    <div class="hero-flow">
+      <span class="flow-chip">자기 이해</span><span class="flow-arrow">→</span>
+      <span class="flow-chip">과목 선택</span><span class="flow-arrow">→</span>
+      <span class="flow-chip">대입 전략</span><span class="flow-arrow">→</span>
+      <span class="flow-chip">실행 점검</span>
+    </div>
+  </section>
+
+  <!-- Nav -->
+  <div class="section-heading">설계 메뉴</div>
+  <div class="nav-grid">
+
+    <a class="nav-card c1" href="career-riasec.html">
+      <span class="nav-step">01</span>
+      <div class="nav-icon">🧭</div>
+      <div class="nav-title">자기 이해</div>
+      <div class="nav-desc">흥미·적성·가치관으로 나의 방향 찾기 (RIASEC)</div>
+      <div class="nav-go">시작하기 →</div>
+    </a>
+
+    <a class="nav-card c2" href="career-credit.html">
+      <span class="nav-step">02</span>
+      <div class="nav-icon">🎓</div>
+      <div class="nav-title">고교학점제·2028수능</div>
+      <div class="nav-desc">192학점·내신 5등급·통합형 수능의 핵심 정리</div>
+      <div class="nav-go">시작하기 →</div>
+    </a>
+
+    <a class="nav-card c3" href="career-subject.html">
+      <span class="nav-step">03</span>
+      <div class="nav-icon">📗</div>
+      <div class="nav-title">과목 선택</div>
+      <div class="nav-desc">계열별 추천 과목과 선택의 기준 잡기</div>
+      <div class="nav-go">시작하기 →</div>
+    </a>
+
+    <a class="nav-card c4" href="career-admission.html">
+      <span class="nav-step">04</span>
+      <div class="nav-icon">🗺️</div>
+      <div class="nav-title">대입 큰 그림</div>
+      <div class="nav-desc">수시·정시와 4대 전형, 학종에서 무엇을 볼까</div>
+      <div class="nav-go">시작하기 →</div>
+    </a>
+
+    <a class="nav-card c5" href="career-roadmap.html">
+      <span class="nav-step">05</span>
+      <div class="nav-icon">📅</div>
+      <div class="nav-title">월별 로드맵</div>
+      <div class="nav-desc">학년별로 이달에 무엇을 해야 하는지 타임라인</div>
+      <div class="nav-go">시작하기 →</div>
+    </a>
+
+    <a class="nav-card c6" href="career-checklist.html">
+      <span class="nav-step">06</span>
+      <div class="nav-icon">✅</div>
+      <div class="nav-title">셀프 체크리스트</div>
+      <div class="nav-desc">지금 나의 준비 상태를 YES/NO로 자가 점검</div>
+      <div class="nav-go">시작하기 →</div>
+    </a>
+
+  </div>
+
+  <!-- 사용 안내 -->
+  <div class="guide-card">
+    <div class="guide-title">🧭 이렇게 활용하세요</div>
+    <div class="guide-list">
+      <div class="guide-item">
+        <div class="guide-num">1</div>
+        <div class="guide-text"><b>자기 이해</b>에서 나의 흥미·적성 유형을 먼저 파악합니다.</div>
+      </div>
+      <div class="guide-item">
+        <div class="guide-num">2</div>
+        <div class="guide-text"><b>고교학점제·2028수능</b>과 <b>과목 선택</b>으로 제도를 이해하고, 나에게 맞는 과목을 고릅니다.</div>
+      </div>
+      <div class="guide-item">
+        <div class="guide-num">3</div>
+        <div class="guide-text"><b>대입 큰 그림</b>으로 목표 전형을 정하고, <b>월별 로드맵</b>에서 지금 할 일을 확인합니다.</div>
+      </div>
+      <div class="guide-item">
+        <div class="guide-num">4</div>
+        <div class="guide-text"><b>셀프 체크리스트</b>로 나의 준비 상태를 점검하고 부족한 부분으로 다시 돌아갑니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <b>인후쌤의 과학 수업 관리 시스템</b> · 진로·학업 설계 대시보드<br>
+    스스로 방향을 세우고, 지금 할 수 있는 한 걸음을 찾도록 설계한 학습 도구입니다.
+  </div>
+
+</div>
+
+</body>
+</html>
