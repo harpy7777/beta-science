@@ -9,6 +9,12 @@
 // 로그인 없이 바로 볼 수 있게 통과시킵니다.
 // 단, 아래 화이트리스트(STUDENT_VIEWABLE) 경로에서만 허용하므로
 // 대시보드·학생관리·성적 등 민감한 선생님 페이지는 절대 열리지 않습니다.
+//
+// [★ 학생 열람 모드에서 '이 페이지 밖으로' 나가는 링크 전면 차단]
+// 학생이 단원 페이지의 헤더 로고/브레드크럼("🏠 홈", 단원 요약 등)을 눌러
+// index.html(허브) 같은 다른 페이지로 넘어가지 못하도록 잠급니다.
+// - 페이지 내 앵커(#탭/#아코디언)는 그대로 유지 → 학습 콘텐츠 동작 정상
+// - "← 뒤로"(history.back) 버튼은 클리닉으로 돌아가는 정상 출구이므로 건드리지 않음
 // =====================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -45,6 +51,47 @@ const _isViewableContent = STUDENT_VIEWABLE.some(re => re.test(location.pathname
 if (_studentMode && _isViewableContent) {
   // ✅ 학생 열람 모드: 로그인 없이 바로 표시
   document.documentElement.style.visibility = "visible";
+
+  // ── ★ 이 페이지 밖으로 나가는 모든 링크 잠금 (허브/다른 단원/요약 등) ──
+  // 같은 경로(#해시)로 가는 페이지 내 링크만 허용하고, 다른 페이지로 가는 링크는
+  // (1) 시각적으로 비활성화하고 (2) 클릭 자체를 캡처 단계에서 차단합니다.
+  const _isCrossPageLink = (a) => {
+    const raw = a.getAttribute("href");
+    if (!raw) return false;
+    if (raw.charAt(0) === "#") return false;              // 페이지 내 앵커 → 허용
+    // javascript:, mailto:, tel: 등은 페이지 이동이 아니므로 건드리지 않음
+    if (/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim())) return false;
+    let dest;
+    try { dest = new URL(a.href, location.href); } catch (e) { return false; }
+    return dest.pathname !== location.pathname;           // 다른 경로면 차단 대상
+  };
+
+  const _lockNav = () => {
+    document.querySelectorAll("a[href]").forEach((a) => {
+      if (!_isCrossPageLink(a)) return;
+      a.removeAttribute("href");            // 링크 기능 제거 (텍스트/로고는 그대로 보임)
+      a.style.pointerEvents = "none";       // 클릭 불가
+      a.style.cursor = "default";
+      a.setAttribute("aria-disabled", "true");
+    });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", _lockNav);
+  } else {
+    _lockNav();
+  }
+
+  // 동적으로 추가되는 링크나 removeAttribute를 놓친 경우까지 대비한 최종 안전망:
+  // 캡처 단계에서 '다른 페이지로 가는 <a>' 클릭을 전부 취소.
+  document.addEventListener("click", (e) => {
+    const a = e.target && e.target.closest ? e.target.closest("a[href]") : null;
+    if (a && _isCrossPageLink(a)) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
+
 } else {
   // ── 선생님 로그인 가드 (기존 동작) ──
   // 로그인 확인 전까지 페이지 숨김 (깜빡임 방지)
