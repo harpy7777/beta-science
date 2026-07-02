@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><script src="/favicon.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="고교학점제 과목 선택 전략 — 계열별 추천 과목과 선택의 기준 · 인후쌤의 과학 수업 관리 시스템">
+<title>과목 선택 · 진로·학업 설계</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root { --accent:#d97706; --accent2:#fbbf24; --soft:#fffbeb; --bd:#fde68a; }
+body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Arial,sans-serif; background:#fafafa; color:#1d1d1f; min-height:100vh; -webkit-font-smoothing:antialiased; overscroll-behavior:none; }
+
+.header { background:#fff; border-bottom:1px solid #f0e8ed; height:54px; display:flex; align-items:center; justify-content:space-between; padding:0 max(1rem,env(safe-area-inset-left)); position:sticky; top:0; z-index:300; }
+.header-left { display:flex; align-items:center; gap:9px; text-decoration:none; color:inherit; cursor:pointer; transition:opacity .15s; }
+.header-left:hover { opacity:.75; }
+.logo-mark { width:30px; height:30px; background:linear-gradient(135deg,#f472b6,#db2777); border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.brand-name { font-size:clamp(11px,3vw,14px); font-weight:600; color:#1d1d1f; letter-spacing:-.3px; line-height:1.15; }
+.header-badge { display:flex; align-items:center; gap:5px; background:var(--soft); border:1px solid var(--bd); border-radius:20px; padding:4px 11px; font-size:10px; font-weight:700; color:var(--accent); white-space:nowrap; }
+
+.wrap { max-width:1080px; margin:0 auto; padding:1.2rem max(0.9rem,env(safe-area-inset-right)) max(5rem,calc(4rem + env(safe-area-inset-bottom))) max(0.9rem,env(safe-area-inset-left)); }
+
+.backlink { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--accent); text-decoration:none; margin-bottom:14px; background:var(--soft); border:1px solid var(--bd); padding:7px 13px; border-radius:20px; transition:opacity .15s; }
+.backlink:hover { opacity:.75; }
+
+.hero { position:relative; overflow:hidden; background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%); border-radius:24px; padding:2.1rem 1.7rem; margin-bottom:1.6rem; color:#fff; box-shadow:0 16px 40px rgba(217,119,6,.26); }
+.hero::before { content:''; position:absolute; top:-60px; right:-50px; width:210px; height:210px; border-radius:50%; background:rgba(255,255,255,.14); }
+.hero-kicker { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:20px; padding:5px 12px; font-size:11px; font-weight:700; margin-bottom:12px; position:relative; z-index:1; }
+.hero-title { font-size:1.6rem; font-weight:800; letter-spacing:-.04em; line-height:1.3; position:relative; z-index:1; word-break:keep-all; }
+.hero-sub { font-size:.9rem; font-weight:500; line-height:1.75; margin-top:12px; position:relative; z-index:1; word-break:keep-all; }
+
+.subhead { font-size:11px; font-weight:700; color:#aeaeb2; letter-spacing:.1em; text-transform:uppercase; margin:1.9rem 0 1rem; display:flex; align-items:center; gap:8px; }
+.subhead::after { content:''; flex:1; height:1px; background:#eee; }
+
+.panel { background:#fff; border:1px solid #eee; border-radius:18px; padding:1.35rem 1.4rem; margin-bottom:1rem; }
+.lead { font-size:13.5px; color:#3c3c43; line-height:1.85; word-break:keep-all; }
+.lead b { color:var(--accent); font-weight:700; }
+
+.cat-list { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:.6rem; }
+.cat { border:1px solid #eee; border-radius:13px; padding:.9rem 1rem; }
+.cat .ct { font-size:12.5px; font-weight:800; color:#1d1d1f; margin-bottom:4px; }
+.cat .cd { font-size:11px; color:#8e8e93; line-height:1.5; }
+
+/* Tabs */
+.tabs { display:flex; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; margin-bottom:12px; }
+.tab-btn { flex:0 0 auto; border:1px solid var(--bd); background:#fff; color:#8e8e93; font-size:12.5px; font-weight:700; padding:9px 15px; border-radius:22px; cursor:pointer; white-space:nowrap; transition:all .15s; }
+.tab-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; box-shadow:0 6px 14px rgba(217,119,6,.28); }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; animation:fade .25s ease; }
+@keyframes fade { from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+
+.rec-intro { font-size:12.5px; color:#3c3c43; line-height:1.7; margin-bottom:12px; word-break:keep-all; }
+.rec-intro b { color:var(--accent); }
+.subj-block { border:1px solid #eee; border-radius:13px; padding:.9rem 1rem; margin-bottom:9px; }
+.subj-block .sb-h { font-size:12px; font-weight:800; color:var(--accent); margin-bottom:6px; }
+.chips { display:flex; flex-wrap:wrap; gap:6px; }
+.chip { font-size:11px; font-weight:600; color:#3c3c43; background:#f5f5f7; border:1px solid #eee; border-radius:8px; padding:5px 9px; }
+.chip.key { background:var(--soft); border-color:var(--bd); color:var(--accent); font-weight:700; }
+
+.callout { border-radius:14px; padding:1rem 1.1rem; margin:1rem 0 0; font-size:12.5px; line-height:1.72; word-break:keep-all; }
+.callout.point { background:var(--soft); border:1px solid var(--bd); color:#7c4a03; }
+.callout.warn { background:#fef2f2; border:1px solid #fecaca; color:#991b1b; }
+.callout .ct { display:block; font-weight:800; margin-bottom:5px; }
+.callout b { font-weight:700; }
+
+.foot { text-align:center; font-size:11px; color:#c7c7cc; line-height:1.7; padding-top:1.4rem; border-top:1px solid #f0e8ed; margin-top:1.5rem; }
+.foot b { color:var(--accent); font-weight:700; }
+
+@media (max-width:520px){
+  .wrap { padding:1rem 0.75rem 4rem; }
+  .hero { padding:1.6rem 1.3rem; border-radius:20px; }
+  .hero-title { font-size:1.35rem; }
+  .cat-list { grid-template-columns:1fr; }
+}
+</style>
+<script>
+(function(){
+  var ALLOW = ['career-design.html','career-riasec.html','career-credit.html','career-subject.html','career-admission.html','career-roadmap.html','career-checklist.html'];
+  if(new URLSearchParams(location.search).get('student')!=='1') return;
+  function fileOf(href){ try{ return new URL(href, location.href).pathname.split('/').pop(); }catch(e){ return null; } }
+  function inSet(a){ var f=fileOf(a.href); return f && ALLOW.indexOf(f)!==-1; }
+  function isPlain(a){ var raw=a.getAttribute('href'); if(!raw) return true; var t=raw.trim(); if(t.charAt(0)==='#') return true; if(/^(javascript:|mailto:|tel:|sms:)/i.test(t)) return true; return false; }
+  function lock(){
+    document.querySelectorAll('a[href]').forEach(function(a){
+      if(isPlain(a)) return;
+      if(a.target==='_blank') return;
+      if(inSet(a)){ try{ var u=new URL(a.href, location.href); u.searchParams.set('student','1'); a.setAttribute('href', u.pathname.split('/').pop()+u.search+u.hash); }catch(e){} return; }
+      a.removeAttribute('href'); a.style.pointerEvents='none'; a.style.cursor='default'; a.setAttribute('aria-disabled','true');
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', lock); else lock();
+  document.addEventListener('click', function(e){
+    var a=e.target.closest?e.target.closest('a[href]'):null;
+    if(!a || isPlain(a) || a.target==='_blank') return;
+    if(!inSet(a)){ e.preventDefault(); e.stopPropagation(); }
+  }, true);
+})();
+</script></head>
+<body>
+
+<header class="header">
+  <a href="career-design.html" class="header-left">
+    <div class="logo-mark"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/><path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg></div>
+    <span class="brand-name">인후쌤의 과학 수업 관리 시스템</span>
+  </a>
+  <div class="header-badge">📗 과목 선택</div>
+</header>
+
+<div class="wrap">
+  <a href="career-design.html" class="backlink">← 설계 메뉴로</a>
+
+  <section class="hero">
+    <span class="hero-kicker">03 · SUBJECT CHOICE</span>
+    <h1 class="hero-title">과목이 곧 나의 이야기입니다</h1>
+    <p class="hero-sub">고교학점제에서는 무엇을 선택했는지가 진로의 방향을 보여 줍니다. 관심 계열에 맞는 과목을 '왜 골랐는지' 설명할 수 있게 준비하세요.</p>
+  </section>
+
+  <div class="subhead">먼저, 과목의 종류</div>
+  <div class="panel">
+    <p class="lead">2022 개정 교육과정의 선택과목은 성격에 따라 <b>세 갈래</b>로 나뉩니다. 공통과목을 배운 뒤, 진로에 맞춰 아래에서 골라 담습니다.</p>
+    <div class="cat-list">
+      <div class="cat"><div class="ct">공통과목</div><div class="cd">모든 학생 공통 기초. 예) 공통국어·공통수학·통합과학·통합사회</div></div>
+      <div class="cat"><div class="ct">일반 선택</div><div class="cd">교과별 핵심 내용. 예) 대수, 영어Ⅰ, 물리학, 화학</div></div>
+      <div class="cat"><div class="ct">진로 선택</div><div class="cd">전공 연계 심화. 예) 미적분Ⅱ, 역학과 에너지, 세포와 물질대사</div></div>
+      <div class="cat"><div class="ct">융합 선택</div><div class="cd">교과 융합·실생활. 예) 융합과학 탐구, 과학의 역사와 문화</div></div>
+    </div>
+  </div>
+
+  <div class="subhead">계열별 추천 과목</div>
+  <div class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="sci">자연·공학</button>
+    <button class="tab-btn" data-tab="med">의약·생명</button>
+    <button class="tab-btn" data-tab="hum">인문·사회</button>
+    <button class="tab-btn" data-tab="etc">예체능·기타</button>
+  </div>
+
+  <div class="panel">
+    <!-- 자연·공학 -->
+    <div class="tab-panel active" data-panel="sci">
+      <p class="rec-intro"><b>자연·공학 계열</b>은 수학·과학의 깊이가 핵심입니다. 지원 학과가 요구하는 과목을 반드시 확인하세요.</p>
+      <div class="subj-block"><div class="sb-h">수학</div><div class="chips"><span class="chip key">대수</span><span class="chip key">미적분Ⅰ·Ⅱ</span><span class="chip">확률과 통계</span><span class="chip">기하</span></div></div>
+      <div class="subj-block"><div class="sb-h">과학</div><div class="chips"><span class="chip key">물리학</span><span class="chip key">화학</span><span class="chip">역학과 에너지</span><span class="chip">전자기와 양자</span><span class="chip">물질과 에너지</span></div></div>
+      <div class="subj-block"><div class="sb-h">진로·융합</div><div class="chips"><span class="chip">융합과학 탐구</span><span class="chip">과학과제 연구</span><span class="chip">정보</span><span class="chip">인공지능 기초</span></div></div>
+    </div>
+    <!-- 의약·생명 -->
+    <div class="tab-panel" data-panel="med">
+      <p class="rec-intro"><b>의약·생명 계열</b>은 화학·생명과학이 중심이며, 수학도 함께 요구되는 경우가 많습니다.</p>
+      <div class="subj-block"><div class="sb-h">과학</div><div class="chips"><span class="chip key">화학</span><span class="chip key">생명과학</span><span class="chip">세포와 물질대사</span><span class="chip">생물의 유전</span><span class="chip">물질과 에너지</span></div></div>
+      <div class="subj-block"><div class="sb-h">수학</div><div class="chips"><span class="chip key">대수</span><span class="chip key">미적분Ⅰ</span><span class="chip">확률과 통계</span></div></div>
+      <div class="subj-block"><div class="sb-h">진로·융합</div><div class="chips"><span class="chip">융합과학 탐구</span><span class="chip">보건</span><span class="chip">생활과학 탐구</span></div></div>
+    </div>
+    <!-- 인문·사회 -->
+    <div class="tab-panel" data-panel="hum">
+      <p class="rec-intro"><b>인문·사회 계열</b>은 언어·사회 과목의 깊이와 함께, 데이터를 다루는 수학 역량도 점점 중요해집니다.</p>
+      <div class="subj-block"><div class="sb-h">국어·영어</div><div class="chips"><span class="chip key">독서와 작문</span><span class="chip key">문학</span><span class="chip">주제 탐구 독서</span><span class="chip">영어 독해와 작문</span></div></div>
+      <div class="subj-block"><div class="sb-h">사회</div><div class="chips"><span class="chip key">사회와 문화</span><span class="chip key">세계시민과 지리</span><span class="chip">정치</span><span class="chip">법과 사회</span><span class="chip">경제</span><span class="chip">윤리와 사상</span></div></div>
+      <div class="subj-block"><div class="sb-h">수학</div><div class="chips"><span class="chip">대수</span><span class="chip">확률과 통계</span><span class="chip">경제 수학</span></div></div>
+    </div>
+    <!-- 예체능·기타 -->
+    <div class="tab-panel" data-panel="etc">
+      <p class="rec-intro"><b>예체능·기타 계열</b>은 실기가 중심이지만, 관심 분야를 뒷받침할 이론·융합 과목을 함께 챙기면 좋습니다.</p>
+      <div class="subj-block"><div class="sb-h">전공 연계</div><div class="chips"><span class="chip key">음악·미술·체육 진로선택</span><span class="chip">미술 창작</span><span class="chip">운동과 건강</span></div></div>
+      <div class="subj-block"><div class="sb-h">기초·융합</div><div class="chips"><span class="chip">문학</span><span class="chip">정보</span><span class="chip">미디어 영어</span><span class="chip">융합 선택과목</span></div></div>
+    </div>
+
+    <div class="callout point"><span class="ct">🎯 선택의 3가지 기준</span>① 지원 <b>희망 학과의 권장·필수 과목</b>을 먼저 확인 → ② 나의 흥미·강점과 겹치는지 → ③ 해당 과목에서 <b>탐구·세특으로 보여줄 것</b>이 있는지. 이 순서로 정하면 흔들리지 않습니다.</div>
+    <div class="callout warn"><span class="ct">⚠ 학과별 권장과목 확인</span>대학·학과마다 권장(핵심) 과목이 다릅니다. 위 목록은 일반적인 예시이며, <b>지원 대학의 '전공 연계 교과 이수 과목' 안내</b>를 반드시 직접 확인하세요.</div>
+  </div>
+
+  <div class="foot"><b>인후쌤의 과학 수업 관리 시스템</b> · 진로·학업 설계<br>과목을 정했다면, 이제 대입의 큰 그림을 봅니다.</div>
+</div>
+
+<script>
+(function(){
+  var btns = document.querySelectorAll('#tabs .tab-btn');
+  var panels = document.querySelectorAll('.tab-panel');
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      var key = b.getAttribute('data-tab');
+      btns.forEach(function(x){ x.classList.toggle('active', x===b); });
+      panels.forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-panel')===key); });
+    });
+  });
+})();
+</script>
+</body>
+</html>
