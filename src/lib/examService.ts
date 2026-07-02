@@ -1,6 +1,6 @@
 // src/lib/examService.ts
 import {
-  collection, addDoc, getDocs, doc, getDoc,
+  collection, addDoc, getDocs, doc, getDoc, setDoc,
   updateDoc, query, where, orderBy, Timestamp, serverTimestamp, deleteDoc
 } from 'firebase/firestore';
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
@@ -374,7 +374,7 @@ export async function submitStudentAnswers(payload: {
     multiScore = Math.round((correct / multipleQuestions.length) * 100);
   }
 
-  const docRef = await addDoc(collection(db, 'grades'), {
+  const data = {
     examId:         payload.examId,
     studentName:    payload.studentName,
     studentId:      payload.studentId ?? '',
@@ -389,7 +389,21 @@ export async function submitStudentAnswers(payload: {
     testName:       exam?.title ?? '',
     date:           new Date().toLocaleDateString('ko-KR'),
     timestamp:      Timestamp.now(),
-  });
+  };
+
+  // ★ 중복 제출 방지 (한 시험 = 한 응시): studentId가 있으면
+  //   (examId + studentId)를 문서 ID로 고정해 setDoc으로 저장한다.
+  //   제출 버튼을 두 번 눌러도, 네트워크 재시도가 걸려도 항상 같은 문서를
+  //   덮어쓰기만 하므로 grades에 같은 응시가 두 번 쌓이지 않는다.
+  const key = (payload.studentId ?? '').trim();
+  if (key) {
+    const gid = `${payload.examId}__${key}`;
+    await setDoc(doc(db, 'grades', gid), data);
+    return gid;
+  }
+
+  // studentId가 없는 예외적 경우에만 기존처럼 새 문서 생성
+  const docRef = await addDoc(collection(db, 'grades'), data);
   return docRef.id;
 }
 
