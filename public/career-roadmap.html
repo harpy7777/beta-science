@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="description" content="학년별·월별 진로·학업 로드맵 타임라인 — 이달에 무엇을 할지 · 인후쌤의 과학 수업 관리 시스템">
+<meta name="description" content="학년별·월별 진로·학업 로드맵 — 3월부터 다음 해 2월까지, 이달에 무엇을 할지 · 인후쌤의 과학 수업 관리 시스템">
 <title>월별 로드맵 · 진로·학업 설계</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -33,31 +33,39 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
 .subhead { font-size:11px; font-weight:700; color:#aeaeb2; letter-spacing:.1em; text-transform:uppercase; margin:1.9rem 0 1rem; display:flex; align-items:center; gap:8px; }
 .subhead::after { content:''; flex:1; height:1px; background:#eee; }
 
-.panel { background:#fff; border:1px solid #eee; border-radius:18px; padding:1.35rem 1.4rem; margin-bottom:1rem; }
-
 /* Tabs */
-.tabs { display:flex; gap:8px; margin-bottom:14px; }
+.tabs { display:flex; gap:8px; margin-bottom:16px; }
 .tab-btn { flex:1; border:1px solid var(--bd); background:#fff; color:#8e8e93; font-size:13px; font-weight:800; padding:11px 10px; border-radius:14px; cursor:pointer; transition:all .15s; }
 .tab-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; box-shadow:0 6px 14px rgba(234,88,12,.28); }
 .tab-panel { display:none; }
 .tab-panel.active { display:block; animation:fade .25s ease; }
 @keyframes fade { from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
 
-.grade-note { font-size:12.5px; color:#3c3c43; line-height:1.7; margin-bottom:14px; word-break:keep-all; }
+.grade-note { font-size:12.5px; color:#3c3c43; line-height:1.7; margin-bottom:16px; padding:0 2px; word-break:keep-all; }
 .grade-note b { color:var(--accent); }
 
-/* Timeline */
-.tl { position:relative; padding-left:26px; }
-.tl::before { content:''; position:absolute; left:8px; top:6px; bottom:6px; width:2px; background:var(--bd); }
-.tl-item { position:relative; padding-bottom:16px; }
-.tl-item:last-child { padding-bottom:0; }
-.tl-item::before { content:''; position:absolute; left:-22px; top:3px; width:11px; height:11px; border-radius:50%; background:var(--accent); border:2px solid #fff; box-shadow:0 0 0 2px var(--bd); }
-.tl-m { font-size:11px; font-weight:800; color:var(--accent); letter-spacing:.02em; }
-.tl-t { font-size:13px; font-weight:800; color:#1d1d1f; margin:2px 0 4px; }
-.tl-d { font-size:12px; color:#3c3c43; line-height:1.6; word-break:keep-all; }
-.tl-d b { color:#1d1d1f; font-weight:700; }
+/* Month cards */
+.mcard { display:flex; gap:15px; background:#fff; border:1px solid #eee; border-left-width:5px; border-left-style:solid; border-radius:16px; padding:1.1rem 1.25rem; margin-bottom:11px; transition:box-shadow .15s, transform .15s; }
+.mcard:hover { box-shadow:0 8px 22px rgba(0,0,0,.06); transform:translateY(-1px); }
+.mcard-left { flex-shrink:0; width:84px; }
+.m-num { font-size:1.5rem; font-weight:800; letter-spacing:-.03em; line-height:1; }
+.m-badge { display:inline-block; margin-top:9px; font-size:10.5px; font-weight:800; padding:4px 9px; border-radius:20px; white-space:nowrap; }
+.mcard-body { flex:1; min-width:0; }
+.m-title { font-size:1rem; font-weight:800; color:#1d1d1f; margin-bottom:5px; word-break:keep-all; }
+.m-desc { font-size:12.5px; color:#3c3c43; line-height:1.66; word-break:keep-all; }
+.m-desc b { color:#1d1d1f; font-weight:700; }
 
-.callout { border-radius:14px; padding:1rem 1.1rem; margin-top:1rem; font-size:12.5px; line-height:1.72; word-break:keep-all; background:var(--soft); border:1px solid var(--bd); color:#7c2d12; }
+/* Seasonal colors */
+.s-spring { border-left-color:#3b82f6; } .s-spring .m-num{ color:#2563eb; } .s-spring .m-badge{ background:#eff6ff; color:#2563eb; }
+.s-summer { border-left-color:#10b981; } .s-summer .m-num{ color:#059669; } .s-summer .m-badge{ background:#ecfdf5; color:#059669; }
+.s-fall   { border-left-color:#f59e0b; } .s-fall .m-num{ color:#d97706; }   .s-fall .m-badge{ background:#fffbeb; color:#d97706; }
+.s-winter { border-left-color:#ef4444; } .s-winter .m-num{ color:#dc2626; } .s-winter .m-badge{ background:#fef2f2; color:#dc2626; }
+
+.legend { display:flex; flex-wrap:wrap; gap:8px 14px; margin:2px 2px 16px; }
+.legend span { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:#8e8e93; }
+.legend i { width:11px; height:11px; border-radius:3px; display:inline-block; }
+
+.callout { border-radius:14px; padding:1rem 1.1rem; margin-top:1.2rem; font-size:12.5px; line-height:1.72; word-break:keep-all; background:var(--soft); border:1px solid var(--bd); color:#7c2d12; }
 .callout .ct { display:block; font-weight:800; margin-bottom:5px; }
 .callout b { font-weight:700; }
 
@@ -68,6 +76,11 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
   .wrap { padding:1rem 0.75rem 4rem; }
   .hero { padding:1.6rem 1.3rem; border-radius:20px; }
   .hero-title { font-size:1.35rem; }
+  .mcard { gap:12px; padding:1rem 1rem; border-radius:14px; }
+  .mcard-left { width:70px; }
+  .m-num { font-size:1.3rem; }
+  .m-badge { font-size:10px; padding:3px 8px; }
+  .m-title { font-size:.95rem; }
 }
 </style>
 <script>
@@ -108,8 +121,8 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
 
   <section class="hero">
     <span class="hero-kicker">05 · ROADMAP</span>
-    <h1 class="hero-title">이달에 할 일을 확인합니다</h1>
-    <p class="hero-sub">막연히 '열심히'가 아니라, 학년별로 지금 이 시기에 챙겨야 할 일을 짚어 줍니다. 학교 일정에 따라 시기는 조금씩 다를 수 있어요.</p>
+    <h1 class="hero-title">달마다 무엇을 할까?<br>나의 학년별 로드맵</h1>
+    <p class="hero-sub">3월부터 다음 해 2월까지, 이 시기에 무엇을 하면 좋을지 정리했어요. 학년 탭을 눌러 나에게 맞는 로드맵을 확인하고, 한 달에 하나씩 실천해 보세요. 🖨️ 인쇄해서 책상에 붙여두는 것도 추천!</p>
   </section>
 
   <div class="subhead">학년을 선택하세요</div>
@@ -118,32 +131,48 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
     <button class="tab-btn" data-tab="g2">2학년</button>
   </div>
 
-  <div class="panel">
-    <!-- 1학년 -->
-    <div class="tab-panel active" data-panel="g1">
-      <p class="grade-note"><b>1학년 키워드 — 기초·탐색.</b> 첫 내신 관리 습관을 잡고, 넓게 탐색하며 2학년 과목 선택의 근거를 만드는 시기입니다.</p>
-      <div class="tl">
-        <div class="tl-item"><div class="tl-m">3–4월</div><div class="tl-t">적응 & 자기 이해</div><div class="tl-d">학교 적응과 함께 <b>진로심리검사</b>(커리어넷)로 흥미·적성 파악. 첫 <b>내신 관리 루틴</b> 만들기.</div></div>
-        <div class="tl-item"><div class="tl-m">5–7월</div><div class="tl-t">1학기 내신 & 활동 시작</div><div class="tl-d">중간·기말 대비. <b>통합과학·통합사회</b> 기초 다지기(2028 수능 범위!). 동아리·수행평가에서 관심 주제 탐색.</div></div>
-        <div class="tl-item"><div class="tl-m">여름방학</div><div class="tl-t">관심 계열 탐색</div><div class="tl-d">흥미 분야 <b>독서·다큐·강연</b>으로 시야 넓히기. 2학기 예습과 부족 과목 보완.</div></div>
-        <div class="tl-item"><div class="tl-m">9–11월</div><div class="tl-t">2학기 내신 & 세특</div><div class="tl-d">내신 유지. 수업 속 궁금증을 <b>탐구·발표</b>로 연결해 세특 근거 남기기.</div></div>
-        <div class="tl-item"><div class="tl-m">12–2월</div><div class="tl-t">2학년 과목 선택 &amp; 겨울방학</div><div class="tl-d"><b>선택과목 수강신청</b>이 핵심! 희망 계열·학과 권장과목 확인 후 결정. 방학 중 관심 분야 심화.</div></div>
-      </div>
-    </div>
-    <!-- 2학년 -->
-    <div class="tab-panel" data-panel="g2">
-      <p class="grade-note"><b>2학년 키워드 — 심화·집중.</b> 진로를 구체화하고, 선택과목에서 깊이 있는 탐구·세특을 만드는 학종의 핵심 시기입니다.</p>
-      <div class="tl">
-        <div class="tl-item"><div class="tl-m">3–4월</div><div class="tl-t">선택과목 본격 학습</div><div class="tl-d">진로 구체화. 선택과목에서 <b>'왜 이 과목을 골랐는지'</b>를 활동으로 증명하기 시작.</div></div>
-        <div class="tl-item"><div class="tl-m">5–7월</div><div class="tl-t">1학기 내신 & 심화 탐구</div><div class="tl-d">내신 관리와 함께 <b>전공 연계 탐구·세특</b>의 핵심 시기. 깊이 있는 주제 하나를 끝까지 밀어붙이기.</div></div>
-        <div class="tl-item"><div class="tl-m">여름방학</div><div class="tl-t">전공 심화 & 모의고사 분석</div><div class="tl-d">관심 전공 심화 활동. <b>모의고사 취약점</b> 분석으로 수능 감각 점검.</div></div>
-        <div class="tl-item"><div class="tl-m">9–11월</div><div class="tl-t">2학기 내신 & 활동 마무리</div><div class="tl-d">내신 마지막 승부처 중 하나. 2년간의 <b>학생부 활동을 하나의 서사</b>로 정리.</div></div>
-        <div class="tl-item"><div class="tl-m">12–2월</div><div class="tl-t">3학년 준비 전환</div><div class="tl-d">3학년 과목 확정. <b>수시·정시 균형</b> 점검하고 수능 대비 학습으로 본격 전환.</div></div>
-      </div>
-    </div>
-
-    <div class="callout"><span class="ct">🧭 로드맵 사용법</span>완벽하게 다 하려 하지 말고, <b>이번 달 항목 1~2개</b>만 골라 실천하세요. 부족하다고 느끼면 '셀프 체크리스트'로 돌아가 점검하면 됩니다.</div>
+  <div class="legend">
+    <span><i style="background:#3b82f6"></i>봄 (3–6월) · 기초·탐색</span>
+    <span><i style="background:#10b981"></i>여름 (7–9월) · 심화·전환</span>
+    <span><i style="background:#f59e0b"></i>가을 (10–12월) · 정리·점검</span>
+    <span><i style="background:#ef4444"></i>겨울 (1–2월) · 준비</span>
   </div>
+
+  <!-- 1학년 -->
+  <div class="tab-panel active" data-panel="g1">
+    <p class="grade-note"><b>1학년 키워드 — 기초·탐색.</b> 첫 내신 관리 습관을 잡고, 넓게 탐색하며 2학년 과목 선택의 근거를 만드는 시기입니다.</p>
+
+    <div class="mcard s-spring"><div class="mcard-left"><div class="m-num">3월</div><span class="m-badge">적응·진단</span></div><div class="mcard-body"><div class="m-title">달라진 환경에 적응하기</div><div class="m-desc">상대평가 <b>5등급</b>과 고교학점제를 이해하고, 커리어넷 흥미·적성검사로 나를 알아가요.</div></div></div>
+    <div class="mcard s-spring"><div class="mcard-left"><div class="m-num">4월</div><span class="m-badge">학습 습관</span></div><div class="mcard-body"><div class="m-title">나만의 공부법 찾기</div><div class="m-desc">고등학교 학습 리듬에 적응하며 학습 동기를 만들고 <b>습관</b>을 잡아요.</div></div></div>
+    <div class="mcard s-spring"><div class="mcard-left"><div class="m-num">5월</div><span class="m-badge">계열 탐색</span></div><div class="mcard-body"><div class="m-title">계열 둘러보기</div><div class="m-desc">첫 중간고사 결과로 취약 과목을 점검하고, 인문·사회·자연·공학 등 <b>계열</b>을 탐색해요.</div></div></div>
+    <div class="mcard s-spring"><div class="mcard-left"><div class="m-num">6월</div><span class="m-badge">위치 점검</span></div><div class="mcard-body"><div class="m-title">객관적 위치 확인</div><div class="m-desc"><b>학력평가</b>로 내 위치를 확인하고 진로 목표를 점검해요.</div></div></div>
+    <div class="mcard s-summer"><div class="mcard-left"><div class="m-num">7월</div><span class="m-badge">골든타임</span></div><div class="mcard-body"><div class="m-title">2학년 과목 설계</div><div class="m-desc">⭐ <b>학업 설계 골든타임!</b> 2학년 선택 과목을 진로와 연결해 신중히 골라요.</div></div></div>
+    <div class="mcard s-summer"><div class="mcard-left"><div class="m-num">8월</div><span class="m-badge">진로 심화</span></div><div class="mcard-body"><div class="m-title">관심 분야 깊이 알기</div><div class="m-desc">여름방학 동안 진로 <b>체험·독서</b>로 관심 분야를 깊이 탐색해요.</div></div></div>
+    <div class="mcard s-summer"><div class="mcard-left"><div class="m-num">9월</div><span class="m-badge">목표 재설정</span></div><div class="mcard-body"><div class="m-title">2학기 목표 세우기</div><div class="m-desc">1학기를 돌아보고, 수정된 진로 희망을 반영해 <b>2학기 목표</b>를 다시 세워요.</div></div></div>
+    <div class="mcard s-fall"><div class="mcard-left"><div class="m-num">10월</div><span class="m-badge">교과 연계</span></div><div class="mcard-body"><div class="m-title">수업에 내 관심 담기</div><div class="m-desc">수업 속 탐구·수행평가에 내 관심사를 담아 <b>세특</b>으로 이어지게 해요.</div></div></div>
+    <div class="mcard s-fall"><div class="mcard-left"><div class="m-num">11월</div><span class="m-badge">설계 점검</span></div><div class="mcard-body"><div class="m-title">1학년 설계 점검</div><div class="m-desc">학력평가 누적 데이터를 분석하고, 활동이 <b>세특</b>에 잘 드러났는지 점검해요.</div></div></div>
+    <div class="mcard s-fall"><div class="mcard-left"><div class="m-num">12월</div><span class="m-badge">결산·성찰</span></div><div class="mcard-body"><div class="m-title">한 해 정리하기</div><div class="m-desc">진로·학업 <b>포트폴리오</b>를 정리하고, 진로가 바뀌었다면 과목 변경을 최종 확인해요.</div></div></div>
+    <div class="mcard s-winter"><div class="mcard-left"><div class="m-num">1~2월</div><span class="m-badge">진급 준비</span></div><div class="mcard-body"><div class="m-title">2학년 준비하기</div><div class="m-desc">겨울방학에 <b>2학년 주요 과목</b>의 기초를 다지고 학습 계획을 세워요.</div></div></div>
+  </div>
+
+  <!-- 2학년 -->
+  <div class="tab-panel" data-panel="g2">
+    <p class="grade-note"><b>2학년 키워드 — 심화·집중.</b> 진로를 구체화하고, 선택과목에서 깊이 있는 탐구·세특을 만드는 학종의 핵심 시기입니다.</p>
+
+    <div class="mcard s-spring"><div class="mcard-left"><div class="m-num">3월</div><span class="m-badge">진로 재설계</span></div><div class="mcard-body"><div class="m-title">내신 전략 세우기</div><div class="m-desc">5등급·성취평가에 맞춘 <b>내신 관리 전략</b>을 세우고, 진로성숙도·학습유형을 점검해요.</div></div></div>
+    <div class="mcard s-spring"><div class="mcard-left"><div class="m-num">4월</div><span class="m-badge">과목 집중</span></div><div class="mcard-body"><div class="m-title">선택 과목 몰입</div><div class="m-desc">내가 고른 과목에 몰입하고, <b>대입 전형</b>의 기본 구조를 이해해요.</div></div></div>
+    <div class="mcard s-spring"><div class="mcard-left"><div class="m-num">5월</div><span class="m-badge">역량 점검</span></div><div class="mcard-body"><div class="m-title">학업 역량 점검</div><div class="m-desc">중간고사 피드백으로 <b>심화 선택 과목</b>의 학습법을 보완해요.</div></div></div>
+    <div class="mcard s-spring"><div class="mcard-left"><div class="m-num">6월</div><span class="m-badge">대입 기초</span></div><div class="mcard-body"><div class="m-title">대입 전략 기초</div><div class="m-desc">학력평가로 기준점을 잡고, 희망 대학 <b>입학처 전형 요강</b>을 살펴봐요.</div></div></div>
+    <div class="mcard s-summer"><div class="mcard-left"><div class="m-num">7월</div><span class="m-badge">3학년 설계</span></div><div class="mcard-body"><div class="m-title">3학년 과목 설계</div><div class="m-desc"><b>수능 응시 과목</b>과 진로 심화 과목 사이의 균형을 맞춰요.</div></div></div>
+    <div class="mcard s-summer"><div class="mcard-left"><div class="m-num">8월</div><span class="m-badge">역량 강화</span></div><div class="mcard-body"><div class="m-title">진로 역량 강화</div><div class="m-desc">전공과 관련된 <b>창의적 체험활동·탐구</b> 활동의 깊이를 더해요.</div></div></div>
+    <div class="mcard s-summer"><div class="mcard-left"><div class="m-num">9월</div><span class="m-badge">수시/정시</span></div><div class="mcard-body"><div class="m-title">전형 균형 잡기</div><div class="m-desc">3학년 선택 과목을 대입과 연계해 최종 확정하고, <b>학생부</b>를 중간 점검해요.</div></div></div>
+    <div class="mcard s-fall"><div class="mcard-left"><div class="m-num">10월</div><span class="m-badge">융합 사고</span></div><div class="mcard-body"><div class="m-title">융합적 사고 확장</div><div class="m-desc">교과 간 <b>융합 프로젝트</b>에 참여하고, 대학 전공 체험·캠프를 경험해요.</div></div></div>
+    <div class="mcard s-fall"><div class="mcard-left"><div class="m-num">11월</div><span class="m-badge">예비 고3</span></div><div class="mcard-body"><div class="m-title">예비 고3 준비</div><div class="m-desc"><b>내신과 수능</b> 학습 비중을 정하고, 수능 영역별 기초를 다져요.</div></div></div>
+    <div class="mcard s-fall"><div class="mcard-left"><div class="m-num">12월</div><span class="m-badge">학생부 점검</span></div><div class="mcard-body"><div class="m-title">2년 기록 마무리</div><div class="m-desc">2년간의 학생부를 최종 점검하고, 나의 <b>강점</b>을 분석해요.</div></div></div>
+    <div class="mcard s-winter"><div class="mcard-left"><div class="m-num">1~2월</div><span class="m-badge">실전 진입</span></div><div class="mcard-body"><div class="m-title">수능 학습 진입</div><div class="m-desc">겨울방학 수능 커리큘럼을 세우고, 목표 대학·학과를 <b>상향/적정/안정</b>으로 작성해요.</div></div></div>
+  </div>
+
+  <div class="callout"><span class="ct">🧭 로드맵 사용법</span>완벽하게 다 하려 하지 말고, <b>이번 달 항목 1~2개</b>만 골라 실천하세요. 부족하다고 느끼면 '셀프 체크리스트'로 돌아가 점검하면 됩니다.</div>
 
   <div class="foot"><b>인후쌤의 과학 수업 관리 시스템</b> · 진로 학업 디자인 랩<br>마지막으로, 셀프 체크리스트로 내 준비 상태를 점검하세요.</div>
 </div>
@@ -157,6 +186,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
       var key = b.getAttribute('data-tab');
       btns.forEach(function(x){ x.classList.toggle('active', x===b); });
       panels.forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-panel')===key); });
+      window.scrollTo({ top:0, behavior:'smooth' });
     });
   });
 })();
