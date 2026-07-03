@@ -43,6 +43,45 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
 .callout b { font-weight:700; }
 .callout .ct { display:block; font-weight:800; margin-bottom:5px; }
 
+/* 커리어넷 3대 검사 카드 */
+.test-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:.4rem; }
+.tcard { display:flex; flex-direction:column; background:#fff; border:1px solid #eee; border-radius:18px; padding:1.3rem 1.3rem 1.4rem; text-decoration:none; color:inherit; transition:transform .15s, box-shadow .15s, border-color .15s; }
+.tcard:hover { transform:translateY(-3px); box-shadow:0 12px 28px rgba(0,0,0,.08); }
+.tc-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; margin-bottom:14px; }
+.tc-blue .tc-icon { background:linear-gradient(135deg,#60a5fa,#2563eb); }
+.tc-green .tc-icon { background:linear-gradient(135deg,#4ade80,#16a34a); }
+.tc-orange .tc-icon { background:linear-gradient(135deg,#fbbf24,#ea580c); }
+.tc-title { font-size:17px; font-weight:800; letter-spacing:-.02em; color:#1d1d1f; }
+.tc-quote { font-size:12.5px; color:#8e8e93; line-height:1.65; margin-top:9px; word-break:keep-all; }
+.tc-stats { border-top:1px dashed #eee; margin-top:14px; padding-top:12px; display:flex; flex-direction:column; gap:9px; }
+.tc-row { display:flex; align-items:center; gap:12px; }
+.tc-k { font-size:12px; color:#aeaeb2; font-weight:600; width:34px; flex-shrink:0; }
+.tc-v { font-size:13px; color:#1d1d1f; font-weight:700; }
+.tc-btn { display:block; text-align:center; margin-top:16px; padding:11px; border-radius:11px; font-size:13px; font-weight:700; border:1.5px solid; }
+.tc-blue .tc-btn { color:#2563eb; border-color:#bfdbfe; background:#eff6ff; }
+.tc-green .tc-btn { color:#16a34a; border-color:#bbf7d0; background:#f0fdf4; }
+.tc-orange .tc-btn { color:#ea580c; border-color:#fed7aa; background:#fff7ed; }
+
+/* 활용 플로우 */
+.flow-title { font-size:15px; font-weight:800; color:#1d1d1f; letter-spacing:-.02em; }
+.flow-lead { font-size:13px; color:#3c3c43; line-height:1.75; margin-top:8px; word-break:keep-all; }
+.flow-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:11px; margin-top:16px; }
+.flow-step { border:1px solid #eee; border-radius:13px; padding:13px 14px; background:#fcfcfd; }
+.fs-t { font-size:13.5px; font-weight:800; color:var(--accent); }
+.fs-d { font-size:11.8px; color:#3c3c43; line-height:1.55; margin-top:6px; word-break:keep-all; }
+
+/* 능력·가치 칩 */
+.chips-panel { display:grid; grid-template-columns:1fr 1fr; gap:26px; }
+.chips-h { font-size:13.5px; font-weight:800; margin-bottom:13px; letter-spacing:-.02em; }
+.chips-h.abil { color:#16a34a; }
+.chips-h.val { color:#0891b2; }
+.chips-wrap { display:flex; flex-wrap:wrap; gap:8px; }
+.chip { font-size:12px; font-weight:600; color:#3c3c43; background:#f5f5f7; border:1px solid #ececf0; border-radius:9px; padding:7px 11px; }
+
+.callout.remember { background:#fffbeb; border:1px solid #fde68a; color:#3c3c43; }
+.callout.remember .ct { color:#d97706; }
+.callout.remember b { color:#d97706; }
+
 /* RIASEC flip cards */
 .riasec-hint { font-size:12px; color:#aeaeb2; margin-bottom:12px; }
 .riasec-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
@@ -79,12 +118,18 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
 .foot { text-align:center; font-size:11px; color:#c7c7cc; line-height:1.7; padding-top:1.4rem; border-top:1px solid #f0e8ed; margin-top:1.5rem; }
 .foot b { color:var(--accent); font-weight:700; }
 
+@media (max-width:820px){
+  .test-cards { grid-template-columns:1fr; }
+  .flow-grid { grid-template-columns:1fr 1fr; }
+  .chips-panel { grid-template-columns:1fr; gap:20px; }
+}
 @media (max-width:520px){
   .wrap { padding:1rem 0.75rem 4rem; }
   .hero { padding:1.6rem 1.3rem; border-radius:20px; }
   .hero-title { font-size:1.4rem; }
   .riasec-grid { grid-template-columns:repeat(2,1fr); gap:10px; }
   .flip { height:168px; }
+  .flow-grid { grid-template-columns:1fr; }
 }
 @media (max-width:360px){ .rc-letter{ font-size:1.9rem; } }
 </style>
@@ -130,14 +175,81 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
     <p class="hero-sub">진로 설계의 첫 단추는 '무엇을 잘하나'보다 '나는 어떤 것에 끌리나'입니다. 흥미·적성·가치관을 먼저 정리하면, 과목 선택과 전공 탐색이 훨씬 선명해집니다.</p>
   </section>
 
+  <div class="subhead">커리어넷 3대 진로심리검사</div>
+  <p class="riasec-hint">카드를 누르면 커리어넷에서 무료로 검사할 수 있어요. 흥미·적성·가치관을 함께 보면 '나에 대한 데이터'가 훨씬 또렷해집니다.</p>
+
+  <div class="test-cards">
+    <a class="tcard tc-blue" href="https://www.career.go.kr/cloud/w/inspect/holland/intro" target="_blank" rel="noopener">
+      <div class="tc-icon">🎯</div>
+      <div class="tc-title">직업흥미검사 (H)</div>
+      <p class="tc-quote">"나는 어떤 활동에 흥미를 느낄까?" — 즐겁고 관심 가는 분야를 찾아요.</p>
+      <div class="tc-stats">
+        <div class="tc-row"><span class="tc-k">문항</span><span class="tc-v">126문항</span></div>
+        <div class="tc-row"><span class="tc-k">소요</span><span class="tc-v">약 20분</span></div>
+        <div class="tc-row"><span class="tc-k">결과</span><span class="tc-v">6가지 흥미유형 (RIASEC)</span></div>
+      </div>
+      <span class="tc-btn">커리어넷에서 검사하기 ↗</span>
+    </a>
+    <a class="tcard tc-green" href="https://www.career.go.kr/cloud/w/inspect/vocation/intro" target="_blank" rel="noopener">
+      <div class="tc-icon">💪</div>
+      <div class="tc-title">직업적성검사</div>
+      <p class="tc-quote">"나는 어떤 분야를 잘할 수 있을까?" — 나의 강점과 가능성을 확인해요.</p>
+      <div class="tc-stats">
+        <div class="tc-row"><span class="tc-k">문항</span><span class="tc-v">88문항</span></div>
+        <div class="tc-row"><span class="tc-k">소요</span><span class="tc-v">약 30분</span></div>
+        <div class="tc-row"><span class="tc-k">결과</span><span class="tc-v">11개 직업적성영역</span></div>
+      </div>
+      <span class="tc-btn">커리어넷에서 검사하기 ↗</span>
+    </a>
+    <a class="tcard tc-orange" href="https://www.career.go.kr/cloud/w/inspect/value2/intro" target="_blank" rel="noopener">
+      <div class="tc-icon">💎</div>
+      <div class="tc-title">직업가치관검사</div>
+      <p class="tc-quote">"나는 직업에서 무엇을 중요하게 여길까?" — 나만의 기준을 찾아요.</p>
+      <div class="tc-stats">
+        <div class="tc-row"><span class="tc-k">문항</span><span class="tc-v">49문항</span></div>
+        <div class="tc-row"><span class="tc-k">소요</span><span class="tc-v">약 15~20분</span></div>
+        <div class="tc-row"><span class="tc-k">결과</span><span class="tc-v">12개 직업가치</span></div>
+      </div>
+      <span class="tc-btn">커리어넷에서 검사하기 ↗</span>
+    </a>
+  </div>
+
+  <div class="panel" style="margin-top:1rem;">
+    <div class="flow-title">🧩 검사 결과는 이렇게 이어서 활용해요</div>
+    <p class="flow-lead">검사 결과를 정답처럼 외우기보다, 흥미유형·강점·중요한 가치를 기록한 뒤 관심 직업과 학과, 선택 과목으로 차근차근 연결해 보세요.</p>
+    <div class="flow-grid">
+      <div class="flow-step"><div class="fs-t">1. 검사하기</div><div class="fs-d">커리어넷에서 흥미·적성·가치관 결과 확인</div></div>
+      <div class="flow-step"><div class="fs-t">2. 학과 찾기</div><div class="fs-d">관심 직업과 연결되는 대학 학과 탐색</div></div>
+      <div class="flow-step"><div class="fs-t">3. 과목 고르기</div><div class="fs-d">진로에 맞는 선택 과목과 위계 점검</div></div>
+      <div class="flow-step"><div class="fs-t">4. 대입 흐름 보기</div><div class="fs-d">전형·학생부·수능의 큰 그림 이해</div></div>
+    </div>
+  </div>
+
+  <div class="panel chips-panel">
+    <div>
+      <div class="chips-h abil">💪 직업적성검사가 보는 11가지 능력</div>
+      <div class="chips-wrap">
+        <span class="chip">신체·운동</span><span class="chip">손재능</span><span class="chip">공간지각</span><span class="chip">음악</span><span class="chip">창의력</span><span class="chip">언어</span><span class="chip">수리·논리</span><span class="chip">자기성찰</span><span class="chip">대인관계</span><span class="chip">자연친화</span><span class="chip">예술시각</span>
+      </div>
+    </div>
+    <div>
+      <div class="chips-h val">💎 직업가치관검사가 보는 12가지 가치</div>
+      <div class="chips-wrap">
+        <span class="chip">안정성</span><span class="chip">보수</span><span class="chip">일과 삶의 균형</span><span class="chip">즐거움</span><span class="chip">소속감</span><span class="chip">자기계발</span><span class="chip">도전성</span><span class="chip">영향력</span><span class="chip">사회적 기여</span><span class="chip">성취</span><span class="chip">사회적 인정</span><span class="chip">자율성</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout remember"><span class="ct">💡 기억하세요!</span>적성은 고정된 게 아니라 <b>경험과 노력으로 자라요.</b> 가치관에는 옳고 그름이 없으니, 결과에 너무 얽매이지 말고 나에게 솔직하게 답해 보세요. 검사 결과가 평소 생각과 비슷한지, 다르다면 왜 그런지 스스로에게 질문해 보는 것이 진짜 자기 이해의 시작이에요.</div>
+
   <div class="subhead">RIASEC 6가지 흥미 유형</div>
   <p class="riasec-hint">카드를 눌러 뒤집으면 유형별 특징과 관련 진로를 볼 수 있어요. 대부분 2~3개 유형이 섞여 나타납니다.</p>
 
   <div class="riasec-grid">
-    <div class="flip t-r" role="button" tabindex="0" aria-label="R 실재형 카드">
+    <div class="flip t-r" role="button" tabindex="0" aria-label="R 현실형 카드">
       <div class="flip-inner">
-        <div class="flip-face flip-front"><div class="rc-letter">R</div><div class="rc-name">실재형</div><div class="rc-kw">Realistic · 손·기계·몸</div><div class="rc-tap">눌러서 뒤집기</div></div>
-        <div class="flip-face flip-back"><div class="rc-bt">R 실재형</div><div class="rc-bd">도구·기계·신체를 쓰는 구체적 활동을 선호. 만들고 고치고 작동시키는 데서 성취감을 느낍니다.</div><div class="rc-job"><b>관련:</b> 기계·전기·토목공학, 로봇, 항공정비, 농생명</div></div>
+        <div class="flip-face flip-front"><div class="rc-letter">R</div><div class="rc-name">현실형</div><div class="rc-kw">Realistic · 손·기계·몸</div><div class="rc-tap">눌러서 뒤집기</div></div>
+        <div class="flip-face flip-back"><div class="rc-bt">R 현실형</div><div class="rc-bd">도구·기계·신체를 쓰는 구체적 활동을 선호. 만들고 고치고 작동시키는 데서 성취감을 느낍니다.</div><div class="rc-job"><b>관련:</b> 기계·전기·토목공학, 로봇, 항공정비, 농생명</div></div>
       </div>
     </div>
     <div class="flip t-i" role="button" tabindex="0" aria-label="I 탐구형 카드">
