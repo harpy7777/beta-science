@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="description" content="고교학점제 과목 선택 전략 — 계열별 추천 과목과 선택의 기준 · 인후쌤의 과학 수업 관리 시스템">
+<meta name="description" content="진로에 맞는 과목 고르기 — 교과별 일반·진로·융합 선택 과목과 계열별 맛보기, 과목 선택 원칙 · 인후쌤의 과학 수업 관리 시스템">
 <title>과목 선택 · 진로·학업 설계</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-:root { --accent:#d97706; --accent2:#fbbf24; --soft:#fffbeb; --bd:#fde68a; }
+:root { --accent:#ea580c; --accent2:#fb923c; --soft:#fff7ed; --bd:#fed7aa; }
 body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Arial,sans-serif; background:#fafafa; color:#1d1d1f; min-height:100vh; -webkit-font-smoothing:antialiased; overscroll-behavior:none; }
 
 .header { background:#fff; border-bottom:1px solid #f0e8ed; height:54px; display:flex; align-items:center; justify-content:space-between; padding:0 max(1rem,env(safe-area-inset-left)); position:sticky; top:0; z-index:300; }
@@ -24,7 +24,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
 .backlink { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--accent); text-decoration:none; margin-bottom:14px; background:var(--soft); border:1px solid var(--bd); padding:7px 13px; border-radius:20px; transition:opacity .15s; }
 .backlink:hover { opacity:.75; }
 
-.hero { position:relative; overflow:hidden; background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%); border-radius:24px; padding:2.1rem 1.7rem; margin-bottom:1.6rem; color:#fff; box-shadow:0 16px 40px rgba(217,119,6,.26); }
+.hero { position:relative; overflow:hidden; background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%); border-radius:24px; padding:2.1rem 1.7rem; margin-bottom:1.6rem; color:#fff; box-shadow:0 16px 40px rgba(234,88,12,.26); }
 .hero::before { content:''; position:absolute; top:-60px; right:-50px; width:210px; height:210px; border-radius:50%; background:rgba(255,255,255,.14); }
 .hero-kicker { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:20px; padding:5px 12px; font-size:11px; font-weight:700; margin-bottom:12px; position:relative; z-index:1; }
 .hero-title { font-size:1.6rem; font-weight:800; letter-spacing:-.04em; line-height:1.3; position:relative; z-index:1; word-break:keep-all; }
@@ -33,45 +33,99 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
 .subhead { font-size:11px; font-weight:700; color:#aeaeb2; letter-spacing:.1em; text-transform:uppercase; margin:1.9rem 0 1rem; display:flex; align-items:center; gap:8px; }
 .subhead::after { content:''; flex:1; height:1px; background:#eee; }
 
-.panel { background:#fff; border:1px solid #eee; border-radius:18px; padding:1.35rem 1.4rem; margin-bottom:1rem; }
-.lead { font-size:13.5px; color:#3c3c43; line-height:1.85; word-break:keep-all; }
-.lead b { color:var(--accent); font-weight:700; }
+/* 상단 안내 콜아웃 */
+.lead-callout { background:#f5f3ff; border:1px solid #ddd6fe; border-radius:18px; padding:1.25rem 1.35rem; margin-bottom:1.4rem; }
+.lead-callout .lc-t { font-size:1rem; font-weight:800; color:#6d28d9; margin-bottom:9px; word-break:keep-all; }
+.lead-callout .lc-d { font-size:12.5px; line-height:1.72; color:#4c1d95; word-break:keep-all; }
+.lead-callout .lc-btn { display:inline-flex; align-items:center; gap:6px; margin-top:14px; background:#7c3aed; color:#fff; font-size:12.5px; font-weight:800; padding:9px 16px; border-radius:12px; text-decoration:none; border:none; cursor:pointer; transition:opacity .15s; }
+.lead-callout .lc-btn:hover { opacity:.85; }
 
-.cat-list { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:.6rem; }
-.cat { border:1px solid #eee; border-radius:13px; padding:.9rem 1rem; }
-.cat .ct { font-size:12.5px; font-weight:800; color:#1d1d1f; margin-bottom:4px; }
-.cat .cd { font-size:11px; color:#8e8e93; line-height:1.5; }
-
-/* Tabs */
-.tabs { display:flex; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; margin-bottom:12px; }
-.tab-btn { flex:0 0 auto; border:1px solid var(--bd); background:#fff; color:#8e8e93; font-size:12.5px; font-weight:700; padding:9px 15px; border-radius:22px; cursor:pointer; white-space:nowrap; transition:all .15s; }
-.tab-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; box-shadow:0 6px 14px rgba(217,119,6,.28); }
+/* 탭 */
+.tabs { display:flex; gap:7px; margin-bottom:16px; }
+.tab-btn { flex:1; border:1px solid var(--bd); background:#fff; color:#8e8e93; font-size:13px; font-weight:800; padding:11px 4px; border-radius:14px; cursor:pointer; transition:all .15s; }
+.tab-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; box-shadow:0 6px 14px rgba(234,88,12,.28); }
 .tab-panel { display:none; }
 .tab-panel.active { display:block; animation:fade .25s ease; }
 @keyframes fade { from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
 
-.rec-intro { font-size:12.5px; color:#3c3c43; line-height:1.7; margin-bottom:12px; word-break:keep-all; }
-.rec-intro b { color:var(--accent); }
-.subj-block { border:1px solid #eee; border-radius:13px; padding:.9rem 1rem; margin-bottom:9px; }
-.subj-block .sb-h { font-size:12px; font-weight:800; color:var(--accent); margin-bottom:6px; }
-.chips { display:flex; flex-wrap:wrap; gap:6px; }
-.chip { font-size:11px; font-weight:600; color:#3c3c43; background:#f5f5f7; border:1px solid #eee; border-radius:8px; padding:5px 9px; }
-.chip.key { background:var(--soft); border-color:var(--bd); color:var(--accent); font-weight:700; }
+/* 선택 카드 (일반/진로/융합) */
+.sel-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.sel-card { background:#fff; border:1px solid #eee; border-radius:18px; overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,.03); }
+.sel-head { padding:.95rem 1.15rem; color:#fff; font-size:.98rem; font-weight:800; display:flex; align-items:center; gap:8px; }
+.sel-head.general { background:linear-gradient(135deg,#3b82f6,#60a5fa); }
+.sel-head.career  { background:linear-gradient(135deg,#10b981,#34d399); }
+.sel-head.fusion  { background:linear-gradient(135deg,#a855f7,#c084fc); }
+.sel-body { padding:1.1rem 1.15rem; display:flex; flex-wrap:wrap; gap:8px; align-content:flex-start; }
+.chip { background:#f2f2f7; color:#3c3c43; font-size:12.5px; font-weight:700; padding:8px 13px; border-radius:11px; white-space:nowrap; }
 
-.callout { border-radius:14px; padding:1rem 1.1rem; margin:1rem 0 0; font-size:12.5px; line-height:1.72; word-break:keep-all; }
-.callout.point { background:var(--soft); border:1px solid var(--bd); color:#7c4a03; }
-.callout.warn { background:#fef2f2; border:1px solid #fecaca; color:#991b1b; }
+.mini-note { font-size:11.5px; color:#8e8e93; line-height:1.7; margin:12px 2px 0; word-break:keep-all; }
+.mini-note b { color:var(--accent); }
+
+/* 계열별 맛보기 */
+.taste-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+.taste-card { background:#fff; border:1px solid #eee; border-radius:18px; padding:1.25rem 1.3rem; box-shadow:0 4px 14px rgba(0,0,0,.03); }
+.taste-t { display:flex; align-items:center; gap:8px; font-size:1rem; font-weight:800; color:#1d1d1f; margin-bottom:14px; word-break:keep-all; }
+.taste-chips { display:flex; flex-wrap:wrap; gap:8px; }
+
+/* 이것만은 기억해요 */
+.remember-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+.remember-card { background:#fff; border:1px solid #eee; border-radius:16px; padding:1.3rem .9rem; text-align:center; box-shadow:0 4px 14px rgba(0,0,0,.03); }
+.rm-ico { font-size:1.9rem; line-height:1; margin-bottom:12px; }
+.rm-t { font-size:.95rem; font-weight:800; color:#1d1d1f; margin-bottom:7px; word-break:keep-all; }
+.rm-d { font-size:11.5px; color:#8e8e93; line-height:1.6; word-break:keep-all; }
+
+/* 대학 권장 이수 과목 */
+.rec-box { background:#fff; border:1px solid #eee; border-radius:18px; padding:.6rem 1.35rem; box-shadow:0 4px 14px rgba(0,0,0,.03); }
+.rec-row { display:flex; gap:16px; padding:1.15rem 0; border-bottom:1px solid #f2f2f7; }
+.rec-row:last-child { border-bottom:none; }
+.rec-label { flex-shrink:0; width:74px; font-size:13px; font-weight:800; color:#2563eb; line-height:1.5; word-break:keep-all; }
+.rec-label.warn { color:var(--accent); }
+.rec-text { flex:1; font-size:13px; line-height:1.72; color:#3c3c43; word-break:keep-all; }
+.rec-text b { color:#1d1d1f; font-weight:700; }
+
+/* 진로가 바뀌면 */
+.change-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+.change-card { background:#fff; border:1px solid #eee; border-radius:18px; padding:1.35rem 1.35rem; box-shadow:0 4px 14px rgba(0,0,0,.03); }
+.change-t { display:flex; align-items:center; gap:9px; font-size:1.02rem; font-weight:800; color:#1d1d1f; margin-bottom:5px; word-break:keep-all; }
+.change-t i { width:14px; height:14px; border-radius:50%; display:inline-block; flex-shrink:0; }
+.change-t.ok i { background:#22c55e; }
+.change-t.hard i { background:#f59e0b; }
+.change-sub { font-size:12px; color:#8e8e93; line-height:1.6; margin-bottom:14px; word-break:keep-all; }
+.change-list { list-style:none; }
+.change-list li { position:relative; padding-left:18px; font-size:12.5px; line-height:1.72; color:#3c3c43; margin-bottom:11px; word-break:keep-all; }
+.change-list li:last-child { margin-bottom:0; }
+.change-list li b { color:#1d1d1f; font-weight:700; }
+.change-list.ok li::before { content:''; position:absolute; left:4px; top:8px; width:7px; height:7px; border-radius:50%; background:#22c55e; }
+.change-list.hard li::before { content:''; position:absolute; left:4px; top:8px; width:7px; height:7px; border-radius:50%; background:#f59e0b; }
+
+.callout { border-radius:14px; padding:1rem 1.1rem; margin-top:1.2rem; font-size:12.5px; line-height:1.72; word-break:keep-all; background:var(--soft); border:1px solid var(--bd); color:#7c2d12; }
 .callout .ct { display:block; font-weight:800; margin-bottom:5px; }
 .callout b { font-weight:700; }
 
-.foot { text-align:center; font-size:11px; color:#c7c7cc; line-height:1.7; padding-top:1.4rem; border-top:1px solid #f0e8ed; margin-top:1.5rem; }
+.foot { text-align:center; font-size:11px; color:#c7c7cc; line-height:1.7; padding-top:1.4rem; border-top:1px solid #f0e8ed; margin-top:1.8rem; }
 .foot b { color:var(--accent); font-weight:700; }
 
+@media (max-width:820px){
+  .sel-grid { grid-template-columns:1fr; }
+  .taste-grid { grid-template-columns:1fr; }
+  .remember-grid { grid-template-columns:repeat(2,1fr); }
+  .change-grid { grid-template-columns:1fr; }
+}
 @media (max-width:520px){
   .wrap { padding:1rem 0.75rem 4rem; }
   .hero { padding:1.6rem 1.3rem; border-radius:20px; }
   .hero-title { font-size:1.35rem; }
-  .cat-list { grid-template-columns:1fr; }
+  .lead-callout { padding:1.1rem 1.1rem; border-radius:16px; }
+  .lead-callout .lc-t { font-size:.95rem; }
+  .tabs { gap:5px; }
+  .tab-btn { font-size:12px; padding:10px 2px; border-radius:12px; }
+  .chip { font-size:12px; padding:7px 11px; }
+  .remember-grid { grid-template-columns:repeat(2,1fr); }
+  .rm-ico { font-size:1.7rem; }
+  .rm-t { font-size:.9rem; }
+  .rec-box { padding:.4rem 1.1rem; }
+  .rec-label { width:60px; font-size:12px; }
+  .rec-text { font-size:12.5px; }
 }
 </style>
 <script>
@@ -104,71 +158,156 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
     <div class="logo-mark"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/><path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg></div>
     <span class="brand-name">인후쌤의 과학 수업 관리 시스템</span>
   </a>
-  <div class="header-badge">📗 과목 선택</div>
+  <div class="header-badge">📚 과목 선택</div>
 </header>
 
 <div class="wrap">
   <a href="career-design.html" class="backlink">← 디자인 랩으로</a>
 
   <section class="hero">
-    <span class="hero-kicker">03 · SUBJECT CHOICE</span>
-    <h1 class="hero-title">과목이 곧 나의 이야기입니다</h1>
-    <p class="hero-sub">고교학점제에서는 무엇을 선택했는지가 진로의 방향을 보여 줍니다. 관심 계열에 맞는 과목을 '왜 골랐는지' 설명할 수 있게 준비하세요.</p>
+    <span class="hero-kicker">04 · SUBJECT</span>
+    <h1 class="hero-title">진로에 맞는<br>과목 고르기</h1>
+    <p class="hero-sub">과목 선택은 내 적성과 진로에 따라 미래를 설계하는 과정의 시작이에요. 선택에는 책임이 따르니, 스스로 계획하고 실천하고 성찰하는 자세가 중요해요. 교과별로 어떤 과목이 있는지 살펴볼까요?</p>
   </section>
 
-  <div class="subhead">먼저, 과목의 종류</div>
-  <div class="panel">
-    <p class="lead">2022 개정 교육과정의 선택과목은 성격에 따라 <b>세 갈래</b>로 나뉩니다. 공통과목을 배운 뒤, 진로에 맞춰 아래에서 골라 담습니다.</p>
-    <div class="cat-list">
-      <div class="cat"><div class="ct">공통과목</div><div class="cd">모든 학생 공통 기초. 예) 공통국어·공통수학·통합과학·통합사회</div></div>
-      <div class="cat"><div class="ct">일반 선택</div><div class="cd">교과별 핵심 내용. 예) 대수, 영어Ⅰ, 물리학, 화학</div></div>
-      <div class="cat"><div class="ct">진로 선택</div><div class="cd">전공 연계 심화. 예) 미적분Ⅱ, 역학과 에너지, 세포와 물질대사</div></div>
-      <div class="cat"><div class="ct">융합 선택</div><div class="cd">교과 융합·실생활. 예) 융합과학 탐구, 과학의 역사와 문화</div></div>
-    </div>
+  <div class="lead-callout">
+    <div class="lc-t">🧭 진로에 맞는 과목 고르기는 전용 페이지와 함께 사용해요</div>
+    <div class="lc-d">관심 학과나 계열을 어느 정도 정했다면, 아래 계열별 맛보기에서 진로와 연결되는 선택 과목을 확인해 보세요. 학교에 실제 개설되는 과목, 과목 위계, 희망 대학의 권장 과목을 함께 놓고 판단하는 것이 좋아요.</div>
+    <a href="#taste" class="lc-btn">진로 맞춤 과목 고르기 바로가기 →</a>
   </div>
 
-  <div class="subhead">계열별 추천 과목</div>
+  <div class="subhead">교과별 선택 과목</div>
   <div class="tabs" id="tabs">
-    <button class="tab-btn active" data-tab="sci">자연·공학</button>
-    <button class="tab-btn" data-tab="med">의약·생명</button>
-    <button class="tab-btn" data-tab="hum">인문·사회</button>
-    <button class="tab-btn" data-tab="etc">예체능·기타</button>
+    <button class="tab-btn active" data-tab="kor">국어</button>
+    <button class="tab-btn" data-tab="mat">수학</button>
+    <button class="tab-btn" data-tab="eng">영어</button>
+    <button class="tab-btn" data-tab="soc">사회</button>
+    <button class="tab-btn" data-tab="sci">과학</button>
   </div>
 
-  <div class="panel">
-    <!-- 자연·공학 -->
-    <div class="tab-panel active" data-panel="sci">
-      <p class="rec-intro"><b>자연·공학 계열</b>은 수학·과학의 깊이가 핵심입니다. 지원 학과가 요구하는 과목을 반드시 확인하세요.</p>
-      <div class="subj-block"><div class="sb-h">수학</div><div class="chips"><span class="chip key">대수</span><span class="chip key">미적분Ⅰ·Ⅱ</span><span class="chip">확률과 통계</span><span class="chip">기하</span></div></div>
-      <div class="subj-block"><div class="sb-h">과학</div><div class="chips"><span class="chip key">물리학</span><span class="chip key">화학</span><span class="chip">역학과 에너지</span><span class="chip">전자기와 양자</span><span class="chip">물질과 에너지</span></div></div>
-      <div class="subj-block"><div class="sb-h">진로·융합</div><div class="chips"><span class="chip">융합과학 탐구</span><span class="chip">과학과제 연구</span><span class="chip">정보</span><span class="chip">인공지능 기초</span></div></div>
+  <!-- 국어 -->
+  <div class="tab-panel active" data-panel="kor">
+    <div class="sel-grid">
+      <div class="sel-card"><div class="sel-head general">📘 일반 선택</div><div class="sel-body"><span class="chip">화법과 언어</span><span class="chip">독서와 작문</span><span class="chip">문학</span></div></div>
+      <div class="sel-card"><div class="sel-head career">🎯 진로 선택</div><div class="sel-body"><span class="chip">주제 탐구 독서</span><span class="chip">문학과 영상</span><span class="chip">직무 의사소통</span></div></div>
+      <div class="sel-card"><div class="sel-head fusion">🔗 융합 선택</div><div class="sel-body"><span class="chip">독서 토론과 글쓰기</span><span class="chip">매체 의사소통</span><span class="chip">언어생활 탐구</span></div></div>
     </div>
-    <!-- 의약·생명 -->
-    <div class="tab-panel" data-panel="med">
-      <p class="rec-intro"><b>의약·생명 계열</b>은 화학·생명과학이 중심이며, 수학도 함께 요구되는 경우가 많습니다.</p>
-      <div class="subj-block"><div class="sb-h">과학</div><div class="chips"><span class="chip key">화학</span><span class="chip key">생명과학</span><span class="chip">세포와 물질대사</span><span class="chip">생물의 유전</span><span class="chip">물질과 에너지</span></div></div>
-      <div class="subj-block"><div class="sb-h">수학</div><div class="chips"><span class="chip key">대수</span><span class="chip key">미적분Ⅰ</span><span class="chip">확률과 통계</span></div></div>
-      <div class="subj-block"><div class="sb-h">진로·융합</div><div class="chips"><span class="chip">융합과학 탐구</span><span class="chip">보건</span><span class="chip">생활과학 탐구</span></div></div>
-    </div>
-    <!-- 인문·사회 -->
-    <div class="tab-panel" data-panel="hum">
-      <p class="rec-intro"><b>인문·사회 계열</b>은 언어·사회 과목의 깊이와 함께, 데이터를 다루는 수학 역량도 점점 중요해집니다.</p>
-      <div class="subj-block"><div class="sb-h">국어·영어</div><div class="chips"><span class="chip key">독서와 작문</span><span class="chip key">문학</span><span class="chip">주제 탐구 독서</span><span class="chip">영어 독해와 작문</span></div></div>
-      <div class="subj-block"><div class="sb-h">사회</div><div class="chips"><span class="chip key">사회와 문화</span><span class="chip key">세계시민과 지리</span><span class="chip">정치</span><span class="chip">법과 사회</span><span class="chip">경제</span><span class="chip">윤리와 사상</span></div></div>
-      <div class="subj-block"><div class="sb-h">수학</div><div class="chips"><span class="chip">대수</span><span class="chip">확률과 통계</span><span class="chip">경제 수학</span></div></div>
-    </div>
-    <!-- 예체능·기타 -->
-    <div class="tab-panel" data-panel="etc">
-      <p class="rec-intro"><b>예체능·기타 계열</b>은 실기가 중심이지만, 관심 분야를 뒷받침할 이론·융합 과목을 함께 챙기면 좋습니다.</p>
-      <div class="subj-block"><div class="sb-h">전공 연계</div><div class="chips"><span class="chip key">음악·미술·체육 진로선택</span><span class="chip">미술 창작</span><span class="chip">운동과 건강</span></div></div>
-      <div class="subj-block"><div class="sb-h">기초·융합</div><div class="chips"><span class="chip">문학</span><span class="chip">정보</span><span class="chip">미디어 영어</span><span class="chip">융합 선택과목</span></div></div>
-    </div>
-
-    <div class="callout point"><span class="ct">🎯 선택의 3가지 기준</span>① 지원 <b>희망 학과의 권장·필수 과목</b>을 먼저 확인 → ② 나의 흥미·강점과 겹치는지 → ③ 해당 과목에서 <b>탐구·세특으로 보여줄 것</b>이 있는지. 이 순서로 정하면 흔들리지 않습니다.</div>
-    <div class="callout warn"><span class="ct">⚠ 학과별 권장과목 확인</span>대학·학과마다 권장(핵심) 과목이 다릅니다. 위 목록은 일반적인 예시이며, <b>지원 대학의 '전공 연계 교과 이수 과목' 안내</b>를 반드시 직접 확인하세요.</div>
   </div>
 
-  <div class="foot"><b>인후쌤의 과학 수업 관리 시스템</b> · 진로 학업 디자인 랩<br>과목을 정했다면, 이제 대입의 큰 그림을 봅니다.</div>
+  <!-- 수학 -->
+  <div class="tab-panel" data-panel="mat">
+    <div class="sel-grid">
+      <div class="sel-card"><div class="sel-head general">📘 일반 선택</div><div class="sel-body"><span class="chip">대수</span><span class="chip">미적분Ⅰ</span><span class="chip">확률과 통계</span></div></div>
+      <div class="sel-card"><div class="sel-head career">🎯 진로 선택</div><div class="sel-body"><span class="chip">기하</span><span class="chip">미적분Ⅱ</span><span class="chip">경제 수학</span><span class="chip">인공지능 수학</span><span class="chip">직무 수학</span></div></div>
+      <div class="sel-card"><div class="sel-head fusion">🔗 융합 선택</div><div class="sel-body"><span class="chip">수학과 문화</span><span class="chip">실용 통계</span><span class="chip">수학과제 탐구</span></div></div>
+    </div>
+  </div>
+
+  <!-- 영어 -->
+  <div class="tab-panel" data-panel="eng">
+    <div class="sel-grid">
+      <div class="sel-card"><div class="sel-head general">📘 일반 선택</div><div class="sel-body"><span class="chip">영어Ⅰ</span><span class="chip">영어Ⅱ</span><span class="chip">영어 독해와 작문</span></div></div>
+      <div class="sel-card"><div class="sel-head career">🎯 진로 선택</div><div class="sel-body"><span class="chip">영미 문학 읽기</span><span class="chip">영어 발표와 토론</span><span class="chip">심화 영어</span><span class="chip">심화 영어 독해와 작문</span><span class="chip">직무 영어</span></div></div>
+      <div class="sel-card"><div class="sel-head fusion">🔗 융합 선택</div><div class="sel-body"><span class="chip">실생활 영어 회화</span><span class="chip">미디어 영어</span><span class="chip">세계 문화와 영어</span></div></div>
+    </div>
+  </div>
+
+  <!-- 사회 -->
+  <div class="tab-panel" data-panel="soc">
+    <div class="sel-grid">
+      <div class="sel-card"><div class="sel-head general">📘 일반 선택</div><div class="sel-body"><span class="chip">세계시민과 지리</span><span class="chip">세계사</span><span class="chip">사회와 문화</span><span class="chip">현대사회와 윤리</span></div></div>
+      <div class="sel-card"><div class="sel-head career">🎯 진로 선택</div><div class="sel-body"><span class="chip">한국지리 탐구</span><span class="chip">도시의 미래 탐구</span><span class="chip">동아시아 역사 기행</span><span class="chip">정치</span><span class="chip">법과 사회</span><span class="chip">경제</span><span class="chip">윤리와 사상</span><span class="chip">인문학과 윤리</span><span class="chip">국제 관계의 이해</span></div></div>
+      <div class="sel-card"><div class="sel-head fusion">🔗 융합 선택</div><div class="sel-body"><span class="chip">여행지리</span><span class="chip">역사로 탐구하는 현대 세계</span><span class="chip">사회문제 탐구</span><span class="chip">금융과 경제생활</span><span class="chip">윤리문제 탐구</span></div></div>
+    </div>
+  </div>
+
+  <!-- 과학 -->
+  <div class="tab-panel" data-panel="sci">
+    <div class="sel-grid">
+      <div class="sel-card"><div class="sel-head general">📘 일반 선택</div><div class="sel-body"><span class="chip">물리학</span><span class="chip">화학</span><span class="chip">생명과학</span><span class="chip">지구과학</span></div></div>
+      <div class="sel-card"><div class="sel-head career">🎯 진로 선택</div><div class="sel-body"><span class="chip">역학과 에너지</span><span class="chip">전자기와 양자</span><span class="chip">물질과 에너지</span><span class="chip">화학 반응의 세계</span><span class="chip">세포와 물질대사</span><span class="chip">생물의 유전</span><span class="chip">지구시스템과학</span><span class="chip">행성우주과학</span></div></div>
+      <div class="sel-card"><div class="sel-head fusion">🔗 융합 선택</div><div class="sel-body"><span class="chip">과학의 역사와 문화</span><span class="chip">기후변화와 환경생태</span><span class="chip">융합과학 탐구</span></div></div>
+    </div>
+  </div>
+
+  <p class="mini-note"><b>어디까지나 예시</b>예요. 실제 개설 과목은 학교마다 다르니, 내 진로와 우리 학교에 개설된 과목에 맞게 선택하세요.</p>
+
+  <!-- 계열별 맛보기 -->
+  <div class="subhead" id="taste">계열별 과목 선택 맛보기</div>
+  <p class="mini-note" style="margin-top:0;margin-bottom:14px;">관심 계열에 따라 이런 과목을 눈여겨보면 좋아요. <b>어디까지나 예시</b>이니, 내 진로와 우리 학교에 개설된 과목에 맞게 선택하세요.</p>
+  <div class="taste-grid">
+    <div class="taste-card">
+      <div class="taste-t">📖 인문·사회 계열</div>
+      <div class="taste-chips"><span class="chip">화법과 언어</span><span class="chip">독서와 작문</span><span class="chip">주제 탐구 독서</span><span class="chip">사회와 문화</span><span class="chip">정치</span><span class="chip">법과 사회</span><span class="chip">윤리와 사상</span><span class="chip">경제</span><span class="chip">세계사</span></div>
+    </div>
+    <div class="taste-card">
+      <div class="taste-t">⚙️ 자연·공학 계열</div>
+      <div class="taste-chips"><span class="chip">대수</span><span class="chip">미적분Ⅰ·Ⅱ</span><span class="chip">기하</span><span class="chip">물리학</span><span class="chip">화학</span><span class="chip">역학과 에너지</span><span class="chip">전자기와 양자</span><span class="chip">화학 반응의 세계</span><span class="chip">인공지능 수학</span></div>
+    </div>
+    <div class="taste-card">
+      <div class="taste-t">🧬 의학·생명 계열</div>
+      <div class="taste-chips"><span class="chip">미적분Ⅰ·Ⅱ</span><span class="chip">확률과 통계</span><span class="chip">생명과학</span><span class="chip">화학</span><span class="chip">세포와 물질대사</span><span class="chip">생물의 유전</span><span class="chip">물질과 에너지</span></div>
+    </div>
+    <div class="taste-card">
+      <div class="taste-t">🎨 예술·체육 계열</div>
+      <div class="taste-chips"><span class="chip">음악·미술·연극</span><span class="chip">음악 연주와 창작</span><span class="chip">미술 창작</span><span class="chip">음악 감상과 비평</span><span class="chip">미술 감상과 비평</span><span class="chip">운동과 건강</span><span class="chip">스포츠 과학</span></div>
+    </div>
+  </div>
+
+  <!-- 이것만은 기억해요 -->
+  <div class="subhead">과목 선택, 이것만은 기억해요</div>
+  <div class="remember-grid">
+    <div class="remember-card"><div class="rm-ico">🙅</div><div class="rm-t">친구 따라 X</div><div class="rm-d">내 진로를 기준으로 선택해요</div></div>
+    <div class="remember-card"><div class="rm-ico">🛟</div><div class="rm-t">쉬운 과목 도피 X</div><div class="rm-d">내신 따기 쉽다고 고르지 않기</div></div>
+    <div class="remember-card"><div class="rm-ico">🧭</div><div class="rm-t">계열 적합성</div><div class="rm-d">진로와 연결된 과목이 핵심</div></div>
+    <div class="remember-card"><div class="rm-ico">🪜</div><div class="rm-t">위계 지키기</div><div class="rm-d">기초 과목 먼저, 그다음 심화</div></div>
+    <div class="remember-card"><div class="rm-ico">📈</div><div class="rm-t">배움의 필요성</div><div class="rm-d">점수보다 학업적 필요 우선</div></div>
+  </div>
+
+  <!-- 대학이 권장하는 이수 과목 -->
+  <div class="subhead">대학이 권장하는 이수 과목</div>
+  <div class="rec-box">
+    <div class="rec-row">
+      <div class="rec-label">자연계열</div>
+      <div class="rec-text">대부분 <b>수학·과학 과목</b>을 권장 이수 과목으로 제시해요.</div>
+    </div>
+    <div class="rec-row">
+      <div class="rec-label">인문·사회</div>
+      <div class="rec-text">권장 과목을 따로 제시하지 않는 경우가 많아요 → <b>진로·적성에 따라 선택</b>하고 책임 있게 학습!</div>
+    </div>
+    <div class="rec-row">
+      <div class="rec-label warn">주의</div>
+      <div class="rec-text">같은 학과여도 <b>대학마다 제시 과목이 달라요.</b> 희망 대학 자료를 참고하되, <b>우리 학교에서 들을 수 있는 과목</b>을 충실히 이수하는 것이 우선이에요. (대입정보포털 '어디가'에서 대학별 반영·권장 과목 확인 가능)</div>
+    </div>
+  </div>
+
+  <!-- 진로가 바뀌면 -->
+  <div class="subhead">진로가 바뀌면 어떡하죠?</div>
+  <p class="mini-note" style="margin-top:0;margin-bottom:14px;">진로가 바뀌는 건 <b>아주 자연스러운 성장의 과정</b>이에요. 걱정하지 말고 상황에 맞게 대처해요.</p>
+  <div class="change-grid">
+    <div class="change-card">
+      <div class="change-t ok"><i></i> 과목 변경이 가능할 때</div>
+      <div class="change-sub">주로 1학년이거나 학기 단위로 변경이 가능한 경우</div>
+      <ul class="change-list ok">
+        <li>변경 가능 여부·신청 시기·절차를 <b>먼저 확인</b>해요</li>
+        <li>학부모님과 함께 충분히 이야기하고 결정해요</li>
+        <li>바뀐 진로와 연계된 과목으로 다시 설계해요</li>
+      </ul>
+    </div>
+    <div class="change-card">
+      <div class="change-t hard"><i></i> 변경이 어려울 때</div>
+      <div class="change-sub">이미 한 학기 이상 이수했거나 변경이 불가능한 경우</div>
+      <ul class="change-list hard">
+        <li>대학은 진로 변경을 <b>'성장과 탐색'</b>으로 봐요</li>
+        <li>일관성보다 변경 과정의 <b>호기심·탐구역량·융합적 사고</b>를 평가</li>
+        <li>변경 계기가 드러나는 활동(수업·독서·세특)으로 이야기를 만들어요</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout"><span class="ct">💡 과목 선택 핵심</span>정답은 '점수'가 아니라 <b>'나의 진로'</b>예요. 계열 적합성과 과목 위계를 지키며, 우리 학교에 개설된 과목 안에서 <b>가장 나다운 조합</b>을 설계하세요.</div>
+
+  <div class="foot"><b>인후쌤의 과학 수업 관리 시스템</b> · 진로 학업 디자인 랩<br>과목을 골랐다면, 월별 로드맵으로 실천 계획을 세워보세요.</div>
 </div>
 
 <script>
