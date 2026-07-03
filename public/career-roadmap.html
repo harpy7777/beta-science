@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="description" content="학년별·월별 진로·학업 로드맵 — 3월부터 다음 해 2월까지, 이달에 무엇을 할지 · 인후쌤의 과학 수업 관리 시스템">
+<meta name="description" content="학년별·월별 진로·학업 로드맵과 학기별 가이드 — 이 시기에 무엇을 할지, 무엇을 조심할지 · 인후쌤의 과학 수업 관리 시스템">
 <title>월별 로드맵 · 진로·학업 설계</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -69,7 +69,39 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
 .callout .ct { display:block; font-weight:800; margin-bottom:5px; }
 .callout b { font-weight:700; }
 
-.foot { text-align:center; font-size:11px; color:#c7c7cc; line-height:1.7; padding-top:1.4rem; border-top:1px solid #f0e8ed; margin-top:1.5rem; }
+/* 학기별 가이드 */
+.guide-head { margin-top:2.6rem; margin-bottom:1.4rem; }
+.guide-badge { display:inline-flex; align-items:center; gap:6px; background:var(--soft); border:1px solid var(--bd); color:var(--accent); font-size:11px; font-weight:800; padding:5px 12px; border-radius:20px; margin-bottom:14px; }
+.guide-badge i { width:7px; height:7px; border-radius:50%; background:var(--accent); display:inline-block; }
+.guide-title { font-size:1.65rem; font-weight:800; letter-spacing:-.04em; line-height:1.32; color:#1d1d1f; word-break:keep-all; }
+.guide-sub { font-size:.9rem; color:#8e8e93; line-height:1.7; margin-top:12px; word-break:keep-all; }
+
+.acc { background:#fff; border:1px solid #eee; border-radius:18px; margin-bottom:12px; overflow:hidden; transition:box-shadow .15s; }
+.acc.open { box-shadow:0 8px 24px rgba(0,0,0,.05); }
+.acc-head { display:flex; align-items:center; gap:14px; padding:1.15rem 1.25rem; cursor:pointer; }
+.acc-tag { flex-shrink:0; font-size:12px; font-weight:800; color:#fff; padding:7px 13px; border-radius:20px; white-space:nowrap; }
+.acc-t { flex:1; font-size:1.02rem; font-weight:800; color:#1d1d1f; line-height:1.4; word-break:keep-all; }
+.acc-chev { flex-shrink:0; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; transition:transform .25s; }
+.acc-chev svg { width:16px; height:16px; }
+.acc.open .acc-chev { transform:rotate(180deg); }
+.acc-body { display:none; padding:.2rem 1.25rem 1.35rem; }
+.acc.open .acc-body { display:block; animation:fade .25s ease; }
+
+.tag-blue { background:#3b82f6; } .chev-blue { background:#eff6ff; color:#2563eb; }
+.tag-green { background:#10b981; } .chev-green { background:#ecfdf5; color:#059669; }
+.tag-orange { background:#f59e0b; } .chev-orange { background:#fffbeb; color:#d97706; }
+
+.gblock-t { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:800; margin:1rem 0 .75rem; }
+.gblock-t.todo { color:#059669; }
+.gblock-t.warn { color:#d97706; }
+.glist { list-style:none; }
+.glist li { position:relative; padding-left:20px; font-size:13px; line-height:1.72; color:#3c3c43; margin-bottom:9px; word-break:keep-all; }
+.glist li:last-child { margin-bottom:0; }
+.glist li b { color:#1d1d1f; font-weight:700; }
+.glist.todo li::before { content:'›'; position:absolute; left:5px; top:-1px; color:#10b981; font-weight:800; }
+.glist.warn li::before { content:'!'; position:absolute; left:7px; top:0; color:#f59e0b; font-weight:800; }
+
+.foot { text-align:center; font-size:11px; color:#c7c7cc; line-height:1.7; padding-top:1.4rem; border-top:1px solid #f0e8ed; margin-top:1.8rem; }
 .foot b { color:var(--accent); font-weight:700; }
 
 @media (max-width:520px){
@@ -81,6 +113,11 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
   .m-num { font-size:1.3rem; }
   .m-badge { font-size:10px; padding:3px 8px; }
   .m-title { font-size:.95rem; }
+  .guide-title { font-size:1.4rem; }
+  .acc-head { gap:10px; padding:1rem 1rem; }
+  .acc-tag { font-size:11px; padding:6px 11px; }
+  .acc-t { font-size:.94rem; }
+  .acc-body { padding:.2rem 1rem 1.15rem; }
 }
 </style>
 <script>
@@ -174,6 +211,104 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
 
   <div class="callout"><span class="ct">🧭 로드맵 사용법</span>완벽하게 다 하려 하지 말고, <b>이번 달 항목 1~2개</b>만 골라 실천하세요. 부족하다고 느끼면 '셀프 체크리스트'로 돌아가 점검하면 됩니다.</div>
 
+  <!-- 학기별 가이드 -->
+  <div class="guide-head">
+    <span class="guide-badge"><i></i> 학기별 가이드</span>
+    <h2 class="guide-title">학기마다 챙길 일과<br>주의할 점</h2>
+    <p class="guide-sub">각 학기에 무엇을 해야 하고, 어떤 점을 조심해야 하는지 정리했어요. 제목을 눌러 펼쳐보세요.</p>
+  </div>
+
+  <div id="acc-wrap">
+    <!-- 1학년 1학기 -->
+    <div class="acc open">
+      <div class="acc-head">
+        <span class="acc-tag tag-blue">1학년 1학기</span>
+        <span class="acc-t">자기 이해와 교육과정 이해하기</span>
+        <span class="acc-chev chev-blue"><svg viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+      <div class="acc-body">
+        <div class="gblock-t todo">✅ 이 학기에 할 일</div>
+        <ul class="glist todo">
+          <li>자기 이해 검사로 흥미·적성·가치관을 확인하기</li>
+          <li>중학교와 달라진 평가 체제(상대평가 5등급)와 고교학점제 이해하기</li>
+          <li><b>6~7월은 학업 설계 골든타임!</b> 2학년 선택 과목을 진로와 연결해 고르기</li>
+        </ul>
+        <div class="gblock-t warn">⚠️ 이런 점 조심해요</div>
+        <ul class="glist warn">
+          <li>첫 중간고사 충격에 좌절하지 않기 — 취약 과목을 분석해 공부법을 수정해요</li>
+          <li>친구 따라, 혹은 내신 쉬운 과목으로 도피하지 않기</li>
+          <li>'계열 적합성'과 과목 '위계(기초→심화)'를 꼭 고려하기</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 1학년 2학기 -->
+    <div class="acc">
+      <div class="acc-head">
+        <span class="acc-tag tag-blue">1학년 2학기</span>
+        <span class="acc-t">진로 구체화와 활동 기록하기</span>
+        <span class="acc-chev chev-blue"><svg viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+      <div class="acc-body">
+        <div class="gblock-t todo">✅ 이 학기에 할 일</div>
+        <ul class="glist todo">
+          <li>여름방학에 경험한 진로 체험·독서를 2학기 수업·수행평가로 연결하기</li>
+          <li>수업 속 발표·토론·프로젝트가 <b>세특(세부능력 및 특기사항)</b>으로 기록됨을 기억하기</li>
+          <li>1년 활동을 모아 <b>'진로·학업 포트폴리오'</b> 완성하기</li>
+        </ul>
+        <div class="gblock-t warn">⚠️ 이런 점 조심해요</div>
+        <ul class="glist warn">
+          <li>의미 없는 일회성 행사보다 <b>깊이 있는 탐구 하나</b>가 더 중요해요</li>
+          <li>진로가 바뀌었다면, 2학년 과목 변경 기회를 놓치지 않기</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 2학년 1학기 -->
+    <div class="acc">
+      <div class="acc-head">
+        <span class="acc-tag tag-green">2학년 1학기</span>
+        <span class="acc-t">선택 과목 몰입·심화, 대입 전략 기초</span>
+        <span class="acc-chev chev-green"><svg viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+      <div class="acc-body">
+        <div class="gblock-t todo">✅ 이 학기에 할 일</div>
+        <ul class="glist todo">
+          <li>내가 고른 선택 과목에 몰입하고, 흥미·적성이 세특에 잘 드러나게 하기</li>
+          <li>성적 추이를 보며 나에게 유리한 대입 전형을 1차로 판단해 보기</li>
+          <li>희망 대학의 전형 가이드북을 찾아 읽으며 입시 문해력 높이기</li>
+        </ul>
+        <div class="gblock-t warn">⚠️ 이런 점 조심해요</div>
+        <ul class="glist warn">
+          <li><b>내신 포기 금지!</b> 수시의 기회를 스스로 닫지 않기</li>
+          <li>특정 과목을 포기하면 '학업 충실도'가 낮게 평가될 수 있어요</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 2학년 2학기 -->
+    <div class="acc">
+      <div class="acc-head">
+        <span class="acc-tag tag-orange">2학년 2학기</span>
+        <span class="acc-t">융합 활동과 예비 수험생 준비</span>
+        <span class="acc-chev chev-orange"><svg viewBox="0 0 20 20" fill="none"><path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+      <div class="acc-body">
+        <div class="gblock-t todo">✅ 이 학기에 할 일</div>
+        <ul class="glist todo">
+          <li>교과 심화·교과 간 융합 탐구로 학생부 경쟁력 높이기</li>
+          <li>10월 학력평가로 정시 지원 가능 라인을 가늠해 보기</li>
+          <li>3학년 선택 과목을 최종 확정하고, 겨울방학 학습 로드맵 세우기</li>
+        </ul>
+        <div class="gblock-t warn">⚠️ 이런 점 조심해요</div>
+        <ul class="glist warn">
+          <li>2학년까지의 학생부 기록을 꼼꼼히 점검하기 (누락된 활동 확인)</li>
+          <li>학습량이 늘며 번아웃이 올 수 있어요 — <b>멘탈 관리</b>도 챙기기</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
   <div class="foot"><b>인후쌤의 과학 수업 관리 시스템</b> · 진로 학업 디자인 랩<br>마지막으로, 셀프 체크리스트로 내 준비 상태를 점검하세요.</div>
 </div>
 
@@ -188,6 +323,10 @@ body { font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Tex
       panels.forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-panel')===key); });
       window.scrollTo({ top:0, behavior:'smooth' });
     });
+  });
+
+  document.querySelectorAll('#acc-wrap .acc-head').forEach(function(h){
+    h.addEventListener('click', function(){ h.parentElement.classList.toggle('open'); });
   });
 })();
 </script>
