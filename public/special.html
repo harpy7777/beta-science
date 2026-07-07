@@ -84,11 +84,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .student-avatar.high{background:#dbeafe;color:#1e40af}
 .student-avatar.done{background:#dcfce7;color:#16a34a}
 .student-info{flex:1;min-width:120px}
-.student-name{font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:-.02em;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.student-meta{font-size:12px;color:#6e6e73;font-weight:500;line-height:1.5;word-break:keep-all}
+.student-name{font-size:15px;font-weight:700;margin-bottom:5px;letter-spacing:-.02em;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.student-meta{font-size:12px;color:#aeaeb2;font-weight:600;line-height:1.4;white-space:nowrap}
+.student-test{font-size:13.5px;color:#1d1d1f;font-weight:700;margin-top:4px;line-height:1.45;word-break:keep-all;letter-spacing:-.02em}
+.score-line{margin-top:9px}
 .type-tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;vertical-align:middle}
 .tag-ox{background:#eff6ff;color:#1d4ed8}.tag-multi{background:#f0fdf4;color:#15803d}.tag-master{background:#faf5ff;color:#7e22ce}
-.score-chip{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;align-self:flex-start}
+.score-chip{display:inline-block;padding:5px 15px;border-radius:20px;font-size:13px;font-weight:800;color:#fff}
 .score-chip.danger{background:#dc2626}.score-chip.warning{background:#d97706}.score-chip.success{background:#16a34a}
 .action-area{width:100%;display:flex;flex-direction:column;gap:8px;margin-top:2px}
 .action-input{width:100%;padding:10px 13px;border:1.5px solid #fce7f3;border-radius:10px;font-size:14px;color:#1d1d1f;font-family:inherit;outline:none;transition:border .15s;background:#fff;-webkit-appearance:none}
@@ -275,6 +277,7 @@ function e(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&l
 function pRD(r){if(!r)return null;if(typeof r==='object'&&r.seconds!=null)return new Date(r.seconds*1000);if(typeof r==='object'&&typeof r.toDate==='function')return r.toDate();if(typeof r!=='string')return null;const m=r.match(/(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);const d=new Date(r);return isNaN(d)?null:d;}
 function resolveDate(r){const t=r.timestamp||r.submittedTimestamp;if(t){if(typeof t==='object'&&t.seconds!=null)return new Date(t.seconds*1000);if(typeof t==='object'&&typeof t.toDate==='function')return t.toDate();const d=new Date(t);return isNaN(d)?null:d;}return pRD(r.date);}
 function fmtDate(d){if(!d||isNaN(d)||d.getTime()<=0)return '-';return`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;}
+function shortDate(d){if(!d||d==='-')return d||'-';const m=String(d).match(/(\d{4})[.\-](\d{1,2})[.\-](\d{1,2})/);return m?`${m[1].slice(2)}.${m[2].padStart(2,'0')}.${m[3].padStart(2,'0')}`:d;}
 function shortGrade(g){const s=String(g==null?'':g).replace('등','').replace('학년','').trim();return s||'?';}
 function avatarCls(g){const s=shortGrade(g);if(s.startsWith('중'))return 'mid';if(s.startsWith('고'))return 'high';return '';}
 
@@ -389,14 +392,15 @@ function renderPending(data,hiddenPending){
       <div class="student-avatar ${avatarCls(s.grade)}">${e(sg)}</div>
       <div class="student-info">
         <div class="student-name">${e(s.name||'-')}<span class="type-tag ${TYPE_TAG[s.type]}">${TYPE_LABEL[s.type]}</span></div>
-        <div class="student-meta">${e(sg)} · ${e(s.test||'-')} · 📅 ${e(s.date)}</div>
-      </div>
-      <span class="score-chip ${lvl}">${s.score}점</span>
-      <div class="action-area">
-        <input class="action-input${s.action?' filled':''}" id="input-${s.caseId}" type="text" placeholder="대처방안을 입력하세요" value="${e(s.action||'')}">
-        <div class="action-btns">
-          <button class="btn-save" onclick="saveAction('${s.caseId}')">저장</button>
-          <button class="btn-complete" onclick="markDone('${s.caseId}')">완료 처리</button>
+        <div class="student-meta">${e(sg)} · ${e(shortDate(s.date))}</div>
+        <div class="student-test">${e(s.test||'-')}</div>
+        <div class="score-line"><span class="score-chip ${lvl}">${s.score}점</span></div>
+        <div class="action-area">
+          <input class="action-input${s.action?' filled':''}" id="input-${s.caseId}" type="text" placeholder="대처방안을 입력하세요" value="${e(s.action||'')}">
+          <div class="action-btns">
+            <button class="btn-save" onclick="saveAction('${s.caseId}')">저장</button>
+            <button class="btn-complete" onclick="markDone('${s.caseId}')">완료 처리</button>
+          </div>
         </div>
       </div>
     </div>`;
@@ -414,18 +418,20 @@ function renderDone(data){
       <div class="student-avatar done">${e(sg)}</div>
       <div class="student-info">
         <div class="student-name">${e(s.name||'-')}<span class="type-tag ${TYPE_TAG[s.type]}">${TYPE_LABEL[s.type]}</span></div>
-        <div class="student-meta">${e(sg)} · ${e(s.test||'-')} · ${s.score}점 · 📅 ${e(s.date)}</div>
-      </div>
-      <div class="action-area">
-        <input class="action-input filled" type="text" value="${e(s.action||'')}" readonly>
-        <div class="action-btns"><button class="btn-reopen" onclick="reopen('${s.caseId}')">↩ 다시 대기로</button></div>
+        <div class="student-meta">${e(sg)} · ${e(shortDate(s.date))}</div>
+        <div class="student-test">${e(s.test||'-')}</div>
+        <div class="score-line"><span class="score-chip success">${s.score}점</span></div>
+        <div class="action-area">
+          <input class="action-input filled" type="text" value="${e(s.action||'')}" readonly>
+          <div class="action-btns"><button class="btn-reopen" onclick="reopen('${s.caseId}')">↩ 다시 대기로</button></div>
+        </div>
       </div>
     </div>`;
   }).join('');
 }
 
 function renderHistory(data){
-  document.getElementById('historyBody').innerHTML=data.map(s=>`<tr><td>${e(s.name||'-')}</td><td>${e(s.test||'-')}</td><td>${TYPE_LABEL[s.type]||'-'}</td><td>${s.score}점</td><td>${s.done?'<span style="color:#16a34a;font-weight:700">완료</span>':'<span style="color:#d97706;font-weight:700">대기</span>'}</td><td>${e(s.action||'-')}</td><td style="color:#aeaeb2">${e(s.date||'-')}</td></tr>`).join('');
+  document.getElementById('historyBody').innerHTML=data.map(s=>`<tr><td>${e(s.name||'-')}</td><td>${e(s.test||'-')}</td><td>${TYPE_LABEL[s.type]||'-'}</td><td>${s.score}점</td><td>${s.done?'<span style="color:#16a34a;font-weight:700">완료</span>':'<span style="color:#d97706;font-weight:700">대기</span>'}</td><td>${e(s.action||'-')}</td><td style="color:#aeaeb2">${e(shortDate(s.date||'-'))}</td></tr>`).join('');
 }
 
 window.showHistory=()=>{const s=document.getElementById('historySection');s.style.display=s.style.display==='none'?'block':'none';};
