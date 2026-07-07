@@ -510,6 +510,8 @@ body {
 .tt-add { width: 100%; height: 32px; background: transparent; border: 1px dashed #fce7f3; border-radius: 6px; cursor: pointer; font-size: 18px; color: #fce7f3; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
 .tt-add:hover { border-color: #db2777; color: #db2777; background: #fdf2f8; }
 .tt-add:active { border-color: #db2777; color: #db2777; background: #fdf2f8; }
+.tt-cell.tt-span { height: 100%; flex-direction: column; gap: 3px; padding: 8px 14px 8px 8px; }
+.tt-span-range { font-size: 9px; font-weight: 600; opacity: 0.7; letter-spacing: -0.02em; }
 
 /* ── 시험 캘린더 ── */
 .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
@@ -991,6 +993,10 @@ body {
     <div style="margin-bottom:10px;">
       <input class="form-input" type="text" id="tt-class-inp" placeholder="수업명 (예: 중2 물리)" style="width:100%;">
     </div>
+    <div class="section-label">수업 길이</div>
+    <select class="form-select" id="tt-span-inp" style="width:100%;margin-bottom:12px;">
+      <option value="1">1시간</option>
+    </select>
     <div class="section-label">색상 선택</div>
     <div class="color-opts" id="tt-color-opts"></div>
     <div class="modal-row">
@@ -1444,25 +1450,54 @@ async function buildTimetable() {
   catch {}
   renderTimetable();
 }
+// span 값을 안전하게 정규화 (기존 데이터엔 span 없음 → 1)
+function ttSpan(cell){ const s=parseInt(cell&&cell.span,10); return (s&&s>1)?s:1; }
 function renderTimetable() {
   const tbl=document.getElementById('timetable-table');
+  // 위 셀의 병합(span)에 의해 가려지는 칸 표시 (건너뛰기용)
+  const covered={};
+  DAYS.forEach(d=>{
+    HOURS.forEach((h,i)=>{
+      const cell=ttData[`${d}-${h}`];
+      if(!cell) return;
+      const span=Math.min(ttSpan(cell), HOURS.length-i);
+      for(let k=1;k<span;k++) covered[`${d}-${i+k}`]=true;
+    });
+  });
   let html=`<thead><tr><th>시간</th>${DAYS.map(d=>`<th>${d}</th>`).join('')}</tr></thead><tbody>`;
-  for(const h of HOURS) {
+  HOURS.forEach((h,i)=>{
     const eh=String(parseInt(h,10)+1).padStart(2,'0')+':00';
     html+=`<tr><td class="time-col">${h}~<br>${eh}</td>`;
     for(const d of DAYS) {
+      if(covered[`${d}-${i}`]) continue; // 위 셀 rowspan에 흡수됨 → td 출력 안 함
       const key=`${d}-${h}`, cell=ttData[key];
-      if(cell) html+=`<td><div class="tt-cell" style="background:${cell.bg};color:${cell.fg};" onclick="deleteTTCell('${key}')">${esc(cell.label)}<span class="tt-del">✕</span></div></td>`;
-      else html+=`<td><button class="tt-add" onclick="openTTModal('${d}','${h}')">+</button></td>`;
+      if(cell){
+        const span=Math.min(ttSpan(cell), HOURS.length-i);
+        const endH=String(parseInt(h,10)+span).padStart(2,'0')+':00';
+        const rowspanAttr=span>1?` rowspan="${span}"`:'';
+        const rangeHtml=span>1?`<span class="tt-span-range">${h}~${endH}</span>`:'';
+        html+=`<td${rowspanAttr}><div class="tt-cell${span>1?' tt-span':''}" style="background:${cell.bg};color:${cell.fg};" onclick="deleteTTCell('${key}')">${esc(cell.label)}${rangeHtml}<span class="tt-del">✕</span></div></td>`;
+      } else {
+        html+=`<td><button class="tt-add" onclick="openTTModal('${d}','${h}')">+</button></td>`;
+      }
     }
     html+='</tr>';
-  }
+  });
   html+='</tbody>'; tbl.innerHTML=html;
 }
 window.openTTModal=(day,hour)=>{
   ttPending={day,hour}; selColor=COLORS[0];
   const opts=document.getElementById('tt-color-opts');
   opts.innerHTML=COLORS.map((c,i)=>`<div class="color-opt ${i===0?'sel':''}" style="background:${c};border:2px solid ${COLORS_DARK[i]};" data-idx="${i}" onclick="selectTTColor(${i},this)"></div>`).join('');
+  // 시작 시각부터 비어있는 연속 칸 수 = 선택 가능한 최대 길이
+  const startIdx=HOURS.indexOf(hour);
+  let maxSpan=HOURS.length-startIdx;
+  for(let k=1;k<maxSpan;k++){ if(ttData[`${day}-${HOURS[startIdx+k]}`]){ maxSpan=k; break; } }
+  const spanSel=document.getElementById('tt-span-inp');
+  let spanOpts='';
+  for(let s=1;s<=maxSpan;s++){ const eh=String(parseInt(hour,10)+s).padStart(2,'0')+':00'; spanOpts+=`<option value="${s}">${s}시간 (${hour}~${eh})</option>`; }
+  spanSel.innerHTML=spanOpts;
+  spanSel.value='1';
   document.getElementById('tt-class-inp').value='';
   document.getElementById('tt-modal').classList.add('open');
 };
@@ -1470,8 +1505,15 @@ window.selectTTColor=(idx,el)=>{ selColor=COLORS[idx]; document.querySelectorAll
 window.saveTTCell = async () => {
   if(!ttPending) return;
   const label=document.getElementById('tt-class-inp').value.trim(); if(!label) return alert('수업명을 입력하세요');
+  let span=parseInt(document.getElementById('tt-span-inp').value,10); if(!span||span<1) span=1;
+  const startIdx=HOURS.indexOf(ttPending.hour);
+  // 범위/겹침 검증
+  for(let k=1;k<span;k++){
+    if(startIdx+k>=HOURS.length){ return alert('시간표 범위를 벗어납니다'); }
+    if(ttData[`${ttPending.day}-${HOURS[startIdx+k]}`]){ return alert('겹치는 수업이 있습니다. 길이를 줄여주세요.'); }
+  }
   const idx=COLORS.indexOf(selColor), fg=COLORS_DARK[idx>=0?idx:0], key=`${ttPending.day}-${ttPending.hour}`;
-  try { await setDoc(doc(db,'timetable',key),{label,bg:selColor,fg}); ttData[key]={label,bg:selColor,fg}; closeTTModal(); renderTimetable(); }
+  try { await setDoc(doc(db,'timetable',key),{label,bg:selColor,fg,span}); ttData[key]={label,bg:selColor,fg,span}; closeTTModal(); renderTimetable(); }
   catch(e) { alert('저장 실패: '+e.message); }
 };
 window.deleteTTCell = async key => {
