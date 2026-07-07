@@ -203,7 +203,7 @@ body {
 .gc-table { background:#fff; border:1px solid #fce7f3; border-radius:16px; overflow:hidden; }
 .gc-head, .gc-row {
   display:grid;
-  grid-template-columns: 104px minmax(0,1.8fr) 78px 92px 80px 46px;
+  grid-template-columns: 96px 90px minmax(0,1.5fr) 72px 86px 74px 44px;
   align-items:center;
 }
 .gc-head {
@@ -218,10 +218,9 @@ body {
 .gc-row > div { display:flex; align-items:center; justify-content:center; min-width:0; }
 .gc-date { font-size:11px; color:#6e6e73; white-space:nowrap; }
 .gc-exam { font-size:13px; font-weight:600; color:#1d1d1f; word-break:break-word; line-height:1.4; }
-.gc-exam-inner { display:flex; flex-direction:column; gap:4px; align-items:flex-start; min-width:0; }
-.gc-subj { display:inline-block; font-size:10.5px; font-weight:700; color:#7c3aed; background:#ede9fe; padding:2px 8px; border-radius:6px; line-height:1.35; white-space:nowrap; }
+.gc-subj-col { min-width:0; }
+.gc-subj { display:inline-block; max-width:100%; font-size:11px; font-weight:700; color:#7c3aed; background:#ede9fe; padding:3px 9px; border-radius:6px; line-height:1.35; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .gc-subj.none { color:#9ca3af; background:#f3f4f6; }
-.gc-exam-name { font-size:13px; font-weight:600; color:#1d1d1f; word-break:break-word; line-height:1.4; }
 .gc-sc { gap:5px; }
 .sc-lbl { display:none; }
 .sc-pill { display:inline-flex; align-items:center; justify-content:center; min-width:46px; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap; }
@@ -320,13 +319,15 @@ body {
   .gc-row {
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-areas:
-      "exam exam del"
+      "subj subj del"
+      "exam exam exam"
       "date date date"
       "ox mc ms";
     gap: 9px 6px;
     padding: 0.95rem 0.95rem;
   }
   .gc-row > div { justify-content:flex-start; }
+  .gc-subj-col { grid-area:subj; }
   .gc-exam { grid-area:exam; font-size:13.5px; align-self:center; }
   .gc-date { grid-area:date; }
   .gc-del  { grid-area:del; justify-content:flex-end !important; }
@@ -732,12 +733,13 @@ function gcRenderTable(list){
     const name=esc2(r.testName||r.examTitle||'—');
     const subjRaw=(r.subject&&String(r.subject).trim())?String(r.subject).trim():'';
     const subjBadge=subjRaw
-      ? `<span class="gc-subj">${esc2(subjRaw)}</span>`
-      : `<span class="gc-subj none">과목 미지정</span>`;
+      ? `<span class="gc-subj" title="${esc2(subjRaw)}">${esc2(subjRaw)}</span>`
+      : `<span class="gc-subj none">미지정</span>`;
     const date=fmtDateShort(r.timestamp)||'—';
     return `<div class="gc-row">
       <div class="gc-date">${date}</div>
-      <div class="gc-exam"><div class="gc-exam-inner">${subjBadge}<span class="gc-exam-name">${name}</span></div></div>
+      <div class="gc-subj-col">${subjBadge}</div>
+      <div class="gc-exam">${name}</div>
       ${scCell(p.ox,'ox')}
       ${scCell(p.mc,'mc')}
       ${scCell(p.master,'ms')}
@@ -745,7 +747,7 @@ function gcRenderTable(list){
     </div>`;
   }).join('');
   el.innerHTML=`<div class="gc-table">
-    <div class="gc-head"><div>응시일</div><div>시험명</div><div>OX</div><div>4지선다</div><div>마스터</div><div>삭제</div></div>
+    <div class="gc-head"><div>응시일</div><div>과목</div><div>시험명</div><div>OX</div><div>4지선다</div><div>마스터</div><div>삭제</div></div>
     ${rows}
   </div>`;
 }
