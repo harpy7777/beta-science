@@ -41,17 +41,33 @@ function StudentExamInner() {
       setExam(e);
       setLoading(false);
     });
-   const savedName = localStorage.getItem('studentName');
+
+    const savedName = localStorage.getItem('studentName');
     const savedId   = localStorage.getItem('studentId');
-    const urlSid    = searchParams.get('sid'); // ★ 클리닉 링크가 실어 보낸 학생ID (OMR과 동일 방식)
-    if (savedName) {
-      setStudentName(savedName);
+    const urlSid    = (searchParams.get('sid') || '').trim();   // ★ 클리닉 링크가 실어 보낸 학생ID
+    const urlSname  = (searchParams.get('sname') || '').trim(); // ★ 클리닉 링크가 실어 보낸 학생 이름
+
+    // ── 신원 결정: URL(sid/sname)이 항상 최우선 ──
+    // 같은 브라우저를 다른 학생이 먼저 썼어도, 이 링크의 sid/sname으로 정확히 덮어써 오염을 막는다.
+    // studentId 우선순위: URL의 sid > localStorage > ''  (성적이 정확한 학생에게 기록됨)
+    const effectiveId = urlSid || savedId || '';
+    if (effectiveId) setStudentId(effectiveId);
+
+    // studentName 우선순위: URL의 sname > (동일 학생일 때만) localStorage
+    // sid가 있는데 저장된 id와 다르면, 저장된 이름은 '다른 학생' 것이므로 절대 쓰지 않는다.
+    let effectiveName = '';
+    if (urlSname) {
+      effectiveName = urlSname;
+    } else if (savedName && (!urlSid || urlSid === (savedId || ''))) {
+      effectiveName = savedName;
+    }
+
+    if (effectiveName) {
+      setStudentName(effectiveName);
       setPhase('exam');
       setCurrent(0);
     }
-    // ★ studentId 우선순위: URL의 sid > localStorage > '' → 성적이 정확한 학생에게 기록되어 학부모 보고서에 표시됨
-    if (urlSid) setStudentId(urlSid);
-    else if (savedId) setStudentId(savedId);
+    // 이름을 확정할 수 없으면(다른 학생 기기 등) 이름 입력 화면을 유지 → 본인 이름으로 정확히 기록
   }, [examId]);
 
   // ★ typeFilter에 따라 실제로 풀 문제 목록 결정
