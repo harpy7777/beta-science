@@ -477,16 +477,12 @@ function normalizeGrade(id,r){
 function isMasterRec(r){return r.testType==='master'||r.masterScore!=null;}
 function oxOf(r){
   if(isMasterRec(r))return null;
-  if(!(r.oxCount>0&&r.oxScore!=null))return null;
-  const scoredMC=(r.multiCount>0&&r.multiScore!=null&&r.multiScore>0);
-  if(!(r.oxScore>0||!scoredMC))return null;
+  if(!(r.oxCount>0&&r.oxScore!=null&&r.oxScore>0))return null;   // 0점 파트 = 미응시 → 숨김
   return{score:r.oxScore,total:r.oxCount};
 }
 function mcOf(r){
   if(isMasterRec(r))return null;
-  if(!(r.multiCount>0&&r.multiScore!=null))return null;
-  const scoredOX=(r.oxCount>0&&r.oxScore!=null&&r.oxScore>0);
-  if(!(r.multiScore>0||!scoredOX))return null;
+  if(!(r.multiCount>0&&r.multiScore!=null&&r.multiScore>0))return null;   // 0점 파트 = 미응시 → 숨김
   return{score:r.multiScore,total:r.multiCount};
 }
 function masterOf(r){
