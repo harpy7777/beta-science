@@ -503,7 +503,7 @@ body {
 .timetable { border-collapse: collapse; width: 100%; min-width: 400px; font-size: 11px; }
 .timetable th { padding: 6px 4px; text-align: center; font-weight: 700; color: #6e6e73; font-size: 10px; border-bottom: 2px solid #fce7f3; }
 .timetable td { padding: 4px; border: 1px solid #fdf2f8; height: 46px; vertical-align: middle; min-width: 55px; }
-.timetable td.time-col { color: #aeaeb2; font-size: 10px; text-align: center; vertical-align: middle; font-weight: 600; min-width: 40px; }
+.timetable td.time-col { color: #aeaeb2; font-size: 11px; line-height: 1.35; text-align: center; vertical-align: middle; font-weight: 600; min-width: 52px; white-space: nowrap; }
 .tt-cell { min-height: 36px; border-radius: 6px; padding: 6px 14px 6px 6px; font-size: 13px; font-weight: 700; line-height: 1.3; cursor: pointer; transition: opacity 0.15s; position: relative; display: flex; align-items: center; justify-content: center; text-align: center; word-break: keep-all; }
 .tt-cell:hover { opacity: 0.8; }
 .tt-del { position: absolute; top: 2px; right: 3px; font-size: 9px; opacity: 0.6; }
@@ -1434,7 +1434,7 @@ window.delClassCard = async id => {
 };
 
 // ── 시간표 ──
-const HOURS=['10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00'];
+const HOURS=['10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'];
 const DAYS=['월','화','수','목','금','토','일'];
 const COLORS=['#fce7f3','#dbeafe','#d1fae5','#fef9c3','#ede9fe','#fff7ed','#f0f9ff','#fdf4ff'];
 const COLORS_DARK=['#db2777','#2563eb','#16a34a','#d97706','#7e22ce','#ea580c','#0284c7','#6d28d9'];
@@ -1448,7 +1448,8 @@ function renderTimetable() {
   const tbl=document.getElementById('timetable-table');
   let html=`<thead><tr><th>시간</th>${DAYS.map(d=>`<th>${d}</th>`).join('')}</tr></thead><tbody>`;
   for(const h of HOURS) {
-    html+=`<tr><td class="time-col">${h}</td>`;
+    const eh=String(parseInt(h,10)+1).padStart(2,'0')+':00';
+    html+=`<tr><td class="time-col">${h}~<br>${eh}</td>`;
     for(const d of DAYS) {
       const key=`${d}-${h}`, cell=ttData[key];
       if(cell) html+=`<td><div class="tt-cell" style="background:${cell.bg};color:${cell.fg};" onclick="deleteTTCell('${key}')">${esc(cell.label)}<span class="tt-del">✕</span></div></td>`;
