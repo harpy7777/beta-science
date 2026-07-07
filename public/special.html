@@ -90,7 +90,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .score-line{margin-top:9px}
 .type-tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;vertical-align:middle}
 .tag-ox{background:#eff6ff;color:#1d4ed8}.tag-multi{background:#f0fdf4;color:#15803d}.tag-master{background:#faf5ff;color:#7e22ce}
-.score-chip{display:inline-block;padding:5px 15px;border-radius:20px;font-size:13px;font-weight:800;color:#fff}
+.score-chip{display:inline-block;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:800;color:#fff;white-space:nowrap}
+
+/* ── 한 줄 가로 행 (테이블형) ── */
+.sp-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sp-scroll::-webkit-scrollbar{height:7px}
+.sp-scroll::-webkit-scrollbar-thumb{background:#fbcfe8;border-radius:4px}
+.sp-list{min-width:1000px;display:flex;flex-direction:column;gap:8px}
+.sp-head{display:flex;align-items:center;gap:10px;padding:2px 12px 8px;font-size:11px;font-weight:700;color:#aeaeb2;letter-spacing:.02em}
+.sp-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #fce7f3;border-radius:12px;padding:9px 12px;transition:border-color .15s}
+.sp-row:hover{border-color:#fbcfe8}
+.sp-row.danger{border-left:3px solid #dc2626;background:#fffafa}
+.sp-row.warning{border-left:3px solid #d97706;background:#fffdf5}
+.sp-row.done{border-left:3px solid #16a34a;background:#f6fef9}
+.col-g{width:46px;flex:none;display:flex;justify-content:center}
+.col-n{width:76px;flex:none;font-size:14px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.col-d{width:76px;flex:none;font-size:12px;font-weight:600;color:#aeaeb2;white-space:nowrap;text-align:center}
+.col-s{width:92px;flex:none;text-align:center}
+.col-t{flex:1 1 auto;min-width:150px;font-size:13px;font-weight:600;color:#1d1d1f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;justify-content:center;gap:6px}
+.col-sc{width:66px;flex:none;display:flex;justify-content:center}
+.col-a{flex:1 1 190px;min-width:170px;text-align:center}
+.col-b{flex:none;display:flex;gap:6px;justify-content:center}
+.gcircle{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;background:#fff0f7;color:#db2777;flex-shrink:0}
+.gcircle.mid{background:#ede9fe;color:#6b21a8}
+.gcircle.high{background:#dbeafe;color:#1e40af}
+.gcircle.done{background:#dcfce7;color:#16a34a}
+.subj-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;background:#fdf2f8;color:#be185d;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+.rinput{width:100%;padding:8px 11px;border:1.5px solid #fce7f3;border-radius:9px;font-size:13px;color:#1d1d1f;font-family:inherit;outline:none;background:#fff;-webkit-appearance:none;transition:border .15s}
+.rinput:focus{border-color:#db2777}
+.rinput.filled{border-color:#86efac;background:#f6fef9;color:#166534;font-weight:600}
+.rbtn{padding:8px 13px;min-height:38px;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:opacity .15s}
+.rbtn.save{background:linear-gradient(135deg,#f472b6,#db2777);color:#fff;box-shadow:0 2px 8px rgba(219,39,119,.25)}
+.rbtn.done{background:linear-gradient(135deg,#4ade80,#16a34a);color:#fff}
+.rbtn.reopen{background:#fff;color:#d97706;border:1.5px solid #fde68a}
+.rbtn:hover{opacity:.85}
 .score-chip.danger{background:#dc2626}.score-chip.warning{background:#d97706}.score-chip.success{background:#16a34a}
 .action-area{width:100%;display:flex;flex-direction:column;gap:8px;margin-top:2px}
 .action-input{width:100%;padding:10px 13px;border:1.5px solid #fce7f3;border-radius:10px;font-size:14px;color:#1d1d1f;font-family:inherit;outline:none;transition:border .15s;background:#fff;-webkit-appearance:none}
@@ -330,6 +363,7 @@ function buildCases(){
       sid,
       name:r.studentName||'-',
       grade:r.studentGrade||r.grade||'',
+      subject:r.subject||r.subjectName||r.examSubject||r.studentSubject||r.course||'',
       test:r.testName||r.examTitle||r.unitName||'-',
       dObj,
       dateStr:fmtDate(dObj)
@@ -383,51 +417,51 @@ function renderPending(data,hiddenPending){
     ? `<div class="hidden-note"><span>⏳ 기간 밖 미처리 기록 ${hiddenPending}건이 숨겨져 있습니다</span><button onclick="setPeriod(0,document.querySelector('.pf-chip[data-days=&quot;0&quot;]'))">전체 보기</button></div>`
     : '';
   if(!data.length){l.innerHTML=note+`<div class="empty-state"><p>✅ 이 기간에 처리할 70점 미만 기록이 없습니다</p></div>`;return;}
-  l.innerHTML=note+data.map(s=>{
+  const head=`<div class="sp-head"><span class="col-g">학년</span><span class="col-n">이름</span><span class="col-d">날짜</span><span class="col-s">과목</span><span class="col-t">단원·시험명</span><span class="col-sc">점수</span><span class="col-a">대처방안</span><span class="col-b">관리</span></div>`;
+  const rows=data.map(s=>{
     const lvl=s.score<40?'danger':s.score<60?'warning':'success';
-    const itemLvl=s.score<40?'danger':s.score<60?'warning':'';
+    const rowLvl=s.score<40?'danger':s.score<60?'warning':'';
     const sg=shortGrade(s.grade);
+    const subj=s.subject?`<span class="subj-badge">${e(s.subject)}</span>`:'<span style="color:#d1d1d6">-</span>';
     return `
-    <div class="student-item ${itemLvl}">
-      <div class="student-avatar ${avatarCls(s.grade)}">${e(sg)}</div>
-      <div class="student-info">
-        <div class="student-name">${e(s.name||'-')}<span class="type-tag ${TYPE_TAG[s.type]}">${TYPE_LABEL[s.type]}</span></div>
-        <div class="student-meta">${e(sg)} · ${e(shortDate(s.date))}</div>
-        <div class="student-test">${e(s.test||'-')}</div>
-        <div class="score-line"><span class="score-chip ${lvl}">${s.score}점</span></div>
-        <div class="action-area">
-          <input class="action-input${s.action?' filled':''}" id="input-${s.caseId}" type="text" placeholder="대처방안을 입력하세요" value="${e(s.action||'')}">
-          <div class="action-btns">
-            <button class="btn-save" onclick="saveAction('${s.caseId}')">저장</button>
-            <button class="btn-complete" onclick="markDone('${s.caseId}')">완료 처리</button>
-          </div>
-        </div>
-      </div>
+    <div class="sp-row ${rowLvl}">
+      <span class="col-g"><span class="gcircle ${avatarCls(s.grade)}">${e(sg)}</span></span>
+      <span class="col-n">${e(s.name||'-')}</span>
+      <span class="col-d">${e(shortDate(s.date))}</span>
+      <span class="col-s">${subj}</span>
+      <span class="col-t" title="${e(s.test||'-')}"><span class="type-tag ${TYPE_TAG[s.type]}">${TYPE_LABEL[s.type]}</span>${e(s.test||'-')}</span>
+      <span class="col-sc"><span class="score-chip ${lvl}">${s.score}점</span></span>
+      <span class="col-a"><input class="rinput${s.action?' filled':''}" id="input-${s.caseId}" type="text" placeholder="대처방안 입력" value="${e(s.action||'')}"></span>
+      <span class="col-b">
+        <button class="rbtn save" onclick="saveAction('${s.caseId}')">저장</button>
+        <button class="rbtn done" onclick="markDone('${s.caseId}')">완료처리</button>
+      </span>
     </div>`;
   }).join('');
+  l.innerHTML=note+`<div class="sp-scroll"><div class="sp-list">${head}${rows}</div></div>`;
 }
 
 function renderDone(data){
   const l=document.getElementById('doneList');
   document.getElementById('doneCount').textContent=data.length;
   if(!data.length){l.innerHTML=`<div class="empty-state"><p>처리 완료된 항목이 없습니다</p></div>`;return;}
-  l.innerHTML=data.map(s=>{
+  const head=`<div class="sp-head"><span class="col-g">학년</span><span class="col-n">이름</span><span class="col-d">날짜</span><span class="col-s">과목</span><span class="col-t">단원·시험명</span><span class="col-sc">점수</span><span class="col-a">대처방안</span><span class="col-b">관리</span></div>`;
+  const rows=data.map(s=>{
     const sg=shortGrade(s.grade);
+    const subj=s.subject?`<span class="subj-badge">${e(s.subject)}</span>`:'<span style="color:#d1d1d6">-</span>';
     return `
-    <div class="student-item done">
-      <div class="student-avatar done">${e(sg)}</div>
-      <div class="student-info">
-        <div class="student-name">${e(s.name||'-')}<span class="type-tag ${TYPE_TAG[s.type]}">${TYPE_LABEL[s.type]}</span></div>
-        <div class="student-meta">${e(sg)} · ${e(shortDate(s.date))}</div>
-        <div class="student-test">${e(s.test||'-')}</div>
-        <div class="score-line"><span class="score-chip success">${s.score}점</span></div>
-        <div class="action-area">
-          <input class="action-input filled" type="text" value="${e(s.action||'')}" readonly>
-          <div class="action-btns"><button class="btn-reopen" onclick="reopen('${s.caseId}')">↩ 다시 대기로</button></div>
-        </div>
-      </div>
+    <div class="sp-row done">
+      <span class="col-g"><span class="gcircle done">${e(sg)}</span></span>
+      <span class="col-n">${e(s.name||'-')}</span>
+      <span class="col-d">${e(shortDate(s.date))}</span>
+      <span class="col-s">${subj}</span>
+      <span class="col-t" title="${e(s.test||'-')}"><span class="type-tag ${TYPE_TAG[s.type]}">${TYPE_LABEL[s.type]}</span>${e(s.test||'-')}</span>
+      <span class="col-sc"><span class="score-chip success">${s.score}점</span></span>
+      <span class="col-a"><input class="rinput filled" type="text" value="${e(s.action||'')}" readonly></span>
+      <span class="col-b"><button class="rbtn reopen" onclick="reopen('${s.caseId}')">↩ 대기로</button></span>
     </div>`;
   }).join('');
+  l.innerHTML=`<div class="sp-scroll"><div class="sp-list">${head}${rows}</div></div>`;
 }
 
 function renderHistory(data){
@@ -441,7 +475,7 @@ async function writeCase(caseId,patch){
   const c=caseMap[caseId];
   if(!c){showToast('기록을 찾을 수 없습니다');return;}
   await setDoc(doc(db,"specialManagement",caseId),{
-    caseId,studentId:c.sid,name:c.name,grade:c.grade,test:c.test,
+    caseId,studentId:c.sid,name:c.name,grade:c.grade,subject:c.subject||'',test:c.test,
     type:c.type,score:c.score,date:c.dateStr,updatedAt:new Date().toISOString(),
     ...patch
   },{merge:true});
