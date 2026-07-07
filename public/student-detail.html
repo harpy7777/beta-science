@@ -653,17 +653,17 @@ function partScores(r){
   const hasOx = r.ox && r.ox.total;
   const hasMc = r.multiple && r.multiple.total;
   if(hasOx || hasMc){
-    return {
-      ox: hasOx ? (r.ox.score!=null?r.ox.score:0) : null,
-      mc: hasMc ? (r.multiple.score!=null?r.multiple.score:0) : null,
-      master: null
-    };
+    let ox = hasOx ? (r.ox.score!=null?+r.ox.score:0) : null;
+    let mc = hasMc ? (r.multiple.score!=null?+r.multiple.score:0) : null;
+    if(ox!=null && !(ox>0)) ox=null;   // 0점 파트 = 미응시 → 숨김
+    if(mc!=null && !(mc>0)) mc=null;   // 0점 파트 = 미응시 → 숨김
+    return { ox, mc, master:null };
   }
-  // 옛 구조 (단일 score + testType)
-  const sc = r.score!=null ? r.score : 0;
-  if(r.testType==='ox')     return { ox:sc, mc:null, master:null };
+  // 옛 구조 (단일 score + testType) — 0점 파트는 미응시로 숨김
+  const sc = r.score!=null ? +r.score : 0;
+  if(r.testType==='ox')     return { ox: sc>0?sc:null, mc:null, master:null };
   if(r.testType==='master') return { ox:null, mc:null, master:sc };
-  return { ox:null, mc:sc, master:null }; // 기본 4지선다
+  return { ox:null, mc: sc>0?sc:null, master:null }; // 기본 4지선다
 }
 function hasType(r,kind){ return partScores(r)[kind]!=null; }
 function typeScore(r,kind){ const v=partScores(r)[kind]; return v==null?0:v; }
