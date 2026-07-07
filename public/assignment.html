@@ -374,6 +374,7 @@ function renderLink(it){
 
 /* ── 시험 바로가기 (온라인 테스트 / 마스터테스트) ── */
 let clinicStudentId = '';   // 클리닉 문서의 studentId (load에서 설정)
+let clinicStudentName = ''; // 클리닉 문서의 studentName (load에서 설정) — 표시 이름을 sid와 일치시키기 위해 링크에 실어 보냄
 let clinicReturnHref = '';  // 시험 끝낸 뒤 돌아올 이 클리닉 첫 페이지 주소 (load에서 설정)
 function buildExamHref(it){
   // 시험을 끝낸 학생이 "시험 목록으로" 누르면 이 클리닉 첫 페이지로 돌아오도록 from 전달
@@ -381,15 +382,17 @@ function buildExamHref(it){
   if(it.source==='master'){
     const qs=[];
     if(clinicStudentId) qs.push('sid='+encodeURIComponent(clinicStudentId));
+    if(clinicStudentName) qs.push('sname='+encodeURIComponent(clinicStudentName));
     if(fromPart) qs.push(fromPart);
     let url='/student-omr.html?testId='+encodeURIComponent(it.examId||'');
     if(qs.length) url += '&'+qs.join('&');
     return url;
   }
- // online: /student/{examId}?type=ox|multiple&sid=학생ID
+ // online: /student/{examId}?type=ox|multiple&sid=학생ID&sname=학생이름
   const qs=[];
   if(it.examType) qs.push('type='+encodeURIComponent(it.examType));
   if(clinicStudentId) qs.push('sid='+encodeURIComponent(clinicStudentId)); // ★ 마스터(OMR)와 동일하게 학생ID를 링크에 실어 보냄 → 성적이 그 학생에게 정확히 기록
+  if(clinicStudentName) qs.push('sname='+encodeURIComponent(clinicStudentName)); // ★ 이름도 실어 보내 표시·저장 이름을 sid와 100% 일치시킴 (다른 학생 기기 오염 방지)
   if(fromPart) qs.push(fromPart);
   let url='/student/'+encodeURIComponent(it.examId||'');
   if(qs.length) url += '?'+qs.join('&');
@@ -598,6 +601,7 @@ async function load(){
   const data=snap.data();
   const items=Array.isArray(data.items)?data.items:[];
   clinicStudentId = data.studentId || '';
+  clinicStudentName = data.studentName || '';
   // 시험을 끝낸 학생이 돌아올 이 클리닉 첫 페이지 주소 (토큰 포함)
   clinicReturnHref = location.pathname + '?t=' + encodeURIComponent(token);
   try{ localStorage.setItem('clinicReturn', clinicReturnHref); }catch(e){}
