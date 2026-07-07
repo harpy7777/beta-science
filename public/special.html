@@ -74,23 +74,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .student-info{flex:1;min-width:120px}
 .student-name{font-size:14px;font-weight:700;margin-bottom:3px;letter-spacing:-.02em}
 .student-meta{font-size:12px;color:#aeaeb2}
+.type-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;margin-left:6px;vertical-align:middle}
+.tag-ox{background:#eff6ff;color:#1d4ed8}.tag-multi{background:#f0fdf4;color:#15803d}.tag-master{background:#faf5ff;color:#7e22ce}
 .score-chip{padding:4px 13px;border-radius:20px;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;align-self:flex-start}
 .score-chip.danger{background:#dc2626}.score-chip.warning{background:#d97706}.score-chip.success{background:#16a34a}
 .action-area{width:100%;display:flex;flex-direction:column;gap:7px;margin-top:4px}
 .action-input{flex:1;padding:10px 13px;border:1.5px solid #fce7f3;border-radius:10px;font-size:14px;color:#1d1d1f;font-family:inherit;outline:none;transition:border .15s;background:#fff;-webkit-appearance:none}
 .action-input:focus{border-color:#db2777}
 .action-input.filled{border-color:#16a34a;background:#f0fdf4}
-.action-btns{display:flex;gap:8px}
+.action-btns{display:flex;gap:8px;flex-wrap:wrap}
 .btn-save{padding:9px 16px;min-height:40px;background:linear-gradient(135deg,#f472b6,#db2777);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:opacity .15s;box-shadow:0 2px 8px rgba(219,39,119,.25)}
 .btn-save:hover{opacity:.85}
 .btn-complete{padding:9px 16px;min-height:40px;background:linear-gradient(135deg,#4ade80,#16a34a);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:opacity .15s}
 .btn-complete:hover{opacity:.85}
+.btn-reopen{padding:8px 14px;min-height:38px;background:#fff;color:#d97706;border:1.5px solid #fde68a;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s}
+.btn-reopen:hover{background:#fffbeb}
 .btn-outline{display:flex;align-items:center;gap:6px;padding:9px 16px;min-height:40px;border:1.5px solid #fce7f3;border-radius:20px;background:#fff;font-size:13px;font-weight:600;color:#db2777;cursor:pointer;transition:background .15s;font-family:inherit;white-space:nowrap;flex-shrink:0}
 .btn-outline:hover{background:#fdf2f8}
 
 /* ── History Table ── */
 .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:collapse;min-width:480px}
+table{width:100%;border-collapse:collapse;min-width:520px}
 thead th{font-size:11px;font-weight:700;color:#aeaeb2;text-align:left;padding:9px 13px;border-bottom:1px solid #fce7f3;background:#fafafa;white-space:nowrap}
 tbody tr{border-bottom:1px solid #fce7f3;transition:background .1s}
 tbody tr:last-child{border-bottom:none}
@@ -113,11 +117,11 @@ tbody td{font-size:13px;padding:11px 13px;color:#1d1d1f}
   .section-card{border-radius:14px}
   .student-item{flex-direction:column;gap:8px}
   .action-btns{flex-direction:column}
-  .btn-save,.btn-complete{width:100%;text-align:center;justify-content:center}
+  .btn-save,.btn-complete,.btn-reopen{width:100%;text-align:center;justify-content:center}
 }
 @media(min-width:601px){
   .student-item{flex-wrap:nowrap;align-items:center}
-  .action-area{width:auto;min-width:200px;margin-top:0}
+  .action-area{width:auto;min-width:220px;margin-top:0}
 }
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
@@ -157,7 +161,7 @@ tbody td{font-size:13px;padding:11px 13px;color:#1d1d1f}
       <div class="hero-icon">⚠️</div>
       <div>
         <div class="hero-title">특별 관리 대상</div>
-        <div class="hero-sub">70점 미만 학생들의 대처방안을 입력하고 관리하세요</div>
+        <div class="hero-sub">70점 미만 응시 기록을 자동으로 모아 대처방안을 관리하세요</div>
       </div>
     </div>
     <button class="btn-outline" onclick="showHistory()">
@@ -175,7 +179,7 @@ tbody td{font-size:13px;padding:11px 13px;color:#1d1d1f}
         <div class="stat-icon-wrap warning">⚠️</div>
       </div>
       <div class="stat-number warning" id="pendingCount">0</div>
-      <div class="stat-desc">대처방안 미입력 학생</div>
+      <div class="stat-desc">대처방안 미입력 기록</div>
     </div>
     <div class="stat-card">
       <div class="stat-card-top">
@@ -183,7 +187,7 @@ tbody td{font-size:13px;padding:11px 13px;color:#1d1d1f}
         <div class="stat-icon-wrap success">✅</div>
       </div>
       <div class="stat-number success" id="doneCount">0</div>
-      <div class="stat-desc">대처방안 입력 완료</div>
+      <div class="stat-desc">대처방안 처리 완료</div>
     </div>
   </div>
 
@@ -195,7 +199,7 @@ tbody td{font-size:13px;padding:11px 13px;color:#1d1d1f}
       <h2>대처방안 입력 필요</h2>
     </div>
     <div class="section-body">
-      <div class="student-list" id="pendingList"></div>
+      <div class="student-list" id="pendingList"><div class="empty-state"><p>불러오는 중...</p></div></div>
     </div>
   </div>
 
@@ -220,7 +224,7 @@ tbody td{font-size:13px;padding:11px 13px;color:#1d1d1f}
     <div class="section-body">
       <div class="table-scroll">
         <table>
-          <thead><tr><th>학생명</th><th>테스트</th><th>점수</th><th>상태</th><th>대처방안</th><th>날짜</th></tr></thead>
+          <thead><tr><th>학생명</th><th>테스트</th><th>유형</th><th>점수</th><th>상태</th><th>대처방안</th><th>날짜</th></tr></thead>
           <tbody id="historyBody"></tbody>
         </table>
       </div>
@@ -233,53 +237,172 @@ tbody td{font-size:13px;padding:11px 13px;color:#1d1d1f}
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc,collection,onSnapshot,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,setDoc,collection,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
 const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app);
-onAuthStateChanged(auth,async u=>{if(!u){window.location.replace("/login.html");return;}try{const s=await getDoc(doc(db,"users",u.uid));if(!s.exists()||s.data().status!=="approved"){await signOut(auth);window.location.replace("/login.html");return;}document.body.style.visibility="visible";initPage();}catch(e){window.location.replace("/login.html");}});
+
+/* ── 기준점: 70점 미만이면 특별관리 대상 (대시보드와 통일) ── */
+const THRESHOLD=70;
+const TYPE_LABEL={ox:'OX',multi:'4지선다',master:'마스터'};
+const TYPE_TAG={ox:'tag-ox',multi:'tag-multi',master:'tag-master'};
+
+onAuthStateChanged(auth,async u=>{
+  if(!u){window.location.replace("/login.html");return;}
+  try{const s=await getDoc(doc(db,"users",u.uid));
+    if(!s.exists()||s.data().status!=="approved"){await signOut(auth);window.location.replace("/login.html");return;}
+    document.body.style.visibility="visible";initPage();
+  }catch(e){window.location.replace("/login.html");}
+});
 window.doLogout=async function(){await signOut(auth);window.location.replace("/login.html");};
-function initPage(){onSnapshot(collection(db,"specialManagement"),s=>{const all=s.docs.map(d=>({id:d.id,...d.data()}));renderPending(all.filter(x=>!x.done));renderDone(all.filter(x=>x.done));renderHistory(all);});}
-window.renderPending=(data)=>{
+
+/* ── 유틸 ── */
+function e(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function pRD(r){if(!r)return null;if(typeof r==='object'&&r.seconds!=null)return new Date(r.seconds*1000);if(typeof r==='object'&&typeof r.toDate==='function')return r.toDate();if(typeof r!=='string')return null;const m=r.match(/(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);const d=new Date(r);return isNaN(d)?null:d;}
+function resolveDate(r){const t=r.timestamp||r.submittedTimestamp;if(t){if(typeof t==='object'&&t.seconds!=null)return new Date(t.seconds*1000);if(typeof t==='object'&&typeof t.toDate==='function')return t.toDate();const d=new Date(t);return isNaN(d)?null:d;}return pRD(r.date);}
+function fmtDate(d){if(!d||isNaN(d)||d.getTime()<=0)return '-';return`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;}
+
+/* ── 점수 계산 (dashboard.html과 동일 로직) ── */
+function cSc(r){let o,mu,ma;if(r.oxScore!=null)o=+r.oxScore;else if(Array.isArray(r.oxAnswers)&&Array.isArray(r.oxCorrect)){let c=0;r.oxAnswers.forEach((a,i)=>{if(a===r.oxCorrect[i])c++;});o=Math.round(c/r.oxCorrect.length*100);}else if(r.testType==='ox'&&r.score!=null)o=+r.score;if(r.multiScore!=null)mu=+r.multiScore;else if(Array.isArray(r.multiAnswers)&&Array.isArray(r.multiCorrect)){let c=0;r.multiAnswers.forEach((a,i)=>{if(a===r.multiCorrect[i])c++;});mu=Math.round(c/r.multiCorrect.length*100);}else if(r.testType==='multiple'&&r.score!=null)mu=+r.score;if(r.testType==='master'&&r.score!=null)ma=+r.score;else if(r.masterScore!=null)ma=+r.masterScore;if(o==null&&mu==null&&ma==null){if(r.testType==='ox')o=+(r.score||0);else if(r.testType==='multiple')mu=+(r.score||0);}return{oxScore:o,multiScore:mu,masterScore:ma};}
+function partScores(r){
+  if(r.category==='master'||r.testType==='master'){
+    const sc=(r.multiple&&typeof r.multiple==='object'&&r.multiple.score!=null)?+r.multiple.score:(r.score!=null?+r.score:null);
+    return {ox:null,multi:null,master:sc};
+  }
+  const hasOx=r.ox&&typeof r.ox==='object'&&r.ox.total;
+  const hasMu=r.multiple&&typeof r.multiple==='object'&&r.multiple.total;
+  if(hasOx||hasMu){
+    let ox=hasOx?(r.ox.score!=null?+r.ox.score:0):null;
+    let mu=hasMu?(r.multiple.score!=null?+r.multiple.score:0):null;
+    if(ox!=null&&!(ox>0))ox=null;
+    if(mu!=null&&!(mu>0))mu=null;
+    return {ox,multi:mu,master:null};
+  }
+  const{oxScore:o,multiScore:mu,masterScore:ma}=cSc(r);
+  let ox=o==null?null:+o, m=mu==null?null:+mu, ms=ma==null?null:+ma;
+  if(ox!=null&&!(ox>0))ox=null;
+  if(m!=null&&!(m>0))m=null;
+  if(ox==null&&m==null&&ms==null&&r.score!=null&&+r.score>0)m=+r.score;
+  return {ox, multi:m, master:ms};
+}
+
+/* ── 실시간 데이터 ── */
+let aIds=new Set();      // 등록 학생 id 집합 (탈원생 필터용)
+let gradeDocs=[];        // grades 원본
+let mgmtMap={};          // specialManagement: caseId -> {action, done, date}
+let caseMap={};          // 현재 화면의 caseId -> case 정보 (버튼에서 사용)
+
+function initPage(){
+  onSnapshot(collection(db,"students"),s=>{aIds=new Set(s.docs.map(d=>d.data().id).filter(Boolean));render();});
+  onSnapshot(collection(db,"grades"),s=>{gradeDocs=s.docs;render();});
+  onSnapshot(collection(db,"specialManagement"),s=>{const m={};s.docs.forEach(d=>{m[d.id]=d.data();});mgmtMap=m;render();});
+}
+
+/* grades에서 70점 미만 파트를 케이스로 추출 (파트 1개 = 케이스 1개) */
+function buildCases(){
+  const cases=[];
+  gradeDocs.forEach(d=>{
+    const r=d.data(),sid=r.studentId||'';
+    if(aIds.size>0 && sid && !aIds.has(sid))return;   // 등록 학생만 (대시보드와 동일 기준)
+    const p=partScores(r);
+    const dObj=resolveDate(r);
+    const base={
+      sid,
+      name:r.studentName||'-',
+      grade:r.studentGrade||r.grade||'',
+      test:r.testName||r.examTitle||r.unitName||'-',
+      dObj,
+      dateStr:fmtDate(dObj)
+    };
+    [['ox',p.ox],['multi',p.multi],['master',p.master]].forEach(([type,sc])=>{
+      if(sc!=null && sc<THRESHOLD){
+        cases.push({...base,caseId:`${d.id}__${type}`,type,score:sc});
+      }
+    });
+  });
+  return cases;
+}
+
+function render(){
+  const cases=buildCases();
+  cases.sort((a,b)=>(b.dObj?b.dObj.getTime():0)-(a.dObj?a.dObj.getTime():0));
+  caseMap={};
+  const pending=[],done=[];
+  cases.forEach(c=>{
+    caseMap[c.caseId]=c;
+    const m=mgmtMap[c.caseId]||{};
+    const item={...c,action:m.action||'',done:!!m.done,date:m.date||c.dateStr};
+    (item.done?done:pending).push(item);
+  });
+  renderPending(pending);
+  renderDone(done);
+  renderHistory([...pending,...done]);
+}
+
+function renderPending(data){
   const l=document.getElementById('pendingList');
   document.getElementById('pendingCount').textContent=data.length;
-  if(!data.length){l.innerHTML=`<div class="empty-state"><p>✅ 모든 학생의 대처방안이 입력되었습니다</p></div>`;return;}
-  l.innerHTML=data.map(s=>`
-    <div class="student-item ${s.score<40?'danger':s.score<60?'warning':''}">
-      <div class="student-avatar">${(s.name||'?')[0]}</div>
+  if(!data.length){l.innerHTML=`<div class="empty-state"><p>✅ 70점 미만 미처리 기록이 없습니다</p></div>`;return;}
+  l.innerHTML=data.map(s=>{
+    const chip=s.score<40?'danger':s.score<60?'warning':'success';
+    const item=s.score<40?'danger':s.score<60?'warning':'';
+    return `
+    <div class="student-item ${item}">
+      <div class="student-avatar">${e((s.name||'?')[0])}</div>
       <div class="student-info">
-        <div class="student-name">${s.name||'-'}</div>
-        <div class="student-meta">${s.grade||''} · ${s.test||''}</div>
+        <div class="student-name">${e(s.name||'-')}<span class="type-tag ${TYPE_TAG[s.type]}">${TYPE_LABEL[s.type]}</span></div>
+        <div class="student-meta">${e(s.grade||'')}${s.grade?' · ':''}${e(s.test||'')} · ${e(s.date)}</div>
       </div>
-      <span class="score-chip ${s.score<40?'danger':s.score<60?'warning':'success'}">${s.score}점</span>
+      <span class="score-chip ${chip}">${s.score}점</span>
       <div class="action-area">
-        <input class="action-input" id="input-${s.id}" type="text" placeholder="대처방안을 입력하세요" value="${s.action||''}">
+        <input class="action-input" id="input-${s.caseId}" type="text" placeholder="대처방안을 입력하세요" value="${e(s.action||'')}">
         <div class="action-btns">
-          <button class="btn-save" onclick="saveAction('${s.id}')">저장</button>
-          <button class="btn-complete" onclick="markDone('${s.id}')">완료 처리</button>
+          <button class="btn-save" onclick="saveAction('${s.caseId}')">저장</button>
+          <button class="btn-complete" onclick="markDone('${s.caseId}')">완료 처리</button>
         </div>
       </div>
-    </div>`).join('');
-};
-window.renderDone=(data)=>{
+    </div>`;
+  }).join('');
+}
+
+function renderDone(data){
   const l=document.getElementById('doneList');
   document.getElementById('doneCount').textContent=data.length;
   if(!data.length){l.innerHTML=`<div class="empty-state"><p>처리 완료된 항목이 없습니다</p></div>`;return;}
   l.innerHTML=data.map(s=>`
     <div class="student-item" style="border-left:3px solid #16a34a;background:#f0fdf4">
-      <div class="student-avatar" style="background:#dcfce7;color:#16a34a">${(s.name||'?')[0]}</div>
+      <div class="student-avatar" style="background:#dcfce7;color:#16a34a">${e((s.name||'?')[0])}</div>
       <div class="student-info">
-        <div class="student-name">${s.name||'-'}</div>
-        <div class="student-meta">${s.test||''}</div>
+        <div class="student-name">${e(s.name||'-')}<span class="type-tag ${TYPE_TAG[s.type]}">${TYPE_LABEL[s.type]}</span></div>
+        <div class="student-meta">${e(s.test||'')} · ${s.score}점 · ${e(s.date)}</div>
       </div>
       <div class="action-area">
-        <input class="action-input filled" type="text" value="${s.action||''}" readonly>
+        <input class="action-input filled" type="text" value="${e(s.action||'')}" readonly>
+        <div class="action-btns">
+          <button class="btn-reopen" onclick="reopen('${s.caseId}')">↩ 다시 대기로</button>
+        </div>
       </div>
     </div>`).join('');
-};
-window.renderHistory=(data)=>{document.getElementById('historyBody').innerHTML=data.map(s=>`<tr><td>${s.name||'-'}</td><td>${s.test||'-'}</td><td>${s.score}점</td><td>${s.done?'<span style="color:#16a34a;font-weight:700">완료</span>':'<span style="color:#d97706;font-weight:700">대기</span>'}</td><td>${s.action||'-'}</td><td style="color:#aeaeb2">${s.date||'-'}</td></tr>`).join('');};
+}
+
+function renderHistory(data){
+  document.getElementById('historyBody').innerHTML=data.map(s=>`<tr><td>${e(s.name||'-')}</td><td>${e(s.test||'-')}</td><td>${TYPE_LABEL[s.type]||'-'}</td><td>${s.score}점</td><td>${s.done?'<span style="color:#16a34a;font-weight:700">완료</span>':'<span style="color:#d97706;font-weight:700">대기</span>'}</td><td>${e(s.action||'-')}</td><td style="color:#aeaeb2">${e(s.date||'-')}</td></tr>`).join('');
+}
+
 window.showHistory=()=>{const s=document.getElementById('historySection');s.style.display=s.style.display==='none'?'block':'none';};
-window.saveAction=async(id)=>{const v=document.getElementById(`input-${id}`).value;await updateDoc(doc(db,"specialManagement",id),{action:v});showToast("저장되었습니다!");};
-window.markDone=async(id)=>{const v=document.getElementById(`input-${id}`).value;await updateDoc(doc(db,"specialManagement",id),{action:v,done:true});showToast("처리가 완료되었습니다!");};
+
+/* specialManagement에 caseId를 문서 ID로 저장 (결정적 ID → 중복 없음) */
+async function writeCase(caseId,patch){
+  const c=caseMap[caseId];
+  if(!c){showToast('기록을 찾을 수 없습니다');return;}
+  await setDoc(doc(db,"specialManagement",caseId),{
+    caseId,studentId:c.sid,name:c.name,grade:c.grade,test:c.test,
+    type:c.type,score:c.score,date:c.dateStr,updatedAt:new Date().toISOString(),
+    ...patch
+  },{merge:true});
+}
+window.saveAction=async(caseId)=>{const el=document.getElementById(`input-${caseId}`);const v=el?el.value.trim():'';try{await writeCase(caseId,{action:v,done:false});showToast("저장되었습니다!");}catch(e){showToast("저장 실패: "+e.message);}};
+window.markDone=async(caseId)=>{const el=document.getElementById(`input-${caseId}`);const v=el?el.value.trim():'';try{await writeCase(caseId,{action:v,done:true});showToast("처리가 완료되었습니다!");}catch(e){showToast("처리 실패: "+e.message);}};
+window.reopen=async(caseId)=>{try{await writeCase(caseId,{done:false});showToast("다시 대기 목록으로 이동했습니다");}catch(e){showToast("변경 실패: "+e.message);}};
 window.showToast=(m)=>{const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);};
 </script>
 </body>
