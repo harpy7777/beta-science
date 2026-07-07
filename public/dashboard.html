@@ -408,15 +408,20 @@ function partScores(r){
   const hasOx=r.ox&&typeof r.ox==='object'&&r.ox.total;
   const hasMu=r.multiple&&typeof r.multiple==='object'&&r.multiple.total;
   if(hasOx||hasMu){
-    return {
-      ox: hasOx?(r.ox.score!=null?+r.ox.score:0):null,
-      multi: hasMu?(r.multiple.score!=null?+r.multiple.score:0):null,
-      master:null
-    };
+    let ox=hasOx?(r.ox.score!=null?+r.ox.score:0):null;
+    let mu=hasMu?(r.multiple.score!=null?+r.multiple.score:0):null;
+    if(ox!=null&&!(ox>0))ox=null;   // 0점 파트 = 미응시 → 숨김
+    if(mu!=null&&!(mu>0))mu=null;   // 0점 파트 = 미응시 → 숨김
+    return {ox,multi:mu,master:null};
   }
   // 옛 구조 폴백
   const{oxScore:o,multiScore:mu,masterScore:ma}=cSc(r);
-  return {ox:o==null?null:o, multi:mu==null?null:mu, master:ma==null?null:ma};
+  let ox=o==null?null:+o, m=mu==null?null:+mu, ms=ma==null?null:+ma;
+  if(ox!=null&&!(ox>0))ox=null;
+  if(m!=null&&!(m>0))m=null;
+  // 타입 정보가 전혀 없는 옛 문서: 대표 score>0면 4지선다로 표시(기록 유실 방지)
+  if(ox==null&&m==null&&ms==null&&r.score!=null&&+r.score>0)m=+r.score;
+  return {ox, multi:m, master:ms};
 }
 // 이 기록이 가진 타입들 (배지 표시용). 마스터면 ['master'], 일반이면 존재하는 ox/multi
 function recTypes(r){
@@ -425,7 +430,7 @@ function recTypes(r){
   const ts=[];
   if(p.ox!=null)ts.push('ox');
   if(p.multi!=null)ts.push('multi');
-  return ts.length?ts:['ox'];
+  return ts;
 }
 
 function iStats(){
