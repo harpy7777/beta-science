@@ -1258,11 +1258,33 @@ async function loadStudentList() {
   }
 }
 
-// ── 반(班): 시간표 수업명 기반 ──
+// ── 반(班): 시간표 요일+시작시간+수업명 기반 ──
+// 같은 수업명이라도 요일/시간이 다르면 다른 반으로 구분 (예: "토요일 오전 10시 물질과 에너지")
+const DAY_FULL = { '월':'월요일','화':'화요일','수':'수요일','목':'목요일','금':'금요일','토':'토요일','일':'일요일' };
+const DAY_ORDER = ['월','화','수','목','금','토','일'];
+function fmtClassName(day, hour, label){
+  const h = parseInt(hour,10);
+  const ampm = (isNaN(h) || h < 12) ? '오전' : '오후';
+  let h12 = isNaN(h) ? 0 : (h % 12); if (h12 === 0) h12 = 12;
+  return `${DAY_FULL[day]||day} ${ampm} ${h12}시 ${label}`;
+}
 function getClassList(){
-  const set = new Set();
-  Object.values(ttData).forEach(c => { if (c && c.label){ const l = String(c.label).trim(); if (l) set.add(l); } });
-  return [...set].sort((a,b) => a.localeCompare(b,'ko'));
+  const arr = [], seen = new Set();
+  Object.keys(ttData).forEach(key => {
+    const c = ttData[key];
+    if (!c || !c.label) return;
+    const label = String(c.label).trim();
+    if (!label) return;
+    const dash = key.indexOf('-');
+    const day = dash >= 0 ? key.slice(0, dash) : key;
+    const hour = dash >= 0 ? key.slice(dash+1) : '';
+    const name = fmtClassName(day, hour, label);
+    if (seen.has(name)) return;
+    seen.add(name);
+    arr.push({ name, di: DAY_ORDER.indexOf(day), h: parseInt(hour,10)||0 });
+  });
+  arr.sort((a,b) => (a.di - b.di) || (a.h - b.h) || a.name.localeCompare(b.name,'ko'));
+  return arr.map(x => x.name);
 }
 function preselectStudentClass(){
   const formSel = document.getElementById('cc-class');
@@ -1560,9 +1582,10 @@ async function loadClassrooms(){
     return;
   }
   const ttClasses = getClassList();
-  const set = new Set(ttClasses);
-  students.forEach(s => { (Array.isArray(s.classNames) ? s.classNames : []).forEach(c => { if (c) set.add(String(c)); }); });
-  const allClasses = [...set].sort((a,b) => a.localeCompare(b,'ko'));
+  const known = new Set(ttClasses);
+  const extra = [];
+  students.forEach(s => { (Array.isArray(s.classNames) ? s.classNames : []).forEach(c => { if (c && !known.has(String(c))){ known.add(String(c)); extra.push(String(c)); } }); });
+  const allClasses = ttClasses.concat(extra.sort((a,b) => a.localeCompare(b,'ko')));
   const unassigned = students.filter(s => !(Array.isArray(s.classNames) && s.classNames.length));
 
   let html = `<div class="room-legend">📋 반은 <b>시간표의 수업명</b>으로 자동 생성돼요. 수업카드 작성 시 반을 선택하면 학생이 그 반에 배정됩니다.</div>`;
