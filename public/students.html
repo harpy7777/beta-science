@@ -161,6 +161,21 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
 .subj-label .check-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.7);display:none}
 .subj-label.checked .check-dot{display:block}
 
+/* ── 반(班) 선택 (학생 모달) ── */
+.class-checks{display:flex;flex-wrap:wrap;gap:6px}
+.class-label{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 13px;min-height:38px;border:1.5px solid #cffafe;border-radius:20px;cursor:pointer;font-size:13px;font-weight:500;color:#0e7490;transition:all .15s;user-select:none;line-height:1.5;background:#fff}
+.class-label:hover{border-color:#0891b2;color:#155e63;background:#ecfeff}
+.class-label input[type=checkbox]{display:none}
+.class-label.checked{background:#0891b2;border-color:#0891b2;color:#fff;font-weight:600}
+.class-label .check-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.7);display:none}
+.class-label.checked .check-dot{display:block}
+.class-empty-hint{font-size:12px;color:#aeaeb2;padding:6px 2px;line-height:1.6}
+.class-tag{display:inline-block;padding:2px 8px;background:#ecfeff;border:1px solid #a5f3fc;border-radius:20px;font-size:11px;font-weight:600;color:#0e7490;margin:1px}
+
+/* 수업카드 폼 반 드롭다운 라벨 색상 */
+.cc-w-class-sel{width:100%;padding:11px 13px;min-height:44px;border:1.5px solid #cffafe;border-radius:10px;font-size:16px;color:#1d1d1f;outline:none;transition:border .15s;background:#fff;font-family:inherit;-webkit-appearance:none;appearance:none;cursor:pointer}
+.cc-w-class-sel:focus{border-color:#0891b2}
+
 /* ── Class Card Modal ── */
 .cc-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
 .cc-modal-overlay.open{display:flex}
@@ -370,6 +385,13 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
         <label class="subj-label"><input type="checkbox" class="subj-chk" value="화학 반응의 세계" onchange="toggleSubjLabel(this)"><span class="check-dot"></span>화학 반응의 세계</label>
       </div>
     </div>
+    <!-- 반 선택 (시간표 기반) -->
+    <div class="form-group">
+      <label>반 배정 <span style="font-weight:500;color:#aeaeb2;font-size:11px">(시간표 수업명 기반 · 복수 선택 가능)</span></label>
+      <div class="class-checks" id="classChecks">
+        <div class="class-empty-hint">시간표에 등록된 반을 불러오는 중...</div>
+      </div>
+    </div>
     <!-- 전화번호 -->
     <div class="form-group"><label>학부모 전화번호</label><input type="tel" id="inputPhone" placeholder="010-0000-0000" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
     <div class="modal-footer">
@@ -403,8 +425,11 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
       </div>
       <div class="form-row">
         <div class="form-group"><label>담당 선생님 <span style="color:#dc2626">*</span></label><input type="text" id="cc-w-teacher" placeholder="선생님 이름" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
-        <div class="form-group"><label>학습 단원 (선택)</label><input type="text" id="cc-w-unit" placeholder="예: 화학 1단원 - 원자의 구조" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+        <div class="form-group"><label>반 (시간표 기반)</label>
+          <select id="cc-w-class" class="cc-w-class-sel"><option value="">미지정</option></select>
+        </div>
       </div>
+      <div class="form-group"><label>학습 단원 (선택)</label><input type="text" id="cc-w-unit" placeholder="예: 화학 1단원 - 원자의 구조" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
       <div class="form-row">
         <div class="form-group"><label>과제 완성도</label>
           <select id="cc-w-hw"><option value="높음">높음</option><option value="보통" selected>보통</option><option value="낮음">낮음</option><option value="-">-</option></select>
@@ -434,7 +459,7 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc,collection,addDoc,updateDoc,deleteDoc,query,orderBy,onSnapshot,getDocs,where,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,setDoc,collection,addDoc,updateDoc,deleteDoc,query,orderBy,onSnapshot,getDocs,where,serverTimestamp,arrayUnion,arrayRemove}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import{getStorage,ref,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
 const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app);
@@ -443,10 +468,48 @@ window.doLogout=async()=>{await signOut(auth);window.location.replace("/login.ht
 const IPP=10;
 let pg=1,eid=null,students=[],filtered=[],ccCache={},s2f={};
 let selectedPhotoFile=null,currentPhotoUrl='';
+// ── 반(班): 시간표 수업명 기반 ──
+let classList=[];
+async function loadClassList(){
+  try{
+    const snap=await getDocs(collection(db,"timetable"));
+    const set=new Set();
+    snap.forEach(d=>{const c=d.data();if(c&&c.label){const l=String(c.label).trim();if(l)set.add(l);}});
+    classList=[...set].sort((a,b)=>a.localeCompare(b,'ko'));
+  }catch(er){classList=[];}
+}
+// 시간표 반 + 기존 학생들이 이미 가진 반을 합쳐 반환 (시간표에서 지워진 반도 표시되게)
+function allKnownClasses(){
+  const set=new Set(classList);
+  students.forEach(s=>{(Array.isArray(s.classNames)?s.classNames:[]).forEach(c=>{if(c)set.add(String(c));});});
+  return [...set].sort((a,b)=>a.localeCompare(b,'ko'));
+}
+window.toggleClassLabel=function(cb){cb.closest('.class-label').classList.toggle('checked',cb.checked);};
+// 학생 모달의 반 체크박스 렌더 (checkedList = 현재 학생이 배정된 반)
+function renderClassChecks(checkedList){
+  const wrap=document.getElementById('classChecks');
+  if(!wrap)return;
+  const checked=new Set((checkedList||[]).map(String));
+  const list=allKnownClasses();
+  if(!list.length){wrap.innerHTML='<div class="class-empty-hint">시간표에 등록된 반이 없습니다.<br>선생님 게시판 › 시간표에서 수업을 먼저 추가하세요.</div>';return;}
+  wrap.innerHTML=list.map(c=>{
+    const on=checked.has(c)?' checked':'';
+    return`<label class="class-label${on}"><input type="checkbox" class="class-chk" value="${e(c)}" onchange="toggleClassLabel(this)"${on?' checked':''}><span class="check-dot"></span>${e(c)}</label>`;
+  }).join('');
+}
+// 수업카드 폼의 반 드롭다운 채우기 (preselect = 선택할 반)
+function fillCCClassSelect(preselect){
+  const sel=document.getElementById('cc-w-class');
+  if(!sel)return;
+  const list=allKnownClasses();
+  sel.innerHTML='<option value="">미지정</option>'+list.map(c=>`<option value="${e(c)}">${e(c)}</option>`).join('');
+  if(preselect&&list.includes(preselect))sel.value=preselect;
+}
 function gBC(g){return{'중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3','고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3'}[g]||'grade-mid1';}
 // 학생 상세 페이지로 이동 (추가)
 window.goStudentDetail=function(sid){if(!sid)return;window.location.href='student-detail.html?id='+encodeURIComponent(sid);};
 async function iStudents(){
+  await loadClassList();
   try{const ss=await getDocs(collection(db,"students"));ss.forEach(d=>{const id=d.data().id;if(id)s2f[id]=d.id;});}catch(er){}
   try{const cc=await getDocs(query(collection(db,"classCards"),orderBy("classDate","desc")));const seen=new Set();cc.forEach(d=>{const c=d.data(),sid=c.studentId;if(!sid)return;const fv=Object.values(s2f).includes(sid),fk=Object.prototype.hasOwnProperty.call(s2f,sid);let rfi=fv?sid:fk?s2f[sid]:sid;if(!rfi)return;if(!ccCache[rfi])ccCache[rfi]={count:0,teacher:''};ccCache[rfi].count++;if(!seen.has(rfi)){ccCache[rfi].teacher=c.teacher||'';seen.add(rfi);}});}catch(er){}
   onSnapshot(query(collection(db,"students"),orderBy("regDate","desc")),s=>{s.docs.forEach(d=>{const id=d.data().id;if(id)s2f[id]=d.id;});students=s.docs.map(d=>({fireId:d.id,...d.data()}));filterStudents();},err=>{document.getElementById('studentTableBody').innerHTML=`<tr><td colspan="9" style="text-align:center;padding:2.5rem;color:#dc2626">오류: ${err.message}</td></tr>`;});
@@ -488,19 +551,22 @@ function setPhotoPreview(url){const img=document.getElementById('photoPreviewImg
 window.onPhotoSelect=function(e){const file=e.target.files[0];if(!file)return;selectedPhotoFile=file;const reader=new FileReader();reader.onload=ev=>setPhotoPreview(ev.target.result);reader.readAsDataURL(file);};
 window.removePhoto=function(){resetPhotoUI();};
 window.toggleSubjLabel=function(cb){cb.closest('.subj-label').classList.toggle('checked',cb.checked);};
-window.openAddModal=function(){eid=null;document.getElementById('modalTitle').textContent='학생 추가';['inputId','inputName','inputTeacher','inputPhone'].forEach(id=>document.getElementById(id).value='');document.getElementById('inputGrade').value='';document.getElementById('inputId').disabled=false;document.querySelectorAll('.subj-chk').forEach(cb=>{cb.checked=false;cb.closest('.subj-label').classList.remove('checked');});resetPhotoUI();document.getElementById('studentModal').classList.add('open');};
-window.openEditModal=function(fi){eid=fi;const s=students.find(x=>x.fireId===fi);if(!s)return;document.getElementById('modalTitle').textContent='학생 정보 수정';document.getElementById('inputId').value=s.id||'';document.getElementById('inputId').disabled=true;document.getElementById('inputName').value=s.name||'';document.getElementById('inputGrade').value=s.grade||'';document.getElementById('inputTeacher').value=s.teacher&&s.teacher!=='-'?(s.teacher||''):'';document.getElementById('inputPhone').value=s.phone||'';const subjects=(s.subject&&s.subject!=='-')?s.subject.split(',').map(x=>x.trim()):[];document.querySelectorAll('.subj-chk').forEach(cb=>{const checked=subjects.includes(cb.value);cb.checked=checked;cb.closest('.subj-label').classList.toggle('checked',checked);});resetPhotoUI();currentPhotoUrl=s.photoUrl||'';if(currentPhotoUrl)setPhotoPreview(currentPhotoUrl);document.getElementById('studentModal').classList.add('open');};
+window.openAddModal=async function(){eid=null;document.getElementById('modalTitle').textContent='학생 추가';['inputId','inputName','inputTeacher','inputPhone'].forEach(id=>document.getElementById(id).value='');document.getElementById('inputGrade').value='';document.getElementById('inputId').disabled=false;document.querySelectorAll('.subj-chk').forEach(cb=>{cb.checked=false;cb.closest('.subj-label').classList.remove('checked');});resetPhotoUI();await loadClassList();renderClassChecks([]);document.getElementById('studentModal').classList.add('open');};
+window.openEditModal=async function(fi){eid=fi;const s=students.find(x=>x.fireId===fi);if(!s)return;document.getElementById('modalTitle').textContent='학생 정보 수정';document.getElementById('inputId').value=s.id||'';document.getElementById('inputId').disabled=true;document.getElementById('inputName').value=s.name||'';document.getElementById('inputGrade').value=s.grade||'';document.getElementById('inputTeacher').value=s.teacher&&s.teacher!=='-'?(s.teacher||''):'';document.getElementById('inputPhone').value=s.phone||'';const subjects=(s.subject&&s.subject!=='-')?s.subject.split(',').map(x=>x.trim()):[];document.querySelectorAll('.subj-chk').forEach(cb=>{const checked=subjects.includes(cb.value);cb.checked=checked;cb.closest('.subj-label').classList.toggle('checked',checked);});resetPhotoUI();currentPhotoUrl=s.photoUrl||'';if(currentPhotoUrl)setPhotoPreview(currentPhotoUrl);await loadClassList();renderClassChecks(Array.isArray(s.classNames)?s.classNames:[]);document.getElementById('studentModal').classList.add('open');};
 window.closeModal=function(){document.getElementById('studentModal').classList.remove('open');};
-window.saveStudent=async function(){const nm=document.getElementById('inputName').value.trim(),gr=document.getElementById('inputGrade').value,id=document.getElementById('inputId').value.trim()||`s${Date.now()}`,tc=document.getElementById('inputTeacher').value.trim()||'-',ph=document.getElementById('inputPhone').value.trim()||'-',checked=[...document.querySelectorAll('.subj-chk:checked')].map(c=>c.value),sb=checked.length?checked.join(','):'-';if(!nm||!gr){alert('이름과 학년을 입력해주세요.');return;}const saveBtn=document.getElementById('saveBtn');saveBtn.disabled=true;saveBtn.textContent='저장 중...';try{let photoUrl=currentPhotoUrl;if(selectedPhotoFile){const ext=selectedPhotoFile.name.split('.').pop();const storageRef=ref(storage,`studentPhotos/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`);await uploadBytes(storageRef,selectedPhotoFile);photoUrl=await getDownloadURL(storageRef);}if(!eid){const t=new Date();await addDoc(collection(db,"students"),{id,name:nm,grade:gr,subject:sb,phone:ph,teacher:tc,photoUrl:photoUrl||'',regDate:`${t.getFullYear()}. ${t.getMonth()+1}. ${t.getDate()}.`});}else{await updateDoc(doc(db,"students",eid),{name:nm,grade:gr,subject:sb,phone:ph,teacher:tc,photoUrl:photoUrl||''});}closeModal();}catch(er){alert("저장 오류: "+er.message);}finally{saveBtn.disabled=false;saveBtn.textContent='저장';}};
+window.saveStudent=async function(){const nm=document.getElementById('inputName').value.trim(),gr=document.getElementById('inputGrade').value,id=document.getElementById('inputId').value.trim()||`s${Date.now()}`,tc=document.getElementById('inputTeacher').value.trim()||'-',ph=document.getElementById('inputPhone').value.trim()||'-',checked=[...document.querySelectorAll('.subj-chk:checked')].map(c=>c.value),sb=checked.length?checked.join(','):'-';const classNames=[...document.querySelectorAll('.class-chk:checked')].map(c=>c.value);if(!nm||!gr){alert('이름과 학년을 입력해주세요.');return;}const saveBtn=document.getElementById('saveBtn');saveBtn.disabled=true;saveBtn.textContent='저장 중...';try{let photoUrl=currentPhotoUrl;if(selectedPhotoFile){const ext=selectedPhotoFile.name.split('.').pop();const storageRef=ref(storage,`studentPhotos/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`);await uploadBytes(storageRef,selectedPhotoFile);photoUrl=await getDownloadURL(storageRef);}if(!eid){const t=new Date();await addDoc(collection(db,"students"),{id,name:nm,grade:gr,subject:sb,phone:ph,teacher:tc,photoUrl:photoUrl||'',classNames,regDate:`${t.getFullYear()}. ${t.getMonth()+1}. ${t.getDate()}.`});}else{await updateDoc(doc(db,"students",eid),{name:nm,grade:gr,subject:sb,phone:ph,teacher:tc,photoUrl:photoUrl||'',classNames});}closeModal();}catch(er){alert("저장 오류: "+er.message);}finally{saveBtn.disabled=false;saveBtn.textContent='저장';}};
 window.deleteStudent=async function(fi,nm){if(!confirm(`"${nm}" 학생을 삭제하시겠습니까?`))return;try{await deleteDoc(doc(db,"students",fi));}catch(er){alert("삭제 오류: "+er.message);}};
 let ccCur=null;
 function setCCView(mode){const isWrite=mode==='write';document.getElementById('ccStatBar').style.display=isWrite?'none':'flex';document.getElementById('ccListScroll').style.display=isWrite?'none':'block';document.getElementById('ccWriteForm').style.display=isWrite?'block':'none';document.getElementById('ccFooterList').style.display=isWrite?'none':'flex';document.getElementById('ccFooterWrite').style.display=isWrite?'flex':'none';}
-window.openClassCardModal=async function(fi,nm,sid){ccCur=students.find(x=>x.fireId===fi)||{fireId:fi,id:sid,name:nm,grade:'',subject:'',teacher:''};document.getElementById('ccModalTitle').textContent=`${nm} · 수업카드`;document.getElementById('classCardModal').classList.add('open');setCCView('list');await loadCCList(fi,sid);};
+window.openClassCardModal=async function(fi,nm,sid){ccCur=students.find(x=>x.fireId===fi)||{fireId:fi,id:sid,name:nm,grade:'',subject:'',teacher:''};document.getElementById('ccModalTitle').textContent=`${nm} · 수업카드`;document.getElementById('classCardModal').classList.add('open');setCCView('list');loadClassList();await loadCCList(fi,sid);};
 async function loadCCList(fi,sid){['cc-total','cc-month'].forEach(id=>document.getElementById(id).textContent='—');document.getElementById('ccListScroll').innerHTML='<div class="cc-loading">불러오는 중...</div>';try{const s1=await getDocs(query(collection(db,"classCards"),where("studentId","==",fi),orderBy("classDate","desc")));let cs=s1.docs.map(d=>({id:d.id,...d.data()}));if(sid&&sid!==fi){try{const s2=await getDocs(query(collection(db,"classCards"),where("studentId","==",sid),orderBy("classDate","desc")));const ex=new Set(cs.map(c=>c.id));s2.docs.forEach(d=>{if(!ex.has(d.id))cs.push({id:d.id,...d.data()});});cs.sort((a,b)=>(b.classDate||'').localeCompare(a.classDate||''));}catch(e2){}}rCCS(cs);rCCL(cs);}catch(er){document.getElementById('ccListScroll').innerHTML=`<div class="cc-empty">로드 실패: ${er.message}</div>`;}}
-window.toggleCCWrite=function(show){if(show){if(!ccCur)return;const teacher=(ccCur.teacher&&ccCur.teacher!=='-')?ccCur.teacher:'';const subs=(ccCur.subject&&ccCur.subject!=='-')?String(ccCur.subject).split(',').map(x=>x.trim()).filter(Boolean):[];document.getElementById('ccWriteStu').innerHTML=`📝 <b>${e(ccCur.name||'학생')}</b>${ccCur.grade?` · ${e(ccCur.grade)}`:''} 수업카드 작성`;const t=new Date();document.getElementById('cc-w-date').value=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;const subjSel=document.getElementById('cc-w-subj');if(subs.length){const opt=[...subjSel.options].find(o=>o.value===subs[0]||o.text===subs[0]);if(opt)subjSel.value=opt.value;}document.getElementById('cc-w-teacher').value=teacher;document.getElementById('cc-w-unit').value='';document.getElementById('cc-w-hw').value='보통';document.getElementById('cc-w-attitude').value='보통';document.getElementById('cc-w-homework-done').value='-';document.getElementById('cc-w-content').value='';document.getElementById('cc-w-homework').value='';setCCView('write');}else{setCCView('list');}};
-window.saveClassCardNew=async function(){if(!ccCur)return;const subject=document.getElementById('cc-w-subj').value;const teacher=document.getElementById('cc-w-teacher').value.trim();const classDate=document.getElementById('cc-w-date').value;const unit=document.getElementById('cc-w-unit').value.trim();const content=document.getElementById('cc-w-content').value.trim();const homework=document.getElementById('cc-w-hw').value;const attitude=document.getElementById('cc-w-attitude').value;const homeworkDone=document.getElementById('cc-w-homework-done').value;const homeworkContent=document.getElementById('cc-w-homework').value.trim();if(!teacher){alert('담당 선생님을 입력하세요');return;}if(!classDate){alert('수업 날짜를 선택하세요');return;}if(!content){alert('수업 내용을 입력하세요');return;}const studentId=(ccCur.id&&ccCur.id!=='')?ccCur.id:ccCur.fireId;const btn=document.getElementById('ccSaveBtn');btn.disabled=true;btn.textContent='저장 중...';try{await addDoc(collection(db,"classCards"),{studentId,studentName:ccCur.name||'',studentGrade:ccCur.grade||'',subject,teacher,classDate,unit,content,score:null,scoreNone:false,ox:null,multiple:null,omr:null,homework,attitude,homeworkDone,homeworkContent,createdAt:serverTimestamp()});const fi=ccCur.fireId;if(!ccCache[fi])ccCache[fi]={count:0,teacher:''};ccCache[fi].count++;if(!ccCache[fi].teacher)ccCache[fi].teacher=teacher;renderTable();await loadCCList(ccCur.fireId,ccCur.id);setCCView('list');alert('수업카드가 저장되었습니다. 학부모 리포트에 바로 반영됩니다.');}catch(er){alert('저장 오류: '+er.message);}finally{btn.disabled=false;btn.textContent='수업카드 저장';}};
+window.toggleCCWrite=function(show){if(show){if(!ccCur)return;const teacher=(ccCur.teacher&&ccCur.teacher!=='-')?ccCur.teacher:'';const subs=(ccCur.subject&&ccCur.subject!=='-')?String(ccCur.subject).split(',').map(x=>x.trim()).filter(Boolean):[];document.getElementById('ccWriteStu').innerHTML=`📝 <b>${e(ccCur.name||'학생')}</b>${ccCur.grade?` · ${e(ccCur.grade)}`:''} 수업카드 작성`;const t=new Date();document.getElementById('cc-w-date').value=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;const subjSel=document.getElementById('cc-w-subj');if(subs.length){const opt=[...subjSel.options].find(o=>o.value===subs[0]||o.text===subs[0]);if(opt)subjSel.value=opt.value;}document.getElementById('cc-w-teacher').value=teacher;const stuClasses=(Array.isArray(ccCur.classNames)?ccCur.classNames:[]).filter(Boolean);fillCCClassSelect(stuClasses[0]||'');document.getElementById('cc-w-unit').value='';document.getElementById('cc-w-hw').value='보통';document.getElementById('cc-w-attitude').value='보통';document.getElementById('cc-w-homework-done').value='-';document.getElementById('cc-w-content').value='';document.getElementById('cc-w-homework').value='';setCCView('write');}else{setCCView('list');}};
+window.saveClassCardNew=async function(){if(!ccCur)return;const subject=document.getElementById('cc-w-subj').value;const teacher=document.getElementById('cc-w-teacher').value.trim();const classDate=document.getElementById('cc-w-date').value;const unit=document.getElementById('cc-w-unit').value.trim();const content=document.getElementById('cc-w-content').value.trim();const homework=document.getElementById('cc-w-hw').value;const attitude=document.getElementById('cc-w-attitude').value;const homeworkDone=document.getElementById('cc-w-homework-done').value;const homeworkContent=document.getElementById('cc-w-homework').value.trim();const className=document.getElementById('cc-w-class')?document.getElementById('cc-w-class').value:'';if(!teacher){alert('담당 선생님을 입력하세요');return;}if(!classDate){alert('수업 날짜를 선택하세요');return;}if(!content){alert('수업 내용을 입력하세요');return;}const studentId=(ccCur.id&&ccCur.id!=='')?ccCur.id:ccCur.fireId;const btn=document.getElementById('ccSaveBtn');btn.disabled=true;btn.textContent='저장 중...';try{await addDoc(collection(db,"classCards"),{studentId,studentName:ccCur.name||'',studentGrade:ccCur.grade||'',subject,className,teacher,classDate,unit,content,score:null,scoreNone:false,ox:null,multiple:null,omr:null,homework,attitude,homeworkDone,homeworkContent,createdAt:serverTimestamp()});
+// 선택한 반이 있으면 학생 문서(fireId)에 반 누적 배정
+if(className&&ccCur.fireId){try{await setDoc(doc(db,"students",ccCur.fireId),{classNames:arrayUnion(className)},{merge:true});const cur=students.find(x=>x.fireId===ccCur.fireId);if(cur){const arr=Array.isArray(cur.classNames)?cur.classNames:[];if(!arr.includes(className)){arr.push(className);cur.classNames=arr;}if(!Array.isArray(ccCur.classNames))ccCur.classNames=[];if(!ccCur.classNames.includes(className))ccCur.classNames.push(className);}}catch(er2){console.warn('반 배정 실패:',er2);}}
+const fi=ccCur.fireId;if(!ccCache[fi])ccCache[fi]={count:0,teacher:''};ccCache[fi].count++;if(!ccCache[fi].teacher)ccCache[fi].teacher=teacher;renderTable();await loadCCList(ccCur.fireId,ccCur.id);setCCView('list');alert('수업카드가 저장되었습니다. 학부모 리포트에 바로 반영됩니다.');}catch(er){alert('저장 오류: '+er.message);}finally{btn.disabled=false;btn.textContent='수업카드 저장';}};
 function rCCS(cs){document.getElementById('cc-total').textContent=cs.length+'건';const n=new Date(),ms=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`;document.getElementById('cc-month').textContent=cs.filter(c=>(c.classDate||'').startsWith(ms)).length+'건';}
-function rCCL(cs){const w=document.getElementById('ccListScroll');if(!cs.length){w.innerHTML=`<div class="cc-empty"><p>아직 작성된 수업카드가 없습니다.</p></div>`;return;}w.innerHTML=cs.map(c=>{const hCls=c.homework==='높음'?'hw-high':c.homework==='낮음'?'hw-low':'hw-mid',aCls=c.attitude==='적극적'?'att-active':c.attitude==='산만'?'att-low':'att-mid';return`<div class="cc-item" id="cci-${c.id}"><div class="cc-item-head" onclick="toggleCC('${c.id}')"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#1d1d1f;margin-bottom:3px"><span class="cc-chip cc-chip-subj" style="margin-right:4px">${e(c.subject||'—')}</span>수업</div><div class="cc-item-meta"><span class="cc-chip cc-chip-teacher">${e(c.teacher||'—')}</span><span class="cc-chip cc-chip-date">${e(c.classDate||'—')}</span></div></div><div style="display:flex;align-items:center;gap:5px;flex-shrink:0">${c.homework&&c.homework!=='-'?`<span class="cc-hw-badge ${hCls}">과제 ${e(c.homework)}</span>`:''} ${c.attitude?`<span class="att-badge ${aCls}">${e(c.attitude)}</span>`:''}<span class="cc-expand">▾</span></div></div><div class="cc-item-body">${c.content?`<div class="cc-body-section"><div class="cc-body-label">수업 내용</div><div class="cc-body-text">${e(c.content)}</div></div>`:''}</div></div>`;}).join('');}
+function rCCL(cs){const w=document.getElementById('ccListScroll');if(!cs.length){w.innerHTML=`<div class="cc-empty"><p>아직 작성된 수업카드가 없습니다.</p></div>`;return;}w.innerHTML=cs.map(c=>{const hCls=c.homework==='높음'?'hw-high':c.homework==='낮음'?'hw-low':'hw-mid',aCls=c.attitude==='적극적'?'att-active':c.attitude==='산만'?'att-low':'att-mid';return`<div class="cc-item" id="cci-${c.id}"><div class="cc-item-head" onclick="toggleCC('${c.id}')"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#1d1d1f;margin-bottom:3px"><span class="cc-chip cc-chip-subj" style="margin-right:4px">${e(c.subject||'—')}</span>수업</div><div class="cc-item-meta"><span class="cc-chip cc-chip-teacher">${e(c.teacher||'—')}</span><span class="cc-chip cc-chip-date">${e(c.classDate||'—')}</span>${c.className?`<span class="cc-chip" style="background:#ecfeff;color:#0e7490">🏷️ ${e(c.className)}</span>`:''}</div></div><div style="display:flex;align-items:center;gap:5px;flex-shrink:0">${c.homework&&c.homework!=='-'?`<span class="cc-hw-badge ${hCls}">과제 ${e(c.homework)}</span>`:''} ${c.attitude?`<span class="att-badge ${aCls}">${e(c.attitude)}</span>`:''}<span class="cc-expand">▾</span></div></div><div class="cc-item-body">${c.content?`<div class="cc-body-section"><div class="cc-body-label">수업 내용</div><div class="cc-body-text">${e(c.content)}</div></div>`:''}</div></div>`;}).join('');}
 window.toggleCC=id=>{document.getElementById('cci-'+id)?.classList.toggle('open');};
 window.closeClassCardModal=function(){document.getElementById('classCardModal').classList.remove('open');};
 function e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
