@@ -163,7 +163,7 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
 
 /* ── 반(班) 선택 (학생 모달) ── */
 .class-checks{display:flex;flex-wrap:wrap;gap:6px}
-.class-label{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 13px;min-height:38px;border:1.5px solid #cffafe;border-radius:20px;cursor:pointer;font-size:13px;font-weight:500;color:#0e7490;transition:all .15s;user-select:none;line-height:1.5;background:#fff}
+.class-label{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 13px;min-height:38px;border:1.5px solid #cffafe;border-radius:20px;cursor:pointer;font-size:13px;font-weight:500;color:#0e7490;transition:all .15s;user-select:none;line-height:1.5;background:#fff;max-width:100%;word-break:keep-all;text-align:center}
 .class-label:hover{border-color:#0891b2;color:#155e63;background:#ecfeff}
 .class-label input[type=checkbox]{display:none}
 .class-label.checked{background:#0891b2;border-color:#0891b2;color:#fff;font-weight:600}
@@ -468,21 +468,43 @@ window.doLogout=async()=>{await signOut(auth);window.location.replace("/login.ht
 const IPP=10;
 let pg=1,eid=null,students=[],filtered=[],ccCache={},s2f={};
 let selectedPhotoFile=null,currentPhotoUrl='';
-// ── 반(班): 시간표 수업명 기반 ──
+// ── 반(班): 시간표 요일+시작시간+수업명 기반 ──
+// 같은 수업명이라도 요일/시간이 다르면 다른 반으로 구분 (예: "토요일 오전 10시 물질과 에너지")
 let classList=[];
+const DAY_FULL={'월':'월요일','화':'화요일','수':'수요일','목':'목요일','금':'금요일','토':'토요일','일':'일요일'};
+const DAY_ORDER=['월','화','수','목','금','토','일'];
+function fmtClassName(day,hour,label){
+  const h=parseInt(hour,10);
+  const ampm=(isNaN(h)||h<12)?'오전':'오후';
+  let h12=isNaN(h)?0:(h%12); if(h12===0)h12=12;
+  return `${DAY_FULL[day]||day} ${ampm} ${h12}시 ${label}`;
+}
 async function loadClassList(){
   try{
     const snap=await getDocs(collection(db,"timetable"));
-    const set=new Set();
-    snap.forEach(d=>{const c=d.data();if(c&&c.label){const l=String(c.label).trim();if(l)set.add(l);}});
-    classList=[...set].sort((a,b)=>a.localeCompare(b,'ko'));
+    const arr=[],seen=new Set();
+    snap.forEach(d=>{
+      const c=d.data();
+      if(!c||!c.label)return;
+      const label=String(c.label).trim();
+      if(!label)return;
+      const key=String(d.id),dash=key.indexOf('-');
+      const day=dash>=0?key.slice(0,dash):key;
+      const hour=dash>=0?key.slice(dash+1):'';
+      const name=fmtClassName(day,hour,label);
+      if(seen.has(name))return;
+      seen.add(name);
+      arr.push({name,di:DAY_ORDER.indexOf(day),h:parseInt(hour,10)||0});
+    });
+    arr.sort((a,b)=>(a.di-b.di)||(a.h-b.h)||a.name.localeCompare(b.name,'ko'));
+    classList=arr.map(x=>x.name);
   }catch(er){classList=[];}
 }
 // 시간표 반 + 기존 학생들이 이미 가진 반을 합쳐 반환 (시간표에서 지워진 반도 표시되게)
 function allKnownClasses(){
-  const set=new Set(classList);
-  students.forEach(s=>{(Array.isArray(s.classNames)?s.classNames:[]).forEach(c=>{if(c)set.add(String(c));});});
-  return [...set].sort((a,b)=>a.localeCompare(b,'ko'));
+  const known=new Set(classList),extra=[];
+  students.forEach(s=>{(Array.isArray(s.classNames)?s.classNames:[]).forEach(c=>{if(c&&!known.has(String(c))){known.add(String(c));extra.push(String(c));}});});
+  return classList.concat(extra.sort((a,b)=>a.localeCompare(b,'ko')));
 }
 window.toggleClassLabel=function(cb){cb.closest('.class-label').classList.toggle('checked',cb.checked);};
 // 학생 모달의 반 체크박스 렌더 (checkedList = 현재 학생이 배정된 반)
