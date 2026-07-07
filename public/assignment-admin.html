@@ -225,6 +225,33 @@ body {
 
 #gate { text-align:center; color:#aeaeb2; font-size:14px; padding:4rem 1rem; }
 
+/* ── 배포 모드 탭 (개별 / 반별) ── */
+.mode-tabs { display:flex; gap:8px; margin-bottom:14px; }
+.mode-tab { flex:1; padding:11px 10px; min-height:46px; border:1.5px solid #fce7f3; background:#fff; color:#6e6e73; border-radius:12px; font-size:13px; font-weight:700; font-family:inherit; cursor:pointer; transition:all .15s; }
+.mode-tab:hover { background:#fdf2f8; }
+.mode-tab.on { background:linear-gradient(135deg,#f472b6,#db2777); color:#fff; border-color:transparent; box-shadow:0 2px 8px rgba(219,39,119,0.25); }
+.mode-tab.on:hover { background:linear-gradient(135deg,#f472b6,#db2777); }
+
+/* ── 반별 학생 체크리스트 ── */
+.class-allbar { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
+.class-count { font-size:11.5px; font-weight:700; color:#be185d; }
+.class-allbtn { border:1.5px solid #fce7f3; background:#fff; color:#db2777; border-radius:9px; padding:7px 13px; min-height:38px; font-size:12px; font-weight:700; font-family:inherit; cursor:pointer; }
+.class-allbtn:hover { background:#fdf2f8; }
+.class-stu-row { display:flex; align-items:center; gap:11px; padding:11px 12px; border:1.5px solid #fce7f3; border-radius:12px; margin-bottom:8px; cursor:pointer; -webkit-user-select:none; user-select:none; transition:border .15s, background .15s; }
+.class-stu-row:has(input:checked) { border-color:#f9a8d4; background:#fdf2f8; }
+.class-stu-row input[type=checkbox] { width:20px; height:20px; accent-color:#db2777; flex-shrink:0; }
+.class-stu-info { min-width:0; }
+.class-stu-name { font-size:13.5px; font-weight:700; color:#1d1d1f; }
+.class-stu-meta { font-size:11px; color:#aeaeb2; margin-top:2px; }
+
+/* ── 반별 결과 (여러 링크) ── */
+.batch-link-row { padding:.65rem 0; border-bottom:1px solid #d1fae5; }
+.batch-link-row:last-of-type { border-bottom:none; }
+.batch-link-name { font-size:12.5px; font-weight:700; color:#065f46; margin-bottom:5px; }
+.batch-link-wrap { display:flex; gap:6px; align-items:center; }
+.batch-link-input { flex:1; min-width:0; border:1.5px solid #a7f3d0; border-radius:8px; padding:8px 10px; font-size:12px; color:#1d1d1f; background:#fff; }
+.batch-fail { font-size:12px; color:#b91c1c; margin-top:10px; font-weight:600; }
+
 /* ── 반응형 ── */
 @media (max-width: 520px) {
   .wrap { padding: 1rem 0.75rem 5rem; }
@@ -280,8 +307,19 @@ body {
 
   <div class="section-heading">새 클리닉 만들기</div>
   <div class="panel">
-    <div class="form-row">
-      <div class="field">
+    <div class="mode-tabs">
+      <button class="mode-tab on" data-mode="single">👤 개별 배포</button>
+      <button class="mode-tab" data-mode="class">👥 반별 배포</button>
+    </div>
+
+    <div class="field" style="margin-bottom:14px;">
+      <span class="fld-label">학습 범위</span>
+      <input class="form-input" id="rangeLabel" placeholder="시험을 담으면 자동으로 채워져요 (직접 수정 가능)">
+    </div>
+
+    <!-- 개별 배포 -->
+    <div id="singleBlock">
+      <div class="field" style="margin-bottom:12px;">
         <span class="fld-label">학년</span>
         <select class="form-select" id="gradeSelect">
           <option value="">학년 선택</option>
@@ -290,15 +328,22 @@ body {
         </select>
         <!-- 학년 값은 normalizeGrade로 비교하므로 "중등1학년","중1" 등 형식 차이 무관 -->
       </div>
-      <div class="field">
-        <span class="fld-label">학습 범위</span>
-        <input class="form-input" id="rangeLabel" placeholder="시험을 담으면 자동으로 채워져요 (직접 수정 가능)">
-      </div>
+      <span class="fld-label" style="margin-top:4px;">학생 선택</span>
+      <div class="hint" id="studentHint">학년을 먼저 선택하세요.</div>
+      <div id="studentGrid" class="student-grid"></div>
     </div>
 
-    <span class="fld-label" style="margin-top:4px;">학생 선택</span>
-    <div class="hint" id="studentHint">학년을 먼저 선택하세요.</div>
-    <div id="studentGrid" class="student-grid"></div>
+    <!-- 반별 배포 -->
+    <div id="classBlock" style="display:none">
+      <div class="field" style="margin-bottom:12px;">
+        <span class="fld-label">반 선택</span>
+        <select class="form-select" id="classSelect"><option value="">반 선택</option></select>
+        <!-- 반 목록은 학생 문서의 classNames 배열(시간표 기반 반 이름)에서 모음 -->
+      </div>
+      <span class="fld-label" style="margin-top:4px;">이 반 학생</span>
+      <div class="hint" id="classHint">반을 먼저 선택하세요.</div>
+      <div id="classStudents"></div>
+    </div>
 
     <span class="fld-label" style="margin-top:4px;">학습 내용</span>
     <div class="hint">시험을 담으면 학생이 눌러서 <strong>실제 시험을 풀러 가고, 점수는 성적에 자동 기록</strong>됩니다. 핵심내용·OX·4지선다는 직접 추가할 수도 있어요. 추가한 순서대로 학생에게 보입니다.</div>
@@ -323,6 +368,8 @@ body {
         <button class="copy-btn" id="previewLink" style="background:#2563eb;">미리보기</button>
       </div>
     </div>
+
+    <div class="result" id="batchResult"></div>
   </div>
 
   <div class="section-heading">보낸 클리닉 목록</div>
@@ -790,6 +837,88 @@ function renderStudentGrid(){
 }
 $('gradeSelect').addEventListener('change', renderStudentGrid);
 
+/* ── 배포 모드 (개별 / 반별) ── */
+let curMode='single';
+function setMode(mode){
+  curMode=mode;
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.toggle('on', t.dataset.mode===mode));
+  $('singleBlock').style.display = mode==='single' ? 'block' : 'none';
+  $('classBlock').style.display  = mode==='class'  ? 'block' : 'none';
+  $('saveBtn').textContent = mode==='class' ? '🔗 반 전체 링크 만들기' : '🔗 클리닉 링크 만들기';
+  $('result').classList.remove('show');
+  $('batchResult').classList.remove('show');
+  if(mode==='class') renderClassSelect();
+}
+document.querySelectorAll('.mode-tab').forEach(t=>t.addEventListener('click',()=>setMode(t.dataset.mode)));
+
+/* 학생 문서의 classNames 배열을 모아 반 목록 생성 */
+function getAllClassNames(){
+  const set=new Set();
+  (allStudents||[]).forEach(s=>{
+    (Array.isArray(s.classNames)?s.classNames:[]).forEach(c=>{
+      const v=String(c||'').trim(); if(v) set.add(v);
+    });
+  });
+  return [...set].sort((a,b)=>a.localeCompare(b,'ko'));
+}
+function renderClassSelect(){
+  const sel=$('classSelect'); if(!sel) return;
+  const names=getAllClassNames();
+  const prev=sel.value;
+  sel.innerHTML='<option value="">반 선택</option>'+names.map(n=>{
+    const esc=n.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return `<option value="${esc}">${esc}</option>`;
+  }).join('');
+  if(prev && names.includes(prev)) sel.value=prev;
+  if(names.length===0){ $('classHint').textContent='아직 배정된 반이 없습니다. 학생 관리에서 반을 먼저 배정하세요.'; }
+  renderClassStudents();
+}
+function classStudentList(className){
+  if(!className) return [];
+  return (allStudents||[])
+    .filter(s=>Array.isArray(s.classNames) && s.classNames.map(x=>String(x||'').trim()).includes(className))
+    .sort((a,b)=>(a.name||'').localeCompare(b.name||'','ko'));
+}
+function renderClassStudents(){
+  const box=$('classStudents'); if(!box) return;
+  const className=$('classSelect').value;
+  box.innerHTML='';
+  if(!className){ $('classHint').textContent='반을 먼저 선택하세요.'; return; }
+  const list=classStudentList(className);
+  if(list.length===0){ $('classHint').textContent='이 반에 배정된 학생이 없습니다.'; return; }
+  $('classHint').textContent='체크된 학생에게 각각 개별 링크가 만들어집니다.';
+
+  const bar=el('div','class-allbar');
+  bar.appendChild(el('span','class-count', `${list.length}명`));
+  const allBtn=el('button','class-allbtn','전체 해제');
+  bar.appendChild(allBtn); box.appendChild(bar);
+
+  list.forEach(s=>{
+    const row=el('label','class-stu-row');
+    const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=true;
+    cb.dataset.sid=s.id||''; cb.dataset.name=s.name||''; cb.dataset.grade=s.grade||'';
+    const info=el('div','class-stu-info');
+    info.appendChild(el('div','class-stu-name', s.name||'(이름 없음)'));
+    const meta=[s.id||'', s.grade||''].filter(Boolean).join(' · ');
+    if(meta) info.appendChild(el('div','class-stu-meta', meta));
+    row.append(cb,info); box.appendChild(row);
+  });
+
+  allBtn.addEventListener('click',()=>{
+    const cbs=[...box.querySelectorAll('input[type=checkbox]')];
+    const anyChecked=cbs.some(c=>c.checked);
+    cbs.forEach(c=>{ c.checked=!anyChecked; });
+    allBtn.textContent = anyChecked ? '전체 선택' : '전체 해제';
+  });
+}
+function checkedClassStudents(){
+  const box=$('classStudents'); if(!box) return [];
+  return [...box.querySelectorAll('input[type=checkbox]:checked')].map(cb=>({
+    studentId:cb.dataset.sid||'', name:cb.dataset.name||'', grade:cb.dataset.grade||''
+  }));
+}
+$('classSelect').addEventListener('change', renderClassStudents);
+
 /* ── 수집 + 검증 ── */
 function collectItems(){
   const cards=[...document.querySelectorAll('#items .item-card')];
@@ -832,8 +961,8 @@ function collectItems(){
   return items;
 }
 
-/* ── 저장 ── */
-$('saveBtn').addEventListener('click', async ()=>{
+/* ── 저장 (개별) ── */
+async function saveSingle(){
   if(!selectedStudent){ toast('학생을 선택하세요.'); return; }
   const studentName=selectedStudent.name;
   const studentGrade=selectedStudent.grade||'';
@@ -850,6 +979,7 @@ $('saveBtn').addEventListener('click', async ()=>{
       createdBy: auth.currentUser ? auth.currentUser.uid : null
     });
     const link=`${location.origin}/assignment.html?t=${token}`;
+    $('batchResult').classList.remove('show');
     $('resultLink').value=link; $('result').classList.add('show');
     toast('학습 클리닉이 만들어졌습니다.');
     $('rangeLabel').value=''; $('items').innerHTML='';
@@ -858,7 +988,75 @@ $('saveBtn').addEventListener('click', async ()=>{
     loadList();
   }catch(err){ toast('저장 실패 — 보안 규칙을 확인하세요.'); console.error(err); }
   finally{ btn.disabled=false; btn.textContent='🔗 클리닉 링크 만들기'; }
-});
+}
+
+/* ── 저장 (반별: 반 학생 전원에게 각각 개별 링크 일괄 생성) ── */
+async function saveBatch(){
+  const className=$('classSelect').value;
+  if(!className){ toast('반을 선택하세요.'); return; }
+  const students=checkedClassStudents();
+  if(students.length===0){ toast('배포할 학생을 한 명 이상 선택하세요.'); return; }
+  const weekLabel=$('rangeLabel').value.trim();
+  let items;
+  try{ items=collectItems(); }catch(msg){ toast(typeof msg==='string'?msg:'입력을 확인하세요.'); return; }
+
+  const btn=$('saveBtn'); btn.disabled=true;
+  const batchId=genToken(12);
+  const results=[], failed=[];
+  for(let i=0;i<students.length;i++){
+    const stu=students[i];
+    btn.textContent=`만드는 중 (${i+1}/${students.length})…`;
+    const token=genToken();
+    try{
+      await setDoc(doc(db,'assignments',token),{
+        studentName:stu.name, studentGrade:stu.grade||'', studentId:stu.studentId||'',
+        weekLabel, items, className, batchId,
+        createdAt: serverTimestamp(),
+        createdBy: auth.currentUser ? auth.currentUser.uid : null
+      });
+      results.push({name:stu.name||'(이름 없음)', link:`${location.origin}/assignment.html?t=${token}`});
+    }catch(err){ console.error('batch save', stu, err); failed.push(stu.name||'(이름 없음)'); }
+  }
+
+  renderBatchResult(className, results, failed);
+  if(results.length){
+    toast(`${results.length}명에게 클리닉을 만들었습니다.`);
+    $('rangeLabel').value=''; $('items').innerHTML='';
+    loadList();
+  } else {
+    toast('저장 실패 — 보안 규칙을 확인하세요.');
+  }
+  btn.disabled=false; btn.textContent='🔗 반 전체 링크 만들기';
+}
+
+/* 반별 결과 렌더 (학생별 링크 목록 + 전체 복사) */
+function renderBatchResult(className, results, failed){
+  const box=$('batchResult'); box.innerHTML='';
+  $('result').classList.remove('show');
+  box.appendChild(el('div','result-label', `✅ ${className} — ${results.length}명 링크 생성 완료`));
+  results.forEach(r=>{
+    const row=el('div','batch-link-row');
+    row.appendChild(el('div','batch-link-name', r.name));
+    const wrap=el('div','batch-link-wrap');
+    const inp=document.createElement('input'); inp.readOnly=true; inp.value=r.link; inp.className='batch-link-input';
+    const cbtn=el('button','copy-btn','복사'); cbtn.style.padding='8px 12px';
+    cbtn.addEventListener('click',()=>copy(r.link).then(()=>toast(r.name+' 링크 복사됨')));
+    wrap.append(inp,cbtn); row.appendChild(wrap); box.appendChild(row);
+  });
+  if(failed && failed.length){
+    box.appendChild(el('div','batch-fail', `⚠️ 실패: ${failed.join(', ')} (다시 시도하세요)`));
+  }
+  if(results.length){
+    const allBtn=el('button','copy-btn','📋 전체 링크 한번에 복사');
+    allBtn.style.cssText='width:100%;margin-top:12px;background:#2563eb;padding:12px;';
+    const allText=results.map(r=>`${r.name}: ${r.link}`).join('\n');
+    allBtn.addEventListener('click',()=>copy(allText).then(()=>toast('전체 링크를 복사했습니다.')));
+    box.appendChild(allBtn);
+  }
+  box.classList.add('show');
+}
+
+$('saveBtn').addEventListener('click', ()=>{ if(curMode==='class') saveBatch(); else saveSingle(); });
 $('copyLink').addEventListener('click',()=>{ copy($('resultLink').value).then(()=>toast('링크를 복사했습니다.')); });
 $('previewLink').addEventListener('click',()=>{ const v=$('resultLink').value; if(v) window.open(v,'_blank'); });
 
@@ -877,7 +1075,10 @@ async function loadList(){
       const row=el('div','lrow');
       const info=el('div','lr-info');
       info.appendChild(el('div','lr-name', data.studentName||'(이름 없음)'));
-      info.appendChild(el('div','lr-meta', `${data.weekLabel||'—'} · 항목 ${cnt}개`));
+      const metaParts=[data.weekLabel||'—'];
+      if(data.className) metaParts.push('🏷️ '+data.className);
+      metaParts.push(`항목 ${cnt}개`);
+      info.appendChild(el('div','lr-meta', metaParts.join(' · ')));
       const actions=el('div','lr-actions');
       const vbtn=el('button','lr-btn','보기');
       vbtn.addEventListener('click',()=>window.open(link,'_blank'));
@@ -908,7 +1109,7 @@ onAuthStateChanged(auth, async user=>{
   $('main').style.display='block';
   $('logoutBtn').style.display='inline-block';
   $('uidText').textContent=user.uid;
-  loadStudents().then(renderStudentGrid);
+  loadStudents().then(()=>{ renderStudentGrid(); if(curMode==='class') renderClassSelect(); });
   loadList();
 });
 </script>
