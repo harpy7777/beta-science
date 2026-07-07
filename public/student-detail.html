@@ -218,6 +218,10 @@ body {
 .gc-row > div { display:flex; align-items:center; justify-content:center; min-width:0; }
 .gc-date { font-size:11px; color:#6e6e73; white-space:nowrap; }
 .gc-exam { font-size:13px; font-weight:600; color:#1d1d1f; word-break:break-word; line-height:1.4; }
+.gc-exam-inner { display:flex; flex-direction:column; gap:4px; align-items:flex-start; min-width:0; }
+.gc-subj { display:inline-block; font-size:10.5px; font-weight:700; color:#7c3aed; background:#ede9fe; padding:2px 8px; border-radius:6px; line-height:1.35; white-space:nowrap; }
+.gc-subj.none { color:#9ca3af; background:#f3f4f6; }
+.gc-exam-name { font-size:13px; font-weight:600; color:#1d1d1f; word-break:break-word; line-height:1.4; }
 .gc-sc { gap:5px; }
 .sc-lbl { display:none; }
 .sc-pill { display:inline-flex; align-items:center; justify-content:center; min-width:46px; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap; }
@@ -726,10 +730,14 @@ function gcRenderTable(list){
   const rows=list.map(r=>{
     const p=partScores(r);
     const name=esc2(r.testName||r.examTitle||'—');
+    const subjRaw=(r.subject&&String(r.subject).trim())?String(r.subject).trim():'';
+    const subjBadge=subjRaw
+      ? `<span class="gc-subj">${esc2(subjRaw)}</span>`
+      : `<span class="gc-subj none">과목 미지정</span>`;
     const date=fmtDateShort(r.timestamp)||'—';
     return `<div class="gc-row">
       <div class="gc-date">${date}</div>
-      <div class="gc-exam">${name}</div>
+      <div class="gc-exam"><div class="gc-exam-inner">${subjBadge}<span class="gc-exam-name">${name}</span></div></div>
       ${scCell(p.ox,'ox')}
       ${scCell(p.mc,'mc')}
       ${scCell(p.master,'ms')}
