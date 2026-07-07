@@ -662,6 +662,24 @@ body {
 .stu-chip-x:active { background: #fca5a5; color: #7f1d1d; }
 .room-empty { font-size: 12px; color: #aeaeb2; padding: 4px 2px; }
 
+/* 반 이름 옮기기 (마이그레이션) 도구 */
+.mig-box { background:#fff; border:1.5px dashed #cffafe; border-radius:14px; padding:12px 14px; margin-bottom:14px; }
+.mig-title { font-size:12px; font-weight:700; color:#0891b2; margin-bottom:10px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.mig-sub { font-size:10px; font-weight:600; color:#9ca3af; }
+.mig-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.mig-sel { flex:1; min-width:0; padding:9px 10px; min-height:42px; border:1.5px solid #cffafe; border-radius:9px; font-size:16px; font-family:inherit; color:#1d1d1f; background:#fff; outline:none; -webkit-appearance:none; appearance:none; cursor:pointer; }
+.mig-sel:focus { border-color:#0891b2; }
+.mig-arrow { font-size:14px; font-weight:700; color:#0891b2; flex-shrink:0; }
+.mig-btn { padding:9px 16px; min-height:42px; flex-shrink:0; background:linear-gradient(135deg,#22d3ee,#0891b2); border:none; border-radius:9px; font-size:13px; font-weight:700; color:#fff; cursor:pointer; font-family:inherit; transition:opacity .15s; }
+.mig-btn:hover { opacity:.88; }
+.mig-btn:active { opacity:.75; }
+@media (max-width: 520px) {
+  .mig-row { flex-direction:column; align-items:stretch; }
+  .mig-sel { width:100%; }
+  .mig-arrow { transform:rotate(90deg); align-self:center; }
+  .mig-btn { width:100%; }
+}
+
 /* 반 필터 셀렉트 (수업카드 필터바) */
 .cc-class-filter { width: auto; min-width: 118px; flex: 0 0 auto; padding: 7px 10px; min-height: 36px; border: 1.5px solid #f3e8ff; border-radius: 10px; font-size: 16px; font-family: inherit; color: #1d1d1f; outline: none; background: #fff; -webkit-appearance: none; appearance: none; cursor: pointer; }
 .cc-class-filter:focus { border-color: #a21caf; }
@@ -1590,6 +1608,22 @@ async function loadClassrooms(){
 
   let html = `<div class="room-legend">📋 반은 <b>시간표의 수업명</b>으로 자동 생성돼요. 수업카드 작성 시 반을 선택하면 학생이 그 반에 배정됩니다.</div>`;
 
+  // 반 이름 옮기기 도구: 옛 반(시간표에서 바뀐 것) → 새 반으로 학생 배정만 이동, 수업카드 기록은 보존
+  if (ttClasses.length && allClasses.length) {
+    const orphan = new Set(allClasses.filter(c => !ttClasses.includes(c)));
+    const oldOpts = allClasses.map(c => `<option value="${esc(c)}">${esc(c)}${orphan.has(c) ? ' · 시간표에 없음' : ''}</option>`).join('');
+    const newOpts = ttClasses.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+    html += `<div class="mig-box">
+      <div class="mig-title">🔁 반 이름 옮기기 <span class="mig-sub">학생 배정만 이동 · 수업카드 기록은 그대로 보존</span></div>
+      <div class="mig-row">
+        <select class="mig-sel" id="mig-old"><option value="">옛 반 선택</option>${oldOpts}</select>
+        <span class="mig-arrow">→</span>
+        <select class="mig-sel" id="mig-new"><option value="">새 반 선택</option>${newOpts}</select>
+        <button class="mig-btn" onclick="migrateClass()">이동</button>
+      </div>
+    </div>`;
+  }
+
   if (!allClasses.length) {
     html += `<div class="empty-hint">시간표에 등록된 반이 없습니다.<br>먼저 시간표에서 수업을 추가하세요.</div>`;
   } else {
@@ -1632,6 +1666,34 @@ window.removeStudentFromClass = async (sid, cls) => {
   if (!confirm(`이 학생을 '${cls}' 반에서 제외할까요?`)) return;
   try { await updateDoc(doc(db,'students',sid), { classNames: arrayRemove(cls) }); await loadClassrooms(); }
   catch(e) { alert('제외 실패: '+e.message); }
+};
+// 반 이름 옮기기: 옛 반에 배정된 학생 전원의 classNames를 새 반으로 교체 (수업카드 className은 건드리지 않음)
+window.migrateClass = async () => {
+  const oldName = (document.getElementById('mig-old')?.value || '').trim();
+  const newName = (document.getElementById('mig-new')?.value || '').trim();
+  if (!oldName) return alert('옮길 옛 반을 선택하세요');
+  if (!newName) return alert('이동할 새 반을 선택하세요');
+  if (oldName === newName) return alert('옛 반과 새 반이 같습니다');
+  let targets = [];
+  try {
+    const snap = await getDocs(collection(db,'students'));
+    snap.forEach(d => {
+      const cn = d.data().classNames;
+      if (Array.isArray(cn) && cn.includes(oldName)) targets.push({ id:d.id, classNames: cn.slice() });
+    });
+  } catch(e) { return alert('학생 조회 실패: '+e.message); }
+  if (!targets.length) return alert(`'${oldName}' 반에 배정된 학생이 없습니다.`);
+  if (!confirm(`'${oldName}'\n  → '${newName}'\n\n학생 ${targets.length}명의 반 배정을 옮깁니다.\n(수업카드 기록은 옛 반 그대로 보존됩니다)\n\n진행할까요?`)) return;
+  try {
+    await Promise.all(targets.map(t => {
+      const next = t.classNames.filter(c => c !== oldName);
+      if (!next.includes(newName)) next.push(newName);
+      return updateDoc(doc(db,'students',t.id), { classNames: next });
+    }));
+    await loadClassrooms();
+    await loadStudentList();
+    alert(`완료: ${targets.length}명을 '${newName}' 반으로 옮겼습니다.`);
+  } catch(e) { alert('이동 실패: '+e.message); }
 };
 // 반 제외 버튼 이벤트 위임 (한 번만 등록)
 (function(){
