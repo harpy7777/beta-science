@@ -116,6 +116,8 @@ body {
 .nc-timetable::after  { background: linear-gradient(90deg, #fb923c, #ea580c); }
 .nc-exam    .nav-icon { background: #f0f9ff; }
 .nc-exam::after       { background: linear-gradient(90deg, #38bdf8, #0284c7); }
+.nc-classroom .nav-icon { background: #ecfeff; }
+.nc-classroom::after  { background: linear-gradient(90deg, #22d3ee, #0891b2); }
 
 /* ── Quick Stats ── */
 .quick-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 1.6rem; }
@@ -641,6 +643,29 @@ body {
 .section-label { font-size: 10px; font-weight: 700; color: #aeaeb2; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
 .cc-loading { text-align: center; padding: 2rem; color: #aeaeb2; font-size: 12px; }
 
+/* ── 반별 명단 ── */
+.room-legend { font-size: 12px; color: #0e7490; background: #ecfeff; border: 1px solid #cffafe; border-radius: 12px; padding: 10px 12px; line-height: 1.6; margin-bottom: 14px; }
+.room-legend b { color: #0891b2; }
+.room-card { background: #fff; border: 1.5px solid #cffafe; border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; }
+.room-card-none { border-color: #f0e8ed; background: #fafafa; }
+.room-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
+.room-name { font-size: 14px; font-weight: 700; color: #1d1d1f; word-break: keep-all; }
+.room-off { font-size: 9px; font-weight: 700; color: #9ca3af; background: #f3f4f6; padding: 2px 6px; border-radius: 5px; margin-left: 4px; }
+.room-count { font-size: 11px; font-weight: 700; color: #0891b2; background: #ecfeff; padding: 3px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.room-card-none .room-count { color: #6e6e73; background: #f0f0f2; }
+.room-students { display: flex; flex-wrap: wrap; gap: 6px; }
+.stu-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #155e63; background: #ecfeff; border: 1px solid #a5f3fc; border-radius: 20px; padding: 5px 6px 5px 11px; }
+.stu-chip-plain { color: #6e6e73; background: #f5f5f7; border-color: #eee; padding: 5px 11px; }
+.stu-chip-grade { font-size: 9px; font-weight: 700; color: #6d28d9; background: #ede9fe; padding: 1px 6px; border-radius: 5px; }
+.stu-chip-x { border: none; background: #cffafe; color: #0891b2; width: 18px; height: 18px; border-radius: 50%; cursor: pointer; font-size: 10px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; transition: background 0.15s, color 0.15s; }
+.stu-chip-x:hover { background: #fca5a5; color: #7f1d1d; }
+.stu-chip-x:active { background: #fca5a5; color: #7f1d1d; }
+.room-empty { font-size: 12px; color: #aeaeb2; padding: 4px 2px; }
+
+/* 반 필터 셀렉트 (수업카드 필터바) */
+.cc-class-filter { width: auto; min-width: 118px; flex: 0 0 auto; padding: 7px 10px; min-height: 36px; border: 1.5px solid #f3e8ff; border-radius: 10px; font-size: 16px; font-family: inherit; color: #1d1d1f; outline: none; background: #fff; -webkit-appearance: none; appearance: none; cursor: pointer; }
+.cc-class-filter:focus { border-color: #a21caf; }
+
 /* 로그아웃 버튼 */
 .logout-btn {
   padding: 7px 14px; min-height: 36px;
@@ -721,6 +746,12 @@ body {
       <div class="nav-icon">🗓️</div>
       <div class="nav-title">시간표</div>
       <div class="nav-desc">요일·시간별 수업<br>색상 편집 가능</div>
+      <span class="nav-arrow">›</span>
+    </div>
+    <div class="nav-card nc-classroom" onclick="openPanel('classroom')">
+      <div class="nav-icon">👥</div>
+      <div class="nav-title">반별 명단</div>
+      <div class="nav-desc">시간표 반별<br>학생 명단 보기</div>
       <span class="nav-arrow">›</span>
     </div>
     <div class="nav-card nc-exam" onclick="openPanel('exam')">
@@ -881,6 +912,9 @@ body {
       <button class="cc-tab" onclick="setCCSubjFilter('화학',this)">화학</button>
       <button class="cc-tab" onclick="setCCSubjFilter('물질과 에너지',this)">물질과 에너지</button>
       <button class="cc-tab" onclick="setCCSubjFilter('화학 반응의 세계',this)">화학 반응의 세계</button>
+      <select class="cc-class-filter" id="cc-class-filter" onchange="setCCClassFilter(this.value)">
+        <option value="전체">전체 반</option>
+      </select>
       <input class="cc-search-inp" type="text" id="cc-search" placeholder="학생명 검색..." oninput="renderClassCards()">
       <button class="cc-write-btn" onclick="toggleCCForm()">+ 작성</button>
     </div>
@@ -906,6 +940,10 @@ body {
           <span class="cc-label">담당 선생님 *</span>
           <input class="cc-inp" type="text" id="cc-teacher" placeholder="선생님 이름">
         </div>
+      </div>
+      <div style="margin-bottom:8px;">
+        <span class="cc-label">반 선택 (시간표 기반)</span>
+        <select class="cc-sel" id="cc-class"><option value="">미지정</option></select>
       </div>
       <div class="cc-form-grid2">
         <div>
@@ -958,6 +996,14 @@ body {
   <div class="panel-bar"><span class="panel-bar-title">🗓️ 시간표</span><button class="close-btn" onclick="closePanel()">✕</button></div>
   <div class="panel-body">
     <div class="timetable-wrap"><table class="timetable" id="timetable-table"></table></div>
+  </div>
+</div>
+
+<!-- 반별 명단 패널 -->
+<div class="page-panel" id="panel-classroom">
+  <div class="panel-bar"><span class="panel-bar-title">👥 반별 명단</span><button class="close-btn" onclick="closePanel()">✕</button></div>
+  <div class="panel-body" id="classroom-body">
+    <div class="cc-loading">불러오는 중...</div>
   </div>
 </div>
 
@@ -1014,6 +1060,7 @@ import { initializeApp }               from "https://www.gstatic.com/firebasejs/
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore, collection, getDocs, addDoc, deleteDoc, doc, setDoc, getDoc,
+  updateDoc, arrayUnion, arrayRemove,
   query, where, orderBy, Timestamp, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -1185,7 +1232,7 @@ window.clearDoneTasks = async () => {
 };
 
 // ── 수업카드 ──
-let ccData = [], ccSubjFilter = '전체', studentList = [];
+let ccData = [], ccSubjFilter = '전체', ccClassFilter = '전체', studentList = [];
 async function loadStudentList() {
   try {
     const snap = await getDocs(query(collection(db,'students'), orderBy('name','asc')));
@@ -1201,7 +1248,8 @@ async function loadStudentList() {
       const subject = s.subject || '';
       const displayName = s.name || s.id;
       const label = grade ? `${displayName} (${grade})` : displayName;
-      return `<option value="${s.id}" data-grade="${esc(grade)}" data-subject="${esc(subject)}" data-name="${esc(displayName)}" data-fireid="${esc(s.fireId||'')}">${esc(label)}</option>`;
+      const classesAttr = (Array.isArray(s.classNames) ? s.classNames : []).filter(Boolean).join('|');
+      return `<option value="${s.id}" data-grade="${esc(grade)}" data-subject="${esc(subject)}" data-name="${esc(displayName)}" data-fireid="${esc(s.fireId||'')}" data-classes="${esc(classesAttr)}">${esc(label)}</option>`;
     }).join('');
     onStudentChange();
   } catch(e) {
@@ -1209,6 +1257,45 @@ async function loadStudentList() {
     document.getElementById('cc-student').innerHTML = '<option value="">로드 실패</option>';
   }
 }
+
+// ── 반(班): 시간표 수업명 기반 ──
+function getClassList(){
+  const set = new Set();
+  Object.values(ttData).forEach(c => { if (c && c.label){ const l = String(c.label).trim(); if (l) set.add(l); } });
+  return [...set].sort((a,b) => a.localeCompare(b,'ko'));
+}
+function preselectStudentClass(){
+  const formSel = document.getElementById('cc-class');
+  const stuSel  = document.getElementById('cc-student');
+  if (!formSel || !stuSel) return;
+  const opt = stuSel.options[stuSel.selectedIndex];
+  const raw = opt ? (opt.getAttribute('data-classes') || '') : '';
+  const primary = raw.split('|').filter(Boolean)[0] || '';
+  if (primary && getClassList().includes(primary)) formSel.value = primary;
+}
+function refreshClassSelectors(){
+  const list = getClassList();
+  // 수업카드 폼 드롭다운
+  const formSel = document.getElementById('cc-class');
+  if (formSel){
+    const cur = formSel.value;
+    formSel.innerHTML = '<option value="">미지정</option>' + list.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+    if (cur && (cur === '' || list.includes(cur))) formSel.value = cur;
+    else preselectStudentClass();
+  }
+  // 반 필터 드롭다운
+  const filterSel = document.getElementById('cc-class-filter');
+  if (filterSel){
+    const cur = filterSel.value;
+    filterSel.innerHTML = '<option value="전체">전체 반</option>'
+      + list.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('')
+      + '<option value="__none__">미지정</option>';
+    filterSel.value = (cur && (cur === '전체' || cur === '__none__' || list.includes(cur))) ? cur : '전체';
+    ccClassFilter = filterSel.value;
+  }
+}
+window.setCCClassFilter = (v) => { ccClassFilter = v || '전체'; renderClassCards(); };
+
 window.onStudentChange = function() {
   const sel = document.getElementById('cc-student');
   const opt = sel.options[sel.selectedIndex];
@@ -1228,6 +1315,7 @@ window.onStudentChange = function() {
     }
   }
   loadStudentGrades(value, fireId);
+  preselectStudentClass();
 };
 
 /* ── 시험 기록에서 불러오기 (grades 컬렉션, 포털과 동일) ── */
@@ -1320,6 +1408,7 @@ function renderGradePicker(){
 }
 window.pickGrade = function(){};
 async function loadClassCards() {
+  refreshClassSelectors();
   document.getElementById('cc-list-wrap').innerHTML = '<div class="cc-loading">불러오는 중...</div>';
   try {
     const snap = await getDocs(query(collection(db,'classCards'), orderBy('classDate','desc')));
@@ -1346,6 +1435,10 @@ window.renderClassCards = function() {
   const search = (document.getElementById('cc-search')?.value || '').trim().toLowerCase();
   let list = ccData;
   if (ccSubjFilter !== '전체') list = list.filter(c => c.subject === ccSubjFilter);
+  if (ccClassFilter && ccClassFilter !== '전체') {
+    if (ccClassFilter === '__none__') list = list.filter(c => !c.className);
+    else list = list.filter(c => c.className === ccClassFilter);
+  }
   if (search) list = list.filter(c =>
     (c.studentName||'').toLowerCase().includes(search) ||
     (c.content||'').toLowerCase().includes(search) ||
@@ -1362,6 +1455,8 @@ window.renderClassCards = function() {
     const hwCls = (c.homework && c.homework !== '-') ? ccHwColor(c.homework) : 'cc-v-gray';
     const attTxt = c.attitude ? esc(c.attitude) : '—';
     const attCls = c.attitude ? ccAttColor(c.attitude) : 'cc-v-gray';
+    const clsTxt = c.className ? esc(c.className) : '—';
+    const clsCls = c.className ? 'cc-v-blue' : 'cc-v-gray';
     return `<div class="cc-card" id="cc-${c.id}">
       <div class="cc-card-head" onclick="toggleCCCard('${c.id}')">
         <div class="cc-card-left">
@@ -1371,6 +1466,7 @@ window.renderClassCards = function() {
           </div>
           <div class="cc-fields">
             <div class="cc-field"><span class="cc-f-lbl">수강 과목</span><span class="cc-f-val">${subj}</span></div>
+            <div class="cc-field"><span class="cc-f-lbl">반</span><span class="cc-f-val ${clsCls}">${clsTxt}</span></div>
             <div class="cc-field"><span class="cc-f-lbl">담당 선생님</span><span class="cc-f-val ${teacherCls}">${teacher}</span></div>
             <div class="cc-field"><span class="cc-f-lbl">수업 날짜</span><span class="cc-f-val">${dateTxt}</span></div>
             <div class="cc-field"><span class="cc-f-lbl">과제 완성도</span><span class="cc-f-val ${hwCls}">${hwTxt}</span></div>
@@ -1400,7 +1496,7 @@ window.toggleCCForm = () => {
   ccFormOpen = !ccFormOpen;
   const box = document.getElementById('cc-form-box');
   box.style.display = ccFormOpen ? 'block' : 'none';
-  if (ccFormOpen) setTimeout(() => box.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
+  if (ccFormOpen) { refreshClassSelectors(); preselectStudentClass(); setTimeout(() => box.scrollIntoView({behavior:'smooth', block:'nearest'}), 50); }
 };
 window.toggleScoreNone = () => {};
 window.saveClassCard = async () => {
@@ -1410,6 +1506,7 @@ window.saveClassCard = async () => {
   const studentName = selectedOpt ? (selectedOpt.getAttribute('data-name') || selectedOpt.text) : '';
   const studentGrade = selectedOpt ? (selectedOpt.getAttribute('data-grade') || '') : '';
   const subject = document.getElementById('cc-subj').value;
+  const className = document.getElementById('cc-class') ? document.getElementById('cc-class').value : '';
   const teacher = document.getElementById('cc-teacher').value.trim();
   const classDate = document.getElementById('cc-date').value;
   const content = document.getElementById('cc-content').value.trim();
@@ -1425,16 +1522,22 @@ window.saveClassCard = async () => {
   if (!content) return alert('수업 내용을 입력하세요');
   try {
     await addDoc(collection(db,'classCards'), {
-      studentId, studentName, studentGrade, subject, teacher, classDate,
+      studentId, studentName, studentGrade, subject, className, teacher, classDate,
       content, score, scoreNone, ox, multiple, omr, homework, attitude,
       homeworkDone, homeworkContent, createdAt: serverTimestamp()
     });
+    // 선택한 반이 있으면 학생을 해당 반에 배정(누적)
+    if (className && studentId) {
+      try { await setDoc(doc(db,'students',studentId), { classNames: arrayUnion(className) }, { merge:true }); }
+      catch(err) { console.warn('반 배정 실패:', err); }
+    }
     document.getElementById('cc-content').value = '';
     document.getElementById('cc-homework').value = '';
     document.getElementById('cc-teacher').value = '';
     document.getElementById('cc-date').value = new Date().toISOString().split('T')[0];
+    const clsSel = document.getElementById('cc-class'); if (clsSel) clsSel.value = '';
     toggleCCForm();
-    await loadClassCards(); await loadStats();
+    await loadClassCards(); await loadStats(); await loadStudentList();
   } catch(e) { alert('저장 실패: '+e.message); }
 };
 window.delClassCard = async id => {
@@ -1442,6 +1545,79 @@ window.delClassCard = async id => {
   try { await deleteDoc(doc(db,'classCards',id)); await loadClassCards(); await loadStats(); }
   catch(e) { alert('삭제 실패: '+e.message); }
 };
+
+// ── 반별 명단 ──
+async function loadClassrooms(){
+  const body = document.getElementById('classroom-body');
+  if (!body) return;
+  body.innerHTML = '<div class="cc-loading">불러오는 중...</div>';
+  let students = [];
+  try {
+    const snap = await getDocs(query(collection(db,'students'), orderBy('name','asc')));
+    snap.forEach(d => students.push({ id:d.id, ...d.data() }));
+  } catch(e) {
+    body.innerHTML = '<div class="empty-hint">학생 목록을 불러오지 못했습니다</div>';
+    return;
+  }
+  const ttClasses = getClassList();
+  const set = new Set(ttClasses);
+  students.forEach(s => { (Array.isArray(s.classNames) ? s.classNames : []).forEach(c => { if (c) set.add(String(c)); }); });
+  const allClasses = [...set].sort((a,b) => a.localeCompare(b,'ko'));
+  const unassigned = students.filter(s => !(Array.isArray(s.classNames) && s.classNames.length));
+
+  let html = `<div class="room-legend">📋 반은 <b>시간표의 수업명</b>으로 자동 생성돼요. 수업카드 작성 시 반을 선택하면 학생이 그 반에 배정됩니다.</div>`;
+
+  if (!allClasses.length) {
+    html += `<div class="empty-hint">시간표에 등록된 반이 없습니다.<br>먼저 시간표에서 수업을 추가하세요.</div>`;
+  } else {
+    html += allClasses.map(cls => {
+      const members = students.filter(s => Array.isArray(s.classNames) && s.classNames.includes(cls));
+      const inTT = ttClasses.includes(cls);
+      const chips = members.length
+        ? members.map(s => {
+            const nm = esc(s.name || s.id);
+            const gr = s.grade ? `<span class="stu-chip-grade">${esc(s.grade)}</span>` : '';
+            return `<span class="stu-chip">${nm}${gr}<button class="stu-chip-x" data-sid="${esc(s.id)}" data-cls="${esc(cls)}" title="반에서 제외">✕</button></span>`;
+          }).join('')
+        : `<span class="room-empty">배정된 학생이 없습니다</span>`;
+      return `<div class="room-card">
+        <div class="room-head">
+          <span class="room-name">${esc(cls)}${inTT ? '' : ' <span class="room-off">시간표에 없음</span>'}</span>
+          <span class="room-count">${members.length}명</span>
+        </div>
+        <div class="room-students">${chips}</div>
+      </div>`;
+    }).join('');
+  }
+
+  html += `<div class="room-card room-card-none">
+    <div class="room-head">
+      <span class="room-name">미배정 학생</span>
+      <span class="room-count">${unassigned.length}명</span>
+    </div>
+    <div class="room-students">${
+      unassigned.length
+        ? unassigned.map(s => `<span class="stu-chip stu-chip-plain">${esc(s.name || s.id)}${s.grade ? `<span class="stu-chip-grade">${esc(s.grade)}</span>` : ''}</span>`).join('')
+        : '<span class="room-empty">모든 학생이 반에 배정되어 있습니다</span>'
+    }</div>
+  </div>`;
+
+  body.innerHTML = html;
+}
+window.removeStudentFromClass = async (sid, cls) => {
+  if (!sid || !cls) return;
+  if (!confirm(`이 학생을 '${cls}' 반에서 제외할까요?`)) return;
+  try { await updateDoc(doc(db,'students',sid), { classNames: arrayRemove(cls) }); await loadClassrooms(); }
+  catch(e) { alert('제외 실패: '+e.message); }
+};
+// 반 제외 버튼 이벤트 위임 (한 번만 등록)
+(function(){
+  const body = document.getElementById('classroom-body');
+  if (body) body.addEventListener('click', e => {
+    const btn = e.target.closest ? e.target.closest('.stu-chip-x') : null;
+    if (btn) window.removeStudentFromClass(btn.dataset.sid, btn.dataset.cls);
+  });
+})();
 
 // ── 시간표 ──
 const HOURS=['10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'];
@@ -1453,6 +1629,7 @@ async function buildTimetable() {
   try { const snap=await getDocs(collection(db,'timetable')); ttData={}; snap.forEach(d=>{ ttData[d.id]=d.data(); }); }
   catch {}
   renderTimetable();
+  refreshClassSelectors();
 }
 // span 값을 안전하게 정규화 (기존 데이터엔 span 없음 → 1)
 function ttSpan(cell){ const s=parseInt(cell&&cell.span,10); return (s&&s>1)?s:1; }
@@ -1517,12 +1694,12 @@ window.saveTTCell = async () => {
     if(ttData[`${ttPending.day}-${HOURS[startIdx+k]}`]){ return alert('겹치는 수업이 있습니다. 길이를 줄여주세요.'); }
   }
   const idx=COLORS.indexOf(selColor), fg=COLORS_DARK[idx>=0?idx:0], key=`${ttPending.day}-${ttPending.hour}`;
-  try { await setDoc(doc(db,'timetable',key),{label,bg:selColor,fg,span}); ttData[key]={label,bg:selColor,fg,span}; closeTTModal(); renderTimetable(); }
+  try { await setDoc(doc(db,'timetable',key),{label,bg:selColor,fg,span}); ttData[key]={label,bg:selColor,fg,span}; closeTTModal(); renderTimetable(); refreshClassSelectors(); }
   catch(e) { alert('저장 실패: '+e.message); }
 };
 window.deleteTTCell = async key => {
   if(!confirm('삭제할까요?')) return;
-  try { await deleteDoc(doc(db,'timetable',key)); delete ttData[key]; renderTimetable(); }
+  try { await deleteDoc(doc(db,'timetable',key)); delete ttData[key]; renderTimetable(); refreshClassSelectors(); }
   catch(e) { alert('삭제 실패: '+e.message); }
 };
 window.closeTTModal=()=>{ document.getElementById('tt-modal').classList.remove('open'); ttPending=null; };
@@ -1618,6 +1795,7 @@ window.openPanel = id => {
   document.body.style.overflow = 'hidden';
   if (id === 'classcard') loadClassCards();
   if (id === 'timetable') setTimeout(renderTimetable, 50);
+  if (id === 'classroom') loadClassrooms();
 };
 window.closePanel = () => {
   if(curPanel){ document.getElementById('panel-'+curPanel)?.classList.remove('open'); curPanel=null; }
