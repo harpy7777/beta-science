@@ -632,6 +632,12 @@ function normalizeDoc(id, r){
     category: r.category || (r.testType==='master' ? 'master' : ''),
     ox: (r.ox && typeof r.ox==='object') ? r.ox : null,
     multiple: (r.multiple && typeof r.multiple==='object') ? r.multiple : null,
+    // 평면(flat) 스키마 필드 — portal·dashboard와 동일하게 읽기 위해 보존
+    oxScore:    (r.oxScore!=null    && !isNaN(+r.oxScore))    ? +r.oxScore    : null,
+    oxCount:    (r.oxCount!=null     && !isNaN(+r.oxCount))    ? +r.oxCount    : null,
+    multiScore: (r.multiScore!=null && !isNaN(+r.multiScore)) ? +r.multiScore : null,
+    multiCount: (r.multiCount!=null && !isNaN(+r.multiCount)) ? +r.multiCount : null,
+    masterScore:(r.masterScore!=null && !isNaN(+r.masterScore))? +r.masterScore: null,
     // 점수·집계
     score: (typeof r.score==='number') ? r.score : (typeof r.percentage==='number'?r.percentage:null),
     totalQuestions: r.totalQuestions ?? r.totalQ ?? r.total ?? null,
@@ -647,7 +653,9 @@ function normalizeDoc(id, r){
 /* 이 기록이 가진 파트별 점수 {ox, mc, master} (없으면 null) */
 function partScores(r){
   if(r.category==='master' || r.testType==='master'){
-    const sc=(r.multiple && r.multiple.score!=null) ? r.multiple.score : (r.score!=null ? r.score : null);
+    const sc=(r.multiple && r.multiple.score!=null) ? r.multiple.score
+           : (r.masterScore!=null ? r.masterScore
+           : (r.score!=null ? r.score : null));
     return { ox:null, mc:null, master: sc };
   }
   const hasOx = r.ox && r.ox.total;
@@ -657,6 +665,16 @@ function partScores(r){
     let mc = hasMc ? (r.multiple.score!=null?+r.multiple.score:0) : null;
     if(ox!=null && !(ox>0)) ox=null;   // 0점 파트 = 미응시 → 숨김
     if(mc!=null && !(mc>0)) mc=null;   // 0점 파트 = 미응시 → 숨김
+    return { ox, mc, master:null };
+  }
+  // 평면(flat) 스키마 (oxScore/multiScore/oxCount/multiCount) — 0점 파트는 미응시로 숨김
+  const hasFlatOx = r.oxCount>0    && r.oxScore!=null;
+  const hasFlatMc = r.multiCount>0 && r.multiScore!=null;
+  if(hasFlatOx || hasFlatMc){
+    let ox = hasFlatOx ? +r.oxScore    : null;
+    let mc = hasFlatMc ? +r.multiScore : null;
+    if(ox!=null && !(ox>0)) ox=null;
+    if(mc!=null && !(mc>0)) mc=null;
     return { ox, mc, master:null };
   }
   // 옛 구조 (단일 score + testType) — 0점 파트는 미응시로 숨김
