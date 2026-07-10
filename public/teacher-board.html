@@ -1567,8 +1567,10 @@ window.saveClassCard = async () => {
       homeworkDone, homeworkContent, createdAt: serverTimestamp()
     });
     // 선택한 반이 있으면 학생을 해당 반에 배정(누적)
-    if (className && studentId) {
-      try { await setDoc(doc(db,'students',studentId), { classNames: arrayUnion(className) }, { merge:true }); }
+   // 수정
+const fireId = selectedOpt ? (selectedOpt.getAttribute('data-fireid') || '') : '';
+if (className && fireId) {
+  try { await setDoc(doc(db,'students',fireId), { classNames: arrayUnion(className) }, { merge:true }); }
       catch(err) { console.warn('반 배정 실패:', err); }
     }
     document.getElementById('cc-content').value = '';
