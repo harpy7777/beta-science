@@ -43,8 +43,7 @@ body {
   border-radius: 20px; padding: 4px 10px;
   font-size: 10px; font-weight: 600; color: #16a34a; white-space: nowrap;
 }
-.dot-green { width: 5px; height: 5px; background: #22c55e; border-radius: 50%; animation: blink 2s ease-in-out infinite; flex-shrink: 0; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.dot-green { width: 5px; height: 5px; background: #22c55e; border-radius: 50%; flex-shrink: 0; }
 
 /* ── Layout ── */
 .wrap {
@@ -164,6 +163,8 @@ body {
 .sm-card-top { display:flex; align-items:center; gap:11px; margin-bottom:0.8rem; }
 .sm-av { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; }
 .sm-name { font-size:15px; font-weight:700; color:#1d1d1f; letter-spacing:-0.02em; }
+.sm-stu-phone { font-size:11.5px; color:#0e7490; font-family:monospace; margin-top:2px; }
+.sm-stu-phone.none { color:#c7c7cc; }
 .sm-id { font-size:11px; color:#aeaeb2; margin-top:2px; }
 .sm-subjects { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:0.55rem; min-height:21px; }
 .sm-subj { font-size:10px; color:#7c3aed; background:#ede9fe; padding:3px 8px; border-radius:6px; }
@@ -181,7 +182,7 @@ body {
 .sm-class.none { color:#aeaeb2; background:#f5f5f7; border-color:#f0f0f2; font-weight:600; }
 
 .sm-meta { font-size:11.5px; color:#3c3c43; line-height:1.7; margin-bottom:0.85rem; }
-.sm-meta .ml { color:#aeaeb2; display:inline-block; width:34px; }
+.sm-meta .ml { color:#aeaeb2; display:inline-block; width:44px; }
 .sm-actions { display:flex; gap:6px; }
 .sm-btn { flex:1; text-align:center; font-size:12px; font-weight:600; padding:9px 0; border-radius:9px; border:1.5px solid #fce7f3; background:#fff; color:#6e6e73; cursor:pointer; font-family:inherit; text-decoration:none; min-height:40px; display:flex; align-items:center; justify-content:center; gap:4px; transition:all .15s; }
 .sm-btn:hover { border-color:#fbcfe8; }
@@ -219,6 +220,7 @@ body {
 .sm-class-hint { font-size:11px; color:#aeaeb2; line-height:1.6; padding:8px 2px; }
 .sm-class-note { font-size:10.5px; color:#0e7490; background:#ecfeff; border:1px solid #cffafe; border-radius:9px; padding:7px 9px; line-height:1.55; margin-bottom:7px; }
 
+.sm-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .sm-modal-footer { display:flex; gap:8px; margin-top:1.3rem; }
 .sm-modal-footer button { flex:1; min-height:46px; }
 @media (max-width:600px) {
@@ -227,6 +229,7 @@ body {
   .grade-filter-row { grid-template-columns:repeat(4,1fr); }
   .sm-grid { grid-template-columns:1fr; }
   .sm-modal { border-radius:18px; padding:1.2rem 1.1rem; }
+  .sm-row2 { grid-template-columns:1fr; }
 }
 @media (max-width:360px) {
   .gf-btn { font-size:12px; padding:10px 0; }
@@ -265,7 +268,7 @@ body {
 
   <div class="section-heading">학생 명단</div>
   <div class="sm-toolbar">
-    <input class="cc-inp sm-search" id="sm-search" type="text" placeholder="학생 이름 또는 ID로 검색..." oninput="renderCards()" autocomplete="off">
+    <input class="cc-inp sm-search" id="sm-search" type="text" placeholder="이름 · ID · 전화번호로 검색..." oninput="onSearchInput()" autocomplete="off">
     <select class="cc-sel sm-class-filter" id="sm-class-filter" onchange="setClassFilter(this.value)">
       <option value="전체">전체 반</option>
     </select>
@@ -322,9 +325,15 @@ body {
       <div class="sm-class-note">📋 반 목록은 <b>시간표(관리 시스템)</b>에서 자동으로 만들어집니다. 시간표를 수정하면 여기에도 즉시 반영됩니다.</div>
       <div class="sm-class-checks" id="sm-class-checks"></div>
     </div>
-    <div class="sm-field">
-      <span class="cc-label">학부모 전화번호</span>
-      <input class="cc-inp" id="sm-phone" type="tel" placeholder="010-0000-0000" autocomplete="off">
+    <div class="sm-row2">
+      <div class="sm-field">
+        <span class="cc-label">학생 전화번호</span>
+        <input class="cc-inp" id="sm-stu-phone" type="tel" inputmode="tel" placeholder="010-0000-0000" autocomplete="off">
+      </div>
+      <div class="sm-field">
+        <span class="cc-label">학부모 전화번호</span>
+        <input class="cc-inp" id="sm-phone" type="tel" inputmode="tel" placeholder="010-0000-0000" autocomplete="off">
+      </div>
     </div>
     <div class="sm-modal-footer">
       <button class="btn-secondary" onclick="closeModal()">취소</button>
@@ -399,7 +408,7 @@ body {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, addDoc, updateDoc, deleteDoc, setDoc, arrayUnion, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, addDoc, updateDoc, deleteDoc, setDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const cfg = {
   apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
@@ -420,16 +429,16 @@ const GSHORT = {'중등1학년':'중1','중등2학년':'중2','중등3학년':'�
 let students = [];
 let editId = null;          // 수정 중인 학생의 Firestore 문서 id (null이면 신규)
 let editPhotoUrl = '';      // 수정 시 기존 사진 url 보존
-let editClassNames = [];    // 수정 시 기존 반 배정 보존
 let gradeFilter = '';       // 학년 필터 ('' = 전체)
 let classFilter = '전체';   // 반 필터 ('전체' | 반이름 | '__none__')
 let ccStudent = null;       // 수업카드 작성 대상 학생
 
-/* ════════ 시간표 기반 반(班) — teacher-board.html 과 동일 규칙 ════════ */
+/* ════════ 시간표 기반 반(班) — students.html / teacher-board.html 과 동일 규칙 ════════ */
 const DAY_FULL  = { '월':'월요일','화':'화요일','수':'수요일','목':'목요일','금':'금요일','토':'토요일','일':'일요일' };
 const DAY_ORDER = ['월','화','수','목','금','토','일'];
-let ttData = {};      // timetable 문서 (key: "월-10:00")
-let ttClasses = [];   // 시간표에서 생성된 반 이름 목록
+let ttClasses = [];               // 시간표 반 이름 목록
+let nameToId  = new Map();        // 반 이름 -> 시간표 문서 id
+let idToName  = new Map();        // 시간표 문서 id -> 반 이름
 
 function fmtClassName(day, hour, label) {
   const h = parseInt(hour, 10);
@@ -437,57 +446,75 @@ function fmtClassName(day, hour, label) {
   let h12 = isNaN(h) ? 0 : (h % 12); if (h12 === 0) h12 = 12;
   return `${DAY_FULL[day] || day} ${ampm} ${h12}시 ${label}`;
 }
-function buildClassList() {
-  const arr = [], seen = new Set();
-  Object.keys(ttData).forEach(key => {
-    const c = ttData[key];
+function applyTimetable(docs) {
+  const arr = [], n2i = new Map(), i2n = new Map();
+  docs.forEach(d => {
+    const c = d.data();
     if (!c || !c.label) return;
     const label = String(c.label).trim();
     if (!label) return;
-    const dash = key.indexOf('-');
-    const day  = dash >= 0 ? key.slice(0, dash) : key;
-    const hour = dash >= 0 ? key.slice(dash + 1) : '';
+    const id = String(d.id), dash = id.indexOf('-');
+    const day  = dash >= 0 ? id.slice(0, dash) : id;
+    const hour = dash >= 0 ? id.slice(dash + 1) : '';
     const name = fmtClassName(day, hour, label);
-    if (seen.has(name)) return;
-    seen.add(name);
+    if (i2n.has(id)) return;
+    i2n.set(id, name);
+    if (!n2i.has(name)) n2i.set(name, id);
     arr.push({ name, di: DAY_ORDER.indexOf(day), h: parseInt(hour, 10) || 0 });
   });
   arr.sort((a, b) => (a.di - b.di) || (a.h - b.h) || a.name.localeCompare(b.name, 'ko'));
-  return arr.map(x => x.name);
+  ttClasses = arr.map(x => x.name);
+  nameToId = n2i; idToName = i2n;
 }
-// 학생들에게 배정돼 있지만 현재 시간표엔 없는 반(옛 반)까지 포함한 전체 목록
+// 학생이 속한 반 '이름' 목록 (classIds 우선 → 없으면 classNames)
+function studentClassNames(s) {
+  if (!s) return [];
+  const snap = (s.classes && typeof s.classes === 'object') ? s.classes : {};
+  const ids = Array.isArray(s.classIds) ? s.classIds.filter(Boolean) : [];
+  if (ids.length) return ids.map(id => idToName.get(String(id)) || snap[id] || String(id));
+  return Array.isArray(s.classNames) ? s.classNames.filter(Boolean).map(String) : [];
+}
+// 학생들에게 배정돼 있지만 현재 시간표엔 없는 반(옛 반)까지 포함
 function allClassNames() {
   const known = new Set(ttClasses);
   const extra = [];
-  students.forEach(s => {
-    (Array.isArray(s.classNames) ? s.classNames : []).forEach(c => {
-      const v = String(c || '').trim();
-      if (v && !known.has(v)) { known.add(v); extra.push(v); }
-    });
-  });
+  students.forEach(s => studentClassNames(s).forEach(v => {
+    if (v && !known.has(v)) { known.add(v); extra.push(v); }
+  }));
   extra.sort((a, b) => a.localeCompare(b, 'ko'));
   return ttClasses.concat(extra);
 }
+// 반 이름 배열 → students 문서에 저장할 3종 필드 (students.html 과 동일 스키마)
+function buildClassFields(names) {
+  const classIds = [], classNames = [], classes = {};
+  names.filter(Boolean).forEach(nm => {
+    classNames.push(nm);
+    const id = nameToId.get(nm);
+    if (id) { classIds.push(id); classes[id] = nm; }
+  });
+  return { classIds, classNames, classes };
+}
 function refreshClassSelectors() {
-  // 반 필터
   const fSel = document.getElementById('sm-class-filter');
   if (fSel) {
     const cur = fSel.value;
     const list = allClassNames();
-    fSel.innerHTML = '<option value="전체">전체 반</option>'
-      + list.map(c => `<option value="${esc(c)}">${esc(c)}${ttClasses.includes(c) ? '' : ' · 시간표에 없음'}</option>`).join('')
-      + '<option value="__none__">미배정</option>';
-    fSel.value = (cur === '전체' || cur === '__none__' || list.includes(cur)) ? cur : '전체';
+    const sig = list.join('|');
+    if (fSel.dataset.sig !== sig) {
+      fSel.dataset.sig = sig;
+      fSel.innerHTML = '<option value="전체">전체 반</option>'
+        + list.map(c => `<option value="${esc(c)}">${esc(c)}${ttClasses.includes(c) ? '' : ' · 시간표에 없음'}</option>`).join('')
+        + '<option value="__none__">미배정</option>';
+      fSel.value = (cur === '전체' || cur === '__none__' || list.includes(cur)) ? cur : '전체';
+    }
     classFilter = fSel.value;
   }
-  // 수업카드 모달의 반 선택
   const cSel = document.getElementById('cc-w-class');
   if (cSel) {
     const cur = cSel.value;
     cSel.innerHTML = '<option value="">미지정</option>' + ttClasses.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
     if (cur && ttClasses.includes(cur)) cSel.value = cur;
   }
-  // 열려있는 등록/수정 모달의 반 체크리스트
   if (document.getElementById('sm-modal-bg').classList.contains('open')) {
     renderClassChecks(getCheckedClasses());
   }
@@ -507,17 +534,13 @@ onAuthStateChanged(auth, async u => {
 window.doLogout = async () => { await signOut(auth); location.replace('/login.html'); };
 
 /* ════════ 실시간 로드 ════════ */
-// 시간표 → 반 목록 (teacher-board 에서 시간표를 고치면 즉시 반영)
 function initTimetable() {
   onSnapshot(collection(db,'timetable'), snap => {
-    ttData = {};
-    snap.forEach(d => { ttData[d.id] = d.data(); });
-    ttClasses = buildClassList();
+    applyTimetable(snap.docs);
     refreshClassSelectors();
     renderCards();
   }, err => { console.warn('시간표 로드 실패:', err.message); });
 }
-// 학생
 function initStudents() {
   onSnapshot(query(collection(db,'students'), orderBy('regDate','desc')), snap => {
     students = snap.docs.map(d => ({ fireId:d.id, ...d.data() }));
@@ -539,14 +562,26 @@ window.setClassFilter = function(val) {
   classFilter = val || '전체';
   renderCards();
 };
+let searchTimer = null;
+window.onSearchInput = function() {
+  if (searchTimer) clearTimeout(searchTimer);
+  searchTimer = setTimeout(renderCards, 150);
+};
+const onlyDigits = v => String(v || '').replace(/\D/g, '');
 
 /* ════════ 카드 렌더 ════════ */
 window.renderCards = function() {
-  const kw = (document.getElementById('sm-search').value || '').trim().toLowerCase();
+  const raw = (document.getElementById('sm-search').value || '').trim();
+  const kw = raw.toLowerCase();
+  const dg = onlyDigits(raw);
   const gf = gradeFilter, cf = classFilter;
   const list = students.filter(s => {
-    const cn = Array.isArray(s.classNames) ? s.classNames.filter(Boolean) : [];
-    const okKw = !kw || (s.name && s.name.toLowerCase().includes(kw)) || (s.id && String(s.id).toLowerCase().includes(kw));
+    const cn = studentClassNames(s);
+    let okKw = !kw;
+    if (!okKw) {
+      okKw = (s.name && s.name.toLowerCase().includes(kw)) || (s.id && String(s.id).toLowerCase().includes(kw));
+      if (!okKw && dg.length >= 3) okKw = onlyDigits(s.studentPhone).includes(dg) || onlyDigits(s.phone).includes(dg);
+    }
     const okGf = !gf || (s.grade || '') === gf;
     const okCf = (cf === '전체') || (cf === '__none__' ? cn.length === 0 : cn.includes(cf));
     return okKw && okGf && okCf;
@@ -569,12 +604,13 @@ window.renderCards = function() {
     const sid = s.id || '';
     const subs = (s.subject && s.subject !== '-') ? String(s.subject).split(',').map(x => x.trim()).filter(Boolean) : [];
     const subHtml = subs.length ? subs.map(x => `<span class="sm-subj">${esc(x)}</span>`).join('') : '<span class="sm-subj none">과목 미등록</span>';
-    const cn = Array.isArray(s.classNames) ? s.classNames.filter(Boolean) : [];
+    const cn = studentClassNames(s);
     const clsHtml = cn.length
       ? cn.map(c => `<span class="sm-class${ttClasses.includes(c) ? '' : ' off'}">🕒 ${esc(c)}</span>`).join('')
       : '<span class="sm-class none">반 미배정</span>';
     const teacher = (s.teacher && s.teacher !== '-') ? s.teacher : '미배정';
     const phone = (s.phone && s.phone !== '-') ? s.phone : '-';
+    const sPhone = (s.studentPhone && s.studentPhone !== '-') ? s.studentPhone : '';
     const gradeBtn = sid
       ? `<a class="sm-btn primary" href="student-detail.html?id=${encodeURIComponent(sid)}">📊 테스트 결과</a>`
       : `<button class="sm-btn" disabled style="opacity:0.5;">📊 테스트 결과</button>`;
@@ -583,12 +619,13 @@ window.renderCards = function() {
         <div class="sm-av" style="background:${bg};color:${col};">${esc(short)}</div>
         <div style="min-width:0;">
           <div class="sm-name">${esc(name)}</div>
+          <div class="sm-stu-phone${sPhone ? '' : ' none'}">📱 ${sPhone ? esc(sPhone) : '번호 미등록'}</div>
           <div class="sm-id">${esc(grade || '학년 미등록')}${sid ? ' · ' + esc(sid) : ''}</div>
         </div>
       </div>
       <div class="sm-subjects">${subHtml}</div>
       <div class="sm-classes">${clsHtml}</div>
-      <div class="sm-meta"><span class="ml">선생님</span> ${esc(teacher)}<br><span class="ml">연락처</span> ${esc(phone)}</div>
+      <div class="sm-meta"><span class="ml">선생님</span> ${esc(teacher)}<br><span class="ml">학부모</span> ${esc(phone)}</div>
       <div class="sm-actions">
         ${gradeBtn}
         <button class="sm-btn icon" title="수정" onclick="openEdit('${esc(s.fireId)}')">✏️</button>
@@ -598,6 +635,23 @@ window.renderCards = function() {
     </div>`;
   }).join('');
 };
+
+/* ════════ 전화번호 자동 하이픈 ════════ */
+function fmtPhone(v) {
+  const d = onlyDigits(v).slice(0, 11);
+  if (d.length < 4) return d;
+  if (d.length < 8) return d.slice(0,3) + '-' + d.slice(3);
+  if (d.length < 11) return d.slice(0,3) + '-' + d.slice(3,6) + '-' + d.slice(6);
+  return d.slice(0,3) + '-' + d.slice(3,7) + '-' + d.slice(7);
+}
+['sm-phone','sm-stu-phone'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', () => {
+    const atEnd = el.selectionStart === el.value.length;
+    el.value = fmtPhone(el.value);
+    if (atEnd) el.setSelectionRange(el.value.length, el.value.length);
+  });
+});
 
 /* ════════ 등록/수정 모달 ════════ */
 function setSubjChecks(values) {
@@ -634,11 +688,11 @@ function getCheckedClasses() {
   return [...document.querySelectorAll('.sm-class-chk:checked')].map(c => c.value);
 }
 window.openAdd = function() {
-  editId = null; editPhotoUrl = ''; editClassNames = [];
+  editId = null; editPhotoUrl = '';
   document.getElementById('sm-modal-title').textContent = '신규 학생 등록';
   document.getElementById('sm-id').value = '';
   document.getElementById('sm-id').disabled = false;
-  ['sm-name','sm-teacher','sm-phone'].forEach(id => document.getElementById(id).value = '');
+  ['sm-name','sm-teacher','sm-phone','sm-stu-phone'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('sm-grade').value = '';
   setSubjChecks([]);
   renderClassChecks([]);
@@ -649,7 +703,6 @@ window.openEdit = function(fireId) {
   if (!s) return;
   editId = fireId;
   editPhotoUrl = s.photoUrl || '';
-  editClassNames = Array.isArray(s.classNames) ? s.classNames.filter(Boolean) : [];
   document.getElementById('sm-modal-title').textContent = '학생 정보 수정';
   document.getElementById('sm-id').value = s.id || '';
   document.getElementById('sm-id').disabled = true;   // ID는 수정 불가 (기록 연결 유지)
@@ -657,9 +710,10 @@ window.openEdit = function(fireId) {
   document.getElementById('sm-grade').value = s.grade || '';
   document.getElementById('sm-teacher').value = (s.teacher && s.teacher !== '-') ? s.teacher : '';
   document.getElementById('sm-phone').value = (s.phone && s.phone !== '-') ? s.phone : '';
+  document.getElementById('sm-stu-phone').value = (s.studentPhone && s.studentPhone !== '-') ? s.studentPhone : '';
   const subs = (s.subject && s.subject !== '-') ? String(s.subject).split(',').map(x => x.trim()) : [];
   setSubjChecks(subs);
-  renderClassChecks(editClassNames);
+  renderClassChecks(studentClassNames(s));
   document.getElementById('sm-modal-bg').classList.add('open');
 };
 window.closeModal = function() { document.getElementById('sm-modal-bg').classList.remove('open'); };
@@ -676,9 +730,10 @@ window.saveStudent = async function() {
   const id = document.getElementById('sm-id').value.trim() || ('s' + Date.now());
   const teacher = document.getElementById('sm-teacher').value.trim() || '-';
   const phone = document.getElementById('sm-phone').value.trim() || '-';
+  const studentPhone = document.getElementById('sm-stu-phone').value.trim() || '-';
   const checked = [...document.querySelectorAll('.sm-subj-chk:checked')].map(c => c.value);
   const subject = checked.length ? checked.join(',') : '-';
-  const classNames = getCheckedClasses();
+  const cf = buildClassFields(getCheckedClasses());
   if (!name || !grade) { alert('이름과 학년을 입력해주세요.'); return; }
   const btn = document.getElementById('sm-save-btn');
   btn.disabled = true; btn.textContent = '저장 중...';
@@ -686,15 +741,15 @@ window.saveStudent = async function() {
     if (!editId) {
       const t = new Date();
       await addDoc(collection(db,'students'), {
-        id, name, grade, subject, phone, teacher,
-        classNames,
+        id, name, grade, subject, phone, studentPhone, teacher,
+        classIds: cf.classIds, classNames: cf.classNames, classes: cf.classes,
         photoUrl: '',
         regDate: `${t.getFullYear()}. ${t.getMonth()+1}. ${t.getDate()}.`
       });
     } else {
       await updateDoc(doc(db,'students',editId), {
-        name, grade, subject, phone, teacher,
-        classNames,
+        name, grade, subject, phone, studentPhone, teacher,
+        classIds: cf.classIds, classNames: cf.classNames, classes: cf.classes,
         photoUrl: editPhotoUrl || ''
       });
     }
@@ -714,8 +769,8 @@ window.delStudent = async function(fireId, name) {
 };
 
 /* ════════════════════════════════════════════
-   수업카드 작성 (teacher-board 와 동일한 classCards 스키마)
-   · 반(className)을 함께 저장하고, 선택한 반은 학생에게 자동 배정
+   수업카드 작성 (classCards 스키마 동일)
+   · 반(className/classId)을 함께 저장하고, 선택한 반은 학생에게 자동 배정
 ════════════════════════════════════════════ */
 window.openClassCard = function(fireId) {
   const s = students.find(x => x.fireId === fireId);
@@ -726,23 +781,17 @@ window.openClassCard = function(fireId) {
   document.getElementById('cc-stu-info').innerHTML =
     `<span style="font-size:11px;">📚</span><strong>${esc(s.name || '학생')}</strong>` +
     (s.grade ? `<span style="margin-left:6px;color:#a21caf;">${esc(s.grade)}</span>` : '');
-  // 날짜 = 오늘
   const t = new Date();
   document.getElementById('cc-w-date').value =
     `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
-  // 담당 선생님 = 학생 담당쌤 자동 채움 (수정 가능)
   document.getElementById('cc-w-teacher').value = (s.teacher && s.teacher !== '-') ? s.teacher : '';
-  // 수강 과목 = 학생 첫 과목이 옵션에 있으면 선택
   const subs = (s.subject && s.subject !== '-') ? String(s.subject).split(',').map(x => x.trim()).filter(Boolean) : [];
   const subjSel = document.getElementById('cc-w-subj');
   if (subs.length) { const opt = [...subjSel.options].find(o => o.value === subs[0] || o.text === subs[0]); if (opt) subjSel.value = opt.value; }
-  // 반 = 시간표 목록으로 채우고, 학생의 첫 반이 시간표에 있으면 자동 선택
   const clsSel = document.getElementById('cc-w-class');
   clsSel.innerHTML = '<option value="">미지정</option>' + ttClasses.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-  const cn = Array.isArray(s.classNames) ? s.classNames.filter(Boolean) : [];
-  const primary = cn.find(c => ttClasses.includes(c)) || '';
-  clsSel.value = primary;
-  // 나머지 초기화
+  const cn = studentClassNames(s);
+  clsSel.value = cn.find(c => ttClasses.includes(c)) || '';
   document.getElementById('cc-w-unit').value = '';
   document.getElementById('cc-w-hw').value = '보통';
   document.getElementById('cc-w-attitude').value = '보통';
@@ -769,6 +818,7 @@ window.saveClassCard = async function() {
   if (!classDate) { alert('수업 날짜를 선택하세요'); return; }
   if (!content) { alert('수업 내용을 입력하세요'); return; }
   const studentId = (ccStudent.id && ccStudent.id !== '') ? ccStudent.id : ccStudent.fireId;
+  const classId = className ? (nameToId.get(className) || '') : '';
   const btn = document.getElementById('cc-w-save-btn');
   btn.disabled = true; btn.textContent = '저장 중...';
   try {
@@ -776,15 +826,20 @@ window.saveClassCard = async function() {
       studentId,
       studentName: ccStudent.name || '',
       studentGrade: ccStudent.grade || '',
-      subject, className, teacher, classDate, unit, content,
+      subject, className, classId, teacher, classDate, unit, content,
       score: null, scoreNone: false, ox: null, multiple: null, omr: null,
       homework, attitude, homeworkDone, homeworkContent,
       createdAt: serverTimestamp()
     });
-    // 선택한 반이 있으면 학생을 해당 반에 배정(누적) — 문서 id(fireId) 기준
+    // 선택한 반을 학생에게 누적 배정 — 문서 id(fireId) 기준, classIds/classNames/classes 동시 갱신
     if (className && ccStudent.fireId) {
-      try { await setDoc(doc(db,'students',ccStudent.fireId), { classNames: arrayUnion(className) }, { merge:true }); }
-      catch (err) { console.warn('반 배정 실패:', err); }
+      try {
+        const cur = studentClassNames(ccStudent);
+        if (!cur.includes(className)) {
+          const nf = buildClassFields(cur.concat([className]));
+          await setDoc(doc(db,'students',ccStudent.fireId), nf, { merge:true });
+        }
+      } catch (err) { console.warn('반 배정 실패:', err); }
     }
     closeCCModal();
     alert('수업카드가 저장되었습니다.\n학부모 리포트에 바로 반영됩니다.');
