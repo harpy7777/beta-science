@@ -185,11 +185,23 @@ body {
 
 /* ── 목록 ── */
 .list-empty { color:#aeaeb2; font-size:12.5px; padding:1rem; text-align:center; line-height:1.7; }
-.lrow { display:flex; align-items:center; justify-content:space-between; gap:10px; border:1px solid #fce7f3; border-radius:14px; padding:.85rem 1rem; margin-bottom:.6rem; }
+.lrow { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; border:1px solid #fce7f3; border-radius:14px; padding:.85rem 1rem; margin-bottom:.6rem; }
 .lrow:hover { border-color:#fbcfe8; }
-.lr-info { min-width:0; }
+.lr-info { min-width:0; flex:1; }
 .lr-name { font-size:13.5px; font-weight:700; }
 .lr-meta { font-size:11.5px; color:#aeaeb2; margin-top:2px; }
+.lr-sub { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
+.lr-chip {
+  display:inline-flex; align-items:center; gap:3px;
+  font-size:11px; font-weight:600; line-height:1.5;
+  border-radius:20px; padding:3px 9px;
+  background:#fafafa; border:1px solid #f0e8ed; color:#6e6e73;
+  max-width:100%; word-break:break-all;
+}
+.lr-chip.date { color:#0369a1; background:#f0f9ff; border-color:#bae6fd; }
+.lr-chip.unit { color:#be185d; background:#fdf2f8; border-color:#fce7f3; }
+.lr-chip.cnt  { color:#065f46; background:#f0fdf4; border-color:#a7f3d0; }
+.lr-chip.cls  { color:#92400e; background:#fffbeb; border-color:#fde68a; }
 .lr-actions { display:flex; gap:6px; flex-shrink:0; }
 .lr-btn { border:1.5px solid #fce7f3; background:#fff; border-radius:9px; padding:8px 12px; min-height:40px; font-size:12px; font-weight:700; color:#db2777; cursor:pointer; font-family:inherit; }
 .lr-btn:hover { background:#fdf2f8; }
@@ -264,6 +276,9 @@ body {
   .panel { padding: 1.1rem 1.1rem; }
   .field { flex: 1 1 100%; min-width: 0; }
   .modal-box { border-radius: 20px 20px 0 0; max-height: 90vh; }
+  .lrow { flex-direction: column; align-items: stretch; }
+  .lr-actions { justify-content: flex-end; }
+  .lr-btn { flex: 1 1 0; }
 }
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
@@ -450,6 +465,24 @@ function normalizeGrade(val){
   if(/중/.test(s)) return '중'+num;
   if(/고/.test(s)) return '고'+num;
   return s;
+}
+
+/* ── 생성일시 표기 ──
+   Firestore Timestamp → "2026.07.10(금) 15:20"
+   serverTimestamp() 반영 전(null)이면 '방금 전' */
+function toDateSafe(ts){
+  if(!ts) return null;
+  if(typeof ts.toDate === 'function'){ try{ return ts.toDate(); }catch(e){ return null; } }
+  if(ts instanceof Date) return ts;
+  if(typeof ts.seconds === 'number') return new Date(ts.seconds*1000);
+  return null;
+}
+function fmtCreated(ts){
+  const d=toDateSafe(ts);
+  if(!d || isNaN(d.getTime())) return '방금 전';
+  const w=['일','월','화','수','목','금','토'][d.getDay()];
+  const p=n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())}(${w}) ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
 /* ── 직접 입력 카드 (OX·4지선다·핵심내용) ── */
@@ -1060,7 +1093,7 @@ $('saveBtn').addEventListener('click', ()=>{ if(curMode==='class') saveBatch(); 
 $('copyLink').addEventListener('click',()=>{ copy($('resultLink').value).then(()=>toast('링크를 복사했습니다.')); });
 $('previewLink').addEventListener('click',()=>{ const v=$('resultLink').value; if(v) window.open(v,'_blank'); });
 
-/* ── 목록 ── */
+/* ── 목록 (학생 이름 아래 생성날짜 · 단원명 · 클리닉 수) ── */
 async function loadList(){
   const box=$('list');
   try{
@@ -1072,13 +1105,22 @@ async function loadList(){
       const data=d.data();
       const link=`${location.origin}/assignment.html?t=${d.id}`;
       const cnt=Array.isArray(data.items)?data.items.length:0;
+
       const row=el('div','lrow');
       const info=el('div','lr-info');
-      info.appendChild(el('div','lr-name', data.studentName||'(이름 없음)'));
-      const metaParts=[data.weekLabel||'—'];
-      if(data.className) metaParts.push('🏷️ '+data.className);
-      metaParts.push(`항목 ${cnt}개`);
-      info.appendChild(el('div','lr-meta', metaParts.join(' · ')));
+
+      // 1줄: 학생 이름 (+ 학년)
+      const nameText = (data.studentName||'(이름 없음)') + (data.studentGrade ? ` · ${data.studentGrade}` : '');
+      info.appendChild(el('div','lr-name', nameText));
+
+      // 2줄: 칩 — 생성날짜 / 단원명 / 클리닉 수 (+ 반)
+      const sub=el('div','lr-sub');
+      sub.appendChild(el('span','lr-chip date', '🗓️ ' + fmtCreated(data.createdAt)));
+      sub.appendChild(el('span','lr-chip unit', '📘 ' + (data.weekLabel && data.weekLabel.trim() ? data.weekLabel.trim() : '단원명 없음')));
+      sub.appendChild(el('span','lr-chip cnt',  `📋 클리닉 ${cnt}개`));
+      if(data.className) sub.appendChild(el('span','lr-chip cls', '🏷️ ' + data.className));
+      info.appendChild(sub);
+
       const actions=el('div','lr-actions');
       const vbtn=el('button','lr-btn','보기');
       vbtn.addEventListener('click',()=>window.open(link,'_blank'));
