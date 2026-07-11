@@ -163,6 +163,17 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
 .id-warn.tip{color:#b45309;font-weight:500}
 .form-group input.id-dup{border-color:#dc2626;background:#fef2f2}
 .form-group input.id-ok{border-color:#6ee7b7}
+.id-unlock-btn{padding:4px 10px;border:1.5px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s;align-items:center;justify-content:center}
+.id-unlock-btn:hover{background:#fef3c7}
+.del-rec-box{font-size:12.5px;font-weight:600;color:#0e7490;background:#ecfeff;border:1px solid #cffafe;border-radius:10px;padding:10px 12px;line-height:1.6}
+.del-actions{display:flex;gap:8px;margin-top:14px}
+.del-btn{flex:1;padding:12px 8px;min-height:48px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s,background .15s;border:1.5px solid}
+.del-btn:disabled{opacity:.5;cursor:not-allowed}
+.del-btn.keep{background:#fff;border-color:#fce7f3;color:#6e6e73}
+.del-btn.keep:hover:not(:disabled){background:#fdf2f8}
+.del-btn.purge{background:#fef2f2;border-color:#fca5a5;color:#dc2626}
+.del-btn.purge:hover:not(:disabled){background:#fee2e2}
+.del-note{font-size:11px;color:#aeaeb2;line-height:1.7;margin-top:12px}
 
 /* ── Photo Upload ── */
 .photo-upload-row{display:flex;align-items:center;gap:16px;margin-bottom:1.2rem;padding:1rem;background:#fdf2f8;border-radius:14px;border:1px solid #fce7f3}
@@ -400,7 +411,7 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>학생 ID <span style="color:#dc2626">*</span></label>
+        <label style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span>학생 ID <span style="color:#dc2626">*</span></span><button type="button" id="idUnlockBtn" class="id-unlock-btn" onclick="unlockIdEdit()" style="display:none">🔓 ID 변경</button></label>
         <input type="text" id="inputId" placeholder="예: m01010" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         <div class="id-warn" id="idWarn"></div>
       </div>
@@ -505,10 +516,31 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
   </div>
 </div>
 
+<!-- 학생 삭제 (퇴원) 모달 -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <h2>학생 삭제 (퇴원 처리)</h2>
+      <button class="modal-close" onclick="closeDeleteModal()">✕</button>
+    </div>
+    <p style="font-size:14px;color:#1d1d1f;line-height:1.6;margin-bottom:8px"><b id="delName">이 학생</b> 님을 삭제합니다.</p>
+    <div class="del-rec-box" id="delRecInfo">기록 확인 중...</div>
+    <p style="font-size:12px;color:#6e6e73;line-height:1.7;margin:12px 0 4px">성적·수업카드 기록을 어떻게 할지 선택하세요. 삭제한 학생의 <b>학생 ID는 이후 다른 학생이 다시 사용</b>할 수 있습니다.</p>
+    <div class="del-actions">
+      <button class="del-btn keep" id="delKeepBtn" onclick="confirmDelete('keep')">기록 남기고 삭제</button>
+      <button class="del-btn purge" id="delPurgeBtn" onclick="confirmDelete('purge')">기록까지 완전 삭제</button>
+    </div>
+    <p class="del-note">· <b>기록 남기고 삭제</b>: 학생만 목록에서 지웁니다. 같은 ID를 새 학생이 다시 쓰면 이 기록을 물려받게 됩니다.<br>· <b>기록까지 완전 삭제</b>: 성적·수업카드까지 모두 지웁니다. 되돌릴 수 없습니다.</p>
+    <div style="margin-top:14px;text-align:right">
+      <button class="btn-secondary" onclick="closeDeleteModal()">취소</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc,setDoc,collection,addDoc,updateDoc,deleteDoc,query,orderBy,onSnapshot,getDocs,where,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,setDoc,collection,addDoc,updateDoc,deleteDoc,query,orderBy,onSnapshot,getDocs,where,serverTimestamp,writeBatch}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import{getStorage,ref,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
 const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app);
@@ -519,6 +551,8 @@ const IPP=10;
 const LEGACY='legacy:';
 let pg=1,eid=null,students=[],filtered=[],ccCache={},s2f={},fireIdSet=new Set();
 let selectedPhotoFile=null,currentPhotoUrl='';
+let origId='',idEditUnlocked=false;   // 수정 모달에서 학생 ID 변경용
+let delTarget=null;                   // 삭제 대상 {fireId,id,name}
 
 /* ══════════════════════════════════════════
    반(班) 관리
@@ -955,9 +989,12 @@ function setSaveEnabled(on){
 }
 // 입력할 때마다 실시간 검사
 window.checkIdInput=function(){
-  if(eid){setIdWarn('','');setSaveEnabled(true);return;}   // 수정 모드는 ID 잠김
+  if(eid&&!idEditUnlocked){setIdWarn('','');setSaveEnabled(true);return;}   // 수정 모드: 잠금 해제 전에는 ID 검사 안 함
   const raw=document.getElementById('inputId').value.trim();
-  if(!raw){setIdWarn('tip','학생 ID를 입력하세요. 학년을 고르면 다음 번호를 제안합니다.');setSaveEnabled(true);return;}
+  if(!raw){
+    if(eid){setIdWarn('err','⛔ 학생 ID는 비워 둘 수 없습니다.');setSaveEnabled(false);return;}
+    setIdWarn('tip','학생 ID를 입력하세요. 학년을 고르면 다음 번호를 제안합니다.');setSaveEnabled(true);return;
+  }
   const dup=findDupId(raw);
   if(dup){
     setIdWarn('err',`⛔ 이미 사용 중인 ID입니다 — ${dup.name||'이름없음'}${dup.grade?` (${dup.grade})`:''}`);
@@ -966,6 +1003,11 @@ window.checkIdInput=function(){
   }
   if(!ID_RE.test(raw.toLowerCase())){
     setIdWarn('tip','⚠️ 권장 형식이 아닙니다. (영문 소문자 1자 + 숫자 5자, 예: h01001)');
+    setSaveEnabled(true);
+    return;
+  }
+  if(eid&&idEditUnlocked&&raw.toLowerCase()!==String(origId||'').trim().toLowerCase()){
+    setIdWarn('ok','✅ 변경 가능한 ID · 저장 시 성적·수업카드도 함께 이동합니다');
     setSaveEnabled(true);
     return;
   }
@@ -987,11 +1029,13 @@ window.onGradeChange=function(){
 /* ── 학생 모달 ── */
 window.openAddModal=function(){
   eid=null;
+  origId='';idEditUnlocked=false;
   suggestedId='';
   document.getElementById('modalTitle').textContent='학생 추가';
   ['inputId','inputName','inputTeacher','inputPhone','inputStudentPhone','inputSchool'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('inputGrade').value='';
   document.getElementById('inputId').disabled=false;
+  const ub=document.getElementById('idUnlockBtn');if(ub)ub.style.display='none';
   document.querySelectorAll('.subj-chk').forEach(cb=>{cb.checked=false;cb.closest('.subj-label').classList.remove('checked');});
   resetPhotoUI();renderSchoolList();updateSchoolPreview();
   renderClassChecks([]);            // 시간표는 실시간 구독 중 → 재조회 불필요
@@ -1004,6 +1048,8 @@ window.openEditModal=function(fi){
   suggestedId='';
   const s=students.find(x=>x.fireId===fi);
   if(!s)return;
+  origId=s.id||'';
+  idEditUnlocked=false;
   document.getElementById('modalTitle').textContent='학생 정보 수정';
   document.getElementById('inputId').value=s.id||'';
   document.getElementById('inputId').disabled=true;
@@ -1020,12 +1066,25 @@ window.openEditModal=function(fi){
   if(currentPhotoUrl)setPhotoPreview(currentPhotoUrl);
   renderSchoolList();updateSchoolPreview();
   renderClassChecks(studentClasses(s).map(c=>c.id));
+  const ub=document.getElementById('idUnlockBtn');if(ub)ub.style.display='inline-flex';
   setSaveEnabled(true);
-  setIdWarn('','');
+  setIdWarn('tip','🔒 ID는 기록 연결을 위해 잠겨 있습니다. 바꾸려면 오른쪽 "🔓 ID 변경"을 누르세요.');
   document.getElementById('studentModal').classList.add('open');
+};
+// 수정 모달에서 학생 ID 잠금 해제 (실수 방지용 확인)
+window.unlockIdEdit=function(){
+  if(!eid)return;
+  if(!confirm('학생 ID를 변경하면:\n\n• 이 학생의 성적·수업카드 기록이 새 ID로 함께 이동합니다.\n• 학부모에게 이미 보낸 리포트 링크(옛 ID 주소)는 더 이상 열리지 않습니다.\n\n계속하시겠습니까?'))return;
+  idEditUnlocked=true;
+  const inp=document.getElementById('inputId');
+  inp.disabled=false;
+  inp.focus();inp.select();
+  const ub=document.getElementById('idUnlockBtn');if(ub)ub.style.display='none';
+  checkIdInput();
 };
 window.closeModal=function(){
   document.getElementById('studentModal').classList.remove('open');
+  idEditUnlocked=false;
   setIdWarn('','');
   setSaveEnabled(true);
 };
@@ -1065,6 +1124,18 @@ window.saveStudent=async function(){
     if(!ID_RE.test(id.toLowerCase())){
       if(!confirm(`"${id}" 는 권장 형식(예: h01001)이 아닙니다.\n이대로 저장할까요?`)){idEl.focus();return;}
     }
+  }else if(idEditUnlocked){
+    // ── ID 변경 시 검증 (수정 모드) ──
+    if(!id){alert('학생 ID는 비워 둘 수 없습니다.');idEl.focus();return;}
+    const dup=findDupId(id);   // findDupId 는 수정 중인 본인(eid) 제외
+    if(dup){
+      alert(`⛔ 이미 사용 중인 학생 ID입니다.\n\n  ${id} → ${dup.name||'이름없음'}${dup.grade?` (${dup.grade})`:''}\n\n다른 ID를 입력해주세요.`);
+      idEl.focus();idEl.select();
+      return;
+    }
+    if(!ID_RE.test(id.toLowerCase())){
+      if(!confirm(`"${id}" 는 권장 형식(예: h01001)이 아닙니다.\n이대로 저장할까요?`)){idEl.focus();return;}
+    }
   }
 
   const saveBtn=document.getElementById('saveBtn');saveBtn.disabled=true;saveBtn.textContent='저장 중...';
@@ -1085,15 +1156,134 @@ window.saveStudent=async function(){
         idEl.focus();idEl.select();
         return;
       }
+      // 삭제된 학생이 쓰던 ID를 재사용하는 경우: 남은 성적·수업카드를 새 학생이 물려받게 됨 → 확인
+      saveBtn.textContent='기록 확인 중...';
+      const orphan=await countRecords(id);
+      saveBtn.textContent='저장 중...';
+      if(orphan.grades||orphan.cards){
+        if(!confirm(`ℹ️ 이 ID로 남아있는 기록이 있습니다.\n\n  • 성적 ${orphan.grades}건\n  • 수업카드 ${orphan.cards}건\n\n새 학생이 이 기록을 그대로 물려받습니다.\n(퇴원 학생의 기록이라면 학생 삭제 시 "기록까지 완전 삭제"를 이용하세요.)\n\n이대로 등록할까요?`)){
+          return;
+        }
+      }
       const t=new Date();
       await addDoc(collection(db,"students"),{id,...base,regDate:`${t.getFullYear()}. ${t.getMonth()+1}. ${t.getDate()}.`});
     }else{
+      const oldId=String(origId||'').trim();
+      const changingId=idEditUnlocked&&id&&id!==oldId;
+      if(changingId){
+        // 새 ID가 서버에서 다른 학생과 겹치지 않는지 재확인
+        const chk=await getDocs(query(collection(db,"students"),where("id","==",id)));
+        if(chk.docs.some(d=>d.id!==eid)){
+          alert(`⛔ 방금 다른 곳에서 "${id}" 가 사용되었습니다.\n다른 ID를 사용해주세요.`);
+          idEl.focus();idEl.select();
+          return;
+        }
+        // 성적·수업카드를 옛 ID → 새 ID 로 이동
+        saveBtn.textContent='기록 이동 중...';
+        const moved=await migrateStudentId(oldId,id);
+        await updateDoc(doc(db,"students",eid),{...base,id});
+        origId=id;
+        closeModal();
+        alert(`학생 ID가 "${oldId||'(없음)'}" → "${id}" 로 변경되었습니다.\n성적 ${moved.grades}건 · 수업카드 ${moved.cards}건도 함께 이동했습니다.`);
+        return;
+      }
       await updateDoc(doc(db,"students",eid),base);
     }
     closeModal();
   }catch(er){alert("저장 오류: "+er.message);}finally{saveBtn.disabled=false;saveBtn.textContent='저장';}
 };
-window.deleteStudent=async function(fi,nm){if(!confirm(`"${nm}" 학생을 삭제하시겠습니까?`))return;try{await deleteDoc(doc(db,"students",fi));}catch(er){alert("삭제 오류: "+er.message);}};
+/* ══════════════════════════════════════════
+   학생 ID ↔ 성적(grades)·수업카드(classCards) 연결 유틸
+   - 학생 ID(문자열)는 두 컬렉션의 studentId 필드로 연결됨
+   - classCards 는 옛 문서가 fireId 로 저장된 경우도 있어 둘 다 조회
+   ══════════════════════════════════════════ */
+async function collectRecords(id,fireId){
+  const keys=[...new Set([id,fireId].map(x=>String(x||'').trim()).filter(Boolean))];
+  const grades=[],cards=[],sg=new Set(),sc=new Set();
+  for(const key of keys){
+    try{
+      const g=await getDocs(query(collection(db,"grades"),where("studentId","==",key)));
+      g.forEach(d=>{if(!sg.has(d.id)){sg.add(d.id);grades.push(d.id);}});
+    }catch(er){}
+    try{
+      const c=await getDocs(query(collection(db,"classCards"),where("studentId","==",key)));
+      c.forEach(d=>{if(!sc.has(d.id)){sc.add(d.id);cards.push(d.id);}});
+    }catch(er){}
+  }
+  return{grades,cards};
+}
+async function countRecords(id){
+  const r=await collectRecords(id,null);
+  return{grades:r.grades.length,cards:r.cards.length};
+}
+// 성적·수업카드의 studentId 를 oldId → newId 로 이동 (writeBatch, 400건 단위)
+async function migrateStudentId(oldId,newId){
+  const rec=await collectRecords(oldId,null);
+  const ops=[];
+  rec.grades.forEach(gid=>ops.push(['grades',gid]));
+  rec.cards.forEach(cid=>ops.push(['classCards',cid]));
+  for(let i=0;i<ops.length;i+=400){
+    const batch=writeBatch(db);
+    ops.slice(i,i+400).forEach(([col,docId])=>batch.update(doc(db,col,docId),{studentId:newId}));
+    await batch.commit();
+  }
+  return{grades:rec.grades.length,cards:rec.cards.length};
+}
+
+/* ── 학생 삭제 (퇴원): 기록 보존/완전삭제 선택 모달 ── */
+window.deleteStudent=function(fi,nm){
+  const s=students.find(x=>x.fireId===fi);
+  delTarget={fireId:fi,id:(s&&s.id)||'',name:nm||((s&&s.name)||'')};
+  document.getElementById('delName').textContent=delTarget.name||'이 학생';
+  document.getElementById('delRecInfo').textContent='기록 확인 중...';
+  document.getElementById('delKeepBtn').disabled=false;
+  document.getElementById('delPurgeBtn').disabled=true;
+  document.getElementById('delKeepBtn').textContent='기록 남기고 삭제';
+  document.getElementById('delPurgeBtn').textContent='기록까지 완전 삭제';
+  document.getElementById('deleteModal').classList.add('open');
+  countRecords(delTarget.id).then(c=>{
+    if(!delTarget)return;
+    const has=c.grades||c.cards;
+    document.getElementById('delRecInfo').textContent=has
+      ?`이 학생에게 성적 ${c.grades}건 · 수업카드 ${c.cards}건이 있습니다.`
+      :'이 학생에게 연결된 성적·수업카드 기록이 없습니다.';
+    document.getElementById('delPurgeBtn').disabled=false;
+  }).catch(()=>{
+    document.getElementById('delRecInfo').textContent='기록 수를 확인하지 못했습니다. (그래도 삭제는 가능합니다)';
+    document.getElementById('delPurgeBtn').disabled=false;
+  });
+};
+window.closeDeleteModal=function(){
+  document.getElementById('deleteModal').classList.remove('open');
+  delTarget=null;
+};
+window.confirmDelete=async function(mode){
+  if(!delTarget)return;
+  const t=delTarget;
+  const keepBtn=document.getElementById('delKeepBtn'),purgeBtn=document.getElementById('delPurgeBtn');
+  const active=mode==='purge'?purgeBtn:keepBtn;
+  const label=active.textContent;
+  keepBtn.disabled=true;purgeBtn.disabled=true;active.textContent='삭제 중...';
+  try{
+    if(mode==='purge'){
+      const rec=await collectRecords(t.id,t.fireId);
+      const ops=[];
+      rec.grades.forEach(gid=>ops.push(['grades',gid]));
+      rec.cards.forEach(cid=>ops.push(['classCards',cid]));
+      for(let i=0;i<ops.length;i+=400){
+        const batch=writeBatch(db);
+        ops.slice(i,i+400).forEach(([col,docId])=>batch.delete(doc(db,col,docId)));
+        await batch.commit();
+      }
+    }
+    await deleteDoc(doc(db,"students",t.fireId));
+    if(t.fireId&&ccCache[t.fireId])delete ccCache[t.fireId];
+    closeDeleteModal();
+  }catch(er){
+    alert("삭제 오류: "+er.message);
+    keepBtn.disabled=false;purgeBtn.disabled=false;active.textContent=label;
+  }
+};
 
 /* ── 수업카드 ── */
 let ccCur=null;
@@ -1211,7 +1401,8 @@ document.getElementById('inputId').addEventListener('input',checkIdInput);
 document.getElementById('inputGrade').addEventListener('change',onGradeChange);
 document.getElementById('studentModal').addEventListener('click',ev=>{if(ev.target===ev.currentTarget)closeModal();});
 document.getElementById('classCardModal').addEventListener('click',ev=>{if(ev.target===ev.currentTarget)closeClassCardModal();});
-document.addEventListener('keydown',ev=>{if(ev.key==='Escape'){closeModal();closeClassCardModal();}});
+document.getElementById('deleteModal').addEventListener('click',ev=>{if(ev.target===ev.currentTarget)closeDeleteModal();});
+document.addEventListener('keydown',ev=>{if(ev.key==='Escape'){closeModal();closeClassCardModal();closeDeleteModal();}});
 </script>
 </body>
 </html>
