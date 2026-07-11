@@ -188,7 +188,9 @@ body {
 .lrow { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; border:1px solid #fce7f3; border-radius:14px; padding:.85rem 1rem; margin-bottom:.6rem; }
 .lrow:hover { border-color:#fbcfe8; }
 .lr-info { min-width:0; flex:1; }
+.lr-nameline { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
 .lr-name { font-size:13.5px; font-weight:700; }
+.lr-date-inline { font-size:11.5px; font-weight:600; color:#0369a1; white-space:nowrap; }
 .lr-meta { font-size:11.5px; color:#aeaeb2; margin-top:2px; }
 .lr-sub { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
 .lr-chip {
@@ -1109,13 +1111,15 @@ async function loadList(){
       const row=el('div','lrow');
       const info=el('div','lr-info');
 
-      // 1줄: 학생 이름 (+ 학년)
+      // 1줄: 학생 이름 (+ 학년)  ·  오른쪽에 생성날짜
       const nameText = (data.studentName||'(이름 없음)') + (data.studentGrade ? ` · ${data.studentGrade}` : '');
-      info.appendChild(el('div','lr-name', nameText));
+      const nameLine=el('div','lr-nameline');
+      nameLine.appendChild(el('span','lr-name', nameText));
+      nameLine.appendChild(el('span','lr-date-inline', '🗓️ ' + fmtCreated(data.createdAt)));
+      info.appendChild(nameLine);
 
-      // 2줄: 칩 — 생성날짜 / 단원명 / 클리닉 수 (+ 반)
+      // 2줄: 칩 — 단원명 / 클리닉 수 (+ 반)
       const sub=el('div','lr-sub');
-      sub.appendChild(el('span','lr-chip date', '🗓️ ' + fmtCreated(data.createdAt)));
       sub.appendChild(el('span','lr-chip unit', '📘 ' + (data.weekLabel && data.weekLabel.trim() ? data.weekLabel.trim() : '단원명 없음')));
       sub.appendChild(el('span','lr-chip cnt',  `📋 클리닉 ${cnt}개`));
       if(data.className) sub.appendChild(el('span','lr-chip cls', '🏷️ ' + data.className));
