@@ -101,7 +101,10 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
 /* 응시한 시험 칸: 배지를 고정폭 칸에 넣어 단원명 시작 위치를 모든 줄에서 일치시킴 */
 .exam-cell{display:flex;align-items:center;gap:10px;text-align:left;padding-left:28px}
 .exam-badge-box{flex:0 0 64px;display:flex;justify-content:center;flex-shrink:0}
-.exam-cell .test-name-cell{flex:1;min-width:0;text-align:left}
+.exam-cell .test-name-cell{flex:1;min-width:0;text-align:left;display:flex;align-items:center;gap:6px}
+.exam-name-text{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 재시험(같은 학생·같은 시험 재응시) 표시 배지 */
+.retake-badge{flex-shrink:0;display:inline-flex;align-items:center;gap:2px;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap;background:#dc2626;color:#fff;box-shadow:0 1px 4px rgba(220,38,38,.28)}
 
 /* ── Subject Filter (과목별 탭) ── */
 .subj-filter{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0 10px;margin-bottom:.4rem}
@@ -192,7 +195,7 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
   .test-tab-btn{padding:8px 12px;font-size:12px}
   .test-name-cell{max-width:130px}
   /* 최근 응시 표: 모바일에서 관리(삭제) 열이 눌리지 않도록 최소 너비 확보 */
-  #recentAttemptsTable{min-width:520px}
+  #recentAttemptsTable{min-width:560px}
   .exam-cell{padding-left:14px}
   /* 모바일에서 삭제버튼 터치 영역 키우기 (44px 권장 터치 타깃) */
   #recentAttemptsBody .action-btn{width:38px;height:38px;font-size:15px}
@@ -291,10 +294,10 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
       <a href="https://beta-science.vercel.app/grade-check.html" class="view-all">전체보기 ›</a>
     </div>
     <div class="table-wrap">
-      <table id="recentAttemptsTable" style="min-width:620px">
-        <colgroup><col style="width:10%"><col style="width:10%"><col style="width:9%"><col style="width:8%"><col style="width:11%"><col style="width:44%"><col style="width:8%"></colgroup>
-        <thead><tr><th>응시일</th><th>아이디</th><th>이름</th><th>학년</th><th>과목</th><th>응시한 시험</th><th>관리</th></tr></thead>
-        <tbody id="recentAttemptsBody"><tr><td colspan="7" style="text-align:center;padding:2.5rem;color:#aeaeb2">데이터를 불러오는 중...</td></tr></tbody>
+      <table id="recentAttemptsTable" style="min-width:680px">
+        <colgroup><col style="width:9%"><col style="width:9%"><col style="width:9%"><col style="width:7%"><col style="width:10%"><col style="width:40%"><col style="width:9%"><col style="width:7%"></colgroup>
+        <thead><tr><th>응시일</th><th>아이디</th><th>이름</th><th>학년</th><th>과목</th><th>응시한 시험</th><th>점수</th><th>관리</th></tr></thead>
+        <tbody id="recentAttemptsBody"><tr><td colspan="8" style="text-align:center;padding:2.5rem;color:#aeaeb2">데이터를 불러오는 중...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -461,10 +464,17 @@ function sBadge(s){if(s==null)return'<span style="color:#aeaeb2">-</span>';const
 const TYPE_INFO={ox:{cls:'type-ox',label:'OX'},multi:{cls:'type-multi',label:'4지선다'},master:{cls:'type-master',label:'마스터'}};
 let lastGradeDocs=null;
 function iRG(){onSnapshot(query(collection(db,"grades"),orderBy("timestamp","asc")),s=>{lastGradeDocs=s.docs;renderRecentAttempts();});}
+// 이 줄(유형)에 해당하는 점수
+function rowScore(row){
+  const p=partScores(row.r);
+  if(row.type==='master')return p.master;
+  if(row.type==='ox')return p.ox;
+  return p.multi;
+}
 function renderRecentAttempts(){
   const tb=document.getElementById('recentAttemptsBody');
   if(!tb)return;
-  if(!lastGradeDocs||lastGradeDocs.length===0){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
+  if(!lastGradeDocs||lastGradeDocs.length===0){tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
   const gm={'중1':'g-mid1','중2':'g-mid2','중3':'g-mid3','고1':'g-high1','고2':'g-high2','고3':'g-high3','중등1학년':'g-mid1','중등2학년':'g-mid2','중등3학년':'g-mid3','고등1학년':'g-high1','고등2학년':'g-high2','고등3학년':'g-high3'};
   // 응시 1건이 OX+4지선다를 함께 가지면 각 유형을 별도 줄로 분리 (마스터는 한 줄)
   const rows=[];
@@ -475,10 +485,22 @@ function renderRecentAttempts(){
     if(types.length===1&&types[0]==='master'){rows.push({docId:d.id,r,sid,ts,type:'master'});}
     else{types.forEach(t=>rows.push({docId:d.id,r,sid,ts,type:t}));}
   });
-  if(!rows.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
+  if(!rows.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
+  // 재시험 판별: 같은 학생 · 같은 유형 · 같은 시험을 2번째 이상 응시하면 재시험(가장 오래된 것이 원본)
+  const groups={};
+  rows.forEach(row=>{
+    const tk=String(row.r.examId||row.r.testId||row.r.testName||row.r.examTitle||'').trim();
+    row._key=tk?(row.sid+'|'+row.type+'|'+tk):(row.sid+'|'+row.type+'|__doc:'+row.docId);
+    (groups[row._key]||(groups[row._key]=[])).push(row);
+  });
+  Object.values(groups).forEach(arr=>{
+    arr.sort((a,b)=>a.ts-b.ts);
+    arr.forEach((row,i)=>{ row._retake=i>0; row._attempt=i+1; });
+  });
   rows.sort((x,y)=>y.ts-x.ts);
   const ds=rows.slice(0,10);
-  tb.innerHTML=ds.map(({docId,r,sid,type})=>{
+  tb.innerHTML=ds.map(row=>{
+    const {docId,r,sid,type}=row;
     // 응시일: 26.05.04 형식 (연도 2자리.월.일, 0채움)
     let dt='-';
     {const x=r.timestamp?tD(r.timestamp):(r.submittedTimestamp?tD(r.submittedTimestamp):pRD(r.date));
@@ -493,10 +515,12 @@ function renderRecentAttempts(){
     // 이 줄의 유형 배지 하나만 표시 (OX·4지선다는 이미 별도 줄로 분리됨)
     const ti=TYPE_INFO[type]||TYPE_INFO.ox;
     const badges=`<span class="type-badge ${ti.cls}">${ti.label}</span>`;
-    const testCell=`<div class="exam-cell"><span class="exam-badge-box">${badges}</span><span class="test-name-cell" title="${e(tname)}">${e(tname)}</span></div>`;
+    const retakeBadge=row._retake?`<span class="retake-badge" title="같은 시험 재응시 (${row._attempt}회차)">🔁 재시험</span>`:'';
+    const testCell=`<div class="exam-cell"><span class="exam-badge-box">${badges}</span><span class="test-name-cell">${retakeBadge}<span class="exam-name-text" title="${e(tname)}">${e(tname)}</span></span></div>`;
+    const scoreCell=sBadge(rowScore(row));
     const tnameSafe=String(tname).replace(/'/g,"\\'");
     const delCell=`<div class="action-icons"><button class="action-btn del" title="이 응시 기록 삭제" onclick="deleteAttempt('${docId}','${sf}','${tnameSafe}')">🗑️</button></div>`;
-    return `<tr><td style="color:#aeaeb2;font-size:11px;white-space:nowrap">${dt}</td><td><span class="sid-text">${e(sid||'-')}</span></td><td style="font-weight:700;color:#1d1d1f">${nc}</td><td>${gb}</td><td>${sb}</td><td style="text-align:left">${testCell}</td><td>${delCell}</td></tr>`;
+    return `<tr><td style="color:#aeaeb2;font-size:11px;white-space:nowrap">${dt}</td><td><span class="sid-text">${e(sid||'-')}</span></td><td style="font-weight:700;color:#1d1d1f">${nc}</td><td>${gb}</td><td>${sb}</td><td style="text-align:left">${testCell}</td><td>${scoreCell}</td><td>${delCell}</td></tr>`;
   }).join('');
 }
 
