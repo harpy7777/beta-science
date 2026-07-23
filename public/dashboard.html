@@ -708,8 +708,9 @@ function renderPending(){
     });
   });
   rows.sort((a,b)=>{
-    const av=a.firstMs||Number.MAX_SAFE_INTEGER,bv=b.firstMs||Number.MAX_SAFE_INTEGER;
-    if(av!==bv)return av-bv;                              // 오래 미응시한 건 먼저
+    // 배포일 최근순 (날짜 없는 건은 맨 아래)
+    const av=a.lastMs||0,bv=b.lastMs||0;
+    if(av!==bv)return bv-av;
     return String(a.name).localeCompare(String(b.name),'ko');
   });
   if(cntEl){
