@@ -106,6 +106,32 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
 /* 재시험(같은 학생·같은 시험 재응시) 표시 배지 */
 .retake-badge{flex-shrink:0;display:inline-flex;align-items:center;gap:2px;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap;background:#dc2626;color:#fff;box-shadow:0 1px 4px rgba(220,38,38,.28)}
 
+/* ── 배포일 셀 ── */
+.m-only{display:none}
+.dist-date{display:inline-block;font-size:11px;font-weight:700;color:#7e22ce;background:#faf5ff;border:1px solid #f3e8ff;border-radius:20px;padding:2px 8px;white-space:nowrap}
+.dist-none{color:#d1d1d6;font-size:11px}
+
+/* ── 미응시 명단 ── */
+.pend-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pend-count{display:inline-flex;align-items:center;gap:4px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:11px;font-weight:700;border-radius:20px;padding:3px 10px;white-space:nowrap}
+.pend-count.zero{background:#f0fdf4;border-color:#bbf7d0;color:#16a34a}
+.pend-scroll{max-height:430px;overflow-y:auto;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.pend-scroll::-webkit-scrollbar{width:5px;height:4px}
+.pend-scroll::-webkit-scrollbar-track{background:#fdf2f8}
+.pend-scroll::-webkit-scrollbar-thumb{background:#fbcfe8;border-radius:4px}
+.pend-scroll thead th{position:sticky;top:0;z-index:2}
+.day-badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.d-fresh{background:#f5f5f7;color:#6e6e73}
+.d-warn{background:#fef9c3;color:#854d0e}
+.d-late{background:#fee2e2;color:#991b1b}
+.class-badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;background:#eef2ff;color:#3730a3;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.link-btn{width:30px;height:30px;border-radius:8px;border:1px solid #fce7f3;background:#fff;cursor:pointer;font-size:13px;transition:all .1s;display:inline-flex;align-items:center;justify-content:center}
+.link-btn:hover{background:#fdf2f8;border-color:#fbcfe8}
+.pend-note{font-size:10.5px;color:#c7c7cc;margin-top:.7rem;line-height:1.6}
+.re-badge{display:inline-block;margin-left:5px;padding:1px 6px;border-radius:20px;font-size:10px;font-weight:700;background:#fff7ed;color:#c2410c;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(12px);background:rgba(29,29,31,.92);color:#fff;font-size:12.5px;font-weight:600;padding:10px 18px;border-radius:22px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:900;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
 /* ── Subject Filter (과목별 탭) ── */
 .subj-filter{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0 10px;margin-bottom:.4rem}
 .subj-chip{flex:1 1 92px;min-width:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:12px 8px;border-radius:14px;border:1.5px solid #fce7f3;background:#fff;cursor:pointer;transition:all .15s;font-family:inherit}
@@ -194,11 +220,37 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
   thead th,tbody td{padding:8px 9px;font-size:11px}
   .test-tab-btn{padding:8px 12px;font-size:12px}
   .test-name-cell{max-width:130px}
-  /* 최근 응시 표: 모바일에서 관리(삭제) 열이 눌리지 않도록 최소 너비 확보 */
-  #recentAttemptsTable{min-width:560px}
-  .exam-cell{padding-left:14px}
-  /* 모바일에서 삭제버튼 터치 영역 키우기 (44px 권장 터치 타깃) */
+  /* ── 모바일: 열을 접고(중복 정보는 아래 줄로) 가로 스크롤 최소화 ── */
+  .m-only{display:block;font-size:10px;font-weight:700;margin-top:3px;white-space:nowrap;letter-spacing:-.02em}
+  .m-dist{color:#7e22ce}
+  .m-sid{color:#aeaeb2;font-family:'SF Mono',ui-monospace,Menlo,monospace;font-weight:600}
+  .m-late{color:#dc2626}
+  .m-mid{color:#aeaeb2}
+  #recentAttemptsTable .c-dist,#recentAttemptsTable .c-sid{display:none}
+  #pendingTable .c-days,#pendingTable .c-sid{display:none}
+  #recentAttemptsTable{min-width:520px}
+  #pendingTable{min-width:450px}
+  /* 모바일: 표 안에 세로 스크롤을 겹치면 페이지 스크롤이 갇히므로 해제 */
+  .pend-scroll{max-height:none;overflow-y:visible}
+  .pend-scroll thead th{position:static}
+  .exam-badge-box{flex:0 0 52px}
+  .class-badge{max-width:104px}
+  .type-badge,.grade-badge,.subj-badge,.day-badge,.dist-date{padding:2px 7px;font-size:10px}
+  .retake-badge,.re-badge{font-size:9.5px;padding:1px 6px}
+  .exam-cell{padding-left:8px;gap:7px}
+  /* 터치 타깃 확보 (44px 권장) */
   #recentAttemptsBody .action-btn{width:38px;height:38px;font-size:15px}
+  #pendingBody .link-btn{width:38px;height:38px;font-size:15px}
+  .pend-note{font-size:10px}
+  .pend-head{gap:6px}
+}
+@media(max-width:380px){
+  #recentAttemptsTable{min-width:472px}
+  #pendingTable{min-width:414px}
+  thead th,tbody td{padding:7px 7px;font-size:10.5px}
+  .test-name-cell{max-width:104px}
+  .class-badge{max-width:84px}
+  .exam-badge-box{flex:0 0 46px}
 }
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
@@ -294,12 +346,32 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
       <a href="https://beta-science.vercel.app/grade-check.html" class="view-all">전체보기 ›</a>
     </div>
     <div class="table-wrap">
-      <table id="recentAttemptsTable" style="min-width:680px">
-        <colgroup><col style="width:9%"><col style="width:9%"><col style="width:9%"><col style="width:7%"><col style="width:10%"><col style="width:40%"><col style="width:9%"><col style="width:7%"></colgroup>
-        <thead><tr><th>응시일</th><th>아이디</th><th>이름</th><th>학년</th><th>과목</th><th>응시한 시험</th><th>점수</th><th>관리</th></tr></thead>
-        <tbody id="recentAttemptsBody"><tr><td colspan="8" style="text-align:center;padding:2.5rem;color:#aeaeb2">데이터를 불러오는 중...</td></tr></tbody>
+      <table id="recentAttemptsTable" style="min-width:760px">
+        <colgroup><col style="width:9%"><col style="width:9%"><col style="width:9%"><col style="width:8%"><col style="width:6%"><col style="width:10%"><col style="width:34%"><col style="width:8%"><col style="width:7%"></colgroup>
+        <thead><tr><th class="c-dist">배포일</th><th>응시일</th><th class="c-sid">아이디</th><th>이름</th><th>학년</th><th>과목</th><th>응시한 시험</th><th>점수</th><th>관리</th></tr></thead>
+        <tbody id="recentAttemptsBody"><tr><td colspan="9" style="text-align:center;padding:2.5rem;color:#aeaeb2">데이터를 불러오는 중...</td></tr></tbody>
       </table>
     </div>
+  </div>
+
+  <!-- 미응시 학생 명단 -->
+  <div class="section-heading">PENDING</div>
+  <div class="section-card">
+    <div class="section-header">
+      <span class="pend-head">
+        <span class="section-title">시험 미응시 학생</span>
+        <span class="pend-count" id="pendCount">— 건</span>
+      </span>
+      <a href="assignment-admin.html" class="view-all">시험 배포하기 ›</a>
+    </div>
+    <div class="table-wrap pend-scroll">
+      <table id="pendingTable" style="min-width:700px">
+        <colgroup><col style="width:10%"><col style="width:8%"><col style="width:10%"><col style="width:9%"><col style="width:7%"><col style="width:13%"><col style="width:36%"><col style="width:7%"></colgroup>
+        <thead><tr><th>배포일</th><th class="c-days">경과</th><th class="c-sid">아이디</th><th>이름</th><th>학년</th><th>반</th><th>배포된 시험</th><th>링크</th></tr></thead>
+        <tbody id="pendingBody"><tr><td colspan="8" style="text-align:center;padding:2.5rem;color:#aeaeb2">데이터를 불러오는 중...</td></tr></tbody>
+      </table>
+    </div>
+    <div class="pend-note">※ 주간 학습 클리닉으로 배포된 시험만 집계합니다. 학생이 응시하면 이 목록에서 사라지고 위 '최근 응시 학생'으로 자동 이동합니다.<br>※ 학생 ID 없이 만든 옛 클리닉과 삭제된 학생은 집계에서 제외됩니다.</div>
   </div>
 
   <!-- Test Management -->
@@ -359,6 +431,8 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -389,11 +463,11 @@ function resolveSubject(r){
 onAuthStateChanged(auth,async u=>{
   if(!u){window.location.replace("/login.html");return;}
   try{const s=await getDoc(doc(db,"users",u.uid));if(!s.exists()||s.data().status!=="approved"){await signOut(auth);window.location.replace("/login.html");return;}
-  document.body.style.visibility="visible";iSW();iStats();iRG();iExams();iMT();}catch(e){window.location.replace("/login.html");}
+  document.body.style.visibility="visible";iSW();iStats();iRG();iExams();iMT();iAssign();}catch(e){window.location.replace("/login.html");}
 });
 window.doLogout=async()=>{await signOut(auth);window.location.replace("/login.html");};
 window.downloadStudentsBackup=async function(){try{const snap=await getDocs(collection(db,"students"));const enc=v=>{if(v===null||v===undefined)return v;if(v instanceof Timestamp)return{__ts:true,s:v.seconds,n:v.nanoseconds};if(Array.isArray(v))return v.map(enc);if(typeof v==='object'){const o={};for(const k in v)o[k]=enc(v[k]);return o;}return v;};const students=snap.docs.map(d=>({__id:d.id,...enc(d.data())}));const payload={meta:{app:'beta-science',version:1,exportedAt:new Date().toISOString()},data:{students}};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');const n=new Date(),pad=x=>String(x).padStart(2,'0');a.href=url;a.download=`beta-science-students-${n.getFullYear()}${pad(n.getMonth()+1)}${pad(n.getDate())}-${pad(n.getHours())}${pad(n.getMinutes())}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);alert('학생 명단 백업 파일을 받았습니다. ('+students.length+'명)');}catch(e){alert('학생 백업 실패: '+e.message);}};
-function iSW(){onSnapshot(collection(db,"students"),s=>{aIds=new Set(s.docs.map(d=>d.data().id).filter(Boolean));sfMap={};s.docs.forEach(d=>{const id=d.data().id;if(id)sfMap[id]=d.id;});});}
+function iSW(){onSnapshot(collection(db,"students"),s=>{aIds=new Set(s.docs.map(d=>d.data().id).filter(Boolean));sfMap={};s.docs.forEach(d=>{const id=d.data().id;if(id)sfMap[id]=d.id;});renderRecentAttempts();renderPending();});}
 function pRD(r){if(!r)return null;if(r&&typeof r==='object'&&r.seconds)return new Date(r.seconds*1000);if(typeof r!=='string')return null;const m=r.match(/(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);const d=new Date(r);return isNaN(d)?null:d;}
 function tD(ts){if(!ts)return new Date(0);if(ts&&typeof ts==='object'&&ts.seconds)return new Date(ts.seconds*1000);if(ts&&typeof ts.toDate==='function')return ts.toDate();return new Date(ts);}
 function cSC(docs){const n=new Date(),y=n.getFullYear(),m=n.getMonth(),sT=new Date(y,m,1),sL=new Date(y,m-1,1),eL=new Date(y,m,0,23,59,59);let tN=0,lN=0;docs.forEach(d=>{const dt=pRD(d.data().regDate);if(!dt)return;if(dt>=sT)tN++;else if(dt>=sL&&dt<=eL)lN++;});const el=document.getElementById('stat-student-change');if(!el)return;const d=tN-lN;if(d>0){el.textContent=`+${d}명`;el.className='stat-sub up';}else if(d<0){el.textContent=`${d}명`;el.className='stat-sub down';}else{el.textContent='변동 없음';el.className='stat-sub same';}}
@@ -426,9 +500,22 @@ function partScores(r){
   if(ox==null&&m==null&&ms==null&&r.score!=null&&+r.score>0)m=+r.score;
   return {ox, multi:m, master:ms};
 }
+/* 화면에 표시할 파트별 점수.
+   "실제 제출 여부(submittedTypes)"로 파트를 정하므로 0점으로 제출한 파트도
+   미응시로 오해되지 않고 그대로 표시된다. */
+function displayParts(r){
+  const p=partScores(r);
+  const st=submittedTypes(r);
+  const num=v=>(v===null||v===undefined||isNaN(+v))?0:+v;
+  const out={ox:null,multi:null,master:null};
+  if(st.has('master'))out.master=p.master!=null?p.master:num(r.score);
+  if(st.has('ox'))out.ox=p.ox!=null?p.ox:num(r.oxScore!=null?r.oxScore:(r.ox&&typeof r.ox==='object'?r.ox.score:0));
+  if(st.has('multi'))out.multi=p.multi!=null?p.multi:num(r.multiScore!=null?r.multiScore:(r.multiple&&typeof r.multiple==='object'?r.multiple.score:0));
+  return out;
+}
 // 이 기록이 가진 타입들 (배지 표시용). 마스터면 ['master'], 일반이면 존재하는 ox/multi
 function recTypes(r){
-  const p=partScores(r);
+  const p=displayParts(r);
   if(p.master!=null)return['master'];
   const ts=[];
   if(p.ox!=null)ts.push('ox');
@@ -443,8 +530,8 @@ function iStats(){
     s.forEach(d=>{const r=d.data(),sid=r.studentId||'';
       if(aIds.size===0||aIds.has(sid)){
         v++;
-        // 50점 이하 파트가 하나라도 있으면 그 학생을 집중관리 대상에 추가(중복 제거)
-        const p=partScores(r);
+        // 70점 미만 파트가 하나라도 있으면 그 학생을 집중관리 대상에 추가(중복 제거)
+        const p=displayParts(r);
         [p.ox,p.multi,p.master].forEach(sc=>{if(sc!=null&&sc<70&&sid)lowSet.add(sid);});
       }
     });
@@ -460,13 +547,227 @@ function updateTotalTests(){
 
 function sBadge(s){if(s==null)return'<span style="color:#aeaeb2">-</span>';const c=s>=80?'score-high':s>=60?'score-mid':'score-low';return`<span class="score-badge ${c}">${s}점</span>`;}
 
+/* ══════════════════════════════════════════════════════════════
+   배포(assignments) 연동 — 배포일 표시 + 미응시 명단
+   assignments/{token} = { studentId, studentName, studentGrade,
+     className, weekLabel, items[], createdAt }
+   items[] 중 { type:'examlink', source:'online'|'master',
+     examId, examType:'ox'|'multiple', title, subject } 만 시험으로 집계
+   ══════════════════════════════════════════════════════════════ */
+let assignDocs=[];
+let distMap={};      // 'sid|examId|type' -> [배포시각ms,...] 오름차순
+let distExamMap={};  // 'examId|type'     -> [배포시각ms,...] (학생 매칭 실패 시 폴백)
+let distList=[];     // 배포 건 목록 (미응시 계산용)
+const EXAMTYPE_KEY={ox:'ox',multiple:'multi',mc:'multi',multi:'multi'};
+
+function iAssign(){
+  onSnapshot(collection(db,"assignments"),s=>{
+    assignDocs=s.docs;
+    buildDistMap();
+    renderRecentAttempts();
+    renderPending();
+  },err=>{
+    console.error('assignments 구독 실패',err);
+    const tb=document.getElementById('pendingBody');
+    if(tb)tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:#aeaeb2">배포 목록을 불러오지 못했습니다. (보안 규칙 확인)</td></tr>';
+  });
+}
+function buildDistMap(){
+  distMap={};distExamMap={};distList=[];
+  assignDocs.forEach(d=>{
+    const a=d.data()||{};
+    const items=Array.isArray(a.items)?a.items:[];
+    const t=a.createdAt?tD(a.createdAt):null;
+    const ms=(t&&!isNaN(t))?t.getTime():0;
+    const sid=String(a.studentId||'').trim();
+    items.forEach(it=>{
+      if(!it||it.type!=='examlink'||!it.examId)return;
+      const type=it.source==='master'?'master':(EXAMTYPE_KEY[it.examType]||'multi');
+      const k2=it.examId+'|'+type;
+      (distExamMap[k2]||(distExamMap[k2]=[])).push(ms);
+      if(!sid)return;
+      (distMap[sid+'|'+k2]||(distMap[sid+'|'+k2]=[])).push(ms);
+      distList.push({sid,name:a.studentName||'',grade:a.studentGrade||'',className:a.className||'',
+        token:d.id,examId:it.examId,type,title:it.title||'',subject:it.subject||'',ms});
+    });
+  });
+  Object.values(distMap).forEach(v=>v.sort((x,y)=>x-y));
+  Object.values(distExamMap).forEach(v=>v.sort((x,y)=>x-y));
+}
+/* 응시일(attemptMs)보다 앞선 배포 중 가장 최근 것. 없으면 첫 배포일 */
+function pickDist(arr,attemptMs){
+  if(!arr||!arr.length)return null;
+  const v=arr.filter(x=>x>0);
+  if(!v.length)return null;
+  if(attemptMs>0){
+    const before=v.filter(x=>x<=attemptMs+86400000);
+    if(before.length)return before[before.length-1];
+  }
+  return v[0];
+}
+function distDate(sid,examId,type,attemptMs){
+  if(!examId)return null;
+  const own=pickDist(distMap[sid+'|'+examId+'|'+type],attemptMs);
+  if(own)return own;
+  return pickDist(distExamMap[examId+'|'+type],attemptMs);
+}
+function fmtYMD(ms){
+  if(!ms)return null;
+  const d=new Date(ms);
+  if(isNaN(d))return null;
+  return `${String(d.getFullYear()).slice(-2)}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+}
+
+/* ── 시험지 문항 id 맵 (응시한 파트 판별용) ── */
+let examQMap={}; // examId -> {ox:Set, mu:Set}
+function buildExamQMap(){
+  const m={};
+  const add=d=>{
+    const t=d.data()||{},qs=Array.isArray(t.questions)?t.questions:[];
+    const ox=new Set(),mu=new Set();
+    qs.forEach((q,i)=>{
+      if(!q)return;
+      const id=(q.id!==undefined&&q.id!==null)?String(q.id):'q'+i;
+      if(q.type==='ox')ox.add(id);
+      else if(q.type==='multiple')mu.add(id);
+    });
+    m[d.id]={ox,mu};
+  };
+  oxDocs.forEach(add);muDocs.forEach(add);
+  examQMap=m;
+}
+/* 이 성적 문서가 "실제로 제출된" 파트 집합 (0점이어도 응시로 인정) */
+function submittedTypes(r){
+  const out=new Set();
+  if(r.category==='master'||r.testType==='master'){out.add('master');return out;}
+  const oxObj=r.ox&&typeof r.ox==='object'&&+r.ox.total>0;
+  const muObj=r.multiple&&typeof r.multiple==='object'&&+r.multiple.total>0;
+  if(oxObj)out.add('ox');
+  if(muObj)out.add('multi');
+  if(out.size)return out;
+  if(r.subType==='ox')out.add('ox');
+  if(r.subType==='multiple')out.add('multi');
+  if(out.size)return out;
+  const key=r.examId||r.testId;
+  const qm=key?examQMap[key]:null;
+  if(qm&&r.answers&&typeof r.answers==='object'&&!Array.isArray(r.answers)){
+    Object.keys(r.answers).forEach(k=>{
+      const kk=String(k);
+      if(qm.ox.has(kk))out.add('ox');
+      else if(qm.mu.has(kk))out.add('multi');
+    });
+    if(out.size)return out;
+  }
+  const p=partScores(r);
+  if(p.master!=null)out.add('master');
+  if(p.ox!=null)out.add('ox');
+  if(p.multi!=null)out.add('multi');
+  if(!out.size){
+    if(r.oxScore!=null)out.add('ox');
+    if(r.multiScore!=null)out.add('multi');
+    if(r.masterScore!=null)out.add('master');
+  }
+  return out;
+}
+/* 이미 응시한 (학생|시험|유형) 집합 */
+function buildAttemptedSet(){
+  const s=new Set();
+  (lastGradeDocs||[]).forEach(d=>{
+    const r=d.data()||{};
+    const sid=String(r.studentId||'').trim();
+    const key=r.examId||r.testId;
+    if(!sid||!key)return;
+    submittedTypes(r).forEach(t=>s.add(sid+'|'+key+'|'+t));
+  });
+  return s;
+}
+
+/* ── 미응시 명단 렌더 ── */
+function renderPending(){
+  const tb=document.getElementById('pendingBody');
+  const cntEl=document.getElementById('pendCount');
+  if(!tb)return;
+  const attempted=buildAttemptedSet();
+  const groups={};
+  distList.forEach(x=>{
+    if(!x.sid)return;
+    if(aIds.size>0&&!aIds.has(x.sid))return;              // 삭제된 학생 제외
+    const k=x.sid+'|'+x.examId+'|'+x.type;
+    if(attempted.has(k))return;                           // 이미 응시 → 제외
+    (groups[k]||(groups[k]=[])).push(x);
+  });
+  const now=Date.now();
+  const rows=Object.keys(groups).map(k=>{
+    const arr=groups[k].slice().sort((a,b)=>a.ms-b.ms);
+    const last=arr[arr.length-1];
+    const valid=arr.map(v=>v.ms).filter(v=>v>0);
+    return Object.assign({},last,{
+      firstMs:valid.length?valid[0]:0,
+      lastMs:valid.length?valid[valid.length-1]:0,
+      cnt:arr.length
+    });
+  });
+  rows.sort((a,b)=>{
+    const av=a.firstMs||Number.MAX_SAFE_INTEGER,bv=b.firstMs||Number.MAX_SAFE_INTEGER;
+    if(av!==bv)return av-bv;                              // 오래 미응시한 건 먼저
+    return String(a.name).localeCompare(String(b.name),'ko');
+  });
+  if(cntEl){
+    cntEl.textContent=rows.length?`미응시 ${rows.length}건`:'전원 응시 완료';
+    cntEl.className='pend-count'+(rows.length?'':' zero');
+  }
+  if(!rows.length){
+    tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:#aeaeb2">배포된 시험을 모두 응시했습니다. 🎉</td></tr>';
+    return;
+  }
+  const gm={'중1':'g-mid1','중2':'g-mid2','중3':'g-mid3','고1':'g-high1','고2':'g-high2','고3':'g-high3','중등1학년':'g-mid1','중등2학년':'g-mid2','중등3학년':'g-mid3','고등1학년':'g-high1','고등2학년':'g-high2','고등3학년':'g-high3'};
+  tb.innerHTML=rows.map(x=>{
+    const dstr=fmtYMD(x.lastMs);
+    const dcell=dstr?`<span class="dist-date">${dstr}</span>`:'<span class="dist-none">—</span>';
+    const days=x.firstMs?Math.max(0,Math.floor((now-x.firstMs)/86400000)):null;
+    const dayCell=days==null?'<span class="dist-none">—</span>'
+      :`<span class="day-badge ${days>=7?'d-late':days>=3?'d-warn':'d-fresh'}">D+${days}</span>`;
+    const g=x.grade||'',gs=g.replace('등','').replace('학년','')||g;
+    const gb=g?`<span class="grade-badge ${gm[g]||''}">${e(gs)}</span>`:'<span style="color:#aeaeb2">-</span>';
+    const cb=x.className?`<span class="class-badge" title="${e(x.className)}">${e(x.className)}</span>`:'<span style="color:#aeaeb2">-</span>';
+    const ti=TYPE_INFO[x.type]||TYPE_INFO.multi;
+    const re=x.cnt>1?`<span class="re-badge">재배포 ${x.cnt}회</span>`:'';
+    const testCell=`<div class="exam-cell"><span class="exam-badge-box"><span class="type-badge ${ti.cls}">${ti.label}</span></span><span class="test-name-cell"><span class="exam-name-text" title="${e(x.title||'(제목 없음)')}">${e(x.title||'(제목 없음)')}</span>${re}</span></div>`;
+    const linkCell=`<button class="link-btn" title="이 학생의 클리닉 링크 복사" onclick="copyClinicLink('${e(x.token)}')">🔗</button>`;
+    return `<tr><td>${dcell}${days==null?'':`<span class="m-only ${days>=7?'m-late':'m-mid'}">D+${days} 경과</span>`}</td><td class="c-days">${dayCell}</td><td class="c-sid"><span class="sid-text">${e(x.sid)}</span></td><td style="font-weight:700;color:#1d1d1f">${e(x.name||'-')}<span class="m-only m-sid">${e(x.sid)}</span></td><td>${gb}</td><td>${cb}</td><td style="text-align:left">${testCell}</td><td>${linkCell}</td></tr>`;
+  }).join('');
+}
+window.copyClinicLink=function(token){
+  const link=`${location.origin}/assignment.html?t=${token}`;
+  const done=()=>showToast('클리닉 링크를 복사했습니다.');
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(link).then(done).catch(()=>fallbackCopy(link,done));
+  }else fallbackCopy(link,done);
+};
+function fallbackCopy(text,cb){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.setAttribute('readonly','');
+  ta.style.cssText='position:fixed;top:-1000px;left:-1000px;opacity:0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');cb();}catch(err){prompt('링크를 복사하세요',text);}
+  document.body.removeChild(ta);
+}
+let toastTimer=null;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  if(!t){alert(msg);return;}
+  t.textContent=msg;t.classList.add('show');
+  if(toastTimer)clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
 /* ── 최근 응시 학생 (응시 1건 = 한 줄. OX·4지선다가 한 문서에 있으면 배지 둘 다 표시) ── */
 const TYPE_INFO={ox:{cls:'type-ox',label:'OX'},multi:{cls:'type-multi',label:'4지선다'},master:{cls:'type-master',label:'마스터'}};
 let lastGradeDocs=null;
-function iRG(){onSnapshot(query(collection(db,"grades"),orderBy("timestamp","asc")),s=>{lastGradeDocs=s.docs;renderRecentAttempts();});}
+function iRG(){onSnapshot(query(collection(db,"grades"),orderBy("timestamp","asc")),s=>{lastGradeDocs=s.docs;renderRecentAttempts();renderPending();});}
 // 이 줄(유형)에 해당하는 점수
 function rowScore(row){
-  const p=partScores(row.r);
+  const p=displayParts(row.r);
   if(row.type==='master')return p.master;
   if(row.type==='ox')return p.ox;
   return p.multi;
@@ -474,7 +775,7 @@ function rowScore(row){
 function renderRecentAttempts(){
   const tb=document.getElementById('recentAttemptsBody');
   if(!tb)return;
-  if(!lastGradeDocs||lastGradeDocs.length===0){tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
+  if(!lastGradeDocs||lastGradeDocs.length===0){tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
   const gm={'중1':'g-mid1','중2':'g-mid2','중3':'g-mid3','고1':'g-high1','고2':'g-high2','고3':'g-high3','중등1학년':'g-mid1','중등2학년':'g-mid2','중등3학년':'g-mid3','고등1학년':'g-high1','고등2학년':'g-high2','고등3학년':'g-high3'};
   // 응시 1건이 OX+4지선다를 함께 가지면 각 유형을 별도 줄로 분리 (마스터는 한 줄)
   const rows=[];
@@ -485,7 +786,7 @@ function renderRecentAttempts(){
     if(types.length===1&&types[0]==='master'){rows.push({docId:d.id,r,sid,ts,type:'master'});}
     else{types.forEach(t=>rows.push({docId:d.id,r,sid,ts,type:t}));}
   });
-  if(!rows.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
+  if(!rows.length){tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
   // 재시험 판별: 같은 학생 · 같은 유형 · 같은 시험을 2번째 이상 응시하면 재시험(가장 오래된 것이 원본)
   const groups={};
   rows.forEach(row=>{
@@ -502,9 +803,13 @@ function renderRecentAttempts(){
   tb.innerHTML=ds.map(row=>{
     const {docId,r,sid,type}=row;
     // 응시일: 26.05.04 형식 (연도 2자리.월.일, 0채움)
-    let dt='-';
+    let dt='-',attemptMs=0;
     {const x=r.timestamp?tD(r.timestamp):(r.submittedTimestamp?tD(r.submittedTimestamp):pRD(r.date));
-     if(x&&!isNaN(x)&&x.getTime()>0){const yy=String(x.getFullYear()).slice(-2),mm=String(x.getMonth()+1).padStart(2,'0'),dd=String(x.getDate()).padStart(2,'0');dt=`${yy}.${mm}.${dd}`;}}
+     if(x&&!isNaN(x)&&x.getTime()>0){attemptMs=x.getTime();const yy=String(x.getFullYear()).slice(-2),mm=String(x.getMonth()+1).padStart(2,'0'),dd=String(x.getDate()).padStart(2,'0');dt=`${yy}.${mm}.${dd}`;}}
+    // 배포일: 이 학생에게 이 시험이 배포된 날 (클리닉 assignments 기준)
+    const dms=distDate(sid,r.examId||r.testId,type,attemptMs);
+    const dStr=fmtYMD(dms);
+    const distCell=dStr?`<span class="dist-date">${dStr}</span>`:'<span class="dist-none">—</span>';
     const g=r.studentGrade||r.grade||'',gc=gm[g]||'',gs=g.replace('등','').replace('학년','')||g;
     const gb=g?`<span class="grade-badge ${gc}">${gs}</span>`:'<span style="color:#aeaeb2">-</span>';
     const subj=resolveSubject(r);
@@ -520,7 +825,7 @@ function renderRecentAttempts(){
     const scoreCell=sBadge(rowScore(row));
     const tnameSafe=String(tname).replace(/'/g,"\\'");
     const delCell=`<div class="action-icons"><button class="action-btn del" title="이 응시 기록 삭제" onclick="deleteAttempt('${docId}','${sf}','${tnameSafe}')">🗑️</button></div>`;
-    return `<tr><td style="color:#aeaeb2;font-size:11px;white-space:nowrap">${dt}</td><td><span class="sid-text">${e(sid||'-')}</span></td><td style="font-weight:700;color:#1d1d1f">${nc}</td><td>${gb}</td><td>${sb}</td><td style="text-align:left">${testCell}</td><td>${scoreCell}</td><td>${delCell}</td></tr>`;
+    return `<tr><td class="c-dist">${distCell}</td><td style="color:#aeaeb2;font-size:11px;white-space:nowrap">${dt}${dStr?`<span class="m-only m-dist">배포 ${dStr}</span>`:''}</td><td class="c-sid"><span class="sid-text">${e(sid||'-')}</span></td><td style="font-weight:700;color:#1d1d1f">${nc}${sid?`<span class="m-only m-sid">${e(sid)}</span>`:''}</td><td>${gb}</td><td>${sb}</td><td style="text-align:left">${testCell}</td><td>${scoreCell}</td><td>${delCell}</td></tr>`;
   }).join('');
 }
 
@@ -582,7 +887,7 @@ function cmpUnit(n1,n2){
 function sortByUnit(docs,key){return docs.slice().sort((x,y)=>cmpUnit(x.data()[key],y.data()[key]));}
 
 function renderPanels(){const f=d=>matchSubj(d.data(),activeSubj);const ox=sortByUnit(oxDocs.filter(f),'title'),mu=sortByUnit(muDocs.filter(f),'title'),ma=sortByUnit(masterDocs.filter(f),'unitName');document.getElementById('cnt-ox').textContent=ox.length;document.getElementById('cnt-multi').textContent=mu.length;document.getElementById('cnt-master').textContent=ma.length;document.getElementById('tbody-ox').innerHTML=ox.length===0?EMPTY_ROW:ox.map(mTR).join('');document.getElementById('tbody-multi').innerHTML=mu.length===0?EMPTY_ROW:mu.map(mTR).join('');document.getElementById('tbody-master').innerHTML=ma.length===0?EMPTY_ROW:ma.map(mMR).join('');}
-function renderAll(){buildExamSubjMap();renderSubjFilter();renderPanels();updateTotalTests();renderRecentAttempts();}
+function renderAll(){buildExamSubjMap();buildExamQMap();renderSubjFilter();renderPanels();updateTotalTests();renderRecentAttempts();renderPending();}
 window.selectSubj=(key,el)=>{activeSubj=key;document.querySelectorAll('.subj-chip').forEach(c=>c.classList.remove('on'));if(el)el.classList.add('on');renderPanels();};
 function iExams(){onSnapshot(collection(db,"tests"),s=>{oxDocs=s.docs.filter(d=>(d.data().questions||[]).some(q=>q.type==='ox'));muDocs=s.docs.filter(d=>(d.data().questions||[]).some(q=>q.type==='multiple'));renderAll();});}
 function iMT(){onSnapshot(query(collection(db,"master-tests"),orderBy("regDate","desc")),s=>{masterDocs=s.docs;renderAll();});}
