@@ -42,10 +42,15 @@ function StudentExamInner() {
       setLoading(false);
     });
 
-    const savedName = localStorage.getItem('studentName');
-    const savedId   = localStorage.getItem('studentId');
-    const urlSid    = (searchParams.get('sid') || '').trim();   // ★ 클리닉 링크가 실어 보낸 학생ID
-    const urlSname  = (searchParams.get('sname') || '').trim(); // ★ 클리닉 링크가 실어 보낸 학생 이름
+    let savedName = '';
+    let savedId   = '';
+    try {
+      savedName = localStorage.getItem('studentName') || '';
+      savedId   = localStorage.getItem('studentId') || '';
+    } catch {}
+
+    const urlSid   = (searchParams.get('sid') || '').trim();   // ★ 클리닉 링크가 실어 보낸 학생ID
+    const urlSname = (searchParams.get('sname') || '').trim(); // ★ 클리닉 링크가 실어 보낸 학생 이름
 
     // ── 신원 결정: URL(sid/sname)이 항상 최우선 ──
     // 같은 브라우저를 다른 학생이 먼저 썼어도, 이 링크의 sid/sname으로 정확히 덮어써 오염을 막는다.
@@ -58,9 +63,18 @@ function StudentExamInner() {
     let effectiveName = '';
     if (urlSname) {
       effectiveName = urlSname;
-    } else if (savedName && (!urlSid || urlSid === (savedId || ''))) {
+    } else if (savedName && (!urlSid || urlSid === savedId)) {
       effectiveName = savedName;
     }
+
+    // ★ 신원을 localStorage에 고정 저장한다.
+    //   OX → 4지선다로 넘어갈 때 페이지가 완전히 새로고침되므로,
+    //   여기서 저장해두지 않으면 두 번째 시험에서 학생ID를 잃어버려
+    //   성적이 엉뚱한 문서로 새로 쌓이거나 학생 화면에 안 뜬다.
+    try {
+      if (effectiveId) localStorage.setItem('studentId', effectiveId);
+      if (effectiveName) localStorage.setItem('studentName', effectiveName);
+    } catch {}
 
     if (effectiveName) {
       setStudentName(effectiveName);
@@ -68,6 +82,7 @@ function StudentExamInner() {
       setCurrent(0);
     }
     // 이름을 확정할 수 없으면(다른 학생 기기 등) 이름 입력 화면을 유지 → 본인 이름으로 정확히 기록
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [examId]);
 
   // ★ typeFilter에 따라 실제로 풀 문제 목록 결정
@@ -95,11 +110,8 @@ function StudentExamInner() {
           answers: finalAnswers,
           score: s,
           totalQuestions: questionsForSubmit.length,
-          // ★ subType 기록 (OX만 / 4지선다만 구분)
-          ...(typeFilter ? { subType: typeFilter } : {}),
-          // ★ OX 점수 / 4지선다 점수 각각 저장
-          ...(typeFilter === 'ox'       ? { oxScore: s }    : {}),
-          ...(typeFilter === 'multiple' ? { multiScore: s } : {}),
+          // ★ 어떤 유형을 풀었는지 전달 → 서버 쪽에서 이전 답안과 병합해 유형별 점수를 계산
+          subType: typeFilter,
         });
       } catch {
         toast.error('제출 중 오류가 발생했습니다');
@@ -160,6 +172,16 @@ function StudentExamInner() {
     setCurrent(0);
   }
 
+  // 이름 입력 후 시험 시작 (입력한 이름을 저장해 다음 유형에서도 유지)
+  function startExamWithName() {
+    if (!studentName.trim() && !isPreview) { toast.error('이름을 입력하세요'); return; }
+    const finalName = studentName.trim() || '미리보기';
+    setStudentName(finalName);
+    try { localStorage.setItem('studentName', finalName); } catch {}
+    setCurrent(0);
+    setPhase('exam');
+  }
+
   // ★ 사이트 내부 경로만 허용 (오픈 리다이렉트 방지)
   function safeReturnPath(p: string | null): string | null {
     if (!p) return null;
@@ -177,10 +199,19 @@ function StudentExamInner() {
     else router.push('/student-test');
   }
 
-  // ★ 같은 시험의 다른 유형(OX↔4지선다)으로 이동할 때 from 파라미터를 유지
+  // ★ 같은 시험의 다른 유형(OX↔4지선다)으로 이동
+  //   sid/sname을 반드시 함께 넘긴다. 예전에는 이 값이 빠져서
+  //   두 번째 시험이 "누구인지 모르는 응시"로 기록돼 성적이 안 들어갔다.
   function crossTypeHref(t: 'ox' | 'multiple') {
-    const base = `/student/${examId}?type=${t}`;
-    return fromParam ? `${base}&from=${encodeURIComponent(fromParam)}` : base;
+    const params = new URLSearchParams();
+    params.set('type', t);
+    const sid   = (searchParams.get('sid') || studentId || '').trim();
+    const sname = (searchParams.get('sname') || studentName || '').trim();
+    if (sid)   params.set('sid', sid);
+    if (sname) params.set('sname', sname);
+    if (fromParam) params.set('from', fromParam);
+    if (isPreview) params.set('preview', '1');
+    return `/student/${examId}?${params.toString()}`;
   }
 
   function prev() {
@@ -236,7 +267,7 @@ function StudentExamInner() {
   const answered = Object.keys(currentAnswers).length;
 
   // 틀린 문제 (filteredQuestions 기준)
-  const wrongQuestions = filteredQuestions.filter(q => !isAnswerCorrect(answers[q.id], q.answer));
+  const wrongQuestions = filteredQuestions.filter(item => !isAnswerCorrect(answers[item.id], item.answer));
 
   // ★ 시험 제목에 타입 표시
   const examDisplayTitle = typeFilter === 'ox'
@@ -324,18 +355,14 @@ function StudentExamInner() {
                   onChange={e => setStudentName(e.target.value)}
                   onKeyDown={e => {
                     if (e.key === 'Enter' && studentName.trim()) {
-                      setCurrent(0); setPhase('exam');
+                      startExamWithName();
                     }
                   }}
                   autoFocus
                 />
               </div>
               <button
-                onClick={() => {
-                  if (!studentName.trim() && !isPreview) { toast.error('이름을 입력하세요'); return; }
-                  setStudentName(prev => prev || '미리보기');
-                  setCurrent(0); setPhase('exam');
-                }}
+                onClick={startExamWithName}
                 className="btn-primary w-full mt-4"
               >
                 시험 시작하기 →
@@ -458,11 +485,11 @@ function StudentExamInner() {
               </div>
 
               <div className="space-y-3 mb-6 text-left">
-                {retryQuestions.map((q, i) => {
-                  const myAns = retryAnswers[q.id];
-                  const isCorrect = isAnswerCorrect(myAns, q.answer);
+                {retryQuestions.map((item, i) => {
+                  const myAns = retryAnswers[item.id];
+                  const isCorrect = isAnswerCorrect(myAns, item.answer);
                   return (
-                    <div key={q.id} className={`p-3 rounded-xl text-sm ${
+                    <div key={item.id} className={`p-3 rounded-xl text-sm ${
                       isCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
                     }`}>
                       <div className="flex items-start gap-2">
@@ -471,15 +498,15 @@ function StudentExamInner() {
                         </span>
                         <div>
                           <p className={`font-medium ${isCorrect ? 'text-green-800' : 'text-red-800'}`}>
-                            {q.text.length > 40 ? q.text.slice(0, 40) + '…' : q.text}
+                            {item.text.length > 40 ? item.text.slice(0, 40) + '…' : item.text}
                           </p>
                           {!isCorrect && (
                             <p className="text-xs text-gray-500 mt-0.5">
-                              정답: {formatCorrectAnswer(q)}
+                              정답: {formatCorrectAnswer(item)}
                             </p>
                           )}
-                          {q.explanation && (
-                            <p className="text-xs text-gray-400 mt-0.5 italic">{q.explanation}</p>
+                          {item.explanation && (
+                            <p className="text-xs text-gray-400 mt-0.5 italic">{item.explanation}</p>
                           )}
                         </div>
                       </div>
@@ -522,6 +549,10 @@ function StudentExamInner() {
                 </div>
               </div>
 
+              {submitting && (
+                <div className="text-xs text-gray-400 mb-3">성적 저장 중...</div>
+              )}
+
               {wrongQuestions.length > 0 && (
                 <div className="bg-red-50 rounded-xl px-4 py-3 mb-6 text-sm text-red-700 font-semibold">
                   ❌ 틀린 문제 {wrongQuestions.length}개
@@ -534,11 +565,11 @@ function StudentExamInner() {
               )}
 
               <div className="space-y-3 mb-6 text-left">
-                {filteredQuestions.map((q, i) => {
-                  const myAns = answers[q.id];
-                  const isCorrect = isAnswerCorrect(myAns, q.answer);
+                {filteredQuestions.map((item, i) => {
+                  const myAns = answers[item.id];
+                  const isCorrect = isAnswerCorrect(myAns, item.answer);
                   return (
-                    <div key={q.id} className={`p-3 rounded-xl text-sm ${
+                    <div key={item.id} className={`p-3 rounded-xl text-sm ${
                       isCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
                     }`}>
                       <div className="flex items-start gap-2">
@@ -547,15 +578,15 @@ function StudentExamInner() {
                         </span>
                         <div>
                           <p className={`font-medium ${isCorrect ? 'text-green-800' : 'text-red-800'}`}>
-                            {q.text.length > 40 ? q.text.slice(0, 40) + '…' : q.text}
+                            {item.text.length > 40 ? item.text.slice(0, 40) + '…' : item.text}
                           </p>
                           {!isCorrect && (
                             <p className="text-xs text-gray-500 mt-0.5">
-                              정답: {formatCorrectAnswer(q)}
+                              정답: {formatCorrectAnswer(item)}
                             </p>
                           )}
-                          {q.explanation && (
-                            <p className="text-xs text-gray-400 mt-0.5 italic">{q.explanation}</p>
+                          {item.explanation && (
+                            <p className="text-xs text-gray-400 mt-0.5 italic">{item.explanation}</p>
                           )}
                         </div>
                       </div>
@@ -577,6 +608,7 @@ function StudentExamInner() {
                 {typeFilter === 'ox' && (
                   <button
                     onClick={() => {
+                      if (submitting) { toast('성적 저장 중이에요. 잠시만요!'); return; }
                       window.location.href = crossTypeHref('multiple');
                     }}
                     className="btn-primary w-full"
@@ -588,6 +620,7 @@ function StudentExamInner() {
                 {typeFilter === 'multiple' && (
                   <button
                     onClick={() => {
+                      if (submitting) { toast('성적 저장 중이에요. 잠시만요!'); return; }
                       window.location.href = crossTypeHref('ox');
                     }}
                     className="btn-primary w-full"
