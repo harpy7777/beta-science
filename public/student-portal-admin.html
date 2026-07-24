@@ -38,7 +38,6 @@ body{
 /* ══ 메인 ══ */
 .main{padding:28px 32px;max-width:1200px;margin:0 auto}
 
-/* ★ grade-check welcome-bar와 동일한 페이지 헤더 */
 .page-header{
   background:linear-gradient(135deg,#fff0f7 0%,var(--pink-lt) 60%,#f0f9ff 100%);
   border:1px solid #fce7f3;border-radius:18px;
@@ -46,7 +45,6 @@ body{
   display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
 }
 .page-header-left{display:flex;align-items:center;gap:12px}
-/* ★ grade-check .welcome-avatar와 완전 동일 */
 .page-header-avatar{
   width:44px;height:44px;border-radius:50%;
   background:linear-gradient(135deg,#f472b6,#db2777);
@@ -104,6 +102,12 @@ body{
 .btn-sms{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:linear-gradient(135deg,#fdf4ff,#c084fc);color:#7e22ce;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(192,132,252,.25);transition:opacity .15s,transform .1s;}
 .btn-sms:hover{opacity:.9}.btn-sms:active{transform:scale(.97)}
 
+/* ══ 피드백 버튼 ══ */
+.btn-fb{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;margin-bottom:8px;background:linear-gradient(135deg,#fff7ed,#fed7aa);color:#b45309;border:1px solid #fdba74;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s,transform .1s;}
+.btn-fb:hover{opacity:.88}.btn-fb:active{transform:scale(.98)}
+.fb-cnt{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#b45309;color:#fff;font-size:11px;font-weight:800}
+.fb-cnt.zero{background:#d6d3d1;color:#57534e}
+
 /* ══ 빈 상태 ══ */
 .empty-state{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--mt);font-size:14px}
 .spinner{width:36px;height:36px;border:3px solid var(--bd);border-top-color:var(--pink);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
@@ -111,6 +115,42 @@ body{
 .loading-center{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--mt)}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e293b;color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;z-index:9999;transition:transform .3s ease;pointer-events:none;max-width:calc(100vw - 32px);text-align:center;line-height:1.5;word-break:keep-all;box-shadow:0 4px 16px rgba(0,0,0,.2)}
 .toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ══ 피드백 모달 ══ */
+.fbm-overlay{display:none;position:fixed;inset:0;background:rgba(30,41,59,.45);z-index:9000;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);}
+.fbm-overlay.open{display:flex;align-items:center;justify-content:center;padding:20px}
+.fbm{background:var(--wh);border-radius:18px;width:min(620px,100%);max-height:min(86vh,860px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.fbm-head{padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--pink-lt);flex-shrink:0}
+.fbm-title{font-size:15px;font-weight:700;color:var(--tx);min-width:0}
+.fbm-title span{display:block;font-size:11.5px;font-weight:600;color:var(--mt);margin-top:3px}
+.fbm-close{width:36px;height:36px;min-width:36px;border-radius:50%;border:none;background:var(--wh);color:var(--mt);font-size:16px;cursor:pointer;font-family:inherit;flex-shrink:0}
+.fbm-close:hover{background:#fce7f3;color:var(--pink)}
+.fbm-body{padding:18px 20px 22px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
+.fbm-editor{background:#fffbf5;border:1px solid #fed7aa;border-radius:12px;padding:14px;margin-bottom:18px}
+.fbm-editor-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.fbm-editor-lbl{font-size:12px;font-weight:700;color:#b45309}
+.fbm-date{padding:8px 10px;border:1px solid #fed7aa;border-radius:8px;font-size:14px;font-family:inherit;color:var(--tx);background:var(--wh);outline:none;min-height:40px}
+.fbm-date:focus{border-color:#f59e0b}
+.fbm-ta{width:100%;min-height:120px;resize:vertical;border:1px solid #fed7aa;border-radius:10px;padding:12px 14px;font-size:16px;font-family:inherit;line-height:1.8;color:var(--tx);background:var(--wh);outline:none;-webkit-appearance:none}
+.fbm-ta:focus{border-color:#f59e0b}
+.fbm-editor-btns{display:flex;gap:8px;margin-top:10px}
+.fbm-save{flex:1;padding:12px;background:var(--pink);color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;min-height:46px}
+.fbm-save:hover{background:var(--pink-dk)}
+.fbm-save:disabled{opacity:.55;cursor:default}
+.fbm-cancel{padding:12px 20px;background:var(--wh);color:var(--mt);border:1px solid var(--bd);border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;min-height:46px}
+.fbm-cancel:hover{background:#f8f9fa}
+.fbm-list-lbl{font-size:12px;font-weight:700;color:var(--mt);letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.fbm-list-lbl::after{content:'';flex:1;height:1px;background:var(--bd)}
+.fbm-item{border:1px solid var(--bd);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.fbm-item-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:var(--pink-lt);border-bottom:1px solid #fbcfe8;flex-wrap:wrap}
+.fbm-item-date{font-size:12.5px;font-weight:700;color:var(--pink-dk)}
+.fbm-item-btns{display:flex;gap:6px}
+.fbm-mini{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid var(--bd);background:var(--wh);color:var(--mt);min-height:32px}
+.fbm-mini.edit:hover{background:var(--pink-lt);color:var(--pink);border-color:#fbcfe8}
+.fbm-mini.del{border-color:#fecaca;color:#dc2626}
+.fbm-mini.del:hover{background:#fef2f2}
+.fbm-item-body{padding:13px 14px;font-size:14px;line-height:1.85;color:var(--tx);white-space:pre-wrap;word-break:break-word}
+.fbm-empty{text-align:center;padding:32px 16px;color:var(--mt);font-size:13.5px;line-height:1.9;background:#fafafa;border:1px dashed var(--bd);border-radius:12px}
 
 /* ══ 모바일 ══ */
 .m-header{background:linear-gradient(135deg,#f472b6,#db2777);color:#fff;padding:calc(16px + var(--safe-top)) 18px 16px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(219,39,119,.2);}
@@ -122,14 +162,12 @@ body{
 .m-btn-back{padding:7px 14px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:20px;font-family:inherit;font-size:12px;font-weight:700;color:#fff;cursor:pointer;text-decoration:none;white-space:nowrap}
 .m-btn-logout{padding:7px 14px;background:transparent;border:1px solid rgba(255,255,255,.3);border-radius:20px;font-family:inherit;font-size:12px;font-weight:700;color:#fff;cursor:pointer;white-space:nowrap}
 
-/* ★ 모바일 타이틀바 — grade-check 스타일로 통일 */
 .m-title-bar{
   background:linear-gradient(135deg,#fff0f7 0%,var(--pink-lt) 60%,#f0f9ff 100%);
   border-bottom:1px solid #fce7f3;
   padding:14px 18px;
   display:flex;align-items:center;gap:12px;
 }
-/* ★ grade-check .welcome-avatar와 완전 동일 */
 .m-title-avatar{
   width:44px;height:44px;border-radius:50%;
   background:linear-gradient(135deg,#f472b6,#db2777);
@@ -173,6 +211,8 @@ body{
 .m-url-txt{flex:1;font-size:11px;font-family:monospace;color:var(--pink-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .m-btn-copy{display:flex;align-items:center;gap:4px;padding:9px 14px;background:var(--pink);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;white-space:nowrap;min-height:40px;}
 .m-btn-copy.copied{background:var(--ok)}
+.m-btn-fb{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px 10px;margin-bottom:8px;background:linear-gradient(135deg,#fff7ed,#fed7aa);color:#b45309;border:1px solid #fdba74;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;min-height:48px;}
+.m-btn-fb:active{opacity:.85}
 .m-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .m-btn-preview{display:flex;align-items:center;justify-content:center;gap:5px;padding:12px 10px;background:var(--pink-lt);color:var(--pink);border:1px solid #fbcfe8;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;font-family:inherit;min-height:48px;}
 .m-btn-preview:active{background:#fce7f3}
@@ -180,12 +220,16 @@ body{
 .m-btn-sms:active{opacity:.85}
 .m-empty{text-align:center;padding:48px 20px;color:var(--mt);font-size:13px}
 
-@media(max-width:768px){.desktop-only{display:none!important}.mobile-only{display:block!important}}
+@media(max-width:768px){
+  .desktop-only{display:none!important}.mobile-only{display:block!important}
+  .fbm-overlay.open{padding:0;align-items:flex-end}
+  .fbm{width:100%;max-height:92vh;border-radius:18px 18px 0 0}
+  .fbm-body{padding:16px 15px calc(22px + var(--safe-bot))}
+  .fbm-head{padding:14px 16px}
+}
 @media(min-width:769px){.mobile-only{display:none!important}.desktop-only{display:block!important}}
 @media(min-width:769px) and (max-width:1024px){.card-grid{grid-template-columns:repeat(2,1fr)}.main{padding:20px 24px}}
-/* ★ 초협소 화면(아이폰 SE 등): 학년·과목 셀렉트가 좁아지지 않게 세로로 */
 @media(max-width:360px){.m-filter-selects{flex-direction:column}}
-/* ★ 폰 가로모드: 넓고 짧은 화면을 살려 카드 2단으로 */
 @media(max-width:768px) and (orientation:landscape){.m-card-list{display:grid;grid-template-columns:1fr 1fr;align-items:start}.m-card-list .m-empty{grid-column:1/-1}}
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
@@ -211,13 +255,12 @@ body{
     </div>
   </header>
   <main class="main">
-    <!-- ★ grade-check welcome-bar 레이아웃과 동일 -->
     <div class="page-header">
       <div class="page-header-left">
         <div class="page-header-avatar">📊</div>
         <div class="page-header-text">
           <h1>학생 개별 학습 리포트</h1>
-          <p>링크를 복사해 문자로 학부모님께 공유하세요. 로그인 없이 바로 열립니다.</p>
+          <p>피드백을 작성하고, 링크를 복사해 문자로 학부모님께 공유하세요. 로그인 없이 바로 열립니다.</p>
         </div>
       </div>
       <div class="page-header-stat">
@@ -229,8 +272,8 @@ body{
     <div class="guide-box">
       <div class="guide-icon">💡</div>
       <div class="guide-txt">
-        <strong style="font-size:15px;">보기 전용 · 로그인 불필요 · 수업기록·테스트 자동 연동</strong><br>
-        학생마다 고유 링크가 생성됩니다. 휴대폰에서는 문자 버튼으로 문자 앱이 열리고, PC에서는 문자 내용이 클립보드에 복사됩니다.
+        <strong style="font-size:15px;">보기 전용 · 로그인 불필요 · 피드백·테스트 자동 연동</strong><br>
+        피드백 버튼으로 작성한 내용은 학부모 리포트 첫 화면에 바로 표시됩니다. 학생 상세 페이지에서 작성한 피드백과도 같이 연동됩니다.
         <span class="guide-url" id="d-baseUrlDisplay">불러오는 중...</span>
       </div>
     </div>
@@ -280,12 +323,11 @@ body{
     </div>
   </header>
 
-  <!-- ★ 모바일 타이틀바도 동일한 핑크 동그라미 아이콘 적용 -->
   <div class="m-title-bar">
     <div class="m-title-avatar">📊</div>
     <div class="m-title-text">
       <h1>학생 개별 학습 리포트</h1>
-      <p>링크를 복사해 문자로 학부모님께 공유하세요.</p>
+      <p>피드백을 작성하고 링크를 학부모님께 공유하세요.</p>
     </div>
   </div>
 
@@ -297,7 +339,7 @@ body{
     <div class="m-guide-icon">💡</div>
     <div class="m-guide-txt">
       <strong>보기 전용 · 로그인 불필요</strong><br>
-      학생마다 고유 링크가 생성됩니다.
+      피드백은 학부모 리포트 첫 화면에 표시됩니다.
       <span class="m-guide-url" id="m-baseUrlDisplay">불러오는 중...</span>
     </div>
   </div>
@@ -329,12 +371,37 @@ body{
   </div>
 </div>
 
+<!-- 피드백 모달 (데스크탑·모바일 공용) -->
+<div class="fbm-overlay" id="fbmOverlay" onclick="fbmBgClose(event)">
+  <div class="fbm" role="dialog" aria-modal="true" aria-labelledby="fbmTitle">
+    <div class="fbm-head">
+      <div class="fbm-title" id="fbmTitle">선생님 피드백<span id="fbmSub"></span></div>
+      <button class="fbm-close" onclick="fbmClose()" aria-label="닫기">✕</button>
+    </div>
+    <div class="fbm-body">
+      <div class="fbm-editor">
+        <div class="fbm-editor-top">
+          <span class="fbm-editor-lbl" id="fbmEditorLbl">✏️ 새 피드백 작성</span>
+          <input type="date" class="fbm-date" id="fbmDate">
+        </div>
+        <textarea class="fbm-ta" id="fbmTa" placeholder="학생의 학습 상황, 태도, 보완할 점 등을 적어주세요. 이 내용은 학부모 리포트에 그대로 표시됩니다."></textarea>
+        <div class="fbm-editor-btns">
+          <button class="fbm-save" id="fbmSaveBtn" onclick="fbmSave()">저장하기</button>
+          <button class="fbm-cancel" id="fbmCancelBtn" onclick="fbmCancelEdit()" style="display:none">수정 취소</button>
+        </div>
+      </div>
+      <div class="fbm-list-lbl">작성된 피드백</div>
+      <div id="fbmList"></div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc,collection,getDocs}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,setDoc,collection,getDocs,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
 const app=initializeApp(fc);const auth=getAuth(app);const db=getFirestore(app);
@@ -345,16 +412,23 @@ const BASE_URL=window.location.origin+'/student-portal.html?id=';
 });
 
 let allStudents=[],filtered=[];
+let fbMap=new Map();      // 학생문서ID -> 피드백 항목 배열
+let fbUnsub=null;
+let fbmStudent=null;      // 모달에 열려 있는 학생
+let fbmEditId=null;       // 수정 중인 항목 id (없으면 새 작성)
 
 onAuthStateChanged(auth,async u=>{
-  if(!u){window.location.replace('/login.html');return;}
+  if(!u){if(fbUnsub){fbUnsub();fbUnsub=null;}window.location.replace('/login.html');return;}
   try{
     const s=await getDoc(doc(db,'users',u.uid));
     if(!s.exists()||s.data().status!=='approved'){await signOut(auth);window.location.replace('/login.html');return;}
-    document.body.style.visibility='visible';loadStudents();
+    document.body.style.visibility='visible';
+    loadStudents();
+    subscribeFeedbacks();
   }catch(e){window.location.replace('/login.html');}
 });
-window.doLogout=async()=>{await signOut(auth);window.location.replace('/login.html');};
+window.doLogout=async()=>{if(fbUnsub){fbUnsub();fbUnsub=null;}await signOut(auth);window.location.replace('/login.html');};
+window.addEventListener('beforeunload',()=>{if(fbUnsub){fbUnsub();fbUnsub=null;}});
 
 async function loadStudents(){
   try{
@@ -378,6 +452,67 @@ async function loadStudents(){
   }
 }
 
+/* ════════════════════════════════════════════════
+   피드백 — feedbacks/{학생문서ID} 실시간 구독
+   저장 구조: { entries:[{id,text,date,createdAt}], text, updatedAt }
+   text 만 있는 옛 구조도 항목 1개로 읽어준다.
+════════════════════════════════════════════════ */
+function fbMillis(v){
+  if(v==null)return 0;
+  if(typeof v==='number')return v;
+  if(typeof v==='object'){
+    if(typeof v.toMillis==='function'){try{return v.toMillis();}catch(e){return 0;}}
+    if(v.seconds!=null)return v.seconds*1000;
+    if(v instanceof Date)return v.getTime();
+    return 0;
+  }
+  const t=Date.parse(v);return isNaN(t)?0:t;
+}
+function fbDateFromMs(ms){
+  if(!ms)return'';
+  const d=new Date(ms);if(isNaN(d.getTime()))return'';
+  return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function todayStr(){return fbDateFromMs(Date.now());}
+function parseFbEntries(data){
+  if(!data)return[];
+  let list=[];
+  if(Array.isArray(data.entries)){
+    list=data.entries.filter(x=>x&&String(x.text||'').trim()).map((x,i)=>({
+      id:String(x.id||('e'+i)),
+      text:String(x.text||''),
+      date:String(x.date||fbDateFromMs(fbMillis(x.createdAt))),
+      createdAt:fbMillis(x.createdAt)
+    }));
+  }else if(String(data.text||'').trim()){
+    const ms=fbMillis(data.updatedAt);
+    list=[{id:'legacy-1',text:String(data.text),date:fbDateFromMs(ms),createdAt:ms}];
+  }
+  return sortFb(list);
+}
+function sortFb(list){
+  return list.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||(b.createdAt-a.createdAt));
+}
+function fbDateLabel(ds){
+  if(!ds)return'작성일 미상';
+  const p=String(ds).split('-');
+  if(p.length<3)return String(ds);
+  const y=parseInt(p[0],10),m=parseInt(p[1],10),d=parseInt(p[2],10);
+  if(isNaN(y)||isNaN(m)||isNaN(d))return String(ds);
+  return`${y}년 ${m}월 ${d}일`;
+}
+function subscribeFeedbacks(){
+  if(fbUnsub){fbUnsub();fbUnsub=null;}
+  fbUnsub=onSnapshot(collection(db,'feedbacks'),snap=>{
+    const next=new Map();
+    snap.forEach(d=>{const list=parseFbEntries(d.data());if(list.length)next.set(d.id,list);});
+    fbMap=next;
+    renderDesktop();renderMobile();
+    if(fbmStudent)fbmRenderList();
+  },err=>{console.error('feedbacks onSnapshot error:',err);});
+}
+function fbOf(fireId){return fbMap.get(fireId)||[];}
+
 window.filterStudents=function(){
   const isMobile=window.innerWidth<=768;
   const kw=isMobile?document.getElementById('m-searchInput').value.trim().toLowerCase():document.getElementById('d-searchInput').value.trim().toLowerCase();
@@ -391,7 +526,7 @@ window.filterStudents=function(){
 };
 
 function makeSmsBody(name,grade,url){
-  return `[인후쌤의 과학 수업 관리 시스템] ${name} 학생(${grade}) 학습 리포트\n📚 수업기록·테스트 결과를 확인하세요.\n🔗 ${url}`;
+  return `[인후쌤의 과학 수업 관리 시스템] ${name} 학생(${grade}) 학습 리포트\n💬 선생님 피드백과 테스트 결과를 확인하세요.\n🔗 ${url}`;
 }
 window.sendSms=function(name,grade,url){
   const body=encodeURIComponent(makeSmsBody(name,grade,url));
@@ -405,14 +540,20 @@ window.sendSms=function(name,grade,url){
   }
 };
 
+function gradeClassOf(grade){
+  return{'중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3','고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3'}[grade]||'grade-mid1';
+}
+
 function renderDesktop(){
   const grid=document.getElementById('d-cardGrid');
+  if(!grid)return;
   if(!filtered.length){grid.innerHTML='<div class="empty-state">검색 결과가 없습니다.</div>';return;}
   grid.innerHTML=filtered.map(s=>{
     const url=BASE_URL+(s.id||s.fireId),grade=s.grade||'';
-    const gradeCls={'중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3','고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3'}[grade]||'grade-mid1';
-    const initial=(s.name||'?').charAt(0),shortUrl=url;
+    const gradeCls=gradeClassOf(grade);
+    const initial=(s.name||'?').charAt(0);
     const fid=e(s.fireId),safeUrl=e(url),safeName=e(s.name||''),safeGrade=e(grade);
+    const n=fbOf(s.fireId).length;
     return`<div class="portal-card">
       <div class="card-head">
         <div class="avatar">${e(initial)}</div>
@@ -427,9 +568,10 @@ function renderDesktop(){
       </div>
       <div class="card-body">
         <div class="url-row">
-          <span class="url-txt" title="${safeUrl}">${e(shortUrl)}</span>
+          <span class="url-txt" title="${safeUrl}">${safeUrl}</span>
           <button class="btn-copy" id="dbtn-${fid}" onclick="copyLink('${safeUrl}','dbtn-${fid}')">📋 복사</button>
         </div>
+        <button class="btn-fb" onclick="fbmOpen('${fid}')">💬 피드백 <span class="fb-cnt ${n?'':'zero'}">${n}</span></button>
         <div class="btn-row">
           <a class="btn-preview" href="${safeUrl}" target="_blank" rel="noopener">👁 미리보기</a>
           <button class="btn-sms" onclick="sendSms('${safeName}','${safeGrade}','${safeUrl}')">
@@ -444,12 +586,14 @@ function renderDesktop(){
 
 function renderMobile(){
   const list=document.getElementById('m-cardList');
+  if(!list)return;
   if(!filtered.length){list.innerHTML='<div class="m-empty">검색 결과가 없습니다.</div>';return;}
   list.innerHTML=filtered.map(s=>{
     const url=BASE_URL+(s.id||s.fireId),grade=s.grade||'';
-    const gradeCls={'중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3','고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3'}[grade]||'grade-mid1';
-    const initial=(s.name||'?').charAt(0),shortUrl=url;
+    const gradeCls=gradeClassOf(grade);
+    const initial=(s.name||'?').charAt(0);
     const fid=e(s.fireId),safeUrl=e(url),safeName=e(s.name||''),safeGrade=e(grade);
+    const n=fbOf(s.fireId).length;
     return`<div class="m-portal-card">
       <div class="m-card-head">
         <div class="m-avatar">${e(initial)}</div>
@@ -464,9 +608,10 @@ function renderMobile(){
       </div>
       <div class="m-card-body">
         <div class="m-url-row">
-          <span class="m-url-txt" title="${safeUrl}">${e(shortUrl)}</span>
+          <span class="m-url-txt" title="${safeUrl}">${safeUrl}</span>
           <button class="m-btn-copy" id="mbtn-${fid}" onclick="copyLink('${safeUrl}','mbtn-${fid}')">📋 복사</button>
         </div>
+        <button class="m-btn-fb" onclick="fbmOpen('${fid}')">💬 피드백 <span class="fb-cnt ${n?'':'zero'}">${n}</span></button>
         <div class="m-btn-row">
           <a class="m-btn-preview" href="${safeUrl}" target="_blank" rel="noopener">👁 미리보기</a>
           <button class="m-btn-sms" onclick="sendSms('${safeName}','${safeGrade}','${safeUrl}')">
@@ -477,6 +622,112 @@ function renderMobile(){
       </div>
     </div>`;
   }).join('');
+}
+
+/* ════ 피드백 모달 ════ */
+window.fbmOpen=function(fireId){
+  const s=allStudents.find(x=>x.fireId===fireId);
+  if(!s){showToast('⚠️ 학생 정보를 찾을 수 없습니다');return;}
+  fbmStudent=s;fbmEditId=null;
+  document.getElementById('fbmSub').textContent=`${s.name||'이름없음'} · ${s.grade||'—'}${s.id?' · '+s.id:''}`;
+  document.getElementById('fbmTa').value='';
+  document.getElementById('fbmDate').value=todayStr();
+  document.getElementById('fbmEditorLbl').textContent='✏️ 새 피드백 작성';
+  document.getElementById('fbmCancelBtn').style.display='none';
+  fbmRenderList();
+  document.getElementById('fbmOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+};
+window.fbmClose=function(){
+  document.getElementById('fbmOverlay').classList.remove('open');
+  document.body.style.overflow='';
+  fbmStudent=null;fbmEditId=null;
+};
+window.fbmBgClose=function(ev){if(ev.target&&ev.target.id==='fbmOverlay')fbmClose();};
+document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&fbmStudent)fbmClose();});
+
+function fbmRenderList(){
+  const el=document.getElementById('fbmList');
+  if(!el||!fbmStudent)return;
+  const list=fbOf(fbmStudent.fireId);
+  if(!list.length){
+    el.innerHTML='<div class="fbm-empty">아직 작성된 피드백이 없습니다.<br>위에 내용을 입력하고 저장하면 학부모 리포트에 바로 표시됩니다.</div>';
+    return;
+  }
+  el.innerHTML=list.map(x=>`<div class="fbm-item">
+    <div class="fbm-item-top">
+      <span class="fbm-item-date">🗓 ${e(fbDateLabel(x.date))}</span>
+      <span class="fbm-item-btns">
+        <button class="fbm-mini edit" onclick="fbmEdit('${e(x.id)}')">수정</button>
+        <button class="fbm-mini del" onclick="fbmDelete('${e(x.id)}')">삭제</button>
+      </span>
+    </div>
+    <div class="fbm-item-body">${e(x.text)}</div>
+  </div>`).join('');
+}
+window.fbmEdit=function(entryId){
+  if(!fbmStudent)return;
+  const x=fbOf(fbmStudent.fireId).find(v=>v.id===entryId);
+  if(!x){showToast('⚠️ 항목을 찾을 수 없습니다');return;}
+  fbmEditId=entryId;
+  document.getElementById('fbmTa').value=x.text;
+  document.getElementById('fbmDate').value=x.date||todayStr();
+  document.getElementById('fbmEditorLbl').textContent='✏️ 피드백 수정';
+  document.getElementById('fbmCancelBtn').style.display='inline-block';
+  document.getElementById('fbmTa').focus();
+};
+window.fbmCancelEdit=function(){
+  fbmEditId=null;
+  document.getElementById('fbmTa').value='';
+  document.getElementById('fbmDate').value=todayStr();
+  document.getElementById('fbmEditorLbl').textContent='✏️ 새 피드백 작성';
+  document.getElementById('fbmCancelBtn').style.display='none';
+};
+window.fbmSave=async function(){
+  if(!fbmStudent)return;
+  const txt=document.getElementById('fbmTa').value.trim();
+  if(!txt){showToast('⚠️ 피드백 내용을 입력해주세요');document.getElementById('fbmTa').focus();return;}
+  const date=document.getElementById('fbmDate').value||todayStr();
+  const btn=document.getElementById('fbmSaveBtn');
+  btn.disabled=true;btn.textContent='저장 중...';
+  let list=fbOf(fbmStudent.fireId).slice();
+  if(fbmEditId){
+    list=list.map(x=>x.id===fbmEditId?{...x,text:txt,date:date}:x);
+  }else{
+    list.push({id:'f'+Date.now()+'-'+Math.random().toString(16).slice(2,8),text:txt,date:date,createdAt:Date.now()});
+  }
+  try{
+    await writeFeedback(fbmStudent.fireId,list);
+    showToast(fbmEditId?'✅ 피드백을 수정했습니다':'✅ 피드백을 저장했습니다');
+    fbmCancelEdit();
+  }catch(err){
+    showToast('⚠️ 저장 실패: '+(err&&err.message?err.message:'알 수 없는 오류'));
+  }finally{
+    btn.disabled=false;btn.textContent='저장하기';
+  }
+};
+window.fbmDelete=async function(entryId){
+  if(!fbmStudent)return;
+  if(!confirm('이 피드백을 삭제할까요?\n삭제하면 되돌릴 수 없습니다.'))return;
+  const list=fbOf(fbmStudent.fireId).filter(x=>x.id!==entryId);
+  try{
+    await writeFeedback(fbmStudent.fireId,list);
+    showToast('🗑 피드백을 삭제했습니다');
+    if(fbmEditId===entryId)fbmCancelEdit();
+  }catch(err){
+    showToast('⚠️ 삭제 실패: '+(err&&err.message?err.message:'알 수 없는 오류'));
+  }
+};
+async function writeFeedback(fireId,list){
+  const sorted=sortFb(list);
+  await setDoc(doc(db,'feedbacks',fireId),{
+    entries:sorted.map(x=>({id:x.id,text:x.text,date:x.date||'',createdAt:x.createdAt||0})),
+    text:sorted.length?sorted[0].text:'',
+    updatedAt:Date.now()
+  });
+  // 실시간 구독이 늦게 도착해도 화면이 즉시 반영되도록 로컬 맵도 갱신
+  if(sorted.length)fbMap.set(fireId,sorted);else fbMap.delete(fireId);
+  renderDesktop();renderMobile();fbmRenderList();
 }
 
 window.copyLink=async function(url,btnId){
