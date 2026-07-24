@@ -119,14 +119,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-.stat-box{border-radius:14px;padding:16px 10px;text-align:center;border:1px solid #fbcfe8;background:var(--pink-lt)}
+.stat-box{border-radius:14px;padding:15px 10px 16px;text-align:center;border:1px solid #fbcfe8;background:var(--pink-lt);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:84px}
 .stat-box.blue{background:var(--blue-lt);border-color:#bfdbfe}
 .stat-box.green{background:var(--green-lt);border-color:#6ee7b7}
-.stat-num{font-size:24px;font-weight:700;color:var(--pink);line-height:1}
+/* 라벨(회색)이 위, 값이 아래 — 모든 탭 동일 */
+.stat-lbl{font-size:12px;color:var(--mt);font-weight:600;line-height:1.2;letter-spacing:.01em}
+.stat-num{font-size:24px;font-weight:700;color:var(--pink);line-height:1.2;word-break:keep-all}
 .stat-box.blue .stat-num{color:var(--blue)}
 .stat-box.green .stat-num{color:var(--green)}
-.stat-lbl{font-size:12px;color:var(--mt);margin-top:4px;font-weight:500}
-.stat-num.sm{font-size:18px}
 
 .sec-label{font-size:12px;font-weight:600;color:var(--mt);letter-spacing:.06em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .sec-label::after{content:'';flex:1;height:1px;background:var(--bd)}
@@ -173,8 +173,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .mobile-only{display:block!important}
   body{padding-bottom:calc(64px + var(--safe-bot))}
   .info-card p{white-space:normal}
+  .stat-box{min-height:76px;gap:6px;padding:13px 8px 14px}
   .stat-num{font-size:20px}
-  .stat-num.sm{font-size:15px}
   .stat-lbl{font-size:11px}
   .section{padding-top:2px}
   .fb-card-top{padding:12px 14px;gap:8px}
@@ -189,6 +189,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .sc-row-title .sc-row-val{font-size:15px}
 }
 @media(max-width:380px){
+  .stat-box{min-height:70px;padding:12px 6px 13px}
+  .stat-num{font-size:17px}
+  .stat-lbl{font-size:10.5px}
   .sc-row{flex-direction:column;gap:1px}
   .sc-row-lbl{width:auto;padding-top:0}
   .sc-row-title{align-items:flex-start}
@@ -308,8 +311,8 @@ function buildSections(){
   <div class="section active" id="sec0">
     <br>
     <div class="stat-row" style="grid-template-columns:repeat(2,1fr)">
-      <div class="stat-box"><div class="stat-num" id="fb-count">—</div><div class="stat-lbl">전체 피드백</div></div>
-      <div class="stat-box"><div class="stat-num sm" id="fb-recent">—</div><div class="stat-lbl">최근 작성일</div></div>
+      <div class="stat-box"><div class="stat-lbl">전체 피드백</div><div class="stat-num" id="fb-count">—</div></div>
+      <div class="stat-box"><div class="stat-lbl">최근 작성일</div><div class="stat-num" id="fb-recent">—</div></div>
     </div>
     <div class="sec-label">선생님 피드백</div>
     <div id="feedbackList"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
@@ -317,9 +320,9 @@ function buildSections(){
   <div class="section" id="sec1">
     <br>
     <div class="stat-row">
-      <div class="stat-box"><div class="stat-num" id="ox-total">—</div><div class="stat-lbl">응시 횟수</div></div>
-      <div class="stat-box"><div class="stat-num" id="ox-avg">—</div><div class="stat-lbl">평균 점수</div></div>
-      <div class="stat-box"><div class="stat-num" id="ox-best">—</div><div class="stat-lbl">최고 점수</div></div>
+      <div class="stat-box"><div class="stat-lbl">응시 횟수</div><div class="stat-num" id="ox-total">—</div></div>
+      <div class="stat-box"><div class="stat-lbl">평균 점수</div><div class="stat-num" id="ox-avg">—</div></div>
+      <div class="stat-box"><div class="stat-lbl">최고 점수</div><div class="stat-num" id="ox-best">—</div></div>
     </div>
     <div class="sec-label">OX 퀴즈 결과</div>
     <div id="oxResultList"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
@@ -327,9 +330,9 @@ function buildSections(){
   <div class="section" id="sec2">
     <br>
     <div class="stat-row">
-      <div class="stat-box blue"><div class="stat-num" id="ts-total">—</div><div class="stat-lbl">응시 횟수</div></div>
-      <div class="stat-box blue"><div class="stat-num" id="ts-avg">—</div><div class="stat-lbl">평균 점수</div></div>
-      <div class="stat-box blue"><div class="stat-num" id="ts-best">—</div><div class="stat-lbl">최고 점수</div></div>
+      <div class="stat-box blue"><div class="stat-lbl">응시 횟수</div><div class="stat-num" id="ts-total">—</div></div>
+      <div class="stat-box blue"><div class="stat-lbl">평균 점수</div><div class="stat-num" id="ts-avg">—</div></div>
+      <div class="stat-box blue"><div class="stat-lbl">최고 점수</div><div class="stat-num" id="ts-best">—</div></div>
     </div>
     <div class="sec-label">4지선다 결과</div>
     <div id="testResultList"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
@@ -337,9 +340,9 @@ function buildSections(){
   <div class="section" id="sec3">
     <br>
     <div class="stat-row">
-      <div class="stat-box green"><div class="stat-num" id="ms-total">—</div><div class="stat-lbl">응시 횟수</div></div>
-      <div class="stat-box green"><div class="stat-num" id="ms-avg">—</div><div class="stat-lbl">평균 점수</div></div>
-      <div class="stat-box green"><div class="stat-num" id="ms-best">—</div><div class="stat-lbl">최고 점수</div></div>
+      <div class="stat-box green"><div class="stat-lbl">응시 횟수</div><div class="stat-num" id="ms-total">—</div></div>
+      <div class="stat-box green"><div class="stat-lbl">평균 점수</div><div class="stat-num" id="ms-avg">—</div></div>
+      <div class="stat-box green"><div class="stat-lbl">최고 점수</div><div class="stat-num" id="ms-best">—</div></div>
     </div>
     <div class="sec-label">단원별 결과</div>
     <div id="masterTestList"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
