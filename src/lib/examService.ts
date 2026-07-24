@@ -189,14 +189,25 @@ export interface StudentAnswer {
   id?: string;
   examId: string;
   studentName: string;
+  studentId?: string;
   answers: Record<string, string>;
   score: number;
   totalQuestions: number;
   submittedAt?: Timestamp;
   timestamp?: Timestamp;
+  firstSubmittedAt?: Timestamp;
   testName?: string;
   date?: string;
   grade?: string;
+  // ★ 유형별 점수/문항수 (OX·4지선다 이어풀기 지원)
+  oxScore?: number | null;
+  multiScore?: number | null;
+  oxCount?: number;
+  multiCount?: number;
+  correctCount?: number;
+  answeredCount?: number;
+  subTypes?: QuestionType[];
+  lastSubType?: QuestionType | null;
 }
 
 export interface AcademySettings {
@@ -354,50 +365,105 @@ export async function submitStudentAnswers(payload: {
   score: number;
   totalQuestions: number;
   grade?: string;
+  subType?: QuestionType | null;   // ★ 'ox' | 'multiple' | null(전체)
 }): Promise<string> {
   await ensureAuth(); // ★ 학생 경로: 답안 제출 전 인증 보장
   const exam = await getExam(payload.examId);
 
-  const oxQuestions       = (exam?.questions ?? []).filter(q => q.type === 'ox');
-  const multipleQuestions = (exam?.questions ?? []).filter(q => q.type === 'multiple');
+  const allQuestions      = exam?.questions ?? [];
+  const oxQuestions       = allQuestions.filter(q => q.type === 'ox');
+  const multipleQuestions = allQuestions.filter(q => q.type === 'multiple');
 
-  let oxScore:    number | null = null;
-  let multiScore: number | null = null;
+  // ★ 중복 제출 방지 (한 시험 = 한 문서): studentId가 있으면
+  //   (examId + studentId)를 문서 ID로 고정한다.
+  const key = (payload.studentId ?? '').trim();
+  const gid = key ? `${payload.examId}__${key}` : '';
 
-  if (oxQuestions.length > 0) {
-    const correct = oxQuestions.filter(q => isAnswerCorrect(payload.answers[q.id], q.answer)).length;
-    oxScore = Math.round((correct / oxQuestions.length) * 100);
+  // ★★ 핵심 수정 ★★
+  // OX를 먼저 풀고 이어서 4지선다를 풀면 같은 문서 ID로 저장되는데,
+  // 예전에는 이번 제출분(4지선다 답만)으로 문서를 통째로 덮어써서
+  // 먼저 기록된 OX 답안과 OX 점수가 0으로 날아갔다.
+  // → 이전 제출 답안을 먼저 읽어와 병합한 뒤 점수를 다시 계산한다.
+  let prevAnswers: Record<string, string> = {};
+  let prevSubTypes: QuestionType[] = [];
+  let prevFirstAt: Timestamp | null = null;
+
+  if (gid) {
+    try {
+      const prevSnap = await getDoc(doc(db, 'grades', gid));
+      if (prevSnap.exists()) {
+        const p = prevSnap.data() as any;
+        if (p && p.answers && typeof p.answers === 'object') {
+          prevAnswers = p.answers as Record<string, string>;
+        }
+        if (p && Array.isArray(p.subTypes)) {
+          prevSubTypes = p.subTypes as QuestionType[];
+        }
+        prevFirstAt = (p && (p.firstSubmittedAt ?? p.timestamp)) ?? null;
+      }
+    } catch (e) {
+      // 조회 실패 시에는 신규 제출로 처리 (제출 자체를 막지 않음)
+      console.warn('[examService] 이전 제출 조회 실패, 신규로 처리:', e);
+    }
   }
 
-  if (multipleQuestions.length > 0) {
-    const correct = multipleQuestions.filter(q => isAnswerCorrect(payload.answers[q.id], q.answer)).length;
-    multiScore = Math.round((correct / multipleQuestions.length) * 100);
-  }
+  // 이전 답안 + 이번 답안 병합 (같은 문항은 이번 답이 우선)
+  const mergedAnswers: Record<string, string> = { ...prevAnswers, ...payload.answers };
 
-  const data = {
-    examId:         payload.examId,
-    studentName:    payload.studentName,
-    studentId:      payload.studentId ?? '',
-    answers:        payload.answers,
-    score:          payload.score,
-    oxScore,
-    multiScore,
-    oxCount:        oxQuestions.length,
-    multiCount:     multipleQuestions.length,
-    totalQuestions: payload.totalQuestions,
-    grade:          payload.grade ?? exam?.grade ?? '',
-    testName:       exam?.title ?? '',
-    date:           new Date().toLocaleDateString('ko-KR'),
-    timestamp:      Timestamp.now(),
+  const hasAnswer = (qid: string): boolean => {
+    const v = mergedAnswers[qid];
+    return v !== undefined && v !== null && String(v).trim() !== '';
   };
 
-  // ★ 중복 제출 방지 (한 시험 = 한 응시): studentId가 있으면
-  //   (examId + studentId)를 문서 ID로 고정해 setDoc으로 저장한다.
-  //   제출 버튼을 두 번 눌러도, 네트워크 재시도가 걸려도 항상 같은 문서를
-  //   덮어쓰기만 하므로 grades에 같은 응시가 두 번 쌓이지 않는다.
-  const key = (payload.studentId ?? '').trim();
-  if (key) {
-    const gid = `${payload.examId}__${key}`;
+  // ★ 유형별 점수: 그 유형을 아직 안 풀었으면 null (0점으로 오기록되지 않음)
+  const scoreOf = (list: Question[]): number | null => {
+    const done = list.filter(q => hasAnswer(q.id));
+    if (done.length === 0) return null;
+    const correct = done.filter(q => isAnswerCorrect(mergedAnswers[q.id], q.answer)).length;
+    return Math.round((correct / done.length) * 100);
+  };
+
+  const oxScore    = scoreOf(oxQuestions);
+  const multiScore = scoreOf(multipleQuestions);
+
+  // ★ 총점: 실제로 응시한 문항만을 기준으로 계산 (OX만 풀어도 점수가 반토막 나지 않음)
+  const answeredQuestions = allQuestions.filter(q => hasAnswer(q.id));
+  const correctCount = answeredQuestions.filter(q => isAnswerCorrect(mergedAnswers[q.id], q.answer)).length;
+  const score = answeredQuestions.length > 0
+    ? Math.round((correctCount / answeredQuestions.length) * 100)
+    : 0;
+
+  // 응시한 유형 기록 (['ox'], ['ox','multiple'] 등)
+  const subTypes: QuestionType[] = Array.from(new Set<QuestionType>([
+    ...prevSubTypes,
+    ...(payload.subType ? [payload.subType] : []),
+  ]));
+
+  const now = Timestamp.now();
+
+  const data = {
+    examId:           payload.examId,
+    studentName:      payload.studentName,
+    studentId:        key,
+    answers:          mergedAnswers,
+    score,
+    correctCount,
+    answeredCount:    answeredQuestions.length,
+    oxScore,
+    multiScore,
+    oxCount:          oxQuestions.length,
+    multiCount:       multipleQuestions.length,
+    totalQuestions:   allQuestions.length > 0 ? allQuestions.length : payload.totalQuestions,
+    subTypes,
+    lastSubType:      payload.subType ?? null,
+    grade:            payload.grade ?? exam?.grade ?? '',
+    testName:         exam?.title ?? '',
+    date:             new Date().toLocaleDateString('ko-KR'),
+    timestamp:        now,
+    firstSubmittedAt: prevFirstAt ?? now,
+  };
+
+  if (gid) {
     await setDoc(doc(db, 'grades', gid), data);
     return gid;
   }
