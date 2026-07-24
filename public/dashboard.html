@@ -111,15 +111,19 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
 .dist-date{display:inline-block;font-size:11px;font-weight:700;color:#7e22ce;background:#faf5ff;border:1px solid #f3e8ff;border-radius:20px;padding:2px 8px;white-space:nowrap}
 .dist-none{color:#d1d1d6;font-size:11px}
 
-/* ── 미응시 명단 ── */
+/* ── 최근 응시 / 미응시 명단 공통 ── */
 .pend-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .pend-count{display:inline-flex;align-items:center;gap:4px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:11px;font-weight:700;border-radius:20px;padding:3px 10px;white-space:nowrap}
 .pend-count.zero{background:#f0fdf4;border-color:#bbf7d0;color:#16a34a}
-.pend-scroll{max-height:430px;overflow-y:auto;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.pend-scroll::-webkit-scrollbar{width:5px;height:4px}
-.pend-scroll::-webkit-scrollbar-track{background:#fdf2f8}
-.pend-scroll::-webkit-scrollbar-thumb{background:#fbcfe8;border-radius:4px}
-.pend-scroll thead th{position:sticky;top:0;z-index:2}
+.rec-count{display:inline-flex;align-items:center;gap:4px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:11px;font-weight:700;border-radius:20px;padding:3px 10px;white-space:nowrap}
+.rec-count.zero{background:#f5f5f7;border-color:#e5e5ea;color:#aeaeb2}
+.pend-scroll,.recent-scroll{overflow-y:auto;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.pend-scroll{max-height:430px}
+.recent-scroll{max-height:520px}
+.pend-scroll::-webkit-scrollbar,.recent-scroll::-webkit-scrollbar{width:5px;height:4px}
+.pend-scroll::-webkit-scrollbar-track,.recent-scroll::-webkit-scrollbar-track{background:#fdf2f8}
+.pend-scroll::-webkit-scrollbar-thumb,.recent-scroll::-webkit-scrollbar-thumb{background:#fbcfe8;border-radius:4px}
+.pend-scroll thead th,.recent-scroll thead th{position:sticky;top:0;z-index:2}
 .day-badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
 .d-fresh{background:#f5f5f7;color:#6e6e73}
 .d-warn{background:#fef9c3;color:#854d0e}
@@ -231,8 +235,8 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
   #recentAttemptsTable{min-width:520px}
   #pendingTable{min-width:450px}
   /* 모바일: 표 안에 세로 스크롤을 겹치면 페이지 스크롤이 갇히므로 해제 */
-  .pend-scroll{max-height:none;overflow-y:visible}
-  .pend-scroll thead th{position:static}
+  .pend-scroll,.recent-scroll{max-height:none;overflow-y:visible}
+  .pend-scroll thead th,.recent-scroll thead th{position:static}
   .exam-badge-box{flex:0 0 52px}
   .class-badge{max-width:104px}
   .type-badge,.grade-badge,.subj-badge,.day-badge,.dist-date{padding:2px 7px;font-size:10px}
@@ -342,16 +346,20 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
   <div class="section-heading">RECENT</div>
   <div class="section-card">
     <div class="section-header">
-      <span class="section-title">최근 응시 학생</span>
+      <span class="pend-head">
+        <span class="section-title">최근 응시 학생</span>
+        <span class="rec-count" id="recentCount">— 건</span>
+      </span>
       <a href="https://beta-science.vercel.app/grade-check.html" class="view-all">전체보기 ›</a>
     </div>
-    <div class="table-wrap">
+    <div class="table-wrap recent-scroll">
       <table id="recentAttemptsTable" style="min-width:760px">
         <colgroup><col style="width:9%"><col style="width:9%"><col style="width:9%"><col style="width:8%"><col style="width:6%"><col style="width:10%"><col style="width:34%"><col style="width:8%"><col style="width:7%"></colgroup>
         <thead><tr><th class="c-dist">배포일</th><th>응시일</th><th class="c-sid">아이디</th><th>이름</th><th>학년</th><th>과목</th><th>응시한 시험</th><th>점수</th><th>관리</th></tr></thead>
         <tbody id="recentAttemptsBody"><tr><td colspan="9" style="text-align:center;padding:2.5rem;color:#aeaeb2">데이터를 불러오는 중...</td></tr></tbody>
       </table>
     </div>
+    <div class="pend-note">※ 최근 응시일이 가장 위에 오도록 정렬되며, 전체 응시 기록이 모두 표시됩니다. (표 안에서 스크롤)</div>
   </div>
 
   <!-- 미응시 학생 명단 -->
@@ -762,7 +770,8 @@ function showToast(msg){
   toastTimer=setTimeout(()=>t.classList.remove('show'),1800);
 }
 
-/* ── 최근 응시 학생 (응시 1건 = 한 줄. OX·4지선다가 한 문서에 있으면 배지 둘 다 표시) ── */
+/* ── 최근 응시 학생 (응시 1건 = 한 줄. OX·4지선다가 한 문서에 있으면 배지 둘 다 표시)
+   최근 응시일이 맨 위 → 과거 순으로 전체 기록을 모두 표시(표 내부 스크롤) ── */
 const TYPE_INFO={ox:{cls:'type-ox',label:'OX'},multi:{cls:'type-multi',label:'4지선다'},master:{cls:'type-master',label:'마스터'}};
 let lastGradeDocs=null;
 function iRG(){onSnapshot(query(collection(db,"grades"),orderBy("timestamp","asc")),s=>{lastGradeDocs=s.docs;renderRecentAttempts();renderPending();});}
@@ -773,10 +782,16 @@ function rowScore(row){
   if(row.type==='ox')return p.ox;
   return p.multi;
 }
+function setRecentCount(n){
+  const el=document.getElementById('recentCount');
+  if(!el)return;
+  el.textContent=n?`총 ${n}건`:'기록 없음';
+  el.className='rec-count'+(n?'':' zero');
+}
 function renderRecentAttempts(){
   const tb=document.getElementById('recentAttemptsBody');
   if(!tb)return;
-  if(!lastGradeDocs||lastGradeDocs.length===0){tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
+  if(!lastGradeDocs||lastGradeDocs.length===0){setRecentCount(0);tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
   const gm={'중1':'g-mid1','중2':'g-mid2','중3':'g-mid3','고1':'g-high1','고2':'g-high2','고3':'g-high3','중등1학년':'g-mid1','중등2학년':'g-mid2','중등3학년':'g-mid3','고등1학년':'g-high1','고등2학년':'g-high2','고등3학년':'g-high3'};
   // 응시 1건이 OX+4지선다를 함께 가지면 각 유형을 별도 줄로 분리 (마스터는 한 줄)
   const rows=[];
@@ -787,7 +802,7 @@ function renderRecentAttempts(){
     if(types.length===1&&types[0]==='master'){rows.push({docId:d.id,r,sid,ts,type:'master'});}
     else{types.forEach(t=>rows.push({docId:d.id,r,sid,ts,type:t}));}
   });
-  if(!rows.length){tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
+  if(!rows.length){setRecentCount(0);tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:2.5rem;color:#aeaeb2">등록된 데이터가 없습니다.</td></tr>';return;}
   // 재시험 판별: 같은 학생 · 같은 유형 · 같은 시험을 2번째 이상 응시하면 재시험(가장 오래된 것이 원본)
   const groups={};
   rows.forEach(row=>{
@@ -799,8 +814,13 @@ function renderRecentAttempts(){
     arr.sort((a,b)=>a.ts-b.ts);
     arr.forEach((row,i)=>{ row._retake=i>0; row._attempt=i+1; });
   });
-  rows.sort((x,y)=>y.ts-x.ts);
-  const ds=rows.slice(0,10);
+  // 최근 응시일 → 과거 순 정렬 (동일 시각이면 이름순)
+  rows.sort((x,y)=>{
+    if(y.ts!==x.ts)return y.ts-x.ts;
+    return String(x.r.studentName||'').localeCompare(String(y.r.studentName||''),'ko');
+  });
+  setRecentCount(rows.length);
+  const ds=rows;   // 전체 표시 (자르지 않음)
   tb.innerHTML=ds.map(row=>{
     const {docId,r,sid,type}=row;
     // 응시일: 26.05.04 형식 (연도 2자리.월.일, 0채움)
