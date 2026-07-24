@@ -2,8 +2,12 @@
 // src/app/student/[examId]/page.tsx
 import { useState, useEffect, Suspense } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { getExam, submitStudentAnswers, calculateScore, isAnswerCorrect, formatCorrectAnswer, Exam } from '@/lib/examService';
-import { FlaskConical, ChevronLeft, ChevronRight, CheckCircle, ArrowLeft, RefreshCw } from 'lucide-react';
+import {
+  getExam, submitStudentAnswers, calculateScore, isAnswerCorrect,
+  formatCorrectAnswer, buildSubmissionSummary, getSubmissionSummary,
+  Exam, SubmissionSummary
+} from '@/lib/examService';
+import { FlaskConical, ChevronLeft, ChevronRight, CheckCircle, ArrowLeft, RefreshCw, PartyPopper } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 type Phase = 'name' | 'exam' | 'result';
@@ -26,6 +30,7 @@ function StudentExamInner() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [score, setScore] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [summary, setSummary] = useState<SubmissionSummary | null>(null);
 
   // 재풀기용
   const [retryQuestions, setRetryQuestions] = useState<Exam['questions']>([]);
@@ -49,17 +54,14 @@ function StudentExamInner() {
       savedId   = localStorage.getItem('studentId') || '';
     } catch {}
 
-    const urlSid   = (searchParams.get('sid') || '').trim();   // ★ 클리닉 링크가 실어 보낸 학생ID
-    const urlSname = (searchParams.get('sname') || '').trim(); // ★ 클리닉 링크가 실어 보낸 학생 이름
+    const urlSid   = (searchParams.get('sid') || '').trim();
+    const urlSname = (searchParams.get('sname') || '').trim();
 
     // ── 신원 결정: URL(sid/sname)이 항상 최우선 ──
-    // 같은 브라우저를 다른 학생이 먼저 썼어도, 이 링크의 sid/sname으로 정확히 덮어써 오염을 막는다.
-    // studentId 우선순위: URL의 sid > localStorage > ''  (성적이 정확한 학생에게 기록됨)
     const effectiveId = urlSid || savedId || '';
     if (effectiveId) setStudentId(effectiveId);
 
-    // studentName 우선순위: URL의 sname > (동일 학생일 때만) localStorage
-    // sid가 있는데 저장된 id와 다르면, 저장된 이름은 '다른 학생' 것이므로 절대 쓰지 않는다.
+    // sid가 있는데 저장된 id와 다르면, 저장된 이름은 '다른 학생' 것이므로 쓰지 않는다.
     let effectiveName = '';
     if (urlSname) {
       effectiveName = urlSname;
@@ -67,10 +69,10 @@ function StudentExamInner() {
       effectiveName = savedName;
     }
 
-    // ★ 신원을 localStorage에 고정 저장한다.
+    // ★ 신원을 localStorage에 고정 저장.
     //   OX → 4지선다로 넘어갈 때 페이지가 완전히 새로고침되므로,
-    //   여기서 저장해두지 않으면 두 번째 시험에서 학생ID를 잃어버려
-    //   성적이 엉뚱한 문서로 새로 쌓이거나 학생 화면에 안 뜬다.
+    //   저장해두지 않으면 두 번째 시험에서 학생ID를 잃어버려 성적이 주인 없는
+    //   기록으로 쌓이고 대시보드에서 걸러진다.
     try {
       if (effectiveId) localStorage.setItem('studentId', effectiveId);
       if (effectiveName) localStorage.setItem('studentName', effectiveName);
@@ -81,7 +83,6 @@ function StudentExamInner() {
       setPhase('exam');
       setCurrent(0);
     }
-    // 이름을 확정할 수 없으면(다른 학생 기기 등) 이름 입력 화면을 유지 → 본인 이름으로 정확히 기록
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [examId]);
 
@@ -95,10 +96,12 @@ function StudentExamInner() {
   async function autoSubmit(finalAnswers: Record<string, string>, questionsForSubmit: Exam['questions']) {
     if (!exam) return;
 
-    // ★ typeFilter가 있을 때: 해당 타입 문제만으로 점수 계산
     const virtualExam: Exam = { ...exam, questions: questionsForSubmit };
     const s = calculateScore(virtualExam, finalAnswers);
     setScore(s);
+
+    // 우선 이번 세션 기준 요약을 즉시 세팅 (네트워크가 느려도 화면이 비지 않도록)
+    setSummary(buildSubmissionSummary(exam.questions ?? [], finalAnswers));
 
     if (!isPreview) {
       setSubmitting(true);
@@ -110,9 +113,11 @@ function StudentExamInner() {
           answers: finalAnswers,
           score: s,
           totalQuestions: questionsForSubmit.length,
-          // ★ 어떤 유형을 풀었는지 전달 → 서버 쪽에서 이전 답안과 병합해 유형별 점수를 계산
           subType: typeFilter,
         });
+        // 저장된 이전 답안까지 합친 정확한 요약으로 교체 (OX를 먼저 푼 기록 반영)
+        const merged = await getSubmissionSummary(exam.id!, studentId, finalAnswers);
+        if (merged) setSummary(merged);
       } catch {
         toast.error('제출 중 오류가 발생했습니다');
       } finally {
@@ -144,8 +149,8 @@ function StudentExamInner() {
       setCurrent(c => c + 1);
     } else {
       let correct = 0;
-      retryQuestions.forEach(q => {
-        if (isAnswerCorrect(newAnswers[q.id], q.answer)) correct++;
+      retryQuestions.forEach(item => {
+        if (isAnswerCorrect(newAnswers[item.id], item.answer)) correct++;
       });
       const s = Math.round((correct / retryQuestions.length) * 100);
       setRetryScore(s);
@@ -157,7 +162,7 @@ function StudentExamInner() {
   function startRetry() {
     if (!exam) return;
     const filteredQs = getFilteredQuestions(exam);
-    const wrong = filteredQs.filter(q => !isAnswerCorrect(answers[q.id], q.answer));
+    const wrong = filteredQs.filter(item => !isAnswerCorrect(answers[item.id], item.answer));
     if (wrong.length === 0) return;
     setRetryQuestions(wrong);
     setRetryAnswers({});
@@ -189,7 +194,6 @@ function StudentExamInner() {
     return null;
   }
 
-  // ★ "시험 목록으로": 클리닉에서 들어왔으면 클리닉 첫 페이지로, 아니면 시험 목록으로
   function goToList() {
     let target = safeReturnPath(fromParam);
     if (!target) {
@@ -199,9 +203,7 @@ function StudentExamInner() {
     else router.push('/student-test');
   }
 
-  // ★ 같은 시험의 다른 유형(OX↔4지선다)으로 이동
-  //   sid/sname을 반드시 함께 넘긴다. 예전에는 이 값이 빠져서
-  //   두 번째 시험이 "누구인지 모르는 응시"로 기록돼 성적이 안 들어갔다.
+  // ★ 같은 시험의 다른 유형으로 이동. sid/sname을 반드시 함께 넘긴다.
   function crossTypeHref(t: 'ox' | 'multiple') {
     const params = new URLSearchParams();
     params.set('type', t);
@@ -243,10 +245,8 @@ function StudentExamInner() {
     );
   }
 
-  // ★ 실제로 표시할 문제 목록 (typeFilter 적용)
   const filteredQuestions = getFilteredQuestions(exam);
 
-  // typeFilter로 걸렀는데 문제가 없는 경우
   if (filteredQuestions.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -266,17 +266,32 @@ function StudentExamInner() {
   const q = questions[current];
   const answered = Object.keys(currentAnswers).length;
 
-  // 틀린 문제 (filteredQuestions 기준)
   const wrongQuestions = filteredQuestions.filter(item => !isAnswerCorrect(answers[item.id], item.answer));
 
-  // ★ 시험 제목에 타입 표시
+  // ★ 이 시험지가 가진 유형 / 학생이 끝낸 유형
+  const examHasOx    = summary ? summary.oxTotal > 0    : exam.questions.some(item => item.type === 'ox');
+  const examHasMulti = summary ? summary.multiTotal > 0 : exam.questions.some(item => item.type === 'multiple');
+  const oxDone       = summary ? summary.oxDone    : typeFilter !== 'multiple';
+  const multiDone    = summary ? summary.multiDone : typeFilter !== 'ox';
+  const allDone      = (!examHasOx || oxDone) && (!examHasMulti || multiDone);
+
+  // 아직 안 푼 유형이 있으면 그 유형으로 안내 (없으면 null → 버튼 자체를 숨김)
+  const nextType: 'ox' | 'multiple' | null =
+    (examHasOx && !oxDone) ? 'ox'
+    : (examHasMulti && !multiDone) ? 'multiple'
+    : null;
+
+  const nextTypeLabel = nextType === 'ox' ? 'OX퀴즈' : '4지선다';
+  const nextTypeCount = nextType === 'ox'
+    ? (summary?.oxTotal ?? 0)
+    : (summary?.multiTotal ?? 0);
+
   const examDisplayTitle = typeFilter === 'ox'
     ? `${exam.title} (OX퀴즈)`
     : typeFilter === 'multiple'
     ? `${exam.title} (4지선다)`
     : exam.title;
 
-  // ★ 타입 라벨/색상
   const typeLabel = typeFilter === 'ox'
     ? { text: 'OX퀴즈', bg: 'bg-green-100', color: 'text-green-700' }
     : typeFilter === 'multiple'
@@ -336,7 +351,6 @@ function StudentExamInner() {
             <div className="card p-8 w-full max-w-sm text-center">
               <div className="text-4xl mb-4">👤</div>
               <h2 className="text-xl font-black text-gray-800 mb-1">{examDisplayTitle}</h2>
-              {/* ★ 타입 배지 */}
               {typeLabel && (
                 <span className={`inline-block ${typeLabel.bg} ${typeLabel.color} text-xs font-bold px-2.5 py-1 rounded-full mb-2`}>
                   {typeLabel.text} · {filteredQuestions.length}문항
@@ -361,10 +375,7 @@ function StudentExamInner() {
                   autoFocus
                 />
               </div>
-              <button
-                onClick={startExamWithName}
-                className="btn-primary w-full mt-4"
-              >
+              <button onClick={startExamWithName} className="btn-primary w-full mt-4">
                 시험 시작하기 →
               </button>
             </div>
@@ -374,7 +385,6 @@ function StudentExamInner() {
         {/* 시험 풀기 (일반 + 재풀기 공통) */}
         {((phase === 'exam' && !isRetryMode) || (isRetryMode && retryPhase === 'exam')) && q && (
           <div className="flex-1 flex flex-col">
-            {/* 재풀기 안내 배너 */}
             {isRetryMode && (
               <div className="bg-orange-50 border border-orange-200 rounded-xl px-4 py-2.5 mb-4 flex items-center justify-between">
                 <span className="text-orange-700 text-sm font-semibold">
@@ -408,7 +418,6 @@ function StudentExamInner() {
             <div className="card p-6 mb-6 flex-1">
               <p className="text-lg font-semibold text-gray-800 leading-relaxed mb-6">{q.text}</p>
 
-              {/* OX */}
               {q.type === 'ox' && (
                 <div className="flex gap-4">
                   {(['O', 'X'] as const).map(v => (
@@ -423,7 +432,6 @@ function StudentExamInner() {
                 </div>
               )}
 
-              {/* 4지선다 */}
               {q.type === 'multiple' && q.options && (
                 <div className="space-y-2">
                   {q.options.map((opt, i) => (
@@ -531,23 +539,76 @@ function StudentExamInner() {
         {phase === 'result' && !isRetryMode && (
           <div className="flex-1 flex flex-col items-center justify-center">
             <div className="card p-8 w-full max-w-sm text-center">
-              <CheckCircle size={48} className="text-green-500 mx-auto mb-4" />
-              <h2 className="text-2xl font-black text-gray-800 mb-1">시험 완료!</h2>
-              <p className="text-gray-400 text-sm mb-2">{studentName}의 결과</p>
-              {/* ★ 어떤 유형 시험인지 표시 */}
-              {typeLabel && (
-                <span className={`inline-block ${typeLabel.bg} ${typeLabel.color} text-xs font-bold px-2.5 py-1 rounded-full mb-4`}>
-                  {typeLabel.text} 결과
-                </span>
+
+              {/* ★ 전부 끝냈으면 완료 표시, 아니면 이번 유형만 끝난 상태 표시 */}
+              {allDone ? (
+                <>
+                  <PartyPopper size={48} className="text-green-500 mx-auto mb-4" />
+                  <h2 className="text-2xl font-black text-gray-800 mb-1">시험 끝!</h2>
+                  <p className="text-gray-500 text-sm mb-4">
+                    {studentName} · {examHasOx && examHasMulti ? 'OX와 4지선다를 모두 마쳤어요' : '수고했어요'}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <CheckCircle size={48} className="text-green-500 mx-auto mb-4" />
+                  <h2 className="text-2xl font-black text-gray-800 mb-1">
+                    {typeLabel ? `${typeLabel.text} 완료!` : '시험 완료!'}
+                  </h2>
+                  <p className="text-gray-400 text-sm mb-4">{studentName}의 결과</p>
+                </>
               )}
 
+              {/* 이번에 푼 유형 점수 */}
               <div className="bg-green-50 rounded-2xl p-6 mb-4">
+                {typeLabel && (
+                  <div className={`inline-block ${typeLabel.bg} ${typeLabel.color} text-xs font-bold px-2.5 py-1 rounded-full mb-2`}>
+                    {typeLabel.text}
+                  </div>
+                )}
                 <div className="text-6xl font-black text-green-600 mb-1">{score}</div>
                 <div className="text-green-700 font-medium">점</div>
                 <div className="text-xs text-gray-400 mt-1">
                   {filteredQuestions.length - wrongQuestions.length} / {filteredQuestions.length} 정답
                 </div>
               </div>
+
+              {/* ★ 두 유형을 다 끝냈을 때만: 종합 점수 카드 */}
+              {allDone && examHasOx && examHasMulti && summary && (
+                <div className="rounded-2xl border-2 border-green-200 bg-white p-4 mb-4">
+                  <div className="text-xs font-bold text-gray-400 tracking-wide mb-2">이 시험지 종합 결과</div>
+                  <div className="text-4xl font-black text-green-600 leading-none">
+                    {summary.overallScore}<span className="text-lg ml-1">점</span>
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1 mb-3">
+                    총 {summary.answeredCount}문항 중 {summary.totalCorrect}문항 정답
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="flex-1 rounded-xl bg-green-50 py-2.5">
+                      <div className="text-[11px] font-bold text-green-700 mb-0.5">OX퀴즈</div>
+                      <div className="text-lg font-black text-green-700">
+                        {summary.oxScore ?? 0}<span className="text-xs font-semibold ml-0.5">점</span>
+                      </div>
+                      <div className="text-[10px] text-gray-400">{summary.oxCorrect}/{summary.oxTotal}</div>
+                    </div>
+                    <div className="flex-1 rounded-xl bg-blue-50 py-2.5">
+                      <div className="text-[11px] font-bold text-blue-700 mb-0.5">4지선다</div>
+                      <div className="text-lg font-black text-blue-700">
+                        {summary.multiScore ?? 0}<span className="text-xs font-semibold ml-0.5">점</span>
+                      </div>
+                      <div className="text-[10px] text-gray-400">{summary.multiCorrect}/{summary.multiTotal}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ★ 아직 남은 유형이 있으면 안내 */}
+              {!allDone && nextType && (
+                <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 mb-4 text-sm text-amber-800 font-semibold">
+                  아직 {nextTypeLabel}
+                  {nextTypeCount > 0 ? ` ${nextTypeCount}문항이` : '가'} 남아 있어요
+                </div>
+              )}
 
               {submitting && (
                 <div className="text-xs text-gray-400 mb-3">성적 저장 중...</div>
@@ -604,31 +665,26 @@ function StudentExamInner() {
                     <RefreshCw size={16} /> 틀린 문제 다시 풀기 ({wrongQuestions.length}개)
                   </button>
                 )}
-                {/* ★ 혼합 시험에서 OX만 풀었으면 → 4지선다로 이동, 반대도 동일 */}
-                {typeFilter === 'ox' && (
+
+                {/* ★ 남은 유형이 실제로 있을 때만 이동 버튼을 만든다.
+                    (OX만 있는 시험지에서 4지선다 버튼이 뜨던 문제도 이걸로 사라짐) */}
+                {nextType && (
                   <button
                     onClick={() => {
                       if (submitting) { toast('성적 저장 중이에요. 잠시만요!'); return; }
-                      window.location.href = crossTypeHref('multiple');
+                      window.location.href = crossTypeHref(nextType);
                     }}
                     className="btn-primary w-full"
-                    style={{ background: 'linear-gradient(135deg, #1a3fc4, #3b5bdb)' }}
-                  >
-                    4지선다 문제 풀기 →
-                  </button>
-                )}
-                {typeFilter === 'multiple' && (
-                  <button
-                    onClick={() => {
-                      if (submitting) { toast('성적 저장 중이에요. 잠시만요!'); return; }
-                      window.location.href = crossTypeHref('ox');
+                    style={{
+                      background: nextType === 'ox'
+                        ? 'linear-gradient(135deg, #10b981, #059669)'
+                        : 'linear-gradient(135deg, #1a3fc4, #3b5bdb)'
                     }}
-                    className="btn-primary w-full"
-                    style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}
                   >
-                    OX퀴즈 풀기 →
+                    {nextTypeLabel} 풀러 가기 →
                   </button>
                 )}
+
                 <button onClick={goToList} className="btn-secondary w-full">
                   시험 목록으로
                 </button>
