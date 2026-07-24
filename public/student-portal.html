@@ -8,7 +8,7 @@
   <!-- Open Graph / 카카오톡·소셜 링크 미리보기 -->
 <meta property="og:type" content="website" />
 <meta property="og:title" content="우리 아이 과학 학습 리포트" />
-<meta property="og:description" content="시험 결과와 학습 현황을 한눈에 확인하세요. 인후쌤의 과학 수업 관리 시스템." />
+<meta property="og:description" content="선생님 피드백과 시험 결과를 한눈에 확인하세요. 인후쌤의 과학 수업 관리 시스템." />
 <meta property="og:image" content="https://beta-science.vercel.app/og-parent.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
@@ -18,7 +18,7 @@
 <!-- 트위터/기타 플랫폼 대응 -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="우리 아이 과학 학습 리포트" />
-<meta name="twitter:description" content="시험 결과와 학습 현황을 한눈에 확인하세요." />
+<meta name="twitter:description" content="선생님 피드백과 시험 결과를 한눈에 확인하세요." />
 <meta name="twitter:image" content="https://beta-science.vercel.app/og-parent.png" />
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -126,6 +126,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .stat-box.blue .stat-num{color:var(--blue)}
 .stat-box.green .stat-num{color:var(--green)}
 .stat-lbl{font-size:12px;color:var(--mt);margin-top:4px;font-weight:500}
+.stat-num.sm{font-size:18px}
 
 .sec-label{font-size:12px;font-weight:600;color:var(--mt);letter-spacing:.06em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .sec-label::after{content:'';flex:1;height:1px;background:var(--bd)}
@@ -134,36 +135,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .info-card p{text-align:center;font-size:14px;color:var(--mt);line-height:1.9;font-weight:400}
 .info-card strong{color:var(--tx);font-weight:600}
 
-/* ══ 수업 기록 카드 ══ */
-.cc-item{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
-.cc-head{padding:18px;cursor:default;display:flex;align-items:flex-start;gap:14px}
-.cc-head[onclick]{cursor:pointer}
-.cc-head[onclick]:hover{background:#fdf2f8}
-.cc-date{min-width:54px;text-align:center;background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:10px;padding:8px 4px;flex-shrink:0}
-.cc-date-m{font-size:11px;color:var(--pink);font-weight:600}
-.cc-date-d{font-size:20px;font-weight:700;color:var(--pink-dk);line-height:1.1}
-.cc-main{flex:1;min-width:0}
-.cc-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
-.cc-subj{font-size:16px;font-weight:700;color:#3f4854}
-.cc-date-lbl{font-size:12px;font-weight:600;color:var(--mt);letter-spacing:.02em;margin-right:10px}
-.cc-date-val{font-size:16px;font-weight:700;color:var(--pink-dk)}
-.cc-arrow{color:var(--mt);font-size:14px;flex-shrink:0;transition:transform .25s;margin-top:1px}
-.cc-toggle-wrap{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:999px;padding:5px 11px}
-.cc-head[onclick]:hover .cc-toggle-wrap{background:#fce7f3}
-.cc-toggle{font-size:12.5px;font-weight:700;color:var(--pink-dk);white-space:nowrap}
-.cc-toggle::after{content:'수업 내용 보기'}
-.cc-item.open .cc-toggle::after{content:'접기'}
-.cc-item.open .cc-arrow{transform:rotate(180deg)}
-.cc-fields{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.cc-field{display:flex;align-items:baseline;gap:12px;min-width:0;padding:13px 16px;background:#fbf7fa;border:1px solid #f3e8f0;border-radius:10px}
-.cc-f-lbl{flex-shrink:0;font-size:12px;font-weight:600;color:var(--mt);letter-spacing:.02em}
-.cc-f-val{flex:1;min-width:0;text-align:right;font-size:14.5px;font-weight:700;color:#5b6573;word-break:keep-all;line-height:1.4}
-.cc-v-green{color:#059669}.cc-v-red{color:#dc2626}.cc-v-blue{color:#2563eb}.cc-v-yellow{color:#b45309}.cc-v-pink{color:var(--pink-dk)}.cc-v-gray{color:var(--mt);font-weight:600}
-.cc-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
-.cc-item.open .cc-body{max-height:700px}
-.cc-body-inner{padding:4px 18px 18px;border-top:1px solid #fce7f3}
-.cc-body-lbl{font-size:11px;font-weight:600;color:#a21caf;letter-spacing:.05em;margin:12px 0 5px}
-.cc-body-txt{font-size:14px;color:var(--tx);line-height:1.9;white-space:pre-wrap;word-break:break-word}
+/* ══ 선생님 피드백 카드 ══ */
+.fb-card{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+.fb-card-top{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--pink-lt);border-bottom:1px solid #fbcfe8}
+.fb-badge{display:inline-flex;align-items:center;gap:5px;background:var(--wh);border:1px solid #fbcfe8;border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:700;color:var(--pink-dk);white-space:nowrap}
+.fb-latest{font-size:11px;font-weight:700;color:#fff;background:var(--pink);border-radius:999px;padding:3px 9px;letter-spacing:.02em}
+.fb-card-body{padding:18px;font-size:14.5px;line-height:2;color:var(--tx);white-space:pre-wrap;word-break:break-word}
+
+.empty-box{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);text-align:center;padding:56px 24px;color:var(--mt);font-size:14px;line-height:2}
+.empty-icon{font-size:48px;margin-bottom:14px}
 
 /* ══ 점수 카드 (OX / 4지선다 / 마스터 공통) ══ */
 .test-item{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:10px}
@@ -172,10 +152,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .sc-high{background:#d1fae5;color:#065f46}.sc-mid{background:#fef9c3;color:#854d0e}.sc-low{background:#fee2e2;color:#991b1b}.sc-none{background:#f5f5f7;color:#6e6e73}
 .sc-pct{font-size:20px;font-weight:800;line-height:1.05}
 .test-info{flex:1;min-width:0}
-.test-title{font-size:15px;font-weight:700;margin-bottom:6px;word-break:keep-all;line-height:1.4}
-.test-meta{font-size:12px;color:var(--mt);display:flex;gap:10px;flex-wrap:wrap}
-.sc-detail{font-size:12.5px;color:var(--mt);margin-top:8px;font-weight:500}
-.sc-detail b{color:var(--tx);font-weight:700}
 .sc-rows{display:flex;flex-direction:column;gap:8px}
 .sc-row{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;line-height:1.45}
 .sc-row-lbl{flex-shrink:0;width:62px;font-size:12px;font-weight:600;color:#a8b1bd;padding-top:1px}
@@ -188,9 +164,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .sc-correct{color:#0d9488;font-weight:800}
 .sc-total{color:#1d4ed8;font-weight:800}
 
-.empty-box{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);text-align:center;padding:56px 24px;color:var(--mt);font-size:14px;line-height:2}
-.empty-icon{font-size:48px;margin-bottom:14px}
-
 .desktop-only{display:block}
 .mobile-only{display:none}
 
@@ -201,15 +174,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   body{padding-bottom:calc(64px + var(--safe-bot))}
   .info-card p{white-space:normal}
   .stat-num{font-size:20px}
+  .stat-num.sm{font-size:15px}
   .stat-lbl{font-size:11px}
   .section{padding-top:2px}
-  .cc-fields{grid-template-columns:1fr 1fr;gap:10px}
-  .cc-head{padding:14px;gap:11px}
-  .cc-field{padding:9px 10px}
-  .cc-title-row{flex-wrap:wrap;gap:8px}
-  .cc-subj{font-size:15px}
-  .cc-toggle-wrap{padding:4px 10px}
-  .cc-toggle{font-size:12px}
+  .fb-card-top{padding:12px 14px;gap:8px}
+  .fb-card-body{padding:15px 16px;font-size:14px;line-height:1.95}
   .test-item{padding:15px 16px}
   .test-head{gap:12px}
   .score-circle{width:58px;height:58px}
@@ -226,6 +195,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .sc-row-title .sc-row-val{font-size:15px}
   .score-circle{width:52px;height:52px}
   .sc-pct{font-size:15px}
+  .fb-card-top{flex-wrap:wrap}
 }
 @media(min-width:769px){
   .mobile-only{display:none!important}
@@ -278,7 +248,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
       </div>
     </div>
     <nav class="desktop-tabs">
-      <button class="d-tab active" onclick="switchTab(0)">📖 수업 기록</button>
+      <button class="d-tab active" onclick="switchTab(0)">💬 선생님 피드백</button>
       <button class="d-tab" onclick="switchTab(1)">⭕ OX 퀴즈</button>
       <button class="d-tab" onclick="switchTab(2)">📝 4지선다</button>
       <button class="d-tab" onclick="switchTab(3)">🎯 마스터테스트</button>
@@ -314,7 +284,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
     </div>
     <div class="mobile-body" id="mobileContent"></div>
     <nav class="mobile-tabs">
-      <button class="m-tab active" onclick="switchTab(0)"><span class="m-tab-icon">📖</span><span class="m-tab-lbl">수업기록</span></button>
+      <button class="m-tab active" onclick="switchTab(0)"><span class="m-tab-icon">💬</span><span class="m-tab-lbl">피드백</span></button>
       <button class="m-tab" onclick="switchTab(1)"><span class="m-tab-icon">⭕</span><span class="m-tab-lbl">OX퀴즈</span></button>
       <button class="m-tab" onclick="switchTab(2)"><span class="m-tab-icon">📝</span><span class="m-tab-lbl">4지선다</span></button>
       <button class="m-tab" onclick="switchTab(3)"><span class="m-tab-icon">🎯</span><span class="m-tab-lbl">마스터</span></button>
@@ -325,7 +295,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,query,where,getDocs}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,collection,query,where,getDocs,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
 const app=initializeApp(fc);const db=getFirestore(app);
@@ -338,11 +308,11 @@ function buildSections(){
   <div class="section active" id="sec0">
     <br>
     <div class="stat-row" style="grid-template-columns:repeat(2,1fr)">
-      <div class="stat-box"><div class="stat-num" id="cs-total">—</div><div class="stat-lbl">전체 수업</div></div>
-      <div class="stat-box"><div class="stat-num" id="cs-month">—</div><div class="stat-lbl">이번달</div></div>
+      <div class="stat-box"><div class="stat-num" id="fb-count">—</div><div class="stat-lbl">전체 피드백</div></div>
+      <div class="stat-box"><div class="stat-num sm" id="fb-recent">—</div><div class="stat-lbl">최근 작성일</div></div>
     </div>
-    <div class="sec-label">수업 기록</div>
-    <div id="classCardList"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
+    <div class="sec-label">선생님 피드백</div>
+    <div id="feedbackList"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
   </div>
   <div class="section" id="sec1">
     <br>
@@ -391,59 +361,77 @@ async function loadPortal(sid){
     document.getElementById('mobileContent').innerHTML=html;
     document.getElementById('loadingScreen').style.display='none';
     document.getElementById('portalApp').style.display='block';
-    loadClassCards(student.fireId,sid);
+    loadFeedback(student.fireId);
     loadGrades(sid,student.fireId);
   }catch(err){showError();}
 }
 
 /* ════════════════════════════════════════════════
-   수업 기록 (classCards)
+   선생님 피드백 (feedbacks/{학생문서ID})
+   저장 구조: { entries:[{id,text,date,createdAt}], text, updatedAt }
+   text 만 있는 옛 구조도 항목 1개로 읽어준다.
 ════════════════════════════════════════════════ */
-async function loadClassCards(fireId,sid){
-  try{
-    let cards=[];const ex=new Set();
-    async function tryQ(field,val){
-      try{const s=await getDocs(query(collection(db,'classCards'),where(field,'==',val)));s.forEach(d=>{if(!ex.has(d.id)){ex.add(d.id);cards.push({id:d.id,...d.data()});}});}catch(e){}
-    }
-    await tryQ('studentId',fireId);
-    if(sid!==fireId)await tryQ('studentId',sid);
-    cards.sort((a,b)=>(b.classDate||'').localeCompare(a.classDate||''));
-    const now=new Date();const tm=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-    const mc=cards.filter(c=>(c.classDate||'').startsWith(tm)).length;
-    document.querySelectorAll('#cs-total').forEach(el=>el.textContent=cards.length+'건');
-    document.querySelectorAll('#cs-month').forEach(el=>el.textContent=mc+'건');
-    const html=!cards.length?emptyBox('📭','아직 수업 기록이 없습니다.'):cards.map(c=>renderCC(c)).join('');
-    document.querySelectorAll('#classCardList').forEach(el=>el.innerHTML=html);
-  }catch(err){document.querySelectorAll('#classCardList').forEach(el=>el.innerHTML='<div class="empty-box">수업 기록을 불러오지 못했습니다.</div>');}
+function fbMillis(v){
+  if(v==null)return 0;
+  if(typeof v==='number')return v;
+  if(typeof v==='object'){
+    if(typeof v.toMillis==='function'){try{return v.toMillis();}catch(e){return 0;}}
+    if(v.seconds!=null)return v.seconds*1000;
+    if(v instanceof Date)return v.getTime();
+    return 0;
+  }
+  const t=Date.parse(v);return isNaN(t)?0:t;
 }
-
-function hwColor(v){if(v==='높음')return'cc-v-green';if(v==='낮음')return'cc-v-red';return'cc-v-yellow';}
-function attColor(v){if(v==='적극적')return'cc-v-blue';if(v==='산만')return'cc-v-pink';return'cc-v-yellow';}
-
-function renderCC(c){
-  const dateText=fullDate(c.classDate);
-  const hasBody=!!(c.content||c.unit);
-  const subj=e(c.subject||'수업');
-  const teacher=c.teacher?e(c.teacher):'—';
-  const teacherCls=c.teacher?'':'cc-v-gray';
-  const hwTxt=(c.homework&&c.homework!=='-')?e(c.homework):'—';
-  const hwCls=(c.homework&&c.homework!=='-')?hwColor(c.homework):'cc-v-gray';
-  const attTxt=c.attitude?e(c.attitude):'—';
-  const attCls=c.attitude?attColor(c.attitude):'cc-v-gray';
-  const fields=`
-    <div class="cc-field"><span class="cc-f-lbl">수강 과목</span><span class="cc-f-val">${subj}</span></div>
-    <div class="cc-field"><span class="cc-f-lbl">담당 선생님</span><span class="cc-f-val ${teacherCls}">${teacher}</span></div>
-    <div class="cc-field"><span class="cc-f-lbl">과제 수행</span><span class="cc-f-val ${hwCls}">${hwTxt}</span></div>
-    <div class="cc-field"><span class="cc-f-lbl">수업 태도</span><span class="cc-f-val ${attCls}">${attTxt}</span></div>`;
-  return`<div class="cc-item"${hasBody?` id="cci-${c.id}"`:''}>
-    <div class="cc-head"${hasBody?` onclick="toggleCC('${c.id}')"`:''}>
-      <div class="cc-main">
-        <div class="cc-title-row"><span class="cc-subj"><span class="cc-date-lbl">수업 날짜</span><span class="cc-date-val">${dateText||'—'}</span></span>${hasBody?'<span class="cc-toggle-wrap"><span class="cc-toggle"></span><span class="cc-arrow">▾</span></span>':''}</div>
-        <div class="cc-fields">${fields}</div>
-      </div>
-    </div>
-    ${hasBody?`<div class="cc-body"><div class="cc-body-inner">${c.unit?`<div class="cc-body-lbl">학습 단원</div><div class="cc-body-txt">${e(c.unit)}</div>`:''}${c.content?`<div class="cc-body-lbl">수업 내용</div><div class="cc-body-txt">${e(c.content)}</div>`:''}</div></div>`:''}
-  </div>`;
+function fbDateFromMs(ms){
+  if(!ms)return'';
+  const d=new Date(ms);if(isNaN(d.getTime()))return'';
+  return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function parseFbEntries(data){
+  if(!data)return[];
+  let list=[];
+  if(Array.isArray(data.entries)){
+    list=data.entries.filter(x=>x&&String(x.text||'').trim()).map((x,i)=>({
+      id:String(x.id||('e'+i)),
+      text:String(x.text||''),
+      date:String(x.date||fbDateFromMs(fbMillis(x.createdAt))),
+      createdAt:fbMillis(x.createdAt)
+    }));
+  }else if(String(data.text||'').trim()){
+    const ms=fbMillis(data.updatedAt);
+    list=[{id:'legacy-1',text:String(data.text),date:fbDateFromMs(ms),createdAt:ms}];
+  }
+  return list.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||(b.createdAt-a.createdAt));
+}
+function fbDateLabel(ds){
+  if(!ds)return'작성일 미상';
+  const p=String(ds).split('-');
+  if(p.length<3)return String(ds);
+  const y=parseInt(p[0],10),m=parseInt(p[1],10),d=parseInt(p[2],10);
+  if(isNaN(y)||isNaN(m)||isNaN(d))return String(ds);
+  return`${y}년 ${m}월 ${d}일`;
+}
+async function loadFeedback(fireId){
+  try{
+    const snap=await getDoc(doc(db,'feedbacks',fireId));
+    const list=parseFbEntries(snap.exists()?snap.data():null);
+    document.querySelectorAll('#fb-count').forEach(el=>el.textContent=list.length+'건');
+    document.querySelectorAll('#fb-recent').forEach(el=>el.textContent=list.length?fbDateLabel(list[0].date):'—');
+    const html=!list.length
+      ?emptyBox('💬','아직 등록된 피드백이 없습니다.<br>선생님이 작성하면 이곳에 표시됩니다.')
+      :list.map((x,i)=>`<div class="fb-card">
+          <div class="fb-card-top">
+            <span class="fb-badge">🗓 ${e(fbDateLabel(x.date))}</span>
+            ${i===0?'<span class="fb-latest">최신</span>':''}
+          </div>
+          <div class="fb-card-body">${e(x.text)}</div>
+        </div>`).join('');
+    document.querySelectorAll('#feedbackList').forEach(el=>el.innerHTML=html);
+  }catch(err){
+    document.querySelectorAll('#fb-count').forEach(el=>el.textContent='—');
+    document.querySelectorAll('#fb-recent').forEach(el=>el.textContent='—');
+    document.querySelectorAll('#feedbackList').forEach(el=>el.innerHTML='<div class="empty-box">피드백을 불러오지 못했습니다.</div>');
+  }
 }
 
 /* ════════════════════════════════════════════════
@@ -581,8 +569,6 @@ function renderScoreCard(r,sec){
 }
 
 function emptyBox(icon,msg){return`<div class="empty-box"><div class="empty-icon">${icon}</div>${msg}</div>`;}
-function parseDate(ds){if(!ds)return['—','—'];const p=ds.split('-');return p.length>=3?[p[1]+'월',parseInt(p[2])+'일']:['—','—'];}
-function fullDate(ds){if(!ds)return'';const p=ds.split('-');if(p.length<3)return'';const mo=parseInt(p[1],10),dy=parseInt(p[2],10);if(isNaN(mo)||isNaN(dy))return'';return`${mo}월 ${dy}일`;}
 function showError(){document.getElementById('loadingScreen').style.display='none';document.getElementById('errorScreen').style.display='flex';}
 function e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
@@ -591,9 +577,6 @@ window.switchTab=function(idx){
   document.querySelectorAll('.d-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
   document.querySelectorAll('.m-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
   window.scrollTo({top:0,behavior:'smooth'});
-};
-window.toggleCC=function(id){
-  document.querySelectorAll(`#cci-${id}`).forEach(el=>el.classList.toggle('open'));
 };
 </script>
 </body>
