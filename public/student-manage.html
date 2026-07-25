@@ -846,6 +846,24 @@ function regKey(s) {
   return r !== null ? r : -Infinity;   // 값 없으면 맨 뒤
 }
 
+/* ════════ 학부모 공개용 요약 (students 문서) ════════
+   포털은 classCards 를 읽지 않는다. 수업카드는 선생님 전용이고,
+   학부모에게 보일 값만 학생 문서에 요약해 둔다.
+   recentAttendance: [{d:'2026-07-24', s:'출석'}] 최근 12건
+   lastHomework:     {date, text} */
+const REC_MAX = 12;
+function mergeRecent(cur, date, st) {
+  const list = (Array.isArray(cur) ? cur : [])
+    .filter(x => x && parseYMD(x.d))
+    .map(x => ({ d: String(x.d), s: String(x.s || '출석') }));
+  const i = list.findIndex(x => x.d === date);
+  if (st === null) { if (i >= 0) list.splice(i, 1); }        // 기록 삭제(휴강 전환 등)
+  else if (i >= 0) list[i].s = st;
+  else list.push({ d: date, s: st });
+  list.sort((a, b) => a.d.localeCompare(b.d));
+  return list.slice(-REC_MAX);
+}
+
 /* ════════ 시간표 기반 반(班) — students.html / teacher-board.html 과 동일 규칙 ════════ */
 const DAY_FULL  = { '월':'월요일','화':'화요일','수':'수요일','목':'목요일','금':'금요일','토':'토요일','일':'일요일' };
 const DAY_ORDER = ['월','화','수','목','금','토','일'];
@@ -1029,29 +1047,48 @@ window.recalcAll = async function() {
       const sid = String(c.studentId == null ? '' : c.studentId);
       if (!sid) return;
       const st = c.status || '출석';           // 과거 카드는 status 없음 → 출석 간주
-      const o = agg.get(sid) || { ses:0, abs:0, first:'', last:'' };
+      const o = agg.get(sid) || { ses:0, abs:0, first:'', last:'', rec:[], hw:null };
+      const cd = String(c.classDate || '');
       if (st === '결석') { o.abs++; }
       else {
         o.ses++;
-        const cd = String(c.classDate || '');
         if (parseYMD(cd)) {
           if (!o.first || cd < o.first) o.first = cd;
           if (cd > o.last) o.last = cd;
+          const hwTx = String(c.homeworkContent || '').trim();
+          if (hwTx && (!o.hw || cd >= o.hw.date)) o.hw = { date: cd, text: hwTx };
         }
       }
+      if (parseYMD(cd)) o.rec.push({ d: cd, s: st });
       agg.set(sid, o);
     });
     let batch = writeBatch(db), pend = 0, done = 0;
     for (const s of students) {
       const keys = new Set([String(s.id == null ? '' : s.id), String(s.fireId)].filter(k => k && k !== ''));
-      let ses = 0, abs = 0, first = '', last = '';
+      let ses = 0, abs = 0, first = '', last = '', rec = [], hw = null;
       keys.forEach(k => {
         const a = agg.get(k); if (!a) return;
         ses += a.ses; abs += a.abs;
         if (a.first && (!first || a.first < first)) first = a.first;
         if (a.last && a.last > last) last = a.last;
+        rec = rec.concat(a.rec);
+        if (a.hw && (!hw || a.hw.date >= hw.date)) hw = a.hw;
       });
-      const patch = { sessionCount: ses, absentCount: abs, lastClassDate: last };
+      // 휴강도 흐름에 포함 (그 학생 반 · 첫 수업일 이후 · 오늘까지)
+      const myIds = new Set(studentClassIds(s));
+      const today = todayStr();
+      const base = first || (parseYMD(s.startDate) ? String(s.startDate) : '');
+      if (myIds.size) offs.forEach(o => {
+        const od = String(o.date || '');
+        if (!parseYMD(od) || od > today) return;
+        if (base && od < base) return;
+        if (myIds.has(String(o.classId))) rec.push({ d: od, s: '휴강' });
+      });
+      rec.sort((a, b) => a.d.localeCompare(b.d));
+      const seenD = new Set(); const recU = [];
+      for (let i = rec.length - 1; i >= 0; i--) { if (seenD.has(rec[i].d)) continue; seenD.add(rec[i].d); recU.unshift(rec[i]); }
+      const patch = { sessionCount: ses, absentCount: abs, lastClassDate: last, recentAttendance: recU.slice(-REC_MAX) };
+      if (hw) patch.lastHomework = hw;
       if (!parseYMD(s.startDate) && parseYMD(first)) patch.startDate = first;   // 첫 수업일 자동 보정
       batch.set(doc(db,'students', s.fireId), patch, { merge:true });
       pend++; done++;
@@ -1249,8 +1286,8 @@ window.saveBatch = async function() {
       const stu = students.find(x => x.fireId === r.fireId);
       const ref = doc(db, 'classCards', cardDocId(classId, date, r.sid));
       const newSt = isOff ? '' : (r.status || '');
-      if (!newSt && !(isOff && r.hadCard)) return;   // 미선택 + 기존 없음 → 건드리지 않음
-      if (isOff) { batch.delete(ref); nDel++; }
+      if (!newSt && !isOff) return;                  // 미선택 → 건드리지 않음
+      if (isOff) { if (r.hadCard) { batch.delete(ref); nDel++; } }
       else {
         const lesson = isLessonStatus(newSt);
         batch.set(ref, {
@@ -1286,6 +1323,9 @@ window.saveBatch = async function() {
         if (!parseYMD(stu.lastClassDate) || date > String(stu.lastClassDate)) patch.lastClassDate = date;
         if (!parseYMD(stu.startDate) || date < String(stu.startDate)) patch.startDate = date;
       }
+      // 학부모 공개용 요약 — 휴강은 '휴강'으로, 미선택 해제는 제거
+      patch.recentAttendance = mergeRecent(stu.recentAttendance, date, isOff ? '휴강' : (newSt || null));
+      if (newL && homeworkContent) patch.lastHomework = { date, text: homeworkContent };
       if (Object.keys(patch).length) batch.set(doc(db, 'students', r.fireId), patch, { merge: true });
     });
     // 휴강 문서 동기화
@@ -1619,7 +1659,7 @@ window.saveStudent = async function() {
         id, name, grade, subject, phone, studentPhone, teacher, startDate,
         classIds: cf.classIds, classNames: cf.classNames, classes: cf.classes,
         photoUrl: '',
-        sessionCount: 0, absentCount: 0, lastClassDate: '',
+        sessionCount: 0, absentCount: 0, lastClassDate: '', recentAttendance: [],
         regDate: `${t.getFullYear()}. ${t.getMonth()+1}. ${t.getDate()}.`,
         regTs: serverTimestamp()
       });
@@ -1749,6 +1789,9 @@ window.saveClassCard = async function() {
             patch.absentCount = increment(1);
           }
         }
+        // 학부모 공개용 요약
+        patch.recentAttendance = mergeRecent(ccStudent.recentAttendance, classDate, status);
+        if (lesson && homeworkContent) patch.lastHomework = { date: classDate, text: homeworkContent };
         if (Object.keys(patch).length) await setDoc(doc(db,'students',ccStudent.fireId), patch, { merge:true });
       } catch (err) { console.warn('학생 문서 보정 실패:', err); }
     }
