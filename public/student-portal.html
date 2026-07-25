@@ -104,13 +104,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 }
 .m-tab{
   flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:2px;padding:8px 2px 7px;
+  justify-content:center;gap:2px;padding:8px 1px 7px;
   font-family:inherit;color:var(--mt);cursor:pointer;
   background:none;border:none;transition:color .15s;min-height:54px;
 }
 .m-tab.active{color:var(--pink)}
-.m-tab-icon{font-size:20px;line-height:1}
-.m-tab-lbl{font-size:9.5px;font-weight:600;white-space:nowrap}
+.m-tab-icon{font-size:19px;line-height:1}
+.m-tab-lbl{font-size:9px;font-weight:600;white-space:nowrap}
 .mobile-body{padding:16px 16px 8px;max-width:600px;margin:0 auto}
 
 /* ══ 공통 컴포넌트 ══ */
@@ -144,6 +144,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 
 .empty-box{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);text-align:center;padding:56px 24px;color:var(--mt);font-size:14px;line-height:2}
 .empty-icon{font-size:48px;margin-bottom:14px}
+
+/* ══ 출결 · 회차 ══ */
+.at-flow{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px;margin-bottom:22px}
+.at-line{display:flex;flex-wrap:wrap;gap:6px}
+.at-dot{min-width:40px;padding:6px 4px;border-radius:10px;text-align:center;font-size:11.5px;font-weight:800;line-height:1.3;border:1.5px solid}
+.at-dot .at-d{display:block;font-size:9px;font-weight:700;opacity:.7;margin-top:1px}
+.at-wait{font-size:13px;color:var(--mt)}
+.at-st-출석{background:var(--green-lt);border-color:#6ee7b7;color:#047857}
+.at-st-지각{background:#fffbeb;border-color:#fde68a;color:#b45309}
+.at-st-결석{background:#fef2f2;border-color:#fecaca;color:#b91c1c}
+.at-st-보강{background:var(--blue-lt);border-color:#bfdbfe;color:#1d4ed8}
+.at-st-휴강{background:#f3f4f6;border-color:#e5e7eb;color:#6b7280}
+.at-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:13px;font-size:11px;color:var(--mt)}
+.at-lg{display:flex;align-items:center;gap:5px}
+.at-lg i{width:11px;height:11px;border-radius:4px;display:inline-block;border:1.5px solid}
+.at-card{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px;margin-bottom:10px}
+.at-top{display:flex;align-items:center;gap:9px;margin-bottom:9px;flex-wrap:wrap}
+.at-date{font-size:13.5px;font-weight:700;color:var(--tx)}
+.at-badge{font-size:11.5px;font-weight:800;padding:3px 11px;border-radius:999px;border:1.5px solid;white-space:nowrap}
+.at-unit{font-size:12px;font-weight:700;color:var(--pink-dk);background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:7px;padding:3px 9px;word-break:keep-all}
+.at-body{font-size:13.5px;line-height:1.95;color:#5b6573;white-space:pre-wrap;word-break:break-word}
+.at-body.mute{color:var(--mt)}
+.at-hw{margin-top:9px;padding-top:9px;border-top:1px dashed var(--bd);font-size:12.5px;line-height:1.85;color:#5b6573;white-space:pre-wrap;word-break:break-word}
+.at-hw b{color:var(--pink-dk);font-weight:700}
 
 /* ══ 점수 카드 (OX / 4지선다 / 마스터 공통) ══ */
 .test-item{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:10px}
@@ -179,6 +203,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .section{padding-top:2px}
   .fb-card-top{padding:12px 14px;gap:8px}
   .fb-card-body{padding:15px 16px;font-size:14px;line-height:1.95}
+  .at-flow{padding:14px 15px}
+  .at-card{padding:14px 15px}
   .test-item{padding:15px 16px}
   .test-head{gap:12px}
   .score-circle{width:58px;height:58px}
@@ -199,6 +225,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .score-circle{width:52px;height:52px}
   .sc-pct{font-size:15px}
   .fb-card-top{flex-wrap:wrap}
+  .m-tab-lbl{font-size:8.5px}
+  .m-tab-icon{font-size:18px}
+  .at-dot{min-width:36px;font-size:11px}
 }
 @media(min-width:769px){
   .mobile-only{display:none!important}
@@ -207,6 +236,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 @media(min-width:769px) and (max-width:1024px){
   .desktop-body{padding:24px 28px 48px}
   .desktop-header{padding:24px 28px}
+  .d-tab{font-size:13px;padding:16px 4px;gap:5px}
 }
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
@@ -252,9 +282,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
     </div>
     <nav class="desktop-tabs">
       <button class="d-tab active" onclick="switchTab(0)">💬 선생님 피드백</button>
-      <button class="d-tab" onclick="switchTab(1)">⭕ OX 퀴즈</button>
-      <button class="d-tab" onclick="switchTab(2)">📝 4지선다</button>
-      <button class="d-tab" onclick="switchTab(3)">🎯 마스터테스트</button>
+      <button class="d-tab" onclick="switchTab(1)">🗓 출결 · 회차</button>
+      <button class="d-tab" onclick="switchTab(2)">⭕ OX 퀴즈</button>
+      <button class="d-tab" onclick="switchTab(3)">📝 4지선다</button>
+      <button class="d-tab" onclick="switchTab(4)">🎯 마스터테스트</button>
     </nav>
     <div class="desktop-body" id="desktopContent"></div>
   </div>
@@ -288,9 +319,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
     <div class="mobile-body" id="mobileContent"></div>
     <nav class="mobile-tabs">
       <button class="m-tab active" onclick="switchTab(0)"><span class="m-tab-icon">💬</span><span class="m-tab-lbl">피드백</span></button>
-      <button class="m-tab" onclick="switchTab(1)"><span class="m-tab-icon">⭕</span><span class="m-tab-lbl">OX퀴즈</span></button>
-      <button class="m-tab" onclick="switchTab(2)"><span class="m-tab-icon">📝</span><span class="m-tab-lbl">4지선다</span></button>
-      <button class="m-tab" onclick="switchTab(3)"><span class="m-tab-icon">🎯</span><span class="m-tab-lbl">마스터</span></button>
+      <button class="m-tab" onclick="switchTab(1)"><span class="m-tab-icon">🗓</span><span class="m-tab-lbl">출결</span></button>
+      <button class="m-tab" onclick="switchTab(2)"><span class="m-tab-icon">⭕</span><span class="m-tab-lbl">OX퀴즈</span></button>
+      <button class="m-tab" onclick="switchTab(3)"><span class="m-tab-icon">📝</span><span class="m-tab-lbl">4지선다</span></button>
+      <button class="m-tab" onclick="switchTab(4)"><span class="m-tab-icon">🎯</span><span class="m-tab-lbl">마스터</span></button>
     </nav>
   </div>
 
@@ -320,6 +352,27 @@ function buildSections(){
   <div class="section" id="sec1">
     <br>
     <div class="stat-row">
+      <div class="stat-box green"><div class="stat-lbl">수업 회차</div><div class="stat-num" id="at-ses">—</div></div>
+      <div class="stat-box"><div class="stat-lbl">결석</div><div class="stat-num" id="at-abs">—</div></div>
+      <div class="stat-box blue"><div class="stat-lbl">최근 수업</div><div class="stat-num" id="at-last">—</div></div>
+    </div>
+    <div class="sec-label">최근 출결 흐름</div>
+    <div class="at-flow">
+      <div class="at-line" id="at-line"><span class="at-wait">불러오는 중...</span></div>
+      <div class="at-legend">
+        <span class="at-lg"><i style="background:#ecfdf5;border-color:#6ee7b7"></i>출석</span>
+        <span class="at-lg"><i style="background:#fffbeb;border-color:#fde68a"></i>지각</span>
+        <span class="at-lg"><i style="background:#fef2f2;border-color:#fecaca"></i>결석</span>
+        <span class="at-lg"><i style="background:#eff6ff;border-color:#bfdbfe"></i>보강</span>
+        <span class="at-lg"><i style="background:#f3f4f6;border-color:#e5e7eb"></i>휴강</span>
+      </div>
+    </div>
+    <div class="sec-label">수업 기록</div>
+    <div id="at-list"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
+  </div>
+  <div class="section" id="sec2">
+    <br>
+    <div class="stat-row">
       <div class="stat-box"><div class="stat-lbl">응시 횟수</div><div class="stat-num" id="ox-total">—</div></div>
       <div class="stat-box"><div class="stat-lbl">평균 점수</div><div class="stat-num" id="ox-avg">—</div></div>
       <div class="stat-box"><div class="stat-lbl">최고 점수</div><div class="stat-num" id="ox-best">—</div></div>
@@ -327,7 +380,7 @@ function buildSections(){
     <div class="sec-label">OX 퀴즈 결과</div>
     <div id="oxResultList"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
   </div>
-  <div class="section" id="sec2">
+  <div class="section" id="sec3">
     <br>
     <div class="stat-row">
       <div class="stat-box blue"><div class="stat-lbl">응시 횟수</div><div class="stat-num" id="ts-total">—</div></div>
@@ -337,7 +390,7 @@ function buildSections(){
     <div class="sec-label">4지선다 결과</div>
     <div id="testResultList"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
   </div>
-  <div class="section" id="sec3">
+  <div class="section" id="sec4">
     <br>
     <div class="stat-row">
       <div class="stat-box green"><div class="stat-lbl">응시 횟수</div><div class="stat-num" id="ms-total">—</div></div>
@@ -365,6 +418,7 @@ async function loadPortal(sid){
     document.getElementById('loadingScreen').style.display='none';
     document.getElementById('portalApp').style.display='block';
     loadFeedback(student.fireId);
+    loadAttendance(sid,student.fireId,student);
     loadGrades(sid,student.fireId);
   }catch(err){showError();}
 }
@@ -434,6 +488,128 @@ async function loadFeedback(fireId){
     document.querySelectorAll('#fb-count').forEach(el=>el.textContent='—');
     document.querySelectorAll('#fb-recent').forEach(el=>el.textContent='—');
     document.querySelectorAll('#feedbackList').forEach(el=>el.innerHTML='<div class="empty-box">피드백을 불러오지 못했습니다.</div>');
+  }
+}
+
+/* ════════════════════════════════════════════════
+   출결 · 수업 회차 (classCards)
+   · status 없는 옛 카드는 '출석'으로 간주
+   · 출석 · 지각 · 보강 = 수업 1회 / 결석은 별도 집계
+   · 반 단위 휴강(classOff)은 흐름에만 회색으로 표시
+════════════════════════════════════════════════ */
+const AT_LESSON=['출석','지각','보강'];
+function atStatus(c){const s=String(c&&c.status!=null?c.status:'').trim();return s?s:'출석';}
+function atIsLesson(st){return AT_LESSON.indexOf(st)>=0;}
+function atYmd(v){
+  const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v==null?'':v).trim());
+  if(!m)return null;
+  const y=+m[1],mo=+m[2],d=+m[3];
+  if(mo<1||mo>12||d<1||d>31)return null;
+  const dt=new Date(y,mo-1,d);
+  if(dt.getFullYear()!==y||dt.getMonth()!==mo-1||dt.getDate()!==d)return null;
+  return dt;
+}
+function atToday(){
+  const t=new Date();
+  return`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+}
+function atLongDate(v){const d=atYmd(v);return d?`${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`:String(v==null?'':v);}
+function atShortDate(v){const d=atYmd(v);return d?`${d.getMonth()+1}/${d.getDate()}`:String(v==null?'':v);}
+function atBadgeStyle(st){
+  if(st==='결석')return'background:#fef2f2;border-color:#fecaca;color:#b91c1c';
+  if(st==='지각')return'background:#fffbeb;border-color:#fde68a;color:#b45309';
+  if(st==='보강')return'background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8';
+  if(st==='휴강')return'background:#f3f4f6;border-color:#e5e7eb;color:#6b7280';
+  return'background:#ecfdf5;border-color:#6ee7b7;color:#047857';
+}
+async function loadAttendance(sid,fireId,student){
+  try{
+    const cards=[];const seen=new Set();
+    async function q(val){
+      if(!val)return;
+      try{
+        const s=await getDocs(query(collection(db,'classCards'),where('studentId','==',val)));
+        s.forEach(d=>{
+          if(seen.has(d.id))return;
+          seen.add(d.id);
+          const c=d.data()||{};
+          if(atYmd(c.classDate))cards.push({id:d.id,...c});
+        });
+      }catch(err){}
+    }
+    await q(sid);
+    if(fireId&&fireId!==sid)await q(fireId);
+
+    // 반 단위 휴강 (권한·데이터 없으면 조용히 건너뜀)
+    const offs=[];
+    const myIds=new Set((Array.isArray(student&&student.classIds)?student.classIds:[]).filter(Boolean).map(String));
+    if(myIds.size){
+      try{
+        const os=await getDocs(collection(db,'classOff'));
+        const today=atToday();
+        os.forEach(d=>{
+          const o=d.data()||{};
+          if(!atYmd(o.date))return;
+          if(!myIds.has(String(o.classId)))return;
+          if(String(o.date)>today)return;   // 지난 휴강만 흐름에 표시
+          offs.push(o);
+        });
+      }catch(err){}
+    }
+
+    const asc=cards.slice().sort((a,b)=>String(a.classDate).localeCompare(String(b.classDate)));
+    const ses=asc.filter(c=>atIsLesson(atStatus(c))).length;
+    const abs=asc.filter(c=>atStatus(c)==='결석').length;
+    let lastLesson='';
+    for(let i=asc.length-1;i>=0;i--){if(atIsLesson(atStatus(asc[i]))){lastLesson=String(asc[i].classDate);break;}}
+    document.querySelectorAll('#at-ses').forEach(el=>el.textContent=ses?ses+'회':'—');
+    document.querySelectorAll('#at-abs').forEach(el=>el.textContent=abs?abs+'회':'0회');
+    document.querySelectorAll('#at-last').forEach(el=>el.textContent=lastLesson?atShortDate(lastLesson):'—');
+
+    // 흐름 (수업 + 휴강을 날짜순으로 섞어 최근 12개)
+    const flow=asc.map(c=>({date:String(c.classDate),st:atStatus(c)}))
+      .concat(offs.map(o=>({date:String(o.date),st:'휴강'})))
+      .sort((a,b)=>String(a.date).localeCompare(String(b.date)))
+      .slice(-12);
+    const flowHtml=flow.length
+      ?flow.map(x=>`<span class="at-dot at-st-${e(x.st)}">${e(x.st.charAt(0))}<span class="at-d">${e(atShortDate(x.date))}</span></span>`).join('')
+      :'<span class="at-wait">아직 기록된 수업이 없습니다.</span>';
+    document.querySelectorAll('#at-line').forEach(el=>el.innerHTML=flowHtml);
+
+    // 수업 기록 (최신순, 최대 30건)
+    const desc=asc.slice().reverse().slice(0,30);
+    const listHtml=!desc.length
+      ?emptyBox('🗓','아직 기록된 수업이 없습니다.<br>수업이 진행되면 이곳에 표시됩니다.')
+      :desc.map(c=>{
+        const st=atStatus(c);
+        const lesson=atIsLesson(st);
+        const unit=String(c.unit||'').trim();
+        const content=String(c.content||'').trim();
+        const reason=String(c.absenceReason||'').trim();
+        const note=String(c.studentNote||'').trim();
+        const hw=String(c.homeworkContent||'').trim();
+        let body;
+        if(!lesson)body=`<div class="at-body${reason?'':' mute'}">${reason?e(reason):'사유가 기록되지 않았습니다.'}</div>`;
+        else if(content)body=`<div class="at-body">${e(content)}</div>`;
+        else body='<div class="at-body mute">수업 내용이 아직 등록되지 않았습니다.</div>';
+        const noteHtml=(lesson&&note)?`<div class="at-hw"><b>개별 메모</b> ${e(note)}</div>`:'';
+        const hwHtml=(lesson&&hw)?`<div class="at-hw"><b>📌 과제</b> ${e(hw)}</div>`:'';
+        return`<div class="at-card">
+          <div class="at-top">
+            <span class="at-date">${e(atLongDate(c.classDate))}</span>
+            <span class="at-badge" style="${atBadgeStyle(st)}">${e(st)}</span>
+            ${unit?`<span class="at-unit">${e(unit)}</span>`:''}
+          </div>
+          ${body}${noteHtml}${hwHtml}
+        </div>`;
+      }).join('');
+    document.querySelectorAll('#at-list').forEach(el=>el.innerHTML=listHtml);
+  }catch(err){
+    document.querySelectorAll('#at-ses').forEach(el=>el.textContent='—');
+    document.querySelectorAll('#at-abs').forEach(el=>el.textContent='—');
+    document.querySelectorAll('#at-last').forEach(el=>el.textContent='—');
+    document.querySelectorAll('#at-line').forEach(el=>el.innerHTML='<span class="at-wait">출결을 불러오지 못했습니다.</span>');
+    document.querySelectorAll('#at-list').forEach(el=>el.innerHTML='<div class="empty-box">수업 기록을 불러오지 못했습니다.</div>');
   }
 }
 
@@ -576,7 +752,7 @@ function showError(){document.getElementById('loadingScreen').style.display='non
 function e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 window.switchTab=function(idx){
-  document.querySelectorAll('.section').forEach((s,i)=>s.classList.toggle('active',i%4===idx));
+  document.querySelectorAll('.section').forEach((s,i)=>s.classList.toggle('active',i%5===idx));
   document.querySelectorAll('.d-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
   document.querySelectorAll('.m-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
   window.scrollTo({top:0,behavior:'smooth'});
