@@ -91,7 +91,22 @@ body {
   -webkit-appearance: none; appearance: none;
 }
 .cc-inp:focus, .cc-sel:focus { border-color: #a21caf; }
-.cc-sel { cursor: pointer; }
+.cc-sel {
+  cursor: pointer; padding-right: 32px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%236e6e73' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 11px center; background-size: 12px 8px;
+  text-overflow: ellipsis;
+}
+/* iOS 날짜 입력 보정 (값 가운데정렬·높이 찌그러짐 방지) */
+input[type="date"] {
+  -webkit-appearance: none; appearance: none;
+  max-width: 100%; line-height: 1.2; text-align: left;
+}
+input[type="date"]::-webkit-date-and-time-value { text-align: left; margin: 0; }
+input[type="date"]::-webkit-datetime-edit { padding: 0; }
+input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; padding: 4px; }
+button, .sm-btn, .gf-btn, label { touch-action: manipulation; }
+body.modal-open { overflow: hidden; }
 .cc-textarea {
   width: 100%; padding: 10px 12px; min-height: 44px;
   border: 1.5px solid #f3e8ff;
@@ -131,12 +146,14 @@ body {
 
 /* ── 학생 관리 전용 ── */
 .sm-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:0.9rem; }
-.sm-search { flex:1 1 300px; max-width:440px; min-width:150px; }
+.sm-search { flex:1 1 280px; max-width:440px; min-width:150px; }
 .sm-class-filter {
-  flex:0 1 240px; min-width:150px; width:auto;
+  flex:0 1 220px; min-width:150px; width:auto;
   border-color:#cffafe;
 }
 .sm-class-filter:focus { border-color:#0891b2; }
+.sm-sort { flex:0 1 170px; min-width:140px; width:auto; border-color:#fce7f3; }
+.sm-sort:focus { border-color:#db2777; }
 
 /* 학년 필터 버튼 — 균등 분할 그리드 */
 .grade-filter-row { display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-bottom:1.1rem; }
@@ -163,6 +180,12 @@ body {
 .sm-card-top { display:flex; align-items:center; gap:11px; margin-bottom:0.8rem; }
 .sm-av { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; }
 .sm-name { font-size:15px; font-weight:700; color:#1d1d1f; letter-spacing:-0.02em; }
+.sm-new-badge {
+  display:inline-block; margin-left:5px; vertical-align:1px;
+  font-size:9px; font-weight:800; color:#fff; letter-spacing:0.03em;
+  background:linear-gradient(135deg,#34d399,#059669);
+  padding:2px 6px; border-radius:5px;
+}
 .sm-stu-phone { font-size:11.5px; color:#0e7490; font-family:monospace; margin-top:2px; }
 .sm-stu-phone.none { color:#c7c7cc; }
 .sm-id { font-size:11px; color:#aeaeb2; margin-top:2px; }
@@ -181,8 +204,10 @@ body {
 .sm-class.off { color:#9ca3af; background:#f3f4f6; border-color:#e5e7eb; }
 .sm-class.none { color:#aeaeb2; background:#f5f5f7; border-color:#f0f0f2; font-weight:600; }
 
-.sm-meta { font-size:11.5px; color:#3c3c43; line-height:1.7; margin-bottom:0.85rem; }
-.sm-meta .ml { color:#aeaeb2; display:inline-block; width:44px; }
+.sm-meta { font-size:11.5px; color:#3c3c43; line-height:1.75; margin-bottom:0.85rem; }
+.sm-meta .ml { color:#aeaeb2; display:inline-block; width:52px; }
+.sm-meta .muted { color:#aeaeb2; }
+.sm-meta .tenure { color:#059669; font-weight:700; }
 .sm-actions { display:flex; gap:6px; }
 .sm-btn { flex:1; text-align:center; font-size:12px; font-weight:600; padding:9px 0; border-radius:9px; border:1.5px solid #fce7f3; background:#fff; color:#6e6e73; cursor:pointer; font-family:inherit; text-decoration:none; min-height:40px; display:flex; align-items:center; justify-content:center; gap:4px; transition:all .15s; }
 .sm-btn:hover { border-color:#fbcfe8; }
@@ -196,18 +221,20 @@ body {
 /* 등록/수정 모달 */
 .sm-modal-bg { display:none; position:fixed; inset:0; background:rgba(29,29,31,0.42); z-index:600; align-items:center; justify-content:center; padding:1rem; }
 .sm-modal-bg.open { display:flex; }
-.sm-modal { background:#fff; border-radius:20px; width:100%; max-width:460px; max-height:88vh; overflow-y:auto; -webkit-overflow-scrolling:touch; box-shadow:0 20px 60px rgba(0,0,0,0.18); padding:1.5rem 1.4rem; padding-bottom:max(1.5rem,env(safe-area-inset-bottom)); }
+.sm-modal { background:#fff; border-radius:20px; width:100%; max-width:460px; max-height:88vh; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; box-shadow:0 20px 60px rgba(0,0,0,0.18); padding:1.5rem 1.4rem; padding-bottom:max(1.5rem,env(safe-area-inset-bottom)); }
+@supports (max-height:1dvh) { .sm-modal { max-height:86dvh; } }
 .sm-modal-title { font-size:1.05rem; font-weight:700; color:#1d1d1f; margin-bottom:1.2rem; letter-spacing:-0.02em; }
 .sm-field { margin-bottom:0.9rem; }
 .sm-field .req { color:#dc2626; }
 .sm-modal .cc-inp, .sm-modal .cc-sel { font-size:16px; }
+.sm-hint { font-size:10.5px; color:#aeaeb2; line-height:1.55; margin-top:5px; }
 .sm-subj-checks { display:flex; flex-wrap:wrap; gap:7px; }
 .sm-subj-label { display:inline-flex; align-items:center; gap:6px; padding:9px 13px; border:1.5px solid #fce7f3; border-radius:10px; font-size:13px; color:#3c3c43; cursor:pointer; -webkit-user-select:none; user-select:none; min-height:42px; transition:all .15s; }
 .sm-subj-label input { display:none; }
 .sm-subj-label.checked { border-color:#db2777; background:#fdf2f8; color:#db2777; font-weight:600; }
 
 /* 반 배정 체크 리스트 */
-.sm-class-checks { display:flex; flex-direction:column; gap:6px; max-height:190px; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:2px; }
+.sm-class-checks { display:flex; flex-direction:column; gap:6px; max-height:190px; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding:2px; }
 .sm-class-label {
   display:flex; align-items:center; gap:8px; padding:9px 12px;
   border:1.5px solid #cffafe; border-radius:10px; background:#fff;
@@ -224,15 +251,28 @@ body {
 .sm-modal-footer { display:flex; gap:8px; margin-top:1.3rem; }
 .sm-modal-footer button { flex:1; min-height:46px; }
 @media (max-width:600px) {
-  .sm-search { flex:1 1 100%; max-width:none; }
-  .sm-class-filter { flex:1 1 100%; max-width:none; }
+  .sm-search { flex:1 1 100%; max-width:none; min-width:0; }
+  /* 반 필터 · 정렬을 한 줄에 2단으로 — 세로 공간 절약 */
+  .sm-class-filter { flex:1 1 calc(50% - 4px); max-width:none; min-width:0; }
+  .sm-sort { flex:1 1 calc(50% - 4px); max-width:none; min-width:0; }
   .grade-filter-row { grid-template-columns:repeat(4,1fr); }
   .sm-grid { grid-template-columns:1fr; }
+  .sm-card { padding:1rem 1.05rem; }
+  .sm-btn { min-height:44px; font-size:12.5px; }
   .sm-modal { border-radius:18px; padding:1.2rem 1.1rem; }
   .sm-row2 { grid-template-columns:1fr; }
+  .welcome-bar { padding:1.05rem 1.1rem; }
+  .welcome-bar .cc-write-btn { width:100%; min-height:44px; font-size:13px; }
+}
+@media (max-width:400px) {
+  .sm-class-filter, .sm-sort { flex:1 1 100%; }
+  /* font-size는 16px 유지 (iOS 포커스 자동 확대 방지), 패딩만 축소 */
+  .cc-sel { padding-left:9px; padding-right:29px; }
 }
 @media (max-width:360px) {
   .gf-btn { font-size:12px; padding:10px 0; }
+  .sm-meta .ml { width:48px; }
+  .sm-btn.icon, .sm-btn.danger { padding:9px 11px; }
 }
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
@@ -260,7 +300,7 @@ body {
       <div class="welcome-avatar">👩‍🎓</div>
       <div>
         <div class="welcome-greeting">학생 관리</div>
-        <div class="welcome-sub">학년 · 반(시간표 연동)으로 학생을 관리하세요</div>
+        <div class="welcome-sub">학년 · 반(시간표 연동) · 첫 수업일로 학생을 관리하세요</div>
       </div>
     </div>
     <button class="cc-write-btn" onclick="openAdd()">+ 신규 학생 등록</button>
@@ -271,6 +311,12 @@ body {
     <input class="cc-inp sm-search" id="sm-search" type="text" placeholder="이름 · ID · 전화번호로 검색..." oninput="onSearchInput()" autocomplete="off">
     <select class="cc-sel sm-class-filter" id="sm-class-filter" onchange="setClassFilter(this.value)">
       <option value="전체">전체 반</option>
+    </select>
+    <select class="cc-sel sm-sort" id="sm-sort" onchange="setSort(this.value)">
+      <option value="reg">등록 최신순</option>
+      <option value="new">첫 수업 최신순</option>
+      <option value="old">첫 수업 오래된순</option>
+      <option value="name">이름순</option>
     </select>
   </div>
   <div class="grade-filter-row" id="grade-filter-row">
@@ -306,9 +352,16 @@ body {
         <option value="고등1학년">고등1학년</option><option value="고등2학년">고등2학년</option><option value="고등3학년">고등3학년</option>
       </select>
     </div>
-    <div class="sm-field">
-      <span class="cc-label">담당 선생님</span>
-      <input class="cc-inp" id="sm-teacher" type="text" placeholder="선생님 이름" autocomplete="off">
+    <div class="sm-row2">
+      <div class="sm-field">
+        <span class="cc-label">첫 수업일 (입회일)</span>
+        <input class="cc-inp" id="sm-start" type="date">
+        <div class="sm-hint" id="sm-start-hint">첫 수업일을 넣으면 카드에 재원 기간이 표시됩니다.</div>
+      </div>
+      <div class="sm-field">
+        <span class="cc-label">담당 선생님</span>
+        <input class="cc-inp" id="sm-teacher" type="text" placeholder="선생님 이름" autocomplete="off">
+      </div>
     </div>
     <div class="sm-field">
       <span class="cc-label">수강 과목</span>
@@ -431,7 +484,60 @@ let editId = null;          // 수정 중인 학생의 Firestore 문서 id (null
 let editPhotoUrl = '';      // 수정 시 기존 사진 url 보존
 let gradeFilter = '';       // 학년 필터 ('' = 전체)
 let classFilter = '전체';   // 반 필터 ('전체' | 반이름 | '__none__')
+let sortMode = 'reg';       // 정렬 ('reg' | 'new' | 'old' | 'name')
 let ccStudent = null;       // 수업카드 작성 대상 학생
+
+/* ════════ 모달 열림 시 배경 스크롤 잠금 (iOS 스크롤 새어나감 방지) ════════ */
+function syncBodyLock() {
+  const open = document.querySelectorAll('.sm-modal-bg.open').length > 0;
+  document.body.classList.toggle('modal-open', open);
+}
+
+/* ════════ 날짜 유틸 (첫 수업일 / 재원 기간) ════════ */
+function todayStr() {
+  const t = new Date();
+  return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+}
+// 'YYYY-MM-DD' 만 유효 처리 (그 외 형식/빈값 → null)
+function parseYMD(v) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v == null ? '' : v).trim());
+  if (!m) return null;
+  const y = +m[1], mo = +m[2], d = +m[3];
+  if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+  const dt = new Date(y, mo - 1, d);
+  if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
+  dt.setHours(0,0,0,0);
+  return dt;
+}
+function fmtYMD(v) {
+  const d = parseYMD(v);
+  return d ? `${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}.` : String(v == null ? '' : v);
+}
+function daysSince(v) {
+  const d = parseYMD(v);
+  if (!d) return null;
+  const t = new Date(); t.setHours(0,0,0,0);
+  return Math.round((t.getTime() - d.getTime()) / 86400000);
+}
+// 재원 개월 수 문자열 (' · 3개월 차' / ' · 1년 2개월 차' / ' · 시작 예정')
+function tenureTxt(v) {
+  const d = parseYMD(v);
+  if (!d) return '';
+  const t = new Date(); t.setHours(0,0,0,0);
+  if (d.getTime() > t.getTime()) return ' · 시작 예정';
+  let m = (t.getFullYear() - d.getFullYear()) * 12 + (t.getMonth() - d.getMonth());
+  if (t.getDate() < d.getDate()) m--;
+  if (m < 0) m = 0;
+  const mm = m + 1;
+  if (mm < 12) return ` · ${mm}개월 차`;
+  const y = Math.floor(mm / 12), r = mm % 12;
+  return r ? ` · ${y}년 ${r}개월 차` : ` · ${y}년 차`;
+}
+// 최근 30일 이내 첫 수업 → NEW
+function isNewStudent(v) {
+  const dd = daysSince(v);
+  return dd !== null && dd >= -14 && dd <= 30;
+}
 
 /* ════════ 시간표 기반 반(班) — students.html / teacher-board.html 과 동일 규칙 ════════ */
 const DAY_FULL  = { '월':'월요일','화':'화요일','수':'수요일','목':'목요일','금':'금요일','토':'토요일','일':'일요일' };
@@ -551,7 +657,7 @@ function initStudents() {
   });
 }
 
-/* ════════ 필터 ════════ */
+/* ════════ 필터 · 정렬 ════════ */
 window.setGradeFilter = function(btn, val) {
   gradeFilter = val;
   document.querySelectorAll('.gf-btn').forEach(b => b.classList.remove('on'));
@@ -560,6 +666,10 @@ window.setGradeFilter = function(btn, val) {
 };
 window.setClassFilter = function(val) {
   classFilter = val || '전체';
+  renderCards();
+};
+window.setSort = function(val) {
+  sortMode = val || 'reg';
   renderCards();
 };
 let searchTimer = null;
@@ -587,12 +697,27 @@ window.renderCards = function() {
     return okKw && okGf && okCf;
   });
 
+  // 정렬 (기본 reg = Firestore regDate 내림차순 그대로)
+  if (sortMode === 'name') {
+    list.sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'ko'));
+  } else if (sortMode === 'new' || sortMode === 'old') {
+    const key = s => { const d = parseYMD(s.startDate); return d ? d.getTime() : null; };
+    list.sort((a, b) => {
+      const ka = key(a), kb = key(b);
+      if (ka === null && kb === null) return 0;
+      if (ka === null) return 1;   // 미기록은 항상 뒤로
+      if (kb === null) return -1;
+      return sortMode === 'new' ? (kb - ka) : (ka - kb);
+    });
+  }
+
   const parts = [];
   if (gf) parts.push(gf);
   if (cf === '__none__') parts.push('반 미배정');
   else if (cf !== '전체') parts.push(cf);
-  document.getElementById('sm-count').textContent =
-    parts.length ? `${parts.join(' · ')} · ${list.length}명` : `전체 ${students.length}명`;
+  const noStart = list.filter(s => !parseYMD(s.startDate)).length;
+  const base = parts.length ? `${parts.join(' · ')} · ${list.length}명` : `전체 ${students.length}명`;
+  document.getElementById('sm-count').textContent = noStart ? `${base} · 첫 수업일 미기록 ${noStart}명` : base;
 
   const grid = document.getElementById('sm-grid');
   if (!list.length) { grid.innerHTML = '<div class="sm-empty">해당하는 학생이 없습니다.</div>'; return; }
@@ -611,6 +736,11 @@ window.renderCards = function() {
     const teacher = (s.teacher && s.teacher !== '-') ? s.teacher : '미배정';
     const phone = (s.phone && s.phone !== '-') ? s.phone : '-';
     const sPhone = (s.studentPhone && s.studentPhone !== '-') ? s.studentPhone : '';
+    const startD = parseYMD(s.startDate);
+    const startHtml = startD
+      ? `${esc(fmtYMD(s.startDate))}<span class="tenure">${esc(tenureTxt(s.startDate))}</span>`
+      : `<span class="muted">미기록${s.regDate ? ' · 등록 ' + esc(s.regDate) : ''}</span>`;
+    const newBadge = isNewStudent(s.startDate) ? '<span class="sm-new-badge">NEW</span>' : '';
     const gradeBtn = sid
       ? `<a class="sm-btn primary" href="student-detail.html?id=${encodeURIComponent(sid)}">📊 테스트 결과</a>`
       : `<button class="sm-btn" disabled style="opacity:0.5;">📊 테스트 결과</button>`;
@@ -618,14 +748,14 @@ window.renderCards = function() {
       <div class="sm-card-top">
         <div class="sm-av" style="background:${bg};color:${col};">${esc(short)}</div>
         <div style="min-width:0;">
-          <div class="sm-name">${esc(name)}</div>
+          <div class="sm-name">${esc(name)}${newBadge}</div>
           <div class="sm-stu-phone${sPhone ? '' : ' none'}">📱 ${sPhone ? esc(sPhone) : '번호 미등록'}</div>
           <div class="sm-id">${esc(grade || '학년 미등록')}${sid ? ' · ' + esc(sid) : ''}</div>
         </div>
       </div>
       <div class="sm-subjects">${subHtml}</div>
       <div class="sm-classes">${clsHtml}</div>
-      <div class="sm-meta"><span class="ml">선생님</span> ${esc(teacher)}<br><span class="ml">학부모</span> ${esc(phone)}</div>
+      <div class="sm-meta"><span class="ml">첫 수업</span> ${startHtml}<br><span class="ml">선생님</span> ${esc(teacher)}<br><span class="ml">학부모</span> ${esc(phone)}</div>
       <div class="sm-actions">
         ${gradeBtn}
         <button class="sm-btn icon" title="수정" onclick="openEdit('${esc(s.fireId)}')">✏️</button>
@@ -694,9 +824,12 @@ window.openAdd = function() {
   document.getElementById('sm-id').disabled = false;
   ['sm-name','sm-teacher','sm-phone','sm-stu-phone'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('sm-grade').value = '';
+  document.getElementById('sm-start').value = todayStr();   // 기본값 = 오늘
+  document.getElementById('sm-start-hint').textContent = '오늘로 채워뒀습니다. 실제 첫 수업일로 바꿔주세요.';
   setSubjChecks([]);
   renderClassChecks([]);
   document.getElementById('sm-modal-bg').classList.add('open');
+  syncBodyLock();
 };
 window.openEdit = function(fireId) {
   const s = students.find(x => x.fireId === fireId);
@@ -711,17 +844,36 @@ window.openEdit = function(fireId) {
   document.getElementById('sm-teacher').value = (s.teacher && s.teacher !== '-') ? s.teacher : '';
   document.getElementById('sm-phone').value = (s.phone && s.phone !== '-') ? s.phone : '';
   document.getElementById('sm-stu-phone').value = (s.studentPhone && s.studentPhone !== '-') ? s.studentPhone : '';
+  const sd = parseYMD(s.startDate);
+  document.getElementById('sm-start').value = sd ? String(s.startDate).trim() : '';
+  document.getElementById('sm-start-hint').textContent = sd
+    ? `재원 기간${tenureTxt(s.startDate).replace(' · ', ': ')}`
+    : `첫 수업일 기록 없음 (시스템 등록일: ${s.regDate || '-'})`;
   const subs = (s.subject && s.subject !== '-') ? String(s.subject).split(',').map(x => x.trim()) : [];
   setSubjChecks(subs);
   renderClassChecks(studentClassNames(s));
   document.getElementById('sm-modal-bg').classList.add('open');
+  syncBodyLock();
 };
-window.closeModal = function() { document.getElementById('sm-modal-bg').classList.remove('open'); };
+window.closeModal = function() { document.getElementById('sm-modal-bg').classList.remove('open'); syncBodyLock(); };
 
 // 과목 라벨 토글
 document.querySelectorAll('.sm-subj-chk').forEach(cb => {
   cb.addEventListener('change', () => cb.closest('.sm-subj-label').classList.toggle('checked', cb.checked));
 });
+
+// 첫 수업일 입력 시 힌트 즉시 갱신
+(function(){
+  const el = document.getElementById('sm-start');
+  const hint = document.getElementById('sm-start-hint');
+  if (!el || !hint) return;
+  el.addEventListener('change', () => {
+    const v = el.value;
+    if (!v) { hint.textContent = '비워두면 카드에 "미기록"으로 표시됩니다.'; return; }
+    const t = tenureTxt(v);
+    hint.textContent = t ? `${fmtYMD(v)}${t.replace(' · ', ' · ')}` : fmtYMD(v);
+  });
+})();
 
 // 저장 (신규=addDoc / 수정=updateDoc)
 window.saveStudent = async function() {
@@ -731,24 +883,27 @@ window.saveStudent = async function() {
   const teacher = document.getElementById('sm-teacher').value.trim() || '-';
   const phone = document.getElementById('sm-phone').value.trim() || '-';
   const studentPhone = document.getElementById('sm-stu-phone').value.trim() || '-';
+  const startRaw = document.getElementById('sm-start').value.trim();
+  const startDate = parseYMD(startRaw) ? startRaw : '';   // 유효한 YYYY-MM-DD 만 저장
   const checked = [...document.querySelectorAll('.sm-subj-chk:checked')].map(c => c.value);
   const subject = checked.length ? checked.join(',') : '-';
   const cf = buildClassFields(getCheckedClasses());
   if (!name || !grade) { alert('이름과 학년을 입력해주세요.'); return; }
+  if (startRaw && !startDate) { alert('첫 수업일 형식이 올바르지 않습니다.'); return; }
   const btn = document.getElementById('sm-save-btn');
   btn.disabled = true; btn.textContent = '저장 중...';
   try {
     if (!editId) {
       const t = new Date();
       await addDoc(collection(db,'students'), {
-        id, name, grade, subject, phone, studentPhone, teacher,
+        id, name, grade, subject, phone, studentPhone, teacher, startDate,
         classIds: cf.classIds, classNames: cf.classNames, classes: cf.classes,
         photoUrl: '',
         regDate: `${t.getFullYear()}. ${t.getMonth()+1}. ${t.getDate()}.`
       });
     } else {
       await updateDoc(doc(db,'students',editId), {
-        name, grade, subject, phone, studentPhone, teacher,
+        name, grade, subject, phone, studentPhone, teacher, startDate,
         classIds: cf.classIds, classNames: cf.classNames, classes: cf.classes,
         photoUrl: editPhotoUrl || ''
       });
@@ -771,6 +926,7 @@ window.delStudent = async function(fireId, name) {
 /* ════════════════════════════════════════════
    수업카드 작성 (classCards 스키마 동일)
    · 반(className/classId)을 함께 저장하고, 선택한 반은 학생에게 자동 배정
+   · 첫 수업일이 비어 있으면 이 수업 날짜로 자동 기록
 ════════════════════════════════════════════ */
 window.openClassCard = function(fireId) {
   const s = students.find(x => x.fireId === fireId);
@@ -781,9 +937,7 @@ window.openClassCard = function(fireId) {
   document.getElementById('cc-stu-info').innerHTML =
     `<span style="font-size:11px;">📚</span><strong>${esc(s.name || '학생')}</strong>` +
     (s.grade ? `<span style="margin-left:6px;color:#a21caf;">${esc(s.grade)}</span>` : '');
-  const t = new Date();
-  document.getElementById('cc-w-date').value =
-    `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+  document.getElementById('cc-w-date').value = todayStr();
   document.getElementById('cc-w-teacher').value = (s.teacher && s.teacher !== '-') ? s.teacher : '';
   const subs = (s.subject && s.subject !== '-') ? String(s.subject).split(',').map(x => x.trim()).filter(Boolean) : [];
   const subjSel = document.getElementById('cc-w-subj');
@@ -799,8 +953,9 @@ window.openClassCard = function(fireId) {
   document.getElementById('cc-w-content').value = '';
   document.getElementById('cc-w-homework').value = '';
   document.getElementById('cc-modal-bg').classList.add('open');
+  syncBodyLock();
 };
-window.closeCCModal = function() { document.getElementById('cc-modal-bg').classList.remove('open'); };
+window.closeCCModal = function() { document.getElementById('cc-modal-bg').classList.remove('open'); syncBodyLock(); };
 
 window.saveClassCard = async function() {
   if (!ccStudent) return;
@@ -831,15 +986,17 @@ window.saveClassCard = async function() {
       homework, attitude, homeworkDone, homeworkContent,
       createdAt: serverTimestamp()
     });
-    // 선택한 반을 학생에게 누적 배정 — 문서 id(fireId) 기준, classIds/classNames/classes 동시 갱신
-    if (className && ccStudent.fireId) {
+    // 학생 문서 보정: 반 누적 배정 + 첫 수업일 자동 기록(비어 있을 때만)
+    if (ccStudent.fireId) {
       try {
-        const cur = studentClassNames(ccStudent);
-        if (!cur.includes(className)) {
-          const nf = buildClassFields(cur.concat([className]));
-          await setDoc(doc(db,'students',ccStudent.fireId), nf, { merge:true });
+        const patch = {};
+        if (className) {
+          const cur = studentClassNames(ccStudent);
+          if (!cur.includes(className)) Object.assign(patch, buildClassFields(cur.concat([className])));
         }
-      } catch (err) { console.warn('반 배정 실패:', err); }
+        if (!parseYMD(ccStudent.startDate) && parseYMD(classDate)) patch.startDate = classDate;
+        if (Object.keys(patch).length) await setDoc(doc(db,'students',ccStudent.fireId), patch, { merge:true });
+      } catch (err) { console.warn('학생 문서 보정 실패:', err); }
     }
     closeCCModal();
     alert('수업카드가 저장되었습니다.\n학부모 리포트에 바로 반영됩니다.');
