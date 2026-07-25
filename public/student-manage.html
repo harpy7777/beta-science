@@ -204,10 +204,17 @@ body.modal-open { overflow: hidden; }
 .sm-class.off { color:#9ca3af; background:#f3f4f6; border-color:#e5e7eb; }
 .sm-class.none { color:#aeaeb2; background:#f5f5f7; border-color:#f0f0f2; font-weight:600; }
 
-.sm-meta { font-size:11.5px; color:#3c3c43; line-height:1.75; margin-bottom:0.85rem; }
+.sm-meta { font-size:11.5px; color:#3c3c43; line-height:1.85; margin-bottom:0.85rem; }
 .sm-meta .ml { color:#aeaeb2; display:inline-block; width:52px; }
 .sm-meta .muted { color:#aeaeb2; }
-.sm-meta .tenure { color:#059669; font-weight:700; }
+/* 회차 칩 */
+.sm-chip {
+  display:inline-block; font-size:10px; font-weight:800; letter-spacing:0.01em;
+  padding:2px 7px; border-radius:6px; margin-left:5px; vertical-align:1px; white-space:nowrap;
+}
+.sm-chip.ses  { color:#047857; background:#ecfdf5; border:1px solid #a7f3d0; }
+.sm-chip.soon { color:#b45309; background:#fffbeb; border:1px solid #fde68a; }
+.sm-chip.gray { color:#8e8e93; background:#f5f5f7; border:1px solid #ececef; font-weight:700; }
 .sm-actions { display:flex; gap:6px; }
 .sm-btn { flex:1; text-align:center; font-size:12px; font-weight:600; padding:9px 0; border-radius:9px; border:1.5px solid #fce7f3; background:#fff; color:#6e6e73; cursor:pointer; font-family:inherit; text-decoration:none; min-height:40px; display:flex; align-items:center; justify-content:center; gap:4px; transition:all .15s; }
 .sm-btn:hover { border-color:#fbcfe8; }
@@ -314,8 +321,8 @@ body.modal-open { overflow: hidden; }
     </select>
     <select class="cc-sel sm-sort" id="sm-sort" onchange="setSort(this.value)">
       <option value="reg">등록 최신순</option>
-      <option value="new">첫 수업 최신순</option>
-      <option value="old">첫 수업 오래된순</option>
+      <option value="new">입회 최신순</option>
+      <option value="old">회차 많은순</option>
       <option value="name">이름순</option>
     </select>
   </div>
@@ -519,24 +526,55 @@ function daysSince(v) {
   const t = new Date(); t.setHours(0,0,0,0);
   return Math.round((t.getTime() - d.getTime()) / 86400000);
 }
-// 재원 개월 수 문자열 (' · 3개월 차' / ' · 1년 2개월 차' / ' · 시작 예정')
-function tenureTxt(v) {
-  const d = parseYMD(v);
-  if (!d) return '';
-  const t = new Date(); t.setHours(0,0,0,0);
-  if (d.getTime() > t.getTime()) return ' · 시작 예정';
-  let m = (t.getFullYear() - d.getFullYear()) * 12 + (t.getMonth() - d.getMonth());
-  if (t.getDate() < d.getDate()) m--;
-  if (m < 0) m = 0;
-  const mm = m + 1;
-  if (mm < 12) return ` · ${mm}개월 차`;
-  const y = Math.floor(mm / 12), r = mm % 12;
-  return r ? ` · ${y}년 ${r}개월 차` : ` · ${y}년 차`;
+// 주 1회 수업 기준 회차 (첫 수업일 = 1회차, 7일마다 +1)
+function sessionNo(v) {
+  const dd = daysSince(v);
+  if (dd === null) return null;
+  if (dd < 0) return 0;              // 아직 시작 전
+  return Math.floor(dd / 7) + 1;
 }
-// 최근 30일 이내 첫 수업 → NEW
+function sessionTxt(v) {
+  const n = sessionNo(v);
+  if (n === null) return '';
+  return n === 0 ? '시작 예정' : `${n}회차`;
+}
+// 최근 4주(=1~4회차) 이내 입회 → NEW
 function isNewStudent(v) {
   const dd = daysSince(v);
-  return dd !== null && dd >= -14 && dd <= 30;
+  return dd !== null && dd >= -14 && dd <= 28;
+}
+
+/* ════════ 등록일(regDate/regTs) 정렬 키 ════════
+   regDate는 "2025. 3. 2." 문자열이라 사전순 정렬이 틀림(3월 > 12월).
+   → regTs(서버 타임스탬프) 우선, 없으면 문자열을 파싱해 숫자로 비교. */
+function tsMillis(v) {
+  if (v == null) return null;
+  if (typeof v === 'number' && isFinite(v)) return v;
+  if (v instanceof Date) return v.getTime();
+  if (typeof v.toMillis === 'function') { try { return v.toMillis(); } catch (e) { return null; } }
+  if (typeof v.seconds === 'number') return v.seconds * 1000;
+  return null;
+}
+// "2025. 3. 2." / "2025.3.2" / "2025-03-02" 모두 처리
+function parseRegDate(v) {
+  const s = String(v == null ? '' : v).trim();
+  if (!s) return null;
+  const ymd = parseYMD(s);
+  if (ymd) return ymd.getTime();
+  const m = /^(\d{4})\s*[.\-/]\s*(\d{1,2})\s*[.\-/]\s*(\d{1,2})\s*\.?$/.exec(s);
+  if (!m) return null;
+  const y = +m[1], mo = +m[2], d = +m[3];
+  if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+  const dt = new Date(y, mo - 1, d);
+  if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
+  dt.setHours(0,0,0,0);
+  return dt.getTime();
+}
+function regKey(s) {
+  const t = tsMillis(s && s.regTs);
+  if (t !== null) return t;
+  const r = parseRegDate(s && s.regDate);
+  return r !== null ? r : -Infinity;   // 값 없으면 맨 뒤
 }
 
 /* ════════ 시간표 기반 반(班) — students.html / teacher-board.html 과 동일 규칙 ════════ */
@@ -648,8 +686,11 @@ function initTimetable() {
   }, err => { console.warn('시간표 로드 실패:', err.message); });
 }
 function initStudents() {
-  onSnapshot(query(collection(db,'students'), orderBy('regDate','desc')), snap => {
+  // orderBy('regDate') 사용 금지 — 문자열이라 "2025. 3. 2." > "2025. 12. 1." 로 뒤집힘.
+  // 전체를 받아 regTs / regDate 파싱값으로 클라이언트 정렬한다.
+  onSnapshot(collection(db,'students'), snap => {
     students = snap.docs.map(d => ({ fireId:d.id, ...d.data() }));
+    students.sort((a, b) => (regKey(b) - regKey(a)) || String(a.name || '').localeCompare(String(b.name || ''), 'ko'));
     refreshClassSelectors();
     renderCards();
   }, err => {
@@ -697,18 +738,21 @@ window.renderCards = function() {
     return okKw && okGf && okCf;
   });
 
-  // 정렬 (기본 reg = Firestore regDate 내림차순 그대로)
+  // 정렬
   if (sortMode === 'name') {
     list.sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'ko'));
   } else if (sortMode === 'new' || sortMode === 'old') {
     const key = s => { const d = parseYMD(s.startDate); return d ? d.getTime() : null; };
     list.sort((a, b) => {
       const ka = key(a), kb = key(b);
-      if (ka === null && kb === null) return 0;
+      if (ka === null && kb === null) return regKey(b) - regKey(a);
       if (ka === null) return 1;   // 미기록은 항상 뒤로
       if (kb === null) return -1;
-      return sortMode === 'new' ? (kb - ka) : (ka - kb);
+      return (sortMode === 'new' ? (kb - ka) : (ka - kb))
+        || String(a.name || '').localeCompare(String(b.name || ''), 'ko');
     });
+  } else {
+    list.sort((a, b) => (regKey(b) - regKey(a)) || String(a.name || '').localeCompare(String(b.name || ''), 'ko'));
   }
 
   const parts = [];
@@ -737,9 +781,10 @@ window.renderCards = function() {
     const phone = (s.phone && s.phone !== '-') ? s.phone : '-';
     const sPhone = (s.studentPhone && s.studentPhone !== '-') ? s.studentPhone : '';
     const startD = parseYMD(s.startDate);
+    const sn = sessionNo(s.startDate);
     const startHtml = startD
-      ? `${esc(fmtYMD(s.startDate))}<span class="tenure">${esc(tenureTxt(s.startDate))}</span>`
-      : `<span class="muted">미기록${s.regDate ? ' · 등록 ' + esc(s.regDate) : ''}</span>`;
+      ? `${esc(fmtYMD(s.startDate))}<span class="sm-chip ${sn === 0 ? 'soon' : 'ses'}">${esc(sessionTxt(s.startDate))}</span>`
+      : `<span class="muted">미기록</span>${s.regDate ? `<span class="sm-chip gray">등록 ${esc(s.regDate)}</span>` : ''}`;
     const newBadge = isNewStudent(s.startDate) ? '<span class="sm-new-badge">NEW</span>' : '';
     const gradeBtn = sid
       ? `<a class="sm-btn primary" href="student-detail.html?id=${encodeURIComponent(sid)}">📊 테스트 결과</a>`
@@ -825,7 +870,7 @@ window.openAdd = function() {
   ['sm-name','sm-teacher','sm-phone','sm-stu-phone'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('sm-grade').value = '';
   document.getElementById('sm-start').value = todayStr();   // 기본값 = 오늘
-  document.getElementById('sm-start-hint').textContent = '오늘로 채워뒀습니다. 실제 첫 수업일로 바꿔주세요.';
+  document.getElementById('sm-start-hint').textContent = '오늘로 채워뒀습니다. 실제 첫 수업일로 바꿔주세요. (주 1회 기준 회차 계산)';
   setSubjChecks([]);
   renderClassChecks([]);
   document.getElementById('sm-modal-bg').classList.add('open');
@@ -847,7 +892,7 @@ window.openEdit = function(fireId) {
   const sd = parseYMD(s.startDate);
   document.getElementById('sm-start').value = sd ? String(s.startDate).trim() : '';
   document.getElementById('sm-start-hint').textContent = sd
-    ? `재원 기간${tenureTxt(s.startDate).replace(' · ', ': ')}`
+    ? `현재 ${sessionTxt(s.startDate)} · 주 1회 기준`
     : `첫 수업일 기록 없음 (시스템 등록일: ${s.regDate || '-'})`;
   const subs = (s.subject && s.subject !== '-') ? String(s.subject).split(',').map(x => x.trim()) : [];
   setSubjChecks(subs);
@@ -870,8 +915,8 @@ document.querySelectorAll('.sm-subj-chk').forEach(cb => {
   el.addEventListener('change', () => {
     const v = el.value;
     if (!v) { hint.textContent = '비워두면 카드에 "미기록"으로 표시됩니다.'; return; }
-    const t = tenureTxt(v);
-    hint.textContent = t ? `${fmtYMD(v)}${t.replace(' · ', ' · ')}` : fmtYMD(v);
+    const t = sessionTxt(v);
+    hint.textContent = t ? `${fmtYMD(v)} · ${t} (주 1회 기준)` : fmtYMD(v);
   });
 })();
 
@@ -899,7 +944,8 @@ window.saveStudent = async function() {
         id, name, grade, subject, phone, studentPhone, teacher, startDate,
         classIds: cf.classIds, classNames: cf.classNames, classes: cf.classes,
         photoUrl: '',
-        regDate: `${t.getFullYear()}. ${t.getMonth()+1}. ${t.getDate()}.`
+        regDate: `${t.getFullYear()}. ${t.getMonth()+1}. ${t.getDate()}.`,
+        regTs: serverTimestamp()
       });
     } else {
       await updateDoc(doc(db,'students',editId), {
