@@ -198,6 +198,64 @@ body {
 .leg-dot { width: 8px; height: 8px; border-radius: 50%; }
 
 /* ════════════════════════════════
+   🗓 출결 현황 (선생님용)
+   · 입력은 student-manage.html 전용, 이 페이지는 조회만 한다
+════════════════════════════════ */
+.at-warn {
+  display: none; font-size: 11.5px; line-height: 1.7;
+  color: #b45309; background: #fffbeb; border: 1px solid #fde68a;
+  border-radius: 12px; padding: 10px 12px; margin-bottom: 0.9rem;
+}
+.at-warn.show { display: block; }
+.at-warn b { font-weight: 800; }
+.at-warn a { color: #b45309; font-weight: 800; text-decoration: underline; }
+.at-card { background: #fff; border: 1px solid #fce7f3; border-radius: 16px; padding: 1.1rem 1.2rem; margin-bottom: 1rem; }
+.at-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 0.9rem; }
+.at-head .card-title { margin-bottom: 0; }
+.at-chip { font-size: 10.5px; font-weight: 700; color: #0e7490; background: #ecfeff; border: 1px solid #cffafe; border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
+.at-chip.gray { color: #8e8e93; background: #f5f5f7; border-color: #ececef; }
+.at-note { font-size: 11px; color: #6e6e73; line-height: 1.65; margin-top: 0.7rem; }
+.at-note .hol { color: #b91c1c; font-weight: 700; }
+
+/* 출결 상태 배지 */
+.at-st { display: inline-flex; align-items: center; justify-content: center; padding: 3px 9px; border-radius: 7px; font-size: 10.5px; font-weight: 800; white-space: nowrap; border: 1px solid; }
+.at-st.att  { color: #047857; background: #ecfdf5; border-color: #a7f3d0; }
+.at-st.late { color: #b45309; background: #fffbeb; border-color: #fde68a; }
+.at-st.abs  { color: #b91c1c; background: #fef2f2; border-color: #fecaca; }
+.at-st.mk   { color: #1d4ed8; background: #eff6ff; border-color: #bfdbfe; }
+.at-st.off  { color: #6b7280; background: #f3f4f6; border-color: #e5e7eb; }
+
+/* 타임라인 (최신순 · 줄바꿈형) */
+.at-tl { display: flex; flex-wrap: wrap; gap: 6px; }
+.at-tl-item { display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px; border: 1px solid #f0e4ec; border-radius: 10px; background: #fffbfe; }
+.at-tl-d { font-size: 11px; font-weight: 700; color: #3c3c43; white-space: nowrap; }
+.at-empty { padding: 1.6rem 1rem; text-align: center; font-size: 12.5px; color: #aeaeb2; line-height: 1.9; background: #fafafa; border: 1px dashed #f0e4ec; border-radius: 12px; }
+
+/* 수업카드 이력 (아코디언) */
+.at-row { border: 1px solid #f0e4ec; border-radius: 12px; margin-bottom: 7px; overflow: hidden; background: #fff; }
+.at-row:last-child { margin-bottom: 0; }
+.at-row-top {
+  width: 100%; display: flex; align-items: center; gap: 8px;
+  padding: 11px 12px; min-height: 48px;
+  background: #fffbfe; border: none; border-bottom: 1px solid transparent;
+  font-family: inherit; text-align: left; cursor: pointer; flex-wrap: wrap;
+}
+.at-row-top:hover { background: #fdf2f8; }
+.at-row.open .at-row-top { background: #fdf2f8; border-bottom-color: #fce7f3; }
+.at-row-d { font-size: 12px; font-weight: 800; color: #1d1d1f; white-space: nowrap; }
+.at-row-cls { font-size: 11px; color: #6e6e73; flex: 1; min-width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.at-row-arrow { font-size: 10px; color: #c7c7cc; flex-shrink: 0; transition: transform 0.15s; }
+.at-row.open .at-row-arrow { transform: rotate(180deg); color: #db2777; }
+.at-row-body { display: none; padding: 11px 12px 13px; }
+.at-row.open .at-row-body { display: block; }
+.at-kv { display: grid; grid-template-columns: 76px 1fr; gap: 7px 10px; font-size: 12px; }
+.at-k { color: #aeaeb2; font-weight: 700; font-size: 11px; padding-top: 1px; word-break: keep-all; }
+.at-v { color: #3c3c43; line-height: 1.75; white-space: pre-wrap; word-break: break-word; }
+.at-v.red { color: #b91c1c; font-weight: 600; }
+.at-more { width: 100%; margin-top: 9px; min-height: 42px; padding: 10px; background: #fdf2f8; border: 1px solid #fce7f3; border-radius: 10px; font-family: inherit; font-size: 12px; font-weight: 700; color: #db2777; cursor: pointer; }
+.at-more:hover { background: #fce7f3; }
+
+/* ════════════════════════════════
    성적 현황 — 응시 기록 테이블
 ════════════════════════════════ */
 .gc-table { background:#fff; border:1px solid #fce7f3; border-radius:16px; overflow:hidden; }
@@ -230,6 +288,7 @@ body {
 .sc-na { font-size:13px; color:#d8d8dd; font-weight:600; }
 .gc-del-btn { font-size:13px; background:#fff; border:1.5px solid #fca5a5; border-radius:8px; padding:6px 9px; cursor:pointer; color:#dc2626; min-height:34px; line-height:1; font-family:inherit; transition:background 0.15s; }
 .gc-del-btn:hover { background:#fef2f2; }
+.gc-err { padding:1.4rem 1rem; text-align:center; font-size:12.5px; color:#b91c1c; background:#fef2f2; border:1px solid #fecaca; border-radius:14px; line-height:1.8; }
 
 /* ════════════════════════════════
    선생님 피드백 (여러 건 누적)
@@ -348,6 +407,14 @@ body {
   .panel-body { padding: 1rem 0.9rem; padding-left: max(0.9rem, env(safe-area-inset-left)); padding-right: max(0.9rem, env(safe-area-inset-right)); }
   .panel-bar { padding-left: max(1rem, env(safe-area-inset-left)); padding-right: max(1rem, env(safe-area-inset-right)); }
 
+  /* 출결 섹션 모바일 */
+  .at-card { padding: 1rem; border-radius: 14px; }
+  .at-kv { grid-template-columns: 64px 1fr; gap: 6px 8px; }
+  .at-row-top { padding: 11px 11px; gap: 7px; }
+  .at-row-cls { flex: 1 1 100%; min-width: 0; order: 9; }
+  .at-tl-item { padding: 6px 8px; gap: 5px; }
+  .at-tl-d { font-size: 10.5px; }
+
   /* 성적 현황 테이블 → 카드형 리플로우 */
   .gc-head { display:none; }
   .gc-row {
@@ -407,6 +474,8 @@ body {
   /* 점수 칸이 너무 좁아지면 한 줄에 OX·4지선다·마스터를 그대로 유지하되 폰트만 축소 */
   .sc-pill { min-width:38px; padding:4px 7px; font-size:10.5px; }
   .fb-item-top { flex-wrap: wrap; }
+  .at-kv { grid-template-columns: 58px 1fr; }
+  .mini-n { font-size: 0.92rem; }
 }
 
 /* ── 세부 페이지 전용 ── */
@@ -416,6 +485,7 @@ body {
 .sect-title { font-size:1rem; font-weight:800; color:#1d1d1f; letter-spacing:-0.02em; margin:1.6rem 0 0.9rem; display:flex; align-items:center; gap:8px; }
 .sect-title .sect-ico { width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:15px; }
 .sect-grade { background:#fdf2f8; } .sect-report { background:#eff6ff; } .sect-share { background:#f0fdf4; }
+.sect-attend { background:#ecfeff; }
 .big-divider { height:8px; background:linear-gradient(90deg,#fdf2f8,#eff6ff); border-radius:8px; margin:1.8rem 0; }
 #loadingBox { padding:4rem 1rem; text-align:center; color:#aeaeb2; font-size:14px; }
 #errorBox { display:none; padding:3rem 1rem; text-align:center; color:#dc2626; font-size:14px; }
@@ -462,8 +532,35 @@ body {
       <div class="p-right"><div class="p-overall-n" id="rp-overall">—</div><div class="p-overall-l">종합 평가</div></div>
     </div>
 
+    <!-- ═══ 출결 현황 (선생님용 · 조회 전용) ═══ -->
+    <div class="sect-title"><span class="sect-ico sect-attend">🗓</span>출결 현황</div>
+    <div class="at-warn" id="at-warn"></div>
+    <div class="mini-grid">
+      <div class="mini-card"><div class="mini-n" id="at-ses" style="color:#047857;">0</div><div class="mini-l">총 회차<br>출석·지각·보강</div></div>
+      <div class="mini-card"><div class="mini-n" id="at-abs" style="color:#b91c1c;">0</div><div class="mini-l">결석</div></div>
+      <div class="mini-card"><div class="mini-n" id="at-first" style="color:#0e7490;">—</div><div class="mini-l">첫 수업일</div></div>
+      <div class="mini-card"><div class="mini-n" id="at-last" style="color:#0e7490;">—</div><div class="mini-l">최근 수업일</div></div>
+    </div>
+    <div class="at-card">
+      <div class="at-head">
+        <div class="card-title">최근 출결 (최신순)</div>
+        <span class="at-chip gray" id="at-tl-chip">—</span>
+      </div>
+      <div id="at-timeline"><div class="at-empty">출결 기록을 불러오는 중입니다...</div></div>
+      <div class="at-note" id="at-note"></div>
+    </div>
+    <div class="at-card">
+      <div class="at-head">
+        <div class="card-title">수업카드 이력</div>
+        <span class="at-chip" id="at-cards-chip">0건</span>
+      </div>
+      <div id="at-cards"><div class="at-empty">수업카드를 불러오는 중입니다...</div></div>
+    </div>
+
+    <div class="big-divider"></div>
+
     <!-- ═══ 성적 현황 ═══ -->
-    <div class="sect-title"><span class="sect-ico sect-grade">📊</span>성적 현황</div>
+    <div class="sect-title" style="margin-top:0;"><span class="sect-ico sect-grade">📊</span>성적 현황</div>
     <div class="mini-grid">
       <div class="mini-card"><div class="mini-n" id="d-cnt" style="color:#db2777;">0</div><div class="mini-l">총 응시</div></div>
       <div class="mini-card"><div class="mini-n" id="d-ox" style="color:#1e40af;">—</div><div class="mini-l">OX 평균</div></div>
@@ -585,10 +682,11 @@ const idParam=params.get('id');
 
 let stu=null, sid=null, recsAll=[];
 let radarInst=null, trendInst=null;
-let gradesUnsub=null, fbUnsub=null, started=false;
+let gradesUnsub=null, fbUnsub=null, stuUnsub=null, ccUnsub=null, offUnsub=null, started=false;
 let testById=new Map(), testByTitle=new Map();
 let testsLoaded=false;   // tests 과목 매핑을 이미 받았는지 (불필요한 재다운로드 방지)
 let fbList=[], fbEditId=null;
+let gradesErr=false;
 
 onAuthStateChanged(auth, async user => {
   if(!user){ cleanupSubs(); location.replace('/login.html'); return; }
@@ -604,6 +702,9 @@ onAuthStateChanged(auth, async user => {
 function cleanupSubs(){
   if(gradesUnsub){ gradesUnsub(); gradesUnsub=null; }
   if(fbUnsub){ fbUnsub(); fbUnsub=null; }
+  if(stuUnsub){ stuUnsub(); stuUnsub=null; }
+  if(ccUnsub){ ccUnsub(); ccUnsub=null; }
+  if(offUnsub){ offUnsub(); offUnsub=null; }
 }
 window.doLogout=async()=>{ cleanupSubs(); await signOut(auth); location.replace('/login.html'); };
 window.addEventListener('beforeunload', cleanupSubs);
@@ -615,36 +716,44 @@ async function startRealtime() {
   if(!stu){ showError(); return; }
   sid=stu.id||stu.uid;
 
-  // 2) 피드백 실시간 구독 — 다른 관리 페이지에서 저장해도 즉시 반영
+  // 화면을 먼저 띄운다 — 성적(grades)이 늦거나 실패해도 출결·피드백은 보이도록
+  document.getElementById('loadingBox').style.display='none';
+  document.getElementById('content').style.display='block';
+  renderProfile();
+  renderPortalLink();
+
+  // 2) 학생 문서 실시간 구독 — 학생 관리에서 회차 재집계를 돌리면 즉시 반영
+  subscribeStudentDoc();
+
+  // 3) 피드백 실시간 구독 — 다른 관리 페이지에서 저장해도 즉시 반영
   subscribeFeedback();
 
-  // 3) grades 실시간 구독 — 화면을 곧바로 표시.
+  // 4) 출결(수업카드 · 휴강) 실시간 구독
+  subscribeAttendance();
+
+  // 5) grades 실시간 구독.
   //    과목(tests) 매핑은 subject가 비어있는 기록이 있을 때만 1회 지연 로드 → 평상시엔 tests 전체를 받지 않음
   if(gradesUnsub){ gradesUnsub(); gradesUnsub=null; }
-  let firstSnap=true;
   gradesUnsub = onSnapshot(
     query(collection(db,'grades'),where('studentId','==',sid)),
     async (snap)=>{
+      gradesErr=false;
       // 새 구조(ox/multiple/category) + 옛 구조 둘 다 읽어서 필드명 정규화 (문서 1개 = 응시 1건)
       recsAll = snap.docs.map(d=>normalizeDoc(d.id,d.data())).sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp));
       // subject가 빠진 기록이 있을 때만 tests 매핑을 1회 로드
       if(!testsLoaded && recsAll.some(r=>!r.subject)){ await loadTestSubjMap(); testsLoaded=true; }
       recsAll = enrichSubjectsSync(recsAll);
-      if(firstSnap){
-        document.getElementById('loadingBox').style.display='none';
-        document.getElementById('content').style.display='block';
-        renderProfile();
-        renderPortalLink();
-        firstSnap=false;
-      }
       gcRender();
       rpRender();
     },
     (err)=>{
       console.error('grades onSnapshot error:', err);
-      if(firstSnap){ showError(); }
+      gradesErr=true; recsAll=[];
+      gcRender(); rpRender();
     }
   );
+  gcRender();
+  rpRender();
 }
 
 /* 학생 1명만 조회 — id 필드 우선, 없으면 문서 id로 폴백 (students 전체 스캔 제거) */
@@ -658,6 +767,19 @@ async function findStudent(idp){
     if(ds.exists()) return {uid:ds.id,...ds.data()};
   } catch {}
   return null;
+}
+
+/* 학생 문서 실시간 구독 — 회차 · 결석 · 첫 수업일 요약이 바뀌면 화면 갱신 */
+function subscribeStudentDoc(){
+  if(stuUnsub){ stuUnsub(); stuUnsub=null; }
+  const uid=stu.uid;
+  stuUnsub=onSnapshot(doc(db,'students',uid), snap=>{
+    if(!snap.exists()) return;      // 삭제되어도 기존 화면 유지
+    stu={uid:snap.id,...snap.data()};
+    renderProfile();
+    renderPortalLink();
+    atRender();
+  }, err=>{ console.warn('student onSnapshot error:', err); });
 }
 
 async function loadTestSubjMap(){
@@ -762,11 +884,268 @@ function renderProfile() {
   const name=stu.name||stu.displayName||'이름없음', grade=stu.grade||stu.year||'—';
   const bg=GRADE_BG[grade]||'#f5f5f7', col=GRADE_COL[grade]||'#6e6e73', short=GRADE_SHORT[grade]||grade;
   const av=document.getElementById('d-av'); av.textContent=short; av.style.background=bg; av.style.color=col;
-  setTxt('d-name',name); setTxt('d-meta',`${grade} · 종합 성적 분석`);
+  setTxt('d-name',name);
+  const cls=studentClassNames(stu);
+  setTxt('d-meta',`${grade} · ${cls.length?cls.join(' / '):'반 미배정'}`);
   document.title=`${name} 성적 · 인후쌤의 과학 수업 관리 시스템`;
   const subs=(stu.subject&&stu.subject!=='-')?String(stu.subject).split(',').map(x=>x.trim()).filter(Boolean):[];
   document.getElementById('d-subjects').innerHTML=subs.length?subs.map(x=>`<span class="subject-chip2">${esc2(x)}</span>`).join(''):'';
 }
+
+/* ════════════════════════════════════════════════
+   🗓 출결 현황 (조회 전용)
+   · 수업카드(classCards) : studentId == 학생ID(또는 문서ID)
+   · 휴강(classOff)       : 학생이 속한 반 · 첫 수업일 이후 · 오늘까지
+   · 집계 규칙은 student-manage.html 의 회차 재집계와 동일
+     (결석 = 결석 카운트, 그 외 = 수업 1회. status 없으면 출석 간주)
+════════════════════════════════════════════════ */
+const LESSON_ST=['출석','지각','보강'];
+const isLesson = st => LESSON_ST.includes(st||'출석');
+const ST_INFO={
+  '출석':{k:'att'}, '지각':{k:'late'}, '결석':{k:'abs'}, '보강':{k:'mk'}, '휴강':{k:'off'}
+};
+const AT_PAGE=20;
+let atCards=[], atOffs=[], atOpen=new Set(), atLimit=AT_PAGE, atErr='';
+
+function isYMD(v){ return /^\d{4}-\d{2}-\d{2}$/.test(String(v==null?'':v).trim()); }
+function ymd(v){ return String(v==null?'':v).trim(); }
+function ymdParts(v){
+  const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd(v));
+  if(!m) return null;
+  const y=+m[1], mo=+m[2], d=+m[3];
+  if(mo<1||mo>12||d<1||d>31) return null;
+  const dt=new Date(y,mo-1,d);
+  if(dt.getFullYear()!==y||dt.getMonth()!==mo-1||dt.getDate()!==d) return null;
+  return {y:m[1],m:m[2],d:m[3],dow:DAY_KO[dt.getDay()]};
+}
+function fmtYmdFull(v){ const p=ymdParts(v); return p?`${p.y.slice(2)}.${p.m}.${p.d}(${p.dow})`:''; }
+function fmtYmdMd(v){ const p=ymdParts(v); return p?`${+p.m}/${+p.d}(${p.dow})`:''; }
+function fmtYmdDot(v){ const p=ymdParts(v); return p?`${p.y.slice(2)}.${p.m}.${p.d}`:'—'; }
+function stBadge(st){ const k=(ST_INFO[st]||ST_INFO['출석']).k; return `<span class="at-st ${k}">${esc2(st||'출석')}</span>`; }
+
+/* 학생이 속한 반 이름 목록 (classIds → classes 스냅샷 → classNames) */
+function studentClassNames(s){
+  if(!s) return [];
+  const snap=(s.classes&&typeof s.classes==='object')?s.classes:{};
+  const ids=Array.isArray(s.classIds)?s.classIds.filter(Boolean):[];
+  if(ids.length) return ids.map(id=>snap[id]||String(id));
+  return Array.isArray(s.classNames)?s.classNames.filter(Boolean).map(String):[];
+}
+function myClassSets(){
+  const ids=new Set(), names=new Set();
+  (Array.isArray(stu.classIds)?stu.classIds:[]).forEach(v=>{ if(v) ids.add(String(v)); });
+  (Array.isArray(stu.classNames)?stu.classNames:[]).forEach(v=>{ if(v) names.add(String(v)); });
+  const cls=(stu.classes&&typeof stu.classes==='object')?stu.classes:{};
+  Object.keys(cls).forEach(k=>{ ids.add(String(k)); if(cls[k]) names.add(String(cls[k])); });
+  return {ids,names};
+}
+/* classCards.studentId 후보 — student-manage 의 저장 규칙(id 우선, 없으면 문서id)과 동일 */
+function attendKeys(){
+  const set=new Set();
+  [stu.id, stu.uid].forEach(v=>{ const s=String(v==null?'':v).trim(); if(s) set.add(s); });
+  return [...set].slice(0,10);
+}
+function cardMs(c){
+  const v=c.createdAt;
+  if(!v) return 0;
+  if(typeof v==='number') return v;
+  if(typeof v==='object'){
+    if(typeof v.toMillis==='function'){ try{ return v.toMillis(); }catch(e){ return 0; } }
+    if(v.seconds!=null) return v.seconds*1000;
+    if(v instanceof Date) return v.getTime();
+    return 0;
+  }
+  const t=Date.parse(v); return isNaN(t)?0:t;
+}
+function normCard(id,c){
+  return {
+    id,
+    date: ymd(c.classDate),
+    status: c.status || '출석',
+    className: String(c.className||''),
+    classId: String(c.classId||''),
+    subject: String(c.subject||''),
+    teacher: String(c.teacher||''),
+    unit: String(c.unit||''),
+    content: String(c.content||''),
+    homework: String(c.homework||''),
+    attitude: String(c.attitude||''),
+    homeworkDone: String(c.homeworkDone||''),
+    homeworkContent: String(c.homeworkContent||''),
+    absenceReason: String(c.absenceReason||''),
+    studentNote: String(c.studentNote||''),
+    batchWrite: !!c.batchWrite,
+    createdAt: c.createdAt||null
+  };
+}
+function subscribeAttendance(){
+  if(ccUnsub){ ccUnsub(); ccUnsub=null; }
+  if(offUnsub){ offUnsub(); offUnsub=null; }
+  const keys=attendKeys();
+  if(!keys.length){ atCards=[]; atOffs=[]; atRender(); return; }
+  const q = (keys.length===1)
+    ? query(collection(db,'classCards'), where('studentId','==',keys[0]))
+    : query(collection(db,'classCards'), where('studentId','in',keys));
+  ccUnsub=onSnapshot(q, snap=>{
+    atErr='';
+    atCards=snap.docs.map(d=>normCard(d.id, d.data()||{}))
+      .sort((a,b)=> (b.date.localeCompare(a.date)) || (cardMs(b)-cardMs(a)));
+    atRender();
+  }, err=>{
+    console.error('classCards onSnapshot error:', err);
+    atErr=err && err.message ? err.message : '수업카드를 읽을 수 없습니다.';
+    atCards=[]; atRender();
+  });
+  // 휴강은 반 단위 1문서 — 컬렉션이 작아 전체를 받아 클라이언트에서 내 반만 걸러낸다
+  offUnsub=onSnapshot(collection(db,'classOff'), snap=>{
+    atOffs=snap.docs.map(d=>({id:d.id,...(d.data()||{})})).filter(o=>o&&isYMD(o.date));
+    atRender();
+  }, err=>{ console.warn('classOff onSnapshot error:', err); atOffs=[]; atRender(); });
+}
+/* 카드에서 뽑은 집계 (student-manage 재집계와 동일 규칙) */
+function atCompute(){
+  let ses=0, abs=0, first='', last='';
+  atCards.forEach(c=>{
+    if(c.status==='결석'){ abs++; return; }
+    ses++;
+    if(!isYMD(c.date)) return;
+    if(!first || c.date<first) first=c.date;
+    if(c.date>last) last=c.date;
+  });
+  return {ses,abs,first,last};
+}
+/* 내 반 · 첫 수업일 이후 · 오늘까지의 휴강 */
+function myOffs(){
+  const {ids,names}=myClassSets();
+  if(!ids.size && !names.size) return [];
+  const t=todayStr(), cmp=atCompute();
+  const base = (isYMD(stu.startDate)?ymd(stu.startDate):'') || cmp.first || '';
+  return atOffs.filter(o=>{
+    const d=ymd(o.date);
+    if(d>t) return false;
+    if(base && d<base) return false;
+    return ids.has(String(o.classId||'')) || names.has(String(o.className||''));
+  }).sort((a,b)=>ymd(b.date).localeCompare(ymd(a.date)));
+}
+function nextOff(){
+  const {ids,names}=myClassSets();
+  if(!ids.size && !names.size) return null;
+  const t=todayStr();
+  let best=null;
+  atOffs.forEach(o=>{
+    const d=ymd(o.date);
+    if(d<t) return;
+    if(!(ids.has(String(o.classId||'')) || names.has(String(o.className||'')))) return;
+    if(!best || d<ymd(best.date)) best=o;
+  });
+  return best;
+}
+function atRender(){
+  if(!stu) return;
+  const cmp=atCompute();
+  setTxt('at-ses', cmp.ses+'회');
+  setTxt('at-abs', cmp.abs+'회');
+  const firstD = isYMD(stu.startDate)?ymd(stu.startDate):cmp.first;
+  setTxt('at-first', firstD?fmtYmdDot(firstD):'—');
+  setTxt('at-last', cmp.last?fmtYmdDot(cmp.last):'—');
+  atRenderWarn(cmp);
+  atRenderTimeline();
+  atRenderCards();
+}
+function atRenderWarn(cmp){
+  const box=document.getElementById('at-warn');
+  if(!box) return;
+  const lines=[];
+  if(atErr){
+    lines.push(`⚠️ 수업카드를 불러오지 못했습니다 — <b>${esc2(atErr)}</b><br>Firestore 규칙에서 <b>classCards</b> 읽기 권한을 확인해주세요.`);
+  } else if(typeof stu.sessionCount!=='number'){
+    lines.push(`⚠️ 이 학생은 회차가 아직 집계되지 않았습니다. <b><a href="student-manage.html">학생 관리</a></b> 페이지에서 <b>🔄 회차 재집계</b>를 한 번 눌러주세요.<br>위 숫자는 수업카드 ${atCards.length}건을 즉석에서 센 값이고, 학부모 포털은 학생 문서 값을 읽으므로 지금은 비어 보입니다.`);
+  } else {
+    const sSes=stu.sessionCount, sAbs=(typeof stu.absentCount==='number')?stu.absentCount:0;
+    if(sSes!==cmp.ses || sAbs!==cmp.abs){
+      lines.push(`⚠️ 저장된 집계와 수업카드가 다릅니다 — 저장값 <b>회차 ${sSes} · 결석 ${sAbs}</b> / 실제 카드 <b>회차 ${cmp.ses} · 결석 ${cmp.abs}</b><br><b><a href="student-manage.html">학생 관리</a></b>에서 <b>🔄 회차 재집계</b>를 실행하면 맞춰집니다. (학부모 포털은 저장값을 봅니다)`);
+    } else if(cmp.last && ymd(stu.lastClassDate)!==cmp.last){
+      lines.push(`ℹ️ 최근 수업일 저장값(${esc2(ymd(stu.lastClassDate)||'없음')})이 실제 카드(${esc2(cmp.last)})와 다릅니다. 회차 재집계로 정리할 수 있습니다.`);
+    }
+  }
+  if(lines.length){ box.innerHTML=lines.join('<br><br>'); box.classList.add('show'); }
+  else { box.innerHTML=''; box.classList.remove('show'); }
+}
+function atRenderTimeline(){
+  const el=document.getElementById('at-timeline');
+  const chip=document.getElementById('at-tl-chip');
+  const note=document.getElementById('at-note');
+  if(!el) return;
+  const items=[];
+  atCards.forEach(c=>{ if(isYMD(c.date)) items.push({d:c.date,s:c.status||'출석'}); });
+  myOffs().forEach(o=>items.push({d:ymd(o.date),s:'휴강'}));
+  const seen=new Set(), uniq=[];
+  items.sort((a,b)=> b.d.localeCompare(a.d));
+  items.forEach(x=>{ const k=x.d+'|'+x.s; if(seen.has(k)) return; seen.add(k); uniq.push(x); });
+  const show=uniq.slice(0,24);
+  if(chip) chip.textContent = uniq.length?`전체 ${uniq.length}건 중 ${show.length}건`:'기록 없음';
+  if(!show.length){
+    el.innerHTML=`<div class="at-empty">${atErr?'수업카드를 불러오지 못했습니다.':'아직 출결 기록이 없습니다.<br>학생 관리 › 📋 반별 수업카드 일괄 작성에서 출결을 기록하세요.'}</div>`;
+  } else {
+    el.innerHTML=`<div class="at-tl">`+show.map(x=>
+      `<span class="at-tl-item"><span class="at-tl-d">${esc2(fmtYmdMd(x.d))}</span>${stBadge(x.s)}</span>`
+    ).join('')+`</div>`;
+  }
+  if(note){
+    const bits=[];
+    const nOff=nextOff();
+    if(nOff) bits.push(`<span class="hol">🚫 다음 휴강 ${esc2(fmtYmdFull(nOff.date))}${nOff.className?' · '+esc2(nOff.className):''}${nOff.reason?' ('+esc2(nOff.reason)+')':''}</span>`);
+    bits.push('출결 입력·수정은 <b>학생 관리</b> 페이지에서만 가능합니다. (이 페이지는 조회 전용)');
+    note.innerHTML=bits.join('<br>');
+  }
+}
+function atRenderCards(){
+  const el=document.getElementById('at-cards');
+  const chip=document.getElementById('at-cards-chip');
+  if(!el) return;
+  if(chip) chip.textContent=atCards.length+'건';
+  if(atErr){ el.innerHTML=`<div class="at-empty">수업카드를 불러오지 못했습니다.<br>${esc2(atErr)}</div>`; return; }
+  if(!atCards.length){ el.innerHTML=`<div class="at-empty">아직 작성된 수업카드가 없습니다.</div>`; return; }
+  const list=atCards.slice(0, Math.max(AT_PAGE, atLimit));
+  const rows=list.map((c,i)=>{
+    const open=atOpen.has(c.id);
+    const dl=isYMD(c.date)?fmtYmdFull(c.date):'날짜 미기록';
+    const lesson=isLesson(c.status);
+    const kv=[];
+    if(c.subject) kv.push(['과목', esc2(c.subject)]);
+    if(c.teacher) kv.push(['선생님', esc2(c.teacher)]);
+    if(c.className) kv.push(['반', esc2(c.className)]);
+    if(!lesson && c.absenceReason) kv.push(['사유', `<span class="red">${esc2(c.absenceReason)}</span>`]);
+    if(c.studentNote) kv.push(['개별 메모', esc2(c.studentNote)]);
+    if(lesson && c.unit) kv.push(['단원', esc2(c.unit)]);
+    if(lesson && c.content) kv.push(['수업 내용', esc2(c.content)]);
+    if(lesson && c.homeworkContent) kv.push(['과제 내용', esc2(c.homeworkContent)]);
+    if(lesson && c.homework && c.homework!=='-') kv.push(['과제 완성도', esc2(c.homework)]);
+    if(lesson && c.attitude && c.attitude!=='-') kv.push(['수업 태도', esc2(c.attitude)]);
+    if(lesson && c.homeworkDone && c.homeworkDone!=='-') kv.push(['숙제 완료', esc2(c.homeworkDone)]);
+    kv.push(['작성 방식', c.batchWrite?'반 일괄 작성':'개별 작성']);
+    const body=kv.map(([k,v])=>`<div class="at-k">${esc2(k)}</div><div class="at-v">${v}</div>`).join('');
+    return `<div class="at-row${open?' open':''}" id="at-row-i${i}">
+      <button type="button" class="at-row-top" onclick="atToggle(${i},'${esc(c.id)}')">
+        <span class="at-row-d">${esc2(dl)}</span>
+        ${stBadge(c.status)}
+        <span class="at-row-cls">${esc2(c.className||c.subject||'')}</span>
+        <span class="at-row-arrow">▼</span>
+      </button>
+      <div class="at-row-body"><div class="at-kv">${body}</div></div>
+    </div>`;
+  }).join('');
+  const more = (atCards.length>list.length)
+    ? `<button type="button" class="at-more" onclick="atMore()">이전 기록 더보기 (${atCards.length-list.length}건 남음)</button>`
+    : '';
+  el.innerHTML=rows+more;
+}
+window.atToggle=(idx,cardId)=>{
+  if(atOpen.has(cardId)) atOpen.delete(cardId); else atOpen.add(cardId);
+  const row=document.getElementById('at-row-i'+idx);
+  if(row) row.classList.toggle('open', atOpen.has(cardId));
+};
+window.atMore=()=>{ atLimit=Math.max(AT_PAGE,atLimit)+AT_PAGE; atRenderCards(); };
 
 /* ════ 성적 현황 — 응시 기록 테이블 ════ */
 function gcRender() {
@@ -781,6 +1160,8 @@ function gcRender() {
 }
 function gcRenderTable(list){
   const el=document.getElementById('d-records');
+  if(!el) return;
+  if(gradesErr){ el.innerHTML=`<div class="gc-err">응시 기록을 불러오지 못했습니다.<br>잠시 후 새로고침하거나 Firestore 규칙(grades 읽기 권한)을 확인해주세요.</div>`; return; }
   if(!list.length){ el.innerHTML=`<div class="empty-box">아직 응시한 기록이 없습니다.</div>`; return; }
   const scCell=(v,type)=>{
     const map={ ox:{cls:'sc-ox',lbl:'OX',col:'sc-col-ox'}, mc:{cls:'sc-mc',lbl:'4지선다',col:'sc-col-mc'}, ms:{cls:'sc-ms',lbl:'마스터',col:'sc-col-ms'} };
