@@ -367,8 +367,11 @@ function buildSections(){
         <span class="at-lg"><i style="background:#f3f4f6;border-color:#e5e7eb"></i>휴강</span>
       </div>
     </div>
-    <div class="sec-label">수업 기록</div>
-    <div id="at-list"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
+    <div class="sec-label">최근 과제</div>
+    <div id="at-hw"><div class="at-flow"><span class="at-wait">불러오는 중...</span></div></div>
+    <div class="info-card" style="margin-top:16px">
+      <p>수업 내용과 학습 상황은 선생님이 <strong>피드백</strong>으로 정리해 알려드립니다.</p>
+    </div>
   </div>
   <div class="section" id="sec2">
     <br>
@@ -418,7 +421,7 @@ async function loadPortal(sid){
     document.getElementById('loadingScreen').style.display='none';
     document.getElementById('portalApp').style.display='block';
     loadFeedback(student.fireId);
-    loadAttendance(sid,student.fireId,student);
+    renderAttendance(student);
     loadGrades(sid,student.fireId);
   }catch(err){showError();}
 }
@@ -492,14 +495,13 @@ async function loadFeedback(fireId){
 }
 
 /* ════════════════════════════════════════════════
-   출결 · 수업 회차 (classCards)
-   · status 없는 옛 카드는 '출석'으로 간주
-   · 출석 · 지각 · 보강 = 수업 1회 / 결석은 별도 집계
-   · 반 단위 휴강(classOff)은 흐름에만 회색으로 표시
+   출결 · 수업 회차
+   · classCards 를 읽지 않는다 — 수업카드는 선생님 전용(내부 기록)
+   · students 문서에 집계된 값만 사용:
+     sessionCount / absentCount / lastClassDate / recentAttendance / lastHomework
+   · 학생 문서 1개만 읽으므로 남의 학생 기록에 접근할 경로가 없다
 ════════════════════════════════════════════════ */
-const AT_LESSON=['출석','지각','보강'];
-function atStatus(c){const s=String(c&&c.status!=null?c.status:'').trim();return s?s:'출석';}
-function atIsLesson(st){return AT_LESSON.indexOf(st)>=0;}
+function atNum(v){return(typeof v==='number'&&isFinite(v))?v:null;}
 function atYmd(v){
   const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v==null?'':v).trim());
   if(!m)return null;
@@ -509,107 +511,53 @@ function atYmd(v){
   if(dt.getFullYear()!==y||dt.getMonth()!==mo-1||dt.getDate()!==d)return null;
   return dt;
 }
-function atToday(){
-  const t=new Date();
-  return`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
-}
 function atLongDate(v){const d=atYmd(v);return d?`${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`:String(v==null?'':v);}
 function atShortDate(v){const d=atYmd(v);return d?`${d.getMonth()+1}/${d.getDate()}`:String(v==null?'':v);}
-function atBadgeStyle(st){
-  if(st==='결석')return'background:#fef2f2;border-color:#fecaca;color:#b91c1c';
-  if(st==='지각')return'background:#fffbeb;border-color:#fde68a;color:#b45309';
-  if(st==='보강')return'background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8';
-  if(st==='휴강')return'background:#f3f4f6;border-color:#e5e7eb;color:#6b7280';
-  return'background:#ecfdf5;border-color:#6ee7b7;color:#047857';
+const AT_VALID=['출석','지각','결석','보강','휴강'];
+function atStatusOf(x){
+  const st=String(x&&x.s!=null?x.s:'').trim();
+  return AT_VALID.indexOf(st)>=0?st:'출석';
 }
-async function loadAttendance(sid,fireId,student){
+function renderAttendance(student){
   try{
-    const cards=[];const seen=new Set();
-    async function q(val){
-      if(!val)return;
-      try{
-        const s=await getDocs(query(collection(db,'classCards'),where('studentId','==',val)));
-        s.forEach(d=>{
-          if(seen.has(d.id))return;
-          seen.add(d.id);
-          const c=d.data()||{};
-          if(atYmd(c.classDate))cards.push({id:d.id,...c});
-        });
-      }catch(err){}
-    }
-    await q(sid);
-    if(fireId&&fireId!==sid)await q(fireId);
+    const ses=atNum(student&&student.sessionCount);
+    const abs=atNum(student&&student.absentCount);
+    const last=(student&&atYmd(student.lastClassDate))?String(student.lastClassDate):'';
+    document.querySelectorAll('#at-ses').forEach(el=>el.textContent=ses!=null?ses+'회':'—');
+    document.querySelectorAll('#at-abs').forEach(el=>el.textContent=abs!=null?abs+'회':'—');
+    document.querySelectorAll('#at-last').forEach(el=>el.textContent=last?atShortDate(last):'—');
 
-    // 반 단위 휴강 (권한·데이터 없으면 조용히 건너뜀)
-    const offs=[];
-    const myIds=new Set((Array.isArray(student&&student.classIds)?student.classIds:[]).filter(Boolean).map(String));
-    if(myIds.size){
-      try{
-        const os=await getDocs(collection(db,'classOff'));
-        const today=atToday();
-        os.forEach(d=>{
-          const o=d.data()||{};
-          if(!atYmd(o.date))return;
-          if(!myIds.has(String(o.classId)))return;
-          if(String(o.date)>today)return;   // 지난 휴강만 흐름에 표시
-          offs.push(o);
-        });
-      }catch(err){}
-    }
-
-    const asc=cards.slice().sort((a,b)=>String(a.classDate).localeCompare(String(b.classDate)));
-    const ses=asc.filter(c=>atIsLesson(atStatus(c))).length;
-    const abs=asc.filter(c=>atStatus(c)==='결석').length;
-    let lastLesson='';
-    for(let i=asc.length-1;i>=0;i--){if(atIsLesson(atStatus(asc[i]))){lastLesson=String(asc[i].classDate);break;}}
-    document.querySelectorAll('#at-ses').forEach(el=>el.textContent=ses?ses+'회':'—');
-    document.querySelectorAll('#at-abs').forEach(el=>el.textContent=abs?abs+'회':'0회');
-    document.querySelectorAll('#at-last').forEach(el=>el.textContent=lastLesson?atShortDate(lastLesson):'—');
-
-    // 흐름 (수업 + 휴강을 날짜순으로 섞어 최근 12개)
-    const flow=asc.map(c=>({date:String(c.classDate),st:atStatus(c)}))
-      .concat(offs.map(o=>({date:String(o.date),st:'휴강'})))
-      .sort((a,b)=>String(a.date).localeCompare(String(b.date)))
+    // 출결 흐름 — recentAttendance: [{d:'2026-07-24', s:'출석'}, ...]
+    const raw=Array.isArray(student&&student.recentAttendance)?student.recentAttendance:[];
+    const flow=raw.filter(x=>x&&atYmd(x.d))
+      .map(x=>({d:String(x.d),s:atStatusOf(x)}))
+      .sort((a,b)=>a.d.localeCompare(b.d))
       .slice(-12);
     const flowHtml=flow.length
-      ?flow.map(x=>`<span class="at-dot at-st-${e(x.st)}">${e(x.st.charAt(0))}<span class="at-d">${e(atShortDate(x.date))}</span></span>`).join('')
-      :'<span class="at-wait">아직 기록된 수업이 없습니다.</span>';
+      ?flow.map(x=>`<span class="at-dot at-st-${e(x.s)}">${e(x.s.charAt(0))}<span class="at-d">${e(atShortDate(x.d))}</span></span>`).join('')
+      :`<span class="at-wait">${ses?'출결 기록이 정리되는 중입니다.':'아직 기록된 수업이 없습니다.'}</span>`;
     document.querySelectorAll('#at-line').forEach(el=>el.innerHTML=flowHtml);
 
-    // 수업 기록 (최신순, 최대 30건)
-    const desc=asc.slice().reverse().slice(0,30);
-    const listHtml=!desc.length
-      ?emptyBox('🗓','아직 기록된 수업이 없습니다.<br>수업이 진행되면 이곳에 표시됩니다.')
-      :desc.map(c=>{
-        const st=atStatus(c);
-        const lesson=atIsLesson(st);
-        const unit=String(c.unit||'').trim();
-        const content=String(c.content||'').trim();
-        const reason=String(c.absenceReason||'').trim();
-        const note=String(c.studentNote||'').trim();
-        const hw=String(c.homeworkContent||'').trim();
-        let body;
-        if(!lesson)body=`<div class="at-body${reason?'':' mute'}">${reason?e(reason):'사유가 기록되지 않았습니다.'}</div>`;
-        else if(content)body=`<div class="at-body">${e(content)}</div>`;
-        else body='<div class="at-body mute">수업 내용이 아직 등록되지 않았습니다.</div>';
-        const noteHtml=(lesson&&note)?`<div class="at-hw"><b>개별 메모</b> ${e(note)}</div>`:'';
-        const hwHtml=(lesson&&hw)?`<div class="at-hw"><b>📌 과제</b> ${e(hw)}</div>`:'';
-        return`<div class="at-card">
+    // 최근 과제 — lastHomework: {date, text}
+    const hw=(student&&student.lastHomework&&typeof student.lastHomework==='object')?student.lastHomework:null;
+    const hwText=hw?String(hw.text||'').trim():'';
+    const hwDate=(hw&&atYmd(hw.date))?String(hw.date):'';
+    const hwHtml=hwText
+      ?`<div class="at-card">
           <div class="at-top">
-            <span class="at-date">${e(atLongDate(c.classDate))}</span>
-            <span class="at-badge" style="${atBadgeStyle(st)}">${e(st)}</span>
-            ${unit?`<span class="at-unit">${e(unit)}</span>`:''}
+            <span class="at-date">${e(hwDate?atLongDate(hwDate):'최근 수업')}</span>
+            <span class="at-badge" style="background:#fdf2f8;border-color:#fbcfe8;color:#be185d">과제</span>
           </div>
-          ${body}${noteHtml}${hwHtml}
-        </div>`;
-      }).join('');
-    document.querySelectorAll('#at-list').forEach(el=>el.innerHTML=listHtml);
+          <div class="at-body">${e(hwText)}</div>
+        </div>`
+      :`<div class="at-flow"><span class="at-wait">등록된 과제가 없습니다.</span></div>`;
+    document.querySelectorAll('#at-hw').forEach(el=>el.innerHTML=hwHtml);
   }catch(err){
     document.querySelectorAll('#at-ses').forEach(el=>el.textContent='—');
     document.querySelectorAll('#at-abs').forEach(el=>el.textContent='—');
     document.querySelectorAll('#at-last').forEach(el=>el.textContent='—');
     document.querySelectorAll('#at-line').forEach(el=>el.innerHTML='<span class="at-wait">출결을 불러오지 못했습니다.</span>');
-    document.querySelectorAll('#at-list').forEach(el=>el.innerHTML='<div class="empty-box">수업 기록을 불러오지 못했습니다.</div>');
+    document.querySelectorAll('#at-hw').forEach(el=>el.innerHTML='<div class="at-flow"><span class="at-wait">과제를 불러오지 못했습니다.</span></div>');
   }
 }
 
