@@ -152,6 +152,39 @@ tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:#fdf2f8}
 tbody td{font-size:13px;padding:11px 13px;color:#1d1d1f}
 
+/* ── 퇴원생 기록 정리 ── */
+.btn-clean{display:none;align-items:center;gap:6px;padding:9px 16px;min-height:40px;border:1.5px solid #fecaca;border-radius:20px;background:#fff;font-size:13px;font-weight:700;color:#dc2626;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;transition:background .15s}
+.btn-clean.show{display:flex}
+.btn-clean:hover{background:#fef2f2}
+.hero-btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ov{display:none;position:fixed;inset:0;background:rgba(29,29,31,.45);z-index:700;align-items:center;justify-content:center;padding:1rem}
+.ov.open{display:flex}
+.md{background:#fff;border-radius:20px;width:100%;max-width:560px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.18)}
+@supports (max-height:1dvh){.md{max-height:86dvh}}
+.md-h{padding:1.1rem 1.2rem .9rem;border-bottom:1px solid #f5f5f7;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.md-h h2{font-size:15px;font-weight:700;letter-spacing:-.02em}
+.md-x{width:36px;height:36px;min-width:36px;border:none;background:#f5f5f7;border-radius:50%;cursor:pointer;font-size:13px;color:#3c3c43;font-family:inherit}
+.md-b{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:1rem 1.2rem}
+.md-f{padding:.9rem 1.2rem;padding-bottom:max(.9rem,env(safe-area-inset-bottom));border-top:1px solid #f5f5f7;display:flex;gap:8px;flex-wrap:wrap}
+.md-f button{flex:1 1 120px;min-height:46px;border-radius:11px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;border:none}
+.bt-cancel{background:#f5f5f7;color:#6e6e73}
+.bt-backup{background:#fff;color:#0e7490;border:1.5px solid #cffafe}
+.bt-del{background:linear-gradient(135deg,#f87171,#dc2626);color:#fff}
+.bt-del:disabled{opacity:.45;cursor:default}
+.cl-note{font-size:11.5px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:9px 11px;line-height:1.6;margin-bottom:.9rem}
+.cl-tools{display:flex;gap:8px;margin-bottom:.7rem;flex-wrap:wrap}
+.cl-tools button{min-height:36px;padding:7px 12px;border-radius:9px;border:1.5px solid #e5e7eb;background:#fff;color:#3c3c43;font-family:inherit;font-size:11.5px;font-weight:700;cursor:pointer}
+.cl-sum{font-size:11.5px;font-weight:700;color:#3c3c43;margin-left:auto;align-self:center}
+.cl-row{display:flex;align-items:center;gap:10px;border:1.5px solid #f3f4f6;border-radius:12px;padding:10px 11px;margin-bottom:7px;cursor:pointer;-webkit-user-select:none;user-select:none;transition:border-color .15s}
+.cl-row.on{border-color:#fca5a5;background:#fffafa}
+.cl-row input{display:none}
+.cl-mark{width:22px;height:22px;border-radius:7px;border:2px solid #d1d5db;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff}
+.cl-row.on .cl-mark{background:#dc2626;border-color:#dc2626}
+.cl-nm{flex:1;min-width:0;font-size:13.5px;font-weight:700;letter-spacing:-.02em}
+.cl-sub{display:block;font-size:10.5px;font-weight:600;color:#aeaeb2;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-cnt{flex-shrink:0;font-size:11px;font-weight:800;color:#b91c1c;background:#fef2f2;border:1px solid #fecaca;border-radius:20px;padding:3px 9px;white-space:nowrap}
+.cl-empty{text-align:center;padding:2rem 1rem;font-size:12.5px;color:#aeaeb2;line-height:1.8}
+
 /* ── Toast ── */
 .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:#1d1d1f;color:#fff;padding:11px 22px;border-radius:12px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s,transform .3s;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.2)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -214,10 +247,13 @@ tbody td{font-size:13px;padding:11px 13px;color:#1d1d1f}
         <div class="hero-sub">70점 미만 응시 기록을 자동으로 모아 대처방안을 관리하세요</div>
       </div>
     </div>
-    <button class="btn-outline" onclick="showHistory()">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.7"/></svg>
-      전체 이력 보기
-    </button>
+    <div class="hero-btns">
+      <button class="btn-clean" id="cleanBtn" onclick="openClean()">🧹 퇴원생 기록 정리</button>
+      <button class="btn-outline" onclick="showHistory()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.7"/></svg>
+        전체 이력 보기
+      </button>
+    </div>
   </div>
 
   <!-- Period Filter -->
@@ -291,12 +327,36 @@ tbody td{font-size:13px;padding:11px 13px;color:#1d1d1f}
   </div>
 </div>
 
+<!-- 퇴원생 기록 일괄 삭제 -->
+<div class="ov" id="cleanOv">
+  <div class="md">
+    <div class="md-h">
+      <h2>🧹 퇴원생 응시 기록 정리</h2>
+      <button class="md-x" onclick="closeClean()">✕</button>
+    </div>
+    <div class="md-b">
+      <div class="cl-note">학생 관리에 <b>더 이상 없는 학생</b>(퇴원 · 삭제)의 응시 기록입니다. 지우면 특별관리 · 대시보드에서 완전히 사라지고 <b>되돌릴 수 없습니다.</b> 삭제 전에 백업 파일을 받아두세요.</div>
+      <div class="cl-tools">
+        <button onclick="cleanAll(true)">전체 선택</button>
+        <button onclick="cleanAll(false)">전체 해제</button>
+        <span class="cl-sum" id="cleanSum">—</span>
+      </div>
+      <div id="cleanList"></div>
+    </div>
+    <div class="md-f">
+      <button class="bt-cancel" onclick="closeClean()">취소</button>
+      <button class="bt-backup" onclick="backupClean()">📥 백업 받기</button>
+      <button class="bt-del" id="cleanDelBtn" onclick="runClean()">선택 삭제</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc,setDoc,collection,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,setDoc,collection,onSnapshot,writeBatch}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
 const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app);
 
@@ -490,7 +550,161 @@ function doRender(){
   renderPending(pending,hiddenPending);
   renderDone(done);
   renderHistory(all.map(c=>{const m=mgmtMap[c.caseId]||{};return{...c,action:m.action||'',done:!!m.done,date:m.date||c.dateStr};}));
+  syncCleanBtn();
 }
+
+/* ══════════════════════════════════════════════════════════════
+   퇴원생 응시 기록 일괄 삭제
+   students 에 없는 학생(퇴원·삭제)의 grades 문서를 학생별로 묶어 보여주고,
+   선택한 학생의 기록을 한 번에 지운다. 관련 특별관리(specialManagement)
+   기록도 같이 정리한다. 삭제 전 백업 JSON 을 받을 수 있다.
+   ══════════════════════════════════════════════════════════════ */
+let cleanSel=new Set();
+
+/* 퇴원·미등록 학생의 grades 문서를 학생 단위로 그룹화 */
+function orphanGroups(){
+  if(!studentsLoaded)return [];
+  const map=new Map();
+  gradeDocs.forEach(d=>{
+    const r=d.data()||{};
+    const sid=String(r.studentId||'').trim();
+    const nm=(r.studentName||'').trim();
+    if((sid&&aIds.has(sid))||(nm&&aNames.has(nm)))return;   // 재원생 → 대상 아님
+    const key=sid+'|'+nm;
+    let g=map.get(key);
+    if(!g){g={key,sid,name:nm||'(이름 없음)',grade:r.studentGrade||r.grade||'',ids:[],low:0,last:null};map.set(key,g);}
+    g.ids.push(d.id);
+    const p=partScores(r);
+    [p.ox,p.multi,p.master].forEach(v=>{if(v!=null&&v<THRESHOLD)g.low++;});
+    const dt=resolveDate(r);
+    if(dt&&!isNaN(dt)&&(!g.last||dt>g.last))g.last=dt;
+  });
+  return [...map.values()].sort((a,b)=>(b.ids.length-a.ids.length)||String(a.name).localeCompare(String(b.name),'ko'));
+}
+function syncCleanBtn(){
+  const btn=document.getElementById('cleanBtn');
+  if(!btn)return;
+  const gs=orphanGroups();
+  const n=gs.reduce((t,g)=>t+g.ids.length,0);
+  btn.classList.toggle('show',gs.length>0);
+  btn.textContent=`🧹 퇴원생 기록 정리 (${gs.length}명 · ${n}건)`;
+  if(document.getElementById('cleanOv').classList.contains('open'))renderClean();
+}
+function renderClean(){
+  const box=document.getElementById('cleanList');
+  const sum=document.getElementById('cleanSum');
+  const del=document.getElementById('cleanDelBtn');
+  if(!box)return;
+  const gs=orphanGroups();
+  const alive=new Set(gs.map(g=>g.key));
+  [...cleanSel].forEach(k=>{if(!alive.has(k))cleanSel.delete(k);});   // 사라진 항목 정리
+  if(!gs.length){
+    box.innerHTML='<div class="cl-empty">지울 기록이 없습니다.<br>모든 응시 기록이 현재 재원생의 것입니다. 🎉</div>';
+    if(sum)sum.textContent='—';
+    if(del)del.disabled=true;
+    return;
+  }
+  const selG=gs.filter(g=>cleanSel.has(g.key));
+  const selDocs=selG.reduce((t,g)=>t+g.ids.length,0);
+  if(sum)sum.textContent=`선택 ${selG.length}명 · ${selDocs}건`;
+  if(del)del.disabled=selDocs===0;
+  box.innerHTML=gs.map(g=>{
+    const on=cleanSel.has(g.key);
+    const sub=[g.grade||'학년 미기록', g.sid?g.sid:'ID 없음', g.last?fmtDate(g.last):'날짜 미기록'].join(' · ');
+    return `<label class="cl-row${on?' on':''}" onclick="toggleClean('${e(g.key)}');return false;">
+      <span class="cl-mark">${on?'✓':''}</span>
+      <span class="cl-nm">${e(g.name)}<span class="cl-sub">${e(sub)}</span></span>
+      <span class="cl-cnt">${g.ids.length}건${g.low?` · 70점↓ ${g.low}`:''}</span>
+    </label>`;
+  }).join('');
+}
+window.openClean=()=>{
+  const gs=orphanGroups();
+  cleanSel=new Set(gs.map(g=>g.key));   // 기본값: 전체 선택
+  document.getElementById('cleanOv').classList.add('open');
+  renderClean();
+};
+window.closeClean=()=>{document.getElementById('cleanOv').classList.remove('open');};
+window.toggleClean=(key)=>{
+  if(cleanSel.has(key))cleanSel.delete(key);else cleanSel.add(key);
+  renderClean();
+};
+window.cleanAll=(on)=>{
+  cleanSel=on?new Set(orphanGroups().map(g=>g.key)):new Set();
+  renderClean();
+};
+/* 삭제 전 백업 — 선택한 학생의 grades 문서를 JSON 파일로 저장 */
+window.backupClean=()=>{
+  const gs=orphanGroups().filter(g=>cleanSel.has(g.key));
+  if(!gs.length){showToast('선택된 학생이 없습니다');return;}
+  const wanted=new Set();
+  gs.forEach(g=>g.ids.forEach(id=>wanted.add(id)));
+  const enc=v=>{
+    if(v===null||v===undefined)return v;
+    if(typeof v==='object'){
+      if(typeof v.toDate==='function'&&v.seconds!=null)return{__ts:true,s:v.seconds,n:v.nanoseconds||0};
+      if(v.seconds!=null&&v.nanoseconds!=null)return{__ts:true,s:v.seconds,n:v.nanoseconds};
+      if(Array.isArray(v))return v.map(enc);
+      const o={};Object.keys(v).forEach(k=>{o[k]=enc(v[k]);});return o;
+    }
+    return v;
+  };
+  const rows=gradeDocs.filter(d=>wanted.has(d.id)).map(d=>({__id:d.id,...enc(d.data()||{})}));
+  const mg=[];
+  rows.forEach(r=>['ox','multi','master'].forEach(t=>{
+    const cid=`${r.__id}__${t}`;
+    if(mgmtMap[cid])mg.push({__id:cid,...enc(mgmtMap[cid])});
+  }));
+  const payload={meta:{app:'beta-science',type:'withdrawn-grades-backup',version:1,exportedAt:new Date().toISOString(),students:gs.map(g=>({name:g.name,id:g.sid,grade:g.grade,count:g.ids.length}))},data:{grades:rows,specialManagement:mg}};
+  try{
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const n=new Date(),p=x=>String(x).padStart(2,'0');
+    a.href=url;a.download=`beta-science-withdrawn-grades-${n.getFullYear()}${p(n.getMonth()+1)}${p(n.getDate())}-${p(n.getHours())}${p(n.getMinutes())}.json`;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+    showToast(`백업 파일을 받았습니다 (${rows.length}건)`);
+  }catch(err){alert('백업 실패: '+err.message);}
+};
+window.runClean=async()=>{
+  const gs=orphanGroups().filter(g=>cleanSel.has(g.key));
+  if(!gs.length){showToast('선택된 학생이 없습니다');return;}
+  const nDoc=gs.reduce((t,g)=>t+g.ids.length,0);
+  const names=gs.slice(0,12).map(g=>`· ${g.name} (${g.ids.length}건)`).join('\n')+(gs.length>12?`\n· 외 ${gs.length-12}명`:'');
+  if(!confirm(`다음 학생의 응시 기록 ${nDoc}건을 삭제합니다.\n\n${names}\n\n※ 되돌릴 수 없습니다. 백업 파일을 먼저 받아두셨나요?`))return;
+  if(!confirm(`마지막 확인입니다.\n기록 ${nDoc}건을 정말 삭제할까요?`))return;
+  const btn=document.getElementById('cleanDelBtn');
+  btn.disabled=true;btn.textContent='삭제 중...';
+  const ids=[];
+  gs.forEach(g=>g.ids.forEach(id=>ids.push(id)));
+  try{
+    // 1) 응시 기록(grades) 삭제
+    let batch=writeBatch(db),ops=0;
+    for(const id of ids){
+      batch.delete(doc(db,'grades',id));ops++;
+      if(ops>=450){await batch.commit();batch=writeBatch(db);ops=0;}
+    }
+    if(ops)await batch.commit();
+    // 2) 관련 특별관리 기록 정리 (규칙상 삭제가 막혀 있어도 화면에는 영향 없으므로 실패는 무시)
+    try{
+      const cids=[];
+      ids.forEach(id=>['ox','multi','master'].forEach(t=>{const c=`${id}__${t}`;if(mgmtMap[c])cids.push(c);}));
+      let b2=writeBatch(db),o2=0;
+      for(const c of cids){
+        b2.delete(doc(db,'specialManagement',c));o2++;
+        if(o2>=450){await b2.commit();b2=writeBatch(db);o2=0;}
+      }
+      if(o2)await b2.commit();
+    }catch(err){console.warn('특별관리 기록 정리 실패:',err.message);}
+    cleanSel=new Set();
+    closeClean();
+    showToast(`응시 기록 ${nDoc}건을 삭제했습니다`);
+  }catch(err){
+    alert('삭제 오류: '+err.message);
+  }finally{
+    btn.disabled=false;btn.textContent='선택 삭제';
+  }
+};
 
 window.setPeriod=(days,el)=>{
   activePeriodDays=days;
@@ -507,7 +721,7 @@ function renderPending(data,hiddenPending){
   const note=((hiddenPending>0&&activePeriodDays!==0)
     ? `<div class="hidden-note"><span>⏳ 기간 밖 미처리 기록 ${hiddenPending}건이 숨겨져 있습니다</span><button onclick="setPeriod(0,document.querySelector('.pf-chip[data-days=&quot;0&quot;]'))">전체 보기</button></div>`
     : '')
-    + (exCount>0 ? `<div class="ex-note">🚪 퇴원·미등록 학생의 70점 미만 기록 ${exCount}건은 목록에서 제외했습니다</div>` : '');
+    + (exCount>0 ? `<div class="ex-note">🚪 퇴원·미등록 학생의 70점 미만 기록 ${exCount}건은 목록에서 제외했습니다 — 완전히 지우려면 위 <b>🧹 퇴원생 기록 정리</b>를 쓰세요</div>` : '');
   if(!data.length){setHTML(l,note+`<div class="empty-state"><p>✅ 이 기간에 처리할 70점 미만 기록이 없습니다</p></div>`);return;}
   const rows=data.map(s=>{
     const lvl=s.score<40?'danger':s.score<60?'warning':'success';
@@ -572,6 +786,15 @@ async function writeCase(caseId,patch){
 window.saveAction=async(caseId)=>{const el=document.getElementById(`input-${caseId}`);const v=el?el.value.trim():(drafts[caseId]||'');try{await writeCase(caseId,{action:v,done:false});drafts[caseId]=v;showToast("저장되었습니다!");}catch(e){showToast("저장 실패: "+e.message);}};
 window.markDone=async(caseId)=>{const el=document.getElementById(`input-${caseId}`);const v=el?el.value.trim():(drafts[caseId]||'');try{await writeCase(caseId,{action:v,done:true});delete drafts[caseId];showToast("처리가 완료되었습니다!");}catch(e){showToast("처리 실패: "+e.message);}};
 window.reopen=async(caseId)=>{try{await writeCase(caseId,{done:false});showToast("다시 대기 목록으로 이동했습니다");}catch(e){showToast("변경 실패: "+e.message);}};
+(function(){
+  const ov=document.getElementById('cleanOv');
+  if(!ov)return;
+  let down=false;
+  ['pointerdown','mousedown','touchstart'].forEach(ev=>ov.addEventListener(ev,e=>{down=(e.target===ov);},{passive:true}));
+  ov.addEventListener('click',e=>{if(e.target===ov&&down){down=false;closeClean();}});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ov.classList.contains('open'))closeClean();});
+})();
+
 window.showToast=(m)=>{const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);};
 </script>
 </body>
