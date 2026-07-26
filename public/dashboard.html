@@ -379,7 +379,7 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
         <tbody id="pendingBody"><tr><td colspan="8" style="text-align:center;padding:2.5rem;color:#aeaeb2">데이터를 불러오는 중...</td></tr></tbody>
       </table>
     </div>
-    <div class="pend-note">※ 주간 학습 클리닉으로 배포된 시험만 집계합니다. 학생이 응시하면 이 목록에서 사라지고 위 '최근 응시 학생'으로 자동 이동합니다.<br>※ 학생 ID 없이 만든 옛 클리닉과 삭제된 학생은 집계에서 제외됩니다.</div>
+    <div class="pend-note">※ 주간 학습 클리닉으로 배포된 시험만 집계합니다. 학생이 응시하면 이 목록에서 사라지고 위 '최근 응시 학생'으로 자동 이동합니다.<br>※ 반 · 이름 · 학년은 학생 관리에 저장된 <b>현재 정보</b>를 실시간으로 표시합니다. (배포 후 반을 배정해도 즉시 반영)<br>※ 학생 ID 없이 만든 옛 클리닉과 삭제된 학생은 집계에서 제외됩니다.</div>
   </div>
 
   <!-- Test Management -->
@@ -451,6 +451,73 @@ const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app);
 (function(){const n=new Date(),days=['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];const el=document.getElementById('today-date');if(el)el.textContent=`${n.getFullYear()}년 ${n.getMonth()+1}월 ${n.getDate()}일`;const dl=document.getElementById('today-day');if(dl)dl.textContent=days[n.getDay()];})();
 
 let aIds=new Set(),sfMap={};
+/* ── 학생 현재 정보 맵 (미응시 명단에서 "지금" 값을 쓰기 위함) ──
+   배포(assignments) 문서에 저장된 className/이름/학년은 "배포 당시 스냅샷"이므로,
+   배포 후에 반을 배정하면 옛 값(빈 값)이 그대로 남는다.
+   그래서 표시할 때는 students 문서의 현재 값을 우선 사용한다. */
+let sClassMap={},sNameMap={},sGradeMap={};
+let classNameById={};   // 반 문서ID -> 반 이름 (classId 참조 구조 대응)
+let studentDocs=[];     // students 스냅샷 원본 (classes 로드 후 재계산용)
+
+/* 학생 문서에서 반 이름 추출: 문자열 필드 → 배열 → classId 참조 순으로 시도 */
+function pickClassName(o){
+  if(!o)return '';
+  const strCands=[o.className,o.class,o.banName,o.ban,o.classTitle,o.classLabel,o.classGroup];
+  for(const v of strCands){
+    if(typeof v==='string'&&v.trim())return v.trim();
+  }
+  const arrCands=[o.classNames,o.classes,o.banList];
+  for(const v of arrCands){
+    if(!Array.isArray(v)||!v.length)continue;
+    const names=v.map(x=>{
+      if(typeof x==='string')return x.trim();
+      if(x&&typeof x==='object')return String(x.className||x.name||x.title||'').trim();
+      return '';
+    }).filter(Boolean);
+    if(names.length)return names.join(', ');
+  }
+  const ids=[];
+  [o.classId,o.banId,o.classDocId].forEach(v=>{if(typeof v==='string'&&v.trim())ids.push(v.trim());});
+  [o.classIds,o.banIds].forEach(v=>{if(Array.isArray(v))v.forEach(x=>{if(typeof x==='string'&&x.trim())ids.push(x.trim());});});
+  const resolved=ids.map(id=>classNameById[id]).filter(Boolean);
+  if(resolved.length)return resolved.join(', ');
+  return '';
+}
+/* students 스냅샷 -> 각종 맵 재계산 */
+function rebuildStudentMaps(){
+  aIds=new Set();sfMap={};sClassMap={};sNameMap={};sGradeMap={};
+  studentDocs.forEach(d=>{
+    const s=d.data()||{};
+    const sid=s.id;
+    if(!sid)return;
+    aIds.add(sid);
+    sfMap[sid]=d.id;
+    const cn=pickClassName(s);
+    if(cn)sClassMap[sid]=cn;
+    const nm=String(s.name||s.studentName||'').trim();
+    if(nm)sNameMap[sid]=nm;
+    const gr=String(s.grade||s.studentGrade||'').trim();
+    if(gr)sGradeMap[sid]=gr;
+  });
+}
+/* 반(classes) 컬렉션 구독 — classId 참조 구조일 때만 의미가 있고, 없거나 권한이 없으면 조용히 무시 */
+function iClasses(){
+  const CAND=['classes','class','bans','classList'];
+  CAND.forEach(name=>{
+    try{
+      onSnapshot(collection(db,name),s=>{
+        let changed=false;
+        s.docs.forEach(d=>{
+          const c=d.data()||{};
+          const nm=String(c.className||c.name||c.title||c.label||'').trim();
+          if(nm&&classNameById[d.id]!==nm){classNameById[d.id]=nm;changed=true;}
+        });
+        if(changed){rebuildStudentMaps();renderPending();}
+      },()=>{ /* 컬렉션 없음 또는 규칙상 접근 불가 → 무시 */ });
+    }catch(err){ /* 잘못된 컬렉션 이름 등 → 무시 */ }
+  });
+}
+
 // 시험ID -> 과목 맵 (tests + master-tests). 응시 기록에 subject가 없을 때 시험지에서 끌어옴
 let examSubjMap={};
 function buildExamSubjMap(){
@@ -471,11 +538,11 @@ function resolveSubject(r){
 onAuthStateChanged(auth,async u=>{
   if(!u){window.location.replace("/login.html");return;}
   try{const s=await getDoc(doc(db,"users",u.uid));if(!s.exists()||s.data().status!=="approved"){await signOut(auth);window.location.replace("/login.html");return;}
-  document.body.style.visibility="visible";iSW();iStats();iRG();iExams();iMT();iAssign();}catch(e){window.location.replace("/login.html");}
+  document.body.style.visibility="visible";iClasses();iSW();iStats();iRG();iExams();iMT();iAssign();}catch(e){window.location.replace("/login.html");}
 });
 window.doLogout=async()=>{await signOut(auth);window.location.replace("/login.html");};
 window.downloadStudentsBackup=async function(){try{const snap=await getDocs(collection(db,"students"));const enc=v=>{if(v===null||v===undefined)return v;if(v instanceof Timestamp)return{__ts:true,s:v.seconds,n:v.nanoseconds};if(Array.isArray(v))return v.map(enc);if(typeof v==='object'){const o={};for(const k in v)o[k]=enc(v[k]);return o;}return v;};const students=snap.docs.map(d=>({__id:d.id,...enc(d.data())}));const payload={meta:{app:'beta-science',version:1,exportedAt:new Date().toISOString()},data:{students}};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');const n=new Date(),pad=x=>String(x).padStart(2,'0');a.href=url;a.download=`beta-science-students-${n.getFullYear()}${pad(n.getMonth()+1)}${pad(n.getDate())}-${pad(n.getHours())}${pad(n.getMinutes())}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);alert('학생 명단 백업 파일을 받았습니다. ('+students.length+'명)');}catch(e){alert('학생 백업 실패: '+e.message);}};
-function iSW(){onSnapshot(collection(db,"students"),s=>{aIds=new Set(s.docs.map(d=>d.data().id).filter(Boolean));sfMap={};s.docs.forEach(d=>{const id=d.data().id;if(id)sfMap[id]=d.id;});renderRecentAttempts();renderPending();});}
+function iSW(){onSnapshot(collection(db,"students"),s=>{studentDocs=s.docs;rebuildStudentMaps();renderRecentAttempts();renderPending();});}
 function pRD(r){if(!r)return null;if(r&&typeof r==='object'&&r.seconds)return new Date(r.seconds*1000);if(typeof r!=='string')return null;const m=r.match(/(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);const d=new Date(r);return isNaN(d)?null:d;}
 function tD(ts){if(!ts)return new Date(0);if(ts&&typeof ts==='object'&&ts.seconds)return new Date(ts.seconds*1000);if(ts&&typeof ts.toDate==='function')return ts.toDate();return new Date(ts);}
 function cSC(docs){const n=new Date(),y=n.getFullYear(),m=n.getMonth(),sT=new Date(y,m,1),sL=new Date(y,m-1,1),eL=new Date(y,m,0,23,59,59);let tN=0,lN=0;docs.forEach(d=>{const dt=pRD(d.data().regDate);if(!dt)return;if(dt>=sT)tN++;else if(dt>=sL&&dt<=eL)lN++;});const el=document.getElementById('stat-student-change');if(!el)return;const d=tN-lN;if(d>0){el.textContent=`+${d}명`;el.className='stat-sub up';}else if(d<0){el.textContent=`${d}명`;el.className='stat-sub down';}else{el.textContent='변동 없음';el.className='stat-sub same';}}
@@ -561,6 +628,7 @@ function sBadge(s){if(s==null)return'<span style="color:#aeaeb2">-</span>';const
      className, weekLabel, items[], createdAt }
    items[] 중 { type:'examlink', source:'online'|'master',
      examId, examType:'ox'|'multiple', title, subject } 만 시험으로 집계
+   ※ className 등은 배포 당시 스냅샷이므로 표시는 students 문서 현재값 우선
    ══════════════════════════════════════════════════════════════ */
 let assignDocs=[];
 let distMap={};      // 'sid|examId|type' -> [배포시각ms,...] 오름차순
@@ -719,7 +787,8 @@ function renderPending(){
     // 배포일 최근순 (날짜 없는 건은 맨 아래)
     const av=a.lastMs||0,bv=b.lastMs||0;
     if(av!==bv)return bv-av;
-    return String(a.name).localeCompare(String(b.name),'ko');
+    const an=sNameMap[a.sid]||a.name||'',bn=sNameMap[b.sid]||b.name||'';
+    return String(an).localeCompare(String(bn),'ko');
   });
   if(cntEl){
     cntEl.textContent=rows.length?`미응시 ${rows.length}건`:'전원 응시 완료';
@@ -736,14 +805,17 @@ function renderPending(){
     const days=x.firstMs?Math.max(0,Math.floor((now-x.firstMs)/86400000)):null;
     const dayCell=days==null?'<span class="dist-none">—</span>'
       :`<span class="day-badge ${days>=7?'d-late':days>=3?'d-warn':'d-fresh'}">D+${days}</span>`;
-    const g=x.grade||'',gs=g.replace('등','').replace('학년','')||g;
+    // 이름 · 학년 · 반: 학생 관리에 저장된 현재 값 우선, 없으면 배포 당시 스냅샷
+    const nm=sNameMap[x.sid]||x.name||'';
+    const g=sGradeMap[x.sid]||x.grade||'',gs=g.replace('등','').replace('학년','')||g;
     const gb=g?`<span class="grade-badge ${gm[g]||''}">${e(gs)}</span>`:'<span style="color:#aeaeb2">-</span>';
-    const cb=x.className?`<span class="class-badge" title="${e(x.className)}">${e(x.className)}</span>`:'<span style="color:#aeaeb2">-</span>';
+    const cn=sClassMap[x.sid]||x.className||'';
+    const cb=cn?`<span class="class-badge" title="${e(cn)}">${e(cn)}</span>`:'<span style="color:#aeaeb2">-</span>';
     const ti=TYPE_INFO[x.type]||TYPE_INFO.multi;
     const re=x.cnt>1?`<span class="re-badge">재배포 ${x.cnt}회</span>`:'';
     const testCell=`<div class="exam-cell"><span class="exam-badge-box"><span class="type-badge ${ti.cls}">${ti.label}</span></span><span class="test-name-cell"><span class="exam-name-text" title="${e(x.title||'(제목 없음)')}">${e(x.title||'(제목 없음)')}</span>${re}</span></div>`;
     const linkCell=`<button class="link-btn" title="이 학생의 클리닉 링크 복사" onclick="copyClinicLink('${e(x.token)}')">🔗</button>`;
-    return `<tr><td>${dcell}${days==null?'':`<span class="m-only ${days>=7?'m-late':'m-mid'}">D+${days} 경과</span>`}</td><td class="c-days">${dayCell}</td><td class="c-sid"><span class="sid-text">${e(x.sid)}</span></td><td style="font-weight:700;color:#1d1d1f">${e(x.name||'-')}<span class="m-only m-sid">${e(x.sid)}</span></td><td>${gb}</td><td>${cb}</td><td style="text-align:left">${testCell}</td><td>${linkCell}</td></tr>`;
+    return `<tr><td>${dcell}${days==null?'':`<span class="m-only ${days>=7?'m-late':'m-mid'}">D+${days} 경과</span>`}</td><td class="c-days">${dayCell}</td><td class="c-sid"><span class="sid-text">${e(x.sid)}</span></td><td style="font-weight:700;color:#1d1d1f">${e(nm||'-')}<span class="m-only m-sid">${e(x.sid)}</span></td><td>${gb}</td><td>${cb}</td><td style="text-align:left">${testCell}</td><td>${linkCell}</td></tr>`;
   }).join('');
 }
 window.copyClinicLink=function(token){
@@ -831,11 +903,11 @@ function renderRecentAttempts(){
     const dms=distDate(sid,r.examId||r.testId,type,attemptMs);
     const dStr=fmtYMD(dms);
     const distCell=dStr?`<span class="dist-date">${dStr}</span>`:'<span class="dist-none">—</span>';
-    const g=r.studentGrade||r.grade||'',gc=gm[g]||'',gs=g.replace('등','').replace('학년','')||g;
-    const gb=g?`<span class="grade-badge ${gc}">${gs}</span>`:'<span style="color:#aeaeb2">-</span>';
+    const g=sGradeMap[sid]||r.studentGrade||r.grade||'',gc=gm[g]||'',gs=g.replace('등','').replace('학년','')||g;
+    const gb=g?`<span class="grade-badge ${gc}">${e(gs)}</span>`:'<span style="color:#aeaeb2">-</span>';
     const subj=resolveSubject(r);
     const sb=subj?`<span class="subj-badge ${sC(subj)}">${e(subj)}</span>`:'<span style="color:#aeaeb2">-</span>';
-    const sn=r.studentName||'-',sf=sn.replace(/'/g,"\\'");
+    const sn=sNameMap[sid]||r.studentName||'-',sf=String(sn).replace(/'/g,"\\'");
     const nc=sid?`<span class="student-name-link" onclick="openSCC('${sid}','${sf}')">${e(sn)}</span>`:e(sn);
     const tname=r.testName||r.examTitle||r.unitName||'-';
     // 이 줄의 유형 배지 하나만 표시 (OX·4지선다는 이미 별도 줄로 분리됨)
