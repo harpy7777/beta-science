@@ -370,6 +370,28 @@ function partScores(r){
   return {ox, multi:m, master:ms};
 }
 
+/* ── 입력 보존: 실시간 갱신(onSnapshot)이 와도 타이핑 중인 값·포커스·스크롤 유지 ── */
+const drafts={};                                                  // caseId → 저장 전 입력값
+const lastHTML={pendingList:'',doneList:'',historyBody:''};       // 같은 내용이면 다시 그리지 않음
+document.addEventListener('input',ev=>{
+  const t=ev.target;
+  if(t&&t.id&&t.id.indexOf('input-')===0)drafts[t.id.slice(6)]=t.value;
+});
+function draftVal(c){return drafts[c.caseId]!=null?drafts[c.caseId]:(c.action||'');}
+function setHTML(el,html){
+  if(!el)return;
+  if(lastHTML[el.id]===html)return;                               // 변화 없으면 DOM 유지 → 입력 안 날아감
+  const a=document.activeElement;
+  const f=(a&&a.id&&a.id.indexOf('input-')===0)?{id:a.id,s:a.selectionStart,e:a.selectionEnd}:null;
+  const sc=el.querySelector('.sp-scroll');
+  const sl=sc?sc.scrollLeft:0;
+  el.innerHTML=html;
+  lastHTML[el.id]=html;
+  const sc2=el.querySelector('.sp-scroll');
+  if(sc2&&sl)sc2.scrollLeft=sl;
+  if(f){const t=document.getElementById(f.id);if(t){t.focus();try{t.setSelectionRange(f.s,f.e);}catch(_){}}}
+}
+
 /* ── 실시간 데이터 ── */
 let aIds=new Set();      // 등록 학생 id 집합 (탈원생 필터용)
 let clsById={};          // 학생 id → 반 이름
@@ -432,7 +454,10 @@ function inPeriod(c){
   return c.dObj.getTime()>=cutoff;
 }
 
-function render(){
+let rTimer=null;
+function render(){clearTimeout(rTimer);rTimer=setTimeout(doRender,70);}  // 3개 리스너 연속 발화 합치기
+
+function doRender(){
   const all=buildCases();
   all.sort((a,b)=>(b.dObj?b.dObj.getTime():0)-(a.dObj?a.dObj.getTime():0));
   caseMap={};
@@ -465,11 +490,12 @@ function renderPending(data,hiddenPending){
   const note=(hiddenPending>0&&activePeriodDays!==0)
     ? `<div class="hidden-note"><span>⏳ 기간 밖 미처리 기록 ${hiddenPending}건이 숨겨져 있습니다</span><button onclick="setPeriod(0,document.querySelector('.pf-chip[data-days=&quot;0&quot;]'))">전체 보기</button></div>`
     : '';
-  if(!data.length){l.innerHTML=note+`<div class="empty-state"><p>✅ 이 기간에 처리할 70점 미만 기록이 없습니다</p></div>`;return;}
+  if(!data.length){setHTML(l,note+`<div class="empty-state"><p>✅ 이 기간에 처리할 70점 미만 기록이 없습니다</p></div>`);return;}
   const rows=data.map(s=>{
     const lvl=s.score<40?'danger':s.score<60?'warning':'success';
     const rowLvl=s.score<40?'danger':s.score<60?'warning':'';
     const sg=shortGrade(s.grade);
+    const av=draftVal(s);
     return `
     <div class="sp-row ${rowLvl}">
       <span class="col-g"><span class="gcircle ${avatarCls(s.grade)}">${e(sg)}</span></span>
@@ -478,20 +504,20 @@ function renderPending(data,hiddenPending){
       <span class="col-c">${clsCell(s.cls)}</span>
       <span class="col-t"><span class="type-tag ${TYPE_TAG[s.type]}">${TYPE_LABEL[s.type]}</span><span class="tname" title="${e(s.test||'-')}">${e(s.test||'-')}</span></span>
       <span class="col-sc"><span class="score-chip ${lvl}">${s.score}점</span></span>
-      <span class="col-a"><input class="rinput${s.action?' filled':''}" id="input-${s.caseId}" type="text" placeholder="대처방안 입력" value="${e(s.action||'')}"></span>
+      <span class="col-a"><input class="rinput${av?' filled':''}" id="input-${s.caseId}" type="text" placeholder="대처방안 입력" value="${e(av)}"></span>
       <span class="col-b">
         <button class="rbtn save" onclick="saveAction('${s.caseId}')">저장</button>
         <button class="rbtn done" onclick="markDone('${s.caseId}')">완료처리</button>
       </span>
     </div>`;
   }).join('');
-  l.innerHTML=note+`<div class="sp-scroll"><div class="sp-list">${HEAD_HTML}${rows}</div></div>`;
+  setHTML(l,note+`<div class="sp-scroll"><div class="sp-list">${HEAD_HTML}${rows}</div></div>`);
 }
 
 function renderDone(data){
   const l=document.getElementById('doneList');
   document.getElementById('doneCount').textContent=data.length;
-  if(!data.length){l.innerHTML=`<div class="empty-state"><p>처리 완료된 항목이 없습니다</p></div>`;return;}
+  if(!data.length){setHTML(l,`<div class="empty-state"><p>처리 완료된 항목이 없습니다</p></div>`);return;}
   const rows=data.map(s=>{
     const sg=shortGrade(s.grade);
     return `
@@ -506,11 +532,11 @@ function renderDone(data){
       <span class="col-b"><button class="rbtn reopen" onclick="reopen('${s.caseId}')">↩ 대기로</button></span>
     </div>`;
   }).join('');
-  l.innerHTML=`<div class="sp-scroll"><div class="sp-list">${HEAD_HTML}${rows}</div></div>`;
+  setHTML(l,`<div class="sp-scroll"><div class="sp-list">${HEAD_HTML}${rows}</div></div>`);
 }
 
 function renderHistory(data){
-  document.getElementById('historyBody').innerHTML=data.map(s=>`<tr><td>${e(s.name||'-')}</td><td>${s.cls?e(shortClass(s.cls)):'-'}</td><td>${e(s.test||'-')}</td><td>${TYPE_LABEL[s.type]||'-'}</td><td>${s.score}점</td><td>${s.done?'<span style="color:#16a34a;font-weight:700">완료</span>':'<span style="color:#d97706;font-weight:700">대기</span>'}</td><td>${e(s.action||'-')}</td><td style="color:#aeaeb2">${e(shortDate(s.date||'-'))}</td></tr>`).join('');
+  setHTML(document.getElementById('historyBody'),data.map(s=>`<tr><td>${e(s.name||'-')}</td><td>${s.cls?e(shortClass(s.cls)):'-'}</td><td>${e(s.test||'-')}</td><td>${TYPE_LABEL[s.type]||'-'}</td><td>${s.score}점</td><td>${s.done?'<span style="color:#16a34a;font-weight:700">완료</span>':'<span style="color:#d97706;font-weight:700">대기</span>'}</td><td>${e(s.action||'-')}</td><td style="color:#aeaeb2">${e(shortDate(s.date||'-'))}</td></tr>`).join(''));
 }
 
 window.showHistory=()=>{const s=document.getElementById('historySection');s.style.display=s.style.display==='none'?'block':'none';};
@@ -525,8 +551,8 @@ async function writeCase(caseId,patch){
     ...patch
   },{merge:true});
 }
-window.saveAction=async(caseId)=>{const el=document.getElementById(`input-${caseId}`);const v=el?el.value.trim():'';try{await writeCase(caseId,{action:v,done:false});showToast("저장되었습니다!");}catch(e){showToast("저장 실패: "+e.message);}};
-window.markDone=async(caseId)=>{const el=document.getElementById(`input-${caseId}`);const v=el?el.value.trim():'';try{await writeCase(caseId,{action:v,done:true});showToast("처리가 완료되었습니다!");}catch(e){showToast("처리 실패: "+e.message);}};
+window.saveAction=async(caseId)=>{const el=document.getElementById(`input-${caseId}`);const v=el?el.value.trim():(drafts[caseId]||'');try{await writeCase(caseId,{action:v,done:false});drafts[caseId]=v;showToast("저장되었습니다!");}catch(e){showToast("저장 실패: "+e.message);}};
+window.markDone=async(caseId)=>{const el=document.getElementById(`input-${caseId}`);const v=el?el.value.trim():(drafts[caseId]||'');try{await writeCase(caseId,{action:v,done:true});delete drafts[caseId];showToast("처리가 완료되었습니다!");}catch(e){showToast("처리 실패: "+e.message);}};
 window.reopen=async(caseId)=>{try{await writeCase(caseId,{done:false});showToast("다시 대기 목록으로 이동했습니다");}catch(e){showToast("변경 실패: "+e.message);}};
 window.showToast=(m)=>{const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);};
 </script>
