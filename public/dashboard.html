@@ -451,6 +451,16 @@ const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app);
 (function(){const n=new Date(),days=['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];const el=document.getElementById('today-date');if(el)el.textContent=`${n.getFullYear()}년 ${n.getMonth()+1}월 ${n.getDate()}일`;const dl=document.getElementById('today-day');if(dl)dl.textContent=days[n.getDay()];})();
 
 let aIds=new Set(),sfMap={};
+/* ── 재원 판정 ──
+   students 에 없는 학생(퇴원·삭제)의 기록은 통계·목록에서 제외한다.
+   studentId 로 확인하고, studentId 가 없던 옛 기록은 이름으로 확인한다.
+   students 를 아직 못 받은 로딩 중에는 판단을 보류(전부 통과)해 깜빡임을 막는다. */
+let aNames=new Set(),studentsLoaded=false;
+function isAliveRec(sid,name){
+  if(!studentsLoaded)return true;
+  const s=String(sid==null?'':sid).trim(),n=String(name==null?'':name).trim();
+  return (!!s&&aIds.has(s))||(!!n&&aNames.has(n));
+}
 /* ── 학생 현재 정보 맵 (미응시 명단에서 "지금" 값을 쓰기 위함) ──
    배포(assignments) 문서에 저장된 className/이름/학년은 "배포 당시 스냅샷"이므로,
    배포 후에 반을 배정하면 옛 값(빈 값)이 그대로 남는다.
@@ -485,10 +495,12 @@ function pickClassName(o){
 }
 /* students 스냅샷 -> 각종 맵 재계산 */
 function rebuildStudentMaps(){
-  aIds=new Set();sfMap={};sClassMap={};sNameMap={};sGradeMap={};
+  aIds=new Set();aNames=new Set();sfMap={};sClassMap={};sNameMap={};sGradeMap={};
   studentDocs.forEach(d=>{
     const s=d.data()||{};
     const sid=s.id;
+    const rawNm=String(s.name||s.studentName||'').trim();
+    if(rawNm)aNames.add(rawNm);          // ID 없는 학생도 이름은 재원 판정에 사용
     if(!sid)return;
     aIds.add(sid);
     sfMap[sid]=d.id;
@@ -542,7 +554,7 @@ onAuthStateChanged(auth,async u=>{
 });
 window.doLogout=async()=>{await signOut(auth);window.location.replace("/login.html");};
 window.downloadStudentsBackup=async function(){try{const snap=await getDocs(collection(db,"students"));const enc=v=>{if(v===null||v===undefined)return v;if(v instanceof Timestamp)return{__ts:true,s:v.seconds,n:v.nanoseconds};if(Array.isArray(v))return v.map(enc);if(typeof v==='object'){const o={};for(const k in v)o[k]=enc(v[k]);return o;}return v;};const students=snap.docs.map(d=>({__id:d.id,...enc(d.data())}));const payload={meta:{app:'beta-science',version:1,exportedAt:new Date().toISOString()},data:{students}};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');const n=new Date(),pad=x=>String(x).padStart(2,'0');a.href=url;a.download=`beta-science-students-${n.getFullYear()}${pad(n.getMonth()+1)}${pad(n.getDate())}-${pad(n.getHours())}${pad(n.getMinutes())}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);alert('학생 명단 백업 파일을 받았습니다. ('+students.length+'명)');}catch(e){alert('학생 백업 실패: '+e.message);}};
-function iSW(){onSnapshot(collection(db,"students"),s=>{studentDocs=s.docs;rebuildStudentMaps();renderRecentAttempts();renderPending();});}
+function iSW(){onSnapshot(collection(db,"students"),s=>{studentDocs=s.docs;studentsLoaded=true;rebuildStudentMaps();renderRecentAttempts();renderPending();});}
 function pRD(r){if(!r)return null;if(r&&typeof r==='object'&&r.seconds)return new Date(r.seconds*1000);if(typeof r!=='string')return null;const m=r.match(/(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);const d=new Date(r);return isNaN(d)?null:d;}
 function tD(ts){if(!ts)return new Date(0);if(ts&&typeof ts==='object'&&ts.seconds)return new Date(ts.seconds*1000);if(ts&&typeof ts.toDate==='function')return ts.toDate();return new Date(ts);}
 function cSC(docs){const n=new Date(),y=n.getFullYear(),m=n.getMonth(),sT=new Date(y,m,1),sL=new Date(y,m-1,1),eL=new Date(y,m,0,23,59,59);let tN=0,lN=0;docs.forEach(d=>{const dt=pRD(d.data().regDate);if(!dt)return;if(dt>=sT)tN++;else if(dt>=sL&&dt<=eL)lN++;});const el=document.getElementById('stat-student-change');if(!el)return;const d=tN-lN;if(d>0){el.textContent=`+${d}명`;el.className='stat-sub up';}else if(d<0){el.textContent=`${d}명`;el.className='stat-sub down';}else{el.textContent='변동 없음';el.className='stat-sub same';}}
@@ -603,11 +615,12 @@ function iStats(){
   onSnapshot(collection(db,"grades"),s=>{
     let v=0; const lowSet=new Set();
     s.forEach(d=>{const r=d.data(),sid=r.studentId||'';
-      if(aIds.size===0||aIds.has(sid)){
+      if(isAliveRec(sid,r.studentName)){                 // 퇴원·삭제 학생 기록 제외
         v++;
         // 70점 미만 파트가 하나라도 있으면 그 학생을 집중관리 대상에 추가(중복 제거)
+        const key=String(sid||'').trim()||('n:'+String(r.studentName||'').trim());
         const p=displayParts(r);
-        [p.ox,p.multi,p.master].forEach(sc=>{if(sc!=null&&sc<70&&sid)lowSet.add(sid);});
+        [p.ox,p.multi,p.master].forEach(sc=>{if(sc!=null&&sc<70&&key!=='n:')lowSet.add(key);});
       }
     });
     document.getElementById('stat-total-grades').textContent=v;
@@ -767,7 +780,7 @@ function renderPending(){
   const groups={};
   distList.forEach(x=>{
     if(!x.sid)return;
-    if(aIds.size>0&&!aIds.has(x.sid))return;              // 삭제된 학생 제외
+    if(studentsLoaded&&!aIds.has(String(x.sid).trim()))return;   // 퇴원·삭제 학생 제외
     const k=x.sid+'|'+x.examId+'|'+x.type;
     if(attempted.has(k))return;                           // 이미 응시 → 제외
     (groups[k]||(groups[k]=[])).push(x);
@@ -868,7 +881,7 @@ function renderRecentAttempts(){
   // 응시 1건이 OX+4지선다를 함께 가지면 각 유형을 별도 줄로 분리 (마스터는 한 줄)
   const rows=[];
   lastGradeDocs.forEach(d=>{const r=d.data(),sid=r.studentId||'';
-    if(aIds.size>0&&!aIds.has(sid))return;
+    if(!isAliveRec(sid,r.studentName))return;            // 퇴원·삭제 학생 기록 제외
     const ts=tD(r.timestamp||r.submittedTimestamp||r.date).getTime();
     const types=recTypes(r);
     if(types.length===1&&types[0]==='master'){rows.push({docId:d.id,r,sid,ts,type:'master'});}
