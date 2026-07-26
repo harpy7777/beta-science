@@ -237,6 +237,7 @@ body.modal-open { overflow: hidden; }
 .sm-hint { font-size:10.5px; color:#aeaeb2; line-height:1.55; margin-top:5px; }
 .sm-hint.ok { color:#047857; font-weight:700; }
 .sm-hint.bad { color:#b91c1c; font-weight:700; }
+.sm-hint.blue { color:#1d4ed8; font-weight:700; }
 .cc-inp.bad { border-color:#ef4444; background:#fffafa; }
 .sm-idbtn {
   margin-top:6px; min-height:34px; padding:7px 11px; border-radius:9px;
@@ -281,6 +282,9 @@ body.modal-open { overflow: hidden; }
 .sm-chip.abs { color:#b91c1c; background:#fef2f2; border:1px solid #fecaca; }
 .sm-chip.est { color:#8e8e93; background:#f5f5f7; border:1px solid #ececef; font-weight:700; }
 .sm-chip.hol { color:#6b7280; background:#f3f4f6; border:1px solid #e5e7eb; }
+/* 보강 칩 — 완료(파랑) · 대기(주황) */
+.sm-chip.mk  { color:#1d4ed8; background:#eff6ff; border:1px solid #bfdbfe; }
+.sm-chip.mkw { color:#b45309; background:#fffbeb; border:1px solid #fde68a; }
 
 /* 출결 요약 줄 */
 .sm-stat { font-size:11px; color:#6e6e73; margin:-1px 0 0.7rem; display:flex; flex-wrap:wrap; gap:5px; align-items:center; line-height:1.5; }
@@ -288,6 +292,17 @@ body.modal-open { overflow: hidden; }
 .sm-stat .sep { color:#d1d1d6; }
 .sm-stat .red { color:#b91c1c; }
 .sm-stat .red b { color:#b91c1c; }
+.sm-stat .blue { color:#1d4ed8; }
+.sm-stat .blue b { color:#1d4ed8; }
+
+/* 보강 안내 줄 (결석 → 보강 완료 / 보강 대기) */
+.sm-mkline {
+  font-size:11px; font-weight:700; line-height:1.5;
+  color:#1d4ed8; background:#eff6ff; border:1px solid #dbeafe;
+  border-radius:10px; padding:7px 9px; margin:0 0 0.7rem;
+  display:flex; align-items:center; gap:5px; flex-wrap:wrap; word-break:keep-all;
+}
+.sm-mkline.wait { color:#b45309; background:#fffbeb; border-color:#fde68a; }
 
 /* 도구 버튼 · 안내 배너 */
 .sm-tools { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:0.9rem; }
@@ -376,6 +391,10 @@ body.modal-open { overflow: hidden; }
 .bt-av { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; }
 .bt-nm { font-size:13.5px; font-weight:700; color:#1d1d1f; min-width:0; flex:1; letter-spacing:-0.01em; }
 .bt-nm .bt-sub { display:block; font-size:10px; font-weight:600; color:#aeaeb2; margin-top:1px; }
+/* 보강 연결 표시 · 미보강 결석 경고 */
+.bt-mkfor { display:block; font-size:10px; font-weight:800; color:#1d4ed8; margin-top:2px; }
+.bt-mkfor.wait { color:#b45309; }
+.bt-mkfor:empty { display:none; }
 .bt-seg { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; width:216px; flex-shrink:0; }
 .bt-sbtn {
   min-height:38px; border:1.5px solid #e5e7eb; background:#fff; color:#8e8e93; border-radius:9px;
@@ -416,6 +435,7 @@ body.modal-open { overflow: hidden; }
   .welcome-bar .cc-write-btn { width:100%; min-height:44px; font-size:13px; }
   .sm-draft { font-size:11px; }
   .sm-draft button { width:100%; }
+  .sm-mkline { font-size:10.5px; padding:7px 8px; }
 }
 @media (max-width:400px) {
   .sm-class-filter, .sm-sort { flex:1 1 100%; }
@@ -472,6 +492,7 @@ body.modal-open { overflow: hidden; }
       <option value="new">입회 최신순</option>
       <option value="ses">회차 많은순</option>
       <option value="abs">결석 많은순</option>
+      <option value="mkw">보강 대기순</option>
       <option value="name">이름순</option>
     </select>
   </div>
@@ -580,6 +601,11 @@ body.modal-open { overflow: hidden; }
       <span class="cc-label">수업 날짜 <span class="req">*</span></span>
       <input class="cc-inp" id="cc-w-date" type="date">
     </div>
+    <div class="sm-field" id="cc-mk-field" style="display:none;">
+      <span class="cc-label">이 보강은 어떤 결석의 보강인가요?</span>
+      <select class="cc-sel" id="cc-w-mkfor"><option value="">지정 안 함</option></select>
+      <div class="sm-hint blue" id="cc-mk-hint">결석과 연결하면 카드와 학부모 리포트에 「7/24 결석 → 7/27 보강 완료」로 표시됩니다.</div>
+    </div>
     <div class="sm-field" id="cc-reason-field" style="display:none;">
       <span class="cc-label">사유 (선택)</span>
       <input class="cc-inp" id="cc-w-reason" type="text" placeholder="예: 학교 행사 · 몸살 · 가족 일정" autocomplete="off">
@@ -643,7 +669,7 @@ body.modal-open { overflow: hidden; }
   <div class="sm-modal bt-modal">
     <div class="sm-modal-title">📋 반별 수업카드 일괄 작성</div>
     <div class="sm-draft" id="bt-draft"><span></span><button type="button" onclick="resetBTDraft()">새로 작성</button></div>
-    <div class="bt-note">반 · 날짜를 고르면 그 반 학생이 모두 나옵니다. <b>수업 내용은 한 번만</b> 쓰면 전원에게 저장되고, 출결과 개별 메모만 학생별로 다르게 넣습니다.</div>
+    <div class="bt-note">반 · 날짜를 고르면 그 반 학생이 모두 나옵니다. <b>수업 내용은 한 번만</b> 쓰면 전원에게 저장되고, 출결과 개별 메모만 학생별로 다르게 넣습니다.<br><b>보강</b>을 누르면 그 학생의 미보강 결석일이 자동으로 연결됩니다.</div>
     <div class="bt-loaded" id="bt-loaded"></div>
     <div class="sm-row2">
       <div class="sm-field">
@@ -774,7 +800,7 @@ let editId = null;          // 수정 중인 학생의 Firestore 문서 id (null
 let editPhotoUrl = '';      // 수정 시 기존 사진 url 보존
 let gradeFilter = '';       // 학년 필터 ('' = 전체)
 let classFilter = '전체';   // 반 필터 ('전체' | 반이름 | '__none__')
-let sortMode = 'reg';       // 정렬 ('reg' | 'new' | 'old' | 'name')
+let sortMode = 'reg';       // 정렬 ('reg' | 'new' | 'ses' | 'abs' | 'mkw' | 'name')
 let ccStudent = null;       // 수업카드 작성 대상 학생
 let ccStatus = '출석';      // 수업카드 출결 상태
 let offs = [];              // 휴강 목록 {id, classId, className, date, reason}
@@ -795,7 +821,7 @@ let offs = [];              // 휴강 목록 {id, classId, className, date, reas
 ════════════════════════════════════════════════════════════════════ */
 const DIRTY = new Set();              // 작성 중인 모달 id
 let hydrating = false;                // 코드가 모달을 채우는 중 (초안 저장 금지)
-const CC_FIELDS = ['cc-w-date','cc-w-reason','cc-w-subj','cc-w-class','cc-w-teacher','cc-w-unit','cc-w-hw','cc-w-attitude','cc-w-homework-done','cc-w-content','cc-w-homework'];
+const CC_FIELDS = ['cc-w-date','cc-w-mkfor','cc-w-reason','cc-w-subj','cc-w-class','cc-w-teacher','cc-w-unit','cc-w-hw','cc-w-attitude','cc-w-homework-done','cc-w-content','cc-w-homework'];
 const BT_FIELDS = ['bt-class','bt-date','bt-subj','bt-teacher','bt-unit','bt-content','bt-homework','bt-hw','bt-attitude'];
 const SM_FIELDS = ['sm-id','sm-name','sm-grade','sm-start','sm-teacher','sm-stu-phone','sm-phone'];
 let ccDraft = null, btDraft = null, smDraft = null;
@@ -828,7 +854,7 @@ function saveBTDraft() {
     cls: cs ? cs.value : '',
     date: ds ? ds.value : '',
     vals: grabFields(BT_FIELDS),
-    rows: btRows.map(r => ({ sid: r.sid, status: r.status, memo: r.memo }))
+    rows: btRows.map(r => ({ sid: r.sid, status: r.status, memo: r.memo, mkFor: r.mkFor }))
   };
   DIRTY.add('bt-modal-bg');
 }
@@ -859,7 +885,8 @@ window.resetBTDraft = function() {
   openBatch();
 };
 
-/* 출결 상태: 출석·지각·보강 = 수업 1회로 집계 / 결석 = 결석 카운트 */
+/* 출결 상태: 출석·지각·보강 = 수업 1회로 집계 / 결석 = 결석 카운트
+   보강은 수업 1회 + '보강 1회'로 따로도 집계해 카드·리포트에 표시한다. */
 const LESSON_ST = ['출석','지각','보강'];
 const isLessonStatus = st => LESSON_ST.includes(st || '출석');
 
@@ -910,6 +937,9 @@ function sessionTxt(v) {
 // 학생 문서의 집계 카운터 (재집계 전에는 undefined)
 const hasCounter = s => typeof (s && s.sessionCount) === 'number';
 const absentOf   = s => (typeof (s && s.absentCount) === 'number' ? s.absentCount : 0);
+const makeupOf   = s => (typeof (s && s.makeupCount) === 'number' ? s.makeupCount : 0);
+// 아직 보강하지 않은 결석 수
+const pendingOf  = s => Math.max(0, absentOf(s) - makeupOf(s));
 // 정렬용 회차 값 — 카운터 없으면 주차 추정값으로 폴백
 function effSession(s) {
   if (hasCounter(s)) return s.sessionCount;
@@ -922,6 +952,41 @@ function shortDate(v) { const d = parseYMD(v); return d ? `${d.getMonth()+1}/${d
 function isNewStudent(v) {
   const dd = daysSince(v);
   return dd !== null && dd >= -14 && dd <= 28;
+}
+
+/* ════════ 보강(補講) 유틸 ════════
+   · makeupCount  : 보강으로 처리한 수업 수 (누적)
+   · makeupFors   : 보강으로 메운 결석 날짜 목록 ['2026-07-24', ...]
+   · makeupPending: 아직 보강하지 않은 결석 수 (학부모 포털에서 그대로 사용)
+   · lastMakeup   : { date:'2026-07-27', forDate:'2026-07-24' } */
+const MKF_MAX = 24;
+function makeupForsOf(s) {
+  return Array.isArray(s && s.makeupFors) ? s.makeupFors.filter(v => parseYMD(v)).map(String) : [];
+}
+function addMakeupFor(cur, add) {
+  const set = new Set((Array.isArray(cur) ? cur : []).filter(v => parseYMD(v)).map(String));
+  if (add && parseYMD(add)) set.add(String(add));
+  return [...set].sort().slice(-MKF_MAX);
+}
+function removeMakeupFor(cur, del) {
+  const d = String(del == null ? '' : del);
+  return (Array.isArray(cur) ? cur : []).filter(v => parseYMD(v) && String(v) !== d).map(String).sort();
+}
+// recentAttendance 에 남아 있는 결석 날짜 (오래된 순)
+function absentDatesOf(s) {
+  const list = Array.isArray(s && s.recentAttendance) ? s.recentAttendance : [];
+  return list.filter(x => x && x.s === '결석' && parseYMD(x.d)).map(x => String(x.d)).sort();
+}
+// 아직 보강으로 연결되지 않은 결석 날짜
+function openAbsentDates(s) {
+  const done = new Set(makeupForsOf(s));
+  return absentDatesOf(s).filter(d => !done.has(d));
+}
+function lastMakeupOf(s) {
+  const m = s && s.lastMakeup;
+  if (!m || typeof m !== 'object') return null;
+  if (!parseYMD(m.date)) return null;
+  return { date: String(m.date), forDate: parseYMD(m.forDate) ? String(m.forDate) : '' };
 }
 
 /* ════════ 등록일(regDate/regTs) 정렬 키 ════════
@@ -961,7 +1026,8 @@ function regKey(s) {
    포털은 classCards 를 읽지 않는다. 수업카드는 선생님 전용이고,
    학부모에게 보일 값만 학생 문서에 요약해 둔다.
    recentAttendance: [{d:'2026-07-24', s:'출석'}] 최근 12건
-   lastHomework:     {date, text} */
+   lastHomework:     {date, text}
+   lastMakeup:       {date, forDate} · makeupCount · makeupPending */
 const REC_MAX = 12;
 function mergeRecent(cur, date, st) {
   const list = (Array.isArray(cur) ? cur : [])
@@ -1159,25 +1225,33 @@ window.delOff = async function(id) {
   catch (e) { alert('삭제 오류: ' + e.message); }
 };
 
-/* ════════ 회차 재집계 — classCards 전체를 읽어 학생 카운터 복구 ════════ */
+/* ════════ 회차 재집계 — classCards 전체를 읽어 학생 카운터 복구 ════════
+   보강 카드(status='보강')는 수업 1회 + 보강 1회로 함께 집계하고,
+   makeupFor 로 연결된 결석 날짜를 모아 makeupFors 를 복구한다. */
 window.recalcAll = async function() {
   if (!students.length) { alert('학생 데이터를 먼저 불러온 뒤 실행하세요.'); return; }
-  if (!confirm('모든 수업카드를 읽어 학생별 회차 · 결석 · 첫 수업일을 다시 계산합니다.\n계속하시겠습니까?')) return;
+  if (!confirm('모든 수업카드를 읽어 학생별 회차 · 결석 · 보강 · 첫 수업일을 다시 계산합니다.\n계속하시겠습니까?')) return;
   const btn = document.getElementById('sm-recalc-btn');
   btn.disabled = true; btn.textContent = '집계 중...';
   try {
     const snap = await getDocs(collection(db,'classCards'));
-    const agg = new Map();   // studentId -> {ses, abs, first, last}
+    const agg = new Map();   // studentId -> {ses, abs, mk, first, last, rec, hw, fors, lastMk}
     snap.forEach(d => {
       const c = d.data() || {};
       const sid = String(c.studentId == null ? '' : c.studentId);
       if (!sid) return;
       const st = c.status || '출석';           // 과거 카드는 status 없음 → 출석 간주
-      const o = agg.get(sid) || { ses:0, abs:0, first:'', last:'', rec:[], hw:null };
+      const o = agg.get(sid) || { ses:0, abs:0, mk:0, first:'', last:'', rec:[], hw:null, fors:[], lastMk:null };
       const cd = String(c.classDate || '');
       if (st === '결석') { o.abs++; }
       else {
         o.ses++;
+        if (st === '보강') {
+          o.mk++;
+          const mf = String(c.makeupFor || '');
+          if (parseYMD(mf)) o.fors.push(mf);
+          if (parseYMD(cd) && (!o.lastMk || cd >= o.lastMk.date)) o.lastMk = { date: cd, forDate: parseYMD(mf) ? mf : '' };
+        }
         if (parseYMD(cd)) {
           if (!o.first || cd < o.first) o.first = cd;
           if (cd > o.last) o.last = cd;
@@ -1191,14 +1265,16 @@ window.recalcAll = async function() {
     let batch = writeBatch(db), pend = 0, done = 0;
     for (const s of students) {
       const keys = new Set([String(s.id == null ? '' : s.id), String(s.fireId)].filter(k => k && k !== ''));
-      let ses = 0, abs = 0, first = '', last = '', rec = [], hw = null;
+      let ses = 0, abs = 0, mk = 0, first = '', last = '', rec = [], hw = null, fors = [], lastMk = null;
       keys.forEach(k => {
         const a = agg.get(k); if (!a) return;
-        ses += a.ses; abs += a.abs;
+        ses += a.ses; abs += a.abs; mk += a.mk;
         if (a.first && (!first || a.first < first)) first = a.first;
         if (a.last && a.last > last) last = a.last;
         rec = rec.concat(a.rec);
+        fors = fors.concat(a.fors);
         if (a.hw && (!hw || a.hw.date >= hw.date)) hw = a.hw;
+        if (a.lastMk && (!lastMk || a.lastMk.date >= lastMk.date)) lastMk = a.lastMk;
       });
       // 휴강도 흐름에 포함 (그 학생 반 · 첫 수업일 이후 · 오늘까지)
       const myIds = new Set(studentClassIds(s));
@@ -1213,8 +1289,14 @@ window.recalcAll = async function() {
       rec.sort((a, b) => a.d.localeCompare(b.d));
       const seenD = new Set(); const recU = [];
       for (let i = rec.length - 1; i >= 0; i--) { if (seenD.has(rec[i].d)) continue; seenD.add(rec[i].d); recU.unshift(rec[i]); }
-      const patch = { sessionCount: ses, absentCount: abs, lastClassDate: last, recentAttendance: recU.slice(-REC_MAX) };
+      const forsU = addMakeupFor(fors, '');
+      const patch = {
+        sessionCount: ses, absentCount: abs, makeupCount: mk,
+        makeupFors: forsU, makeupPending: Math.max(0, abs - mk),
+        lastClassDate: last, recentAttendance: recU.slice(-REC_MAX)
+      };
       if (hw) patch.lastHomework = hw;
+      if (lastMk) patch.lastMakeup = lastMk;
       if (!parseYMD(s.startDate) && parseYMD(first)) patch.startDate = first;   // 첫 수업일 자동 보정
       batch.set(doc(db,'students', s.fireId), patch, { merge:true });
       pend++; done++;
@@ -1234,9 +1316,10 @@ window.recalcAll = async function() {
    · 문서 ID = `${classId}__${date}__${studentId}` (결정적)
      → 같은 반·같은 날 중복 저장 불가, 재저장은 '수정'이 되고 회차가 두 번 오르지 않음
    · 수업 내용/과제/단원은 반 전체 공통, 출결·개별 메모만 학생별
+   · '보강'을 누르면 그 학생의 미보강 결석일이 자동으로 연결된다
 ════════════════════════════════════════════════════════ */
 const BT_ST = ['출석','지각','결석','보강'];
-let btRows = [];   // {fireId, sid, name, grade, status, memo, prevStatus, hadCard}
+let btRows = [];   // {fireId, sid, name, grade, status, memo, mkFor, cand, openCnt, prevStatus, prevMkFor, hadCard}
 function cardDocId(classId, date, studentId) { return `${classId}__${date}__${studentId}`; }
 function btStudentId(s) { return (s.id != null && String(s.id).trim()) ? String(s.id).trim() : String(s.fireId); }
 
@@ -1282,20 +1365,43 @@ window.toggleBatchMemo = function(i) {
   const el = document.getElementById('bt-memo-' + i);
   if (el) el.classList.toggle('open');
 };
+// 보강 연결 · 미보강 경고 문구 갱신
+function paintBtMk(i) {
+  const r = btRows[i];
+  const el = document.getElementById('bt-mkfor-' + i);
+  if (!r || !el) return;
+  if (r.status === '보강') {
+    if (r.mkFor) { el.className = 'bt-mkfor'; el.textContent = `🔁 ${shortDate(r.mkFor)} 결석의 보강`; }
+    else { el.className = 'bt-mkfor wait'; el.textContent = '🔁 보강 (연결할 결석 기록 없음)'; }
+  } else if (r.openCnt > 0) {
+    el.className = 'bt-mkfor wait'; el.textContent = `⚠️ 미보강 결석 ${r.openCnt}회`;
+  } else {
+    el.className = 'bt-mkfor'; el.textContent = '';
+  }
+}
 window.setBatchStatus = function(i, st) {
   if (!btRows[i]) return;
-  btRows[i].status = BT_ST.includes(st) ? st : '';
+  const r = btRows[i];
+  r.status = BT_ST.includes(st) ? st : '';
+  // 보강이면 가장 오래된 미보강 결석일을 자동 연결, 아니면 연결 해제
+  if (r.status === '보강') { if (!r.mkFor) r.mkFor = r.cand.length ? r.cand[0] : ''; }
+  else { r.mkFor = ''; }
   const row = document.getElementById('bt-row-' + i);
   if (row) {
     BT_ST.forEach(x => row.classList.remove('st-' + x));
-    if (btRows[i].status) row.classList.add('st-' + btRows[i].status);
-    row.querySelectorAll('.bt-sbtn').forEach(b => b.classList.toggle('on', b.dataset.st === btRows[i].status));
+    if (r.status) row.classList.add('st-' + r.status);
+    row.querySelectorAll('.bt-sbtn').forEach(b => b.classList.toggle('on', b.dataset.st === r.status));
   }
+  paintBtMk(i);
   updateBtSum();
   saveBTDraft();
 };
 window.setAllBatch = function(st) {
-  btRows.forEach(r => { r.status = BT_ST.includes(st) ? st : ''; });
+  btRows.forEach(r => {
+    r.status = BT_ST.includes(st) ? st : '';
+    if (r.status === '보강') { if (!r.mkFor) r.mkFor = r.cand.length ? r.cand[0] : ''; }
+    else r.mkFor = '';
+  });
   renderBatch();
   saveBTDraft();
 };
@@ -1322,7 +1428,7 @@ function renderBatch() {
     return `<div class="bt-row${r.status ? ' st-' + r.status : ''}" id="bt-row-${i}">
       <div class="bt-top">
         <div class="bt-av" style="background:${bg};color:${col};">${esc(sh)}</div>
-        <div class="bt-nm">${esc(r.name)}${r.hadCard ? `<span class="bt-sub">이미 저장됨 · ${esc(r.prevStatus)}</span>` : ''}</div>
+        <div class="bt-nm">${esc(r.name)}${r.hadCard ? `<span class="bt-sub">이미 저장됨 · ${esc(r.prevStatus)}</span>` : ''}<span class="bt-mkfor" id="bt-mkfor-${i}"></span></div>
         <div class="bt-seg">${BT_ST.map(st => `<button class="bt-sbtn${r.status === st ? ' on' : ''}" data-st="${st}" onclick="setBatchStatus(${i},'${st}')">${st}</button>`).join('')}</div>
       </div>
       <button class="bt-memo-btn" onclick="toggleBatchMemo(${i})">＋ 개별 메모 · 결석 사유${r.memo ? ' (작성됨)' : ''}</button>
@@ -1331,6 +1437,7 @@ function renderBatch() {
       </div>
     </div>`;
   }).join('');
+  btRows.forEach((r, i) => paintBtMk(i));
   updateBtSum();
 }
 window.loadBatch = async function() {
@@ -1362,12 +1469,19 @@ window.loadBatch = async function() {
   }));
   btRows = mem.map((s, i) => {
     const c = found[i];
+    const prevMkFor = (c && c.status === '보강' && parseYMD(c.makeupFor)) ? String(c.makeupFor) : '';
+    // 보강으로 연결할 수 있는 결석일 = 미보강 결석 중 이 수업일보다 앞선 날
+    const openA = openAbsentDates(s).filter(d => d < date);
+    const cand = (prevMkFor && !openA.includes(prevMkFor)) ? [prevMkFor].concat(openA).sort() : openA;
     return {
       fireId: s.fireId, sid: btStudentId(s),
       name: s.name || '이름없음', grade: s.grade || '',
       status: c ? (c.status || '출석') : '',
       memo: c ? String(c.absenceReason || c.studentNote || '') : '',
+      mkFor: prevMkFor,
+      cand, openCnt: openA.length,
       prevStatus: c ? (c.status || '출석') : '',
+      prevMkFor,
       hadCard: !!c
     };
   });
@@ -1380,6 +1494,10 @@ window.loadBatch = async function() {
       if (!x) return;
       if (x.status) r.status = x.status;
       if (x.memo) r.memo = x.memo;
+      if (r.status === '보강') {
+        if (x.mkFor && parseYMD(x.mkFor)) r.mkFor = String(x.mkFor);
+        else if (!r.mkFor && r.cand.length) r.mkFor = r.cand[0];
+      } else if (x.status) { r.mkFor = ''; }
     });
   }
   const nFound = found.filter(Boolean).length;
@@ -1451,7 +1569,7 @@ window.saveBatch = async function() {
   btn.disabled = true; btn.textContent = '저장 중...';
   try {
     const batch = writeBatch(db);
-    let nCard = 0, nDel = 0;
+    let nCard = 0, nDel = 0, nMk = 0;
     btRows.forEach(r => {
       const stu = students.find(x => x.fireId === r.fireId);
       const ref = doc(db, 'classCards', cardDocId(classId, date, r.sid));
@@ -1460,10 +1578,12 @@ window.saveBatch = async function() {
       if (isOff) { if (r.hadCard) { batch.delete(ref); nDel++; } }
       else {
         const lesson = isLessonStatus(newSt);
+        const mkFor = (newSt === '보강' && parseYMD(r.mkFor)) ? String(r.mkFor) : '';
+        if (newSt === '보강') nMk++;
         batch.set(ref, {
           studentId: r.sid, studentName: r.name, studentGrade: r.grade,
           subject, className: cls, classId, teacher, classDate: date,
-          status: newSt,
+          status: newSt, makeupFor: mkFor,
           absenceReason: lesson ? '' : r.memo,
           studentNote: lesson ? r.memo : '',
           unit: lesson ? unit : '', content: lesson ? content : '',
@@ -1480,15 +1600,31 @@ window.saveBatch = async function() {
       if (!stu) return;
       const prevL = r.hadCard && isLessonStatus(r.prevStatus);
       const prevA = r.hadCard && r.prevStatus === '결석';
+      const prevM = r.hadCard && r.prevStatus === '보강';
       const newL = !isOff && isLessonStatus(newSt);
       const newA = !isOff && newSt === '결석';
+      const newM = !isOff && newSt === '보강';
       const dSes = (newL ? 1 : 0) - (prevL ? 1 : 0);
       const dAbs = (newA ? 1 : 0) - (prevA ? 1 : 0);
+      const dMk  = (newM ? 1 : 0) - (prevM ? 1 : 0);
       const patch = {};
       if (hasCounter(stu)) {
         if (dSes) patch.sessionCount = increment(dSes);
         if (dAbs) patch.absentCount = increment(dAbs);
+        if (dMk)  patch.makeupCount = increment(dMk);
+        // 최종 결석·보강 수를 미리 계산해 '보강 대기' 값을 정확히 저장
+        patch.makeupPending = Math.max(0, (absentOf(stu) + dAbs) - (makeupOf(stu) + dMk));
       }
+      // 보강 ↔ 결석 연결 목록 갱신
+      let fors = makeupForsOf(stu);
+      if (prevM && r.prevMkFor) fors = removeMakeupFor(fors, r.prevMkFor);
+      if (newM) {
+        const mf = parseYMD(r.mkFor) ? String(r.mkFor) : '';
+        if (mf) fors = addMakeupFor(fors, mf);
+        const prevLast = lastMakeupOf(stu);
+        if (!prevLast || date >= prevLast.date) patch.lastMakeup = { date, forDate: mf };
+      }
+      patch.makeupFors = fors;
       if (newL) {
         if (!parseYMD(stu.lastClassDate) || date > String(stu.lastClassDate)) patch.lastClassDate = date;
         if (!parseYMD(stu.startDate) || date < String(stu.startDate)) patch.startDate = date;
@@ -1507,7 +1643,7 @@ window.saveBatch = async function() {
     closeBatch(true);
     alert(isOff
       ? `${cls}\n${date} 휴강으로 저장했습니다.${nDel ? `\n기존 수업카드 ${nDel}건 삭제 · 회차 차감 완료` : ''}`
-      : `${cls}\n수업카드 ${nCard}건을 저장했습니다.\n학부모 리포트에 바로 반영됩니다.`);
+      : `${cls}\n수업카드 ${nCard}건을 저장했습니다.${nMk ? `\n보강 ${nMk}건이 함께 기록됐습니다.` : ''}\n학부모 리포트에 바로 반영됩니다.`);
   } catch (e) {
     alert('일괄 저장 오류: ' + e.message);
   } finally {
@@ -1597,6 +1733,8 @@ window.renderCards = function() {
     list.sort((a, b) => (effSession(b) - effSession(a)) || String(a.name || '').localeCompare(String(b.name || ''), 'ko'));
   } else if (sortMode === 'abs') {
     list.sort((a, b) => (absentOf(b) - absentOf(a)) || (effSession(b) - effSession(a)) || String(a.name || '').localeCompare(String(b.name || ''), 'ko'));
+  } else if (sortMode === 'mkw') {
+    list.sort((a, b) => (pendingOf(b) - pendingOf(a)) || (absentOf(b) - absentOf(a)) || String(a.name || '').localeCompare(String(b.name || ''), 'ko'));
   } else if (sortMode === 'new') {
     const key = s => { const d = parseYMD(s.startDate); return d ? d.getTime() : null; };
     list.sort((a, b) => {
@@ -1617,16 +1755,25 @@ window.renderCards = function() {
   const noStart = list.filter(s => !parseYMD(s.startDate)).length;
   const base = parts.length ? `${parts.join(' · ')} · ${list.length}명` : `전체 ${students.length}명`;
   const absSum = list.reduce((n, s) => n + absentOf(s), 0);
+  const mkSum  = list.reduce((n, s) => n + makeupOf(s), 0);
+  const pdSum  = list.reduce((n, s) => n + pendingOf(s), 0);
   document.getElementById('sm-count').textContent =
-    base + (noStart ? ` · 첫 수업일 미기록 ${noStart}명` : '') + (absSum ? ` · 누적 결석 ${absSum}회` : '');
+    base + (noStart ? ` · 첫 수업일 미기록 ${noStart}명` : '')
+    + (absSum ? ` · 누적 결석 ${absSum}회` : '')
+    + (mkSum ? ` · 보강 완료 ${mkSum}회` : '')
+    + (pdSum ? ` · 보강 대기 ${pdSum}회` : '');
 
   // 재집계 안내 (카운터 없는 학생이 있을 때만)
   const need = document.getElementById('sm-need');
   if (need) {
     const noCnt = students.filter(s => !hasCounter(s)).length;
+    const noMk  = students.filter(s => hasCounter(s) && typeof s.makeupCount !== 'number' && absentOf(s) > 0).length;
     if (noCnt) {
       need.classList.add('show');
-      need.innerHTML = `⚠️ 회차가 아직 집계되지 않은 학생 <b>${noCnt}명</b> — 위의 <b>🔄 회차 재집계</b>를 한 번 눌러주세요.<br>기존 수업카드를 읽어 회차 · 결석 · 첫 수업일을 자동으로 채웁니다. (한 번만 하면 됩니다)`;
+      need.innerHTML = `⚠️ 회차가 아직 집계되지 않은 학생 <b>${noCnt}명</b> — 위의 <b>🔄 회차 재집계</b>를 한 번 눌러주세요.<br>기존 수업카드를 읽어 회차 · 결석 · 보강 · 첫 수업일을 자동으로 채웁니다. (한 번만 하면 됩니다)`;
+    } else if (noMk) {
+      need.classList.add('show');
+      need.innerHTML = `🔁 보강 집계가 아직 없는 학생 <b>${noMk}명</b> — <b>🔄 회차 재집계</b>를 한 번 누르면 과거 보강 기록까지 카드에 표시됩니다.`;
     } else {
       need.classList.remove('show');
       need.innerHTML = '';
@@ -1652,7 +1799,8 @@ window.renderCards = function() {
     const sPhone = (s.studentPhone && s.studentPhone !== '-') ? s.studentPhone : '';
     const startD = parseYMD(s.startDate);
     const sn = sessionNo(s.startDate);
-    const cnt = hasCounter(s), ses = cnt ? s.sessionCount : null, abs = absentOf(s);
+    const cnt = hasCounter(s), ses = cnt ? s.sessionCount : null;
+    const abs = absentOf(s), mk = makeupOf(s), pend = pendingOf(s);
     // 회차 칩: 집계값 우선 → 없으면 주차 추정(예상)
     let chip;
     if (cnt) chip = ses > 0 ? `<span class="sm-chip ses">${ses}회차</span>` : '<span class="sm-chip gray">수업 전</span>';
@@ -1667,9 +1815,20 @@ window.renderCards = function() {
     const bits = [];
     if (cnt) bits.push(`수업 <b>${ses}</b>회`);
     if (abs) bits.push(`<span class="red">결석 <b>${abs}</b></span>`);
+    if (mk) bits.push(`<span class="blue">보강 <b>${mk}</b></span>`);
     if (parseYMD(s.lastClassDate)) bits.push(`최근 ${esc(shortDate(s.lastClassDate))}`);
     if (nOff) bits.push(`<span class="sm-chip hol" style="margin-left:0;">🚫 ${esc(shortDate(nOff.date))} 휴강</span>`);
     const statHtml = bits.length ? `<div class="sm-stat">${bits.join('<span class="sep">·</span>')}</div>` : '';
+    // 보강 안내 줄 — 완료 내역과 남은 보강을 한눈에
+    const lm = lastMakeupOf(s);
+    const mkBits = [];
+    if (lm) mkBits.push(lm.forDate
+      ? `🔁 ${esc(shortDate(lm.forDate))} 결석 → <b>${esc(shortDate(lm.date))} 보강 완료</b>`
+      : `🔁 <b>${esc(shortDate(lm.date))} 보강 완료</b>`);
+    if (pend) mkBits.push(`⚠️ 보강 대기 <b>${pend}회</b>`);
+    const mkHtml = mkBits.length
+      ? `<div class="sm-mkline${(!lm && pend) ? ' wait' : ''}">${mkBits.join('<span class="sep">·</span>')}</div>`
+      : '';
     const newBadge = isNewStudent(s.startDate) ? '<span class="sm-new-badge">NEW</span>' : '';
     const gradeBtn = sid
       ? `<a class="sm-btn primary" href="student-detail.html?id=${encodeURIComponent(sid)}">📊 테스트 결과</a>`
@@ -1686,6 +1845,7 @@ window.renderCards = function() {
       <div class="sm-subjects">${subHtml}</div>
       <div class="sm-classes">${clsHtml}</div>
       ${statHtml}
+      ${mkHtml}
       <div class="sm-meta"><span class="ml">첫 수업</span> ${startHtml}<br><span class="ml">선생님</span> ${esc(teacher)}<br><span class="ml">학부모</span> ${esc(phone)}</div>
       <div class="sm-actions">
         ${gradeBtn}
@@ -1976,7 +2136,8 @@ window.saveStudent = async function() {
         id, name, grade, subject, phone, studentPhone, teacher, startDate,
         classIds: cf.classIds, classNames: cf.classNames, classes: cf.classes,
         photoUrl: '',
-        sessionCount: 0, absentCount: 0, lastClassDate: '', recentAttendance: [],
+        sessionCount: 0, absentCount: 0, makeupCount: 0, makeupPending: 0, makeupFors: [],
+        lastClassDate: '', recentAttendance: [],
         regDate: `${t.getFullYear()}. ${t.getMonth()+1}. ${t.getDate()}.`,
         regTs: serverTimestamp()
       });
@@ -2007,7 +2168,31 @@ window.delStudent = async function(fireId, name) {
    수업카드 작성 (classCards 스키마 동일)
    · 반(className/classId)을 함께 저장하고, 선택한 반은 학생에게 자동 배정
    · 첫 수업일이 비어 있으면 이 수업 날짜로 자동 기록
+   · 보강이면 makeupFor(보강 대상 결석일)를 함께 저장해
+     학생 문서의 makeupCount · makeupFors · lastMakeup 을 갱신한다
 ════════════════════════════════════════════ */
+// 보강 대상 결석일 드롭다운 채우기 (미보강 결석 중 수업일 이전 날짜)
+function fillMkForOptions(s, dateStr) {
+  const sel = document.getElementById('cc-w-mkfor');
+  const hint = document.getElementById('cc-mk-hint');
+  if (!sel) return;
+  const cur = sel.value;
+  const base = parseYMD(dateStr) ? String(dateStr) : todayStr();
+  const list = openAbsentDates(s).filter(x => x <= base);
+  sel.innerHTML = '<option value="">지정 안 함</option>'
+    + list.map(x => `<option value="${esc(x)}">${esc(fmtYMD(x))} 결석</option>`).join('');
+  if (cur && [...sel.options].some(o => o.value === cur)) sel.value = cur;
+  else if (list.length) sel.value = list[list.length - 1];   // 가장 최근 결석을 기본 선택
+  if (hint) {
+    if (list.length) {
+      hint.className = 'sm-hint blue';
+      hint.textContent = `미보강 결석 ${list.length}건 · 연결하면 카드와 학부모 리포트에 「결석 → 보강 완료」로 표시됩니다.`;
+    } else {
+      hint.className = 'sm-hint';
+      hint.textContent = '연결할 결석 기록이 없습니다. 지정하지 않아도 보강 1회로 집계됩니다.';
+    }
+  }
+}
 window.openClassCard = function(fireId) {
   const s = students.find(x => x.fireId === fireId);
   if (!s) return;
@@ -2017,7 +2202,8 @@ window.openClassCard = function(fireId) {
   document.getElementById('cc-modal-title').textContent = `📝 ${s.name || '학생'} · 수업카드 작성`;
   document.getElementById('cc-stu-info').innerHTML =
     `<span style="font-size:11px;">📚</span><strong>${esc(s.name || '학생')}</strong>` +
-    (s.grade ? `<span style="margin-left:6px;color:#a21caf;">${esc(s.grade)}</span>` : '');
+    (s.grade ? `<span style="margin-left:6px;color:#a21caf;">${esc(s.grade)}</span>` : '') +
+    (pendingOf(s) ? `<span style="margin-left:auto;color:#b45309;font-weight:800;">🔁 보강 대기 ${pendingOf(s)}회</span>` : '');
   document.getElementById('cc-w-date').value = todayStr();
   document.getElementById('cc-w-teacher').value = (s.teacher && s.teacher !== '-') ? s.teacher : '';
   const subs = (s.subject && s.subject !== '-') ? String(s.subject).split(',').map(x => x.trim()).filter(Boolean) : [];
@@ -2040,6 +2226,9 @@ window.openClassCard = function(fireId) {
   if (d) {
     putFields(CC_FIELDS, d.vals);
     setCCStatus(d.status || '출석');
+    const mkEl = document.getElementById('cc-w-mkfor');
+    const want = d.vals ? d.vals['cc-w-mkfor'] : '';
+    if (mkEl && want != null && [...mkEl.options].some(o => o.value === want)) mkEl.value = want;
     DIRTY.add('cc-modal-bg');
   } else {
     DIRTY.delete('cc-modal-bg');
@@ -2056,13 +2245,31 @@ window.setCCStatus = function(st) {
   const absent = (ccStatus === '결석');
   box.classList.toggle('absent-mode', absent);
   document.getElementById('cc-reason-field').style.display = (ccStatus === '출석') ? 'none' : '';
+  // 보강일 때만 '보강 대상 결석일' 노출
+  const mkField = document.getElementById('cc-mk-field');
+  if (ccStatus === '보강') {
+    if (ccStudent) fillMkForOptions(ccStudent, document.getElementById('cc-w-date').value);
+    mkField.style.display = '';
+  } else {
+    mkField.style.display = 'none';
+    const mkEl = document.getElementById('cc-w-mkfor');
+    if (mkEl) mkEl.value = '';
+  }
   const hint = document.getElementById('cc-status-hint');
   if (absent) hint.textContent = '결석은 회차에 포함되지 않고, 수업 내용 입력도 생략됩니다.';
-  else if (ccStatus === '보강') hint.textContent = '보강은 수업 1회로 집계됩니다.';
+  else if (ccStatus === '보강') hint.textContent = '보강은 수업 1회 + 보강 1회로 집계되고, 카드에 「보강 완료」로 표시됩니다.';
   else if (ccStatus === '지각') hint.textContent = '지각도 수업 1회로 집계됩니다.';
   else hint.textContent = '출석 · 지각 · 보강은 회차에 포함되고, 결석은 결석 횟수로만 집계됩니다.';
   saveCCDraft();
 };
+// 수업 날짜를 바꾸면 연결 가능한 결석일 목록도 다시 계산
+(function(){
+  const el = document.getElementById('cc-w-date');
+  if (!el) return;
+  el.addEventListener('change', () => {
+    if (ccStatus === '보강' && ccStudent) fillMkForOptions(ccStudent, el.value);
+  });
+})();
 window.closeCCModal = function(keep) {
   if (!keep && DIRTY.has('cc-modal-bg') && !confirm('작성 중인 내용을 버리고 닫을까요?')) return;
   if (!keep) { ccDraft = null; DIRTY.delete('cc-modal-bg'); showDraftNote('cc-draft', false); }
@@ -2081,6 +2288,8 @@ window.saveClassCard = async function() {
   const status = (LESSON_ST.includes(ccStatus) || ccStatus === '결석') ? ccStatus : '출석';
   const lesson = isLessonStatus(status);
   const absenceReason = document.getElementById('cc-w-reason').value.trim();
+  const mkForRaw = document.getElementById('cc-w-mkfor').value;
+  const makeupFor = (status === '보강' && parseYMD(mkForRaw)) ? String(mkForRaw) : '';
   // 결석이면 수업 관련 항목은 '-'로 저장 (보통/적극적 같은 값이 남아 리포트를 오염시키지 않도록)
   const homework = lesson ? document.getElementById('cc-w-hw').value : '-';
   const attitude = lesson ? document.getElementById('cc-w-attitude').value : '-';
@@ -2089,6 +2298,7 @@ window.saveClassCard = async function() {
   if (!teacher) { alert('담당 선생님을 입력하세요'); return; }
   if (!parseYMD(classDate)) { alert('수업 날짜를 올바르게 선택하세요'); return; }
   if (lesson && !content) { alert('수업 내용을 입력하세요'); return; }
+  if (status === '보강' && makeupFor && makeupFor > String(classDate)) { alert('보강 대상 결석일이 수업 날짜보다 늦습니다.\n날짜를 확인해주세요.'); return; }
   const studentId = (ccStudent.id && ccStudent.id !== '') ? ccStudent.id : ccStudent.fireId;
   const classId = className ? (nameToId.get(className) || '') : '';
   const btn = document.getElementById('cc-w-save-btn');
@@ -2099,13 +2309,13 @@ window.saveClassCard = async function() {
       studentName: ccStudent.name || '',
       studentGrade: ccStudent.grade || '',
       subject, className, classId, teacher, classDate,
-      status, absenceReason,
+      status, absenceReason, makeupFor,
       unit: lesson ? unit : '', content: lesson ? content : '',
       score: null, scoreNone: false, ox: null, multiple: null, omr: null,
       homework, attitude, homeworkDone, homeworkContent,
       createdAt: serverTimestamp()
     });
-    // 학생 문서 보정: 반 배정 · 첫 수업일 · 출결 카운터
+    // 학생 문서 보정: 반 배정 · 첫 수업일 · 출결 카운터 · 보강 집계
     if (ccStudent.fireId) {
       try {
         const patch = {};
@@ -2124,6 +2334,16 @@ window.saveClassCard = async function() {
           } else {
             patch.absentCount = increment(1);
           }
+          if (status === '보강') patch.makeupCount = increment(1);
+          const nAbs = absentOf(ccStudent) + (status === '결석' ? 1 : 0);
+          const nMk  = makeupOf(ccStudent) + (status === '보강' ? 1 : 0);
+          patch.makeupPending = Math.max(0, nAbs - nMk);
+        }
+        // 보강 ↔ 결석 연결 기록
+        if (status === '보강') {
+          patch.makeupFors = makeupFor ? addMakeupFor(makeupForsOf(ccStudent), makeupFor) : makeupForsOf(ccStudent);
+          const pl = lastMakeupOf(ccStudent);
+          if (!pl || String(classDate) >= pl.date) patch.lastMakeup = { date: classDate, forDate: makeupFor };
         }
         // 학부모 공개용 요약
         patch.recentAttendance = mergeRecent(ccStudent.recentAttendance, classDate, status);
@@ -2133,9 +2353,13 @@ window.saveClassCard = async function() {
     }
     ccDraft = null; DIRTY.delete('cc-modal-bg'); showDraftNote('cc-draft', false);
     closeCCModal(true);
-    alert(lesson
-      ? `${status} 처리되었습니다. 수업카드가 저장되고 회차가 1 올라갑니다.`
-      : '결석으로 기록되었습니다. 회차는 올라가지 않습니다.');
+    alert(status === '보강'
+      ? (makeupFor
+          ? `보강으로 저장했습니다.\n${fmtYMD(makeupFor)} 결석 → ${fmtYMD(classDate)} 보강 완료로 표시됩니다.`
+          : `보강으로 저장했습니다. 보강 1회가 기록됩니다.`)
+      : (lesson
+          ? `${status} 처리되었습니다. 수업카드가 저장되고 회차가 1 올라갑니다.`
+          : '결석으로 기록되었습니다. 회차는 올라가지 않습니다.'));
   } catch (e) {
     alert('저장 오류: ' + e.message);
   } finally {
