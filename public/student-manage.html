@@ -295,7 +295,7 @@ body.modal-open { overflow: hidden; }
 .sm-stat .blue { color:#1d4ed8; }
 .sm-stat .blue b { color:#1d4ed8; }
 
-/* 보강 안내 줄 (결석 → 보강 완료 / 보강 대기) */
+/* 보강 대기 안내 줄 (원장 전용) */
 .sm-mkline {
   font-size:11px; font-weight:700; line-height:1.5;
   color:#1d4ed8; background:#eff6ff; border:1px solid #dbeafe;
@@ -1819,15 +1819,10 @@ window.renderCards = function() {
     if (parseYMD(s.lastClassDate)) bits.push(`최근 ${esc(shortDate(s.lastClassDate))}`);
     if (nOff) bits.push(`<span class="sm-chip hol" style="margin-left:0;">🚫 ${esc(shortDate(nOff.date))} 휴강</span>`);
     const statHtml = bits.length ? `<div class="sm-stat">${bits.join('<span class="sep">·</span>')}</div>` : '';
-    // 보강 안내 줄 — 완료 내역과 남은 보강을 한눈에
-    const lm = lastMakeupOf(s);
-    const mkBits = [];
-    if (lm) mkBits.push(lm.forDate
-      ? `🔁 ${esc(shortDate(lm.forDate))} 결석 → <b>${esc(shortDate(lm.date))} 보강 완료</b>`
-      : `🔁 <b>${esc(shortDate(lm.date))} 보강 완료</b>`);
-    if (pend) mkBits.push(`⚠️ 보강 대기 <b>${pend}회</b>`);
-    const mkHtml = mkBits.length
-      ? `<div class="sm-mkline${(!lm && pend) ? ' wait' : ''}">${mkBits.join('<span class="sep">·</span>')}</div>`
+    // 보강 안내 줄 — 원장 전용(학부모 화면에는 표시하지 않음)
+    // 아직 보강하지 않은 결석이 남은 학생만 알려준다
+    const mkHtml = pend
+      ? `<div class="sm-mkline wait">🔁 보강 대기 <b>${pend}회</b><span class="sep">·</span>미보강 결석</div>`
       : '';
     const newBadge = isNewStudent(s.startDate) ? '<span class="sm-new-badge">NEW</span>' : '';
     const gradeBtn = sid
