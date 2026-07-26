@@ -235,10 +235,34 @@ body.modal-open { overflow: hidden; }
 .sm-field .req { color:#dc2626; }
 .sm-modal .cc-inp, .sm-modal .cc-sel { font-size:16px; }
 .sm-hint { font-size:10.5px; color:#aeaeb2; line-height:1.55; margin-top:5px; }
+.sm-hint.ok { color:#047857; font-weight:700; }
+.sm-hint.bad { color:#b91c1c; font-weight:700; }
+.cc-inp.bad { border-color:#ef4444; background:#fffafa; }
+.sm-idbtn {
+  margin-top:6px; min-height:34px; padding:7px 11px; border-radius:9px;
+  border:1.5px solid #fce7f3; background:#fff; color:#db2777;
+  font-family:inherit; font-size:11.5px; font-weight:800; cursor:pointer;
+}
+.sm-idbtn:active { background:#fdf2f8; }
 .sm-subj-checks { display:flex; flex-wrap:wrap; gap:7px; }
 .sm-subj-label { display:inline-flex; align-items:center; gap:6px; padding:9px 13px; border:1.5px solid #fce7f3; border-radius:10px; font-size:13px; color:#3c3c43; cursor:pointer; -webkit-user-select:none; user-select:none; min-height:42px; transition:all .15s; }
 .sm-subj-label input { display:none; }
 .sm-subj-label.checked { border-color:#db2777; background:#fdf2f8; color:#db2777; font-weight:600; }
+
+/* 임시 보관된 작성 내용 안내 */
+.sm-draft {
+  display:none; align-items:center; justify-content:space-between; gap:9px; flex-wrap:wrap;
+  font-size:11.5px; font-weight:700; color:#b45309; line-height:1.55;
+  background:#fffbeb; border:1px solid #fde68a; border-radius:11px;
+  padding:9px 11px; margin-bottom:0.9rem;
+}
+.sm-draft.show { display:flex; }
+.sm-draft span { flex:1 1 auto; min-width:0; }
+.sm-draft button {
+  flex-shrink:0; border:none; background:#d97706; color:#fff; font-family:inherit;
+  font-size:11px; font-weight:800; padding:8px 12px; min-height:36px; border-radius:9px; cursor:pointer; white-space:nowrap;
+}
+.sm-draft button:active { opacity:0.8; }
 
 /* 반 배정 체크 리스트 */
 .sm-class-checks { display:flex; flex-direction:column; gap:6px; max-height:190px; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding:2px; }
@@ -390,6 +414,8 @@ body.modal-open { overflow: hidden; }
   .sm-row2 { grid-template-columns:1fr; }
   .welcome-bar { padding:1.05rem 1.1rem; }
   .welcome-bar .cc-write-btn { width:100%; min-height:44px; font-size:13px; }
+  .sm-draft { font-size:11px; }
+  .sm-draft button { width:100%; }
 }
 @media (max-width:400px) {
   .sm-class-filter, .sm-sort { flex:1 1 100%; }
@@ -472,9 +498,12 @@ body.modal-open { overflow: hidden; }
 <div class="sm-modal-bg" id="sm-modal-bg">
   <div class="sm-modal">
     <div class="sm-modal-title" id="sm-modal-title">신규 학생 등록</div>
+    <div class="sm-draft" id="sm-draft"><span></span><button type="button" onclick="resetSMDraft()">새로 작성</button></div>
     <div class="sm-field">
-      <span class="cc-label">학생 ID</span>
-      <input class="cc-inp" id="sm-id" type="text" placeholder="예: m01010 (비우면 자동 생성)" autocomplete="off">
+      <span class="cc-label">학생 ID <span class="req">*</span></span>
+      <input class="cc-inp" id="sm-id" type="text" placeholder="예: h01005" autocomplete="off" oninput="checkIdInput()">
+      <div class="sm-hint" id="sm-id-hint">학년을 고르면 다음 번호를 제안합니다.</div>
+      <button type="button" class="sm-idbtn" id="sm-id-suggest" style="display:none;" onclick="useSuggestedId()">제안 번호 넣기</button>
     </div>
     <div class="sm-field">
       <span class="cc-label">이름 <span class="req">*</span></span>
@@ -535,6 +564,7 @@ body.modal-open { overflow: hidden; }
 <div class="sm-modal-bg" id="cc-modal-bg">
   <div class="sm-modal" id="cc-modal-box">
     <div class="sm-modal-title" id="cc-modal-title">📝 수업카드 작성</div>
+    <div class="sm-draft" id="cc-draft"><span></span><button type="button" onclick="resetCCDraft()">새로 작성</button></div>
     <div class="student-grade-info" id="cc-stu-info" style="margin-top:0;margin-bottom:1rem;">학생</div>
     <div class="sm-field">
       <span class="cc-label">출결 상태 <span class="req">*</span></span>
@@ -612,6 +642,7 @@ body.modal-open { overflow: hidden; }
 <div class="sm-modal-bg" id="bt-modal-bg">
   <div class="sm-modal bt-modal">
     <div class="sm-modal-title">📋 반별 수업카드 일괄 작성</div>
+    <div class="sm-draft" id="bt-draft"><span></span><button type="button" onclick="resetBTDraft()">새로 작성</button></div>
     <div class="bt-note">반 · 날짜를 고르면 그 반 학생이 모두 나옵니다. <b>수업 내용은 한 번만</b> 쓰면 전원에게 저장되고, 출결과 개별 메모만 학생별로 다르게 넣습니다.</div>
     <div class="bt-loaded" id="bt-loaded"></div>
     <div class="sm-row2">
@@ -747,6 +778,86 @@ let sortMode = 'reg';       // 정렬 ('reg' | 'new' | 'old' | 'name')
 let ccStudent = null;       // 수업카드 작성 대상 학생
 let ccStatus = '출석';      // 수업카드 출결 상태
 let offs = [];              // 휴강 목록 {id, classId, className, date, reason}
+
+/* ════════════════════════════════════════════════════════════════════
+   입력 보호 — "글자 치다가 딴 걸 누르면 사라진다" 문제의 원인과 대책
+   원인 ① 어두운 배경(.sm-modal-bg)을 클릭하면 확인 없이 모달이 닫혔다.
+        모달이 화면 높이의 88%라 위·아래·옆에 배경이 노출돼 있고,
+        모바일에서 스크롤하려고 끌다가 배경에서 손을 떼면 클릭으로 잡혔다.
+   원인 ② ESC 키도 확인 없이 모든 모달을 닫았다.
+   원인 ③ 일괄 작성에서 반·날짜를 바꾸면 이미 타이핑한 공통 칸을
+        기존 기록 값으로 덮어썼다.
+   대책 · 누른 지점과 뗀 지점이 모두 배경일 때만 닫기 (스크롤 오인 차단)
+        · 작성 중이면 닫기 전 확인창
+        · 닫혀도 입력값을 메모리에 임시 보관 → 다시 열면 이어서 작성
+        · 이미 입력한 칸은 자동 채움이 덮어쓰지 않음
+        · 작성 중 새로고침·이탈 시 브라우저 경고
+════════════════════════════════════════════════════════════════════ */
+const DIRTY = new Set();              // 작성 중인 모달 id
+let hydrating = false;                // 코드가 모달을 채우는 중 (초안 저장 금지)
+const CC_FIELDS = ['cc-w-date','cc-w-reason','cc-w-subj','cc-w-class','cc-w-teacher','cc-w-unit','cc-w-hw','cc-w-attitude','cc-w-homework-done','cc-w-content','cc-w-homework'];
+const BT_FIELDS = ['bt-class','bt-date','bt-subj','bt-teacher','bt-unit','bt-content','bt-homework','bt-hw','bt-attitude'];
+const SM_FIELDS = ['sm-id','sm-name','sm-grade','sm-start','sm-teacher','sm-stu-phone','sm-phone'];
+let ccDraft = null, btDraft = null, smDraft = null;
+
+function grabFields(ids) {
+  const o = {};
+  ids.forEach(id => { const el = document.getElementById(id); if (el) o[id] = el.value; });
+  return o;
+}
+function putFields(ids, vals) {
+  if (!vals) return;
+  ids.forEach(id => { const el = document.getElementById(id); if (el && vals[id] != null) el.value = vals[id]; });
+}
+function showDraftNote(id, on, txt) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('show', !!on);
+  const sp = el.querySelector('span');
+  if (sp && txt) sp.textContent = txt;
+}
+function saveCCDraft() {
+  if (hydrating || !ccStudent) return;
+  ccDraft = { fireId: ccStudent.fireId, vals: grabFields(CC_FIELDS), status: ccStatus };
+  DIRTY.add('cc-modal-bg');
+}
+function saveBTDraft() {
+  if (hydrating) return;
+  const cs = document.getElementById('bt-class'), ds = document.getElementById('bt-date');
+  btDraft = {
+    cls: cs ? cs.value : '',
+    date: ds ? ds.value : '',
+    vals: grabFields(BT_FIELDS),
+    rows: btRows.map(r => ({ sid: r.sid, status: r.status, memo: r.memo }))
+  };
+  DIRTY.add('bt-modal-bg');
+}
+function saveSMDraft() {
+  if (hydrating) return;
+  smDraft = {
+    editId,
+    vals: grabFields(SM_FIELDS),
+    subs: [...document.querySelectorAll('.sm-subj-chk:checked')].map(c => c.value),
+    classes: getCheckedClasses()
+  };
+  DIRTY.add('sm-modal-bg');
+}
+window.resetSMDraft = function() {
+  if (!confirm('작성 중인 내용을 지우고 처음부터 다시 작성할까요?')) return;
+  smDraft = null; DIRTY.delete('sm-modal-bg');
+  if (editId) openEdit(editId); else openAdd();
+};
+window.resetCCDraft = function() {
+  if (!confirm('작성 중인 내용을 지우고 처음부터 다시 작성할까요?')) return;
+  const f = ccStudent && ccStudent.fireId;
+  ccDraft = null; DIRTY.delete('cc-modal-bg');
+  if (f) openClassCard(f); else closeCCModal(true);
+};
+window.resetBTDraft = function() {
+  if (!confirm('작성 중인 내용을 지우고 처음부터 다시 작성할까요?')) return;
+  btDraft = null; DIRTY.delete('bt-modal-bg');
+  openBatch();
+};
 
 /* 출결 상태: 출석·지각·보강 = 수업 1회로 집계 / 결석 = 결석 카운트 */
 const LESSON_ST = ['출석','지각','보강'];
@@ -940,14 +1051,21 @@ function refreshClassSelectors() {
     }
     classFilter = fSel.value;
   }
+  // 반 목록이 실제로 바뀐 경우에만 다시 만든다 (작성 중 선택값·드롭다운 유지)
   const cSel = document.getElementById('cc-w-class');
   if (cSel) {
-    const cur = cSel.value;
-    cSel.innerHTML = '<option value="">미지정</option>' + ttClasses.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-    if (cur && ttClasses.includes(cur)) cSel.value = cur;
+    const sig = ttClasses.join('|');
+    if (cSel.dataset.sig !== sig) {
+      const cur = cSel.value;
+      cSel.dataset.sig = sig;
+      cSel.innerHTML = '<option value="">미지정</option>' + ttClasses.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+      if (cur && ttClasses.includes(cur)) cSel.value = cur;
+    }
   }
   if (document.getElementById('sm-modal-bg').classList.contains('open')) {
+    const was = hydrating; hydrating = true;
     renderClassChecks(getCheckedClasses());
+    hydrating = was;
   }
 }
 
@@ -1000,16 +1118,23 @@ function renderOffList() {
   }).join('');
 }
 window.openOff = function() {
+  hydrating = true;
   const sel = document.getElementById('off-class');
   sel.innerHTML = '<option value="">선택</option>'
     + ttClasses.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
   document.getElementById('off-date').value = todayStr();
   document.getElementById('off-reason').value = '';
   renderOffList();
+  DIRTY.delete('off-modal-bg');
   document.getElementById('off-modal-bg').classList.add('open');
   syncBodyLock();
+  hydrating = false;
 };
-window.closeOff = function() { document.getElementById('off-modal-bg').classList.remove('open'); syncBodyLock(); };
+window.closeOff = function() {
+  DIRTY.delete('off-modal-bg');
+  document.getElementById('off-modal-bg').classList.remove('open');
+  syncBodyLock();
+};
 window.saveOff = async function() {
   const className = document.getElementById('off-class').value;
   const date = document.getElementById('off-date').value.trim();
@@ -1024,6 +1149,7 @@ window.saveOff = async function() {
     await setDoc(doc(db,'classOff', offDocId(classId, date)),
       { classId, className, date, reason, createdAt: serverTimestamp() }, { merge:true });
     document.getElementById('off-reason').value = '';
+    DIRTY.delete('off-modal-bg');
   } catch (e) { alert('휴강 등록 오류: ' + e.message); }
   finally { btn.disabled = false; btn.textContent = '휴강 등록'; }
 };
@@ -1115,29 +1241,43 @@ function cardDocId(classId, date, studentId) { return `${classId}__${date}__${st
 function btStudentId(s) { return (s.id != null && String(s.id).trim()) ? String(s.id).trim() : String(s.fireId); }
 
 window.openBatch = function() {
+  hydrating = true;
   const sel = document.getElementById('bt-class');
   sel.innerHTML = '<option value="">선택</option>' + ttClasses.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-  // 오늘 요일 수업이 딱 하나면 자동 선택
-  const dayCh = DAY_ORDER[(new Date().getDay() + 6) % 7];
-  const todayCls = ttClasses.filter(c => String(nameToId.get(c) || '').split('-')[0] === dayCh);
-  sel.value = (todayCls.length === 1) ? todayCls[0] : '';
-  document.getElementById('bt-date').value = todayStr();
+  const d = btDraft;
+  if (d && d.cls && ttClasses.includes(d.cls)) {
+    sel.value = d.cls;
+  } else {
+    // 오늘 요일 수업이 딱 하나면 자동 선택
+    const dayCh = DAY_ORDER[(new Date().getDay() + 6) % 7];
+    const todayCls = ttClasses.filter(c => String(nameToId.get(c) || '').split('-')[0] === dayCh);
+    sel.value = (todayCls.length === 1) ? todayCls[0] : '';
+  }
+  document.getElementById('bt-date').value = (d && parseYMD(d.date)) ? d.date : todayStr();
   document.getElementById('bt-off').checked = false;
   ['bt-teacher','bt-unit','bt-content','bt-homework'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('bt-hw').value = '보통';
   document.getElementById('bt-attitude').value = '보통';
+  showDraftNote('bt-draft', false);
+  DIRTY.delete('bt-modal-bg');
   toggleBatchOff();
   document.getElementById('bt-modal-bg').classList.add('open');
   syncBodyLock();
+  hydrating = false;
   loadBatch();
 };
-window.closeBatch = function() { document.getElementById('bt-modal-bg').classList.remove('open'); syncBodyLock(); };
+window.closeBatch = function(keep) {
+  if (!keep && DIRTY.has('bt-modal-bg') && !confirm('작성 중인 내용을 버리고 닫을까요?')) return;
+  if (!keep) { btDraft = null; DIRTY.delete('bt-modal-bg'); showDraftNote('bt-draft', false); }
+  document.getElementById('bt-modal-bg').classList.remove('open');
+  syncBodyLock();
+};
 window.toggleBatchOff = function() {
   const on = document.getElementById('bt-off').checked;
   document.getElementById('bt-offbar').classList.toggle('on', on);
   document.getElementById('bt-student-area').style.display = on ? 'none' : '';
 };
-window.btMemoInput = function(i, v) { if (btRows[i]) btRows[i].memo = String(v || ''); };
+window.btMemoInput = function(i, v) { if (btRows[i]) { btRows[i].memo = String(v || ''); saveBTDraft(); } };
 window.toggleBatchMemo = function(i) {
   const el = document.getElementById('bt-memo-' + i);
   if (el) el.classList.toggle('open');
@@ -1152,10 +1292,12 @@ window.setBatchStatus = function(i, st) {
     row.querySelectorAll('.bt-sbtn').forEach(b => b.classList.toggle('on', b.dataset.st === btRows[i].status));
   }
   updateBtSum();
+  saveBTDraft();
 };
 window.setAllBatch = function(st) {
-  btRows.forEach((r, i) => { r.status = BT_ST.includes(st) ? st : ''; });
+  btRows.forEach(r => { r.status = BT_ST.includes(st) ? st : ''; });
   renderBatch();
+  saveBTDraft();
 };
 function updateBtSum() {
   const el = document.getElementById('bt-sum');
@@ -1229,24 +1371,51 @@ window.loadBatch = async function() {
       hadCard: !!c
     };
   });
+  // 임시 보관된 작성 내용(같은 반·같은 날)이 있으면 그것을 우선 복원
+  const dr = (btDraft && btDraft.cls === cls && btDraft.date === date) ? btDraft : null;
+  if (dr && Array.isArray(dr.rows)) {
+    const m = new Map(dr.rows.map(r => [String(r.sid), r]));
+    btRows.forEach(r => {
+      const x = m.get(String(r.sid));
+      if (!x) return;
+      if (x.status) r.status = x.status;
+      if (x.memo) r.memo = x.memo;
+    });
+  }
   const nFound = found.filter(Boolean).length;
+  // 이미 타이핑해 둔 칸은 절대 덮어쓰지 않는다
+  const isEmpty = id => { const el = document.getElementById(id); return !el || String(el.value || '').trim() === ''; };
+  const fillIfEmpty = (id, v) => { const el = document.getElementById(id); if (el && v != null && isEmpty(id)) el.value = String(v); };
+  const setSelIfFree = (id, v) => {
+    if (dr) return;                                  // 초안이 있으면 초안이 우선
+    const el = document.getElementById(id);
+    if (!el || !v) return;
+    const o = [...el.options].find(x => x.value === v);
+    if (o) el.value = v;
+  };
   if (nFound) {
     const common = found.find(c => c && c.content) || found.find(Boolean);
     info.classList.add('show');
-    info.innerHTML = `📂 이 반 ${esc(date)} 기록 <b>${nFound}건</b>을 불러왔습니다. 그대로 저장하면 <b>덮어쓰기(수정)</b>되고 회차가 중복으로 오르지 않습니다.`;
-    const sSel = document.getElementById('bt-subj');
-    if (common.subject) { const o = [...sSel.options].find(x => x.value === common.subject); if (o) sSel.value = common.subject; }
-    document.getElementById('bt-teacher').value = common.teacher || '';
-    document.getElementById('bt-unit').value = common.unit || '';
-    document.getElementById('bt-content').value = common.content || '';
-    document.getElementById('bt-homework').value = common.homeworkContent || '';
-    if (common.homework) document.getElementById('bt-hw').value = common.homework;
-    if (common.attitude) document.getElementById('bt-attitude').value = common.attitude;
+    info.innerHTML = `📂 이 반 ${esc(date)} 기록 <b>${nFound}건</b>을 불러왔습니다. 그대로 저장하면 <b>덮어쓰기(수정)</b>되고 회차가 중복으로 오르지 않습니다.<br>이미 입력해 둔 칸은 지우지 않고 그대로 두었습니다.`;
+    setSelIfFree('bt-subj', common.subject);
+    fillIfEmpty('bt-teacher', common.teacher);
+    fillIfEmpty('bt-unit', common.unit);
+    fillIfEmpty('bt-content', common.content);
+    fillIfEmpty('bt-homework', common.homeworkContent);
+    setSelIfFree('bt-hw', common.homework);
+    setSelIfFree('bt-attitude', common.attitude);
   } else {
     const t = mem.find(x => x.teacher && x.teacher !== '-');
-    if (t && !document.getElementById('bt-teacher').value) document.getElementById('bt-teacher').value = t.teacher;
+    if (t) fillIfEmpty('bt-teacher', t.teacher);
     const subs = mem.map(x => x.subject).filter(v => v && v !== '-').map(v => String(v).split(',')[0].trim());
-    if (subs.length) { const o = [...document.getElementById('bt-subj').options].find(x => x.value === subs[0]); if (o) document.getElementById('bt-subj').value = subs[0]; }
+    if (subs.length) setSelIfFree('bt-subj', subs[0]);
+  }
+  if (dr) {
+    putFields(BT_FIELDS.filter(f => f !== 'bt-class' && f !== 'bt-date'), dr.vals);
+    DIRTY.add('bt-modal-bg');
+    showDraftNote('bt-draft', true, '✍️ 저장하지 않고 닫았던 내용을 이어서 불러왔습니다.');
+  } else {
+    showDraftNote('bt-draft', false);
   }
   renderBatch();
 };
@@ -1265,7 +1434,6 @@ window.saveBatch = async function() {
   const homeworkContent = document.getElementById('bt-homework').value.trim();
   const hwDefault = document.getElementById('bt-hw').value;
   const atDefault = document.getElementById('bt-attitude').value;
-  const reason = isOff ? (prompt('휴강 사유를 입력하세요 (선택)', '') || '') : '';
 
   if (isOff) {
     const had = btRows.filter(r => r.hadCard).length;
@@ -1276,6 +1444,8 @@ window.saveBatch = async function() {
     if (!teacher) { alert('담당 선생님을 입력하세요.'); return; }
     if (marked.some(r => isLessonStatus(r.status)) && !content) { alert('수업 내용을 입력하세요.'); return; }
   }
+  // 사유 입력은 모든 검증을 통과한 뒤에 (취소해도 입력 내용은 그대로 남음)
+  const reason = isOff ? (prompt('휴강 사유를 입력하세요 (선택)', '') || '') : '';
 
   const btn = document.getElementById('bt-save-btn');
   btn.disabled = true; btn.textContent = '저장 중...';
@@ -1333,7 +1503,8 @@ window.saveBatch = async function() {
     if (isOff) batch.set(offRef, { classId, className: cls, date, reason, createdAt: serverTimestamp() }, { merge: true });
     else if (offs.some(o => String(o.classId) === String(classId) && String(o.date) === date)) batch.delete(offRef);
     await batch.commit();
-    closeBatch();
+    btDraft = null; DIRTY.delete('bt-modal-bg'); showDraftNote('bt-draft', false);
+    closeBatch(true);
     alert(isOff
       ? `${cls}\n${date} 휴강으로 저장했습니다.${nDel ? `\n기존 수업카드 ${nDel}건 삭제 · 회차 차감 완료` : ''}`
       : `${cls}\n수업카드 ${nCard}건을 저장했습니다.\n학부모 리포트에 바로 반영됩니다.`);
@@ -1543,10 +1714,108 @@ function fmtPhone(v) {
   });
 });
 
+/* ════════ 학생 ID — 자동 생성 제거 · 중복 차단 · 다음 번호 제안 ════════
+   ID는 grades / classCards 가 학생을 찾는 연결 키이고, 등록 후에는 수정이 막혀 있다.
+   전에는 비워두면 's1753…' 같은 규칙 밖 ID가 조용히 만들어져 성적이 엉뚱하게
+   붙을 수 있었다 → 입력 필수 + 실시간 중복 검사 + 저장 직전 서버 재확인으로 교체.
+   접두어: 중등 = m / 고등 = h, 번호는 기존 데이터의 자릿수를 따라 max+1 */
+const ID_RE = /^[mh]\d{4,6}$/;
+const ID_BAD_CH = /[^a-z0-9_-]/;
+let idTouched = false;                 // 원장님이 ID를 직접 입력했는지 (제안값 덮어쓰기 방지)
+function normId(v) { return String(v == null ? '' : v).trim().toLowerCase(); }
+function usedIdSet(exceptFireId) {
+  const set = new Set();
+  students.forEach(s => {
+    if (exceptFireId && s.fireId === exceptFireId) return;
+    const v = normId(s.id);
+    if (v) set.add(v);
+  });
+  return set;
+}
+function idPrefix(grade) {
+  const g = String(grade || '');
+  if (g.startsWith('중')) return 'm';
+  if (g.startsWith('고')) return 'h';
+  return '';
+}
+function nextIdFor(grade) {
+  const p = idPrefix(grade);
+  if (!p) return '';
+  let max = 0, width = 5;
+  students.forEach(s => {
+    const m = /^([mh])(\d+)$/.exec(normId(s.id));
+    if (!m || m[1] !== p) return;
+    width = Math.max(width, m[2].length);
+    const n = parseInt(m[2], 10);
+    if (n > max) max = n;
+  });
+  return p + String(max + 1).padStart(width, '0');
+}
+window.checkIdInput = function() {
+  const el = document.getElementById('sm-id');
+  const hint = document.getElementById('sm-id-hint');
+  const btn = document.getElementById('sm-id-suggest');
+  const gSel = document.getElementById('sm-grade');
+  if (!el || !hint || !gSel) return;
+  if (el.disabled) {
+    el.classList.remove('bad');
+    hint.className = 'sm-hint';
+    hint.textContent = '등록 후에는 ID를 바꿀 수 없습니다. (성적 · 수업카드 연결 유지)';
+    if (btn) btn.style.display = 'none';
+    return;
+  }
+  const v = normId(el.value);
+  const sug = nextIdFor(gSel.value);
+  const used = usedIdSet(editId);
+  let cls = '', msg = '';
+  if (!v) {
+    msg = sug ? `ID는 필수입니다. 제안 번호: ${sug}` : 'ID는 필수입니다. 학년을 먼저 고르면 번호를 제안합니다.';
+  } else if (ID_BAD_CH.test(v)) {
+    cls = 'bad'; msg = '영문 소문자와 숫자만 쓸 수 있습니다. (공백 · 특수문자 불가)';
+  } else if (used.has(v)) {
+    cls = 'bad'; msg = `이미 사용 중인 ID입니다.${sug ? ` 제안 번호: ${sug}` : ''}`;
+  } else if (!ID_RE.test(v)) {
+    msg = `권장 형식(${sug || 'h01005'})과 다릅니다. 저장은 되지만 한 번 확인해주세요.`;
+  } else {
+    cls = 'ok'; msg = '사용할 수 있는 ID입니다.';
+  }
+  el.classList.toggle('bad', cls === 'bad');
+  hint.className = 'sm-hint' + (cls ? ' ' + cls : '');
+  hint.textContent = msg;
+  if (btn) btn.style.display = (sug && v !== sug && (!v || cls === 'bad')) ? 'inline-block' : 'none';
+};
+window.useSuggestedId = function() {
+  const el = document.getElementById('sm-id');
+  const gSel = document.getElementById('sm-grade');
+  if (!el || !gSel || el.disabled) return;
+  const sug = nextIdFor(gSel.value);
+  if (!sug) { alert('학년을 먼저 선택하세요.'); return; }
+  el.value = sug;
+  idTouched = false;
+  checkIdInput();
+  saveSMDraft();
+};
+(function(){
+  const el = document.getElementById('sm-id');
+  if (el) el.addEventListener('input', () => { if (!hydrating) idTouched = true; });
+  const g = document.getElementById('sm-grade');
+  if (g) g.addEventListener('change', () => {
+    const idEl = document.getElementById('sm-id');
+    if (!idEl || idEl.disabled) return;
+    // 직접 입력한 ID는 건드리지 않고, 비어 있거나 제안값일 때만 다시 제안
+    if (!editId && (!normId(idEl.value) || !idTouched)) {
+      const sug = nextIdFor(g.value);
+      if (sug) { idEl.value = sug; idTouched = false; }
+    }
+    checkIdInput();
+  });
+})();
+
 /* ════════ 등록/수정 모달 ════════ */
 function setSubjChecks(values) {
+  const vals = Array.isArray(values) ? values : [];
   document.querySelectorAll('.sm-subj-chk').forEach(cb => {
-    const on = values.includes(cb.value);
+    const on = vals.includes(cb.value);
     cb.checked = on;
     cb.closest('.sm-subj-label').classList.toggle('checked', on);
   });
@@ -1578,22 +1847,39 @@ function getCheckedClasses() {
   return [...document.querySelectorAll('.sm-class-chk:checked')].map(c => c.value);
 }
 window.openAdd = function() {
+  hydrating = true;
   editId = null; editPhotoUrl = '';
+  idTouched = false;
   document.getElementById('sm-modal-title').textContent = '신규 학생 등록';
   document.getElementById('sm-id').value = '';
   document.getElementById('sm-id').disabled = false;
+  document.getElementById('sm-id').classList.remove('bad');
   ['sm-name','sm-teacher','sm-phone','sm-stu-phone'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('sm-grade').value = '';
   document.getElementById('sm-start').value = todayStr();   // 기본값 = 오늘
   document.getElementById('sm-start-hint').textContent = '오늘로 채워뒀습니다. 실제 첫 수업일로 바꿔주세요. (주 1회 기준 회차 계산)';
   setSubjChecks([]);
   renderClassChecks([]);
+  const d = (smDraft && !smDraft.editId) ? smDraft : null;
+  if (d) {
+    putFields(SM_FIELDS, d.vals);
+    setSubjChecks(d.subs);
+    renderClassChecks(d.classes);
+    DIRTY.add('sm-modal-bg');
+  } else {
+    DIRTY.delete('sm-modal-bg');
+  }
+  showDraftNote('sm-draft', !!d, '✍️ 저장하지 않고 닫았던 내용을 이어서 불러왔습니다.');
+  if (d) idTouched = !!normId(d.vals && d.vals['sm-id']);
+  checkIdInput();
   document.getElementById('sm-modal-bg').classList.add('open');
   syncBodyLock();
+  hydrating = false;
 };
 window.openEdit = function(fireId) {
   const s = students.find(x => x.fireId === fireId);
   if (!s) return;
+  hydrating = true;
   editId = fireId;
   editPhotoUrl = s.photoUrl || '';
   document.getElementById('sm-modal-title').textContent = '학생 정보 수정';
@@ -1612,10 +1898,27 @@ window.openEdit = function(fireId) {
   const subs = (s.subject && s.subject !== '-') ? String(s.subject).split(',').map(x => x.trim()) : [];
   setSubjChecks(subs);
   renderClassChecks(studentClassNames(s));
+  const d = (smDraft && smDraft.editId === fireId) ? smDraft : null;
+  if (d) {
+    putFields(SM_FIELDS, d.vals);
+    setSubjChecks(d.subs);
+    renderClassChecks(d.classes);
+    DIRTY.add('sm-modal-bg');
+  } else {
+    DIRTY.delete('sm-modal-bg');
+  }
+  showDraftNote('sm-draft', !!d, '✍️ 저장하지 않고 닫았던 수정 내용을 이어서 불러왔습니다.');
+  checkIdInput();
   document.getElementById('sm-modal-bg').classList.add('open');
   syncBodyLock();
+  hydrating = false;
 };
-window.closeModal = function() { document.getElementById('sm-modal-bg').classList.remove('open'); syncBodyLock(); };
+window.closeModal = function(keep) {
+  if (!keep && DIRTY.has('sm-modal-bg') && !confirm('작성 중인 내용을 버리고 닫을까요?')) return;
+  if (!keep) { smDraft = null; DIRTY.delete('sm-modal-bg'); showDraftNote('sm-draft', false); }
+  document.getElementById('sm-modal-bg').classList.remove('open');
+  syncBodyLock();
+};
 
 // 과목 라벨 토글
 document.querySelectorAll('.sm-subj-chk').forEach(cb => {
@@ -1639,7 +1942,7 @@ document.querySelectorAll('.sm-subj-chk').forEach(cb => {
 window.saveStudent = async function() {
   const name = document.getElementById('sm-name').value.trim();
   const grade = document.getElementById('sm-grade').value;
-  const id = document.getElementById('sm-id').value.trim() || ('s' + Date.now());
+  const id = normId(document.getElementById('sm-id').value);
   const teacher = document.getElementById('sm-teacher').value.trim() || '-';
   const phone = document.getElementById('sm-phone').value.trim() || '-';
   const studentPhone = document.getElementById('sm-stu-phone').value.trim() || '-';
@@ -1650,10 +1953,24 @@ window.saveStudent = async function() {
   const cf = buildClassFields(getCheckedClasses());
   if (!name || !grade) { alert('이름과 학년을 입력해주세요.'); return; }
   if (startRaw && !startDate) { alert('첫 수업일 형식이 올바르지 않습니다.'); return; }
+  if (!editId) {
+    // 신규 등록만 ID를 저장한다 (수정 시에는 ID를 건드리지 않음)
+    if (!id) { alert('학생 ID를 입력하세요.\n학년을 고르면 다음 번호를 제안합니다.'); checkIdInput(); return; }
+    if (ID_BAD_CH.test(id)) { alert('학생 ID는 영문 소문자와 숫자만 쓸 수 있습니다.\n공백 · 특수문자는 사용할 수 없습니다.'); checkIdInput(); return; }
+    if (usedIdSet(null).has(id)) { alert(`이미 사용 중인 ID입니다: ${id}\n다른 번호를 넣어주세요.`); checkIdInput(); return; }
+    if (!ID_RE.test(id) && !confirm(`권장 형식(중등 m01011 · 고등 h01005)과 다릅니다:\n${id}\n\n이 ID로 그대로 저장할까요?`)) { checkIdInput(); return; }
+  }
   const btn = document.getElementById('sm-save-btn');
   btn.disabled = true; btn.textContent = '저장 중...';
   try {
     if (!editId) {
+      // 저장 직전 서버 데이터로 중복 재확인 (다른 창·다른 기기에서 동시에 등록한 경우 방지)
+      const dupSnap = await getDocs(collection(db,'students'));
+      if (dupSnap.docs.some(d => normId((d.data() || {}).id) === id)) {
+        alert(`이미 사용 중인 ID입니다: ${id}\n다른 번호로 저장해주세요.`);
+        checkIdInput();
+        return;
+      }
       const t = new Date();
       await addDoc(collection(db,'students'), {
         id, name, grade, subject, phone, studentPhone, teacher, startDate,
@@ -1670,7 +1987,8 @@ window.saveStudent = async function() {
         photoUrl: editPhotoUrl || ''
       });
     }
-    closeModal();
+    smDraft = null; DIRTY.delete('sm-modal-bg'); showDraftNote('sm-draft', false);
+    closeModal(true);
   } catch (e) {
     alert('저장 오류: ' + e.message);
   } finally {
@@ -1694,6 +2012,7 @@ window.openClassCard = function(fireId) {
   const s = students.find(x => x.fireId === fireId);
   if (!s) return;
   if (!s.id) { alert('이 학생은 학생 ID가 없어 수업카드를 연동할 수 없습니다.\n먼저 학생 정보를 수정해 ID를 부여해주세요.'); return; }
+  hydrating = true;
   ccStudent = s;
   document.getElementById('cc-modal-title').textContent = `📝 ${s.name || '학생'} · 수업카드 작성`;
   document.getElementById('cc-stu-info').innerHTML =
@@ -1705,6 +2024,7 @@ window.openClassCard = function(fireId) {
   const subjSel = document.getElementById('cc-w-subj');
   if (subs.length) { const opt = [...subjSel.options].find(o => o.value === subs[0] || o.text === subs[0]); if (opt) subjSel.value = opt.value; }
   const clsSel = document.getElementById('cc-w-class');
+  clsSel.dataset.sig = ttClasses.join('|');
   clsSel.innerHTML = '<option value="">미지정</option>' + ttClasses.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
   const cn = studentClassNames(s);
   clsSel.value = cn.find(c => ttClasses.includes(c)) || '';
@@ -1716,8 +2036,18 @@ window.openClassCard = function(fireId) {
   document.getElementById('cc-w-homework').value = '';
   document.getElementById('cc-w-reason').value = '';
   setCCStatus('출석');
+  const d = (ccDraft && ccDraft.fireId === fireId) ? ccDraft : null;
+  if (d) {
+    putFields(CC_FIELDS, d.vals);
+    setCCStatus(d.status || '출석');
+    DIRTY.add('cc-modal-bg');
+  } else {
+    DIRTY.delete('cc-modal-bg');
+  }
+  showDraftNote('cc-draft', !!d, '✍️ 저장하지 않고 닫았던 내용을 이어서 불러왔습니다.');
   document.getElementById('cc-modal-bg').classList.add('open');
   syncBodyLock();
+  hydrating = false;
 };
 window.setCCStatus = function(st) {
   ccStatus = LESSON_ST.includes(st) || st === '결석' ? st : '출석';
@@ -1731,8 +2061,14 @@ window.setCCStatus = function(st) {
   else if (ccStatus === '보강') hint.textContent = '보강은 수업 1회로 집계됩니다.';
   else if (ccStatus === '지각') hint.textContent = '지각도 수업 1회로 집계됩니다.';
   else hint.textContent = '출석 · 지각 · 보강은 회차에 포함되고, 결석은 결석 횟수로만 집계됩니다.';
+  saveCCDraft();
 };
-window.closeCCModal = function() { document.getElementById('cc-modal-bg').classList.remove('open'); syncBodyLock(); };
+window.closeCCModal = function(keep) {
+  if (!keep && DIRTY.has('cc-modal-bg') && !confirm('작성 중인 내용을 버리고 닫을까요?')) return;
+  if (!keep) { ccDraft = null; DIRTY.delete('cc-modal-bg'); showDraftNote('cc-draft', false); }
+  document.getElementById('cc-modal-bg').classList.remove('open');
+  syncBodyLock();
+};
 
 window.saveClassCard = async function() {
   if (!ccStudent) return;
@@ -1795,7 +2131,8 @@ window.saveClassCard = async function() {
         if (Object.keys(patch).length) await setDoc(doc(db,'students',ccStudent.fireId), patch, { merge:true });
       } catch (err) { console.warn('학생 문서 보정 실패:', err); }
     }
-    closeCCModal();
+    ccDraft = null; DIRTY.delete('cc-modal-bg'); showDraftNote('cc-draft', false);
+    closeCCModal(true);
     alert(lesson
       ? `${status} 처리되었습니다. 수업카드가 저장되고 회차가 1 올라갑니다.`
       : '결석으로 기록되었습니다. 회차는 올라가지 않습니다.');
@@ -1806,12 +2143,52 @@ window.saveClassCard = async function() {
   }
 };
 
-// 배경 클릭 / ESC 로 닫기
-document.getElementById('sm-modal-bg').addEventListener('click', ev => { if (ev.target === ev.currentTarget) closeModal(); });
-document.getElementById('cc-modal-bg').addEventListener('click', ev => { if (ev.target === ev.currentTarget) closeCCModal(); });
-document.getElementById('off-modal-bg').addEventListener('click', ev => { if (ev.target === ev.currentTarget) closeOff(); });
-document.getElementById('bt-modal-bg').addEventListener('click', ev => { if (ev.target === ev.currentTarget) closeBatch(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeCCModal(); closeOff(); closeBatch(); } });
+/* ════════ 모달 닫힘 처리 — 실수로 입력이 사라지지 않게 ════════ */
+const MODALS = {
+  'sm-modal-bg':  { close: k => closeModal(k),   draft: saveSMDraft },
+  'cc-modal-bg':  { close: k => closeCCModal(k), draft: saveCCDraft },
+  'bt-modal-bg':  { close: k => closeBatch(k),   draft: saveBTDraft },
+  'off-modal-bg': { close: () => closeOff(),     draft: null }
+};
+function isOpenModal(id) {
+  const el = document.getElementById(id);
+  return !!el && el.classList.contains('open');
+}
+function askKeep(id) {
+  if (!DIRTY.has(id)) return true;
+  return confirm('작성 중인 내용이 있습니다. 창을 닫을까요?\n\n입력한 내용은 임시 보관되며, 다시 열면 이어서 작성할 수 있습니다.');
+}
+Object.keys(MODALS).forEach(id => {
+  const bg = document.getElementById(id);
+  if (!bg) return;
+  const cfgM = MODALS[id];
+  ['input','change'].forEach(ev => bg.addEventListener(ev, () => {
+    if (hydrating) return;
+    DIRTY.add(id);
+    if (cfgM.draft) cfgM.draft();
+  }));
+  // 누른 지점과 뗀 지점이 모두 배경일 때만 닫기 (스크롤·드래그 오인 방지)
+  let downOnBg = false;
+  ['pointerdown','mousedown','touchstart'].forEach(ev =>
+    bg.addEventListener(ev, e => { downOnBg = (e.target === bg); }, { passive: true }));
+  bg.addEventListener('click', e => {
+    if (e.target !== bg || !downOnBg) return;
+    downOnBg = false;
+    if (!askKeep(id)) return;
+    cfgM.close(true);
+  });
+});
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  const id = Object.keys(MODALS).reverse().find(isOpenModal);
+  if (!id) return;
+  if (!askKeep(id)) return;
+  MODALS[id].close(true);
+});
+// 작성 중 새로고침·이탈 경고
+window.addEventListener('beforeunload', e => {
+  if ([...DIRTY].some(isOpenModal)) { e.preventDefault(); e.returnValue = ''; }
+});
 
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 </script>
