@@ -233,6 +233,29 @@ body {
 .ex-add { background:linear-gradient(135deg,#f472b6,#db2777); color:#fff; border:none; border-radius:9px; padding:9px 13px; min-height:40px; font-size:12px; font-weight:700; white-space:nowrap; cursor:pointer; }
 .ex-add.added { background:#059669; pointer-events:none; }
 
+/* ── 소단원 담기 (신규) ── */
+.sub-toggle { background:#eff6ff; color:#1e40af; border:1.5px solid #bfdbfe; border-radius:9px; padding:9px 13px; min-height:40px; font-size:12px; font-weight:700; white-space:nowrap; cursor:pointer; font-family:inherit; }
+.sub-toggle:hover { background:#dbeafe; }
+.sub-toggle.on { background:#2563eb; color:#fff; border-color:#2563eb; }
+.sub-panel { border:1px solid #bfdbfe; background:#f7fbff; border-radius:14px; padding:.7rem .8rem; margin:-.2rem 0 .7rem; }
+.sub-loading { font-size:12px; color:#6e6e73; text-align:center; padding:.6rem .3rem; }
+.sub-warn { font-size:12px; line-height:1.7; color:#92400e; background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:.7rem .8rem; }
+.sub-group { margin-bottom:.55rem; }
+.sub-group:last-child { margin-bottom:0; }
+.sub-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border-radius:10px; }
+.sub-row.mid { background:#dbeafe; border:1px solid #bfdbfe; }
+.sub-row.small { background:#fff; border:1px solid #e3edfa; margin:5px 0 0 12px; }
+.sub-name { font-size:12.5px; font-weight:700; color:#1e40af; min-width:0; word-break:break-word; line-height:1.5; }
+.sub-row.small .sub-name { font-size:12px; font-weight:600; color:#3c3c43; }
+.sub-add { background:linear-gradient(135deg,#60a5fa,#2563eb); color:#fff; border:none; border-radius:8px; padding:7px 12px; min-height:36px; font-size:11.5px; font-weight:700; white-space:nowrap; cursor:pointer; font-family:inherit; flex-shrink:0; }
+.sub-add.added { background:#059669; pointer-events:none; }
+.sub-na { font-size:11px; font-weight:700; color:#aeaeb2; background:#f5f5f7; border:1px solid #f0e8ed; border-radius:8px; padding:6px 10px; white-space:nowrap; flex-shrink:0; }
+@media (max-width: 520px) {
+  .sub-panel { padding:.6rem .6rem; }
+  .sub-row.small { margin-left:8px; }
+  .sub-add { padding:7px 10px; }
+}
+
 /* ── Toast ── */
 .toast { position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:#1d1d1f; color:#fff; font-size:13px; font-weight:600; padding:11px 20px; border-radius:24px; opacity:0; transition:all 0.25s; z-index:900; pointer-events:none; }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
@@ -640,6 +663,136 @@ function addConceptCard(page){
   $('items').appendChild(card);
 }
 
+/* ══════════════════════════════════════════════════════════
+   중단원·소단원 실시간 파싱 (하드코딩 없음)
+   - 단원 페이지를 fetch → DOMParser로 읽는다
+   - 중단원: .unit-section[id]  → 이름 .ub-title (번호 .ub-num)
+   - 소단원: .acc-item[id]      → 이름 .acc-htitle (번호 .acc-num)
+   - 페이지 스크립트의 hashMap 키도 읽어, 해시 이동이 지원되는
+     항목만 담을 수 있게 한다 (미등록 항목은 '미지원' 표시)
+   - 결과는 파일명 기준 캐시. 실패·구조 불일치는 빈 결과로 처리
+   ══════════════════════════════════════════════════════════ */
+const subUnitCache = {};   // 파일명 → { ok:boolean, groups:[...] }
+
+function cleanText(node){
+  if(!node) return '';
+  return String(node.textContent||'').replace(/\s+/g,' ').trim();
+}
+
+/* 같은 도메인 파일 읽기 — 상대경로 먼저, 실패하면 루트경로 재시도 */
+async function fetchPageHtml(file){
+  const cands = [file, '/'+String(file).replace(/^\/+/,'')];
+  for(const u of cands){
+    try{
+      const r = await fetch(u, {cache:'no-cache'});
+      if(r && r.ok){
+        const txt = await r.text();
+        if(txt) return txt;
+      }
+    }catch(e){ /* 다음 후보로 재시도 */ }
+  }
+  return null;
+}
+
+/* 페이지 스크립트의 hashMap 키 수집 → Set('unit1','unit1-origin', …) */
+function extractHashKeys(html){
+  const set = new Set();
+  try{
+    const m = String(html).match(/hashMap\s*=\s*\{([\s\S]*?)\}/);
+    if(!m) return set;
+    const re = /['"]#([A-Za-z0-9_\-]+)['"]/g;
+    let x;
+    while((x = re.exec(m[1])) !== null) set.add(x[1]);
+  }catch(e){ /* 못 읽으면 빈 Set (전부 담기 허용) */ }
+  return set;
+}
+
+async function loadSubUnits(file){
+  if(subUnitCache[file]) return subUnitCache[file];
+  let result = { ok:false, groups:[] };
+  try{
+    const html = await fetchPageHtml(file);
+    if(html){
+      const hashKeys = extractHashKeys(html);
+      const hasMap = hashKeys.size > 0;
+      const dp = new DOMParser().parseFromString(html, 'text/html');
+      const groups = [];
+
+      dp.querySelectorAll('.unit-section[id]').forEach(sec=>{
+        const name = cleanText(sec.querySelector('.ub-title')) || sec.id;
+        const num  = cleanText(sec.querySelector('.ub-num'));
+        const g = { id: sec.id, name, num, supported: hasMap ? hashKeys.has(sec.id) : true, subs: [] };
+        sec.querySelectorAll('.acc-item[id]').forEach(item=>{
+          const sname = cleanText(item.querySelector('.acc-htitle')) || item.id;
+          const snum  = cleanText(item.querySelector('.acc-num'));
+          g.subs.push({ id:item.id, name:sname, num:snum, supported: hasMap ? hashKeys.has(item.id) : true });
+        });
+        groups.push(g);
+      });
+
+      /* .unit-section 밖에 있는 소단원도 놓치지 않게 별도 수집 */
+      const orphans = [];
+      dp.querySelectorAll('.acc-item[id]').forEach(item=>{
+        if(item.closest('.unit-section[id]')) return;
+        const sname = cleanText(item.querySelector('.acc-htitle')) || item.id;
+        const snum  = cleanText(item.querySelector('.acc-num'));
+        orphans.push({ id:item.id, name:sname, num:snum, supported: hasMap ? hashKeys.has(item.id) : true });
+      });
+      if(orphans.length) groups.push({ id:'', name:'소단원', num:'', supported:false, subs:orphans });
+
+      const total = groups.reduce((n,g)=>n + (g.id?1:0) + g.subs.length, 0);
+      result = { ok: total > 0, groups };
+    }
+  }catch(e){
+    console.error('subunit parse fail', file, e);
+    result = { ok:false, groups:[] };
+  }
+  subUnitCache[file] = result;
+  return result;
+}
+
+/* 담기 버튼 하나 만들기 (담으면 '담김 ✓' + 초록) */
+function makeSubAddBtn(page, entry, kindLabel){
+  if(!entry.supported){
+    const na = el('span','sub-na','미지원');
+    na.title = '이 단원 페이지의 hashMap에 등록되지 않아 링크 이동이 되지 않습니다.';
+    return na;
+  }
+  const b = el('button','sub-add','담기');
+  b.addEventListener('click', ()=>{
+    const item = { f: page.f + '#' + entry.id, t: page.t + ' › ' + entry.name };
+    addConceptCard(item);
+    autofillRange(entry.name);
+    b.textContent='담김 ✓'; b.classList.add('added');
+    toast(kindLabel+'을 담았습니다.');
+  });
+  return b;
+}
+
+/* 펼친 패널에 중단원·소단원 줄 렌더 */
+function renderSubGroups(panel, page, groups){
+  groups.forEach(g=>{
+    if(!g.id && g.subs.length===0) return;
+    const grp = el('div','sub-group');
+
+    const midRow = el('div','sub-row mid');
+    const midLabel = (g.num ? g.num+' · ' : '') + g.name;
+    midRow.appendChild(el('div','sub-name','📗 '+midLabel));
+    if(g.id) midRow.appendChild(makeSubAddBtn(page, g, '중단원'));
+    grp.appendChild(midRow);
+
+    g.subs.forEach(s=>{
+      const row = el('div','sub-row small');
+      const label = (s.num ? s.num+' · ' : '') + s.name;
+      row.appendChild(el('div','sub-name','· '+label));
+      row.appendChild(makeSubAddBtn(page, s, '소단원'));
+      grp.appendChild(row);
+    });
+
+    panel.appendChild(grp);
+  });
+}
+
 /* ── 핵심내용 모달 ── */
 let curConceptSubj=null;
 function openConceptModal(){
@@ -669,14 +822,45 @@ function renderConceptList(){
     const info=el('div','ex-info');
     info.appendChild(el('div','ex-title', page.t));
     info.appendChild(el('div','ex-meta', curConceptSubj));
-    const btn=el('button','ex-add','담기');
+
+    const btns=el('div','ex-btns');
+    const btn=el('button','ex-add','대단원 담기');
     btn.addEventListener('click',()=>{
       addConceptCard(page);
       autofillRange(page.t);
       btn.textContent='담김 ✓'; btn.classList.add('added');
       toast('핵심내용을 담았습니다.');
     });
-    row.append(info,btn); box.appendChild(row);
+    const sbtn=el('button','sub-toggle','소단원 ▾');
+    btns.append(btn, sbtn);
+    row.append(info, btns); box.appendChild(row);
+
+    /* 소단원 목록 패널 — 처음 펼칠 때만 fetch */
+    const panel=el('div','sub-panel'); panel.style.display='none';
+    box.appendChild(panel);
+    let loaded=false, loading=false;
+
+    sbtn.addEventListener('click', async ()=>{
+      if(panel.style.display!=='none'){        // 접기
+        panel.style.display='none';
+        sbtn.classList.remove('on'); sbtn.textContent='소단원 ▾';
+        return;
+      }
+      panel.style.display='block';             // 펼치기
+      sbtn.classList.add('on'); sbtn.textContent='소단원 ▴';
+      if(loaded || loading) return;
+      loading=true;
+      panel.innerHTML='';
+      panel.appendChild(el('div','sub-loading','소단원 목록을 불러오는 중…'));
+      const data=await loadSubUnits(page.f);
+      loading=false; loaded=true;
+      panel.innerHTML='';
+      if(!data.ok){
+        panel.appendChild(el('div','sub-warn','이 페이지에서는 중단원·소단원 목록을 읽지 못했습니다. 위의 [대단원 담기]를 사용해 주세요.'));
+        return;
+      }
+      renderSubGroups(panel, page, data.groups);
+    });
   });
 }
 $('pickConceptBtn').addEventListener('click', openConceptModal);
