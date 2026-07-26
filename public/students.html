@@ -155,6 +155,7 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
 .btn-secondary:hover{background:#fdf2f8}
 .hint-lbl{font-weight:500;color:#aeaeb2;font-size:11px}
 .school-preview{font-size:11px;color:#0e7490;margin-top:5px;min-height:14px}
+.teacher-preview{font-size:11px;color:#0e7490;margin-top:5px;min-height:14px}
 
 /* ── 학생 ID 중복 경고 ── */
 .id-warn{font-size:11px;margin-top:5px;min-height:15px;line-height:1.5;font-weight:600;word-break:keep-all}
@@ -426,7 +427,7 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
           <option value="고등1학년">고등1학년</option><option value="고등2학년">고등2학년</option><option value="고등3학년">고등3학년</option>
         </select>
       </div>
-      <div class="form-group"><label>담당선생님</label><input type="text" id="inputTeacher" placeholder="선생님 이름" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+      <div class="form-group"><label>담당선생님 <span class="hint-lbl">(이름만 쓰면 "선생님"이 자동으로 붙습니다)</span></label><input type="text" id="inputTeacher" placeholder="예: 김인후" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"><div class="teacher-preview" id="teacherPreview"></div></div>
     </div>
     <!-- 학교명 (학년 ↔ 수강 과목 사이) -->
     <div class="form-group">
@@ -484,7 +485,7 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
         </div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>담당 선생님 <span style="color:#dc2626">*</span></label><input type="text" id="cc-w-teacher" placeholder="선생님 이름" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+        <div class="form-group"><label>담당 선생님 <span style="color:#dc2626">*</span></label><input type="text" id="cc-w-teacher" placeholder="예: 김인후" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
         <div class="form-group"><label>반 (시간표 기반)</label>
           <select id="cc-w-class" class="cc-w-class-sel"><option value="">미지정</option></select>
         </div>
@@ -553,6 +554,46 @@ let pg=1,eid=null,students=[],filtered=[],ccCache={},s2f={},fireIdSet=new Set();
 let selectedPhotoFile=null,currentPhotoUrl='';
 let origId='',idEditUnlocked=false;   // 수정 모달에서 학생 ID 변경용
 let delTarget=null;                   // 삭제 대상 {fireId,id,name}
+
+/* ══════════════════════════════════════════
+   담당선생님 이름 → "○○○ 선생님" 자동 완성
+   - 이름만 입력해도 뒤에 " 선생님"이 붙는다
+   - 이미 붙어 있으면(선생님·선생·쌤·샘·T) 중복으로 붙이지 않는다
+   - "이샘" 처럼 이름 자체가 샘/쌤으로 끝나는 경우는 깎지 않는다
+     (앞에 공백이 있거나, 떼어낸 뒤 2자 이상 남을 때만 접미사로 판단)
+   - 빈칸·'-' 는 그대로 빈 값으로 둔다
+   ══════════════════════════════════════════ */
+function withTeacherSuffix(v){
+  const s=String(v==null?'':v).trim().replace(/\s+/g,' ');
+  if(!s||s==='-')return'';
+  // '선생님' / '선생' 은 사람 이름 끝에 올 수 없으므로 항상 떼어낸다
+  let c=s.replace(/\s*선생님$/,'').replace(/\s*선생$/,'').trim();
+  // '쌤' '샘' 'T' 는 이름의 일부일 수 있어 조건부로 떼어낸다
+  let m=c.match(/^(.+?)\s+(?:쌤|샘|[Tt])$/);
+  if(m){
+    c=m[1].trim();
+  }else{
+    m=c.match(/^(.+?)(?:쌤|샘)$/);
+    if(m&&m[1].trim().length>=2)c=m[1].trim();
+  }
+  if(!c)return s;   // "선생님" 처럼 이름이 없으면 입력값을 그대로 둔다
+  return c+' 선생님';
+}
+// 입력칸용: 포커스가 빠질 때 눈에 보이게 보정 + 미리보기 문구
+function bindTeacherInput(id,previewId){
+  const elT=document.getElementById(id);
+  if(!elT)return;
+  const pv=previewId?document.getElementById(previewId):null;
+  const paint=()=>{
+    if(!pv)return;
+    const raw=elT.value.trim();
+    const out=withTeacherSuffix(raw);
+    pv.textContent=(out&&out!==raw)?`저장 시: ${out}`:'';
+  };
+  elT.addEventListener('input',paint);
+  elT.addEventListener('blur',()=>{elT.value=withTeacherSuffix(elT.value);paint();});
+  paint();
+}
 
 /* ══════════════════════════════════════════
    반(班) 관리
@@ -834,7 +875,8 @@ window.renderTable=function(){
       const cls=studentClasses(s);
       const clsTags=cls.length?cls.map(c=>`<span class="class-tag${c.stale?' stale':''}">${c.stale?'⚠ ':''}${e(c.name)}</span>`).join(''):'<span class="class-none">반 미배정</span>';
       const info=ccCache[s.fireId]||{count:0,teacher:''},hc=info.count>0;
-      const dt=s.teacher&&s.teacher!=='-'?s.teacher:(info.teacher||'');
+      const dtRaw=s.teacher&&s.teacher!=='-'?s.teacher:(info.teacher||'');
+      const dt=withTeacherSuffix(dtRaw);   // 기존 데이터도 화면에서는 "○○○ 선생님"으로 통일
       const sn=(s.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
       const sid=(s.id||'').replace(/'/g,"\\'");
       const sidJs=(s.id||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
@@ -852,7 +894,8 @@ window.renderTable=function(){
       const cls=studentClasses(s);
       const clsCell=cls.length?cls.map(c=>`<span class="class-tag${c.stale?' stale':''}">${c.stale?'⚠ ':''}${e(c.name)}</span>`).join(''):'<span class="class-none">미배정</span>';
       const info=ccCache[s.fireId]||{count:0,teacher:''},hc=info.count>0;
-      const dt=s.teacher&&s.teacher!=='-'?s.teacher:(info.teacher||'-');
+      const dtRaw=s.teacher&&s.teacher!=='-'?s.teacher:(info.teacher||'');
+      const dt=withTeacherSuffix(dtRaw)||'-';   // 기존 데이터도 화면에서는 "○○○ 선생님"으로 통일
       const sn=(s.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
       const sidJs=(s.id||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
       const sc=(s.school&&s.school!=='-')?s.school:'';
@@ -941,6 +984,9 @@ function fmtPhone(v){
   const el=document.getElementById(id);
   if(el)el.addEventListener('input',()=>{const p=el.selectionStart===el.value.length;el.value=fmtPhone(el.value);if(p)el.setSelectionRange(el.value.length,el.value.length);});
 });
+/* 담당선생님 입력칸 2곳: 포커스 빠질 때 " 선생님" 자동 부착 */
+bindTeacherInput('inputTeacher','teacherPreview');
+bindTeacherInput('cc-w-teacher',null);
 
 /* ══════════════════════════════════════════
    학생 ID 중복 방지
@@ -1037,7 +1083,7 @@ window.openAddModal=function(){
   document.getElementById('inputId').disabled=false;
   const ub=document.getElementById('idUnlockBtn');if(ub)ub.style.display='none';
   document.querySelectorAll('.subj-chk').forEach(cb=>{cb.checked=false;cb.closest('.subj-label').classList.remove('checked');});
-  resetPhotoUI();renderSchoolList();updateSchoolPreview();
+  resetPhotoUI();renderSchoolList();updateSchoolPreview();updateTeacherPreview();
   renderClassChecks([]);            // 시간표는 실시간 구독 중 → 재조회 불필요
   setSaveEnabled(true);
   setIdWarn('tip','학년을 선택하면 다음 번호를 자동으로 제안합니다.');
@@ -1056,7 +1102,7 @@ window.openEditModal=function(fi){
   document.getElementById('inputName').value=s.name||'';
   document.getElementById('inputGrade').value=s.grade||'';
   document.getElementById('inputSchool').value=(s.school&&s.school!=='-')?s.school:'';
-  document.getElementById('inputTeacher').value=(s.teacher&&s.teacher!=='-')?s.teacher:'';
+  document.getElementById('inputTeacher').value=withTeacherSuffix(s.teacher);   // 기존 값도 "○○○ 선생님" 형태로 정리해서 표시
   document.getElementById('inputPhone').value=(s.phone&&s.phone!=='-')?s.phone:'';
   document.getElementById('inputStudentPhone').value=(s.studentPhone&&s.studentPhone!=='-')?s.studentPhone:'';
   const subjects=(s.subject&&s.subject!=='-')?s.subject.split(',').map(x=>x.trim()):[];
@@ -1064,13 +1110,21 @@ window.openEditModal=function(fi){
   resetPhotoUI();
   currentPhotoUrl=s.photoUrl||'';
   if(currentPhotoUrl)setPhotoPreview(currentPhotoUrl);
-  renderSchoolList();updateSchoolPreview();
+  renderSchoolList();updateSchoolPreview();updateTeacherPreview();
   renderClassChecks(studentClasses(s).map(c=>c.id));
   const ub=document.getElementById('idUnlockBtn');if(ub)ub.style.display='inline-flex';
   setSaveEnabled(true);
   setIdWarn('tip','🔒 ID는 기록 연결을 위해 잠겨 있습니다. 바꾸려면 오른쪽 "🔓 ID 변경"을 누르세요.');
   document.getElementById('studentModal').classList.add('open');
 };
+// 담당선생님 미리보기 문구 갱신 (모달 열 때 호출)
+function updateTeacherPreview(){
+  const elT=document.getElementById('inputTeacher'),pv=document.getElementById('teacherPreview');
+  if(!elT||!pv)return;
+  const raw=elT.value.trim();
+  const out=withTeacherSuffix(raw);
+  pv.textContent=(out&&out!==raw)?`저장 시: ${out}`:'';
+}
 // 수정 모달에서 학생 ID 잠금 해제 (실수 방지용 확인)
 window.unlockIdEdit=function(){
   if(!eid)return;
@@ -1093,7 +1147,10 @@ window.saveStudent=async function(){
   const gr=document.getElementById('inputGrade').value;
   const idEl=document.getElementById('inputId');
   const id=idEl.value.trim();
-  const tc=document.getElementById('inputTeacher').value.trim()||'-';
+  const tcInput=document.getElementById('inputTeacher');
+  const tcNorm=withTeacherSuffix(tcInput.value);   // 저장 직전 정규화 (이름만 썼으면 " 선생님" 부착)
+  tcInput.value=tcNorm;
+  const tc=tcNorm||'-';
   const ph=document.getElementById('inputPhone').value.trim()||'-';
   const sph=document.getElementById('inputStudentPhone').value.trim()||'-';
   const sc=document.getElementById('inputSchool').value.trim();
@@ -1315,7 +1372,7 @@ async function loadCCList(fi,sid){
 window.toggleCCWrite=function(show){
   if(!show){setCCView('list');return;}
   if(!ccCur)return;
-  const teacher=(ccCur.teacher&&ccCur.teacher!=='-')?ccCur.teacher:'';
+  const teacher=withTeacherSuffix(ccCur.teacher);
   const subs=(ccCur.subject&&ccCur.subject!=='-')?String(ccCur.subject).split(',').map(x=>x.trim()).filter(Boolean):[];
   document.getElementById('ccWriteStu').innerHTML=`📝 <b>${e(ccCur.name||'학생')}</b>${ccCur.grade?` · ${e(ccCur.grade)}`:''} 수업카드 작성`;
   const t=new Date();
@@ -1336,7 +1393,9 @@ window.toggleCCWrite=function(show){
 window.saveClassCardNew=async function(){
   if(!ccCur)return;
   const subject=document.getElementById('cc-w-subj').value;
-  const teacher=document.getElementById('cc-w-teacher').value.trim();
+  const tcEl=document.getElementById('cc-w-teacher');
+  const teacher=withTeacherSuffix(tcEl.value);   // 저장 직전 정규화 (이름만 썼으면 " 선생님" 부착)
+  tcEl.value=teacher;
   const classDate=document.getElementById('cc-w-date').value;
   const unit=document.getElementById('cc-w-unit').value.trim();
   const content=document.getElementById('cc-w-content').value.trim();
@@ -1389,7 +1448,8 @@ function rCCL(cs){
     const hCls=c.homework==='높음'?'hw-high':c.homework==='낮음'?'hw-low':'hw-mid';
     const aCls=c.attitude==='적극적'?'att-active':c.attitude==='산만'?'att-low':'att-mid';
     const nm=c.classId?(classMap.get(c.classId)||c.className||''):(c.className||'');
-    return`<div class="cc-item" id="cci-${c.id}"><div class="cc-item-head" onclick="toggleCC('${c.id}')"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#1d1d1f;margin-bottom:3px"><span class="cc-chip cc-chip-subj" style="margin-right:4px">${e(c.subject||'—')}</span>수업</div><div class="cc-item-meta"><span class="cc-chip cc-chip-teacher">${e(c.teacher||'—')}</span><span class="cc-chip cc-chip-date">${e(c.classDate||'—')}</span>${nm?`<span class="cc-chip" style="background:#ecfeff;color:#0e7490">🏷️ ${e(nm)}</span>`:''}</div></div><div style="display:flex;align-items:center;gap:5px;flex-shrink:0">${c.homework&&c.homework!=='-'?`<span class="cc-hw-badge ${hCls}">과제 ${e(c.homework)}</span>`:''}${c.attitude?`<span class="att-badge ${aCls}">${e(c.attitude)}</span>`:''}<span class="cc-expand">▾</span></div></div><div class="cc-item-body">${c.content?`<div class="cc-body-section"><div class="cc-body-label">수업 내용</div><div class="cc-body-text">${e(c.content)}</div></div>`:''}</div></div>`;
+    const tn=withTeacherSuffix(c.teacher);   // 옛 기록도 화면에서는 "○○○ 선생님"으로 통일
+    return`<div class="cc-item" id="cci-${c.id}"><div class="cc-item-head" onclick="toggleCC('${c.id}')"><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#1d1d1f;margin-bottom:3px"><span class="cc-chip cc-chip-subj" style="margin-right:4px">${e(c.subject||'—')}</span>수업</div><div class="cc-item-meta"><span class="cc-chip cc-chip-teacher">${e(tn||'—')}</span><span class="cc-chip cc-chip-date">${e(c.classDate||'—')}</span>${nm?`<span class="cc-chip" style="background:#ecfeff;color:#0e7490">🏷️ ${e(nm)}</span>`:''}</div></div><div style="display:flex;align-items:center;gap:5px;flex-shrink:0">${c.homework&&c.homework!=='-'?`<span class="cc-hw-badge ${hCls}">과제 ${e(c.homework)}</span>`:''}${c.attitude?`<span class="att-badge ${aCls}">${e(c.attitude)}</span>`:''}<span class="cc-expand">▾</span></div></div><div class="cc-item-body">${c.content?`<div class="cc-body-section"><div class="cc-body-label">수업 내용</div><div class="cc-body-text">${e(c.content)}</div></div>`:''}</div></div>`;
   }).join('');
 }
 window.toggleCC=id=>{const el=document.getElementById('cci-'+id);if(el)el.classList.toggle('open');};
