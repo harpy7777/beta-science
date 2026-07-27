@@ -141,30 +141,35 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:400;align-items:center;justify-content:center}
 .modal-overlay.open{display:flex}
 .modal{background:#fff;border-radius:20px;padding:1.4rem 1.2rem;width:100%;max-width:500px;margin:1rem;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem}
+.modal-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:1.2rem}
 .modal-header h2{font-size:16px;font-weight:700;letter-spacing:-.02em}
-.modal-close{width:32px;height:32px;border:none;background:#f5f5f7;border-radius:50%;cursor:pointer;font-size:14px;color:#3c3c43;display:flex;align-items:center;justify-content:center;transition:background .15s;min-width:44px;min-height:44px}
+.modal-close{width:40px;height:40px;min-width:40px;min-height:40px;border:none;background:#f5f5f7;border-radius:50%;cursor:pointer;font-size:14px;color:#3c3c43;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0;font-family:inherit}
 .modal-close:hover{background:#fce7f3;color:#db2777}
-.form-group{margin-bottom:.9rem}
-.form-group label{display:block;font-size:12px;font-weight:700;color:#1d1d1f;margin-bottom:5px}
-.form-group input,.form-group select{width:100%;padding:11px 13px;min-height:44px;border:1.5px solid #fce7f3;border-radius:10px;font-size:16px;color:#1d1d1f;outline:none;transition:border .15s;background:#fff;font-family:inherit;-webkit-appearance:none;appearance:none}
+
+/* ── Form (2열 정렬 통일)
+   · 라벨 높이 24px 고정 → 좌우 입력칸이 같은 높이에서 시작
+   · 입력칸 높이 44px 고정 → 칸 크기가 내용에 따라 달라지지 않음
+   · 안내문구는 라벨이 아니라 입력칸 아래 .fg-hint 슬롯에만 넣는다 ── */
+.form-group{margin-bottom:.9rem;display:flex;flex-direction:column;min-width:0}
+.form-group label{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-height:24px;margin:0 0 6px;font-size:12px;font-weight:700;color:#1d1d1f;line-height:1.35}
+.form-group label.lbl-split{justify-content:space-between}
+.form-group input,.form-group select{width:100%;height:44px;padding:11px 13px;border:1.5px solid #fce7f3;border-radius:10px;font-size:16px;color:#1d1d1f;outline:none;transition:border .15s;background:#fff;font-family:inherit;-webkit-appearance:none;appearance:none}
 .form-group input:focus,.form-group select:focus{border-color:#db2777}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;align-items:start}
+.fg-hint{min-height:16px;margin-top:5px;font-size:11px;line-height:1.45;font-weight:500;color:#aeaeb2;word-break:keep-all}
+.fg-hint.info{color:#0e7490}
 .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:1.2rem;padding-top:1rem;border-top:1px solid #fce7f3}
 .btn-secondary{padding:10px 18px;min-height:40px;border:1.5px solid #fce7f3;border-radius:10px;background:#fff;font-size:13px;color:#1d1d1f;cursor:pointer;font-family:inherit;font-weight:500;transition:background .15s}
 .btn-secondary:hover{background:#fdf2f8}
 .hint-lbl{font-weight:500;color:#aeaeb2;font-size:11px}
-.school-preview{font-size:11px;color:#0e7490;margin-top:5px;min-height:14px}
-.teacher-preview{font-size:11px;color:#0e7490;margin-top:5px;min-height:14px}
 
-/* ── 학생 ID 중복 경고 ── */
-.id-warn{font-size:11px;margin-top:5px;min-height:15px;line-height:1.5;font-weight:600;word-break:keep-all}
-.id-warn.err{color:#dc2626}
-.id-warn.ok{color:#16a34a}
+/* ── 학생 ID 중복 경고 (.fg-hint 색상만 덮어씀) ── */
+.id-warn.err{color:#dc2626;font-weight:600}
+.id-warn.ok{color:#16a34a;font-weight:600}
 .id-warn.tip{color:#b45309;font-weight:500}
 .form-group input.id-dup{border-color:#dc2626;background:#fef2f2}
 .form-group input.id-ok{border-color:#6ee7b7}
-.id-unlock-btn{padding:4px 10px;border:1.5px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s;align-items:center;justify-content:center}
+.id-unlock-btn{height:24px;padding:0 10px;border:1.5px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:8px;font-size:11px;font-weight:700;line-height:1;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s;align-items:center;justify-content:center;flex-shrink:0}
 .id-unlock-btn:hover{background:#fef3c7}
 .del-rec-box{font-size:12.5px;font-weight:600;color:#0e7490;background:#ecfeff;border:1px solid #cffafe;border-radius:10px;padding:10px 12px;line-height:1.6}
 .del-actions{display:flex;gap:8px;margin-top:14px}
@@ -216,14 +221,14 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
 .class-tag{display:inline-block;padding:2px 8px;background:#ecfeff;border:1px solid #a5f3fc;border-radius:20px;font-size:11px;font-weight:600;color:#0e7490;margin:1px;white-space:nowrap}
 .class-tag.stale{background:#fffbeb;border-color:#fde68a;color:#92400e}
 .class-none{font-size:11px;color:#aeaeb2}
-.cc-w-class-sel{width:100%;padding:11px 13px;min-height:44px;border:1.5px solid #cffafe;border-radius:10px;font-size:16px;color:#1d1d1f;outline:none;transition:border .15s;background:#fff;font-family:inherit;-webkit-appearance:none;appearance:none;cursor:pointer}
+.cc-w-class-sel{width:100%;height:44px;padding:11px 13px;border:1.5px solid #cffafe;border-radius:10px;font-size:16px;color:#1d1d1f;outline:none;transition:border .15s;background:#fff;font-family:inherit;-webkit-appearance:none;appearance:none;cursor:pointer}
 .cc-w-class-sel:focus{border-color:#0891b2}
 
 /* ── Class Card Modal ── */
 .cc-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:400;align-items:center;justify-content:center}
 .cc-modal-overlay.open{display:flex}
 .cc-modal{background:#fff;border-radius:20px;width:100%;max-width:640px;margin:1rem;max-height:92vh;overflow:hidden;display:flex;flex-direction:column}
-.cc-modal-header{padding:1.2rem 1.2rem 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.cc-modal-header{padding:1.2rem 1.2rem 0;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}
 .cc-modal-header h2{font-size:15px;font-weight:700}
 .cc-stat-bar{display:flex;gap:8px;padding:12px 1.2rem 0;flex-shrink:0}
 .cc-stat-chip{flex:1;padding:10px 8px;border-radius:12px;border:1px solid #fce7f3;background:#fff0f7;text-align:center}
@@ -287,6 +292,8 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
   .cc-modal-overlay{align-items:flex-end}
   .cc-modal{border-radius:20px 20px 0 0;margin:0;max-width:100%}
   .form-row{grid-template-columns:1fr}
+  /* 1열로 접히면 안내문 빈 슬롯은 자리만 차지하므로 감춘다 */
+  .fg-hint:empty{display:none;min-height:0;margin-top:0}
 }
 @media(min-width:601px){
   .table-desktop{display:block}
@@ -412,11 +419,15 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span>학생 ID <span style="color:#dc2626">*</span></span><button type="button" id="idUnlockBtn" class="id-unlock-btn" onclick="unlockIdEdit()" style="display:none">🔓 ID 변경</button></label>
+        <label class="lbl-split"><span>학생 ID <span style="color:#dc2626">*</span></span><button type="button" id="idUnlockBtn" class="id-unlock-btn" onclick="unlockIdEdit()" style="display:none">🔓 ID 변경</button></label>
         <input type="text" id="inputId" placeholder="예: m01010" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-        <div class="id-warn" id="idWarn"></div>
+        <div class="fg-hint id-warn" id="idWarn"></div>
       </div>
-      <div class="form-group"><label>이름 <span style="color:#dc2626">*</span></label><input type="text" id="inputName" placeholder="학생 이름" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+      <div class="form-group">
+        <label>이름 <span style="color:#dc2626">*</span></label>
+        <input type="text" id="inputName" placeholder="학생 이름" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div class="fg-hint"></div>
+      </div>
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -426,15 +437,20 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
           <option value="중등1학년">중등1학년</option><option value="중등2학년">중등2학년</option><option value="중등3학년">중등3학년</option>
           <option value="고등1학년">고등1학년</option><option value="고등2학년">고등2학년</option><option value="고등3학년">고등3학년</option>
         </select>
+        <div class="fg-hint"></div>
       </div>
-      <div class="form-group"><label>담당선생님 <span class="hint-lbl">(이름만 쓰면 "선생님"이 자동으로 붙습니다)</span></label><input type="text" id="inputTeacher" placeholder="예: 김인후" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"><div class="teacher-preview" id="teacherPreview"></div></div>
+      <div class="form-group">
+        <label>담당선생님</label>
+        <input type="text" id="inputTeacher" placeholder="예: 김인후" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div class="fg-hint" id="teacherPreview"></div>
+      </div>
     </div>
     <!-- 학교명 (학년 ↔ 수강 과목 사이) -->
     <div class="form-group">
-      <label>학교명 <span class="hint-lbl">(고등학교 · 중학교 / 목록 선택 또는 직접 입력)</span></label>
+      <label>학교명</label>
       <input type="text" id="inputSchool" list="schoolList" placeholder="예: 한일고등학교" oninput="updateSchoolPreview()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       <datalist id="schoolList"></datalist>
-      <div class="school-preview" id="schoolPreview"></div>
+      <div class="fg-hint" id="schoolPreview"></div>
     </div>
     <div class="form-group">
       <label>수강 과목</label>
@@ -555,6 +571,10 @@ let selectedPhotoFile=null,currentPhotoUrl='';
 let origId='',idEditUnlocked=false;   // 수정 모달에서 학생 ID 변경용
 let delTarget=null;                   // 삭제 대상 {fireId,id,name}
 
+/* 입력칸 아래 안내문 기본 문구 (라벨에서 옮겨 온 것 — 2열 높이를 맞추기 위함) */
+const TEACHER_TIP='이름만 쓰면 "선생님"이 자동으로 붙습니다';
+const SCHOOL_TIP='고등학교 · 중학교 — 목록 선택 또는 직접 입력';
+
 /* ══════════════════════════════════════════
    담당선생님 이름 → "○○○ 선생님" 자동 완성
    - 이름만 입력해도 뒤에 " 선생님"이 붙는다
@@ -579,20 +599,24 @@ function withTeacherSuffix(v){
   if(!c)return s;   // "선생님" 처럼 이름이 없으면 입력값을 그대로 둔다
   return c+' 선생님';
 }
-// 입력칸용: 포커스가 빠질 때 눈에 보이게 보정 + 미리보기 문구
-function bindTeacherInput(id,previewId){
+// 담당선생님 안내문 갱신: 보정 결과가 있으면 미리보기, 없으면 기본 안내
+function paintTeacherPreview(){
+  const elT=document.getElementById('inputTeacher'),pv=document.getElementById('teacherPreview');
+  if(!elT||!pv)return;
+  const raw=elT.value.trim();
+  const out=withTeacherSuffix(raw);
+  const on=!!(out&&out!==raw);
+  pv.textContent=on?`저장 시: ${out}`:TEACHER_TIP;
+  pv.classList.toggle('info',on);
+}
+// 입력칸용: 포커스가 빠질 때 눈에 보이게 보정 + 안내문 갱신
+function bindTeacherInput(id,paint){
   const elT=document.getElementById(id);
   if(!elT)return;
-  const pv=previewId?document.getElementById(previewId):null;
-  const paint=()=>{
-    if(!pv)return;
-    const raw=elT.value.trim();
-    const out=withTeacherSuffix(raw);
-    pv.textContent=(out&&out!==raw)?`저장 시: ${out}`:'';
-  };
-  elT.addEventListener('input',paint);
-  elT.addEventListener('blur',()=>{elT.value=withTeacherSuffix(elT.value);paint();});
-  paint();
+  const p=typeof paint==='function'?paint:function(){};
+  elT.addEventListener('input',p);
+  elT.addEventListener('blur',()=>{elT.value=withTeacherSuffix(elT.value);p();});
+  p();
 }
 
 /* ══════════════════════════════════════════
@@ -715,10 +739,14 @@ function shortSchool(v){
     .replace(/여자고$/,'여고').replace(/여자중$/,'여중');
 }
 window.updateSchoolPreview=function(){
-  const v=document.getElementById('inputSchool').value.trim();
+  const el=document.getElementById('inputSchool');
   const p=document.getElementById('schoolPreview');
+  if(!el||!p)return;
+  const v=el.value.trim();
   const sh=shortSchool(v);
-  p.textContent=(v&&sh!==v)?`모바일 표시: ${sh}`:'';
+  const on=!!(v&&sh!==v);
+  p.textContent=on?`모바일 표시: ${sh}`:SCHOOL_TIP;
+  p.classList.toggle('info',on);
 };
 
 /* ── 동기화 진단 (문자열 비교 · JSON.stringify 제거) ── */
@@ -985,7 +1013,7 @@ function fmtPhone(v){
   if(el)el.addEventListener('input',()=>{const p=el.selectionStart===el.value.length;el.value=fmtPhone(el.value);if(p)el.setSelectionRange(el.value.length,el.value.length);});
 });
 /* 담당선생님 입력칸 2곳: 포커스 빠질 때 " 선생님" 자동 부착 */
-bindTeacherInput('inputTeacher','teacherPreview');
+bindTeacherInput('inputTeacher',paintTeacherPreview);
 bindTeacherInput('cc-w-teacher',null);
 
 /* ══════════════════════════════════════════
@@ -1026,7 +1054,7 @@ function nextStudentId(prefix){
 function setIdWarn(cls,msg){
   const w=document.getElementById('idWarn');
   const inp=document.getElementById('inputId');
-  if(w){w.className='id-warn'+(cls?' '+cls:'');w.textContent=msg||'';}
+  if(w){w.className='fg-hint id-warn'+(cls?' '+cls:'');w.textContent=msg||'';}
   if(inp){inp.classList.toggle('id-dup',cls==='err');inp.classList.toggle('id-ok',cls==='ok');}
 }
 function setSaveEnabled(on){
@@ -1038,22 +1066,22 @@ window.checkIdInput=function(){
   if(eid&&!idEditUnlocked){setIdWarn('','');setSaveEnabled(true);return;}   // 수정 모드: 잠금 해제 전에는 ID 검사 안 함
   const raw=document.getElementById('inputId').value.trim();
   if(!raw){
-    if(eid){setIdWarn('err','⛔ 학생 ID는 비워 둘 수 없습니다.');setSaveEnabled(false);return;}
-    setIdWarn('tip','학생 ID를 입력하세요. 학년을 고르면 다음 번호를 제안합니다.');setSaveEnabled(true);return;
+    if(eid){setIdWarn('err','⛔ ID는 비워 둘 수 없습니다');setSaveEnabled(false);return;}
+    setIdWarn('tip','학년을 고르면 번호를 자동 제안합니다');setSaveEnabled(true);return;
   }
   const dup=findDupId(raw);
   if(dup){
-    setIdWarn('err',`⛔ 이미 사용 중인 ID입니다 — ${dup.name||'이름없음'}${dup.grade?` (${dup.grade})`:''}`);
+    setIdWarn('err',`⛔ 사용 중 — ${dup.name||'이름없음'}${dup.grade?` (${dup.grade})`:''}`);
     setSaveEnabled(false);
     return;
   }
   if(!ID_RE.test(raw.toLowerCase())){
-    setIdWarn('tip','⚠️ 권장 형식이 아닙니다. (영문 소문자 1자 + 숫자 5자, 예: h01001)');
+    setIdWarn('tip','⚠️ 권장 형식: 영문 1자 + 숫자 5자 (h01001)');
     setSaveEnabled(true);
     return;
   }
   if(eid&&idEditUnlocked&&raw.toLowerCase()!==String(origId||'').trim().toLowerCase()){
-    setIdWarn('ok','✅ 변경 가능한 ID · 저장 시 성적·수업카드도 함께 이동합니다');
+    setIdWarn('ok','✅ 변경 가능 · 기록도 함께 이동합니다');
     setSaveEnabled(true);
     return;
   }
@@ -1083,10 +1111,10 @@ window.openAddModal=function(){
   document.getElementById('inputId').disabled=false;
   const ub=document.getElementById('idUnlockBtn');if(ub)ub.style.display='none';
   document.querySelectorAll('.subj-chk').forEach(cb=>{cb.checked=false;cb.closest('.subj-label').classList.remove('checked');});
-  resetPhotoUI();renderSchoolList();updateSchoolPreview();updateTeacherPreview();
+  resetPhotoUI();renderSchoolList();updateSchoolPreview();paintTeacherPreview();
   renderClassChecks([]);            // 시간표는 실시간 구독 중 → 재조회 불필요
   setSaveEnabled(true);
-  setIdWarn('tip','학년을 선택하면 다음 번호를 자동으로 제안합니다.');
+  setIdWarn('tip','학년을 고르면 번호를 자동 제안합니다');
   document.getElementById('studentModal').classList.add('open');
 };
 window.openEditModal=function(fi){
@@ -1110,21 +1138,13 @@ window.openEditModal=function(fi){
   resetPhotoUI();
   currentPhotoUrl=s.photoUrl||'';
   if(currentPhotoUrl)setPhotoPreview(currentPhotoUrl);
-  renderSchoolList();updateSchoolPreview();updateTeacherPreview();
+  renderSchoolList();updateSchoolPreview();paintTeacherPreview();
   renderClassChecks(studentClasses(s).map(c=>c.id));
   const ub=document.getElementById('idUnlockBtn');if(ub)ub.style.display='inline-flex';
   setSaveEnabled(true);
-  setIdWarn('tip','🔒 ID는 기록 연결을 위해 잠겨 있습니다. 바꾸려면 오른쪽 "🔓 ID 변경"을 누르세요.');
+  setIdWarn('tip','🔒 잠금 — 오른쪽 "ID 변경"으로 해제');
   document.getElementById('studentModal').classList.add('open');
 };
-// 담당선생님 미리보기 문구 갱신 (모달 열 때 호출)
-function updateTeacherPreview(){
-  const elT=document.getElementById('inputTeacher'),pv=document.getElementById('teacherPreview');
-  if(!elT||!pv)return;
-  const raw=elT.value.trim();
-  const out=withTeacherSuffix(raw);
-  pv.textContent=(out&&out!==raw)?`저장 시: ${out}`:'';
-}
 // 수정 모달에서 학생 ID 잠금 해제 (실수 방지용 확인)
 window.unlockIdEdit=function(){
   if(!eid)return;
@@ -1150,6 +1170,7 @@ window.saveStudent=async function(){
   const tcInput=document.getElementById('inputTeacher');
   const tcNorm=withTeacherSuffix(tcInput.value);   // 저장 직전 정규화 (이름만 썼으면 " 선생님" 부착)
   tcInput.value=tcNorm;
+  paintTeacherPreview();
   const tc=tcNorm||'-';
   const ph=document.getElementById('inputPhone').value.trim()||'-';
   const sph=document.getElementById('inputStudentPhone').value.trim()||'-';
@@ -1463,6 +1484,9 @@ document.getElementById('studentModal').addEventListener('click',ev=>{if(ev.targ
 document.getElementById('classCardModal').addEventListener('click',ev=>{if(ev.target===ev.currentTarget)closeClassCardModal();});
 document.getElementById('deleteModal').addEventListener('click',ev=>{if(ev.target===ev.currentTarget)closeDeleteModal();});
 document.addEventListener('keydown',ev=>{if(ev.key==='Escape'){closeModal();closeClassCardModal();closeDeleteModal();}});
+/* 초기 안내문 세팅 (모달을 아직 열지 않아도 슬롯 높이가 잡히도록) */
+updateSchoolPreview();
+paintTeacherPreview();
 </script>
 </body>
 </html>
