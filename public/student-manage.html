@@ -1226,6 +1226,37 @@ function regKey(s) {
    lastHomework:     {date, text}
    lastMakeup:       {date, forDate} · makeupCount · makeupPending
    cycleRound/cycleIn/cycleLeft: 4주 단위 회차 (학부모 리포트에서도 사용 가능) */
+/* 학부모 공개용 수업 기록 — recentLessons (최근 30건)
+   수업카드 원문(내부 메모·결석 사유·태도·과제 완성도)은 절대 넣지 않는다.
+   학부모 화면에 보여줄 항목만 골라 담는다.
+     d 날짜 · s 출결 상태 · u 학습 단원 · c 수업 내용 · h 과제 내용 */
+const LESSON_MAX = 30;
+function lessonEntry(date, st, unit, content, homework) {
+  const o = { d: String(date), s: String(st || '출석') };
+  const u = String(unit || '').trim();       if (u) o.u = u;
+  const c = String(content || '').trim();    if (c) o.c = c;
+  const h = String(homework || '').trim();   if (h) o.h = h;
+  return o;
+}
+function mergeLesson(cur, date, entry) {
+  const list = (Array.isArray(cur) ? cur : [])
+    .filter(x => x && parseYMD(x.d))
+    .map(x => {
+      const o = { d: String(x.d), s: String(x.s || '출석') };
+      if (x.u) o.u = String(x.u);
+      if (x.c) o.c = String(x.c);
+      if (x.h) o.h = String(x.h);
+      return o;
+    });
+  const key = String(date);
+  const i = list.findIndex(x => x.d === key);
+  if (entry === null) { if (i >= 0) list.splice(i, 1); }   // 기록 삭제 (미선택 해제 등)
+  else if (i >= 0) list[i] = entry;                        // 같은 날 재저장 = 덮어쓰기
+  else list.push(entry);
+  list.sort((a, b) => a.d.localeCompare(b.d));
+  return list.slice(-LESSON_MAX);
+}
+
 const REC_MAX = 12;
 function mergeRecent(cur, date, st) {
   const list = (Array.isArray(cur) ? cur : [])
@@ -1436,7 +1467,7 @@ window.delOff = async function(id) {
    4주 단위 회차 필드(cycleRound/cycleIn/cycleLeft)도 함께 다시 계산한다. */
 window.recalcAll = async function() {
   if (!students.length) { alert('학생 데이터를 먼저 불러온 뒤 실행하세요.'); return; }
-  if (!confirm('모든 수업카드를 읽어 학생별 회차 · 4주 단위 · 결석 · 보강 · 첫 수업일을 다시 계산합니다.\n계속하시겠습니까?')) return;
+  if (!confirm('모든 수업카드를 읽어 학생별 회차 · 4주 단위 · 결석 · 보강 · 첫 수업일과\n학부모 화면용 수업 기록(최근 30건)을 다시 계산합니다.\n계속하시겠습니까?')) return;
   const btn = document.getElementById('sm-recalc-btn');
   btn.disabled = true; btn.textContent = '집계 중...';
   try {
@@ -1447,7 +1478,7 @@ window.recalcAll = async function() {
       const sid = String(c.studentId == null ? '' : c.studentId);
       if (!sid) return;
       const st = c.status || '출석';           // 과거 카드는 status 없음 → 출석 간주
-      const o = agg.get(sid) || { ses:0, abs:0, mk:0, first:'', last:'', rec:[], hw:null, fors:[], lastMk:null };
+      const o = agg.get(sid) || { ses:0, abs:0, mk:0, first:'', last:'', rec:[], hw:null, fors:[], lastMk:null, lessons:[] };
       const cd = String(c.classDate || '');
       if (st === '결석') { o.abs++; }
       else {
@@ -1466,18 +1497,23 @@ window.recalcAll = async function() {
         }
       }
       if (parseYMD(cd)) o.rec.push({ d: cd, s: st });
+      if (parseYMD(cd)) o.lessons.push(lessonEntry(cd, st,
+        st === '결석' ? '' : c.unit,
+        st === '결석' ? '' : c.content,
+        st === '결석' ? '' : c.homeworkContent));
       agg.set(sid, o);
     });
     let batch = writeBatch(db), pend = 0, done = 0;
     for (const s of students) {
       const keys = new Set([String(s.id == null ? '' : s.id), String(s.fireId)].filter(k => k && k !== ''));
-      let ses = 0, abs = 0, mk = 0, first = '', last = '', rec = [], hw = null, fors = [], lastMk = null;
+      let ses = 0, abs = 0, mk = 0, first = '', last = '', rec = [], hw = null, fors = [], lastMk = null, lessons = [];
       keys.forEach(k => {
         const a = agg.get(k); if (!a) return;
         ses += a.ses; abs += a.abs; mk += a.mk;
         if (a.first && (!first || a.first < first)) first = a.first;
         if (a.last && a.last > last) last = a.last;
         rec = rec.concat(a.rec);
+        lessons = lessons.concat(a.lessons);
         fors = fors.concat(a.fors);
         if (a.hw && (!hw || a.hw.date >= hw.date)) hw = a.hw;
         if (a.lastMk && (!lastMk || a.lastMk.date >= lastMk.date)) lastMk = a.lastMk;
@@ -1490,16 +1526,21 @@ window.recalcAll = async function() {
         const od = String(o.date || '');
         if (!parseYMD(od) || od > today) return;
         if (base && od < base) return;
-        if (myIds.has(String(o.classId))) rec.push({ d: od, s: '휴강' });
+        if (myIds.has(String(o.classId))) { rec.push({ d: od, s: '휴강' }); lessons.push(lessonEntry(od, '휴강', '', '', '')); }
       });
       rec.sort((a, b) => a.d.localeCompare(b.d));
       const seenD = new Set(); const recU = [];
       for (let i = rec.length - 1; i >= 0; i--) { if (seenD.has(rec[i].d)) continue; seenD.add(rec[i].d); recU.unshift(rec[i]); }
+      // 수업 기록도 같은 날짜는 1건만 남기고 최근 30건 보관
+      lessons.sort((a, b) => a.d.localeCompare(b.d));
+      const seenL = new Set(); const lesU = [];
+      for (let i = lessons.length - 1; i >= 0; i--) { if (seenL.has(lessons[i].d)) continue; seenL.add(lessons[i].d); lesU.unshift(lessons[i]); }
       const forsU = addMakeupFor(fors, '');
       const patch = {
         sessionCount: ses, absentCount: abs, makeupCount: mk,
         makeupFors: forsU, makeupPending: Math.max(0, abs - mk),
-        lastClassDate: last, recentAttendance: recU.slice(-REC_MAX)
+        lastClassDate: last, recentAttendance: recU.slice(-REC_MAX),
+        recentLessons: lesU.slice(-LESSON_MAX)
       };
       Object.assign(patch, cycleFields(ses));      // 4주 단위 회차 필드 갱신
       if (hw) patch.lastHomework = hw;
@@ -1874,6 +1915,10 @@ window.saveBatch = async function() {
       }
       // 학부모 공개용 요약 — 휴강은 '휴강'으로, 미선택 해제는 제거
       patch.recentAttendance = mergeRecent(stu.recentAttendance, date, isOff ? '휴강' : (newSt || null));
+      // 학부모 화면에 보일 수업 기록 (내부 메모는 제외)
+      patch.recentLessons = mergeLesson(stu.recentLessons, date,
+        isOff ? lessonEntry(date, '휴강', '', '', '')
+              : (newSt ? lessonEntry(date, newSt, newL ? unit : '', newL ? content : '', newL ? homeworkContent : '') : null));
       if (newL && homeworkContent) patch.lastHomework = { date, text: homeworkContent };
       if (Object.keys(patch).length) batch.set(doc(db, 'students', r.fireId), patch, { merge: true });
     });
@@ -2433,7 +2478,7 @@ window.saveStudent = async function() {
         photoUrl: '',
         sessionCount: 0, absentCount: 0, makeupCount: 0, makeupPending: 0, makeupFors: [],
         cycleRound: 1, cycleIn: 0, cycleLeft: CYCLE,
-        lastClassDate: '', recentAttendance: [],
+        lastClassDate: '', recentAttendance: [], recentLessons: [],
         regDate: `${t.getFullYear()}. ${t.getMonth()+1}. ${t.getDate()}.`,
         regTs: serverTimestamp()
       });
@@ -2669,6 +2714,9 @@ window.saveClassCard = async function() {
         }
         // 학부모 공개용 요약
         patch.recentAttendance = mergeRecent(ccStudent.recentAttendance, classDate, status);
+        // 학부모 화면에 보일 수업 기록 (내부 메모는 제외)
+        patch.recentLessons = mergeLesson(ccStudent.recentLessons, classDate,
+          lessonEntry(classDate, status, lesson ? unit : '', lesson ? content : '', lesson ? homeworkContent : ''));
         if (lesson && homeworkContent) patch.lastHomework = { date: classDate, text: homeworkContent };
         if (Object.keys(patch).length) await setDoc(doc(db,'students',ccStudent.fireId), patch, { merge:true });
       } catch (err) { console.warn('학생 문서 보정 실패:', err); }
