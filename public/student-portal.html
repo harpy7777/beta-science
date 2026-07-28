@@ -296,13 +296,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .desktop-header{padding:24px 28px}
   .d-tab{font-size:13px;padding:16px 4px;gap:5px}
 }
-</style>
-  /* ══════════════════════════════════════════════════════════════
-   [스크롤 복구] </style> 바로 앞에 추가 · 위쪽 CSS는 지우지 말 것
-   ① body 의 overflow-x:hidden 해제 (클리핑은 html 이 담당)
-   ② 하단 탭바 여백을 고정값 먼저 → env() 는 별도 선언으로 덧씀
-      (env 가 무효여도 앞 선언이 남아 여백이 0 이 되지 않음)
-   ③ 100vh → svh 보강
+
+/* ══════════════════════════════════════════════════════════════
+   [스크롤 복구] 모바일에서 화면 아래가 안 내려가던 문제
+   ① body 의 overflow-x:hidden 이 body 를 별도 스크롤 박스로 만들어
+      sticky · 아래쪽 스크롤이 함께 깨졌다 → html 에만 남기고 해제
+   ② 하단 탭바 여백을 var(--safe-bot) 로 계산했는데, env() 를 커스텀
+      속성에 담아 calc 로 쓰면 일부 사파리에서 선언 전체가 무효가 되어
+      여백이 0 이 된다 → 고정값 먼저, env() 는 별도 선언으로 덧씀
+   ③ 100vh 는 iOS 주소창 높이를 포함해 첫 화면이 잘린다 → svh 보강
 ══════════════════════════════════════════════════════════════ */
 html { overflow-x: hidden; }
 body {
@@ -327,6 +329,7 @@ body {
   .mobile-header { padding-top: 16px; }
   .mobile-header { padding-top: calc(16px + env(safe-area-inset-top)); }
 }
+</style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
 <body>
 
