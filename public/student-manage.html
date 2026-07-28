@@ -285,7 +285,7 @@ body.modal-open { overflow: hidden; }
 /* 보강 칩 — 완료(파랑) · 대기(주황) */
 .sm-chip.mk  { color:#1d4ed8; background:#eff6ff; border:1px solid #bfdbfe; }
 .sm-chip.mkw { color:#b45309; background:#fffbeb; border:1px solid #fde68a; }
-/* 4주(4회) 주기 칩 — 진행중(보라) · 마감(주황) · 추정(회색) */
+/* 4주 단위 회차 칩 — 진행중(보라) · 마감(주황) · 추정(회색) */
 .sm-chip.cyc { color:#4338ca; background:#eef2ff; border:1px solid #c7d2fe; }
 .sm-chip.cyc.done { color:#b45309; background:#fffbeb; border-color:#fde68a; }
 .sm-chip.cyc.dim { color:#8e8e93; background:#f5f5f7; border-color:#ececef; font-weight:700; }
@@ -303,7 +303,7 @@ body.modal-open { overflow: hidden; }
 .sm-stat .cycdone { color:#b45309; font-weight:700; }
 .sm-stat .cycdone b { color:#b45309; }
 
-/* 4주 주기 진행 막대 */
+/* 4주 단위 회차 진행 막대 */
 .sm-cycbar { display:flex; align-items:center; gap:6px; margin:-2px 0 0.7rem; }
 .sm-cycbar .cb-dots { display:flex; gap:4px; flex:0 0 auto; }
 .sm-cycbar .cb-d { width:16px; height:6px; border-radius:3px; background:#ececef; }
@@ -323,6 +323,16 @@ body.modal-open { overflow: hidden; }
 }
 .sm-warnline b { font-weight:900; }
 .sm-warnline .wl-sub { color:#dc2626; font-weight:700; }
+.sm-warnline .wl-dates { display:flex; flex-wrap:wrap; gap:4px; align-items:center; }
+.sm-warnline .wl-d {
+  border:1px solid #fca5a5; background:#fff; color:#b91c1c;
+  font-family:inherit; font-size:10.5px; font-weight:800;
+  padding:4px 8px; min-height:28px; border-radius:7px; cursor:pointer; white-space:nowrap;
+  transition:background .15s;
+}
+.sm-warnline .wl-d:hover { background:#fee2e2; }
+.sm-warnline .wl-d:active { transform:scale(0.96); }
+.sm-warnline .wl-more { font-size:10px; font-weight:700; color:#dc2626; }
 
 /* 보강 대기 안내 줄 (원장 전용) */
 .sm-mkline {
@@ -424,7 +434,7 @@ body.modal-open { overflow: hidden; }
 .bt-mkfor { display:block; font-size:10px; font-weight:800; color:#1d4ed8; margin-top:2px; }
 .bt-mkfor.wait { color:#b45309; }
 .bt-mkfor:empty { display:none; }
-/* 4주 주기 표시 (일괄 작성 목록) */
+/* 4주 단위 회차 표시 (일괄 작성 목록) */
 .bt-cyc { display:block; font-size:10px; font-weight:800; color:#4338ca; margin-top:2px; }
 .bt-cyc.done { color:#b45309; }
 .bt-cyc:empty { display:none; }
@@ -510,7 +520,7 @@ body.modal-open { overflow: hidden; }
       <div class="welcome-avatar">👩‍🎓</div>
       <div>
         <div class="welcome-greeting">학생 관리</div>
-        <div class="welcome-sub">총 수업 회차와 4주(4회) 주기 진행을 함께 확인하세요</div>
+        <div class="welcome-sub">시간표 요일 기준 정규 회차와 4주 단위 회차를 함께 확인하세요</div>
       </div>
     </div>
     <button class="cc-write-btn" onclick="openAdd()">+ 신규 학생 등록</button>
@@ -526,7 +536,7 @@ body.modal-open { overflow: hidden; }
       <option value="reg">등록 최신순</option>
       <option value="new">입회 최신순</option>
       <option value="ses">총 회차 많은순</option>
-      <option value="cyc">주기 마감 임박순</option>
+      <option value="cyc">4주 마감 임박순</option>
       <option value="mis">카드 미작성순</option>
       <option value="abs">결석 많은순</option>
       <option value="mkw">보강 대기순</option>
@@ -706,7 +716,7 @@ body.modal-open { overflow: hidden; }
   <div class="sm-modal bt-modal">
     <div class="sm-modal-title">📋 반별 수업카드 일괄 작성</div>
     <div class="sm-draft" id="bt-draft"><span></span><button type="button" onclick="resetBTDraft()">새로 작성</button></div>
-    <div class="bt-note">반 · 날짜를 고르면 그 반 학생이 모두 나옵니다. <b>수업 내용은 한 번만</b> 쓰면 전원에게 저장되고, 출결과 개별 메모만 학생별로 다르게 넣습니다.<br><b>보강</b>을 누르면 그 학생의 미보강 결석일이 자동으로 연결됩니다. 학생 이름 아래에는 <b>4주(4회) 주기 진행</b>이 표시됩니다.</div>
+    <div class="bt-note">반 · 날짜를 고르면 그 반 학생이 모두 나옵니다. <b>수업 내용은 한 번만</b> 쓰면 전원에게 저장되고, 출결과 개별 메모만 학생별로 다르게 넣습니다.<br><b>보강</b>을 누르면 그 학생의 미보강 결석일이 자동으로 연결됩니다. 학생 이름 아래에는 <b>4주 단위 회차</b>가 표시됩니다.</div>
     <div class="bt-loaded" id="bt-loaded"></div>
     <div class="sm-row2">
       <div class="sm-field">
@@ -985,14 +995,20 @@ function effSession(s) {
 }
 function shortDate(v) { const d = parseYMD(v); return d ? `${d.getMonth()+1}/${d.getDate()}` : String(v == null ? '' : v); }
 
-/* ════════ 4주(4회) 주기 — 총 회차를 결제 주기 단위로 쪼개 보기 ════════
+/* ════════ 4주 단위 회차 — 총 회차를 4회씩 끊어서 보기 ════════
    학원 결제가 4회(=주 1회 × 4주) 단위이므로,
-   총 누적 회차와 별개로 "지금 몇 번째 주기의 몇 회차인지"를 함께 보여준다.
-     예) 총 6회 → 2주기 2/4 (남은 2회)
-         총 8회 → 2주기 4/4 → 주기 마감 (다음 결제 안내 타이밍)
+   총 누적 회차와 별개로 "이번 4주에서 몇 회차인지"를 함께 보여준다.
+     예) 총 6회 → 2/4회차 (남은 2회) · 두 번째 4주
+         총 8회 → 4/4회차 마감 (다음 결제 안내 타이밍)
    결석은 회차에 포함되지 않으므로 실제 진행한 수업만 세어진다.
    집계 카운터(sessionCount)가 없는 학생은 첫 수업일 기준 '예상' 값으로 표시한다. */
 const CYCLE = 4;
+// 1 → '첫', 2 → '두 번째' … (막대 안내문에만 사용)
+const ORD4 = ['', '첫', '두 번째', '세 번째', '네 번째', '다섯 번째', '여섯 번째', '일곱 번째', '여덟 번째'];
+function ordinal4(n) {
+  const i = Math.max(1, Math.floor(Number(n) || 1));
+  return ORD4[i] || `${i}번째`;
+}
 function cycleOf(s) {
   const cnt = hasCounter(s);
   const raw = cnt ? s.sessionCount : sessionNo(s && s.startDate);
@@ -1009,7 +1025,7 @@ function cycleOf(s) {
     done: inCycle === CYCLE
   };
 }
-// 정렬용 — 주기 마감(4/4)이 가장 위, 그다음 3/4 → 2/4 → 1/4, 미수업은 맨 뒤
+// 정렬용 — 4주 마감(4/4회차)이 가장 위, 그다음 3/4 → 2/4 → 1/4, 미수업은 맨 뒤
 function cycleKey(s) {
   const c = cycleOf(s);
   if (!c || c.total === 0) return -1;
@@ -1018,7 +1034,7 @@ function cycleKey(s) {
 function cycleChip(c) {
   if (!c || c.total === 0) return '';
   const cls = 'sm-chip cyc' + (c.est ? ' dim' : (c.done ? ' done' : ''));
-  return `<span class="${cls}">${c.round}주기 ${c.inCycle}/${CYCLE}${c.est ? ' 예상' : ''}</span>`;
+  return `<span class="${cls}">${c.inCycle}/${CYCLE}회차${c.est ? ' 예상' : ''}</span>`;
 }
 function cycleBar(c) {
   if (!c || c.total === 0) return '';
@@ -1026,35 +1042,108 @@ function cycleBar(c) {
   let dots = '';
   for (let i = 1; i <= CYCLE; i++) dots += `<span class="cb-d${i <= c.inCycle ? ' on' : ''}"></span>`;
   const tx = c.done
-    ? `${c.round}주기 완료 · 다음 주기 안내`
-    : `${c.round}주기 ${c.inCycle}/${CYCLE} · 남은 ${c.left}회`;
+    ? `${ordinal4(c.round)} 4주 ${CYCLE}/${CYCLE}회차 완료 · 다음 4주 안내`
+    : `${ordinal4(c.round)} 4주 · ${c.inCycle}/${CYCLE}회차 · 남은 ${c.left}회`;
   return `<div class="${cls}"><span class="cb-dots">${dots}</span><span class="cb-tx">${tx}${c.est ? ' (예상)' : ''}</span></div>`;
 }
 
-/* ════════ 수업카드 미작성 감지 ════════
-   회차는 첫 수업일이 아니라 classCards 저장 건수로만 올라간다.
-   그래서 "첫 수업일은 이미 지났는데 수업카드가 한 건도 없는" 학생은
-   기록을 빠뜨린 것인지 아직 시작 안 한 것인지 구분이 되지 않았다.
-   → 아래 조건을 모두 만족하면 '미작성'으로 보고 카드에 경고를 띄운다.
-     ① 집계 카운터가 있다 (재집계는 이미 돌린 상태)
-     ② 수업 0회 · 결석 0회 — 어떤 카드도 저장된 적이 없다
-     ③ 첫 수업일이 어제 이전이다 (오늘 등록한 신규 학생은 제외)
-     ④ 휴강으로 설명되지 않는 예상 회차가 1회 이상 남는다
-   반환 { expect, days, off } · 해당 없으면 null */
-function missingCards(s) {
-  if (!hasCounter(s)) return null;                       // ① 재집계 전 학생은 별도 배너로 안내
-  if (s.sessionCount > 0 || absentOf(s) > 0) return null; // ② 기록이 하나라도 있으면 대상 아님
-  const dd = daysSince(s && s.startDate);
-  if (dd === null || dd < 1) return null;                // ③ 미기록 · 미래 · 오늘 첫 수업은 제외
-  const sn = sessionNo(s.startDate);
-  if (sn === null || sn < 1) return null;
-  const off = (Array.isArray(s.recentAttendance) ? s.recentAttendance : [])
-    .filter(x => x && x.s === '휴강').length;
-  const expect = sn - off;                               // ④ 휴강분은 빼고 센다
-  if (expect < 1) return null;
-  return { expect, days: dd, off };
+/* ════════════════════════════════════════════════════════════════
+   정규 수업일 — 시간표(반)의 요일로 실제 날짜를 만들어 회차를 확정한다
+   ────────────────────────────────────────────────────────────────
+   전에는 "첫 수업일 + 7일마다 1회"라는 추정을 썼다. 요일·휴강·복수 반을
+   반영하지 못해 값이 애매했다.
+   시간표 문서 ID가 `금-19`(요일-시)라 반에서 요일을 바로 알 수 있으므로,
+   첫 수업일부터 오늘까지 그 요일의 날짜를 모두 생성해 정규 수업일로 삼는다.
+     · 반이 여러 개면 각 반의 요일을 모두 합친다 (같은 날은 1회로)
+     · 그 반에 휴강이 등록된 날은 제외한다
+     · 첫 수업일이 반 요일과 다르면 첫 수업일도 1회로 포함한다
+   결과: "정규 4회 (7/10·7/17·7/24·7/28)" 처럼 날짜가 특정되고,
+         저장된 기록과 대조해 빠진 날짜를 그대로 지목할 수 있다.
+════════════════════════════════════════════════════════════════ */
+const DAY_IDX = { '일':0, '월':1, '화':2, '수':3, '목':4, '금':5, '토':6 };
+function ymdOf(dt) {
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
 }
-const missingCount = s => { const m = missingCards(s); return m ? m.expect : 0; };
+// 반 이름 → 요일 문자 ('금'). 시간표 ID(`금-19`) 우선, 없으면 이름("금요일 …")에서 추출
+function classDayChar(className) {
+  const id = nameToId.get(className);
+  if (id) {
+    const sid = String(id), dash = sid.indexOf('-');
+    const c = dash >= 0 ? sid.slice(0, dash) : sid;
+    if (DAY_IDX[c] !== undefined) return c;
+  }
+  const m = /^([월화수목금토일])요일/.exec(String(className || ''));
+  return m ? m[1] : '';
+}
+// fromDt ~ toDt 사이의 해당 요일 날짜 전부 (문자열 배열)
+function weekdayDates(dayChar, fromDt, toDt) {
+  const target = DAY_IDX[dayChar];
+  if (target === undefined || !fromDt || !toDt || fromDt > toDt) return [];
+  const cur = new Date(fromDt.getTime());
+  cur.setDate(cur.getDate() + ((target - cur.getDay() + 7) % 7));   // from 이후 첫 해당 요일
+  const out = [];
+  while (cur <= toDt && out.length < 520) { out.push(ymdOf(cur)); cur.setDate(cur.getDate() + 7); }
+  return out;
+}
+function offDatesFor(classId) {
+  const set = new Set();
+  if (!classId) return set;
+  offs.forEach(o => { if (String(o.classId) === String(classId) && parseYMD(o.date)) set.add(String(o.date)); });
+  return set;
+}
+/* 학생의 정규 수업일 목록
+   반환 { dates:[YYYY-MM-DD…], map:Map(date→반이름), count, offCnt } · 산정 불가면 null */
+function scheduledOf(s) {
+  const start = parseYMD(s && s.startDate);
+  if (!start) return null;                       // 첫 수업일 미기록 → 산정 불가
+  const names = studentClassNames(s);
+  if (!names.length) return null;                // 반 미배정 → 산정 불가
+  const today = new Date(); today.setHours(0,0,0,0);
+  if (start > today) return { dates: [], map: new Map(), count: 0, offCnt: 0, future: true };
+  const map = new Map();
+  let offCnt = 0;
+  names.forEach(nm => {
+    const dc = classDayChar(nm);
+    if (!dc) return;
+    const offSet = offDatesFor(nameToId.get(nm) || '');
+    const list = weekdayDates(dc, start, today);
+    const sYmd = ymdOf(start);
+    if (!list.includes(sYmd)) list.unshift(sYmd);            // 첫 수업일은 요일이 달라도 1회로 인정
+    list.forEach(d => {
+      if (offSet.has(d)) { offCnt++; return; }               // 휴강일 제외
+      if (!map.has(d)) map.set(d, nm);
+    });
+  });
+  if (!map.size) return null;
+  const dates = [...map.keys()].sort();
+  return { dates, map, count: dates.length, offCnt, future: false };
+}
+/* 정규 수업일 중 수업카드가 없는 날짜
+   ① 빠진 '건수'는 확정할 수 있다 — (오늘 이전 정규 수업일) − (저장된 카드 수)
+      카드 수 = 수업 회차 + 결석 수. 휴강은 양쪽 모두에서 빠지므로 계산이 어긋나지 않는다.
+   ② 빠진 '날짜'는 students.recentAttendance(최근 12건)로 대조해 찾는다.
+      보관 범위를 넘어서면 최근 것부터 건수만큼만 지목한다.
+      (버튼을 눌러 일괄 작성 창을 열면 그 날짜의 저장 여부가 바로 보인다)
+   반환 { count, dates, unknown, sched } · 빠진 게 없으면 null */
+function missingOf(s) {
+  if (!hasCounter(s)) return null;               // 재집계 전 학생은 상단 배너로 안내
+  const sch = scheduledOf(s);
+  if (!sch || sch.future || !sch.count) return null;
+  const t = todayStr();
+  const past = sch.dates.filter(d => d < t);     // 오늘 수업은 아직 판단하지 않음
+  if (!past.length) return null;
+  const recorded = (typeof s.sessionCount === 'number' ? s.sessionCount : 0) + absentOf(s);
+  const gap = past.length - recorded;            // ① 빠진 건수 (확정)
+  if (gap < 1) return null;
+  const rec = new Set(
+    (Array.isArray(s.recentAttendance) ? s.recentAttendance : [])
+      .filter(x => x && parseYMD(x.d)).map(x => String(x.d))
+  );
+  const known = past.filter(d => !rec.has(d));   // ② 기록에 없는 정규 수업일
+  const dates = known.slice(-gap);               // 건수를 넘기면 최근 것부터
+  return { count: gap, dates, unknown: Math.max(0, gap - dates.length), sched: sch };
+}
+const missingCount = s => { const m = missingOf(s); return m ? m.count : 0; };
 
 // 최근 4주(=1~4회차) 이내 입회 → NEW
 function isNewStudent(v) {
@@ -1136,7 +1225,7 @@ function regKey(s) {
    recentAttendance: [{d:'2026-07-24', s:'출석'}] 최근 12건
    lastHomework:     {date, text}
    lastMakeup:       {date, forDate} · makeupCount · makeupPending
-   cycleRound/cycleIn/cycleLeft: 4주(4회) 주기 진행 (학부모 리포트에서도 사용 가능) */
+   cycleRound/cycleIn/cycleLeft: 4주 단위 회차 (학부모 리포트에서도 사용 가능) */
 const REC_MAX = 12;
 function mergeRecent(cur, date, st) {
   const list = (Array.isArray(cur) ? cur : [])
@@ -1149,7 +1238,7 @@ function mergeRecent(cur, date, st) {
   list.sort((a, b) => a.d.localeCompare(b.d));
   return list.slice(-REC_MAX);
 }
-// 총 회차 값으로 주기 필드 3종을 계산 (students 문서에 함께 저장)
+// 총 회차 값으로 4주 단위 필드 3종을 계산 (students 문서에 함께 저장)
 function cycleFields(total) {
   const n = Math.max(0, Math.floor(Number(total) || 0));
   if (n === 0) return { cycleRound: 1, cycleIn: 0, cycleLeft: CYCLE };
@@ -1344,10 +1433,10 @@ window.delOff = async function(id) {
 /* ════════ 회차 재집계 — classCards 전체를 읽어 학생 카운터 복구 ════════
    보강 카드(status='보강')는 수업 1회 + 보강 1회로 함께 집계하고,
    makeupFor 로 연결된 결석 날짜를 모아 makeupFors 를 복구한다.
-   4주(4회) 주기 필드(cycleRound/cycleIn/cycleLeft)도 함께 다시 계산한다. */
+   4주 단위 회차 필드(cycleRound/cycleIn/cycleLeft)도 함께 다시 계산한다. */
 window.recalcAll = async function() {
   if (!students.length) { alert('학생 데이터를 먼저 불러온 뒤 실행하세요.'); return; }
-  if (!confirm('모든 수업카드를 읽어 학생별 회차 · 4주 주기 · 결석 · 보강 · 첫 수업일을 다시 계산합니다.\n계속하시겠습니까?')) return;
+  if (!confirm('모든 수업카드를 읽어 학생별 회차 · 4주 단위 · 결석 · 보강 · 첫 수업일을 다시 계산합니다.\n계속하시겠습니까?')) return;
   const btn = document.getElementById('sm-recalc-btn');
   btn.disabled = true; btn.textContent = '집계 중...';
   try {
@@ -1412,7 +1501,7 @@ window.recalcAll = async function() {
         makeupFors: forsU, makeupPending: Math.max(0, abs - mk),
         lastClassDate: last, recentAttendance: recU.slice(-REC_MAX)
       };
-      Object.assign(patch, cycleFields(ses));      // 4주(4회) 주기 필드 갱신
+      Object.assign(patch, cycleFields(ses));      // 4주 단위 회차 필드 갱신
       if (hw) patch.lastHomework = hw;
       if (lastMk) patch.lastMakeup = lastMk;
       if (!parseYMD(s.startDate) && parseYMD(first)) patch.startDate = first;   // 첫 수업일 자동 보정
@@ -1467,6 +1556,16 @@ window.openBatch = function() {
   hydrating = false;
   loadBatch();
 };
+// 카드의 미작성 날짜 버튼 → 그 반·그 날짜로 일괄 작성 모달을 바로 연다
+window.openBatchFor = function(cls, date) {
+  openBatch();
+  hydrating = true;
+  const sel = document.getElementById('bt-class');
+  if (cls && [...sel.options].some(o => o.value === cls)) sel.value = cls;
+  if (parseYMD(date)) document.getElementById('bt-date').value = date;
+  hydrating = false;
+  loadBatch();
+};
 window.closeBatch = function(keep) {
   if (!keep && DIRTY.has('bt-modal-bg') && !confirm('작성 중인 내용을 버리고 닫을까요?')) return;
   if (!keep) { btDraft = null; DIRTY.delete('bt-modal-bg'); showDraftNote('bt-draft', false); }
@@ -1497,7 +1596,7 @@ function paintBtMk(i) {
     el.className = 'bt-mkfor'; el.textContent = '';
   }
 }
-// 4주(4회) 주기 — 이 수업을 저장하면 몇 회차가 되는지 미리 보여준다
+// 4주 단위 회차 — 이 수업을 저장하면 몇 회차가 되는지 미리 보여준다
 function paintBtCyc(i) {
   const r = btRows[i];
   const el = document.getElementById('bt-cyc-' + i);
@@ -1509,12 +1608,12 @@ function paintBtCyc(i) {
   const newL = isLessonStatus(r.status) && !!r.status;
   const next = Math.max(0, base + ((newL ? 1 : 0) - (prevL ? 1 : 0)));
   const f = cycleFields(next);
-  if (next === 0) { el.className = 'bt-cyc'; el.textContent = '4주 주기 · 수업 전'; return; }
+  if (next === 0) { el.className = 'bt-cyc'; el.textContent = '4주 단위 · 수업 전'; return; }
   const done = f.cycleIn === CYCLE;
   el.className = 'bt-cyc' + (done ? ' done' : '');
   el.textContent = done
-    ? `📗 ${f.cycleRound}주기 ${CYCLE}/${CYCLE} 완료 예정`
-    : `📗 ${f.cycleRound}주기 ${f.cycleIn}/${CYCLE} · 남은 ${f.cycleLeft}회`;
+    ? `📗 ${CYCLE}/${CYCLE}회차 마감 예정 · ${ordinal4(f.cycleRound)} 4주`
+    : `📗 ${f.cycleIn}/${CYCLE}회차 · 남은 ${f.cycleLeft}회`;
 }
 window.setBatchStatus = function(i, st) {
   if (!btRows[i]) return;
@@ -1753,7 +1852,7 @@ window.saveBatch = async function() {
         if (dMk)  patch.makeupCount = increment(dMk);
         // 최종 결석·보강 수를 미리 계산해 '보강 대기' 값을 정확히 저장
         patch.makeupPending = Math.max(0, (absentOf(stu) + dAbs) - (makeupOf(stu) + dMk));
-        // 4주(4회) 주기 필드 — 저장 후 총 회차로 다시 계산
+        // 4주 단위 회차 필드 — 저장 후 총 회차로 다시 계산
         const nextSes = Math.max(0, (typeof stu.sessionCount === 'number' ? stu.sessionCount : 0) + dSes);
         const cf2 = cycleFields(nextSes);
         Object.assign(patch, cf2);
@@ -1787,7 +1886,7 @@ window.saveBatch = async function() {
     closeBatch(true);
     alert(isOff
       ? `${cls}\n${date} 휴강으로 저장했습니다.${nDel ? `\n기존 수업카드 ${nDel}건 삭제 · 회차 차감 완료` : ''}`
-      : `${cls}\n수업카드 ${nCard}건을 저장했습니다.${nMk ? `\n보강 ${nMk}건이 함께 기록됐습니다.` : ''}${nCycDone ? `\n📗 4주 주기(${CYCLE}회)를 마친 학생 ${nCycDone}명 — 다음 주기 안내를 확인하세요.` : ''}\n학부모 리포트에 바로 반영됩니다.`);
+      : `${cls}\n수업카드 ${nCard}건을 저장했습니다.${nMk ? `\n보강 ${nMk}건이 함께 기록됐습니다.` : ''}${nCycDone ? `\n📗 ${CYCLE}/${CYCLE}회차를 마친 학생 ${nCycDone}명 — 다음 4주 안내를 확인하세요.` : ''}\n학부모 리포트에 바로 반영됩니다.`);
   } catch (e) {
     alert('일괄 저장 오류: ' + e.message);
   } finally {
@@ -1876,7 +1975,7 @@ window.renderCards = function() {
   } else if (sortMode === 'ses') {
     list.sort((a, b) => (effSession(b) - effSession(a)) || String(a.name || '').localeCompare(String(b.name || ''), 'ko'));
   } else if (sortMode === 'cyc') {
-    // 주기 마감(4/4) → 3/4 → 2/4 → 1/4 → 수업 전
+    // 4주 마감(4/4회차) → 3/4 → 2/4 → 1/4 → 수업 전
     list.sort((a, b) => (cycleKey(b) - cycleKey(a)) || (effSession(b) - effSession(a)) || String(a.name || '').localeCompare(String(b.name || ''), 'ko'));
   } else if (sortMode === 'mis') {
     // 수업카드 미작성 학생을 맨 위로, 밀린 회차가 많은 순
@@ -1907,29 +2006,29 @@ window.renderCards = function() {
   const absSum = list.reduce((n, s) => n + absentOf(s), 0);
   const mkSum  = list.reduce((n, s) => n + makeupOf(s), 0);
   const pdSum  = list.reduce((n, s) => n + pendingOf(s), 0);
-  // 4주(4회) 주기를 채운 학생 수 (집계된 값 기준만 카운트 — 추정값 제외)
+  // 4주 단위 회차를 채운 학생 수 (집계된 값 기준만 카운트 — 추정값 제외)
   const cycDone = list.filter(s => { const c = cycleOf(s); return c && !c.est && c.total > 0 && c.done; }).length;
-  const misCnt = list.filter(s => !!missingCards(s)).length;
+  const misCnt = list.filter(s => !!missingOf(s)).length;
   document.getElementById('sm-count').textContent =
     base + (noStart ? ` · 첫 수업일 미기록 ${noStart}명` : '')
     + (misCnt ? ` · 카드 미작성 ${misCnt}명` : '')
     + (absSum ? ` · 누적 결석 ${absSum}회` : '')
     + (mkSum ? ` · 보강 완료 ${mkSum}회` : '')
     + (pdSum ? ` · 보강 대기 ${pdSum}회` : '')
-    + (cycDone ? ` · 4주 주기 마감 ${cycDone}명` : '');
+    + (cycDone ? ` · 4주 마감 ${cycDone}명` : '');
 
   // 재집계 안내 (카운터 없는 학생이 있을 때만)
   const need = document.getElementById('sm-need');
   if (need) {
     const noCnt = students.filter(s => !hasCounter(s)).length;
     const noMk  = students.filter(s => hasCounter(s) && typeof s.makeupCount !== 'number' && absentOf(s) > 0).length;
-    const misAll = students.filter(s => !!missingCards(s)).length;
+    const misAll = students.filter(s => !!missingOf(s)).length;
     if (noCnt) {
       need.classList.add('show');
-      need.innerHTML = `⚠️ 회차가 아직 집계되지 않은 학생 <b>${noCnt}명</b> — 위의 <b>🔄 회차 재집계</b>를 한 번 눌러주세요.<br>기존 수업카드를 읽어 회차 · 4주 주기 · 결석 · 보강 · 첫 수업일을 자동으로 채웁니다. (한 번만 하면 됩니다)`;
+      need.innerHTML = `⚠️ 회차가 아직 집계되지 않은 학생 <b>${noCnt}명</b> — 위의 <b>🔄 회차 재집계</b>를 한 번 눌러주세요.<br>기존 수업카드를 읽어 회차 · 4주 단위 · 결석 · 보강 · 첫 수업일을 자동으로 채웁니다. (한 번만 하면 됩니다)`;
     } else if (misAll) {
       need.classList.add('show');
-      need.innerHTML = `📝 첫 수업일은 지났는데 <b>수업카드가 한 건도 없는 학생 ${misAll}명</b> — 정렬을 <b>「카드 미작성순」</b>으로 바꾸면 맨 위로 모입니다.<br>기록을 빠뜨린 것이라면 <b>📋 반별 수업카드 일괄 작성</b>에서 그 날짜로 저장하면 회차가 바로 채워집니다. (휴강으로 등록된 날은 제외하고 셉니다)`;
+      need.innerHTML = `📝 시간표 요일 기준으로 <b>수업카드가 빠진 학생 ${misAll}명</b> — 정렬을 <b>「카드 미작성순」</b>으로 바꾸면 맨 위로 모입니다.<br>학생 카드의 <b>빨간 날짜 버튼</b>을 누르면 그 반 · 그 날짜로 일괄 작성 창이 바로 열립니다. (휴강 등록일은 제외하고 셉니다)`;
     } else if (noMk) {
       need.classList.add('show');
       need.innerHTML = `🔁 보강 집계가 아직 없는 학생 <b>${noMk}명</b> — <b>🔄 회차 재집계</b>를 한 번 누르면 과거 보강 기록까지 카드에 표시됩니다.`;
@@ -1961,24 +2060,32 @@ window.renderCards = function() {
     const cnt = hasCounter(s), ses = cnt ? s.sessionCount : null;
     const abs = absentOf(s), mk = makeupOf(s), pend = pendingOf(s);
     const cyc = cycleOf(s);
-    const miss = missingCards(s);
+    const sch = scheduledOf(s);
+    const miss = missingOf(s);
     const dd = daysSince(s.startDate);
-    // 회차 칩: 집계값 우선 → 없으면 주차 추정(예상)
-    // 카운터가 0이어도 첫 수업일이 이미 지났으면 '수업 전'이 아니라 예상 회차를 보여준다
+    // 회차 칩 ① 실제 저장된 회차
     let chip;
     if (cnt) {
       if (ses > 0) chip = `<span class="sm-chip ses">총 ${ses}회차</span>`;
-      else if (miss) chip = `<span class="sm-chip est">${miss.expect}회차 예상</span>`;
+      else if (sch && sch.future) chip = '<span class="sm-chip soon">시작 예정</span>';
       else if (dd === 0) chip = '<span class="sm-chip soon">오늘 첫 수업</span>';
       else if (dd !== null && dd < 0) chip = '<span class="sm-chip soon">시작 예정</span>';
-      else chip = '<span class="sm-chip gray">수업 전</span>';
+      else chip = '<span class="sm-chip gray">기록 0건</span>';
     }
     else if (sn === 0) chip = '<span class="sm-chip soon">시작 예정</span>';
-    else if (sn !== null) chip = `<span class="sm-chip est">${sn}회차 예상</span>`;
-    else chip = '';
+    else chip = '<span class="sm-chip gray">집계 전</span>';
+    // 회차 칩 ② 시간표 기준 정규 회차 (요일·휴강 반영, 추정 아님)
+    let schChip = '';
+    if (sch && !sch.future && sch.count) {
+      const gap = cnt ? (sch.count - ses) : null;
+      const cls = (gap === null) ? 'est' : (gap > 0 ? 'soon' : 'ses');
+      schChip = `<span class="sm-chip ${cls}">정규 ${sch.count}회</span>`;
+    } else if (!sch && startD) {
+      schChip = `<span class="sm-chip gray">${cn.length ? '요일 확인 필요' : '반 미배정'}</span>`;
+    }
     const cycChip = cycleChip(cyc);
     const startHtml = startD
-      ? `${esc(fmtYMD(s.startDate))}${chip}${cycChip}`
+      ? `${esc(fmtYMD(s.startDate))}${chip}${schChip}${cycChip}`
       : `<span class="muted">미기록</span>${s.regDate ? `<span class="sm-chip gray">등록 ${esc(s.regDate)}</span>` : ''}${cycChip}`;
     // 출결 요약 줄
     const nOff = nextOff(s);
@@ -1986,26 +2093,34 @@ window.renderCards = function() {
     if (cnt) bits.push(`총 수업 <b>${ses}</b>회`);
     if (cyc && cyc.total > 0) {
       bits.push(cyc.done
-        ? `<span class="cycdone">${cyc.round}주기 <b>${CYCLE}/${CYCLE}</b> 마감</span>`
-        : `<span class="cyc">${cyc.round}주기 <b>${cyc.inCycle}/${CYCLE}</b> · 남은 ${cyc.left}회</span>`);
+        ? `<span class="cycdone">이번 4주 <b>${CYCLE}/${CYCLE}회차</b> 마감</span>`
+        : `<span class="cyc">이번 4주 <b>${cyc.inCycle}/${CYCLE}회차</b> · 남은 ${cyc.left}회</span>`);
     }
     if (abs) bits.push(`<span class="red">결석 <b>${abs}</b></span>`);
     if (mk) bits.push(`<span class="blue">보강 <b>${mk}</b></span>`);
     if (parseYMD(s.lastClassDate)) bits.push(`최근 ${esc(shortDate(s.lastClassDate))}`);
     if (nOff) bits.push(`<span class="sm-chip hol" style="margin-left:0;">🚫 ${esc(shortDate(nOff.date))} 휴강</span>`);
     const statHtml = bits.length ? `<div class="sm-stat">${bits.join('<span class="sep">·</span>')}</div>` : '';
-    // 4주 주기 진행 막대 (●●●○)
+    // 4주 단위 회차 진행 막대 (●●●○)
     const cycBarHtml = cycleBar(cyc);
     // 보강 안내 줄 — 원장 전용(학부모 화면에는 표시하지 않음)
     // 아직 보강하지 않은 결석이 남은 학생만 알려준다
     const mkHtml = pend
       ? `<div class="sm-mkline wait">🔁 보강 대기 <b>${pend}회</b><span class="sep">·</span>미보강 결석</div>`
       : '';
-    // 수업카드 미작성 경고 — 첫 수업일은 지났는데 카드가 한 건도 없는 학생
-    const misHtml = miss
-      ? `<div class="sm-warnline">⚠️ 수업카드 미작성 <b>${miss.expect}회</b><span class="sep">·</span>` +
-        `<span class="wl-sub">첫 수업 ${esc(shortDate(s.startDate))} 이후 ${miss.days}일<span class="sep"> </span>기록 0건${miss.off ? ` · 휴강 ${miss.off}회 제외` : ''}</span></div>`
-      : '';
+    // 수업카드 미작성 경고 — 시간표 요일로 계산한 정규 수업일 중 기록이 없는 날짜를 그대로 지목
+    let misHtml = '';
+    if (miss) {
+      const show = miss.dates.slice(-6);                       // 최근 6건까지 버튼으로
+      const more = miss.dates.length - show.length;
+      const btns = show.map(d => {
+        const nm = miss.sched.map.get(d) || '';
+        return `<button class="wl-d" title="${esc(nm)} · ${esc(d)} 수업카드 작성" onclick="openBatchFor('${esc(nm)}','${esc(d)}')">${esc(shortDate(d))}</button>`;
+      }).join('');
+      misHtml = `<div class="sm-warnline">⚠️ 수업카드 미작성 <b>${miss.count}회</b>` +
+        `<span class="wl-dates">${btns}${more > 0 ? `<span class="wl-more">+${more}</span>` : ''}` +
+        `${miss.unknown > 0 ? `<span class="wl-more">날짜 미확인 ${miss.unknown}회</span>` : ''}</span></div>`;
+    }
     const newBadge = isNewStudent(s.startDate) ? '<span class="sm-new-badge">NEW</span>' : '';
     const gradeBtn = sid
       ? `<a class="sm-btn primary" href="student-detail.html?id=${encodeURIComponent(sid)}">📊 테스트 결과</a>`
@@ -2233,7 +2348,7 @@ window.openEdit = function(fireId) {
   document.getElementById('sm-start').value = sd ? String(s.startDate).trim() : '';
   const cycS = cycleOf(s);
   document.getElementById('sm-start-hint').textContent = sd
-    ? `현재 ${sessionTxt(s.startDate)} · 주 1회 기준` + (cycS && cycS.total > 0 ? ` · ${cycS.round}주기 ${cycS.inCycle}/${CYCLE}` : '')
+    ? `현재 총 ${cycS && cycS.total ? cycS.total : 0}회차` + (cycS && cycS.total > 0 ? ` · 이번 4주 ${cycS.inCycle}/${CYCLE}회차` : '')
     : `첫 수업일 기록 없음 (시스템 등록일: ${s.regDate || '-'})`;
   const subs = (s.subject && s.subject !== '-') ? String(s.subject).split(',').map(x => x.trim()) : [];
   setSubjChecks(subs);
@@ -2351,7 +2466,7 @@ window.delStudent = async function(fireId, name) {
    · 첫 수업일이 비어 있으면 이 수업 날짜로 자동 기록
    · 보강이면 makeupFor(보강 대상 결석일)를 함께 저장해
      학생 문서의 makeupCount · makeupFors · lastMakeup 을 갱신한다
-   · 저장 시 4주(4회) 주기 필드(cycleRound/cycleIn/cycleLeft)도 함께 갱신
+   · 저장 시 4주 단위 회차 필드(cycleRound/cycleIn/cycleLeft)도 함께 갱신
 ════════════════════════════════════════════ */
 // 보강 대상 결석일 드롭다운 채우기 (미보강 결석 중 수업일 이전 날짜)
 function fillMkForOptions(s, dateStr) {
@@ -2387,7 +2502,7 @@ window.openClassCard = function(fireId) {
     `<span style="font-size:11px;">📚</span><strong>${esc(s.name || '학생')}</strong>` +
     (s.grade ? `<span style="margin-left:6px;color:#a21caf;">${esc(s.grade)}</span>` : '') +
     (cycS && cycS.total > 0
-      ? `<span style="margin-left:6px;color:${cycS.done ? '#b45309' : '#4338ca'};font-weight:800;">총 ${cycS.total}회 · ${cycS.round}주기 ${cycS.inCycle}/${CYCLE}${cycS.est ? ' 예상' : ''}</span>`
+      ? `<span style="margin-left:6px;color:${cycS.done ? '#b45309' : '#4338ca'};font-weight:800;">총 ${cycS.total}회차 · 이번 4주 ${cycS.inCycle}/${CYCLE}회차${cycS.est ? ' 예상' : ''}</span>`
       : '') +
     (pendingOf(s) ? `<span style="margin-left:auto;color:#b45309;font-weight:800;">🔁 보강 대기 ${pendingOf(s)}회</span>` : '');
   document.getElementById('cc-w-date').value = todayStr();
@@ -2442,15 +2557,15 @@ window.setCCStatus = function(st) {
     if (mkEl) mkEl.value = '';
   }
   const hint = document.getElementById('cc-status-hint');
-  // 이 수업을 저장하면 4주 주기가 어떻게 되는지 미리 안내
+  // 이 수업을 저장하면 4주 단위 회차가 어떻게 되는지 미리 안내
   let cycTx = '';
   if (ccStudent) {
     const c0 = cycleOf(ccStudent);
     if (c0 && typeof c0.total === 'number' && isLessonStatus(ccStatus)) {
       const f = cycleFields(c0.total + 1);
       cycTx = f.cycleIn === CYCLE
-        ? ` 저장 시 ${f.cycleRound}주기 ${CYCLE}/${CYCLE} 마감입니다.`
-        : ` 저장 시 ${f.cycleRound}주기 ${f.cycleIn}/${CYCLE} (남은 ${f.cycleLeft}회)입니다.`;
+        ? ` 저장하면 이번 4주 ${CYCLE}/${CYCLE}회차로 마감됩니다.`
+        : ` 저장하면 이번 4주 ${f.cycleIn}/${CYCLE}회차 (남은 ${f.cycleLeft}회)입니다.`;
     }
   }
   if (absent) hint.textContent = '결석은 회차에 포함되지 않고, 수업 내용 입력도 생략됩니다.';
@@ -2513,7 +2628,7 @@ window.saveClassCard = async function() {
       homework, attitude, homeworkDone, homeworkContent,
       createdAt: serverTimestamp()
     });
-    // 학생 문서 보정: 반 배정 · 첫 수업일 · 출결 카운터 · 보강 집계 · 4주 주기
+    // 학생 문서 보정: 반 배정 · 첫 수업일 · 출결 카운터 · 보강 집계 · 4주 단위 회차
     if (ccStudent.fireId) {
       try {
         const patch = {};
@@ -2536,14 +2651,14 @@ window.saveClassCard = async function() {
           const nAbs = absentOf(ccStudent) + (status === '결석' ? 1 : 0);
           const nMk  = makeupOf(ccStudent) + (status === '보강' ? 1 : 0);
           patch.makeupPending = Math.max(0, nAbs - nMk);
-          // 4주(4회) 주기 필드 갱신
+          // 4주 단위 회차 필드 갱신
           const nextSes = Math.max(0, ccStudent.sessionCount + (lesson ? 1 : 0));
           const cf3 = cycleFields(nextSes);
           Object.assign(patch, cf3);
           if (lesson && nextSes > 0) {
             cycMsg = cf3.cycleIn === CYCLE
-              ? `\n📗 ${cf3.cycleRound}주기 ${CYCLE}/${CYCLE} 마감 — 다음 주기 안내 타이밍입니다.`
-              : `\n📗 ${cf3.cycleRound}주기 ${cf3.cycleIn}/${CYCLE} (남은 ${cf3.cycleLeft}회)`;
+              ? `\n📗 이번 4주 ${CYCLE}/${CYCLE}회차 마감 — 다음 4주 안내 타이밍입니다.`
+              : `\n📗 이번 4주 ${cf3.cycleIn}/${CYCLE}회차 (남은 ${cf3.cycleLeft}회)`;
           }
         }
         // 보강 ↔ 결석 연결 기록
