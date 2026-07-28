@@ -547,6 +547,67 @@ body.modal-open { overflow: hidden; }
   .sm-warnline .wl-d { padding:7px 9px; font-size:11px; }
 }
 </style>
+  /* ══════════════════════════════════════════════════════════════
+   [모달 닫힘 복구] 바텀시트 CSS 되돌리기 · </style> 바로 앞에 추가
+   위쪽 규칙은 지우지 말 것 (뒤에 있어서 자동으로 덮어씀)
+   ① footer 가 iOS 툴바에 가리던 문제 → 안전영역을 footer 가 직접 흡수
+   ② 배경 탭으로 닫을 영역 복구 (사방 여백)
+   ③ 제목 막대의 음수 sticky 제거
+   ④ bt-sumbar sticky 해제 (제목 막대와 같은 자리에 겹침)
+══════════════════════════════════════════════════════════════ */
+.sm-modal-bg {
+  padding: 1rem 0.9rem;
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  align-items: center;
+}
+/* 위·아래 padding 은 모달이 아니라 제목·버튼 줄이 직접 갖는다
+   (모달이 가지면 sticky 요소가 그 위로 내려앉아 잘림) */
+.sm-modal {
+  padding-top: 0;
+  padding-bottom: 0;
+  max-height: 88vh;
+  border-radius: 20px;
+}
+.sm-modal-title {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #fff;
+  margin-top: 0;
+  padding: 1.3rem 0 0.85rem;
+}
+.sm-modal-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  background: #fff;
+  margin-top: 1.3rem;
+  padding: 0.75rem 0 max(0.75rem, env(safe-area-inset-bottom));
+  box-shadow: 0 -10px 18px -12px rgba(0,0,0,0.14);
+}
+.bt-sumbar { position: static; }
+
+@media (max-width: 600px) {
+  .sm-modal-bg {
+    padding: 0.75rem 0.7rem;
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+  .sm-modal {
+    max-width: none; width: 100%;
+    max-height: 88vh; border-radius: 18px;
+    padding-left: 1rem; padding-right: 1rem;
+  }
+  .bt-modal { max-width: none; }
+  .sm-modal-title { padding: 1.05rem 0 0.75rem; font-size: 1rem; }
+  .sm-modal-footer { margin-top: 1rem; padding: 0.65rem 0 max(0.65rem, env(safe-area-inset-bottom)); }
+  .sm-modal-footer button { min-height: 48px; font-size: 14px; }
+}
+@supports (max-height: 1dvh) {
+  .sm-modal { max-height: 88dvh; }
+  @media (max-width: 600px) { .sm-modal { max-height: 88dvh; } }
+}
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
 <body>
 
