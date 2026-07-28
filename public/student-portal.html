@@ -297,6 +297,36 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .d-tab{font-size:13px;padding:16px 4px;gap:5px}
 }
 </style>
+  /* ══════════════════════════════════════════════════════════════
+   [스크롤 복구] </style> 바로 앞에 추가 · 위쪽 CSS는 지우지 말 것
+   ① body 의 overflow-x:hidden 해제 (클리핑은 html 이 담당)
+   ② 하단 탭바 여백을 고정값 먼저 → env() 는 별도 선언으로 덧씀
+      (env 가 무효여도 앞 선언이 남아 여백이 0 이 되지 않음)
+   ③ 100vh → svh 보강
+══════════════════════════════════════════════════════════════ */
+html { overflow-x: hidden; }
+body {
+  overflow-x: visible;
+  overscroll-behavior-y: auto;
+  min-height: 100vh;
+}
+@supports (min-height: 100svh) {
+  body { min-height: 100svh; }
+  .loading-screen, .error-screen { min-height: 100svh; }
+}
+@media (max-width: 768px) {
+  body { padding-bottom: 78px; }
+  body { padding-bottom: calc(78px + env(safe-area-inset-bottom)); }
+  .mobile-tabs { padding-bottom: 0; }
+  .mobile-tabs { padding-bottom: env(safe-area-inset-bottom); }
+  .mobile-header { padding-top: 18px; }
+  .mobile-header { padding-top: calc(18px + env(safe-area-inset-top)); }
+  .mobile-body { padding-bottom: 10px; }
+}
+@media (max-width: 380px) {
+  .mobile-header { padding-top: 16px; }
+  .mobile-header { padding-top: calc(16px + env(safe-area-inset-top)); }
+}
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
 <body>
 
