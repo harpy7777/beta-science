@@ -31,8 +31,10 @@
   --safe-top:env(safe-area-inset-top);
   --safe-bot:env(safe-area-inset-bottom);
 }
-html{-webkit-text-size-adjust:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;min-height:100dvh}
+html{-webkit-text-size-adjust:100%;overflow-x:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;min-height:100dvh;overflow-x:hidden;overscroll-behavior-y:none;-webkit-font-smoothing:antialiased}
+/* 학부모가 붙여넣은 긴 단어·URL 이 카드를 밀어내지 않도록 */
+.ls-body,.ls-hw,.ls-fb-tx,.sc-row-val{overflow-wrap:anywhere}
 
 .loading-screen,.error-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;color:var(--mt);text-align:center;padding:24px}
 .spinner{width:40px;height:40px;border:3px solid var(--bd);border-top-color:var(--pink);border-radius:50%;animation:spin .8s linear infinite}
@@ -108,10 +110,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   font-family:inherit;color:var(--mt);cursor:pointer;
   background:none;border:none;transition:color .15s;min-height:54px;
 }
+.m-tab:active{background:var(--pink-lt)}
 .m-tab.active{color:var(--pink)}
+.m-tab.active .m-tab-icon{transform:translateY(-1px)}
+.m-tab-icon{transition:transform .15s}
 .m-tab-icon{font-size:19px;line-height:1}
 .m-tab-lbl{font-size:9.5px;font-weight:600;white-space:nowrap}
-.mobile-body{padding:16px 16px 8px;max-width:600px;margin:0 auto}
+.mobile-body{
+  padding:16px 16px 8px;max-width:600px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left));
+  padding-right:max(16px,env(safe-area-inset-right));
+}
 
 /* ══ 공통 컴포넌트 ══ */
 .section{display:none}
@@ -136,13 +145,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .info-card p{text-align:center;font-size:14px;color:var(--mt);line-height:1.9;font-weight:400}
 .info-card strong{color:var(--tx);font-weight:600}
 
-/* ══ 선생님 메모(피드백) — 작성된 경우에만 표시 ══ */
-#fbWrapD,#fbWrapM{display:none;margin-bottom:24px}
-.fb-card{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
-.fb-card-top{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--pink-lt);border-bottom:1px solid #fbcfe8}
-.fb-badge{display:inline-flex;align-items:center;gap:5px;background:var(--wh);border:1px solid #fbcfe8;border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:700;color:var(--pink-dk);white-space:nowrap}
-.fb-latest{font-size:11px;font-weight:700;color:#fff;background:var(--pink);border-radius:999px;padding:3px 9px;letter-spacing:.02em}
-.fb-card-body{padding:18px;font-size:14.5px;line-height:2;color:var(--tx);white-space:pre-wrap;word-break:break-word}
+/* ══ 수업카드 안 선생님 메모 — 그 날짜에 작성된 경우에만 생성 ══ */
+.ls-fb{margin-top:11px;padding:12px 14px;background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:11px}
+.ls-fb+.ls-fb{margin-top:8px}
+.ls-fb b{display:block;font-size:11.5px;font-weight:800;color:var(--pink-dk);letter-spacing:.03em;margin-bottom:6px}
+.ls-fb-tx{font-size:13.5px;line-height:1.95;color:var(--tx);white-space:pre-wrap;word-break:break-word}
+.ls-card.fbonly{border-color:#fbcfe8;background:#fffdfe}
 
 .empty-box{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);text-align:center;padding:56px 24px;color:var(--mt);font-size:14px;line-height:2}
 .empty-icon{font-size:48px;margin-bottom:14px}
@@ -150,6 +158,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 /* ══ 출결 흐름 ══ */
 .at-flow{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px;margin-bottom:22px}
 .at-line{display:flex;flex-wrap:wrap;gap:6px}
+.at-line::-webkit-scrollbar{display:none}
 .at-dot{min-width:40px;padding:6px 4px;border-radius:10px;text-align:center;font-size:11.5px;font-weight:800;line-height:1.3;border:1.5px solid}
 .at-dot .at-d{display:block;font-size:9px;font-weight:700;opacity:.7;margin-top:1px}
 .at-wait{font-size:13px;color:var(--mt)}
@@ -165,7 +174,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 /* ══ 수업 기록 카드 (최신순) ══ */
 .ls-card{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px;margin-bottom:10px}
 .ls-card.latest{border-color:#fbcfe8;box-shadow:0 2px 12px rgba(236,72,153,.07)}
-.ls-top{display:flex;align-items:center;gap:9px;margin-bottom:10px;flex-wrap:wrap}
+.ls-top{display:flex;align-items:center;gap:9px;margin-bottom:10px;flex-wrap:wrap;row-gap:6px}
 .ls-date{font-size:14px;font-weight:700;color:var(--tx)}
 .ls-badge{font-size:11.5px;font-weight:800;padding:3px 11px;border-radius:999px;border:1.5px solid;white-space:nowrap}
 .ls-new{font-size:10.5px;font-weight:800;color:#fff;background:var(--pink);border-radius:999px;padding:3px 9px;letter-spacing:.02em}
@@ -204,14 +213,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .desktop-only{display:none!important}
   .mobile-only{display:block!important}
   body{padding-bottom:calc(64px + var(--safe-bot))}
+  /* 출결 흐름 — 한 줄로 고정하고 가로 스크롤 (세로 공간 절약) */
+  .at-line{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .at-dot{flex:0 0 auto;scroll-snap-align:start}
+  .at-legend{gap:9px;font-size:10.5px}
+  /* 수업 카드 — 회차를 오른쪽 끝에 유지 */
+  .ls-top{gap:7px}
+  .ls-no{margin-left:auto}
+  .sec-label{margin-bottom:11px}
   .info-card p{white-space:normal}
   .stat-box{min-height:76px;gap:6px;padding:13px 8px 14px}
   .stat-num{font-size:20px}
   .stat-lbl{font-size:11px}
   .stat-row.at4{grid-template-columns:repeat(2,1fr)}
   .section{padding-top:2px}
-  .fb-card-top{padding:12px 14px;gap:8px}
-  .fb-card-body{padding:15px 16px;font-size:14px;line-height:1.95}
+  .ls-fb{padding:11px 12px;margin-top:10px}
+  .ls-fb-tx{font-size:13px;line-height:1.9}
+  .ls-hw{font-size:12.5px}
+  .ls-unit{max-width:100%}
   .at-flow{padding:14px 15px}
   .ls-card{padding:14px 15px}
   .ls-date{font-size:13.5px}
@@ -224,7 +243,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .sc-row-lbl{width:54px;font-size:11.5px}
   .sc-row-title .sc-row-val{font-size:15px}
 }
+/* ── 아이폰 SE·미니 등 좁은 화면 ── */
 @media(max-width:380px){
+  .mobile-body{padding:14px 12px 8px}
+  .mobile-header{padding:calc(16px + var(--safe-top)) 16px 14px}
+  .student-name-m{font-size:23px}
+  .logo-name-m{font-size:12px}
+  .header-label-m{font-size:12px}
+  .s-chip{padding:4px 11px;font-size:12px}
+  .stat-row{gap:8px}
   .stat-box{min-height:70px;padding:12px 6px 13px}
   .stat-num{font-size:17px}
   .stat-lbl{font-size:10.5px}
@@ -234,11 +261,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .sc-row-title .sc-row-val{font-size:15px}
   .score-circle{width:52px;height:52px}
   .sc-pct{font-size:15px}
-  .fb-card-top{flex-wrap:wrap}
   .m-tab-lbl{font-size:9px}
   .m-tab-icon{font-size:18px}
   .at-dot{min-width:36px;font-size:11px}
-  .ls-no{margin-left:0}
+  .ls-top{gap:6px}
+  .ls-no{margin-left:0;font-size:11px}
+  .ls-date{font-size:13px}
+  .ls-badge{font-size:11px;padding:3px 9px}
+  .ls-fb{padding:10px 11px}
+  .ls-fb b{font-size:11px}
+  .ls-fb-tx{font-size:12.5px;line-height:1.85}
+  .ls-unit{font-size:11.5px;padding:3px 8px}
+}
+/* ── 폴더블 접힘 등 초협소 화면 안전망 ── */
+@media(max-width:340px){
+  .mobile-body{padding:12px 10px 8px}
+  .stat-row.at4{grid-template-columns:repeat(2,1fr);gap:7px}
+  .stat-num{font-size:16px}
+  .stat-lbl{font-size:10px}
+  .ls-card{padding:12px 13px}
+  .ls-date{font-size:12.5px}
+  .ls-badge{font-size:10.5px;padding:2px 8px}
+  .ls-no{font-size:10.5px}
+  .ls-body{font-size:13px}
+  .m-tab-lbl{font-size:8.5px}
+  .at-dot{min-width:34px;font-size:10.5px}
 }
 @media(min-width:769px){
   .mobile-only{display:none!important}
@@ -349,18 +396,13 @@ if(!studentId){showError();}else{loadPortal(studentId);}
 
 const TAB_COUNT=4;
 
-/* 탭 0 = 출결 · 수업내용 (선생님 메모 + 출결 4칸 + 흐름 + 수업 기록 최신순)
-   선생님 메모(피드백)는 작성된 경우에만 나타난다.
-   빈 칸이 늘 보이면 "왜 우리 아이만 없나" 하는 오해가 생기므로,
-   특별히 남길 말이 있을 때만 노출되도록 섹션 자체를 감춘다. */
+/* 탭 0 = 출결 · 수업내용 (출결 4칸 + 흐름 + 수업 기록 최신순)
+   선생님 메모는 별도 섹션이 아니라 그 날짜 수업카드 안(과제 아래)에 붙는다.
+   메모를 쓴 날에만 그 카드에 생기므로, 빈 칸이 늘 노출되지 않는다. */
 function buildSections(){
   return`
   <div class="section active" id="sec0">
     <br>
-    <div id="fbWrapD">
-      <div class="sec-label">선생님 메모</div>
-      <div id="feedbackList"></div>
-    </div>
     <div class="stat-row at4">
       <div class="stat-box green"><div class="stat-lbl">수업 회차</div><div class="stat-num" id="at-ses">—</div></div>
       <div class="stat-box"><div class="stat-lbl">결석</div><div class="stat-num" id="at-abs">—</div></div>
@@ -378,7 +420,7 @@ function buildSections(){
         <span class="at-lg"><i style="background:#f3f4f6;border-color:#e5e7eb"></i>휴강</span>
       </div>
     </div>
-    <div class="sec-label">수업 내용 · 과제</div>
+    <div class="sec-label">수업 내용 · 과제 · 메모</div>
     <div id="lessonList"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
   </div>
   <div class="section" id="sec1">
@@ -424,15 +466,14 @@ async function loadPortal(sid){
     if(student.grade){['hGradeD','hGradeM'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=student.grade;el.style.display='inline';}})}
     if(student.subject&&student.subject!=='-'){['hSubjectD','hSubjectM'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=student.subject;el.style.display='inline';}})}
     const html=buildSections();
-    // 모바일 쪽 피드백 래퍼는 id를 구분해 CSS 초기 display:none 이 양쪽 모두 걸리게 한다
     document.getElementById('desktopContent').innerHTML=html;
-    document.getElementById('mobileContent').innerHTML=html.replace(/id="fbWrapD"/g,'id="fbWrapM"');
+    document.getElementById('mobileContent').innerHTML=html;
     document.getElementById('loadingScreen').style.display='none';
     document.getElementById('portalApp').style.display='block';
-    loadFeedback(student.fireId);
     renderAttendance(student);
-    renderLessons(student);
     loadGrades(sid,student.fireId);
+    const fbList=await fetchFeedback(student.fireId);   // 메모를 먼저 받아 수업 기록에 얹는다
+    renderLessons(student,fbList);
   }catch(err){showError();}
 }
 
@@ -474,36 +515,38 @@ function parseFbEntries(data){
   }
   return list.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||(b.createdAt-a.createdAt));
 }
-function fbDateLabel(ds){
-  if(!ds)return'작성일 미상';
-  const p=String(ds).split('-');
-  if(p.length<3)return String(ds);
-  const y=parseInt(p[0],10),m=parseInt(p[1],10),d=parseInt(p[2],10);
-  if(isNaN(y)||isNaN(m)||isNaN(d))return String(ds);
-  return`${y}년 ${m}월 ${d}일`;
-}
-function showFeedbackWrap(on){
-  ['fbWrapD','fbWrapM'].forEach(id=>{
-    document.querySelectorAll('#'+id).forEach(el=>el.style.display=on?'block':'none');
-  });
-}
-async function loadFeedback(fireId){
+/* 메모를 읽어오기만 한다 (화면 표시는 수업 기록 쪽에서 담당)
+   실패하면 빈 배열 — 메모 때문에 수업 기록이 막히지 않게 한다. */
+async function fetchFeedback(fireId){
   try{
     const snap=await getDoc(doc(db,'feedbacks',fireId));
-    const list=parseFbEntries(snap.exists()?snap.data():null);
-    if(!list.length){showFeedbackWrap(false);return;}   // 작성된 메모가 없으면 아예 숨김
-    const html=list.map((x,i)=>`<div class="fb-card">
-        <div class="fb-card-top">
-          <span class="fb-badge">🗓 ${e(fbDateLabel(x.date))}</span>
-          ${i===0&&list.length>1?'<span class="fb-latest">최신</span>':''}
-        </div>
-        <div class="fb-card-body">${e(x.text)}</div>
-      </div>`).join('');
-    document.querySelectorAll('#feedbackList').forEach(el=>el.innerHTML=html);
-    showFeedbackWrap(true);
-  }catch(err){
-    showFeedbackWrap(false);
-  }
+    return parseFbEntries(snap.exists()?snap.data():null);
+  }catch(err){return[];}
+}
+
+/* 메모를 수업일에 배정한다
+   ① 같은 날짜의 수업이 있으면 그 수업카드 안으로
+   ② 없으면 그 날짜 '이전'의 가장 가까운 수업으로 (수업 뒤에 쓴 메모)
+   ③ 모든 수업보다 이른 메모 · 날짜 없는 메모는 독립 카드로
+   반환 { map:Map(수업날짜→[메모…]), orphans:[메모…] } */
+function assignFeedback(lessonDates,fbList){
+  const map=new Map(),orphans=[];
+  const sorted=[...lessonDates].sort();
+  (Array.isArray(fbList)?fbList:[]).forEach(fb=>{
+    const d=String(fb&&fb.date||'');
+    if(!atYmd(d)){orphans.push(fb);return;}
+    let target='';
+    for(let i=0;i<sorted.length;i++){
+      if(sorted[i]<=d)target=sorted[i];
+      else break;
+    }
+    if(target){if(!map.has(target))map.set(target,[]);map.get(target).push(fb);}
+    else orphans.push(fb);
+  });
+  return{map,orphans};
+}
+function fbBlock(fb){
+  return`<div class="ls-fb"><b>💬 선생님 메모</b><div class="ls-fb-tx">${e(fb&&fb.text||'')}</div></div>`;
 }
 
 /* ════════════════════════════════════════════════
@@ -572,14 +615,14 @@ const LS_BADGE={
   '보강':'background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8',
   '휴강':'background:#f3f4f6;border-color:#e5e7eb;color:#6b7280'
 };
-function renderLessons(student){
+function renderLessons(student,fbList){
   try{
     const raw=Array.isArray(student&&student.recentLessons)?student.recentLessons:[];
     const list=raw.filter(x=>x&&atYmd(x.d))
       .map(x=>({d:String(x.d),s:atStatusOf(x),u:String(x.u||''),c:String(x.c||''),h:String(x.h||'')}))
       .sort((a,b)=>a.d.localeCompare(b.d));   // 오래된 순으로 정렬해 회차 번호를 매긴다
 
-    if(!list.length){renderLessonsFallback(student);return;}
+    if(!list.length){renderLessonsFallback(student,fbList);return;}
 
     let no=0;
     const numbered=list.map(x=>{
@@ -588,7 +631,28 @@ function renderLessons(student){
     });
     numbered.reverse();                        // 최신이 맨 위
 
-    const html=numbered.map((x,i)=>{
+    const{map,orphans}=assignFeedback(list.map(x=>x.d),fbList);
+
+    // 수업 카드 + 어느 수업에도 붙지 않은 메모 카드를 날짜순으로 합친다
+    const items=numbered.map(x=>({kind:'lesson',d:x.d,x}));
+    orphans.forEach(fb=>{
+      const d=String(fb&&fb.date||'');
+      if(atYmd(d))items.push({kind:'fb',d,fb});
+    });
+    items.sort((a,b)=>String(b.d).localeCompare(String(a.d)));
+    orphans.filter(fb=>!atYmd(String(fb&&fb.date||''))).forEach(fb=>items.unshift({kind:'fb',d:'',fb}));
+
+    const html=items.map((it,i)=>{
+      if(it.kind==='fb'){
+        return`<div class="ls-card fbonly">
+          <div class="ls-top">
+            <span class="ls-date">${e(it.d?atLongDate(it.d):'작성일 미상')}</span>
+            <span class="ls-badge" style="${LS_BADGE['보강']}">선생님 메모</span>
+          </div>
+          ${fbBlock(it.fb)}
+        </div>`;
+      }
+      const x=it.x;
       const badge=LS_BADGE[x.s]||LS_BADGE['출석'];
       const body=x.c
         ?`<div class="ls-body">${e(x.c)}</div>`
@@ -597,14 +661,16 @@ function renderLessons(student){
          :'<div class="ls-body mute">수업 내용이 등록되지 않았습니다.</div>'));
       const hw=x.h?`<div class="ls-hw"><b>과제</b>${e(x.h)}</div>`:'';
       const unit=x.u?`<div class="ls-unit">📘 ${e(x.u)}</div>`:'';
+      // 메모는 과제 아래에, 그 날짜에 작성된 것이 있을 때만 생성된다
+      const fbs=(map.get(x.d)||[]).map(fbBlock).join('');
       return`<div class="ls-card${i===0?' latest':''}">
         <div class="ls-top">
           <span class="ls-date">${e(atLongDate(x.d))}</span>
           <span class="ls-badge" style="${badge}">${e(x.s)}</span>
-          ${i===0&&numbered.length>1?'<span class="ls-new">최신</span>':''}
+          ${i===0&&items.length>1?'<span class="ls-new">최신</span>':''}
           ${x.no?`<span class="ls-no">${x.no}회차</span>`:''}
         </div>
-        ${unit}${body}${hw}
+        ${unit}${body}${hw}${fbs}
       </div>`;
     }).join('');
 
@@ -617,16 +683,25 @@ function renderLessons(student){
     document.querySelectorAll('#lessonList').forEach(el=>el.innerHTML='<div class="empty-box">수업 기록을 불러오지 못했습니다.</div>');
   }
 }
-// recentLessons 가 아직 없는 학생 — 예전 방식(lastHomework)으로 최소한의 정보만
-function renderLessonsFallback(student){
+// recentLessons 가 아직 없는 학생 — 예전 방식(lastHomework) + 메모만이라도 보여준다
+function renderLessonsFallback(student,fbList){
+  const fbs=(Array.isArray(fbList)?fbList:[]);
+  const fbHtml=fbs.map(fb=>`<div class="ls-card fbonly">
+      <div class="ls-top">
+        <span class="ls-date">${e(fb.date?atLongDate(fb.date):'작성일 미상')}</span>
+        <span class="ls-badge" style="${LS_BADGE['보강']}">선생님 메모</span>
+      </div>
+      ${fbBlock(fb)}
+    </div>`).join('');
   const hw=(student&&student.lastHomework&&typeof student.lastHomework==='object')?student.lastHomework:null;
   const text=hw?String(hw.text||'').trim():'';
   const date=(hw&&atYmd(hw.date))?String(hw.date):'';
   if(!text){
-    document.querySelectorAll('#lessonList').forEach(el=>el.innerHTML=emptyBox('🗓','아직 등록된 수업 기록이 없습니다.<br>수업이 진행되면 이곳에 표시됩니다.'));
+    const html=fbHtml||emptyBox('🗓','아직 등록된 수업 기록이 없습니다.<br>수업이 진행되면 이곳에 표시됩니다.');
+    document.querySelectorAll('#lessonList').forEach(el=>el.innerHTML=html);
     return;
   }
-  const html=`<div class="ls-card latest">
+  const html=fbHtml+`<div class="ls-card latest">
       <div class="ls-top">
         <span class="ls-date">${e(date?atLongDate(date):'최근 수업')}</span>
         <span class="ls-badge" style="${LS_BADGE['출석']}">과제</span>
