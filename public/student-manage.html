@@ -8,12 +8,15 @@
 <title>학생 관리 · 인후쌤의 과학 수업 관리 시스템</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { overflow-x: hidden; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
   background: #fafafa; color: #1d1d1f; min-height: 100vh;
   -webkit-font-smoothing: antialiased; visibility: hidden;
-  overscroll-behavior: none;
+  overscroll-behavior: none; overflow-x: hidden;
 }
+/* 학생 이름·수업 내용에 긴 단어가 들어와도 카드가 밀리지 않게 */
+.sm-name, .bt-nm, .sm-stat, .sm-meta { overflow-wrap: anywhere; }
 
 /* ── Header ── */
 .header {
@@ -326,9 +329,9 @@ body.modal-open { overflow: hidden; }
 .sm-warnline .wl-dates { display:flex; flex-wrap:wrap; gap:4px; align-items:center; }
 .sm-warnline .wl-d {
   border:1px solid #fca5a5; background:#fff; color:#b91c1c;
-  font-family:inherit; font-size:10.5px; font-weight:800;
-  padding:4px 8px; min-height:28px; border-radius:7px; cursor:pointer; white-space:nowrap;
-  transition:background .15s;
+  font-family:inherit; font-size:11px; font-weight:800;
+  padding:6px 10px; min-height:34px; border-radius:8px; cursor:pointer; white-space:nowrap;
+  transition:background .15s; touch-action:manipulation;
 }
 .sm-warnline .wl-d:hover { background:#fee2e2; }
 .sm-warnline .wl-d:active { transform:scale(0.96); }
@@ -448,7 +451,7 @@ body.modal-open { overflow: hidden; }
 .bt-sbtn.on[data-st="지각"] { background:#fffbeb; border-color:#f59e0b; color:#b45309; }
 .bt-sbtn.on[data-st="결석"] { background:#fef2f2; border-color:#ef4444; color:#b91c1c; }
 .bt-sbtn.on[data-st="보강"] { background:#eff6ff; border-color:#3b82f6; color:#1d4ed8; }
-.bt-memo-btn { background:none; border:none; font-family:inherit; font-size:10.5px; font-weight:700; color:#a21caf; cursor:pointer; padding:6px 2px 0; min-height:30px; }
+.bt-memo-btn { background:none; border:none; font-family:inherit; font-size:11px; font-weight:700; color:#a21caf; cursor:pointer; padding:8px 2px 2px; min-height:36px; text-align:left; }
 .bt-memo-wrap { display:none; margin-top:6px; }
 .bt-memo-wrap.open { display:block; }
 .bt-memo-inp { width:100%; min-height:40px; padding:8px 10px; border:1.5px solid #f3e8ff; border-radius:9px; font-size:16px; font-family:inherit; color:#1d1d1f; outline:none; -webkit-appearance:none; appearance:none; }
@@ -459,6 +462,11 @@ body.modal-open { overflow: hidden; }
 .sm-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .sm-modal-footer { display:flex; gap:8px; margin-top:1.3rem; }
 .sm-modal-footer button { flex:1; min-height:46px; }
+/* 모달 제목 · 하단 버튼 고정 (긴 모달에서 저장 버튼을 찾아 내려가지 않도록) */
+.sm-modal-title {
+  position:sticky; top:-1.5rem; z-index:3; background:#fff;
+  padding:0.9rem 0 0.8rem; margin-top:-0.9rem;
+}
 @media (max-width:600px) {
   .sm-search { flex:1 1 100%; max-width:none; min-width:0; }
   /* 반 필터 · 정렬을 한 줄에 2단으로 — 세로 공간 절약 */
@@ -469,17 +477,59 @@ body.modal-open { overflow: hidden; }
   .sm-card { padding:1rem 1.05rem; }
   .sm-btn { min-height:44px; font-size:12.5px; }
   .sm-tool-btn { flex:1 1 calc(50% - 4px); font-size:12px; padding:10px 8px; }
-  .bt-top { flex-wrap:wrap; }
-  .bt-seg { width:100%; }
+  /* 일괄 작성 — 이름 줄과 출결 버튼 줄을 분리해 손가락으로 누르기 쉽게 */
+  .bt-top { flex-wrap:wrap; row-gap:8px; }
+  .bt-seg { width:100%; gap:6px; }
+  .bt-sbtn { min-height:44px; font-size:12.5px; }
+  .bt-row { padding:10px 11px; }
+  .bt-av { width:30px; height:30px; font-size:10.5px; }
+  .bt-nm { font-size:13px; flex:1 1 auto; }
   .bt-list { max-height:none; overflow:visible; }
-  .sm-modal { border-radius:18px; padding:1.2rem 1.1rem; }
+  .bt-sumbar { position:sticky; top:0; z-index:2; background:#fff; padding:6px 0; }
+  .bt-quick { width:100%; }
+  .bt-qbtn { flex:1; min-height:40px; }
+  .bt-note, .bt-loaded { font-size:10.5px; padding:8px 9px; }
+  .off-list { max-height:none; }
+  .sm-class-checks { max-height:none; }
+  /* 남은 소형 버튼 터치 영역 확보 (44px 기준) */
+  .off-item .oi-x { min-height:44px; padding:0 14px; }
+  .off-item { padding:10px 11px; }
+  .logout-btn { min-height:40px; padding:8px 15px; }
+  .sm-subj-label { min-height:44px; }
+  .bt-qbtn { min-height:44px; }
+  .sm-idbtn { min-height:42px; padding:9px 13px; }
+  /* 모달을 화면에 꽉 채워 입력 공간 확보 */
+  .sm-modal-bg { padding:0; align-items:flex-end; }
+  .sm-modal {
+    border-radius:20px 20px 0 0; padding:1.1rem 1rem;
+    max-width:none; max-height:94vh; width:100%;
+    padding-bottom:max(1.1rem, env(safe-area-inset-bottom));
+  }
+  .bt-modal { max-width:none; }
+  .sm-modal-title { top:-1.1rem; padding:0.7rem 0 0.7rem; margin-top:-0.7rem; font-size:1rem; }
+  /* 저장·취소를 항상 화면 아래에 붙여둔다 */
+  .sm-modal-footer {
+    position:sticky; bottom:0; z-index:3;
+    background:#fff; margin-top:1rem;
+    padding:0.7rem 0 0.2rem;
+    box-shadow:0 -8px 16px -8px rgba(0,0,0,0.12);
+  }
+  .sm-modal-footer button { min-height:48px; font-size:14px; }
   .sm-row2 { grid-template-columns:1fr; }
   .welcome-bar { padding:1.05rem 1.1rem; }
   .welcome-bar .cc-write-btn { width:100%; min-height:44px; font-size:13px; }
   .sm-draft { font-size:11px; }
   .sm-draft button { width:100%; }
   .sm-mkline { font-size:10.5px; padding:7px 8px; }
-  .sm-warnline { font-size:10.5px; padding:7px 8px; }
+  .sm-warnline { font-size:10.5px; padding:8px 9px; gap:6px; }
+  .sm-warnline .wl-d { min-height:40px; padding:9px 12px; font-size:11.5px; }
+  .sm-warnline .wl-dates { gap:5px; width:100%; }
+  .sm-cycbar { flex-wrap:wrap; gap:5px; }
+  .sm-cycbar .cb-tx { font-size:10px; }
+  .sm-stat { font-size:10.5px; gap:4px; }
+}
+@supports (max-height:1dvh) {
+  @media (max-width:600px) { .sm-modal { max-height:94dvh; } }
 }
 @media (max-width:400px) {
   .sm-class-filter, .sm-sort { flex:1 1 100%; }
@@ -492,7 +542,9 @@ body.modal-open { overflow: hidden; }
   .sm-tool-btn { flex:1 1 100%; }
   .sm-meta .ml { width:48px; }
   .sm-btn.icon, .sm-btn.danger { padding:9px 11px; }
-  .sm-cycbar .cb-d { width:14px; }
+  .sm-cycbar .cb-d { width:13px; }
+  .sm-chip { font-size:9.5px; padding:2px 6px; margin-left:4px; }
+  .sm-warnline .wl-d { padding:7px 9px; font-size:11px; }
 }
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
