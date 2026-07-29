@@ -78,6 +78,8 @@ body{
 .count-txt strong{color:var(--tx);font-weight:700}
 .bulk-btn{display:flex;align-items:center;gap:7px;padding:10px 18px;background:var(--pink);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
 .bulk-btn:hover{background:var(--pink-dk)}
+.bulk-btn.sms{background:linear-gradient(135deg,#a855f7,#7e22ce)}
+.bulk-btn.sms:hover{opacity:.9}
 
 /* ══ 카드 그리드 ══ */
 .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
@@ -91,6 +93,9 @@ body{
 .grade-mid1{background:#ede9fe;color:#6d28d9}.grade-mid2{background:#dbeafe;color:#1d4ed8}.grade-mid3{background:#d1fae5;color:#065f46}
 .grade-high1{background:#fef3c7;color:#92400e}.grade-high2{background:#fee2e2;color:#991b1b}.grade-high3{background:#fce7f3;color:#9d174d}
 .id-chip{font-size:11px;color:var(--mt);font-family:monospace;background:#f8f9fa;border:1px solid var(--bd);border-radius:4px;padding:1px 6px}
+/* 학부모 번호 칩 */
+.ph-chip{font-size:11px;font-weight:700;font-family:monospace;border-radius:4px;padding:1px 6px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8}
+.ph-chip.none{background:#f8f9fa;border-color:var(--bd);color:#b0b0b5;font-weight:600}
 .card-body{padding:14px 16px}
 .url-row{display:flex;align-items:center;gap:8px;background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:10px;padding:10px 12px;margin-bottom:10px}
 .url-txt{flex:1;font-size:11px;font-family:monospace;color:var(--pink-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
@@ -101,6 +106,8 @@ body{
 .btn-preview:hover{background:#fce7f3}
 .btn-sms{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:linear-gradient(135deg,#fdf4ff,#c084fc);color:#7e22ce;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(192,132,252,.25);transition:opacity .15s,transform .1s;}
 .btn-sms:hover{opacity:.9}.btn-sms:active{transform:scale(.97)}
+.btn-sms.off{background:#f4f4f5;color:#a1a1aa;box-shadow:none;cursor:default}
+.btn-sms.off:hover{opacity:1}.btn-sms.off:active{transform:none}
 
 /* ══ 피드백 버튼 ══ */
 .btn-fb{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;margin-bottom:8px;background:linear-gradient(135deg,#fff7ed,#fed7aa);color:#b45309;border:1px solid #fdba74;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s,transform .1s;}
@@ -116,7 +123,7 @@ body{
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e293b;color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;z-index:9999;transition:transform .3s ease;pointer-events:none;max-width:calc(100vw - 32px);text-align:center;line-height:1.5;word-break:keep-all;box-shadow:0 4px 16px rgba(0,0,0,.2)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
-/* ══ 피드백 모달 ══ */
+/* ══ 공용 모달 (피드백 · 문자) ══ */
 .fbm-overlay{display:none;position:fixed;inset:0;background:rgba(30,41,59,.45);z-index:9000;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);}
 .fbm-overlay.open{display:flex;align-items:center;justify-content:center;padding:20px}
 .fbm{background:var(--wh);border-radius:18px;width:min(620px,100%);max-height:min(86vh,860px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)}
@@ -125,7 +132,7 @@ body{
 .fbm-title span{display:block;font-size:11.5px;font-weight:600;color:var(--mt);margin-top:3px}
 .fbm-close{width:36px;height:36px;min-width:36px;border-radius:50%;border:none;background:var(--wh);color:var(--mt);font-size:16px;cursor:pointer;font-family:inherit;flex-shrink:0}
 .fbm-close:hover{background:#fce7f3;color:var(--pink)}
-.fbm-body{padding:18px 20px 22px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
+.fbm-body{padding:18px 20px 22px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0}
 .fbm-editor{background:#fffbf5;border:1px solid #fed7aa;border-radius:12px;padding:14px;margin-bottom:18px}
 .fbm-editor-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
 .fbm-editor-lbl{font-size:12px;font-weight:700;color:#b45309}
@@ -151,6 +158,45 @@ body{
 .fbm-mini.del:hover{background:#fef2f2}
 .fbm-item-body{padding:13px 14px;font-size:14px;line-height:1.85;color:var(--tx);white-space:pre-wrap;word-break:break-word}
 .fbm-empty{text-align:center;padding:32px 16px;color:var(--mt);font-size:13.5px;line-height:1.9;background:#fafafa;border:1px dashed var(--bd);border-radius:12px}
+
+/* ══ 문자 발송 모달 ══ */
+.smsm-head{background:#faf5ff;border-bottom-color:#e9d5ff}
+.smsm-foot{
+  flex-shrink:0;display:flex;gap:8px;padding:12px 20px;
+  padding-bottom:max(12px,var(--safe-bot));
+  border-top:1px solid var(--bd);background:var(--wh);
+}
+.smsm-btn{flex:1;min-height:48px;padding:12px 10px;border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;border:none;white-space:nowrap}
+.smsm-btn:disabled{opacity:.5;cursor:default}
+.smsm-btn.ghost{flex:0 0 auto;padding:12px 18px;background:var(--wh);color:var(--mt);border:1px solid var(--bd)}
+.smsm-btn.test{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.smsm-btn.go{background:linear-gradient(135deg,#a855f7,#7e22ce);color:#fff;box-shadow:0 2px 10px rgba(126,34,206,.28)}
+.smsm-sec{margin-bottom:16px}
+.smsm-lbl{font-size:12px;font-weight:700;color:var(--mt);letter-spacing:.04em;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.smsm-reset{margin-left:auto;padding:5px 11px;border-radius:7px;border:1px solid var(--bd);background:var(--wh);color:var(--mt);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;min-height:30px}
+.smsm-reset:hover{background:#f8f9fa}
+.smsm-to{display:flex;flex-wrap:wrap;gap:6px}
+.smsm-to-item{display:inline-flex;align-items:center;gap:6px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;color:#6d28d9}
+.smsm-to-item .p{font-family:monospace;font-weight:600;color:#7c3aed;opacity:.85}
+.smsm-ta{width:100%;min-height:130px;resize:vertical;border:1px solid #e9d5ff;border-radius:10px;padding:12px 14px;font-size:16px;font-family:inherit;line-height:1.8;color:var(--tx);background:var(--wh);outline:none;-webkit-appearance:none}
+.smsm-ta:focus{border-color:#a855f7}
+.smsm-hint{font-size:11.5px;color:var(--mt);line-height:1.8;margin-top:7px}
+.smsm-hint code{background:#f5f3ff;border:1px solid #ddd6fe;border-radius:5px;padding:1px 6px;font-size:11px;color:#6d28d9;font-weight:700}
+.smsm-prev{background:#fafafa;border:1px dashed var(--bd);border-radius:10px;padding:13px 14px;font-size:13.5px;line-height:1.85;white-space:pre-wrap;word-break:break-word;color:var(--tx)}
+.smsm-meta{font-size:11.5px;color:var(--mt);margin-top:8px;line-height:1.8}
+.smsm-meta b{color:var(--tx)}
+.smsm-kind{font-size:11px;font-weight:800;padding:2px 8px;border-radius:5px;background:#ecfdf5;border:1px solid #a7f3d0;color:#047857}
+.smsm-kind.lms{background:#fffbeb;border-color:#fde68a;color:#b45309}
+.smsm-warn{display:none;font-size:12px;font-weight:700;line-height:1.8;background:#fffbeb;border:1px solid #fde68a;color:#b45309;border-radius:11px;padding:11px 13px;margin-bottom:16px;word-break:keep-all}
+.smsm-warn.show{display:block}
+.smsm-result{display:none;border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.85;margin-top:4px;word-break:keep-all}
+.smsm-result.show{display:block}
+.smsm-result.wait{background:#f8f9fa;border:1px solid var(--bd);color:var(--mt);text-align:center}
+.smsm-result.ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
+.smsm-result.ng{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+.smsm-result b{font-weight:800}
+.smsm-result ul{margin:8px 0 0 18px;padding:0}
+.smsm-result li{margin-bottom:3px}
 
 /* ══ 모바일 ══ */
 .m-header{background:linear-gradient(135deg,#f472b6,#db2777);color:#fff;padding:calc(16px + var(--safe-top)) 18px 16px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(219,39,119,.2);}
@@ -193,13 +239,15 @@ body{
 .m-search-input{width:100%;padding:11px 12px 11px 37px;border:1px solid var(--bd);border-radius:10px;font-size:16px;font-family:inherit;color:var(--tx);background:var(--bg);outline:none;-webkit-appearance:none;min-height:44px;}
 .m-search-input:focus{border-color:var(--pink);background:var(--wh)}
 .m-filter-selects{display:flex;gap:8px;margin-bottom:10px}
-.m-filter-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.m-filter-bottom{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .m-filter-select{flex:1;padding:10px 30px 10px 12px;border:1px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit;color:var(--tx);background:var(--bg);cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236e6e73' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;min-height:44px;}
 .m-filter-select:focus{border-color:var(--pink)}
-.m-count{font-size:12px;color:var(--mt);white-space:nowrap;flex-shrink:0}
+.m-count{font-size:12px;color:var(--mt);white-space:nowrap;flex-shrink:0;margin-right:auto}
 .m-count strong{color:var(--tx);font-weight:700}
 .m-bulk-btn{display:flex;align-items:center;gap:6px;padding:10px 14px;background:var(--pink);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;min-height:44px;flex-shrink:0;}
 .m-bulk-btn:active{background:var(--pink-dk)}
+.m-bulk-btn.sms{background:linear-gradient(135deg,#a855f7,#7e22ce)}
+.m-bulk-btn.sms:active{opacity:.85}
 .m-card-list{padding:12px 14px calc(14px + var(--safe-bot));display:flex;flex-direction:column;gap:10px;}
 .m-portal-card{background:var(--wh);border:1px solid var(--bd);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04);}
 .m-card-head{padding:14px 16px;border-bottom:1px solid #fdf2f8;display:flex;align-items:center;gap:12px;}
@@ -218,18 +266,23 @@ body{
 .m-btn-preview:active{background:#fce7f3}
 .m-btn-sms{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 10px;background:linear-gradient(135deg,#fdf4ff,#c084fc);color:#7e22ce;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;min-height:48px;box-shadow:0 2px 8px rgba(192,132,252,.25);transition:opacity .15s;}
 .m-btn-sms:active{opacity:.85}
+.m-btn-sms.off{background:#f4f4f5;color:#a1a1aa;box-shadow:none;cursor:default}
+.m-btn-sms.off:active{opacity:1}
 .m-empty{text-align:center;padding:48px 20px;color:var(--mt);font-size:13px}
 
 @media(max-width:768px){
   .desktop-only{display:none!important}.mobile-only{display:block!important}
   .fbm-overlay.open{padding:0;align-items:flex-end}
   .fbm{width:100%;max-height:92vh;border-radius:18px 18px 0 0}
-  .fbm-body{padding:16px 15px calc(22px + var(--safe-bot))}
+  .fbm-body{padding:16px 15px 22px}
   .fbm-head{padding:14px 16px}
+  .smsm-foot{padding:10px 15px;padding-bottom:max(10px,var(--safe-bot))}
+  .smsm-btn{font-size:13px;padding:12px 8px}
+  .smsm-btn.ghost{padding:12px 14px}
 }
 @media(min-width:769px){.mobile-only{display:none!important}.desktop-only{display:block!important}}
 @media(min-width:769px) and (max-width:1024px){.card-grid{grid-template-columns:repeat(2,1fr)}.main{padding:20px 24px}}
-@media(max-width:360px){.m-filter-selects{flex-direction:column}}
+@media(max-width:360px){.m-filter-selects{flex-direction:column}.smsm-btn{font-size:12.5px}}
 @media(max-width:768px) and (orientation:landscape){.m-card-list{display:grid;grid-template-columns:1fr 1fr;align-items:start}.m-card-list .m-empty{grid-column:1/-1}}
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
@@ -260,12 +313,13 @@ body{
         <div class="page-header-avatar">📊</div>
         <div class="page-header-text">
           <h1>학생 개별 학습 리포트</h1>
-          <p>피드백을 작성하고, 링크를 복사해 문자로 학부모님께 공유하세요. 로그인 없이 바로 열립니다.</p>
+          <p>피드백을 작성하고, 학부모님께 문자로 리포트 링크를 바로 보내세요. 링크는 로그인 없이 열립니다.</p>
         </div>
       </div>
       <div class="page-header-stat">
         <div class="hstat"><div class="hstat-num" id="d-statTotal">—</div><div class="hstat-lbl">전체 학생</div></div>
         <div class="hstat"><div class="hstat-num" id="d-statFiltered">—</div><div class="hstat-lbl">표시 중</div></div>
+        <div class="hstat"><div class="hstat-num" id="d-statPhone">—</div><div class="hstat-lbl">번호 등록</div></div>
       </div>
     </div>
 
@@ -273,7 +327,8 @@ body{
       <div class="guide-icon">💡</div>
       <div class="guide-txt">
         <strong style="font-size:15px;">보기 전용 · 로그인 불필요 · 피드백·테스트 자동 연동</strong><br>
-        피드백 버튼으로 작성한 내용은 학부모 리포트 첫 화면에 바로 표시됩니다. 학생 상세 페이지에서 작성한 피드백과도 같이 연동됩니다.
+        피드백 버튼으로 작성한 내용은 학부모 리포트 첫 화면에 바로 표시됩니다. 학생 상세 페이지에서 작성한 피드백과도 같이 연동됩니다.<br>
+        <span style="color:#7e22ce;">📨 <b>문자 발송</b>은 학생 관리에 등록된 <b>학부모 전화번호</b>로 바로 나갑니다. 번호가 없으면 버튼이 잠깁니다.</span>
         <span class="guide-url" id="d-baseUrlDisplay">불러오는 중...</span>
       </div>
     </div>
@@ -295,6 +350,10 @@ body{
       <button class="bulk-btn" onclick="copyAllLinks()">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         전체 링크 복사
+      </button>
+      <button class="bulk-btn sms" onclick="smsOpenBulk()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        전체 문자 발송
       </button>
     </div>
     <div class="card-grid" id="d-cardGrid">
@@ -327,19 +386,21 @@ body{
     <div class="m-title-avatar">📊</div>
     <div class="m-title-text">
       <h1>학생 개별 학습 리포트</h1>
-      <p>피드백을 작성하고 링크를 학부모님께 공유하세요.</p>
+      <p>피드백을 쓰고, 학부모님께 문자로 바로 보내세요.</p>
     </div>
   </div>
 
   <div class="m-stat-row">
     <div class="m-stat"><div class="m-stat-num" id="m-statTotal">—</div><div class="m-stat-lbl">전체 학생</div></div>
     <div class="m-stat" style="border-left:1px solid var(--bd)"><div class="m-stat-num" id="m-statFiltered">—</div><div class="m-stat-lbl">표시 중</div></div>
+    <div class="m-stat" style="border-left:1px solid var(--bd)"><div class="m-stat-num" id="m-statPhone">—</div><div class="m-stat-lbl">번호 등록</div></div>
   </div>
   <div class="m-guide">
     <div class="m-guide-icon">💡</div>
     <div class="m-guide-txt">
       <strong>보기 전용 · 로그인 불필요</strong><br>
-      피드백은 학부모 리포트 첫 화면에 표시됩니다.
+      피드백은 학부모 리포트 첫 화면에 표시됩니다.<br>
+      <span style="color:#7e22ce">📨 문자는 <b>학부모 전화번호</b>로 바로 발송됩니다.</span>
       <span class="m-guide-url" id="m-baseUrlDisplay">불러오는 중...</span>
     </div>
   </div>
@@ -363,6 +424,10 @@ body{
       <button class="m-bulk-btn" onclick="copyAllLinks()">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         전체복사
+      </button>
+      <button class="m-bulk-btn sms" onclick="smsOpenBulk()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        전체문자
       </button>
     </div>
   </div>
@@ -392,6 +457,45 @@ body{
       </div>
       <div class="fbm-list-lbl">작성된 피드백</div>
       <div id="fbmList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 문자 발송 모달 -->
+<div class="fbm-overlay" id="smsOverlay" onclick="smsBgClose(event)">
+  <div class="fbm" role="dialog" aria-modal="true" aria-labelledby="smsTitle">
+    <div class="fbm-head smsm-head">
+      <div class="fbm-title" id="smsTitle">📨 문자 발송<span id="smsSub"></span></div>
+      <button class="fbm-close" onclick="smsClose()" aria-label="닫기">✕</button>
+    </div>
+    <div class="fbm-body">
+      <div class="smsm-warn" id="smsWarn"></div>
+
+      <div class="smsm-sec">
+        <div class="smsm-lbl">받는 사람 (학부모)<span id="smsCount"></span></div>
+        <div class="smsm-to" id="smsTo"></div>
+      </div>
+
+      <div class="smsm-sec">
+        <div class="smsm-lbl">문자 내용<button class="smsm-reset" onclick="smsResetTpl()">기본 문구로 되돌리기</button></div>
+        <textarea class="smsm-ta" id="smsTpl" oninput="smsUpdateMeta()"></textarea>
+        <div class="smsm-hint">
+          <code>{이름}</code> <code>{학년}</code> <code>{링크}</code> 를 넣으면 학생마다 자동으로 바뀝니다. 수정한 문구는 이 브라우저에 기억됩니다.
+        </div>
+      </div>
+
+      <div class="smsm-sec">
+        <div class="smsm-lbl">미리보기<span class="smsm-kind" id="smsKind">SMS</span></div>
+        <div class="smsm-prev" id="smsPrev"></div>
+        <div class="smsm-meta" id="smsMeta"></div>
+      </div>
+
+      <div class="smsm-result" id="smsResult"></div>
+    </div>
+    <div class="smsm-foot">
+      <button class="smsm-btn ghost" onclick="smsClose()">취소</button>
+      <button class="smsm-btn test" id="smsTestBtn" onclick="smsSend(true)">🔍 테스트 검사</button>
+      <button class="smsm-btn go" id="smsGoBtn" onclick="smsSend(false)">📨 실제 발송</button>
     </div>
   </div>
 </div>
@@ -444,6 +548,8 @@ async function loadStudents(){
       return String(vb).localeCompare(String(va));
     });
     ['d-statTotal','m-statTotal'].forEach(id=>setTxt(id,allStudents.length));
+    const withPhone=allStudents.filter(s=>phoneOf(s)).length;
+    ['d-statPhone','m-statPhone'].forEach(id=>setTxt(id,withPhone));
     populateSubjects();
     filterStudents();
   }catch(err){
@@ -525,18 +631,210 @@ window.filterStudents=function(){
   renderDesktop();renderMobile();
 };
 
-function makeSmsBody(name,grade,url){
-  return `[인후쌤의 과학 수업 관리 시스템] ${name} 학생(${grade}) 학습 리포트\n💬 선생님 피드백과 테스트 결과를 확인하세요.\n🔗 ${url}`;
+/* ════════════════════════════════════════════════════════════════
+   문자 발송 — /api/send-sms (Vercel 서버) 를 통해 솔라피로 나간다
+   ────────────────────────────────────────────────────────────────
+   · 브라우저는 솔라피를 직접 부르지 않는다 (CORS · Secret 노출 방지)
+   · 로그인한 선생님의 Firebase ID 토큰을 함께 보내 서버가 검증한다
+   · 학부모 번호는 students 문서의 phone 필드를 쓴다
+     (미입력 시 '-' 로 저장돼 있으므로 형식 검사로 걸러낸다)
+════════════════════════════════════════════════════════════════ */
+const SMS_API='/api/send-sms';
+const SMS_TPL_KEY='beta-science.smsTpl.v1';
+const SMS_SUBJECT='아이들 과학관';
+const SMS_TPL_DEFAULT='[아이들 과학관]\n{이름} 학생 학습 리포트입니다.\n선생님 피드백과 테스트 결과를 확인해 주세요.\n\n{링크}';
+const SMS_MAX=50;                 // 솔라피 개인계정 일일 한도
+const SMS_BYTE_SMS=90;            // 이 이하 SMS, 넘으면 LMS
+const SMS_BYTE_MAX=1900;          // LMS 본문 상한
+let smsTargets=[],smsSkipped=[],smsBusy=false;
+
+const digitsOf=v=>String(v==null?'':v).replace(/\D/g,'');
+function validPhone(v){const d=digitsOf(v);return /^01[016789]\d{7,8}$/.test(d)?d:'';}
+function phoneOf(s){return validPhone(s&&s.phone);}
+function fmtPhone(d){
+  if(!d)return'';
+  if(d.length===11)return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7);
+  if(d.length===10)return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6);
+  return d;
 }
-window.sendSms=function(name,grade,url){
-  const body=encodeURIComponent(makeSmsBody(name,grade,url));
-  const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if(isMobile){
-    window.location.href=`sms:?&body=${body}`;
-  }else{
-    const txt=makeSmsBody(name,grade,url);
-    if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>showToast('📋 문자 내용 복사 완료! 문자 앱에 붙여넣기 하세요.'));}
-    else{const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('📋 문자 내용 복사 완료! 문자 앱에 붙여넣기 하세요.');}
+function maskPhone(d){return d?d.slice(0,3)+'-****-'+d.slice(-4):'';}
+// 통신사 기준 바이트 수 (한글 2바이트) — 서버와 동일한 규칙
+function byteLen(s){let n=0;for(const ch of String(s==null?'':s))n+=ch.charCodeAt(0)>0x7f?2:1;return n;}
+function urlOf(s){return BASE_URL+(s.id||s.fireId);}
+function renderTpl(tpl,s){
+  return String(tpl==null?'':tpl)
+    .split('{이름}').join(s.name||'')
+    .split('{학년}').join(s.grade||'')
+    .split('{링크}').join(urlOf(s));
+}
+function loadTpl(){
+  try{const v=localStorage.getItem(SMS_TPL_KEY);if(v&&v.trim())return v;}catch(e){}
+  return SMS_TPL_DEFAULT;
+}
+function saveTpl(v){try{localStorage.setItem(SMS_TPL_KEY,v);}catch(e){}}
+
+window.smsOpen=function(fireId){
+  const s=allStudents.find(x=>x.fireId===fireId);
+  if(!s){showToast('⚠️ 학생 정보를 찾을 수 없습니다');return;}
+  smsStart([s],`${s.name||'이름없음'} · ${s.grade||'—'}`);
+};
+window.smsOpenBulk=function(){
+  if(!filtered.length){showToast('⚠️ 표시된 학생이 없습니다');return;}
+  smsStart(filtered,`현재 표시 중인 ${filtered.length}명`);
+};
+function smsStart(list,subLabel){
+  const ok=[],ng=[];
+  list.forEach(s=>{const p=phoneOf(s);if(p)ok.push({s,p});else ng.push(s);});
+  smsTargets=ok;smsSkipped=ng;
+
+  document.getElementById('smsSub').textContent=subLabel||'';
+  document.getElementById('smsTpl').value=loadTpl();
+
+  // 보낼 수 없는 학생 안내
+  const warn=document.getElementById('smsWarn');
+  const bits=[];
+  if(ng.length){
+    const names=ng.slice(0,8).map(x=>e(x.name||'이름없음')).join(', ');
+    bits.push(`📵 <b>학부모 번호가 없어 제외된 학생 ${ng.length}명</b><br>${names}${ng.length>8?` 외 ${ng.length-8}명`:''}<br><span style="font-weight:600">학생 관리 → ✏️ 수정에서 학부모 전화번호를 입력하면 발송됩니다.</span>`);
+  }
+  if(ok.length>SMS_MAX){
+    bits.push(`⚠️ 한 번에 최대 <b>${SMS_MAX}명</b>까지 보낼 수 있습니다. 검색·필터로 나눠서 보내주세요. (현재 ${ok.length}명)`);
+  }
+  warn.innerHTML=bits.join('<hr style="border:none;border-top:1px solid #fde68a;margin:9px 0">');
+  warn.classList.toggle('show',bits.length>0);
+
+  // 받는 사람 칩
+  const toBox=document.getElementById('smsTo');
+  document.getElementById('smsCount').textContent=ok.length?`· ${ok.length}명`:'';
+  toBox.innerHTML=ok.length
+    ? ok.slice(0,60).map(x=>`<span class="smsm-to-item">${e(x.s.name||'이름없음')}<span class="p">${e(fmtPhone(x.p))}</span></span>`).join('')
+      +(ok.length>60?`<span class="smsm-to-item">외 ${ok.length-60}명</span>`:'')
+    : '<span style="font-size:13px;color:var(--mt)">보낼 수 있는 대상이 없습니다.</span>';
+
+  const box=document.getElementById('smsResult');
+  box.className='smsm-result';box.innerHTML='';
+  smsUpdateMeta();
+  smsBusy=false;smsToggleBtns(false);
+  document.getElementById('smsOverlay').classList.add('open');
+  const body=document.querySelector('#smsOverlay .fbm-body');
+  if(body)body.scrollTop=0;
+  document.body.style.overflow='hidden';
+}
+window.smsClose=function(){
+  if(smsBusy){showToast('⏳ 발송 중입니다. 잠시만 기다려주세요');return;}
+  document.getElementById('smsOverlay').classList.remove('open');
+  document.body.style.overflow='';
+  smsTargets=[];smsSkipped=[];
+};
+window.smsBgClose=function(ev){if(ev.target&&ev.target.id==='smsOverlay')smsClose();};
+window.smsResetTpl=function(){
+  document.getElementById('smsTpl').value=SMS_TPL_DEFAULT;
+  saveTpl(SMS_TPL_DEFAULT);
+  smsUpdateMeta();
+  showToast('↩️ 기본 문구로 되돌렸습니다');
+};
+window.smsUpdateMeta=function(){
+  const tpl=document.getElementById('smsTpl').value;
+  saveTpl(tpl);
+  const sample=smsTargets.length?smsTargets[0].s:{name:'홍길동',grade:'고등1학년',id:'h00000',fireId:'sample'};
+  const text=renderTpl(tpl,sample);
+  document.getElementById('smsPrev').textContent=text||'(내용 없음)';
+
+  // 가장 긴 문자를 기준으로 종류·요금을 계산한다
+  let maxB=byteLen(text),over=0;
+  smsTargets.forEach(x=>{const b=byteLen(renderTpl(tpl,x.s));if(b>maxB)maxB=b;if(b>SMS_BYTE_MAX)over++;});
+  const isLms=maxB>SMS_BYTE_SMS;
+  const kindEl=document.getElementById('smsKind');
+  kindEl.textContent=isLms?'LMS (장문)':'SMS (단문)';
+  kindEl.className='smsm-kind'+(isLms?' lms':'');
+
+  const per=isLms?50:20;
+  const n=Math.min(smsTargets.length,SMS_MAX);
+  const parts=[
+    `길이 <b>${maxB}바이트</b> (SMS 기준 ${SMS_BYTE_SMS}바이트)`,
+    `대상 <b>${n}명</b>`,
+    `예상 요금 <b>약 ${(per*n).toLocaleString()}원</b> <span style="opacity:.7">(${isLms?'LMS':'SMS'} 건당 약 ${per}원 기준 · 참고값)</span>`
+  ];
+  if(over)parts.push(`<span style="color:#b91c1c">⚠️ 내용이 너무 긴 학생 ${over}명 (${SMS_BYTE_MAX}바이트 초과) — 문구를 줄여주세요</span>`);
+  document.getElementById('smsMeta').innerHTML=parts.join('<br>');
+
+  const goBtn=document.getElementById('smsGoBtn'),testBtn=document.getElementById('smsTestBtn');
+  const blocked=!smsTargets.length||smsTargets.length>SMS_MAX||!String(tpl||'').trim()||over>0;
+  if(!smsBusy){goBtn.disabled=blocked;testBtn.disabled=blocked;}
+};
+function smsToggleBtns(busy){
+  const ids=['smsGoBtn','smsTestBtn'];
+  ids.forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=busy;});
+  if(!busy)smsUpdateMeta();
+}
+window.smsSend=async function(dryRun){
+  if(smsBusy)return;
+  const tpl=document.getElementById('smsTpl').value;
+  if(!smsTargets.length){showToast('⚠️ 보낼 대상이 없습니다');return;}
+  if(!String(tpl||'').trim()){showToast('⚠️ 문자 내용을 입력해주세요');return;}
+  if(smsTargets.length>SMS_MAX){showToast(`⚠️ 한 번에 ${SMS_MAX}명까지만 보낼 수 있습니다`);return;}
+  if(!dryRun){
+    const first=smsTargets[0];
+    const msg=`아래 내용으로 학부모님 ${smsTargets.length}명에게 실제로 문자를 발송합니다.\n요금이 발생하며 발송 후 취소할 수 없습니다.\n\n─────────────\n${renderTpl(tpl,first.s)}\n─────────────\n\n계속할까요?`;
+    if(!confirm(msg))return;
+  }
+  const u=auth.currentUser;
+  if(!u){showToast('⚠️ 로그인이 필요합니다. 새로고침 후 다시 시도해주세요');return;}
+
+  smsBusy=true;smsToggleBtns(true);
+  const box=document.getElementById('smsResult');
+  box.className='smsm-result show wait';
+  box.innerHTML=`<div class="spinner" style="margin:0 auto 10px"></div>${dryRun?'검사 중입니다...':'발송 중입니다. 창을 닫지 마세요...'}`;
+  if(typeof box.scrollIntoView==='function'){try{box.scrollIntoView({block:'nearest'});}catch(err){}}
+
+  try{
+    const idToken=await u.getIdToken();
+    const res=await fetch(SMS_API,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        idToken,
+        dryRun:!!dryRun,
+        subject:SMS_SUBJECT,
+        messages:smsTargets.map(x=>({name:x.s.name||'이름없음',to:x.p,text:renderTpl(tpl,x.s)}))
+      })
+    });
+    let d={};
+    try{d=await res.json();}catch(err){d={};}
+
+    if(!res.ok||d.ok===false){
+      const msg=d.error||`서버 오류 (HTTP ${res.status})`;
+      box.className='smsm-result show ng';
+      box.innerHTML=`<b>❌ ${e(msg)}</b>${d.hint?`<br><span style="font-weight:600">${e(d.hint)}</span>`:''}`
+        +(Array.isArray(d['실패목록'])&&d['실패목록'].length?`<ul>${d['실패목록'].map(f=>`<li>${e(f.name||'')} — ${e(f.reason||'')}</li>`).join('')}</ul>`:'');
+      showToast('⚠️ 발송하지 못했습니다');
+      return;
+    }
+
+    const fails=Array.isArray(d['실패목록'])?d['실패목록']:[];
+    if(dryRun){
+      box.className='smsm-result show ok';
+      box.innerHTML=`<b>🔍 검사 완료 — 요금은 발생하지 않았습니다</b><br>`
+        +`보낼 수 있는 대상 <b>${d['발송대상']!=null?d['발송대상']:smsTargets.length}명</b> · 종류 <b>${e(d['종류']||'')}</b><br>`
+        +`발신번호 <b>${e(d['발신번호']||'')}</b>`
+        +(fails.length?`<ul>${fails.map(f=>`<li>${e(f.name||'')} — ${e(f.reason||'')}</li>`).join('')}</ul>`:'')
+        +`<br><span style="font-weight:600">문제가 없으면 아래 <b>📨 실제 발송</b>을 눌러주세요.</span>`;
+      showToast('✅ 검사 완료 — 이상 없습니다');
+    }else{
+      const okN=d['성공']!=null?d['성공']:0;
+      const ngN=d['실패']!=null?d['실패']:fails.length;
+      box.className='smsm-result show '+(ngN?'ng':'ok');
+      box.innerHTML=`<b>${ngN?'⚠️':'🎉'} 발송 완료 — 성공 ${okN}건${ngN?` · 실패 ${ngN}건`:''}</b>`
+        +(d['잔액']?`<br>남은 잔액 <b>${e(d['잔액'])}</b>`:'')
+        +(fails.length?`<ul>${fails.map(f=>`<li>${e(f.name||'')} — ${e(f.reason||'')}</li>`).join('')}</ul>`:'');
+      showToast(ngN?`⚠️ 성공 ${okN}건 · 실패 ${ngN}건`:`🎉 ${okN}건 발송 완료!`);
+    }
+  }catch(err){
+    box.className='smsm-result show ng';
+    box.innerHTML=`<b>❌ 연결 실패</b><br>${e(err&&err.message?err.message:'알 수 없는 오류')}<br><span style="font-weight:600">인터넷 연결을 확인하거나 잠시 후 다시 시도해주세요.</span>`;
+    showToast('⚠️ 연결에 실패했습니다');
+  }finally{
+    smsBusy=false;smsToggleBtns(false);
   }
 };
 
@@ -552,17 +850,28 @@ function renderDesktop(){
     const url=BASE_URL+(s.id||s.fireId),grade=s.grade||'';
     const gradeCls=gradeClassOf(grade);
     const initial=(s.name||'?').charAt(0);
-    const fid=e(s.fireId),safeUrl=e(url),safeName=e(s.name||''),safeGrade=e(grade);
+    const fid=e(s.fireId),safeUrl=e(url),safeName=e(s.name||'');
     const n=fbOf(s.fireId).length;
+    const ph=phoneOf(s);
+    const phChip=ph
+      ? `<span class="ph-chip" title="학부모 전화번호">📱 ${e(fmtPhone(ph))}</span>`
+      : `<span class="ph-chip none" title="학생 관리에서 학부모 전화번호를 입력하세요">📵 번호 없음</span>`;
+    const smsBtn=ph
+      ? `<button class="btn-sms" onclick="smsOpen('${fid}')">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            문자 발송
+         </button>`
+      : `<button class="btn-sms off" disabled title="학생 관리에서 학부모 전화번호를 입력해주세요">📵 번호 미등록</button>`;
     return`<div class="portal-card">
       <div class="card-head">
         <div class="avatar">${e(initial)}</div>
         <div>
           <div class="s-name">${safeName}</div>
           <div class="s-meta">
-            <span class="grade-chip ${gradeCls}">${safeGrade}</span>
+            <span class="grade-chip ${gradeCls}">${e(grade)}</span>
             ${s.subject?`<span class="id-chip" style="background:#f0fdf4;border-color:#bbf7d0;color:#166534">${e(s.subject)}</span>`:''}
             <span class="id-chip">${e(s.id||'-')}</span>
+            ${phChip}
           </div>
         </div>
       </div>
@@ -574,10 +883,7 @@ function renderDesktop(){
         <button class="btn-fb" onclick="fbmOpen('${fid}')">💬 피드백 <span class="fb-cnt ${n?'':'zero'}">${n}</span></button>
         <div class="btn-row">
           <a class="btn-preview" href="${safeUrl}" target="_blank" rel="noopener">👁 미리보기</a>
-          <button class="btn-sms" onclick="sendSms('${safeName}','${safeGrade}','${safeUrl}')">
-            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            문자 발송
-          </button>
+          ${smsBtn}
         </div>
       </div>
     </div>`;
@@ -592,17 +898,28 @@ function renderMobile(){
     const url=BASE_URL+(s.id||s.fireId),grade=s.grade||'';
     const gradeCls=gradeClassOf(grade);
     const initial=(s.name||'?').charAt(0);
-    const fid=e(s.fireId),safeUrl=e(url),safeName=e(s.name||''),safeGrade=e(grade);
+    const fid=e(s.fireId),safeUrl=e(url),safeName=e(s.name||'');
     const n=fbOf(s.fireId).length;
+    const ph=phoneOf(s);
+    const phChip=ph
+      ? `<span class="ph-chip">📱 ${e(fmtPhone(ph))}</span>`
+      : `<span class="ph-chip none">📵 번호 없음</span>`;
+    const smsBtn=ph
+      ? `<button class="m-btn-sms" onclick="smsOpen('${fid}')">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            문자 발송
+         </button>`
+      : `<button class="m-btn-sms off" disabled>📵 번호 미등록</button>`;
     return`<div class="m-portal-card">
       <div class="m-card-head">
         <div class="m-avatar">${e(initial)}</div>
         <div>
           <div class="m-s-name">${safeName}</div>
           <div class="m-s-meta">
-            <span class="grade-chip ${gradeCls}">${safeGrade}</span>
+            <span class="grade-chip ${gradeCls}">${e(grade)}</span>
             ${s.subject?`<span class="id-chip" style="background:#f0fdf4;border-color:#bbf7d0;color:#166534">${e(s.subject)}</span>`:''}
             <span class="id-chip">${e(s.id||'-')}</span>
+            ${phChip}
           </div>
         </div>
       </div>
@@ -614,10 +931,7 @@ function renderMobile(){
         <button class="m-btn-fb" onclick="fbmOpen('${fid}')">💬 피드백 <span class="fb-cnt ${n?'':'zero'}">${n}</span></button>
         <div class="m-btn-row">
           <a class="m-btn-preview" href="${safeUrl}" target="_blank" rel="noopener">👁 미리보기</a>
-          <button class="m-btn-sms" onclick="sendSms('${safeName}','${safeGrade}','${safeUrl}')">
-            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            문자 발송
-          </button>
+          ${smsBtn}
         </div>
       </div>
     </div>`;
@@ -636,6 +950,8 @@ window.fbmOpen=function(fireId){
   document.getElementById('fbmCancelBtn').style.display='none';
   fbmRenderList();
   document.getElementById('fbmOverlay').classList.add('open');
+  const body=document.querySelector('#fbmOverlay .fbm-body');
+  if(body)body.scrollTop=0;
   document.body.style.overflow='hidden';
 };
 window.fbmClose=function(){
@@ -644,7 +960,11 @@ window.fbmClose=function(){
   fbmStudent=null;fbmEditId=null;
 };
 window.fbmBgClose=function(ev){if(ev.target&&ev.target.id==='fbmOverlay')fbmClose();};
-document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&fbmStudent)fbmClose();});
+document.addEventListener('keydown',ev=>{
+  if(ev.key!=='Escape')return;
+  if(document.getElementById('smsOverlay').classList.contains('open')){smsClose();return;}
+  if(fbmStudent)fbmClose();
+});
 
 function fbmRenderList(){
   const el=document.getElementById('fbmList');
@@ -746,7 +1066,7 @@ window.copyAllLinks=async function(){
 };
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 function setTxt(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
-function e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function e(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 // regDate 값을 비교 가능한 형태로 변환 (Timestamp / Date / 숫자 / 문자열 모두 대응)
 function regVal(s){
   const r=s&&s.regDate;
