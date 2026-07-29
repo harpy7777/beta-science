@@ -83,12 +83,57 @@ function json(body, status = 200) {
   });
 }
 
+/* ── 숫자·금액 처리 ────────────────────────────────────────────────
+   솔라피 응답에서 금액은 자리에 따라 숫자로 오기도 하고
+   { requested, replacement, refund, sum } 객체로 오기도 한다.
+   객체를 그대로 Number() 하면 NaN 이 되므로 반드시 아래 함수로 꺼낸다. */
+function toNum(v) {
+  if (v === null || v === undefined || v === '') return null;  // Number(null)===0 함정 차단
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+// 숫자 또는 {sum:...} 객체 → 숫자 (못 꺼내면 null)
+function pickAmount(v) {
+  if (v == null) return null;
+  if (typeof v === 'object') return toNum(v.sum);
+  return toNum(v);
+}
+
+// 1234 → "1,234원"  (ICU 환경 의존 없이 직접 콤마 처리)
+function won(n) {
+  const v = Math.round(Number(n) || 0);
+  const sign = v < 0 ? '-' : '';
+  return sign + String(Math.abs(v)).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '원';
+}
+
 /* ── 솔라피 인증 헤더 (HMAC-SHA256) ───────────────────────────────── */
 function solapiAuth(apiKey, apiSecret) {
   const date = new Date().toISOString();
   const salt = crypto.randomBytes(32).toString('hex');
   const signature = crypto.createHmac('sha256', apiSecret).update(date + salt).digest('hex');
   return `HMAC-SHA256 apiKey=${apiKey}, date=${date}, salt=${salt}, signature=${signature}`;
+}
+
+/* ── 현재 잔액 조회 ────────────────────────────────────────────────
+   발송 응답(groupInfo)에 들어있는 balance/point 는 "이번 발송 차감액"이지
+   계좌 잔액이 아니다. 남은 잔액은 반드시 이 전용 API로 다시 물어본다.
+   실패해도 발송 결과에는 영향을 주지 않도록 null 만 돌려준다. */
+async function fetchBalance(apiKey, apiSecret) {
+  try {
+    const r = await fetch(SOLAPI_BALANCE, {
+      headers: { Authorization: solapiAuth(apiKey, apiSecret) }
+    });
+    if (!r.ok) return null;
+    const d = await r.json().catch(() => null);
+    if (!d || typeof d !== 'object') return null;
+    const b = toNum(d.balance);
+    const p = toNum(d.point);
+    if (b == null && p == null) return null;
+    return won((b || 0) + (p || 0));
+  } catch (e) {
+    return null;
+  }
 }
 
 /* ── 설정값 읽기 ──────────────────────────────────────────────────── */
@@ -173,7 +218,9 @@ export async function GET() {
       const d = await r.json().catch(() => ({}));
       if (r.ok) {
         body.솔라피연결 = '성공 ✅';
-        body.잔액 = `${Math.round(Number(d.balance || 0) + Number(d.point || 0))}원`;
+        const b = toNum(d.balance);
+        const p = toNum(d.point);
+        body.잔액 = (b == null && p == null) ? '조회 불가' : won((b || 0) + (p || 0));
       } else {
         body.ok = false;
         body.솔라피연결 = '실패 ❌ — API Key/Secret 을 다시 확인해주세요.';
@@ -201,7 +248,8 @@ export async function GET() {
        "dryRun": true                         // (선택) 실제로 보내지 않고 검사만
      }
    응답
-     { ok, 요청:N, 성공:N, 실패:N, 종류:"LMS", 실패목록:[...], 잔액:"..." }
+     { ok, 요청:N, 성공:N, 실패:N, 종류:"LMS", 실패목록:[...],
+       차감액:"34원", 잔액:"266원", groupId:"..." }
 ════════════════════════════════════════════════════════════════════ */
 export async function POST(req) {
   /* ① 설정 확인 */
@@ -329,16 +377,27 @@ export async function POST(req) {
     });
 
   const okCount = list.length - failedNamed.length;
-  const gi = data.groupInfo || {};
+  const gi = (data && typeof data.groupInfo === 'object' && data.groupInfo) ? data.groupInfo : {};
 
-  return json({
+  // 이번 발송으로 빠져나간 금액 (숫자/객체 두 형태 모두 대응)
+  const cb = pickAmount(gi.balance);
+  const cp = pickAmount(gi.point);
+  const charged = (cb == null && cp == null) ? null : (cb || 0) + (cp || 0);
+
+  // 남은 잔액은 전용 API로 재조회 (실패해도 발송 결과는 그대로 반환)
+  const balanceText = await fetchBalance(apiKey, apiSecret);
+
+  const out = {
     ok: true,
     요청: raw.length,
     성공: okCount,
     실패: failedNamed.length + bad.length,
     종류: kind,
-    실패목록: bad.concat(failedNamed),
-    잔액: gi.balance != null ? `${Math.round(Number(gi.balance) + Number(gi.point || 0))}원` : undefined,
-    groupId: gi.groupId || data.groupId || undefined
-  });
+    실패목록: bad.concat(failedNamed)
+  };
+  if (charged != null && charged > 0) out.차감액 = won(charged);
+  if (balanceText) out.잔액 = balanceText;
+  if (gi.groupId || data.groupId) out.groupId = gi.groupId || data.groupId;
+
+  return json(out);
 }
