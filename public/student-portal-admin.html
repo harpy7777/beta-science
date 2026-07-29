@@ -123,16 +123,30 @@ body{
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e293b;color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;z-index:9999;transition:transform .3s ease;pointer-events:none;max-width:calc(100vw - 32px);text-align:center;line-height:1.5;word-break:keep-all;box-shadow:0 4px 16px rgba(0,0,0,.2)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
+/* 모달이 하나라도 열려 있으면 뒤 페이지 스크롤을 잠근다.
+   전에는 style.overflow 를 직접 넣고 뺐는데, 모달 두 개가 겹치면
+   하나만 닫아도 잠금이 풀려 뒤 화면이 움직이거나
+   반대로 잠금이 남아 페이지가 굳는 일이 있었다. */
+body.modal-open{overflow:hidden}
+
 /* ══ 공용 모달 (피드백 · 문자) ══ */
-.fbm-overlay{display:none;position:fixed;inset:0;background:rgba(30,41,59,.45);z-index:9000;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);}
+/* backdrop-filter 사용 금지 — 크롬에서 합성 레이어가 만들어지면
+   그 안의 스크롤 상자(.fbm-body)가 한 번 스크롤한 뒤 멈추는 버그가 있다.
+   흐림 효과 대신 배경을 조금 더 진하게 해서 같은 느낌을 낸다. */
+.fbm-overlay{display:none;position:fixed;inset:0;background:rgba(30,41,59,.55);z-index:9000}
 .fbm-overlay.open{display:flex;align-items:center;justify-content:center;padding:20px}
-.fbm{background:var(--wh);border-radius:18px;width:min(620px,100%);max-height:min(86vh,860px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.fbm{background:var(--wh);border-radius:18px;width:min(620px,100%);max-height:min(86vh,860px);min-height:0;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)}
 .fbm-head{padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--pink-lt);flex-shrink:0}
 .fbm-title{font-size:15px;font-weight:700;color:var(--tx);min-width:0}
 .fbm-title span{display:block;font-size:11.5px;font-weight:600;color:var(--mt);margin-top:3px}
 .fbm-close{width:36px;height:36px;min-width:36px;border-radius:50%;border:none;background:var(--wh);color:var(--mt);font-size:16px;cursor:pointer;font-family:inherit;flex-shrink:0}
 .fbm-close:hover{background:#fce7f3;color:var(--pink)}
-.fbm-body{padding:18px 20px 22px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0}
+/* 이 페이지에서 스크롤되는 곳은 여기 하나뿐이다.
+   overscroll-behavior : 스크롤이 바깥으로 새어나가 크롬이 다른 요소에
+                         '걸리는(latch)' 것을 막는다
+   overflow-anchor     : 입력할 때마다 미리보기·요금이 다시 그려지는데
+                         크롬이 스크롤 위치를 멋대로 되돌리는 것을 막는다 */
+.fbm-body{padding:18px 20px 22px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;overflow-anchor:none;touch-action:pan-y;flex:1 1 auto;min-height:0}
 .fbm-editor{background:#fffbf5;border:1px solid #fed7aa;border-radius:12px;padding:14px;margin-bottom:18px}
 .fbm-editor-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
 .fbm-editor-lbl{font-size:12px;font-weight:700;color:#b45309}
@@ -515,6 +529,15 @@ const BASE_URL=window.location.origin+'/student-portal.html?id=';
   const el=document.getElementById(id);if(el)el.textContent=BASE_URL+'학생ID';
 });
 
+/* 열려 있는 모달 수를 실제로 세어 잠금을 맞춘다 (해제 누락·중복 방지) */
+function syncScrollLock(){
+  const open=document.querySelectorAll('.fbm-overlay.open').length>0;
+  document.body.classList.toggle('modal-open',open);
+  if(!open)document.body.style.overflow='';
+}
+document.addEventListener('visibilitychange',syncScrollLock);
+window.addEventListener('pageshow',syncScrollLock);
+
 let allStudents=[],filtered=[];
 let fbMap=new Map();      // 학생문서ID -> 피드백 항목 배열
 let fbUnsub=null;
@@ -718,13 +741,13 @@ function smsStart(list,subLabel){
   document.getElementById('smsOverlay').classList.add('open');
   const body=document.querySelector('#smsOverlay .fbm-body');
   if(body)body.scrollTop=0;
-  document.body.style.overflow='hidden';
+  syncScrollLock();
 }
 window.smsClose=function(){
   if(smsBusy){showToast('⏳ 발송 중입니다. 잠시만 기다려주세요');return;}
   document.getElementById('smsOverlay').classList.remove('open');
-  document.body.style.overflow='';
   smsTargets=[];smsSkipped=[];
+  syncScrollLock();
 };
 window.smsBgClose=function(ev){if(ev.target&&ev.target.id==='smsOverlay')smsClose();};
 window.smsResetTpl=function(){
@@ -952,12 +975,12 @@ window.fbmOpen=function(fireId){
   document.getElementById('fbmOverlay').classList.add('open');
   const body=document.querySelector('#fbmOverlay .fbm-body');
   if(body)body.scrollTop=0;
-  document.body.style.overflow='hidden';
+  syncScrollLock();
 };
 window.fbmClose=function(){
   document.getElementById('fbmOverlay').classList.remove('open');
-  document.body.style.overflow='';
   fbmStudent=null;fbmEditId=null;
+  syncScrollLock();
 };
 window.fbmBgClose=function(ev){if(ev.target&&ev.target.id==='fbmOverlay')fbmClose();};
 document.addEventListener('keydown',ev=>{
