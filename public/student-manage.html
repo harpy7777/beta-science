@@ -8,12 +8,54 @@
 <title>학생 관리 · 인후쌤의 과학 수업 관리 시스템</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { overflow-x: hidden; }
+
+/* ══════════════════════════════════════════════════════════════════
+   페이지 스크롤 구조 — 세로 스크롤 상자는 '문서(viewport)' 하나뿐이다
+   ──────────────────────────────────────────────────────────────────
+   [증상] 아이폰에서 모달과 무관하게 페이지 전체가 내려가지 않았다.
+        며칠간 "됐다 안 됐다" 하다가 결국 아예 안 내려갔다.
+
+   [원인 ①] html 과 body 에 overflow-x:hidden 이 동시에 걸려 있었다.
+        CSS 규칙상 한 축이 visible 이 아니면 다른 축의 visible 은
+        auto 로 승격된다. 즉 body 가 overflow-y:auto 인 '두 번째
+        스크롤 상자'가 되어 문서 스크롤러와 두 겹이 됐다.
+        iOS 는 이때 손가락을 어느 스크롤러에 붙일지 프레임마다 달라진다.
+        (내려갔다 안 내려갔다 한 이유)
+
+   [원인 ②] body 의 min-height:100vh
+        iOS 의 100vh 는 주소창이 접힌 상태 기준이라 실제 보이는 높이보다
+        크다. 두 겹 스크롤러와 겹치면 바깥 스크롤러의 스크롤 가능 높이가
+        0 으로 계산되는 프레임이 생긴다.
+
+   [원인 ③] body 의 overscroll-behavior:none
+        body 값은 뷰포트로 전파되어 스크롤 체이닝을 끊는다. ①②와 겹치면
+        스크롤이 아예 먹지 않는다.
+
+   [대책]
+   · body 에서 overflow-x:hidden · min-height:100vh ·
+     overscroll-behavior:none 을 모두 제거한다.
+   · 가로 스크롤 방지는 overflow-x:clip 으로 대체한다.
+     clip 은 스크롤 상자를 만들지 않으므로 overflow-y 가 auto 로
+     승격되지 않는다. (= 두 겹 스크롤러가 생기지 않는다)
+   · clip 미지원 구형 브라우저만 @supports 폴백으로 html 에 hidden 을
+     주고, body 는 어떤 경우에도 스크롤 상자로 만들지 않는다.
+   · 세로 스크롤은 문서(html) 하나만 담당한다.
+══════════════════════════════════════════════════════════════════ */
+html {
+  background: #fafafa;
+  -webkit-text-size-adjust: 100%;
+}
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
-  background: #fafafa; color: #1d1d1f; min-height: 100vh;
+  background: #fafafa; color: #1d1d1f;
   -webkit-font-smoothing: antialiased; visibility: hidden;
-  overscroll-behavior: none; overflow-x: hidden;
+  overflow-x: clip;              /* hidden 금지 — clip 은 스크롤 상자를 만들지 않는다 */
+}
+/* 폴백: overflow:clip 미지원 브라우저에서만 동작.
+   가로 차단은 문서 스크롤러(html)가 담당하고 body 는 건드리지 않는다. */
+@supports not (overflow: clip) {
+  html { overflow-x: hidden; }
+  body { overflow-x: visible; }
 }
 /* 학생 이름·수업 내용에 긴 단어가 들어와도 카드가 밀리지 않게 */
 .sm-name, .bt-nm, .sm-stat, .sm-meta { overflow-wrap: anywhere; }
@@ -50,7 +92,7 @@ body {
 
 /* ── Layout ── */
 .wrap {
-  max-width: 1100px; margin: 0 auto;
+  max-width: 1100px; margin: 0 auto; min-width: 0;
   padding: 1.2rem 0.9rem 5rem;
   padding-bottom: max(5rem, calc(4rem + env(safe-area-inset-bottom)));
   padding-left: max(0.9rem, env(safe-area-inset-left));
@@ -109,9 +151,23 @@ input[type="date"]::-webkit-date-and-time-value { text-align: left; margin: 0; }
 input[type="date"]::-webkit-datetime-edit { padding: 0; }
 input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; padding: 4px; }
 button, .sm-btn, .gf-btn, label { touch-action: manipulation; }
-/* iOS 배경 스크롤 완전 차단 — overflow:hidden 만으로는 막히지 않는다.
-   position:fixed 로 body 자체를 얼리고, 닫을 때 JS 가 원래 위치로 되돌린다. */
-body.modal-open { position: fixed; left: 0; right: 0; width: 100%; overflow: hidden; }
+
+/* ══════════════════════════════════════════════════════════════════
+   모달 열림 잠금 — 문서 스크롤러(html)만 잠근다
+   ──────────────────────────────────────────────────────────────────
+   전에는 body 를 position:fixed 로 얼렸다. 그 방식은
+   ① 잠금이 한 번이라도 안 벗겨지면 페이지가 영구히 굳고
+   ② iOS 뒤로가기 캐시(bfcache)로 복귀하면 fixed 상태 그대로 되살아나
+      "지금은 아예 안 내려감" 상태가 된다.
+   지금은 클래스 하나만 붙였다 떼며, body 의 위치·인라인 스타일은
+   전혀 건드리지 않는다. 스크롤 위치도 그대로 유지된다.
+   추가로 JS 감시(MutationObserver + pageshow)가 잠금을 항상 실제
+   모달 개수와 맞춘다.
+══════════════════════════════════════════════════════════════════ */
+html.modal-open { overflow: hidden; overscroll-behavior: none; }
+/* 옛 방식의 흔적이 남아도 페이지가 굳지 않게 무력화 */
+body.modal-open { position: static; top: auto; left: auto; right: auto; width: auto; overflow: visible; }
+
 .cc-textarea {
   width: 100%; padding: 10px 12px; min-height: 44px;
   border: 1.5px solid #f3e8ff;
@@ -179,8 +235,9 @@ body.modal-open { position: fixed; left: 0; right: 0; width: 100%; overflow: hid
 }
 
 .sm-count { font-size:11px; color:#aeaeb2; margin-bottom:0.8rem; }
-.sm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
-.sm-card { background:#fff; border:1px solid #fce7f3; border-radius:16px; padding:1.1rem 1.2rem; transition:transform .18s, box-shadow .18s, border-color .18s; }
+/* min() — 화면이 240px보다 좁아도 가로로 삐져나가지 않는다 (clip 폴백 대비) */
+.sm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr)); gap:12px; }
+.sm-card { background:#fff; border:1px solid #fce7f3; border-radius:16px; padding:1.1rem 1.2rem; min-width:0; transition:transform .18s, box-shadow .18s, border-color .18s; }
 .sm-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(219,39,119,0.1); border-color:#fbcfe8; }
 .sm-card-top { display:flex; align-items:center; gap:11px; margin-bottom:0.8rem; }
 .sm-av { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; }
@@ -233,14 +290,10 @@ body.modal-open { position: fixed; left: 0; right: 0; width: 100%; overflow: hid
 /* ══════════════════════════════════════════════════════════════════
    모달 — 스크롤 규칙 (여기 한 곳에서만 정의한다)
    ──────────────────────────────────────────────────────────────────
-   [증상] 모바일에서 모달이 내려갔다 안 내려갔다 했다.
-   원인이 하나가 아니라 셋이었다.
-
-   ① body 잠금이 새어나갔다
-      body.modal-open { overflow:hidden } 만으로는 iOS 가 배경 스크롤을
-      막지 못한다. 페이지가 이미 내려가 있으면 손가락이 body 를 잡아
-      모달은 그대로 있고 뒤가 움직인다.
-      → body 를 position:fixed 로 얼리고 닫을 때 위치 복원 (JS syncBodyLock)
+   ① 배경 잠금은 html.modal-open { overflow:hidden } 하나로 끝낸다.
+      body 를 position:fixed 로 얼리지 않으므로 잠금이 남더라도
+      페이지가 굳지 않고, JS 감시가 즉시 되돌린다.
+      (위 '모달 열림 잠금' 블록 참고)
 
    ② max-height:100% (퍼센트 높이)
       flex 아이템의 퍼센트 높이는 iOS 주소창 높이 변화 때마다 다시
@@ -258,6 +311,7 @@ body.modal-open { position: fixed; left: 0; right: 0; width: 100%; overflow: hid
    · 스크롤 상자는 .sm-modal 하나뿐. 안쪽 목록은 전부 스크롤 없음.
    · 높이는 flex 가 확정. 퍼센트·vh 추측값 없음.
    · 제목·푸터는 sticky 로 고정, 좌우 여백까지 덮도록 음수 마진 사용.
+   · 이 블록의 값은 이번 수정에서 건드리지 않았다. (동작 검증된 부분)
 ══════════════════════════════════════════════════════════════════ */
 .sm-modal-bg {
   display:none; position:fixed; inset:0;
@@ -590,7 +644,32 @@ body.modal-open { position: fixed; left: 0; right: 0; width: 100%; overflow: hid
   .sm-warnline .wl-d { padding:7px 9px; font-size:11px; }
 }
 </style>
-<script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
+<script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script>
+<script>
+/* 스크롤 잠금 해제 안전장치 (모듈 로드 실패·bfcache 복귀 대비).
+   모듈 스크립트가 어떤 이유로 실행되지 않아도 페이지가 굳지 않게 한다. */
+(function(){
+  function unstick(){
+    try {
+      var r = document.documentElement, b = document.body;
+      var open = document.querySelectorAll('.sm-modal-bg.open').length > 0;
+      if (!open && r) r.classList.remove('modal-open');
+      if (!b) return;
+      b.classList.remove('modal-open');
+      var s = b.style;
+      if (s.position === 'fixed') s.position = '';
+      if (s.top) s.top = '';
+      if (s.left) s.left = '';
+      if (s.right) s.right = '';
+      if (s.width) s.width = '';
+      if (s.overflow) s.overflow = '';
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', unstick);
+  else unstick();
+  window.addEventListener('pageshow', unstick);
+})();
+</script></head>
 <body>
 
 <header class="header">
@@ -969,30 +1048,47 @@ let ccDraft = null, btDraft = null, smDraft = null;
 /* ════════════════════════════════════════════════════════════════════
    모달 열기/닫기 · 배경 스크롤 잠금 (한 곳에서만 관리한다)
    ──────────────────────────────────────────────────────────────────
-   [증상] 모바일에서 모달이 내려갔다 안 내려갔다 했다.
-   [원인] body.modal-open { overflow:hidden } 만으로는 iOS 가 배경
-        스크롤을 막지 못한다. 페이지가 이미 아래로 내려가 있으면
-        손가락이 body 를 잡아 모달은 그대로 있고 뒤가 움직인다.
-   [대책] 모달을 열 때 현재 스크롤 위치를 기억하고 body 를
-        position:fixed + top:-Ypx 로 완전히 얼린다.
-        닫을 때 기억한 위치로 정확히 되돌린다.
+   [예전 방식과 무엇이 다른가]
+   전에는 body 를 position:fixed 로 얼리고 스크롤 위치를 기억했다가
+   닫을 때 되돌렸다. 잠금이 한 번이라도 안 벗겨지면 페이지가 통째로
+   굳고, iOS 뒤로가기 캐시(bfcache)로 복귀하면 fixed 상태가 그대로
+   되살아나 아예 스크롤이 죽었다.
+
+   [지금 방식]
+   · 잠금은 html 에 클래스 하나(modal-open) 만 붙인다.
+     → CSS 는 html.modal-open { overflow:hidden } 뿐이다.
+   · body 의 위치·인라인 스타일은 절대 건드리지 않는다.
+     → 스크롤 위치가 그대로 남아 복원 계산이 필요 없다.
+   · 잠금 상태는 항상 '지금 열려 있는 .sm-modal-bg.open 개수'에서만
+     다시 계산한다. (syncBodyLock 이 유일한 판단 지점)
+   · 어떤 경로로 .open 이 바뀌어도 MutationObserver 가 syncBodyLock 을
+     호출하므로, 닫기 함수를 지나지 않는 경로가 생겨도 잠금이 남지 않는다.
+   · pageshow · visibilitychange · focus 에서도 다시 맞춘다. (bfcache 대비)
 ════════════════════════════════════════════════════════════════════ */
-let lockY = 0;
-function syncBodyLock() {
-  const open = document.querySelectorAll('.sm-modal-bg.open').length > 0;
-  const b = document.body;
-  const locked = b.classList.contains('modal-open');
-  if (open && !locked) {
-    lockY = window.pageYOffset || document.documentElement.scrollTop || 0;
-    b.style.top = '-' + lockY + 'px';
-    b.classList.add('modal-open');
-  } else if (!open && locked) {
-    b.classList.remove('modal-open');
-    b.style.top = '';
-    window.scrollTo(0, lockY);
-  }
+function anyModalOpen() {
+  return document.querySelectorAll('.sm-modal-bg.open').length > 0;
 }
-/* 모달을 열 때마다 스크롤 위치를 맨 위로 되돌린다.
+// 옛 방식(body position:fixed)의 흔적을 모두 지운다 — 페이지가 굳는 유일한 원인이었다
+function clearLegacyBodyLock() {
+  const b = document.body;
+  if (!b) return;
+  if (b.classList.contains('modal-open')) b.classList.remove('modal-open');
+  const s = b.style;
+  if (s.position === 'fixed') s.position = '';
+  if (s.top) s.top = '';
+  if (s.left) s.left = '';
+  if (s.right) s.right = '';
+  if (s.width) s.width = '';
+  if (s.overflow) s.overflow = '';
+}
+function syncBodyLock() {
+  clearLegacyBodyLock();
+  const r = document.documentElement;
+  if (!r) return;
+  if (anyModalOpen()) r.classList.add('modal-open');
+  else r.classList.remove('modal-open');
+}
+/* 모달을 열 때마다 모달 내부 스크롤을 맨 위로 되돌린다.
    (전에는 이전에 내려둔 위치가 남아 "중간부터 열리고 안 움직이는" 것처럼 보였다)
    레이아웃이 확정된 다음 프레임에서 한 번 더 0으로 맞춘다. */
 function showModalBg(id) {
@@ -1002,13 +1098,35 @@ function showModalBg(id) {
   const box = bg.querySelector('.sm-modal');
   if (box) box.scrollTop = 0;
   syncBodyLock();
-  if (box) requestAnimationFrame(() => { box.scrollTop = 0; });
+  if (box && typeof requestAnimationFrame === 'function') requestAnimationFrame(() => { box.scrollTop = 0; });
 }
 function hideModalBg(id) {
   const bg = document.getElementById(id);
   if (bg) bg.classList.remove('open');
   syncBodyLock();
 }
+/* 잠금 감시 — 닫기 함수를 지나지 않는 경로가 생겨도 잠금이 남지 않게 한다 */
+(function watchScrollLock() {
+  syncBodyLock();
+  const bgs = document.querySelectorAll('.sm-modal-bg');
+  if (typeof MutationObserver === 'function') {
+    const obs = new MutationObserver(() => syncBodyLock());
+    bgs.forEach(el => obs.observe(el, { attributes: true, attributeFilter: ['class', 'style'] }));
+  }
+  ['pageshow', 'visibilitychange', 'focus'].forEach(ev =>
+    window.addEventListener(ev, () => syncBodyLock(), { passive: true }));
+  /* 배경(모달 밖)을 문지를 때만 뒤 페이지가 따라 움직이지 않게 막는다.
+     모달 내부(.sm-modal) 스크롤은 그대로 통과시키고,
+     모달이 닫혀 있으면 즉시 통과 → 평소 페이지 스크롤에는 영향이 없다. */
+  bgs.forEach(bg => {
+    bg.addEventListener('touchmove', e => {
+      if (!bg.classList.contains('open')) return;
+      const t = e.target;
+      if (t && typeof t.closest === 'function' && t.closest('.sm-modal')) return;
+      if (e.cancelable) e.preventDefault();
+    }, { passive: false });
+  });
+})();
 
 function grabFields(ids) {
   const o = {};
