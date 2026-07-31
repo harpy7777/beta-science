@@ -208,12 +208,12 @@ body.parentview #hero { display: block; }
 .nlink:hover { color: #db2777; text-decoration: underline; }
 .col-hide { display: table-cell; }
 
-/* 학부모 화면에서 감추는 것들
-   - 성취기준 코드(내부 표기)
-   - 문항 수 / 정답률 (시험 단위 집계라 개념끼리 값이 겹쳐 오해를 부른다) */
-body.parentview .c-std,
+/* 학부모 화면에서 감추는 것
+   - 문항 수 / 정답률 (시험 단위 집계라 개념끼리 값이 겹쳐 오해를 부른다)
+   성취기준은 오히려 보여 준다. 교육부 고시 단위에 맞춰 관리한다는 근거가 된다. */
 body.parentview .c-num,
 body.parentview .c-rate { display: none; }
+.tbl-empty { padding: 1.5rem 0.6rem; text-align: center; color: #86868b; font-size: 13px; line-height: 1.75; }
 body.parentview #fieldPub,
 body.parentview #fieldGrain,
 body.parentview #ctrlNote { display: none; }
@@ -247,6 +247,10 @@ pre.dump {
   .brand { font-size: 13px; }
   .brand-sub { font-size: 10px; }
   .col-hide { display: none; }
+  /* 학부모 화면에서는 성취기준을 모바일에서도 남기되,
+     모든 줄에 반복되는 '고1 통합과학2' 접두는 접어 자리를 줄인다. */
+  body.parentview .c-std { display: table-cell; width: 84px; }
+  body.parentview .std-pre { display: none; }
   .tbl { font-size: 12px; }
   .tbl th, .tbl td { padding: 8px 6px; }
   .tbl .c-num   { width: 56px; }
@@ -474,6 +478,15 @@ pre.dump {
     var g = GRADE_LABEL[m[1]] || m[1];
     var subj = SUBJ_LABEL[m[2]] || m[2];
     return g + ' ' + subj + ' ' + Number(m[3]) + '단원-' + Number(m[4]);
+  }
+
+  /** 표 안에서 쓸 성취기준 표기.
+      '고1 통합과학2 1단원-3' 에서 앞부분은 모바일에서 접을 수 있게 span 으로 분리한다. */
+  function stdCell(code) {
+    var s = stdLabel(code);
+    var m = s.match(/^(.*?)(\d+단원-\d+)$/);
+    if (!m) return esc(s);
+    return '<span class="std-pre">' + esc(m[1]) + '</span>' + esc(m[2]);
   }
 
   function log(label, obj) {
@@ -1415,13 +1428,34 @@ pre.dump {
 
   function renderTable() {
     var A = state.analysis;
-    var nodes = CM.byArea(state.area);
     var isP = state.view === 'parent';
+    var nodes = CM.byArea(state.area);
+
+    /* 학부모 화면에서는 실제로 평가한 개념만 남긴다.
+       아직 다루지 않은 개념까지 늘어놓으면 빈칸이 눈에 먼저 들어오기 때문이다.
+       (지도는 전체 흐름을 보여야 하므로 여기서만 걸러낸다.) */
+    if (isP) {
+      nodes = nodes.filter(function (n) {
+        var st = A && A.stats[n.id];
+        return !!(st && st.total > 0);
+      });
+    }
 
     $('tblTitle').textContent = isP ? '개념별 진행 상황' : '개념별 상세';
-    $('tblNote').textContent = isP
-      ? '교육부가 정한 학습 목표를 개념 단위로 나눈 목록입니다. 이번 학기에 다룰 개념까지 모두 포함되어 있습니다.'
-      : '성취기준은 교육부 고시 학습 목표 단위입니다. 학교 시험과 2028 수능이 이 단위로 출제됩니다. 칸에 마우스를 올리면 원본 코드가 보입니다.';
+    if (isP) {
+      $('tblNote').textContent = nodes.length
+        ? '지금까지 평가로 확인한 개념 ' + nodes.length + '개입니다. 각 개념은 교육부가 고시한 성취기준에 연결해 관리합니다.'
+        : '이 영역은 앞으로 수업에서 다룰 예정입니다.';
+    } else {
+      $('tblNote').textContent = '성취기준은 교육부 고시 학습 목표 단위입니다. 학교 시험과 2028 수능이 이 단위로 출제됩니다. 칸에 마우스를 올리면 원본 코드가 보입니다.';
+    }
+
+    if (isP && !nodes.length) {
+      $('tblBody').innerHTML = '<tr><td colspan="5" class="tbl-empty">'
+        + '이 영역은 앞으로 수업에서 다룰 예정입니다.<br>'
+        + '평가가 진행되면 확인한 개념이 하나씩 이곳에 쌓입니다.</td></tr>';
+      return;
+    }
 
     var html = '';
     for (var i = 0; i < nodes.length; i++) {
@@ -1431,7 +1465,7 @@ pre.dump {
       var url = CM.pageUrl(n.id, state.publisher);
       html += '<tr>'
         + '<td class="c-name"><a class="nlink" href="/' + esc(url) + '">' + esc(n.name) + '</a></td>'
-        + '<td class="c-std col-hide" title="' + esc(n.std) + '"><span class="muted">' + esc(stdLabel(n.std)) + '</span></td>'
+        + '<td class="c-std col-hide" title="' + esc(n.std) + '"><span class="muted">' + stdCell(n.std) + '</span></td>'
         + '<td class="c-num">' + (st.total || '—') + '</td>'
         + '<td class="c-rate">' + pct(st.rate) + '</td>'
         + '<td class="c-state"><span class="pill" style="background:' + s.bg + ';color:' + s.fg + '">' + esc(s.label) + '</span></td>'
