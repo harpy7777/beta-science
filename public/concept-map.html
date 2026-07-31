@@ -113,14 +113,22 @@ select:focus, input:focus { outline: 2px solid #f9a8d4; outline-offset: 1px; }
 .maphint { font-size: 11px; color: #b0b0b5; margin-top: 6px; }
 
 /* — Table — */
-.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
-.tbl th { text-align: left; font-size: 11px; color: #db2777; font-weight: 700; padding: 8px 6px; border-bottom: 1px solid #fce7f3; white-space: nowrap; }
-.tbl td { padding: 9px 6px; border-bottom: 1px solid #f7f7f8; vertical-align: middle; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+.tbl th { text-align: left; font-size: 11px; color: #db2777; font-weight: 700; padding: 8px 10px; border-bottom: 1px solid #fce7f3; white-space: nowrap; }
+.tbl td { padding: 9px 10px; border-bottom: 1px solid #f7f7f8; vertical-align: middle; }
 .tbl tr:last-child td { border-bottom: none; }
+/* 열 규칙: 이름은 가변, 나머지는 고정폭으로 통일 */
+.c-name  { width: auto; }
+.c-std   { width: 132px; }
+.c-num   { width: 72px;  text-align: right; }
+.c-rate  { width: 84px;  text-align: right; }
+.c-state { width: 96px;  text-align: left; padding-left: 22px; }
 .pill { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; display: inline-block; }
 .nlink { color: #1d1d1f; text-decoration: none; font-weight: 600; }
 .nlink:hover { color: #db2777; text-decoration: underline; }
 .col-hide { display: table-cell; }
+/* 학부모 화면에서는 성취기준 코드를 감춘다 */
+body.parentview .c-std { display: none; }
 
 /* — Exam tagging — */
 .exrow { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid #f7f7f8; }
@@ -228,15 +236,16 @@ pre.dump {
   <!-- 개념별 표 -->
   <div class="card">
     <div class="card-title">개념별 상세</div>
+    <div class="muted" id="tblNote" style="margin-bottom:0.8rem"></div>
     <div style="overflow-x:auto">
       <table class="tbl">
         <thead>
           <tr>
-            <th>개념</th>
-            <th class="col-hide">성취기준</th>
-            <th style="text-align:right">문항</th>
-            <th style="text-align:right">정답률</th>
-            <th>상태</th>
+            <th class="c-name">개념</th>
+            <th class="c-std col-hide">성취기준</th>
+            <th class="c-num">문항</th>
+            <th class="c-rate">정답률</th>
+            <th class="c-state">상태</th>
           </tr>
         </thead>
         <tbody id="tblBody"></tbody>
@@ -802,6 +811,12 @@ pre.dump {
   function renderTable() {
     var A = state.analysis;
     var nodes = CM.byArea(state.area);
+    var isP = state.view === 'parent';
+
+    $('tblNote').textContent = isP
+      ? '교육부가 정한 학습 목표를 개념 단위로 나눈 목록입니다. 문항 수가 적을수록 참고 자료로 봐 주세요.'
+      : '성취기준은 교육부 고시 학습 목표 코드입니다. 학교 시험과 2028 수능이 이 단위로 출제됩니다.';
+
     var html = '';
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
@@ -809,11 +824,11 @@ pre.dump {
       var s = sty(st.status);
       var url = CM.pageUrl(n.id, state.publisher);
       html += '<tr>'
-        + '<td><a class="nlink" href="/' + esc(url) + '">' + esc(n.name) + '</a></td>'
-        + '<td class="col-hide"><span class="muted">' + esc(n.std) + '</span></td>'
-        + '<td style="text-align:right">' + (st.total || '—') + '</td>'
-        + '<td style="text-align:right">' + pct(st.rate) + '</td>'
-        + '<td><span class="pill" style="background:' + s.bg + ';color:' + s.fg + '">' + esc(s.label) + '</span></td>'
+        + '<td class="c-name"><a class="nlink" href="/' + esc(url) + '">' + esc(n.name) + '</a></td>'
+        + '<td class="c-std col-hide"><span class="muted">' + esc(n.std) + '</span></td>'
+        + '<td class="c-num">' + (st.total || '—') + '</td>'
+        + '<td class="c-rate">' + pct(st.rate) + '</td>'
+        + '<td class="c-state"><span class="pill" style="background:' + s.bg + ';color:' + s.fg + '">' + esc(s.label) + '</span></td>'
         + '</tr>';
     }
     $('tblBody').innerHTML = html;
@@ -896,6 +911,7 @@ pre.dump {
       var hide = state.view === 'parent' ? 'none' : '';
       $('tagCard').style.display = hide;
       $('diagCard').style.display = hide;
+      document.body.classList.toggle('parentview', state.view === 'parent');
       renderAll();
     });
     $('btnSaveTags').addEventListener('click', saveTags);
