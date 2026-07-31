@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><script src="/favicon.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#db2777">
+<title>인후쌤의 과학 수업 관리 시스템 · 과학 개념 지도</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  background: #fafafa; color: #1d1d1f; min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+/* — Header — */
+.header {
+  background: #fff; border-bottom: 1px solid #fce7f3;
+  padding: 0 1rem;
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  height: 54px;
+  display: flex; align-items: center; justify-content: center;
+  position: sticky; top: 0; z-index: 300;
+}
+.header-inner { display: flex; align-items: center; gap: 10px; min-width: 0; width: 100%; max-width: 1080px; }
+.logo {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg,#f472b6,#db2777);
+  border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  color: #fff; font-size: 15px; font-weight: 800;
+}
+.brand { font-size: 15px; font-weight: 700; color: #1d1d1f; line-height: 1.2; }
+.brand-sub { font-size: 11px; color: #db2777; font-weight: 600; margin-top: 1px; }
+.header-spacer { flex: 1; }
+.hbtn {
+  border: 1px solid #fce7f3; background: #fff; color: #db2777;
+  font-size: 12px; font-weight: 700; padding: 7px 11px; border-radius: 9px; cursor: pointer;
+  font-family: inherit; white-space: nowrap;
+}
+.hbtn:hover { background: #fdf2f8; }
+.hbtn.on { background: #db2777; color: #fff; border-color: #db2777; }
+
+/* — Layout — */
+.wrap { max-width: 1080px; margin: 0 auto; padding: 1rem; padding-bottom: 4rem; }
+.card {
+  background: #fff; border: 1px solid #fce7f3; border-radius: 18px;
+  padding: 1.25rem; margin-bottom: 1rem;
+  box-shadow: 0 4px 24px rgba(219,39,119,0.08);
+}
+.card-title { font-size: 1.05rem; font-weight: 700; color: #1d1d1f; margin-bottom: 0.9rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.card-title .tag { font-size: 11px; font-weight: 700; color: #db2777; background: #fdf2f8; padding: 3px 8px; border-radius: 999px; }
+.field-label { font-size: 11px; font-weight: 700; color: #db2777; letter-spacing: 0.05em; margin-bottom: 6px; display: block; }
+.muted { color: #86868b; font-size: 12px; line-height: 1.6; }
+
+/* — Controls — */
+.controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+select, input[type=text] {
+  width: 100%; font-family: inherit; font-size: 14px; color: #1d1d1f;
+  padding: 10px 12px; border: 1px solid #f3d6e6; border-radius: 11px; background: #fff;
+  appearance: none; -webkit-appearance: none;
+}
+select:focus, input:focus { outline: 2px solid #f9a8d4; outline-offset: 1px; }
+
+/* — Banner — */
+.banner {
+  border-radius: 14px; padding: 0.85rem 1rem; margin-bottom: 1rem;
+  font-size: 13px; line-height: 1.65; border: 1px solid;
+}
+.banner b { font-weight: 700; }
+.banner.info { background: #fdf2f8; border-color: #fbcfe8; color: #9d174d; }
+.banner.warnbox { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+.banner.okbox { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+
+/* — Stat strip — */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.stat { background: #fdf2f8; border: 1px solid #fce7f3; border-radius: 14px; padding: 0.85rem; text-align: center; }
+.stat .v { font-size: 1.5rem; font-weight: 800; color: #db2777; line-height: 1.1; }
+.stat .l { font-size: 11px; color: #86868b; margin-top: 4px; font-weight: 600; }
+.stat .s { font-size: 10px; color: #b0b0b5; margin-top: 2px; }
+
+/* — Focus cards — */
+.focus { border: 1px solid #fde68a; background: #fffbeb; border-radius: 14px; padding: 1rem; margin-bottom: 10px; }
+.focus.parent { border-color: #bfdbfe; background: #eff6ff; }
+.focus h4 { font-size: 15px; font-weight: 800; color: #1d1d1f; margin-bottom: 6px; }
+.focus p { font-size: 13px; line-height: 1.7; color: #4b4b50; }
+.focus .why { margin-top: 8px; font-size: 12px; color: #86868b; }
+.focus .go {
+  display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 700;
+  color: #db2777; background: #fff; border: 1px solid #fce7f3;
+  padding: 7px 12px; border-radius: 9px; text-decoration: none;
+}
+
+/* — Tabs — */
+.tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 0.9rem; -webkit-overflow-scrolling: touch; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex-shrink: 0; font-family: inherit; font-size: 13px; font-weight: 700;
+  padding: 8px 14px; border-radius: 999px; border: 1px solid #fce7f3;
+  background: #fff; color: #86868b; cursor: pointer;
+}
+.tab.on { background: #db2777; color: #fff; border-color: #db2777; }
+
+/* — Map — */
+.mapbox { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; border-radius: 12px; background: #fdfdfd; border: 1px solid #f5f5f7; }
+.mapbox svg { display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 0.8rem; }
+.legend span { font-size: 11px; color: #86868b; display: flex; align-items: center; gap: 5px; font-weight: 600; }
+.legend i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; border: 1px solid rgba(0,0,0,0.08); }
+.maphint { font-size: 11px; color: #b0b0b5; margin-top: 6px; }
+
+/* — Table — */
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tbl th { text-align: left; font-size: 11px; color: #db2777; font-weight: 700; padding: 8px 6px; border-bottom: 1px solid #fce7f3; white-space: nowrap; }
+.tbl td { padding: 9px 6px; border-bottom: 1px solid #f7f7f8; vertical-align: middle; }
+.tbl tr:last-child td { border-bottom: none; }
+.pill { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; display: inline-block; }
+.nlink { color: #1d1d1f; text-decoration: none; font-weight: 600; }
+.nlink:hover { color: #db2777; text-decoration: underline; }
+.col-hide { display: table-cell; }
+
+/* — Exam tagging — */
+.exrow { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid #f7f7f8; }
+.exrow:last-child { border-bottom: none; }
+.exname { font-size: 13px; font-weight: 600; color: #1d1d1f; word-break: break-all; }
+.exmeta { font-size: 11px; color: #b0b0b5; margin-top: 2px; }
+.exsel { min-width: 190px; }
+.btn {
+  font-family: inherit; font-size: 13px; font-weight: 700; padding: 10px 16px;
+  border-radius: 11px; border: none; cursor: pointer;
+  background: linear-gradient(135deg,#f472b6,#db2777); color: #fff;
+}
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn.ghost { background: #fff; color: #db2777; border: 1px solid #fce7f3; }
+
+details.diag { border: 1px solid #f3d6e6; border-radius: 12px; padding: 0.8rem 1rem; background: #fffdfe; }
+details.diag summary { cursor: pointer; font-size: 13px; font-weight: 700; color: #db2777; }
+pre.dump {
+  margin-top: 0.7rem; background: #1d1d1f; color: #e8e8ed; padding: 0.9rem;
+  border-radius: 10px; font-size: 11px; line-height: 1.6; overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; word-break: break-all;
+}
+
+@media (max-width: 640px) {
+  .wrap { padding: 0.75rem; }
+  .card { padding: 1rem; border-radius: 15px; }
+  .brand { font-size: 13px; }
+  .brand-sub { font-size: 10px; }
+  .col-hide { display: none; }
+  .exrow { grid-template-columns: 1fr; }
+  .exsel { min-width: 0; width: 100%; }
+  .stat .v { font-size: 1.25rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">과</div>
+    <div>
+      <div class="brand">과학 개념 지도</div>
+      <div class="brand-sub">통합과학2 · 2022 개정</div>
+    </div>
+    <div class="header-spacer"></div>
+    <button class="hbtn" id="btnView" type="button">학부모 화면</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div id="banner"></div>
+
+  <!-- 조회 조건 -->
+  <div class="card">
+    <div class="card-title">조회 조건</div>
+    <div class="controls">
+      <div>
+        <label class="field-label" for="selStudent">학생</label>
+        <select id="selStudent"><option value="">불러오는 중…</option></select>
+      </div>
+      <div>
+        <label class="field-label" for="selPub">교과서</label>
+        <select id="selPub">
+          <option value="miraen">미래엔</option>
+          <option value="visang">비상교육</option>
+          <option value="donga">동아출판</option>
+        </select>
+      </div>
+      <div>
+        <label class="field-label" for="selGrain">보기 단위</label>
+        <select id="selGrain">
+          <option value="auto">자동 (데이터량에 맞춤)</option>
+          <option value="area">영역 3개</option>
+          <option value="std">성취기준 15개</option>
+          <option value="node">개념 57개</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 요약 -->
+  <div class="card">
+    <div class="card-title" id="sumTitle">학습 현황</div>
+    <div class="stats" id="stats"></div>
+    <div class="muted" style="margin-top:0.8rem" id="sumNote"></div>
+  </div>
+
+  <!-- 공략 포인트 -->
+  <div class="card">
+    <div class="card-title" id="focusTitle">공략 포인트 <span class="tag">선수 개념 추적</span></div>
+    <div id="focusList"></div>
+  </div>
+
+  <!-- 지도 -->
+  <div class="card">
+    <div class="card-title">개념 지도</div>
+    <div class="tabs" id="areaTabs"></div>
+    <div class="mapbox" id="mapbox"></div>
+    <div class="legend" id="legend"></div>
+    <div class="maphint" id="mapHint"></div>
+  </div>
+
+  <!-- 개념별 표 -->
+  <div class="card">
+    <div class="card-title">개념별 상세</div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>개념</th>
+            <th class="col-hide">성취기준</th>
+            <th style="text-align:right">문항</th>
+            <th style="text-align:right">정답률</th>
+            <th>상태</th>
+          </tr>
+        </thead>
+        <tbody id="tblBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 시험별 개념 연결 -->
+  <div class="card" id="tagCard">
+    <div class="card-title">시험 ↔ 개념 연결 <span class="tag">최초 1회</span></div>
+    <div class="muted" style="margin-bottom:0.9rem">
+      기존 시험 데이터에는 개념 정보가 없습니다. 시험마다 다루는 성취기준을 지정해 두면
+      이후 채점 결과가 자동으로 개념 지도에 반영됩니다. 시험명으로 추천을 먼저 띄웁니다.
+    </div>
+    <div id="examList"></div>
+    <div style="margin-top:1rem; display:flex; gap:8px; flex-wrap:wrap">
+      <button class="btn" id="btnSaveTags" type="button">연결 저장</button>
+      <button class="btn ghost" id="btnAutoTag" type="button">시험명으로 자동 추천</button>
+    </div>
+    <div class="muted" style="margin-top:0.7rem" id="tagMsg"></div>
+  </div>
+
+  <!-- 진단 -->
+  <div class="card" id="diagCard">
+    <details class="diag">
+      <summary>데이터 연결 진단</summary>
+      <div class="muted" style="margin-top:0.7rem">
+        Firestore에서 실제로 읽어온 내용입니다. 필드 이름이 맞지 않으면 여기에 그대로 나오니,
+        이 내용을 복사해서 알려주시면 연결 코드를 맞춰 드릴 수 있습니다.
+      </div>
+      <pre class="dump" id="diagDump">대기 중…</pre>
+    </details>
+  </div>
+
+</div>
+
+<script src="/concept-map.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ==================================================================
+   * [설정] 아래 firebaseConfig 를 다른 페이지(student-manage.html 등)에
+   *        들어 있는 것과 똑같이 바꿔 넣으세요.
+   *        바꾸기 전에는 샘플 데이터로 화면만 미리 보여 줍니다.
+   * ================================================================ */
+  var firebaseConfig = {
+    apiKey: 'PASTE_HERE',
+    authDomain: 'beta-science.firebaseapp.com',
+    projectId: 'beta-science',
+    storageBucket: 'beta-science.appspot.com',
+    messagingSenderId: 'PASTE_HERE',
+    appId: 'PASTE_HERE'
+  };
+
+  var CM = window.ConceptMap;
+  var db = null;
+  var LIVE = false;
+
+  var state = {
+    view: 'teacher',        // 'teacher' | 'parent'
+    area: 1,
+    students: [],
+    studentId: '',
+    publisher: 'miraen',
+    grain: 'auto',
+    records: [],
+    exams: [],              // [{key, title, count}]
+    tagMap: {},             // examKey -> [std]
+    analysis: null,
+    diag: []
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  };
+  var pct = function (r) { return r == null ? '—' : Math.round(r * 100) + '%'; };
+
+  function log(label, obj) {
+    state.diag.push('■ ' + label + '\n' + (typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2)));
+    var el = $('diagDump');
+    if (el) el.textContent = state.diag.join('\n\n');
+  }
+
+  /* ---------------- 상태 표현 (선생님 / 학부모) ---------------- */
+
+  var STYLE = {
+    teacher: {
+      ok:      { label: '안정',      fg: '#065f46', bg: '#ecfdf5', line: '#059669' },
+      warn:    { label: '주의',      fg: '#92400e', bg: '#fffbeb', line: '#d97706' },
+      weak:    { label: '취약',      fg: '#991b1b', bg: '#fef2f2', line: '#dc2626' },
+      few:     { label: '표본 부족',  fg: '#5b21b6', bg: '#f5f3ff', line: '#7c3aed' },
+      unknown: { label: '미측정',    fg: '#6b7280', bg: '#f9fafb', line: '#9ca3af' }
+    },
+    parent: {
+      ok:      { label: '탄탄해요',    fg: '#065f46', bg: '#ecfdf5', line: '#059669' },
+      warn:    { label: '다지는 중',   fg: '#155e75', bg: '#ecfeff', line: '#0891b2' },
+      weak:    { label: '집중 개념',   fg: '#92400e', bg: '#fffbeb', line: '#f59e0b' },
+      few:     { label: '학습 중',     fg: '#6b7280', bg: '#f9fafb', line: '#9ca3af' },
+      unknown: { label: '학습 예정',   fg: '#9ca3af', bg: '#fcfcfd', line: '#d1d5db' }
+    }
+  };
+
+  function sty(status) {
+    var set = STYLE[state.view] || STYLE.teacher;
+    return set[status] || set.unknown;
+  }
+
+  /* ---------------- 샘플 데이터 (연결 전 미리보기) ---------------- */
+
+  function sampleStudents() {
+    return [
+      { id: 'demo1', studentId: 'demo1', name: '샘플 학생 A' },
+      { id: 'demo2', studentId: 'demo2', name: '샘플 학생 B' }
+    ];
+  }
+
+  function sampleRecords(seed) {
+    // 아레니우스 정의가 흔들려 중화 단원 전체가 무너진 패턴
+    var out = [];
+    function add(id, correct, n) { for (var i = 0; i < n; i++) out.push({ conceptId: id, correct: correct }); }
+    if (seed === 'demo2') {
+      add('S2-207', true, 4); add('S2-208', false, 5); add('S2-209', false, 4);
+      add('S2-210', true, 4); add('S2-211', false, 4);
+      add('S2-201', true, 5); add('S2-204', true, 4); add('S2-205', true, 4);
+      add('S2-216', true, 4); add('S2-217', true, 3);
+    } else {
+      add('S2-116', true, 4); add('S2-117', true, 4);
+      add('S2-118', false, 4); add('S2-118', true, 1);
+      add('S2-120', false, 5); add('S2-121', false, 4); add('S2-122', false, 3);
+      add('S2-110', true, 4); add('S2-111', true, 5); add('S2-113', true, 3);
+      add('S2-101', true, 4); add('S2-102', true, 4); add('S2-105', true, 3); add('S2-106', true, 4);
+    }
+    return out;
+  }
+
+  /* ---------------- Firestore 연결 ---------------- */
+
+  function looksConfigured(cfg) {
+    return cfg && cfg.apiKey && cfg.apiKey.indexOf('PASTE') === -1;
+  }
+
+  function initFirebase() {
+    if (!looksConfigured(firebaseConfig)) {
+      log('설정', 'firebaseConfig 가 아직 채워지지 않아 샘플 데이터로 실행합니다.');
+      return false;
+    }
+    if (typeof firebase === 'undefined' || !firebase.initializeApp) {
+      log('설정', 'Firebase SDK 를 불러오지 못했습니다.');
+      return false;
+    }
+    try {
+      if (!firebase.apps || firebase.apps.length === 0) firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      return true;
+    } catch (e) {
+      log('Firebase 초기화 실패', String(e && e.message ? e.message : e));
+      return false;
+    }
+  }
+
+  function pick(obj, names) {
+    for (var i = 0; i < names.length; i++) {
+      if (obj && obj[names[i]] !== undefined && obj[names[i]] !== null && obj[names[i]] !== '') return obj[names[i]];
+    }
+    return null;
+  }
+
+  function loadStudents() {
+    if (!LIVE) { state.students = sampleStudents(); return Promise.resolve(); }
+    return db.collection('students').get().then(function (snap) {
+      var arr = [];
+      var sampleShape = null;
+      snap.forEach(function (d) {
+        var v = d.data() || {};
+        if (!sampleShape) sampleShape = Object.keys(v);
+        var withdrawn = v.withdrawn === true || v.isWithdrawn === true || v.status === '퇴원' || v.active === false;
+        if (withdrawn) return;
+        arr.push({
+          id: d.id,
+          studentId: String(pick(v, ['studentId', 'sid', 'studentID', 'loginId']) || d.id).toLowerCase(),
+          name: pick(v, ['name', 'studentName', '이름']) || d.id
+        });
+      });
+      arr.sort(function (a, b) { return String(a.name).localeCompare(String(b.name), 'ko'); });
+      state.students = arr;
+      log('students 컬렉션', { 읽은문서수: snap.size, 재원학생수: arr.length, 첫문서필드: sampleShape });
+    }).catch(function (e) {
+      log('students 읽기 실패', String(e && e.message ? e.message : e));
+      state.students = sampleStudents();
+    });
+  }
+
+  /** grades 문서에서 정오 기록을 뽑아낸다. 스키마를 방어적으로 탐색한다. */
+  function extractResults(data) {
+    var out = [];
+    var groups = ['ox', 'multiple'];
+    for (var g = 0; g < groups.length; g++) {
+      var blk = data[groups[g]];
+      if (!blk || typeof blk !== 'object') continue;
+      for (var k in blk) {
+        if (!Object.prototype.hasOwnProperty.call(blk, k)) continue;
+        var item = blk[k];
+        var correct = null;
+        if (typeof item === 'boolean') correct = item;
+        else if (item && typeof item === 'object') {
+          if (typeof item.correct === 'boolean') correct = item.correct;
+          else if (typeof item.isCorrect === 'boolean') correct = item.isCorrect;
+          else if (item.answer !== undefined && item.userAnswer !== undefined) {
+            correct = String(item.answer) === String(item.userAnswer);
+          }
+        }
+        if (correct !== null) out.push({ correct: correct, type: groups[g], no: k });
+      }
+    }
+    return out;
+  }
+
+  function examKeyOf(id, data) {
+    var t = pick(data, ['examId', 'examTitle', 'title', 'testName', 'examName', 'quizId', 'unit']);
+    if (t) return String(t);
+    // 문서 id 가 "학번_시험명" 형태인 경우가 많아 뒤쪽을 시험 키로 본다
+    var parts = String(id).split('_');
+    return parts.length > 1 ? parts.slice(1).join('_') : String(id);
+  }
+
+  function loadGrades(studentId) {
+    if (!LIVE) {
+      state.records = sampleRecords(studentId);
+      state.exams = [
+        { key: '샘플 단원평가 1회', count: 12 },
+        { key: '샘플 단원평가 2회', count: 10 }
+      ];
+      return Promise.resolve();
+    }
+    return db.collection('grades').get().then(function (snap) {
+      var recs = [];
+      var examCount = {};
+      var firstShape = null;
+      var matched = 0;
+      snap.forEach(function (d) {
+        var v = d.data() || {};
+        if (!firstShape) firstShape = { docId: d.id, 필드: Object.keys(v) };
+        var sid = String(pick(v, ['studentId', 'sid', 'studentID']) || '').toLowerCase();
+        if (!sid && String(d.id).toLowerCase().indexOf(studentId) === 0) sid = studentId;
+        if (sid !== studentId) return;
+        matched++;
+        var key = examKeyOf(d.id, v);
+        var res = extractResults(v);
+        examCount[key] = (examCount[key] || 0) + res.length;
+        var stds = state.tagMap[key] || [];
+        for (var i = 0; i < res.length; i++) {
+          if (stds.length === 0) { recs.push({ std: null, correct: res[i].correct }); continue; }
+          for (var s = 0; s < stds.length; s++) recs.push({ std: stds[s], correct: res[i].correct });
+        }
+      });
+      state.records = recs.filter(function (r) { return r.std; });
+      state.exams = Object.keys(examCount).map(function (k) { return { key: k, count: examCount[k] }; })
+        .sort(function (a, b) { return b.count - a.count; });
+      log('grades 컬렉션', {
+        전체문서수: snap.size, 이학생문서수: matched,
+        첫문서구조: firstShape, 시험수: state.exams.length,
+        태그된기록수: state.records.length
+      });
+    }).catch(function (e) {
+      log('grades 읽기 실패', String(e && e.message ? e.message : e));
+      state.records = [];
+      state.exams = [];
+    });
+  }
+
+  function loadTags() {
+    if (!LIVE) { state.tagMap = {}; return Promise.resolve(); }
+    return db.collection('conceptTags').get().then(function (snap) {
+      var m = {};
+      snap.forEach(function (d) {
+        var v = d.data() || {};
+        if (Array.isArray(v.standards)) m[d.id] = v.standards;
+      });
+      state.tagMap = m;
+      log('conceptTags 컬렉션', { 저장된시험수: snap.size });
+    }).catch(function (e) {
+      log('conceptTags 읽기 실패', String(e && e.message ? e.message : e));
+      state.tagMap = {};
+    });
+  }
+
+  function saveTags() {
+    if (!LIVE) { $('tagMsg').textContent = '샘플 모드에서는 저장되지 않습니다. Firebase 설정을 채우면 저장됩니다.'; return; }
+    var rows = document.querySelectorAll('[data-exam]');
+    var batch = db.batch();
+    var count = 0;
+    for (var i = 0; i < rows.length; i++) {
+      var key = rows[i].getAttribute('data-exam');
+      var sel = rows[i];
+      var chosen = [];
+      for (var o = 0; o < sel.options.length; o++) {
+        if (sel.options[o].selected && sel.options[o].value) chosen.push(sel.options[o].value);
+      }
+      state.tagMap[key] = chosen;
+      batch.set(db.collection('conceptTags').doc(key), { standards: chosen, updatedAt: new Date().toISOString() });
+      count++;
+    }
+    batch.commit().then(function () {
+      $('tagMsg').textContent = count + '개 시험의 개념 연결을 저장했습니다.';
+      return refresh();
+    }).catch(function (e) {
+      $('tagMsg').textContent = '저장하지 못했습니다: ' + (e && e.message ? e.message : e);
+    });
+  }
+
+  function autoTag() {
+    var rows = document.querySelectorAll('[data-exam]');
+    var n = 0;
+    for (var i = 0; i < rows.length; i++) {
+      var key = rows[i].getAttribute('data-exam');
+      var hits = CM.matchConcepts(key, { limit: 2 });
+      if (!hits.length) continue;
+      var stds = {};
+      for (var h = 0; h < hits.length; h++) {
+        var node = CM.getNode(hits[h].id);
+        if (node) stds[node.std] = true;
+      }
+      for (var o = 0; o < rows[i].options.length; o++) {
+        rows[i].options[o].selected = !!stds[rows[i].options[o].value];
+      }
+      n++;
+    }
+    $('tagMsg').textContent = n > 0
+      ? n + '개 시험에 추천을 채웠습니다. 확인 후 저장하세요.'
+      : '시험명에서 개념을 찾지 못했습니다. 직접 골라 주세요.';
+  }
+
+  /* ---------------- 렌더링 ---------------- */
+
+  function renderBanner() {
+    var el = $('banner');
+    if (!LIVE) {
+      el.innerHTML = '<div class="banner warnbox">'
+        + '<b>샘플 데이터로 보고 있습니다.</b><br>'
+        + '화면 구성과 진단 방식을 먼저 확인하시라고 예시를 띄웠습니다. '
+        + '이 파일 위쪽 <b>firebaseConfig</b> 를 다른 페이지에 있는 것과 똑같이 바꿔 넣으면 실제 학생 데이터로 바뀝니다.'
+        + '</div>';
+      return;
+    }
+    var tagged = Object.keys(state.tagMap).length;
+    if (tagged === 0) {
+      el.innerHTML = '<div class="banner info">'
+        + '<b>아직 시험과 개념이 연결되지 않았습니다.</b><br>'
+        + '아래 <b>시험 ↔ 개념 연결</b>에서 시험마다 성취기준을 지정하면 지도가 채워집니다.'
+        + '</div>';
+    } else {
+      el.innerHTML = '';
+    }
+  }
+
+  function grainOf(total) {
+    if (state.grain !== 'auto') return state.grain;
+    if (total < 60) return 'area';
+    if (total < 200) return 'std';
+    return 'node';
+  }
+
+  function renderStats() {
+    var A = state.analysis;
+    var box = $('stats');
+    var total = A ? A.answered : 0;
+    var g = grainOf(total);
+
+    var solid = 0, focusN = 0;
+    var nodes = CM.NODES;
+    for (var i = 0; i < nodes.length; i++) {
+      var st = A.stats[nodes[i].id].status;
+      if (st === 'ok') solid++;
+      if (st === 'weak') focusN++;
+    }
+    var covered = 0;
+    for (i = 0; i < nodes.length; i++) if (A.stats[nodes[i].id].total > 0) covered++;
+
+    var isP = state.view === 'parent';
+    var html = '';
+    html += '<div class="stat"><div class="v">' + Math.round(covered / nodes.length * 100) + '%</div>'
+         + '<div class="l">' + (isP ? '학습 진행' : '개념 커버리지') + '</div>'
+         + '<div class="s">' + covered + ' / ' + nodes.length + ' 개념</div></div>';
+    html += '<div class="stat"><div class="v">' + solid + '</div>'
+         + '<div class="l">' + (isP ? '완성된 개념' : '안정 개념') + '</div>'
+         + '<div class="s">정답률 80% 이상</div></div>';
+    html += '<div class="stat"><div class="v">' + focusN + '</div>'
+         + '<div class="l">' + (isP ? '집중 개념' : '취약 개념') + '</div>'
+         + '<div class="s">' + (isP ? '이번 기간 공략 대상' : '정답률 60% 미만') + '</div></div>';
+    html += '<div class="stat"><div class="v">' + total + '</div>'
+         + '<div class="l">누적 문항</div>'
+         + '<div class="s">' + ({ area: '영역 단위로 표시', std: '성취기준 단위로 표시', node: '개념 단위로 표시' })[g] + '</div></div>';
+    box.innerHTML = html;
+
+    var areas = CM.AREAS.map(function (a) {
+      var s = A.areaSummary[a.id];
+      return a.name + ' ' + (s.total ? pct(s.rate) + ' (' + s.total + '문항)' : '기록 없음');
+    }).join(' · ');
+    $('sumNote').textContent = areas;
+    $('sumTitle').textContent = state.view === 'parent' ? '학습 현황' : '학습 현황 (내부용)';
+  }
+
+  function renderFocus() {
+    var A = state.analysis;
+    var box = $('focusList');
+    var isP = state.view === 'parent';
+    $('focusTitle').innerHTML = (isP ? '이번 기간 공략 포인트' : '공략 포인트')
+      + ' <span class="tag">선수 개념 추적</span>';
+
+    if (!A || A.roots.length === 0) {
+      var emptyMsg;
+      if (A && A.answered > 0) {
+        emptyMsg = isP
+          ? '<b>지금은 개념이 순서대로 잘 이어지고 있습니다.</b> 다음 단원으로 넘어가도 좋은 상태입니다.'
+          : '<b>지금은 막힌 지점이 없습니다.</b> 선수 개념이 끊긴 곳 없이 잘 이어지고 있습니다.';
+      } else {
+        emptyMsg = isP
+          ? '<b>이번 기간 기록을 모으는 중입니다.</b> 수업과 평가가 쌓이면 이곳에 집중 개념이 나타납니다.'
+          : '<b>아직 분석할 기록이 없습니다.</b> 시험 결과가 쌓이면 여기에 공략 포인트가 나타납니다.';
+      }
+      box.innerHTML = '<div class="banner okbox">' + emptyMsg + '</div>';
+      return;
+    }
+
+    var html = '';
+    for (var i = 0; i < Math.min(A.roots.length, 3); i++) {
+      var r = A.roots[i];
+      var node = CM.getNode(r.id);
+      var url = CM.pageUrl(r.id, state.publisher);
+      var names = r.blocking.slice(0, 3).map(function (x) {
+        var t = CM.getNode(x); return t ? t.name : x;
+      });
+
+      var body, why;
+      if (isP) {
+        body = r.blocking.length > 0
+          ? '지금 <b>' + esc(node.name) + '</b> 하나만 잡으면 '
+            + esc(names.join(', ')) + (r.blocking.length > 3 ? ' 등 ' + r.blocking.length + '개' : '')
+            + ' 개념이 함께 풀립니다. 다음 수업에서 이 지점을 집중해서 다룹니다.'
+          : '<b>' + esc(node.name) + '</b>을(를) 이번 기간 집중 개념으로 잡았습니다.';
+        why = '관련 문항 ' + A.stats[r.id].total + '개 기준';
+      } else {
+        body = esc(CM.explainRoot(r));
+        why = '성취기준 ' + esc(node.std) + ' · 관련 문항 ' + A.stats[r.id].total + '개 · 정답률 ' + pct(r.rate);
+      }
+
+      html += '<div class="focus' + (isP ? ' parent' : '') + '">'
+        + '<h4>' + esc(node.name) + '</h4>'
+        + '<p>' + body + '</p>'
+        + '<div class="why">' + why + '</div>'
+        + (url ? '<a class="go" href="/' + esc(url) + '">단원 페이지 열기 →</a>' : '')
+        + '</div>';
+    }
+    box.innerHTML = html;
+  }
+
+  function renderTabs() {
+    var html = '';
+    for (var i = 0; i < CM.AREAS.length; i++) {
+      var a = CM.AREAS[i];
+      html += '<button class="tab' + (state.area === a.id ? ' on' : '') + '" data-area="' + a.id + '" type="button">'
+        + esc(a.name) + '</button>';
+    }
+    $('areaTabs').innerHTML = html;
+  }
+
+  function renderMap() {
+    var A = state.analysis;
+    var nodes = CM.byArea(state.area);
+    var depth = CM.levels();
+
+    // 레벨별 열 구성 (해당 영역 안에서 다시 0부터)
+    var minD = Infinity;
+    var i, j;
+    for (i = 0; i < nodes.length; i++) minD = Math.min(minD, depth[nodes[i].id]);
+    var cols = {};
+    for (i = 0; i < nodes.length; i++) {
+      var d = depth[nodes[i].id] - minD;
+      if (!cols[d]) cols[d] = [];
+      cols[d].push(nodes[i]);
+    }
+    var keys = Object.keys(cols).map(Number).sort(function (a, b) { return a - b; });
+
+    var BW = 138, BH = 46, GX = 62, GY = 13, PAD = 18;
+    var maxRows = 0;
+    for (i = 0; i < keys.length; i++) maxRows = Math.max(maxRows, cols[keys[i]].length);
+
+    var W = PAD * 2 + keys.length * BW + Math.max(0, keys.length - 1) * GX;
+    var H = PAD * 2 + maxRows * BH + Math.max(0, maxRows - 1) * GY;
+
+    var pos = {};
+    for (i = 0; i < keys.length; i++) {
+      var list = cols[keys[i]];
+      var colH = list.length * BH + (list.length - 1) * GY;
+      var y0 = PAD + (H - PAD * 2 - colH) / 2;
+      for (j = 0; j < list.length; j++) {
+        pos[list[j].id] = { x: PAD + i * (BW + GX), y: y0 + j * (BH + GY) };
+      }
+    }
+
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="개념 선수관계 지도">';
+    svg += '<defs><marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">'
+        + '<path d="M0 0 L8 4 L0 8 z" fill="#d8d8dd"/></marker></defs>';
+
+    // 간선
+    for (i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      for (j = 0; j < n.prereq.length; j++) {
+        var p = pos[n.prereq[j]];
+        var q = pos[n.id];
+        if (!p || !q) continue;
+        var x1 = p.x + BW, y1 = p.y + BH / 2;
+        var x2 = q.x, y2 = q.y + BH / 2;
+        var mx = (x1 + x2) / 2;
+        var weakEdge = A && A.stats[n.prereq[j]].status === 'weak';
+        svg += '<path d="M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ', ' + mx + ' ' + y2 + ', ' + x2 + ' ' + y2 + '" '
+          + 'fill="none" stroke="' + (weakEdge ? '#fbbf24' : '#e5e5ea') + '" stroke-width="' + (weakEdge ? 2 : 1.4) + '" marker-end="url(#ar)"/>';
+      }
+    }
+
+    // 노드
+    for (i = 0; i < nodes.length; i++) {
+      var nd = nodes[i];
+      var pt = pos[nd.id];
+      var st = A ? A.stats[nd.id] : { status: 'unknown', total: 0, rate: null };
+      var s = sty(st.status);
+      var url = CM.pageUrl(nd.id, state.publisher);
+      var label = nd.name.length > 11 ? nd.name.slice(0, 10) + '…' : nd.name;
+      var sub = st.total > 0 ? pct(st.rate) + ' · ' + st.total + '문항' : s.label;
+
+      svg += '<a href="/' + esc(url) + '" aria-label="' + esc(nd.name) + '">';
+      svg += '<rect x="' + pt.x + '" y="' + pt.y + '" width="' + BW + '" height="' + BH + '" rx="11" '
+          + 'fill="' + s.bg + '" stroke="' + s.line + '" stroke-width="1.4"/>';
+      svg += '<text x="' + (pt.x + 11) + '" y="' + (pt.y + 19) + '" font-size="12" font-weight="700" fill="' + s.fg + '" '
+          + 'font-family="-apple-system,BlinkMacSystemFont,sans-serif">' + esc(label) + '</text>';
+      svg += '<text x="' + (pt.x + 11) + '" y="' + (pt.y + 34) + '" font-size="10" fill="' + s.fg + '" opacity="0.75" '
+          + 'font-family="-apple-system,BlinkMacSystemFont,sans-serif">' + esc(sub) + '</text>';
+      svg += '</a>';
+    }
+
+    svg += '</svg>';
+    $('mapbox').innerHTML = svg;
+
+    $('mapHint').textContent = state.view === 'parent'
+      ? '화살표는 개념이 이어지는 순서입니다. 왼쪽을 먼저 익혀야 오른쪽이 쉬워집니다. 개념을 누르면 해당 단원 페이지가 열립니다.'
+      : '화살표는 선수 관계입니다. 왼쪽 개념이 무너지면 오른쪽이 따라 무너집니다. 개념을 누르면 해당 단원 페이지가 열립니다.';
+
+    var order = ['ok', 'warn', 'weak', 'few', 'unknown'];
+    var lg = '';
+    for (i = 0; i < order.length; i++) {
+      var t = sty(order[i]);
+      lg += '<span><i style="background:' + t.bg + ';border-color:' + t.line + '"></i>' + esc(t.label) + '</span>';
+    }
+    $('legend').innerHTML = lg;
+  }
+
+  function renderTable() {
+    var A = state.analysis;
+    var nodes = CM.byArea(state.area);
+    var html = '';
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      var st = A ? A.stats[n.id] : { status: 'unknown', total: 0, rate: null };
+      var s = sty(st.status);
+      var url = CM.pageUrl(n.id, state.publisher);
+      html += '<tr>'
+        + '<td><a class="nlink" href="/' + esc(url) + '">' + esc(n.name) + '</a></td>'
+        + '<td class="col-hide"><span class="muted">' + esc(n.std) + '</span></td>'
+        + '<td style="text-align:right">' + (st.total || '—') + '</td>'
+        + '<td style="text-align:right">' + pct(st.rate) + '</td>'
+        + '<td><span class="pill" style="background:' + s.bg + ';color:' + s.fg + '">' + esc(s.label) + '</span></td>'
+        + '</tr>';
+    }
+    $('tblBody').innerHTML = html;
+  }
+
+  function renderExams() {
+    var stds = CM.listStandards();
+    var box = $('examList');
+    if (!state.exams.length) {
+      box.innerHTML = '<div class="muted">채점 기록에서 시험을 찾지 못했습니다.</div>';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < state.exams.length; i++) {
+      var ex = state.exams[i];
+      var chosen = state.tagMap[ex.key] || [];
+      var opts = '';
+      for (var s = 0; s < stds.length; s++) {
+        var first = CM.byStandard(stds[s])[0];
+        var lab = stds[s] + ' · ' + (first ? first.name : '');
+        var sel = chosen.indexOf(stds[s]) !== -1 ? ' selected' : '';
+        opts += '<option value="' + esc(stds[s]) + '"' + sel + '>' + esc(lab) + '</option>';
+      }
+      html += '<div class="exrow">'
+        + '<div><div class="exname">' + esc(ex.key) + '</div>'
+        + '<div class="exmeta">문항 기록 ' + ex.count + '개'
+        + (chosen.length ? ' · 연결됨 ' + chosen.length + '개' : ' · 미연결') + '</div></div>'
+        + '<select class="exsel" multiple size="3" data-exam="' + esc(ex.key) + '">' + opts + '</select>'
+        + '</div>';
+    }
+    box.innerHTML = html;
+  }
+
+  function renderAll() {
+    renderBanner();
+    renderStats();
+    renderFocus();
+    renderTabs();
+    renderMap();
+    renderTable();
+    renderExams();
+  }
+
+  function analyzeNow() {
+    state.analysis = CM.analyze(state.records);
+  }
+
+  function refresh() {
+    return loadGrades(state.studentId).then(function () {
+      analyzeNow();
+      renderAll();
+    });
+  }
+
+  /* ---------------- 이벤트 ---------------- */
+
+  function bind() {
+    $('selStudent').addEventListener('change', function (e) {
+      state.studentId = e.target.value;
+      refresh();
+    });
+    $('selPub').addEventListener('change', function (e) {
+      state.publisher = e.target.value;
+      renderMap(); renderTable(); renderFocus();
+    });
+    $('selGrain').addEventListener('change', function (e) {
+      state.grain = e.target.value;
+      renderStats();
+    });
+    $('areaTabs').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-area]');
+      if (!b) return;
+      state.area = Number(b.getAttribute('data-area'));
+      renderTabs(); renderMap(); renderTable();
+    });
+    $('btnView').addEventListener('click', function () {
+      state.view = state.view === 'teacher' ? 'parent' : 'teacher';
+      this.textContent = state.view === 'teacher' ? '학부모 화면' : '선생님 화면';
+      this.classList.toggle('on', state.view === 'parent');
+      var hide = state.view === 'parent' ? 'none' : '';
+      $('tagCard').style.display = hide;
+      $('diagCard').style.display = hide;
+      renderAll();
+    });
+    $('btnSaveTags').addEventListener('click', saveTags);
+    $('btnAutoTag').addEventListener('click', autoTag);
+  }
+
+  /* ---------------- 시작 ---------------- */
+
+  function boot() {
+    if (!CM) {
+      $('banner').innerHTML = '<div class="banner warnbox"><b>concept-map.js 를 찾지 못했습니다.</b><br>'
+        + 'public 폴더에 concept-map.js 가 올라가 있는지 확인해 주세요.</div>';
+      return;
+    }
+    var v = CM.validate();
+    log('개념 데이터', { 노드수: v.count, 무결성: v.ok ? '정상' : v.errors });
+
+    LIVE = initFirebase();
+    bind();
+
+    loadTags()
+      .then(loadStudents)
+      .then(function () {
+        var sel = $('selStudent');
+        var html = '';
+        for (var i = 0; i < state.students.length; i++) {
+          html += '<option value="' + esc(state.students[i].studentId) + '">'
+            + esc(state.students[i].name) + '</option>';
+        }
+        sel.innerHTML = html || '<option value="">학생 없음</option>';
+        state.studentId = state.students.length ? state.students[0].studentId : '';
+        return refresh();
+      })
+      .catch(function (e) {
+        log('시작 실패', String(e && e.message ? e.message : e));
+        state.records = []; analyzeNow(); renderAll();
+      });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+</script>
+</body>
+</html>
