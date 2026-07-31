@@ -11,7 +11,7 @@
  *  3) prereq(선수관계)를 타고 올라가 "진짜 막힌 지점(root cause)"을 찾는다.
  *
  * [사용법]
- *   <script src="/concept-map.js"></script>
+ *   HTML 에서 <script src="/concept-map.js"> 로 먼저 불러온 뒤
  *   const CM = window.ConceptMap;
  *   CM.pageUrl('S2-120', 'visang');        // 'visang-science2-unit1.html'
  *   CM.matchConcepts('중화 반응에서 온도가...'); // 문항 자동 태깅
