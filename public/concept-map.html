@@ -119,7 +119,7 @@ select:focus, input:focus { outline: 2px solid #f9a8d4; outline-offset: 1px; }
 .tbl tr:last-child td { border-bottom: none; }
 /* 열 규칙: 5개 열 전부 머리글·본문 가운데 정렬 */
 .tbl .c-name  { width: auto;  text-align: center; }
-.tbl .c-std   { width: 132px; text-align: center; }
+.tbl .c-std   { width: 168px; text-align: center; }
 .tbl .c-num   { width: 72px;  text-align: center; }
 .tbl .c-rate  { width: 84px;  text-align: center; }
 .tbl .c-state { width: 96px;  text-align: center; }
@@ -333,6 +333,28 @@ pre.dump {
     });
   };
   var pct = function (r) { return r == null ? '—' : Math.round(r * 100) + '%'; };
+
+  /* 성취기준 코드를 사람이 읽는 표기로 바꾼다.
+     예) 10통과2-01-01  ->  고1 통합과학2 1단원-1
+     앞자리 = 학년(군), 가운데 = 과목, 뒤 두 자리 = 단원(영역)-순번 */
+  var GRADE_LABEL = { '4': '초3~4', '6': '초5~6', '9': '중1~3', '10': '고1', '12': '고2~3' };
+  var SUBJ_LABEL = {
+    '통과1': '통합과학1', '통과2': '통합과학2',
+    '과탐1': '과학탐구실험1', '과탐2': '과학탐구실험2',
+    '화학1': '화학1', '화학2': '화학2',
+    '물리1': '물리학1', '물리2': '물리학2',
+    '생과1': '생명과학1', '생과2': '생명과학2',
+    '지구1': '지구과학1', '지구2': '지구과학2',
+    '과': '과학', '과학': '과학'
+  };
+  function stdLabel(code) {
+    var s = String(code == null ? '' : code).trim();
+    var m = s.match(/^(\d+)([^-]+)-(\d+)-(\d+)$/);
+    if (!m) return s;
+    var g = GRADE_LABEL[m[1]] || m[1];
+    var subj = SUBJ_LABEL[m[2]] || m[2];
+    return g + ' ' + subj + ' ' + Number(m[3]) + '단원-' + Number(m[4]);
+  }
 
   function log(label, obj) {
     state.diag.push('■ ' + label + '\n' + (typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2)));
@@ -700,7 +722,7 @@ pre.dump {
         why = '관련 문항 ' + A.stats[r.id].total + '개 기준';
       } else {
         body = esc(CM.explainRoot(r));
-        why = '성취기준 ' + esc(node.std) + ' · 관련 문항 ' + A.stats[r.id].total + '개 · 정답률 ' + pct(r.rate);
+        why = '성취기준 ' + esc(stdLabel(node.std)) + ' · 관련 문항 ' + A.stats[r.id].total + '개 · 정답률 ' + pct(r.rate);
       }
 
       html += '<div class="focus' + (isP ? ' parent' : '') + '">'
@@ -820,7 +842,7 @@ pre.dump {
 
     $('tblNote').textContent = isP
       ? '교육부가 정한 학습 목표를 개념 단위로 나눈 목록입니다. 문항 수가 적을수록 참고 자료로 봐 주세요.'
-      : '성취기준은 교육부 고시 학습 목표 코드입니다. 학교 시험과 2028 수능이 이 단위로 출제됩니다.';
+      : '성취기준은 교육부 고시 학습 목표 단위입니다. 학교 시험과 2028 수능이 이 단위로 출제됩니다. 칸에 마우스를 올리면 원본 코드가 보입니다.';
 
     var html = '';
     for (var i = 0; i < nodes.length; i++) {
@@ -830,7 +852,7 @@ pre.dump {
       var url = CM.pageUrl(n.id, state.publisher);
       html += '<tr>'
         + '<td class="c-name"><a class="nlink" href="/' + esc(url) + '">' + esc(n.name) + '</a></td>'
-        + '<td class="c-std col-hide"><span class="muted">' + esc(n.std) + '</span></td>'
+        + '<td class="c-std col-hide" title="' + esc(n.std) + '"><span class="muted">' + esc(stdLabel(n.std)) + '</span></td>'
         + '<td class="c-num">' + (st.total || '—') + '</td>'
         + '<td class="c-rate">' + pct(st.rate) + '</td>'
         + '<td class="c-state"><span class="pill" style="background:' + s.bg + ';color:' + s.fg + '">' + esc(s.label) + '</span></td>'
@@ -853,7 +875,7 @@ pre.dump {
       var opts = '';
       for (var s = 0; s < stds.length; s++) {
         var first = CM.byStandard(stds[s])[0];
-        var lab = stds[s] + ' · ' + (first ? first.name : '');
+        var lab = stdLabel(stds[s]) + ' · ' + (first ? first.name : '');
         var sel = chosen.indexOf(stds[s]) !== -1 ? ' selected' : '';
         opts += '<option value="' + esc(stds[s]) + '"' + sel + '>' + esc(lab) + '</option>';
       }
