@@ -197,12 +197,17 @@ body.parentview #hero { display: block; }
 .tbl th { font-size: 11px; color: #db2777; font-weight: 700; padding: 8px 10px; border-bottom: 1px solid #fce7f3; white-space: nowrap; }
 .tbl td { padding: 9px 10px; border-bottom: 1px solid #f7f7f8; vertical-align: middle; }
 .tbl tr:last-child td { border-bottom: none; }
-/* 열 규칙: 5개 열 전부 머리글·본문 가운데 정렬 */
-.tbl .c-name  { width: auto;  text-align: center; }
-.tbl .c-std   { width: 168px; text-align: center; }
-.tbl .c-num   { width: 72px;  text-align: center; }
-.tbl .c-rate  { width: 84px;  text-align: center; }
-.tbl .c-state { width: 96px;  text-align: center; }
+/* 열 규칙: 5개 열 전부 머리글·본문 가운데 정렬.
+   폭은 %로 잡아 두 화면의 비율을 통일한다. (합계 100%) */
+.tbl .c-std   { width: 24%; text-align: center; }
+.tbl .c-name  { width: 28%; text-align: center; }
+.tbl .c-num   { width: 13%; text-align: center; }
+.tbl .c-rate  { width: 16%; text-align: center; }
+.tbl .c-state { width: 19%; text-align: center; }
+/* 학부모 화면은 3열만 남으므로 거의 같은 폭으로 나눈다 */
+body.parentview .c-std   { width: 34%; }
+body.parentview .c-name  { width: 34%; }
+body.parentview .c-state { width: 32%; }
 .pill { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; display: inline-block; }
 .nlink { color: #1d1d1f; text-decoration: none; font-weight: 600; }
 .nlink:hover { color: #db2777; text-decoration: underline; }
@@ -249,13 +254,10 @@ pre.dump {
   .col-hide { display: none; }
   /* 학부모 화면에서는 성취기준을 모바일에서도 남기되,
      모든 줄에 반복되는 '고1 통합과학2' 접두는 접어 자리를 줄인다. */
-  body.parentview .c-std { display: table-cell; width: 84px; }
+  body.parentview .c-std { display: table-cell; }
   body.parentview .std-pre { display: none; }
   .tbl { font-size: 12px; }
-  .tbl th, .tbl td { padding: 8px 6px; }
-  .tbl .c-num   { width: 56px; }
-  .tbl .c-rate  { width: 64px; }
-  .tbl .c-state { width: 78px; }
+  .tbl th, .tbl td { padding: 8px 5px; }
   .exrow { grid-template-columns: 1fr; gap: 8px; }
   .exsel { min-width: 0; width: 100%; }
   .stat .v { font-size: 1.25rem; }
@@ -356,8 +358,8 @@ pre.dump {
       <table class="tbl">
         <thead>
           <tr>
-            <th class="c-name">개념</th>
             <th class="c-std col-hide">성취기준</th>
+            <th class="c-name">개념</th>
             <th class="c-num">문항</th>
             <th class="c-rate">정답률</th>
             <th class="c-state">상태</th>
@@ -1464,8 +1466,8 @@ pre.dump {
       var s = sty(st.status);
       var url = CM.pageUrl(n.id, state.publisher);
       html += '<tr>'
-        + '<td class="c-name"><a class="nlink" href="/' + esc(url) + '">' + esc(n.name) + '</a></td>'
         + '<td class="c-std col-hide" title="' + esc(n.std) + '"><span class="muted">' + stdCell(n.std) + '</span></td>'
+        + '<td class="c-name"><a class="nlink" href="/' + esc(url) + '">' + esc(n.name) + '</a></td>'
         + '<td class="c-num">' + (st.total || '—') + '</td>'
         + '<td class="c-rate">' + pct(st.rate) + '</td>'
         + '<td class="c-state"><span class="pill" style="background:' + s.bg + ';color:' + s.fg + '">' + esc(s.label) + '</span></td>'
