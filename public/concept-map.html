@@ -223,6 +223,17 @@ body.parentview #fieldPub,
 body.parentview #fieldGrain,
 body.parentview #ctrlNote { display: none; }
 
+/* — 상태 안내 (표 아래 범례 + 대응 계획) — */
+.guide { margin-top: 1.15rem; border-top: 1px solid #f3f3f5; padding-top: 1rem; }
+.guide-t { font-size: 11px; font-weight: 800; color: #86868b; letter-spacing: 0.06em; margin-bottom: 0.85rem; }
+.guide-item { display: grid; grid-template-columns: 124px 1fr; gap: 14px; padding: 0.8rem 0; border-bottom: 1px solid #f7f7f8; align-items: start; }
+.guide-item:last-child { border-bottom: none; }
+.guide-l { text-align: center; }
+.guide-cri { display: block; font-size: 10.5px; color: #b0b0b5; margin-top: 6px; font-weight: 600; line-height: 1.45; }
+.guide-mean { font-size: 13px; line-height: 1.7; color: #3a3a3e; }
+.guide-plan { font-size: 12.5px; line-height: 1.7; color: #9d174d; background: #fdf2f8; border: 1px solid #fce7f3; border-radius: 10px; padding: 8px 11px; margin-top: 8px; }
+.guide-plan b { font-weight: 800; }
+
 /* — Exam tagging — */
 .exrow { display: grid; grid-template-columns: 1fr minmax(240px, 320px); gap: 12px; align-items: start; padding: 12px 0; border-bottom: 1px solid #f7f7f8; }
 .exrow:last-child { border-bottom: none; }
@@ -269,6 +280,9 @@ pre.dump {
   .hero-focus { padding: 0.85rem 0.9rem; }
   .hero-focus .nm { font-size: 1rem; }
   .asum-num { margin-left: 0; width: 100%; }
+  .guide-item { grid-template-columns: 1fr; gap: 7px; }
+  .guide-l { text-align: left; }
+  .guide-cri { display: inline; margin-top: 0; margin-left: 7px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
@@ -368,6 +382,7 @@ pre.dump {
         <tbody id="tblBody"></tbody>
       </table>
     </div>
+    <div class="guide" id="guide"></div>
   </div>
 
   <!-- 시험별 개념 연결 -->
@@ -423,6 +438,51 @@ pre.dump {
   };
 
   var ACADEMY = '인후쌤 과학수업';
+
+  /* concept-map.js 의 DEFAULT_THRESHOLD 와 반드시 같은 값이어야 한다.
+     화면에 표시되는 기준 문구는 전부 이 상수에서 만들어진다. */
+  var TH = { minAttempts: 3, weak: 0.60, warn: 0.80 };
+
+  var P = function (v) { return Math.round(v * 100); };
+  var CRITERIA = {
+    ok:      '정답률 ' + P(TH.warn) + '% 이상',
+    warn:    '정답률 ' + P(TH.weak) + '~' + (P(TH.warn) - 1) + '%',
+    weak:    '정답률 ' + P(TH.weak) + '% 미만',
+    few:     '평가 문항 ' + TH.minAttempts + '개 미만',
+    unknown: '평가 기록 없음'
+  };
+
+  /* 상태가 떴을 때 "무엇을 뜻하고, 그래서 무엇을 하는지"를 함께 적는다.
+     학부모 화면에서 상태만 덩그러니 보이면 그냥 넘어가는 인상을 주기 때문이다. */
+  var GUIDE_LEAD = '모든 개념은 아래 다섯 단계 중 하나로 관리됩니다. '
+    + '지금 점수가 낮게 나온 개념도 그대로 두지 않고, 단계마다 정해진 방식으로 끝까지 확인합니다.';
+
+  var GUIDE = {
+    parent: [
+      { k: 'ok',
+        mean: '평가에서 꾸준히 정확하게 풀어낸 개념입니다.',
+        plan: '새로 배우는 개념의 발판으로 활용하고, 복습 평가에서 한 번 더 확인해 유지합니다.' },
+      { k: 'warn',
+        mean: '큰 흐름은 이미 잡은 단계입니다. 묻는 방식이 달라졌을 때를 대비해 한 번 더 손보는 구간이라, 걱정하실 단계는 아닙니다.',
+        plan: '수업 도입부에서 짧게 되짚고, 조건을 바꾼 문항으로 한 번 더 확인합니다.' },
+      { k: 'weak',
+        mean: '배우는 과정에서 자연스럽게 나오는 구간입니다. 이 개념이 눈에 띄었다는 것은 어디를 손봐야 할지 정확히 찾았다는 뜻입니다.',
+        plan: '앞선 개념까지 거슬러 올라가 원인을 찾고, 다시 설명한 뒤 재평가로 확인합니다. 확인될 때까지 저희가 계속 따라갑니다.' },
+      { k: 'few',
+        mean: '아직 나온 문항이 적어, 섣불리 판단하지 않고 미뤄 둔 개념입니다.',
+        plan: '다음 평가에 문항을 더 넣어 상태를 정확히 확정합니다.' },
+      { k: 'unknown',
+        mean: '아직 수업에서 다루지 않은 개념입니다.',
+        plan: '진도에 맞춰 수업한 뒤, 같은 방식으로 평가해 확인합니다.' }
+    ],
+    teacher: [
+      { k: 'ok',      mean: '유지. 후속 개념의 발판으로 사용.' },
+      { k: 'warn',    mean: '변형 문항으로 재확인 필요.' },
+      { k: 'weak',    mean: '선수 개념까지 역추적 후 재수업 · 재평가.' },
+      { k: 'few',     mean: '판단 보류. 표본 확보 필요.' },
+      { k: 'unknown', mean: '미출제 구간. 진도 확인.' }
+    ]
+  };
 
   var CM = window.ConceptMap;
   var db = null;
@@ -1061,6 +1121,80 @@ pre.dump {
     return html;
   }
 
+  /** 지금 화면에서 다룰 개념 하나를 고른다.
+      취약(root) → 주의 → 표본 부족 → 전부 안정 순으로 내려간다.
+      "다음 단원으로 넘어가도 좋다" 같은 두루뭉술한 마무리 대신
+      항상 구체적인 개념 하나와 대응 계획이 나오게 하기 위함이다. */
+  function focusTarget() {
+    var A = state.analysis;
+    if (!A) return null;
+    if (A.roots && A.roots.length) {
+      return { kind: 'weak', id: A.roots[0].id, blocking: A.roots[0].blocking || [] };
+    }
+    function lowestOf(status) {
+      var best = null;
+      for (var i = 0; i < CM.NODES.length; i++) {
+        var id = CM.NODES[i].id, st = A.stats[id];
+        if (!st || st.status !== status) continue;
+        if (best === null || (st.rate || 0) < (A.stats[best].rate || 0)) best = id;
+      }
+      return best;
+    }
+    var w = lowestOf('warn');
+    if (w) return { kind: 'warn', id: w, blocking: [] };
+    var f = lowestOf('few');
+    if (f) return { kind: 'few', id: f, blocking: [] };
+    if (countByStatus(null).measured > 0) return { kind: 'ok', id: null, blocking: [] };
+    return null;
+  }
+
+  /** focusTarget 을 학부모용 문장으로 바꾼다. 히어로 카드와 집중 개념 카드가 함께 쓴다. */
+  function focusCopy() {
+    var t = focusTarget();
+    var out = { kind: t ? t.kind : 'none', lbl: '현재 상태', nm: '', ds: '', plan: '', why: '', url: null };
+
+    if (!t) {
+      out.nm = '학습 기록을 모으는 중입니다';
+      out.ds = '수업과 평가가 쌓이면 이곳에 이번 기간 집중 개념이 표시됩니다.';
+      return out;
+    }
+    if (t.kind === 'ok') {
+      out.nm = '확인한 개념을 유지 관리합니다';
+      out.ds = '이번 기간 평가에서 확인한 개념이 모두 안정적으로 나왔습니다.';
+      out.plan = '다음 계획 — 복습 평가로 한 번 더 점검하고, 새로 배우는 개념의 발판으로 이어 갑니다.';
+      return out;
+    }
+
+    var node = CM.getNode(t.id);
+    out.nm = node ? node.name : t.id;
+    out.url = CM.pageUrl(t.id, state.publisher);
+    out.why = node ? '성취기준 ' + stdLabel(node.std) : '';
+
+    if (t.kind === 'weak') {
+      out.lbl = '지금 집중하는 개념';
+      var names = [];
+      for (var i = 0; i < Math.min(t.blocking.length, 3); i++) {
+        var b = CM.getNode(t.blocking[i]);
+        if (b) names.push(b.name);
+      }
+      out.ds = t.blocking.length
+        ? '이 개념 하나를 잡으면 <b>' + esc(names.join(', ')) + '</b>'
+          + (t.blocking.length > 3 ? ' 등 ' + t.blocking.length + '개' : '')
+          + ' 개념이 함께 풀립니다. 여러 개가 흔들려 보여도 원인은 대개 한 곳이라, 그 지점부터 다시 세우면 나머지는 따라옵니다.'
+        : '배우는 과정에서 자연스럽게 나오는 구간입니다. 어디를 손봐야 할지 정확히 찾았으니, 이 지점부터 다시 세우겠습니다.';
+      out.plan = '다음 계획 — 앞선 개념까지 거슬러 올라가 원인을 찾고, 다시 설명한 뒤 재평가로 확인합니다.';
+    } else if (t.kind === 'warn') {
+      out.lbl = '지금 다지는 개념';
+      out.ds = '큰 흐름은 이미 잡았습니다. 묻는 방식이 달라져도 흔들리지 않도록 굳히는 단계입니다.';
+      out.plan = '다음 계획 — 수업 도입부에서 짧게 되짚고, 조건을 바꾼 문항으로 한 번 더 확인합니다.';
+    } else {
+      out.lbl = '확인 중인 개념';
+      out.ds = '아직 나온 문항이 적어, 섣불리 판단하지 않고 미뤄 둔 개념입니다.';
+      out.plan = '다음 계획 — 다음 평가에 문항을 더 넣어 상태를 정확히 확정합니다.';
+    }
+    return out;
+  }
+
   /* ---------------- 렌더링 ---------------- */
 
   function renderBanner() {
@@ -1130,35 +1264,12 @@ pre.dump {
       + '<span><i style="background:' + set.unknown.line + '"></i>예정 ' + (c.unknown + c.few) + '</span>'
       + '</div>';
 
-    // 지금 잡아야 할 개념 — 딱 하나만
-    if (A && A.roots.length > 0) {
-      var r = A.roots[0];
-      var node = CM.getNode(r.id);
-      var names = [];
-      for (var i = 0; i < Math.min(r.blocking.length, 3); i++) {
-        var t = CM.getNode(r.blocking[i]);
-        if (t) names.push(t.name);
-      }
-      var ds = r.blocking.length > 0
-        ? '이 개념 하나를 잡으면 <b>' + esc(names.join(', ')) + '</b>'
-          + (r.blocking.length > 3 ? ' 등 ' + r.blocking.length + '개' : '')
-          + ' 개념이 함께 풀립니다. 다음 수업에서 이 지점부터 다시 세웁니다.'
-        : '이번 기간 집중해서 다지고 있는 개념입니다.';
-      html += '<div class="hero-focus">'
-        + '<div class="lbl">지금 집중하는 개념</div>'
-        + '<div class="nm">' + esc(node ? node.name : r.id) + '</div>'
-        + '<div class="ds">' + ds + '</div></div>';
-    } else if (c.measured > 0) {
-      html += '<div class="hero-focus">'
-        + '<div class="lbl">현재 상태</div>'
-        + '<div class="nm">개념이 순서대로 잘 이어지고 있습니다</div>'
-        + '<div class="ds">앞선 개념이 끊긴 곳 없이 연결되어 있어, 다음 단원으로 넘어가도 좋은 상태입니다.</div></div>';
-    } else {
-      html += '<div class="hero-focus">'
-        + '<div class="lbl">현재 상태</div>'
-        + '<div class="nm">학습 기록을 모으는 중입니다</div>'
-        + '<div class="ds">수업과 평가가 쌓이면 이곳에 이번 기간 집중 개념이 표시됩니다.</div></div>';
-    }
+    // 지금 잡아야 할 개념 — 딱 하나만, 항상 대응 계획과 함께
+    var fc = focusCopy();
+    html += '<div class="hero-focus">'
+      + '<div class="lbl">' + esc(fc.lbl) + '</div>'
+      + '<div class="nm">' + esc(fc.nm) + '</div>'
+      + '<div class="ds">' + fc.ds + (fc.plan ? '<br>' + esc(fc.plan) : '') + '</div></div>';
 
     html += '<div class="hero-date"><span>' + esc(todayLabel()) + ' 기준</span>'
       + '<span>·</span><span>누적 평가 ' + state.examCount + '회</span></div>';
@@ -1207,10 +1318,10 @@ pre.dump {
            + '<div class="s">' + c.measured + ' / ' + c.total + ' 개념</div></div>';
       html += '<div class="stat"><div class="v">' + c.ok + '</div>'
            + '<div class="l">안정 개념</div>'
-           + '<div class="s">정답률 80% 이상</div></div>';
+           + '<div class="s">' + CRITERIA.ok + '</div></div>';
       html += '<div class="stat"><div class="v">' + c.weak + '</div>'
            + '<div class="l">취약 개념</div>'
-           + '<div class="s">정답률 60% 미만</div></div>';
+           + '<div class="s">' + CRITERIA.weak + '</div></div>';
       html += '<div class="stat"><div class="v">' + total + '</div>'
            + '<div class="l">누적 문항</div>'
            + '<div class="s">' + ({ area: '영역 단위로 표시', std: '성취기준 단위로 표시', node: '개념 단위로 표시' })[g] + '</div></div>';
@@ -1272,55 +1383,62 @@ pre.dump {
     $('focusTitle').innerHTML = (isP ? '이번 기간 집중 개념' : '공략 포인트')
       + ' <span class="tag">선수 개념 추적</span>';
 
-    if (!A || A.roots.length === 0) {
-      var emptyMsg;
-      if (A && A.answered > 0) {
-        emptyMsg = isP
-          ? '<b>지금은 개념이 순서대로 잘 이어지고 있습니다.</b> 다음 단원으로 넘어가도 좋은 상태입니다.'
-          : '<b>지금은 막힌 지점이 없습니다.</b> 선수 개념이 끊긴 곳 없이 잘 이어지고 있습니다.';
-      } else {
-        emptyMsg = isP
-          ? '<b>이번 기간 기록을 모으는 중입니다.</b> 수업과 평가가 쌓이면 이곳에 집중 개념이 나타납니다.'
-          : '<b>아직 분석할 기록이 없습니다.</b> 시험 결과가 쌓이면 여기에 공략 포인트가 나타납니다.';
-      }
-      box.innerHTML = '<div class="banner okbox">' + emptyMsg + '</div>';
+    if (isP) {
+      var fc = focusCopy();
+      box.innerHTML = '<div class="focus parent">'
+        + '<h4>' + esc(fc.nm) + '</h4>'
+        + '<p>' + fc.ds + '</p>'
+        + (fc.plan ? '<div class="plan">' + esc(fc.plan) + '</div>' : '')
+        + (fc.why ? '<div class="why">' + esc(fc.why) + '</div>' : '')
+        + (fc.url ? '<a class="go" href="/' + esc(fc.url) + '">단원 페이지 열기 →</a>' : '')
+        + '</div>';
       return;
     }
 
-    // 학부모 화면에서는 딱 하나만 크게 — 여러 개를 늘어놓으면 메시지가 흐려진다
-    var limit = isP ? 1 : 3;
+    if (!A || A.roots.length === 0) {
+      box.innerHTML = '<div class="banner okbox">' + (A && A.answered > 0
+        ? '<b>지금은 막힌 지점이 없습니다.</b> 선수 개념이 끊긴 곳 없이 잘 이어지고 있습니다.'
+        : '<b>아직 분석할 기록이 없습니다.</b> 시험 결과가 쌓이면 여기에 공략 포인트가 나타납니다.') + '</div>';
+      return;
+    }
+
     var html = '';
-    for (var i = 0; i < Math.min(A.roots.length, limit); i++) {
+    for (var i = 0; i < Math.min(A.roots.length, 3); i++) {
       var r = A.roots[i];
       var node = CM.getNode(r.id);
       var url = CM.pageUrl(r.id, state.publisher);
-      var names = r.blocking.slice(0, 3).map(function (x) {
-        var t = CM.getNode(x); return t ? t.name : x;
-      });
-
-      var body, why, plan = '';
-      if (isP) {
-        body = r.blocking.length > 0
-          ? '지금 <b>' + esc(node.name) + '</b> 하나만 잡으면 '
-            + esc(names.join(', ')) + (r.blocking.length > 3 ? ' 등 ' + r.blocking.length + '개' : '')
-            + ' 개념이 함께 풀립니다.'
-          : '<b>' + esc(node.name) + '</b>을(를) 이번 기간 집중 개념으로 잡았습니다.';
-        why = '앞선 개념부터 되짚는 방식으로 관리합니다';
-        plan = '다음 수업 계획 — ' + esc(node.name) + ' 개념을 다시 세운 뒤, 이어지는 개념을 순서대로 확인합니다.';
-      } else {
-        body = esc(CM.explainRoot(r));
-        why = '성취기준 ' + esc(stdLabel(node.std)) + ' · 관련 문항 ' + A.stats[r.id].total + '개 · 정답률 ' + pct(r.rate);
-      }
-
-      html += '<div class="focus' + (isP ? ' parent' : '') + '">'
+      html += '<div class="focus">'
         + '<h4>' + esc(node.name) + '</h4>'
-        + '<p>' + body + '</p>'
-        + (plan ? '<div class="plan">' + plan + '</div>' : '')
-        + '<div class="why">' + why + '</div>'
+        + '<p>' + esc(CM.explainRoot(r)) + '</p>'
+        + '<div class="why">성취기준 ' + esc(stdLabel(node.std))
+        + ' · 관련 문항 ' + A.stats[r.id].total + '개 · 정답률 ' + pct(r.rate) + '</div>'
         + (url ? '<a class="go" href="/' + esc(url) + '">단원 페이지 열기 →</a>' : '')
         + '</div>';
     }
     box.innerHTML = html;
+  }
+
+  /** 표 아래 상태 안내 — 상태가 뜨면 무엇을 하는지까지 적는다 */
+  function renderGuide() {
+    var isP = state.view === 'parent';
+    var rows = GUIDE[isP ? 'parent' : 'teacher'];
+    var html = '<div class="guide-t">'
+      + (isP ? '상태는 이렇게 나뉘고, 이렇게 관리합니다' : '판정 기준 · 대응') + '</div>';
+    if (isP) html += '<div class="guide-mean" style="margin-bottom:0.9rem;color:#86868b">' + esc(GUIDE_LEAD) + '</div>';
+
+    for (var i = 0; i < rows.length; i++) {
+      var g = rows[i];
+      var s = sty(g.k);
+      html += '<div class="guide-item">'
+        + '<div class="guide-l">'
+        + '<span class="pill" style="background:' + s.bg + ';color:' + s.fg + '">' + esc(s.label) + '</span>'
+        + '<span class="guide-cri">' + esc(CRITERIA[g.k]) + '</span>'
+        + '</div>'
+        + '<div><div class="guide-mean">' + esc(g.mean) + '</div>'
+        + (g.plan ? '<div class="guide-plan"><b>이렇게 합니다</b> · ' + esc(g.plan) + '</div>' : '')
+        + '</div></div>';
+    }
+    $('guide').innerHTML = html;
   }
 
   function renderTabs() {
@@ -1555,6 +1673,7 @@ pre.dump {
     renderAreaSummary();
     renderMap();
     renderTable();
+    renderGuide();
     renderExams();
   }
 
