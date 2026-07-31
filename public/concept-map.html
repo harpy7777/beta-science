@@ -64,6 +64,9 @@ select, input[type=text] {
   appearance: none; -webkit-appearance: none;
 }
 select:focus, input:focus { outline: 2px solid #f9a8d4; outline-offset: 1px; }
+select[multiple] { padding: 6px; appearance: none; -webkit-appearance: none; }
+select[multiple] option { padding: 5px 7px; border-radius: 6px; font-size: 13px; }
+select[multiple] optgroup { font-size: 11px; color: #db2777; font-weight: 700; }
 
 /* — Banner — */
 .banner {
@@ -131,11 +134,12 @@ select:focus, input:focus { outline: 2px solid #f9a8d4; outline-offset: 1px; }
 body.parentview .c-std { display: none; }
 
 /* — Exam tagging — */
-.exrow { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid #f7f7f8; }
+.exrow { display: grid; grid-template-columns: 1fr minmax(240px, 320px); gap: 12px; align-items: start; padding: 12px 0; border-bottom: 1px solid #f7f7f8; }
 .exrow:last-child { border-bottom: none; }
 .exname { font-size: 13px; font-weight: 600; color: #1d1d1f; word-break: break-all; }
-.exmeta { font-size: 11px; color: #b0b0b5; margin-top: 2px; }
-.exsel { min-width: 190px; }
+.exmeta { font-size: 11px; color: #b0b0b5; margin-top: 3px; }
+.exchosen { font-size: 11px; color: #db2777; font-weight: 600; margin-top: 5px; line-height: 1.6; }
+.exsel { width: 100%; }
 .btn {
   font-family: inherit; font-size: 13px; font-weight: 700; padding: 10px 16px;
   border-radius: 11px; border: none; cursor: pointer;
@@ -163,7 +167,7 @@ pre.dump {
   .tbl .c-num   { width: 56px; }
   .tbl .c-rate  { width: 64px; }
   .tbl .c-state { width: 78px; }
-  .exrow { grid-template-columns: 1fr; }
+  .exrow { grid-template-columns: 1fr; gap: 8px; }
   .exsel { min-width: 0; width: 100%; }
   .stat .v { font-size: 1.25rem; }
 }
@@ -193,6 +197,10 @@ pre.dump {
     <div class="card-title">조회 조건</div>
     <div class="controls">
       <div>
+        <label class="field-label" for="selGrade">학년</label>
+        <select id="selGrade"><option value="">전체</option></select>
+      </div>
+      <div>
         <label class="field-label" for="selStudent">학생</label>
         <select id="selStudent"><option value="">불러오는 중…</option></select>
       </div>
@@ -214,6 +222,7 @@ pre.dump {
         </select>
       </div>
     </div>
+    <div class="muted" style="margin-top:0.7rem">교과서 선택은 개념을 눌렀을 때 열리는 단원 페이지에만 적용됩니다. 성취기준은 교육부 고시라 출판사가 달라도 동일합니다.</div>
   </div>
 
   <!-- 요약 -->
@@ -262,8 +271,10 @@ pre.dump {
   <div class="card" id="tagCard">
     <div class="card-title">시험 ↔ 개념 연결 <span class="tag">최초 1회</span></div>
     <div class="muted" style="margin-bottom:0.9rem">
-      기존 시험 데이터에는 개념 정보가 없습니다. 시험마다 다루는 성취기준을 지정해 두면
-      이후 채점 결과가 자동으로 개념 지도에 반영됩니다. 시험명으로 추천을 먼저 띄웁니다.
+      시험마다 다루는 <b>개념</b>을 지정해 두면 이후 채점 결과가 자동으로 개념 지도에 반영됩니다.
+      성취기준(15개)이 아니라 개념(57개) 단위로 연결해야 선수 관계 추적이 작동합니다.
+      목록은 <b>전체 학생의 채점 기록</b>에서 모으므로, 학생을 바꿔 가며 반복할 필요가 없습니다.
+      여러 개를 고를 때는 <b>Cmd(⌘)</b> 또는 <b>Ctrl</b>을 누른 채 클릭하고, 같은 방법으로 선택을 해제합니다.
     </div>
     <div id="examList"></div>
     <div style="margin-top:1rem; display:flex; gap:8px; flex-wrap:wrap">
@@ -315,12 +326,15 @@ pre.dump {
     view: 'teacher',        // 'teacher' | 'parent'
     area: 1,
     students: [],
+    gradeList: [],
+    grade: '',              // '' = 전체
     studentId: '',
     publisher: 'miraen',
     grain: 'auto',
     records: [],
-    exams: [],              // [{key, title, count}]
-    tagMap: {},             // examKey -> [std]
+    exams: [],              // [{key, title, q, takers, mine}]
+    examsSig: '',
+    tagMap: {},             // examKey -> [conceptId]  (S2-xxx)
     tagError: '',
     analysis: null,
     diag: []
@@ -390,8 +404,8 @@ pre.dump {
 
   function sampleStudents() {
     return [
-      { id: 'demo1', studentId: 'demo1', name: '샘플 학생 A' },
-      { id: 'demo2', studentId: 'demo2', name: '샘플 학생 B' }
+      { id: 'demo1', studentId: 'demo1', name: '샘플 학생 A', grade: '1' },
+      { id: 'demo2', studentId: 'demo2', name: '샘플 학생 B', grade: '2' }
     ];
   }
 
@@ -459,12 +473,22 @@ pre.dump {
         arr.push({
           id: d.id,
           studentId: String(pick(v, ['id', 'studentId', 'sid', 'studentID', 'loginId']) || d.id).trim().toLowerCase(),
-          name: pick(v, ['name', 'studentName', '이름']) || d.id
+          name: pick(v, ['name', 'studentName', '이름']) || d.id,
+          grade: String(pick(v, ['grade', '학년', 'gradeLevel', 'schoolGrade']) || '').trim()
         });
       });
-      arr.sort(function (a, b) { return String(a.name).localeCompare(String(b.name), 'ko'); });
+      arr.sort(function (a, b) {
+        var g = String(a.grade).localeCompare(String(b.grade), 'ko', { numeric: true });
+        if (g !== 0) return g;
+        return String(a.name).localeCompare(String(b.name), 'ko');
+      });
       state.students = arr;
-      log('students 컬렉션', { 읽은문서수: snap.size, 재원학생수: arr.length, 첫문서필드: sampleShape });
+      var gcount = {};
+      for (var q = 0; q < arr.length; q++) {
+        var gk = arr[q].grade || '(미지정)';
+        gcount[gk] = (gcount[gk] || 0) + 1;
+      }
+      log('students 컬렉션', { 읽은문서수: snap.size, 재원학생수: arr.length, 학년분포: gcount, 첫문서필드: sampleShape });
     }).catch(function (e) {
       log('students 읽기 실패', String(e && e.message ? e.message : e));
       state.students = sampleStudents();
@@ -546,12 +570,77 @@ pre.dump {
     return String(key).replace(/[\/\\#\[\]*?]/g, '_').slice(0, 500) || '_';
   }
 
+  /* ---------------- 시험명 → 개념 자동 추천 ---------------- */
+
+  /** '1-1. 진화와 생물다양성 (ⓐ 생물다양성과 보전)' → '생물다양성과 보전' */
+  function innerTopic(title) {
+    var s = String(title == null ? '' : title).trim();
+    var m = s.match(/[(（]([^()（）]*)[)）]\s*$/);
+    var inner = m ? m[1] : s;
+    // 앞머리 기호(ⓐ, ①, a., 1) 제거 — 한글/영문/숫자가 처음 나오는 지점부터 취한다
+    inner = inner.replace(/^[^0-9A-Za-z\uAC00-\uD7A3]+/, '').trim();
+    inner = inner.replace(/^[0-9A-Za-z]{1,2}[.)]\s*/, '').trim();
+    return inner || s;
+  }
+
+  /** 한글 2글자 조각으로 잘라 이름 유사도를 잰다. */
+  function bigrams(s) {
+    var t = String(s == null ? '' : s).replace(/[\s·.,、()（）\-_/]/g, '');
+    var out = [];
+    for (var i = 0; i + 1 < t.length; i++) out.push(t.substr(i, 2));
+    return out;
+  }
+
+  function sharedBigrams(a, b) {
+    var A = bigrams(a), B = bigrams(b);
+    var set = {}, seen = {}, c = 0, i;
+    for (i = 0; i < B.length; i++) set[B[i]] = true;
+    for (i = 0; i < A.length; i++) {
+      if (set[A[i]] && !seen[A[i]]) { seen[A[i]] = true; c++; }
+    }
+    return c;
+  }
+
+  var SUGGEST_MIN = 20;
+  var SUGGEST_LIMIT = 4;
+
+  /** 시험명에서 개념 노드 후보를 점수순으로 뽑는다. */
+  function suggestNodes(title) {
+    var full = String(title == null ? '' : title);
+    var inner = innerTopic(full);
+    var out = [];
+    var nodes = CM.NODES;
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      var sc = 0;
+      if (inner === n.name) sc += 100;
+      else if (inner.indexOf(n.name) !== -1) sc += 60;
+      else if (n.name.indexOf(inner) !== -1) sc += 50;
+      sc += 8 * sharedBigrams(n.name, inner);
+      var kws = n.kw || [];
+      for (var k = 0; k < kws.length; k++) {
+        // '물', '산', '철' 같은 한 글자 키워드는 엉뚱한 개념을 끌어오므로 제외한다
+        if (String(kws[k]).length < 2) continue;
+        if (inner.indexOf(kws[k]) !== -1) sc += 12;
+        else if (full.indexOf(kws[k]) !== -1) sc += 4;
+      }
+      if (sc >= SUGGEST_MIN) out.push({ id: n.id, score: sc });
+    }
+    out.sort(function (a, b) {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.id < b.id ? -1 : 1;
+    });
+    return out.slice(0, SUGGEST_LIMIT);
+  }
+
+  /* ---------------- 데이터 로딩 ---------------- */
+
   function loadGrades(studentId) {
     if (!LIVE) {
       state.records = sampleRecords(studentId);
       state.exams = [
-        { key: 'demo-1', title: '샘플 단원평가 1회', count: 12 },
-        { key: 'demo-2', title: '샘플 단원평가 2회', count: 10 }
+        { key: 'demo-1', title: '샘플 단원평가 1회', q: 12, takers: 2, mine: true },
+        { key: 'demo-2', title: '샘플 단원평가 2회', q: 10, takers: 2, mine: true }
       ];
       return Promise.resolve();
     }
@@ -565,11 +654,22 @@ pre.dump {
       snap.forEach(function (d) {
         var v = d.data() || {};
         if (!firstShape) firstShape = { docId: d.id, 필드: Object.keys(v) };
-        var sid = String(pick(v, ['studentId', 'sid', 'studentID', 'id']) || '').trim().toLowerCase();
-        if (!target || sid !== target) return;
-        matched++;
 
         var t = docTally(v);
+        var key = examKeyOf(d.id, v);
+        var sid = String(pick(v, ['studentId', 'sid', 'studentID', 'id']) || '').trim().toLowerCase();
+        var isMine = target && sid === target;
+
+        /* 시험 목록은 학생과 무관하게 전체 문서에서 모은다.
+           한 명씩 돌아가며 태그를 달 필요가 없도록 하기 위함이다. */
+        if (!exams[key]) exams[key] = { key: key, title: examTitleOf(d.id, v), q: 0, takers: 0, mine: false };
+        exams[key].takers += 1;
+        if (t && t.total > exams[key].q) exams[key].q = t.total;
+        if (isMine) exams[key].mine = true;
+
+        // 정답률 집계는 선택된 학생 문서만
+        if (!isMine) return;
+        matched++;
         if (!t) { skipped++; return; }
 
         if (!sampleShown) {
@@ -581,25 +681,28 @@ pre.dump {
           };
         }
 
-        var key = examKeyOf(d.id, v);
-        if (!exams[key]) exams[key] = { key: key, title: examTitleOf(d.id, v), count: 0 };
-        exams[key].count += t.total;
-
-        var stds = state.tagMap[key] || [];
-        if (stds.length === 0) return;
-        for (var s = 0; s < stds.length; s++) {
+        // 개념 단위 집계: conceptId 를 넣어야 analyze() 가 노드별로 나눠 담는다.
+        var ids = state.tagMap[key] || [];
+        if (ids.length === 0) return;
+        for (var s = 0; s < ids.length; s++) {
+          var node = CM.getNode(ids[s]);
+          if (!node) continue;
           for (var i = 0; i < t.total; i++) {
-            recs.push({ std: stds[s], correct: i < t.correct });
+            recs.push({ conceptId: node.id, std: node.std, correct: i < t.correct });
           }
         }
       });
       state.records = recs;
       state.exams = Object.keys(exams).map(function (k) { return exams[k]; })
-        .sort(function (a, b) { return b.count - a.count; });
+        .sort(function (a, b) {
+          if (a.mine !== b.mine) return a.mine ? -1 : 1;
+          if (b.takers !== a.takers) return b.takers - a.takers;
+          return String(a.title).localeCompare(String(b.title), 'ko', { numeric: true });
+        });
       log('grades 컬렉션', {
         전체문서수: snap.size, 이학생문서수: matched, 집계실패문서: skipped,
         첫문서구조: firstShape, 표본: sampleShown,
-        시험수: state.exams.length, 연결된기록수: state.records.length
+        전체시험수: state.exams.length, 연결된기록수: state.records.length
       });
     }).catch(function (e) {
       log('grades 읽기 실패', String(e && e.message ? e.message : e));
@@ -608,18 +711,44 @@ pre.dump {
     });
   }
 
+  /** conceptTags 문서를 개념 id 배열로 정규화한다.
+      concepts(신규) 우선, 없으면 standards(구버전)를 노드로 펼친다. */
+  function normalizeTagDoc(v) {
+    if (Array.isArray(v.concepts) && v.concepts.length) {
+      var ids = [];
+      for (var i = 0; i < v.concepts.length; i++) {
+        if (CM.getNode(v.concepts[i])) ids.push(v.concepts[i]);
+      }
+      return ids;
+    }
+    if (Array.isArray(v.standards) && v.standards.length) {
+      var out = [];
+      for (var s = 0; s < v.standards.length; s++) {
+        var list = CM.byStandard(v.standards[s]) || [];
+        for (var g = 0; g < list.length; g++) out.push(list[g].id);
+      }
+      return out;
+    }
+    return [];
+  }
+
   function loadTags() {
     if (!LIVE) { state.tagMap = {}; return Promise.resolve(); }
     return db.collection('conceptTags').get().then(function (snap) {
       var m = {};
+      var legacy = 0;
       snap.forEach(function (d) {
         var v = d.data() || {};
         var key = v.examId ? String(v.examId) : d.id;
-        if (Array.isArray(v.standards)) m[key] = v.standards;
+        var ids = normalizeTagDoc(v);
+        if (ids.length) {
+          m[key] = ids;
+          if (!Array.isArray(v.concepts) || !v.concepts.length) legacy++;
+        }
       });
       state.tagMap = m;
       state.tagError = '';
-      log('conceptTags 컬렉션', { 저장된시험수: snap.size });
+      log('conceptTags 컬렉션', { 저장된시험수: snap.size, 개념연결된시험: Object.keys(m).length, 구버전문서: legacy });
     }).catch(function (e) {
       var msg = String(e && e.message ? e.message : e);
       state.tagMap = {};
@@ -628,31 +757,50 @@ pre.dump {
     });
   }
 
+  function selectedIds(sel) {
+    var chosen = [];
+    for (var o = 0; o < sel.options.length; o++) {
+      if (sel.options[o].selected && sel.options[o].value) chosen.push(sel.options[o].value);
+    }
+    return chosen;
+  }
+
+  function stdsOf(ids) {
+    var seen = {}, out = [];
+    for (var i = 0; i < ids.length; i++) {
+      var n = CM.getNode(ids[i]);
+      if (n && !seen[n.std]) { seen[n.std] = true; out.push(n.std); }
+    }
+    return out;
+  }
+
   function saveTags() {
     if (!LIVE) { $('tagMsg').textContent = '샘플 모드에서는 저장되지 않습니다. Firebase 설정을 채우면 저장됩니다.'; return; }
     var rows = document.querySelectorAll('[data-exam]');
+    if (!rows.length) { $('tagMsg').textContent = '저장할 시험이 없습니다.'; return; }
     var batch = db.batch();
-    var count = 0;
+    var count = 0, linked = 0;
     for (var i = 0; i < rows.length; i++) {
       var key = rows[i].getAttribute('data-exam');
-      var sel = rows[i];
-      var chosen = [];
-      for (var o = 0; o < sel.options.length; o++) {
-        if (sel.options[o].selected && sel.options[o].value) chosen.push(sel.options[o].value);
-      }
+      var chosen = selectedIds(rows[i]);
       state.tagMap[key] = chosen;
+      if (chosen.length) linked++;
       batch.set(db.collection('conceptTags').doc(safeDocId(key)), {
-        examId: key, standards: chosen, updatedAt: new Date().toISOString()
+        examId: key,
+        concepts: chosen,
+        standards: stdsOf(chosen),
+        updatedAt: new Date().toISOString()
       });
       count++;
     }
+    $('tagMsg').textContent = '저장 중…';
     batch.commit().then(function () {
-      $('tagMsg').textContent = count + '개 시험의 개념 연결을 저장했습니다.';
+      $('tagMsg').textContent = count + '개 시험을 저장했습니다. (개념이 연결된 시험 ' + linked + '개)';
       state.tagError = '';
       return refresh();
     }).catch(function (e) {
       var msg = String(e && e.message ? e.message : e);
-      $('tagMsg').textContent = msg.indexOf('permission') !== -1 || msg.indexOf('insufficient') !== -1
+      $('tagMsg').textContent = (msg.indexOf('permission') !== -1 || msg.indexOf('insufficient') !== -1)
         ? '저장 권한이 없습니다. Firestore 보안 규칙에 conceptTags 컬렉션을 추가해 주세요.'
         : '저장하지 못했습니다: ' + msg;
     });
@@ -660,24 +808,86 @@ pre.dump {
 
   function autoTag() {
     var rows = document.querySelectorAll('[data-exam]');
-    var n = 0;
+    var filled = 0, empty = 0;
     for (var i = 0; i < rows.length; i++) {
-      var key = rows[i].getAttribute('data-title') || rows[i].getAttribute('data-exam');
-      var hits = CM.matchConcepts(key, { limit: 2 });
-      if (!hits.length) continue;
-      var stds = {};
-      for (var h = 0; h < hits.length; h++) {
-        var node = CM.getNode(hits[h].id);
-        if (node) stds[node.std] = true;
-      }
+      var title = rows[i].getAttribute('data-title') || rows[i].getAttribute('data-exam');
+      var hits = suggestNodes(title);
+      var want = {};
+      for (var h = 0; h < hits.length; h++) want[hits[h].id] = true;
       for (var o = 0; o < rows[i].options.length; o++) {
-        rows[i].options[o].selected = !!stds[rows[i].options[o].value];
+        rows[i].options[o].selected = !!want[rows[i].options[o].value];
       }
-      n++;
+      if (hits.length) filled++; else empty++;
+      var box = document.getElementById('chosen-' + i);
+      if (box) box.innerHTML = chosenText(selectedIds(rows[i]));
     }
-    $('tagMsg').textContent = n > 0
-      ? n + '개 시험에 추천을 채웠습니다. 확인 후 저장하세요.'
+    $('tagMsg').textContent = filled > 0
+      ? filled + '개 시험에 추천을 채웠습니다' + (empty ? ' (' + empty + '개는 못 찾음)' : '') + '. 확인 후 저장하세요.'
       : '시험명에서 개념을 찾지 못했습니다. 직접 골라 주세요.';
+  }
+
+  function chosenText(ids) {
+    if (!ids || !ids.length) return '<span style="color:#b0b0b5">선택된 개념 없음</span>';
+    var names = [];
+    for (var i = 0; i < ids.length; i++) {
+      var n = CM.getNode(ids[i]);
+      if (n) names.push(esc(n.name));
+    }
+    return '선택: ' + names.join(' · ');
+  }
+
+  /* ---------------- 학년 / 학생 선택 ---------------- */
+
+  function gradeLabel(g) {
+    var s = String(g == null ? '' : g).trim();
+    if (!s) return '학년 미지정';
+    if (/^\d+$/.test(s)) return s + '학년';
+    return s;
+  }
+
+  function renderGradeOptions() {
+    var seen = {}, list = [], i;
+    for (i = 0; i < state.students.length; i++) {
+      var g = state.students[i].grade || '';
+      if (!seen[g]) { seen[g] = true; list.push(g); }
+    }
+    list.sort(function (a, b) {
+      if (!a) return 1;              // 미지정은 항상 끝으로
+      if (!b) return -1;
+      return String(a).localeCompare(String(b), 'ko', { numeric: true });
+    });
+    state.gradeList = list;
+
+    var html = '<option value="">전체 (' + state.students.length + '명)</option>';
+    for (i = 0; i < list.length; i++) {
+      var cnt = 0;
+      for (var k = 0; k < state.students.length; k++) {
+        if ((state.students[k].grade || '') === list[i]) cnt++;
+      }
+      html += '<option value="' + esc(list[i]) + '">' + esc(gradeLabel(list[i])) + ' (' + cnt + '명)</option>';
+    }
+    $('selGrade').innerHTML = html;
+    $('selGrade').value = state.grade;
+  }
+
+  function filteredStudents() {
+    if (!state.grade) return state.students.slice();
+    var out = [];
+    for (var i = 0; i < state.students.length; i++) {
+      if ((state.students[i].grade || '') === state.grade) out.push(state.students[i]);
+    }
+    return out;
+  }
+
+  function renderStudentOptions() {
+    var arr = filteredStudents();
+    var html = '';
+    for (var i = 0; i < arr.length; i++) {
+      html += '<option value="' + esc(arr[i].studentId) + '">' + esc(arr[i].name) + '</option>';
+    }
+    $('selStudent').innerHTML = html || '<option value="">해당 학년 학생 없음</option>';
+    state.studentId = arr.length ? arr[0].studentId : '';
+    $('selStudent').value = state.studentId;
   }
 
   /* ---------------- 렌더링 ---------------- */
@@ -692,7 +902,10 @@ pre.dump {
         + '</div>';
       return;
     }
-    var tagged = Object.keys(state.tagMap).length;
+    var tagged = 0;
+    for (var k in state.tagMap) {
+      if (Object.prototype.hasOwnProperty.call(state.tagMap, k) && state.tagMap[k].length) tagged++;
+    }
     if (state.tagError) {
       el.innerHTML = '<div class="banner warnbox">'
         + '<b>conceptTags 컬렉션에 접근할 수 없습니다.</b><br>'
@@ -702,7 +915,7 @@ pre.dump {
     } else if (tagged === 0) {
       el.innerHTML = '<div class="banner info">'
         + '<b>아직 시험과 개념이 연결되지 않았습니다.</b><br>'
-        + '아래 <b>시험 ↔ 개념 연결</b>에서 시험마다 성취기준을 지정하면 지도가 채워집니다.'
+        + '아래 <b>시험 ↔ 개념 연결</b>에서 시험마다 개념을 지정하면 지도가 채워집니다.'
         + '</div>';
     } else {
       el.innerHTML = '';
@@ -724,7 +937,8 @@ pre.dump {
 
     var solid = 0, focusN = 0;
     var nodes = CM.NODES;
-    for (var i = 0; i < nodes.length; i++) {
+    var i;
+    for (i = 0; i < nodes.length; i++) {
       var st = A.stats[nodes[i].id].status;
       if (st === 'ok') solid++;
       if (st === 'weak') focusN++;
@@ -936,32 +1150,74 @@ pre.dump {
     $('tblBody').innerHTML = html;
   }
 
-  function renderExams() {
+  /** 개념 57개를 성취기준별 그룹으로 묶은 선택 항목 목록 */
+  function conceptOptions(chosen) {
+    var mark = {};
+    for (var c = 0; c < chosen.length; c++) mark[chosen[c]] = true;
     var stds = CM.listStandards();
+    var html = '';
+    for (var s = 0; s < stds.length; s++) {
+      var group = CM.byStandard(stds[s]);
+      if (!group.length) continue;
+      html += '<optgroup label="' + esc(stdLabel(stds[s])) + '">';
+      for (var g = 0; g < group.length; g++) {
+        html += '<option value="' + esc(group[g].id) + '"' + (mark[group[g].id] ? ' selected' : '') + '>'
+          + esc(group[g].name) + '</option>';
+      }
+      html += '</optgroup>';
+    }
+    return html;
+  }
+
+  function examMeta(ex) {
+    var chosen = state.tagMap[ex.key] || [];
+    return '문항 ' + ex.q + '개 · 응시 ' + ex.takers + '명'
+      + (ex.mine ? ' · 이 학생 응시' : ' · 이 학생 미응시')
+      + (chosen.length ? ' · 개념 ' + chosen.length + '개 연결됨' : ' · 미연결');
+  }
+
+  function renderExams() {
     var box = $('examList');
     if (!state.exams.length) {
       box.innerHTML = '<div class="muted">채점 기록에서 시험을 찾지 못했습니다.</div>';
+      state.examsSig = '';
       return;
     }
+
+    var sig = state.exams.map(function (e) { return e.key; }).join('\u0001');
+    // 학생만 바뀐 경우에는 목록을 다시 그리지 않고 설명글만 갱신한다.
+    // (아직 저장하지 않은 선택이 날아가지 않도록)
+    if (sig === state.examsSig && box.querySelector('[data-exam]')) {
+      for (var m = 0; m < state.exams.length; m++) {
+        var mel = document.getElementById('meta-' + m);
+        if (mel) mel.textContent = examMeta(state.exams[m]);
+      }
+      return;
+    }
+    state.examsSig = sig;
+
     var html = '';
     for (var i = 0; i < state.exams.length; i++) {
       var ex = state.exams[i];
       var chosen = state.tagMap[ex.key] || [];
-      var opts = '';
-      for (var s = 0; s < stds.length; s++) {
-        var first = CM.byStandard(stds[s])[0];
-        var lab = stdLabel(stds[s]) + ' · ' + (first ? first.name : '');
-        var sel = chosen.indexOf(stds[s]) !== -1 ? ' selected' : '';
-        opts += '<option value="' + esc(stds[s]) + '"' + sel + '>' + esc(lab) + '</option>';
-      }
       html += '<div class="exrow">'
         + '<div><div class="exname">' + esc(ex.title) + '</div>'
-        + '<div class="exmeta">문항 ' + ex.count + '개'
-        + (chosen.length ? ' · 연결됨 ' + chosen.length + '개' : ' · 미연결') + '</div></div>'
-        + '<select class="exsel" multiple size="3" data-exam="' + esc(ex.key) + '" data-title="' + esc(ex.title) + '">' + opts + '</select>'
+        + '<div class="exmeta" id="meta-' + i + '">' + esc(examMeta(ex)) + '</div>'
+        + '<div class="exchosen" id="chosen-' + i + '">' + chosenText(chosen) + '</div></div>'
+        + '<select class="exsel" multiple size="8" data-exam="' + esc(ex.key) + '" data-title="' + esc(ex.title) + '" data-idx="' + i + '">'
+        + conceptOptions(chosen) + '</select>'
         + '</div>';
     }
     box.innerHTML = html;
+
+    var sels = box.querySelectorAll('[data-exam]');
+    for (var k = 0; k < sels.length; k++) {
+      sels[k].addEventListener('change', function () {
+        var idx = this.getAttribute('data-idx');
+        var el = document.getElementById('chosen-' + idx);
+        if (el) el.innerHTML = chosenText(selectedIds(this));
+      });
+    }
   }
 
   function renderAll() {
@@ -988,6 +1244,11 @@ pre.dump {
   /* ---------------- 이벤트 ---------------- */
 
   function bind() {
+    $('selGrade').addEventListener('change', function (e) {
+      state.grade = e.target.value;
+      renderStudentOptions();
+      refresh();
+    });
     $('selStudent').addEventListener('change', function (e) {
       state.studentId = e.target.value;
       refresh();
@@ -1037,14 +1298,8 @@ pre.dump {
     loadTags()
       .then(loadStudents)
       .then(function () {
-        var sel = $('selStudent');
-        var html = '';
-        for (var i = 0; i < state.students.length; i++) {
-          html += '<option value="' + esc(state.students[i].studentId) + '">'
-            + esc(state.students[i].name) + '</option>';
-        }
-        sel.innerHTML = html || '<option value="">학생 없음</option>';
-        state.studentId = state.students.length ? state.students[0].studentId : '';
+        renderGradeOptions();
+        renderStudentOptions();
         return refresh();
       })
       .catch(function (e) {
@@ -1052,6 +1307,9 @@ pre.dump {
         state.records = []; analyzeNow(); renderAll();
       });
   }
+
+  // 테스트 전용 노출 (브라우저 동작에는 영향 없음)
+  window.__cmTest = { suggestNodes: suggestNodes, innerTopic: innerTopic, stdLabel: stdLabel };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
