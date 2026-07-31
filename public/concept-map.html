@@ -321,6 +321,7 @@ pre.dump {
     records: [],
     exams: [],              // [{key, title, count}]
     tagMap: {},             // examKey -> [std]
+    tagError: '',
     analysis: null,
     diag: []
   };
@@ -457,7 +458,7 @@ pre.dump {
         if (withdrawn) return;
         arr.push({
           id: d.id,
-          studentId: String(pick(v, ['studentId', 'sid', 'studentID', 'loginId']) || d.id).toLowerCase(),
+          studentId: String(pick(v, ['id', 'studentId', 'sid', 'studentID', 'loginId']) || d.id).trim().toLowerCase(),
           name: pick(v, ['name', 'studentName', '이름']) || d.id
         });
       });
@@ -470,76 +471,135 @@ pre.dump {
     });
   }
 
-  /** grades 문서에서 정오 기록을 뽑아낸다. 스키마를 방어적으로 탐색한다. */
-  function extractResults(data) {
-    var out = [];
-    var groups = ['ox', 'multiple'];
-    for (var g = 0; g < groups.length; g++) {
-      var blk = data[groups[g]];
-      if (!blk || typeof blk !== 'object') continue;
-      for (var k in blk) {
-        if (!Object.prototype.hasOwnProperty.call(blk, k)) continue;
-        var item = blk[k];
-        var correct = null;
-        if (typeof item === 'boolean') correct = item;
-        else if (item && typeof item === 'object') {
-          if (typeof item.correct === 'boolean') correct = item.correct;
-          else if (typeof item.isCorrect === 'boolean') correct = item.isCorrect;
-          else if (item.answer !== undefined && item.userAnswer !== undefined) {
-            correct = String(item.answer) === String(item.userAnswer);
-          }
-        }
-        if (correct !== null) out.push({ correct: correct, type: groups[g], no: k });
-      }
+  function num(x) {
+    if (x === null || x === undefined || x === '') return null;
+    var n = Number(x);
+    return isFinite(n) ? n : null;
+  }
+
+  /** answers 필드가 배열이든 맵이든 정오를 세어 본다. 집계 필드가 없을 때만 쓴다. */
+  function parseAnswers(ans) {
+    var list = [];
+    if (Array.isArray(ans)) list = ans;
+    else if (ans && typeof ans === 'object') {
+      for (var k in ans) if (Object.prototype.hasOwnProperty.call(ans, k)) list.push(ans[k]);
     }
-    return out;
+    var total = 0, correct = 0;
+    for (var i = 0; i < list.length; i++) {
+      var it = list[i];
+      var c = null;
+      if (typeof it === 'boolean') c = it;
+      else if (it && typeof it === 'object') {
+        if (typeof it.correct === 'boolean') c = it.correct;
+        else if (typeof it.isCorrect === 'boolean') c = it.isCorrect;
+        else if (it.result !== undefined) c = (it.result === true || it.result === 'O' || it.result === 'correct');
+        else {
+          var key = pick(it, ['answer', 'correctAnswer', 'key']);
+          var mine = pick(it, ['userAnswer', 'studentAnswer', 'selected', 'input', 'value', 'my']);
+          if (key !== null && mine !== null) c = String(key).trim() === String(mine).trim();
+        }
+      }
+      if (c === null) continue;
+      total++; if (c) correct++;
+    }
+    return { total: total, correct: correct };
+  }
+
+  /** grades 문서 1개 = 시험 1회. 맞은 개수와 전체 문항 수를 뽑는다. */
+  function docTally(v) {
+    var total = num(v.totalQuestions);
+    var correct = num(v.score);
+
+    if (total === null) {
+      var oc = num(v.oxCount), mc = num(v.multiCount);
+      if (oc !== null || mc !== null) total = (oc || 0) + (mc || 0);
+    }
+    if (correct === null) {
+      var os = num(v.oxScore), ms = num(v.multiScore);
+      if (os !== null || ms !== null) correct = (os || 0) + (ms || 0);
+    }
+    if (total === null || correct === null) {
+      var p = parseAnswers(v.answers);
+      if (p.total > 0) { total = p.total; correct = p.correct; }
+    }
+    if (total === null || total <= 0) return null;
+    if (correct === null) return null;
+    // score 가 개수가 아니라 백분율로 저장된 경우를 보정한다
+    if (correct > total && correct <= 100) correct = Math.round(total * correct / 100);
+    if (correct > total) correct = total;
+    if (correct < 0) correct = 0;
+    return { total: total, correct: correct };
   }
 
   function examKeyOf(id, data) {
-    var t = pick(data, ['examId', 'examTitle', 'title', 'testName', 'examName', 'quizId', 'unit']);
-    if (t) return String(t);
-    // 문서 id 가 "학번_시험명" 형태인 경우가 많아 뒤쪽을 시험 키로 본다
-    var parts = String(id).split('_');
-    return parts.length > 1 ? parts.slice(1).join('_') : String(id);
+    var t = pick(data, ['examId', 'testName', 'examTitle', 'title', 'testId']);
+    return t ? String(t) : String(id);
+  }
+
+  function examTitleOf(id, data) {
+    var t = pick(data, ['testName', 'examTitle', 'title', 'examId']);
+    return t ? String(t) : String(id);
+  }
+
+  /** Firestore 문서 ID 로 쓸 수 없는 문자를 치환한다. */
+  function safeDocId(key) {
+    return String(key).replace(/[\/\\#\[\]*?]/g, '_').slice(0, 500) || '_';
   }
 
   function loadGrades(studentId) {
     if (!LIVE) {
       state.records = sampleRecords(studentId);
       state.exams = [
-        { key: '샘플 단원평가 1회', count: 12 },
-        { key: '샘플 단원평가 2회', count: 10 }
+        { key: 'demo-1', title: '샘플 단원평가 1회', count: 12 },
+        { key: 'demo-2', title: '샘플 단원평가 2회', count: 10 }
       ];
       return Promise.resolve();
     }
+    var target = String(studentId || '').trim().toLowerCase();
     return db.collection('grades').get().then(function (snap) {
       var recs = [];
-      var examCount = {};
+      var exams = {};
       var firstShape = null;
-      var matched = 0;
+      var sampleShown = null;
+      var matched = 0, skipped = 0;
       snap.forEach(function (d) {
         var v = d.data() || {};
         if (!firstShape) firstShape = { docId: d.id, 필드: Object.keys(v) };
-        var sid = String(pick(v, ['studentId', 'sid', 'studentID']) || '').toLowerCase();
-        if (!sid && String(d.id).toLowerCase().indexOf(studentId) === 0) sid = studentId;
-        if (sid !== studentId) return;
+        var sid = String(pick(v, ['studentId', 'sid', 'studentID', 'id']) || '').trim().toLowerCase();
+        if (!target || sid !== target) return;
         matched++;
+
+        var t = docTally(v);
+        if (!t) { skipped++; return; }
+
+        if (!sampleShown) {
+          sampleShown = {
+            시험: examTitleOf(d.id, v),
+            맞은개수: t.correct, 전체문항: t.total,
+            answers타입: Array.isArray(v.answers) ? '배열(' + v.answers.length + ')'
+              : (v.answers && typeof v.answers === 'object' ? '맵(' + Object.keys(v.answers).length + ')' : typeof v.answers)
+          };
+        }
+
         var key = examKeyOf(d.id, v);
-        var res = extractResults(v);
-        examCount[key] = (examCount[key] || 0) + res.length;
+        if (!exams[key]) exams[key] = { key: key, title: examTitleOf(d.id, v), count: 0 };
+        exams[key].count += t.total;
+
         var stds = state.tagMap[key] || [];
-        for (var i = 0; i < res.length; i++) {
-          if (stds.length === 0) { recs.push({ std: null, correct: res[i].correct }); continue; }
-          for (var s = 0; s < stds.length; s++) recs.push({ std: stds[s], correct: res[i].correct });
+        if (stds.length === 0) return;
+        for (var s = 0; s < stds.length; s++) {
+          for (var i = 0; i < t.total; i++) {
+            recs.push({ std: stds[s], correct: i < t.correct });
+          }
         }
       });
-      state.records = recs.filter(function (r) { return r.std; });
-      state.exams = Object.keys(examCount).map(function (k) { return { key: k, count: examCount[k] }; })
+      state.records = recs;
+      state.exams = Object.keys(exams).map(function (k) { return exams[k]; })
         .sort(function (a, b) { return b.count - a.count; });
       log('grades 컬렉션', {
-        전체문서수: snap.size, 이학생문서수: matched,
-        첫문서구조: firstShape, 시험수: state.exams.length,
-        태그된기록수: state.records.length
+        전체문서수: snap.size, 이학생문서수: matched, 집계실패문서: skipped,
+        첫문서구조: firstShape, 표본: sampleShown,
+        시험수: state.exams.length, 연결된기록수: state.records.length
       });
     }).catch(function (e) {
       log('grades 읽기 실패', String(e && e.message ? e.message : e));
@@ -554,13 +614,17 @@ pre.dump {
       var m = {};
       snap.forEach(function (d) {
         var v = d.data() || {};
-        if (Array.isArray(v.standards)) m[d.id] = v.standards;
+        var key = v.examId ? String(v.examId) : d.id;
+        if (Array.isArray(v.standards)) m[key] = v.standards;
       });
       state.tagMap = m;
+      state.tagError = '';
       log('conceptTags 컬렉션', { 저장된시험수: snap.size });
     }).catch(function (e) {
-      log('conceptTags 읽기 실패', String(e && e.message ? e.message : e));
+      var msg = String(e && e.message ? e.message : e);
       state.tagMap = {};
+      state.tagError = msg;
+      log('conceptTags 읽기 실패', msg);
     });
   }
 
@@ -577,14 +641,20 @@ pre.dump {
         if (sel.options[o].selected && sel.options[o].value) chosen.push(sel.options[o].value);
       }
       state.tagMap[key] = chosen;
-      batch.set(db.collection('conceptTags').doc(key), { standards: chosen, updatedAt: new Date().toISOString() });
+      batch.set(db.collection('conceptTags').doc(safeDocId(key)), {
+        examId: key, standards: chosen, updatedAt: new Date().toISOString()
+      });
       count++;
     }
     batch.commit().then(function () {
       $('tagMsg').textContent = count + '개 시험의 개념 연결을 저장했습니다.';
+      state.tagError = '';
       return refresh();
     }).catch(function (e) {
-      $('tagMsg').textContent = '저장하지 못했습니다: ' + (e && e.message ? e.message : e);
+      var msg = String(e && e.message ? e.message : e);
+      $('tagMsg').textContent = msg.indexOf('permission') !== -1 || msg.indexOf('insufficient') !== -1
+        ? '저장 권한이 없습니다. Firestore 보안 규칙에 conceptTags 컬렉션을 추가해 주세요.'
+        : '저장하지 못했습니다: ' + msg;
     });
   }
 
@@ -592,7 +662,7 @@ pre.dump {
     var rows = document.querySelectorAll('[data-exam]');
     var n = 0;
     for (var i = 0; i < rows.length; i++) {
-      var key = rows[i].getAttribute('data-exam');
+      var key = rows[i].getAttribute('data-title') || rows[i].getAttribute('data-exam');
       var hits = CM.matchConcepts(key, { limit: 2 });
       if (!hits.length) continue;
       var stds = {};
@@ -623,7 +693,13 @@ pre.dump {
       return;
     }
     var tagged = Object.keys(state.tagMap).length;
-    if (tagged === 0) {
+    if (state.tagError) {
+      el.innerHTML = '<div class="banner warnbox">'
+        + '<b>conceptTags 컬렉션에 접근할 수 없습니다.</b><br>'
+        + 'Firestore 보안 규칙에 conceptTags 를 추가해야 개념 연결을 저장할 수 있습니다. '
+        + '규칙을 추가하기 전까지는 지도가 비어 있습니다.'
+        + '</div>';
+    } else if (tagged === 0) {
       el.innerHTML = '<div class="banner info">'
         + '<b>아직 시험과 개념이 연결되지 않았습니다.</b><br>'
         + '아래 <b>시험 ↔ 개념 연결</b>에서 시험마다 성취기준을 지정하면 지도가 채워집니다.'
@@ -879,10 +955,10 @@ pre.dump {
         opts += '<option value="' + esc(stds[s]) + '"' + sel + '>' + esc(lab) + '</option>';
       }
       html += '<div class="exrow">'
-        + '<div><div class="exname">' + esc(ex.key) + '</div>'
-        + '<div class="exmeta">문항 기록 ' + ex.count + '개'
+        + '<div><div class="exname">' + esc(ex.title) + '</div>'
+        + '<div class="exmeta">문항 ' + ex.count + '개'
         + (chosen.length ? ' · 연결됨 ' + chosen.length + '개' : ' · 미연결') + '</div></div>'
-        + '<select class="exsel" multiple size="3" data-exam="' + esc(ex.key) + '">' + opts + '</select>'
+        + '<select class="exsel" multiple size="3" data-exam="' + esc(ex.key) + '" data-title="' + esc(ex.title) + '">' + opts + '</select>'
         + '</div>';
     }
     box.innerHTML = html;
