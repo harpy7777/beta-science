@@ -114,15 +114,15 @@ select:focus, input:focus { outline: 2px solid #f9a8d4; outline-offset: 1px; }
 
 /* — Table — */
 .tbl { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
-.tbl th { text-align: left; font-size: 11px; color: #db2777; font-weight: 700; padding: 8px 10px; border-bottom: 1px solid #fce7f3; white-space: nowrap; }
+.tbl th { font-size: 11px; color: #db2777; font-weight: 700; padding: 8px 10px; border-bottom: 1px solid #fce7f3; white-space: nowrap; }
 .tbl td { padding: 9px 10px; border-bottom: 1px solid #f7f7f8; vertical-align: middle; }
 .tbl tr:last-child td { border-bottom: none; }
-/* 열 규칙: 이름은 가변, 나머지는 고정폭으로 통일 */
-.c-name  { width: auto; }
-.c-std   { width: 132px; }
-.c-num   { width: 72px;  text-align: right; }
-.c-rate  { width: 84px;  text-align: right; }
-.c-state { width: 96px;  text-align: left; padding-left: 22px; }
+/* 열 규칙: 이름만 왼쪽, 나머지 데이터 열은 머리글·본문 모두 가운데 정렬 */
+.tbl .c-name  { width: auto;  text-align: left; }
+.tbl .c-std   { width: 132px; text-align: center; }
+.tbl .c-num   { width: 72px;  text-align: center; }
+.tbl .c-rate  { width: 84px;  text-align: center; }
+.tbl .c-state { width: 96px;  text-align: center; }
 .pill { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; display: inline-block; }
 .nlink { color: #1d1d1f; text-decoration: none; font-weight: 600; }
 .nlink:hover { color: #db2777; text-decoration: underline; }
@@ -158,6 +158,11 @@ pre.dump {
   .brand { font-size: 13px; }
   .brand-sub { font-size: 10px; }
   .col-hide { display: none; }
+  .tbl { font-size: 12px; }
+  .tbl th, .tbl td { padding: 8px 6px; }
+  .tbl .c-num   { width: 56px; }
+  .tbl .c-rate  { width: 64px; }
+  .tbl .c-state { width: 78px; }
   .exrow { grid-template-columns: 1fr; }
   .exsel { min-width: 0; width: 100%; }
   .stat .v { font-size: 1.25rem; }
@@ -785,9 +790,9 @@ pre.dump {
       svg += '<a href="/' + esc(url) + '" aria-label="' + esc(nd.name) + '">';
       svg += '<rect x="' + pt.x + '" y="' + pt.y + '" width="' + BW + '" height="' + BH + '" rx="11" '
           + 'fill="' + s.bg + '" stroke="' + s.line + '" stroke-width="1.4"/>';
-      svg += '<text x="' + (pt.x + 11) + '" y="' + (pt.y + 19) + '" font-size="12" font-weight="700" fill="' + s.fg + '" '
+      svg += '<text x="' + (pt.x + BW / 2) + '" y="' + (pt.y + 19) + '" text-anchor="middle" font-size="12" font-weight="700" fill="' + s.fg + '" '
           + 'font-family="-apple-system,BlinkMacSystemFont,sans-serif">' + esc(label) + '</text>';
-      svg += '<text x="' + (pt.x + 11) + '" y="' + (pt.y + 34) + '" font-size="10" fill="' + s.fg + '" opacity="0.75" '
+      svg += '<text x="' + (pt.x + BW / 2) + '" y="' + (pt.y + 34) + '" text-anchor="middle" font-size="10" fill="' + s.fg + '" opacity="0.75" '
           + 'font-family="-apple-system,BlinkMacSystemFont,sans-serif">' + esc(sub) + '</text>';
       svg += '</a>';
     }
