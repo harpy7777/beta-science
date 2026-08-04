@@ -1,6 +1,6 @@
 /*!
  * concept-map.js — 통합과학2 개념 지도 (2022 개정 교육과정)
- * 인후쌤의 과학 수업 관리 시스템 / beta-science
+ * 인후쌤 과학수업 관리 시스템 / beta-science
  *
  * [설계 원칙]
  *  1) 개념 노드는 "교과서 단원명"이 아니라 "성취기준 코드"에 붙인다.
@@ -9,6 +9,10 @@
  *  2) 단원 페이지 링크는 {publisher}-science2-unit{unit}.html 규칙으로 자동 생성.
  *     영역1 → unit1 / 영역2 → unit2 / 영역3 → unit3
  *  3) prereq(선수관계)를 타고 올라가 "진짜 막힌 지점(root cause)"을 찾는다.
+ *  4) [v2] 화면에 찍히는 상태 라벨·판정 기준·안내 문구·집중 개념 문장을
+ *     이 파일에 모은다. 선생님 화면(concept-map.html)과
+ *     학부모 화면(concept-report.html)이 같은 문구를 쓰게 하기 위함이다.
+ *     → 톤을 고칠 때 이 파일 한 곳만 만지면 양쪽에 동시에 반영된다.
  *
  * [사용법]
  *   HTML 에서 <script src="/concept-map.js"> 로 먼저 불러온 뒤
@@ -16,6 +20,7 @@
  *   CM.pageUrl('S2-120', 'visang');        // 'visang-science2-unit1.html'
  *   CM.matchConcepts('중화 반응에서 온도가...'); // 문항 자동 태깅
  *   CM.analyze(records);                    // 취약 개념 + 근본 원인 진단
+ *   CM.focusCopy(analysis, { view: 'parent' }); // 집중 개념 문장 생성
  *
  * 전역 노출: window.ConceptMap
  */
@@ -719,8 +724,339 @@
     return '「' + node.name + '」 정답률 ' + pct + '%로 보완이 필요합니다.';
   }
 
+  /* ==================================================================
+   * 7. [v2] 화면 공통 표현 계층
+   *
+   *    선생님 화면(concept-map.html)과 학부모 화면(concept-report.html)이
+   *    같은 라벨·같은 기준·같은 문구를 쓰도록 여기에 모은다.
+   *
+   *    [중요] 학부모(parent) 쪽 문자열에는 아래 단어를 절대 쓰지 않는다.
+   *           취약 / 부족 / 결손 / 미달 / 못한다 / 무너짐 / 미측정
+   *           → validateCopy() 가 배포 전 자동으로 검사한다.
+   * ================================================================ */
+
+  var FORBIDDEN_PARENT = ['취약', '부족', '결손', '미달', '못한다', '무너짐', '미측정'];
+
+  /** HTML 이스케이프 — 화면 문구를 만들 때 함께 쓴다 */
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+
+  /** 정답률 표기 (null 이면 —) */
+  function pctText(r) {
+    return (r === null || r === undefined) ? '—' : Math.round(r * 100) + '%';
+  }
+
+  /* ---- 7-1. 상태 스타일 ---- */
+
+  var STYLE = {
+    teacher: {
+      ok:      { label: '안정',      fg: '#065f46', bg: '#ecfdf5', line: '#059669' },
+      warn:    { label: '주의',      fg: '#92400e', bg: '#fffbeb', line: '#d97706' },
+      weak:    { label: '취약',      fg: '#991b1b', bg: '#fef2f2', line: '#dc2626' },
+      few:     { label: '표본 부족',  fg: '#5b21b6', bg: '#f5f3ff', line: '#7c3aed' },
+      unknown: { label: '미측정',    fg: '#6b7280', bg: '#f9fafb', line: '#9ca3af' }
+    },
+    parent: {
+      ok:      { label: '탄탄해요',      fg: '#065f46', bg: '#ecfdf5', line: '#059669' },
+      warn:    { label: '다지는 중',     fg: '#155e75', bg: '#ecfeff', line: '#0891b2' },
+      weak:    { label: '집중 개념',     fg: '#92400e', bg: '#fffbeb', line: '#f59e0b' },
+      few:     { label: '확인 중',       fg: '#6b7280', bg: '#f9fafb', line: '#9ca3af' },
+      unknown: { label: '이번 학기 예정', fg: '#9ca3af', bg: '#fcfcfd', line: '#d1d5db' }
+    }
+  };
+
+  var STATUS_ORDER = ['ok', 'warn', 'weak', 'few', 'unknown'];
+
+  /** 상태 → 스타일 객체. view 는 'teacher' | 'parent' */
+  function styleOf(status, view) {
+    var set = STYLE[view] || STYLE.teacher;
+    return set[status] || set.unknown;
+  }
+
+  /* ---- 7-2. 판정 기준 문구 ---- */
+
+  /** 임계값에서 "정답률 80% 이상" 같은 기준 문구를 만든다.
+      기준을 바꾸면 화면 문구가 자동으로 따라오게 하기 위함이다. */
+  function criteriaOf(th) {
+    var t = th || DEFAULT_THRESHOLD;
+    var p = function (v) { return Math.round(v * 100); };
+    return {
+      ok:      '정답률 ' + p(t.warn) + '% 이상',
+      warn:    '정답률 ' + p(t.weak) + '~' + (p(t.warn) - 1) + '%',
+      weak:    '정답률 ' + p(t.weak) + '% 미만',
+      few:     '평가 문항 ' + t.minAttempts + '개 미만',
+      unknown: '평가 기록 없음'
+    };
+  }
+
+  var CRITERIA = criteriaOf(DEFAULT_THRESHOLD);
+
+  /* ---- 7-3. 상태 안내 (표 아래 범례) ---- */
+
+  var GUIDE_LEAD = '모든 개념은 아래 다섯 단계 중 하나로 관리됩니다. '
+    + '지금 점수가 낮게 나온 개념도 그대로 두지 않고, 단계마다 정해진 방식으로 끝까지 확인합니다.';
+
+  var GUIDE = {
+    parent: [
+      { k: 'ok',
+        mean: '평가에서 꾸준히 정확하게 풀어낸 개념입니다.',
+        plan: '새로 배우는 개념의 발판으로 활용하고, 복습 평가에서 한 번 더 확인해 유지합니다.' },
+      { k: 'warn',
+        mean: '큰 흐름은 이미 잡은 단계입니다. 묻는 방식이 달라졌을 때를 대비해 한 번 더 손보는 구간이라, 걱정하실 단계는 아닙니다.',
+        plan: '수업 도입부에서 짧게 되짚고, 조건을 바꾼 문항으로 한 번 더 확인합니다.' },
+      { k: 'weak',
+        mean: '배우는 과정에서 자연스럽게 나오는 구간입니다. 이 개념이 눈에 띄었다는 것은 어디를 손봐야 할지 정확히 찾았다는 뜻입니다.',
+        plan: '앞선 개념까지 거슬러 올라가 원인을 찾고, 다시 설명한 뒤 재평가로 확인합니다. 확인될 때까지 저희가 계속 따라갑니다.' },
+      { k: 'few',
+        mean: '아직 나온 문항이 적어, 섣불리 판단하지 않고 미뤄 둔 개념입니다.',
+        plan: '다음 평가에 문항을 더 넣어 상태를 정확히 확정합니다.' },
+      { k: 'unknown',
+        mean: '아직 수업에서 다루지 않은 개념입니다.',
+        plan: '진도에 맞춰 수업한 뒤, 같은 방식으로 평가해 확인합니다.' }
+    ],
+    teacher: [
+      { k: 'ok',      mean: '유지. 후속 개념의 발판으로 사용.' },
+      { k: 'warn',    mean: '변형 문항으로 재확인 필요.' },
+      { k: 'weak',    mean: '선수 개념까지 역추적 후 재수업 · 재평가.' },
+      { k: 'few',     mean: '판단 보류. 표본 확보 필요.' },
+      { k: 'unknown', mean: '미출제 구간. 진도 확인.' }
+    ]
+  };
+
+  /* ---- 7-4. 성취기준 코드 표기 ---- */
+
+  /* 예) 10통과2-01-01  ->  고1 통합과학2 1단원-1
+     앞자리 = 학년(군), 가운데 = 과목, 뒤 두 자리 = 단원(영역)-순번 */
+  var GRADE_LABEL = { '4': '초3~4', '6': '초5~6', '9': '중1~3', '10': '고1', '12': '고2~3' };
+  var SUBJ_LABEL = {
+    '통과1': '통합과학1', '통과2': '통합과학2',
+    '과탐1': '과학탐구실험1', '과탐2': '과학탐구실험2',
+    '화학1': '화학1', '화학2': '화학2',
+    '물리1': '물리학1', '물리2': '물리학2',
+    '생과1': '생명과학1', '생과2': '생명과학2',
+    '지구1': '지구과학1', '지구2': '지구과학2',
+    '과': '과학', '과학': '과학'
+  };
+
+  function stdLabel(code) {
+    var s = String(code == null ? '' : code).trim();
+    var m = s.match(/^(\d+)([^-]+)-(\d+)-(\d+)$/);
+    if (!m) return s;
+    var g = GRADE_LABEL[m[1]] || m[1];
+    var subj = SUBJ_LABEL[m[2]] || m[2];
+    return g + ' ' + subj + ' ' + Number(m[3]) + '단원-' + Number(m[4]);
+  }
+
+  /** 표 안에서 쓸 성취기준 표기.
+      '고1 통합과학2 1단원-3' 에서 앞부분은 모바일에서 접을 수 있게 span 으로 분리한다. */
+  function stdCell(code) {
+    var s = stdLabel(code);
+    var m = s.match(/^(.*?)(\d+단원-\d+)$/);
+    if (!m) return escapeHtml(s);
+    return '<span class="std-pre">' + escapeHtml(m[1]) + '</span>' + escapeHtml(m[2]);
+  }
+
+  /* ---- 7-5. 상태별 집계 ---- */
+
+  /** 전체 또는 특정 영역의 상태별 개념 수를 센다.
+      areaId 가 없거나 null 이면 전체 57개를 센다. */
+  function countByStatus(analysis, areaId) {
+    var nodes = (areaId === null || areaId === undefined || areaId === '')
+      ? NODES : byArea(areaId);
+    var c = { ok: 0, warn: 0, weak: 0, few: 0, unknown: 0, total: nodes.length, measured: 0 };
+    var k, st;
+    for (k = 0; k < nodes.length; k++) {
+      st = (analysis && analysis.stats && analysis.stats[nodes[k].id])
+        ? analysis.stats[nodes[k].id] : { status: 'unknown', total: 0 };
+      if (c[st.status] === undefined) c[st.status] = 0;
+      c[st.status] += 1;
+      if (st.total > 0) c.measured += 1;
+    }
+    return c;
+  }
+
+  /** 상태별 개수를 누적 막대 HTML 로 만든다. */
+  function stackBar(counts, view, className) {
+    var set = STYLE[view] || STYLE.teacher;
+    var cls = className || 'stack-bar';
+    var html = '<div class="' + escapeHtml(cls) + '">';
+    if (!counts || !counts.total) return html + '</div>';
+    for (var k = 0; k < STATUS_ORDER.length; k++) {
+      var num = counts[STATUS_ORDER[k]] || 0;
+      if (!num) continue;
+      var w = (num / counts.total * 100);
+      html += '<i style="width:' + w.toFixed(2) + '%;background:' + set[STATUS_ORDER[k]].line + '"></i>';
+    }
+    return html + '</div>';
+  }
+
+  /** 영역 하나의 상태 요약 — 지도 위 3줄 요약이 쓴다. */
+  function areaState(analysis, areaId, view) {
+    var isP = view === 'parent';
+    var c = countByStatus(analysis, areaId);
+    var s = (analysis && analysis.areaSummary && analysis.areaSummary[areaId])
+      ? analysis.areaSummary[areaId] : { total: 0, rate: null };
+
+    var key;
+    if (c.measured === 0) key = 'unknown';
+    else if (c.weak > 0) key = 'weak';
+    else if (s.rate !== null && s.rate !== undefined && s.rate >= DEFAULT_THRESHOLD.warn) key = 'ok';
+    else key = 'warn';
+
+    var label = isP
+      ? ({ unknown: '이번 학기 예정', weak: '집중 관리 중', warn: '다지는 중', ok: '탄탄합니다' })[key]
+      : styleOf(key, 'teacher').label;
+
+    var right = isP
+      ? (c.measured === 0 ? '개념 ' + c.total + '개' : '다진 개념 ' + c.ok + ' / ' + c.total)
+      : (s.total ? pctText(s.rate) + ' · ' + s.total + '문항' : '기록 없음');
+
+    return { key: key, label: label, right: right, counts: c, style: styleOf(key, view) };
+  }
+
+  /* ---- 7-6. 집중 개념 (focus) ---- */
+
+  /** 지금 화면에서 다룰 개념 하나를 고른다.
+      취약(root) → 주의 → 표본 부족 → 전부 안정 순으로 내려간다.
+      "다음 단원으로 넘어가도 좋다" 같은 두루뭉술한 마무리 대신
+      항상 구체적인 개념 하나와 대응 계획이 나오게 하기 위함이다. */
+  function focusTarget(analysis) {
+    if (!analysis || !analysis.stats) return null;
+
+    if (analysis.roots && analysis.roots.length) {
+      return { kind: 'weak', id: analysis.roots[0].id, blocking: analysis.roots[0].blocking || [] };
+    }
+
+    function lowestOf(status) {
+      var best = null;
+      for (var k = 0; k < NODES.length; k++) {
+        var id = NODES[k].id;
+        var st = analysis.stats[id];
+        if (!st || st.status !== status) continue;
+        if (best === null || (st.rate || 0) < (analysis.stats[best].rate || 0)) best = id;
+      }
+      return best;
+    }
+
+    var w = lowestOf('warn');
+    if (w) return { kind: 'warn', id: w, blocking: [] };
+    var f = lowestOf('few');
+    if (f) return { kind: 'few', id: f, blocking: [] };
+    if (countByStatus(analysis, null).measured > 0) return { kind: 'ok', id: null, blocking: [] };
+    return null;
+  }
+
+  /** focusTarget 을 학부모용 문장으로 바꾼다.
+      히어로 카드와 집중 개념 카드가 함께 쓴다.
+      options:
+        publisher — 단원 페이지 링크에 쓸 출판사 키
+        link      — false 면 url 을 만들지 않는다 (학부모 페이지 이탈 방지) */
+  function focusCopy(analysis, options) {
+    var opts = options || {};
+    var t = focusTarget(analysis);
+    var out = { kind: t ? t.kind : 'none', lbl: '현재 상태', nm: '', ds: '', plan: '', why: '', url: null };
+
+    if (!t) {
+      out.nm = '학습 기록을 모으는 중입니다';
+      out.ds = '수업과 평가가 쌓이면 이곳에 이번 기간 집중 개념이 표시됩니다.';
+      return out;
+    }
+    if (t.kind === 'ok') {
+      out.nm = '확인한 개념을 유지 관리합니다';
+      out.ds = '이번 기간 평가에서 확인한 개념이 모두 안정적으로 나왔습니다.';
+      out.plan = '다음 계획 — 복습 평가로 한 번 더 점검하고, 새로 배우는 개념의 발판으로 이어 갑니다.';
+      return out;
+    }
+
+    var node = getNode(t.id);
+    out.nm = node ? node.name : t.id;
+    out.why = node ? '성취기준 ' + stdLabel(node.std) : '';
+    if (opts.link !== false) out.url = pageUrl(t.id, opts.publisher);
+
+    if (t.kind === 'weak') {
+      out.lbl = '지금 집중하는 개념';
+      var names = [];
+      for (var k = 0; k < Math.min(t.blocking.length, 3); k++) {
+        var b = getNode(t.blocking[k]);
+        if (b) names.push(b.name);
+      }
+      out.ds = t.blocking.length
+        ? '이 개념 하나를 잡으면 <b>' + escapeHtml(names.join(', ')) + '</b>'
+          + (t.blocking.length > 3 ? ' 등 ' + t.blocking.length + '개' : '')
+          + ' 개념이 함께 풀립니다. 여러 개가 흔들려 보여도 원인은 대개 한 곳이라, 그 지점부터 다시 세우면 나머지는 따라옵니다.'
+        : '배우는 과정에서 자연스럽게 나오는 구간입니다. 어디를 손봐야 할지 정확히 찾았으니, 이 지점부터 다시 세우겠습니다.';
+      out.plan = '다음 계획 — 앞선 개념까지 거슬러 올라가 원인을 찾고, 다시 설명한 뒤 재평가로 확인합니다.';
+    } else if (t.kind === 'warn') {
+      out.lbl = '지금 다지는 개념';
+      out.ds = '큰 흐름은 이미 잡았습니다. 묻는 방식이 달라져도 흔들리지 않도록 굳히는 단계입니다.';
+      out.plan = '다음 계획 — 수업 도입부에서 짧게 되짚고, 조건을 바꾼 문항으로 한 번 더 확인합니다.';
+    } else {
+      out.lbl = '확인 중인 개념';
+      out.ds = '아직 나온 문항이 적어, 섣불리 판단하지 않고 미뤄 둔 개념입니다.';
+      out.plan = '다음 계획 — 다음 평가에 문항을 더 넣어 상태를 정확히 확정합니다.';
+    }
+    return out;
+  }
+
+  /* ---- 7-7. 학부모 문구 금지어 검사 ---- */
+
+  /** 학부모 화면에 나갈 수 있는 모든 고정 문자열을 훑어
+      금지어가 섞이지 않았는지 확인한다. 배포 전 자체 점검용.
+
+      hits         — 우리가 쓴 서술 문구의 금지어. 반드시 0 이어야 한다.
+      nameWarnings — 개념명(교육과정 용어)에 금지어 글자가 포함된 경우.
+                     예) '질량 결손과 에너지'(mass defect)는 물리 용어라
+                     문구 실수가 아니다. 오류로 막지 않고 알리기만 한다. */
+  function validateCopy() {
+    var hits = [];
+    var nameWarnings = [];
+
+    function scan(where, text) {
+      var s = String(text == null ? '' : text);
+      for (var k = 0; k < FORBIDDEN_PARENT.length; k++) {
+        if (s.indexOf(FORBIDDEN_PARENT[k]) !== -1) {
+          hits.push(where + ' → "' + FORBIDDEN_PARENT[k] + '"');
+        }
+      }
+    }
+
+    var key;
+    for (key in STYLE.parent) {
+      if (Object.prototype.hasOwnProperty.call(STYLE.parent, key)) {
+        scan('STYLE.parent.' + key, STYLE.parent[key].label);
+      }
+    }
+    scan('GUIDE_LEAD', GUIDE_LEAD);
+    for (var g = 0; g < GUIDE.parent.length; g++) {
+      scan('GUIDE.parent[' + GUIDE.parent[g].k + '].mean', GUIDE.parent[g].mean);
+      scan('GUIDE.parent[' + GUIDE.parent[g].k + '].plan', GUIDE.parent[g].plan);
+    }
+    for (var a = 0; a < AREAS.length; a++) {
+      scan('areaState(' + AREAS[a].id + ')', areaState(null, AREAS[a].id, 'parent').label);
+    }
+
+    // 개념명은 별도 집계 (교육과정 용어라 오류로 취급하지 않는다)
+    for (var d = 0; d < NODES.length; d++) {
+      for (var w = 0; w < FORBIDDEN_PARENT.length; w++) {
+        if (NODES[d].name.indexOf(FORBIDDEN_PARENT[w]) !== -1) {
+          nameWarnings.push(NODES[d].id + ' 「' + NODES[d].name + '」 → "' + FORBIDDEN_PARENT[w] + '"');
+        }
+      }
+    }
+
+    return {
+      ok: hits.length === 0,
+      hits: hits,
+      nameWarnings: nameWarnings,
+      words: FORBIDDEN_PARENT.slice()
+    };
+  }
+
   /* ------------------------------------------------------------------
-   * 7. 무결성 검증 (개발 중 데이터 실수 방지)
+   * 8. 무결성 검증 (개발 중 데이터 실수 방지)
    * ---------------------------------------------------------------- */
 
   function validate() {
@@ -763,11 +1099,15 @@
     }
     for (k = 0; k < NODES.length; k++) dfs(NODES[k].id, []);
 
+    // 학부모 문구 금지어도 함께 본다
+    var copy = validateCopy();
+    for (k = 0; k < copy.hits.length; k++) errors.push('학부모 금지어: ' + copy.hits[k]);
+
     return { ok: errors.length === 0, errors: errors, count: NODES.length };
   }
 
   /* ------------------------------------------------------------------
-   * 8. 전역 노출
+   * 9. 전역 노출
    * ---------------------------------------------------------------- */
 
   var ConceptMap = {
@@ -794,7 +1134,29 @@
     matchConcepts: matchConcepts,
     analyze: analyze,
     explainRoot: explainRoot,
-    validate: validate
+    validate: validate,
+
+    /* --- v2 화면 공통 표현 계층 --- */
+    THRESHOLD: DEFAULT_THRESHOLD,
+    STYLE: STYLE,
+    STATUS_ORDER: STATUS_ORDER,
+    CRITERIA: CRITERIA,
+    GUIDE: GUIDE,
+    GUIDE_LEAD: GUIDE_LEAD,
+    FORBIDDEN_PARENT: FORBIDDEN_PARENT,
+
+    escapeHtml: escapeHtml,
+    pctText: pctText,
+    styleOf: styleOf,
+    criteriaOf: criteriaOf,
+    stdLabel: stdLabel,
+    stdCell: stdCell,
+    countByStatus: countByStatus,
+    stackBar: stackBar,
+    areaState: areaState,
+    focusTarget: focusTarget,
+    focusCopy: focusCopy,
+    validateCopy: validateCopy
   };
 
   global.ConceptMap = ConceptMap;
