@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><script src="/favicon.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#db2777">
+<meta name="robots" content="noindex, nofollow">
+<title>과학 개념 지도 · 인후쌤 과학수업</title>
+
+<!-- Open Graph / 카카오톡·소셜 링크 미리보기 -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="우리 아이 과학 개념 지도" />
+<meta property="og:description" content="교육부 고시 성취기준을 개념 단위로 나누어 하나씩 확인한 결과입니다. 인후쌤 과학수업." />
+<meta property="og:image" content="https://beta-science.vercel.app/og-parent.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:url" content="https://beta-science.vercel.app/concept-report.html" />
+<meta property="og:site_name" content="인후쌤 과학수업" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="우리 아이 과학 개념 지도" />
+<meta name="twitter:description" content="배운 개념을 하나씩 확인한 결과를 보여드립니다." />
+<meta name="twitter:image" content="https://beta-science.vercel.app/og-parent.png" />
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-x: hidden; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  background: #fafafa; color: #1d1d1f;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+  overflow-x: hidden;
+}
+@supports (min-height: 100svh) { body { min-height: 100svh; } }
+
+/* ── 로딩 · 안내 화면 ── */
+.screen {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 100vh; gap: 15px; color: #86868b; text-align: center; padding: 24px;
+}
+@supports (min-height: 100svh) { .screen { min-height: 100svh; } }
+.spinner {
+  width: 38px; height: 38px; border: 3px solid #fce7f3; border-top-color: #db2777;
+  border-radius: 50%; animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.screen h2 { font-size: 19px; color: #1d1d1f; font-weight: 700; }
+.screen p { font-size: 14px; line-height: 1.95; }
+#errScreen { display: none; }
+#app { display: none; }
+
+/* ── 헤더 (sticky 54px) ── */
+.header {
+  background: #fff; border-bottom: 1px solid #fce7f3;
+  padding: 0 1rem;
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  height: 54px;
+  display: flex; align-items: center; justify-content: center;
+  position: sticky; top: 0; z-index: 300;
+}
+.header-inner { display: flex; align-items: center; gap: 10px; min-width: 0; width: 100%; max-width: 1080px; }
+.logo {
+  width: 32px; height: 32px; background: linear-gradient(135deg,#f472b6,#db2777);
+  border-radius: 9px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: #fff; font-size: 15px; font-weight: 800;
+}
+.brand { font-size: 15px; font-weight: 700; color: #1d1d1f; line-height: 1.2; }
+.brand-sub { font-size: 11px; color: #db2777; font-weight: 600; margin-top: 1px; }
+
+/* ── 레이아웃 ── */
+.wrap {
+  max-width: 1080px; margin: 0 auto; padding: 1rem;
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-bottom: calc(3rem + env(safe-area-inset-bottom));
+}
+.card {
+  background: #fff; border: 1px solid #fce7f3; border-radius: 18px;
+  padding: 1.25rem; margin-bottom: 1rem;
+  box-shadow: 0 4px 24px rgba(219,39,119,0.08);
+}
+.card-title { font-size: 1.05rem; font-weight: 700; color: #1d1d1f; margin-bottom: 0.9rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.card-title .tag { font-size: 11px; font-weight: 700; color: #db2777; background: #fdf2f8; padding: 3px 8px; border-radius: 999px; }
+.muted { color: #86868b; font-size: 12px; line-height: 1.7; }
+
+/* ── 히어로 카드 ── */
+.hero-card {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 55%, #a21caf 100%);
+  border-radius: 22px; padding: 1.5rem; margin-bottom: 1rem;
+  box-shadow: 0 12px 34px rgba(219,39,119,0.28); color: #fff;
+}
+.hero-card::after {
+  content: ''; position: absolute; right: -70px; top: -70px;
+  width: 230px; height: 230px; border-radius: 50%;
+  background: rgba(255,255,255,0.10); pointer-events: none;
+}
+.hero-card::before {
+  content: ''; position: absolute; right: 30px; bottom: -110px;
+  width: 190px; height: 190px; border-radius: 50%;
+  background: rgba(255,255,255,0.07); pointer-events: none;
+}
+.hero-top { display: flex; align-items: flex-start; gap: 10px; position: relative; z-index: 1; }
+.hero-name { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.25; }
+.hero-meta { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.82); margin-top: 3px; }
+.hero-brand {
+  margin-left: auto; flex-shrink: 0; text-align: right;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.02em;
+  background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.28);
+  padding: 6px 11px; border-radius: 999px; white-space: nowrap;
+}
+.hero-big { margin-top: 1.1rem; position: relative; z-index: 1; display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
+.hero-big b { font-size: 2.6rem; font-weight: 800; line-height: 1; letter-spacing: -0.02em; }
+.hero-big span { font-size: 1rem; font-weight: 700; }
+.hero-sub { font-size: 12px; color: rgba(255,255,255,0.85); margin-top: 6px; position: relative; z-index: 1; line-height: 1.6; }
+.hero-bar {
+  display: flex; height: 10px; border-radius: 999px; overflow: hidden;
+  background: rgba(255,255,255,0.22); margin-top: 0.9rem; position: relative; z-index: 1;
+}
+.hero-bar i { display: block; height: 100%; }
+.hero-key { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 0.65rem; position: relative; z-index: 1; }
+.hero-key span { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.9); display: flex; align-items: center; gap: 5px; }
+.hero-key i { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
+.hero-focus {
+  margin-top: 1.1rem; position: relative; z-index: 1;
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.26);
+  border-radius: 15px; padding: 0.95rem 1.05rem;
+}
+.hero-focus .lbl { font-size: 10px; font-weight: 800; letter-spacing: 0.08em; color: rgba(255,255,255,0.85); }
+.hero-focus .nm { font-size: 1.1rem; font-weight: 800; margin-top: 5px; letter-spacing: -0.01em; }
+.hero-focus .ds { font-size: 12.5px; line-height: 1.7; color: rgba(255,255,255,0.92); margin-top: 6px; }
+.hero-date {
+  margin-top: 1rem; font-size: 11px; color: rgba(255,255,255,0.72);
+  position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 6px;
+}
+
+/* ── 영역별 한 줄 요약 ── */
+.asum-row { padding: 0.7rem 0; border-bottom: 1px solid #f7f7f8; }
+.asum-row:last-child { border-bottom: none; }
+.asum-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.asum-name { font-size: 13.5px; font-weight: 700; color: #1d1d1f; }
+.asum-state { font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.asum-num { margin-left: auto; font-size: 11px; color: #b0b0b5; font-weight: 600; white-space: nowrap; }
+.asum-bar { display: flex; height: 7px; border-radius: 999px; overflow: hidden; background: #f1f1f4; margin-top: 8px; }
+.asum-bar i { display: block; height: 100%; }
+
+/* ── 탭 · 지도 ── */
+.tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 0.9rem; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex-shrink: 0; font-family: inherit; font-size: 13px; font-weight: 700;
+  padding: 9px 15px; border-radius: 999px; border: 1px solid #fce7f3;
+  background: #fff; color: #86868b; cursor: pointer; min-height: 38px;
+}
+.tab.on { background: #db2777; color: #fff; border-color: #db2777; }
+.mapbox { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; border-radius: 12px; background: #fdfdfd; border: 1px solid #f5f5f7; }
+.mapbox svg { display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 0.8rem; }
+.legend span { font-size: 11px; color: #86868b; display: flex; align-items: center; gap: 5px; font-weight: 600; }
+.legend i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; border: 1px solid rgba(0,0,0,0.08); }
+.maphint { font-size: 11px; color: #b0b0b5; margin-top: 6px; line-height: 1.7; }
+
+/* ── 집중 개념 ── */
+.focus {
+  border: none; border-radius: 16px; padding: 1.2rem;
+  background: linear-gradient(135deg,#fff7fb,#fdf2f8);
+  box-shadow: inset 0 0 0 1px #fbcfe8;
+}
+.focus h4 { font-size: 1.15rem; font-weight: 800; color: #9d174d; margin-bottom: 9px; }
+.focus p { font-size: 14px; line-height: 1.8; color: #3a3a3e; }
+.focus .plan {
+  margin-top: 11px; font-size: 12.5px; font-weight: 700; color: #9d174d;
+  background: #fff; border: 1px solid #fbcfe8; border-radius: 11px; padding: 9px 12px; line-height: 1.65;
+}
+.focus .why { margin-top: 8px; font-size: 12px; color: #86868b; }
+
+/* ── 개념별 표 ── */
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+.tbl th { font-size: 11px; color: #db2777; font-weight: 700; padding: 8px 10px; border-bottom: 1px solid #fce7f3; white-space: nowrap; }
+.tbl td { padding: 9px 10px; border-bottom: 1px solid #f7f7f8; vertical-align: middle; }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl .c-std { width: 34%; text-align: center; }
+.tbl .c-name { width: 34%; text-align: center; }
+.tbl .c-state { width: 32%; text-align: center; }
+.tbl .c-name span { font-weight: 600; color: #1d1d1f; }
+.pill { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; display: inline-block; }
+.tbl-empty { padding: 1.5rem 0.6rem; text-align: center; color: #86868b; font-size: 13px; line-height: 1.85; }
+
+/* ── 상태 안내 ── */
+.guide { margin-top: 1.15rem; border-top: 1px solid #f3f3f5; padding-top: 1rem; }
+.guide-t { font-size: 11px; font-weight: 800; color: #86868b; letter-spacing: 0.06em; margin-bottom: 0.85rem; }
+.guide-item { display: grid; grid-template-columns: 124px 1fr; gap: 14px; padding: 0.8rem 0; border-bottom: 1px solid #f7f7f8; align-items: start; }
+.guide-item:last-child { border-bottom: none; }
+.guide-l { text-align: center; }
+.guide-cri { display: block; font-size: 10.5px; color: #b0b0b5; margin-top: 6px; font-weight: 600; line-height: 1.5; }
+.guide-mean { font-size: 13px; line-height: 1.75; color: #3a3a3e; }
+.guide-plan { font-size: 12.5px; line-height: 1.75; color: #9d174d; background: #fdf2f8; border: 1px solid #fce7f3; border-radius: 10px; padding: 8px 11px; margin-top: 8px; }
+.guide-plan b { font-weight: 800; }
+
+.foot { text-align: center; font-size: 11px; color: #c7c7cc; padding: 0.5rem 0 0; line-height: 1.8; }
+
+@media (max-width: 640px) {
+  .wrap { padding: 0.75rem; padding-bottom: calc(2.5rem + env(safe-area-inset-bottom)); }
+  .card { padding: 1rem; border-radius: 15px; }
+  .brand { font-size: 13px; }
+  .brand-sub { font-size: 10px; }
+  .hero-card { padding: 1.2rem; border-radius: 18px; }
+  .hero-name { font-size: 1.15rem; }
+  .hero-brand { font-size: 10px; padding: 5px 9px; }
+  .hero-big b { font-size: 2.1rem; }
+  .hero-big span { font-size: 0.9rem; }
+  .hero-focus { padding: 0.85rem 0.9rem; }
+  .hero-focus .nm { font-size: 1rem; }
+  .asum-num { margin-left: 0; width: 100%; }
+  .tbl { font-size: 12px; }
+  .tbl th, .tbl td { padding: 8px 5px; }
+  .std-pre { display: none; }
+  .guide-item { grid-template-columns: 1fr; gap: 7px; }
+  .guide-l { text-align: left; }
+  .guide-cri { display: inline; margin-top: 0; margin-left: 7px; }
+}
+@media (max-width: 380px) {
+  .hero-big b { font-size: 1.85rem; }
+  .tab { font-size: 12px; padding: 8px 12px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<div id="loadScreen" class="screen">
+  <div class="spinner"></div>
+  <p>개념 지도를 불러오는 중입니다…</p>
+</div>
+
+<div id="errScreen" class="screen">
+  <div style="font-size:48px">🔍</div>
+  <h2>페이지를 찾을 수 없습니다</h2>
+  <p id="errText">학원에서 보내드린 링크를<br>다시 확인해 주세요.<br><br>문제가 계속되면 학원으로<br>문의해 주세요.</p>
+</div>
+
+<div id="app">
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">과</div>
+      <div>
+        <div class="brand">과학 개념 지도</div>
+        <div class="brand-sub">인후쌤 과학수업</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+    <!-- 1. 히어로 -->
+    <div id="hero"></div>
+
+    <!-- 2. 영역별 한 줄 요약 -->
+    <div class="card">
+      <div class="card-title">영역별 진행 상황</div>
+      <div id="areaSummary"></div>
+      <div class="muted" style="margin-top:0.8rem">통합과학2는 세 영역으로 이루어져 있습니다. 각 영역마다 지금까지 확인한 개념 수를 함께 표시했습니다.</div>
+    </div>
+
+    <!-- 3. 지도 -->
+    <div class="card">
+      <div class="card-title">개념 지도 <span class="tag">개념이 이어지는 순서</span></div>
+      <div class="tabs" id="areaTabs"></div>
+      <div class="mapbox" id="mapbox"></div>
+      <div class="legend" id="legend"></div>
+      <div class="maphint" id="mapHint"></div>
+    </div>
+
+    <!-- 4. 집중 개념 -->
+    <div class="card">
+      <div class="card-title" id="focusTitle">이번 기간 집중 개념 <span class="tag">선수 개념 추적</span></div>
+      <div id="focusBox"></div>
+    </div>
+
+    <!-- 5. 개념별 표 -->
+    <div class="card">
+      <div class="card-title">개념별 진행 상황</div>
+      <div class="muted" id="tblNote" style="margin-bottom:0.8rem"></div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th class="c-std">성취기준</th>
+              <th class="c-name">개념</th>
+              <th class="c-state">상태</th>
+            </tr>
+          </thead>
+          <tbody id="tblBody"></tbody>
+        </table>
+      </div>
+      <!-- 6. 5단계 상태 안내 -->
+      <div class="guide" id="guide"></div>
+    </div>
+
+    <div class="foot">© 2026 인후쌤 과학수업 · 통합과학2 · 2022 개정 교육과정</div>
+
+  </div>
+</div>
+
+<script src="/concept-map.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ==================================================================
+   * concept-report.html — 학부모용 과학 개념 지도
+   *
+   * [설계 원칙]
+   *  1) 이 페이지에는 밖으로 나가는 링크가 하나도 없다.
+   *     지도 노드 · 개념명 · 집중 개념 모두 일반 텍스트다.
+   *     학부모가 실수로 선생님용 페이지로 빠지는 경로를 원천 차단한다.
+   *  2) Firestore 쿼리는 이 학생 한 명으로 좁힌다.
+   *     students   → where('id','==',학생ID).limit(1)
+   *     grades     → where('studentId','==',학생ID)
+   *     conceptTags → 전체 (시험↔개념 대응표, 개인정보 없음)
+   *  3) 화면 문구는 전부 concept-map.js(7절)에서 가져온다.
+   *     톤을 고칠 때 이 파일이 아니라 concept-map.js 한 곳만 만진다.
+   * ================================================================ */
+
+  var firebaseConfig = {
+    apiKey: 'AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k',
+    authDomain: 'beta-science.firebaseapp.com',
+    projectId: 'beta-science',
+    storageBucket: 'beta-science.firebasestorage.app',
+    messagingSenderId: '650652155367',
+    appId: '1:650652155367:web:41d2958e675cb4edd4d142'
+  };
+
+  var ACADEMY = '인후쌤 과학수업';
+  var VIEW = 'parent';
+
+  var CM = window.ConceptMap;
+  var db = null;
+
+  var state = {
+    area: 1,
+    studentId: '',
+    student: null,
+    records: [],
+    examCount: 0,
+    tagMap: {},
+    analysis: null
+  };
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return CM.escapeHtml(s); }
+
+  function showError(msg) {
+    var load = $('loadScreen');
+    var err = $('errScreen');
+    if (load) load.style.display = 'none';
+    if (err) {
+      if (msg) { var t = $('errText'); if (t) t.innerHTML = msg; }
+      err.style.display = 'flex';
+    }
+  }
+
+  function showApp() {
+    var load = $('loadScreen');
+    if (load) load.style.display = 'none';
+    $('app').style.display = 'block';
+  }
+
+  function todayLabel() {
+    var d = new Date();
+    return d.getFullYear() + '년 ' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일';
+  }
+
+  function gradeLabel(g) {
+    var s = String(g == null ? '' : g).trim();
+    if (!s) return '';
+    if (/^\d+$/.test(s)) return s + '학년';
+    return s;
+  }
+
+  /* ---------------- Firestore ---------------- */
+
+  function initFirebase() {
+    if (typeof firebase === 'undefined' || !firebase.initializeApp) return false;
+    try {
+      if (!firebase.apps || firebase.apps.length === 0) firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function pick(obj, names) {
+    for (var k = 0; k < names.length; k++) {
+      if (obj && obj[names[k]] !== undefined && obj[names[k]] !== null && obj[names[k]] !== '') return obj[names[k]];
+    }
+    return null;
+  }
+
+  function num(x) {
+    if (x === null || x === undefined || x === '') return null;
+    var v = Number(x);
+    return isFinite(v) ? v : null;
+  }
+
+  /** answers 필드가 배열이든 맵이든 정오를 센다. 집계 필드가 없을 때만 쓴다. */
+  function parseAnswers(ans) {
+    var list = [];
+    if (Array.isArray(ans)) list = ans;
+    else if (ans && typeof ans === 'object') {
+      for (var key in ans) if (Object.prototype.hasOwnProperty.call(ans, key)) list.push(ans[key]);
+    }
+    var total = 0, correct = 0;
+    for (var k = 0; k < list.length; k++) {
+      var it = list[k];
+      var c = null;
+      if (typeof it === 'boolean') c = it;
+      else if (it && typeof it === 'object') {
+        if (typeof it.correct === 'boolean') c = it.correct;
+        else if (typeof it.isCorrect === 'boolean') c = it.isCorrect;
+        else if (it.result !== undefined) c = (it.result === true || it.result === 'O' || it.result === 'correct');
+        else {
+          var key2 = pick(it, ['answer', 'correctAnswer', 'key']);
+          var mine = pick(it, ['userAnswer', 'studentAnswer', 'selected', 'input', 'value', 'my']);
+          if (key2 !== null && mine !== null) c = String(key2).trim() === String(mine).trim();
+        }
+      }
+      if (c === null) continue;
+      total++; if (c) correct++;
+    }
+    return { total: total, correct: correct };
+  }
+
+  /** grades 문서 1개 = 시험 1회. 맞은 개수와 전체 문항 수를 뽑는다. */
+  function docTally(v) {
+    var total = num(v.totalQuestions);
+    var correct = num(v.score);
+    if (total === null) {
+      var oc = num(v.oxCount), mc = num(v.multiCount);
+      if (oc !== null || mc !== null) total = (oc || 0) + (mc || 0);
+    }
+    if (correct === null) {
+      var os = num(v.oxScore), ms = num(v.multiScore);
+      if (os !== null || ms !== null) correct = (os || 0) + (ms || 0);
+    }
+    if (total === null || correct === null) {
+      var p = parseAnswers(v.answers);
+      if (p.total > 0) { total = p.total; correct = p.correct; }
+    }
+    if (total === null || total <= 0) return null;
+    if (correct === null) return null;
+    if (correct > total && correct <= 100) correct = Math.round(total * correct / 100);
+    if (correct > total) correct = total;
+    if (correct < 0) correct = 0;
+    return { total: total, correct: correct };
+  }
+
+  function examKeyOf(id, data) {
+    var t = pick(data, ['examId', 'testName', 'examTitle', 'title', 'testId']);
+    return t ? String(t) : String(id);
+  }
+
+  /** conceptTags 문서를 개념 id 배열로 정규화한다. */
+  function normalizeTagDoc(v) {
+    if (Array.isArray(v.concepts) && v.concepts.length) {
+      var ids = [];
+      for (var k = 0; k < v.concepts.length; k++) if (CM.getNode(v.concepts[k])) ids.push(v.concepts[k]);
+      return ids;
+    }
+    if (Array.isArray(v.standards) && v.standards.length) {
+      var out = [];
+      for (var s = 0; s < v.standards.length; s++) {
+        var list = CM.byStandard(v.standards[s]) || [];
+        for (var g = 0; g < list.length; g++) out.push(list[g].id);
+      }
+      return out;
+    }
+    return [];
+  }
+
+  function loadTags() {
+    return db.collection('conceptTags').get().then(function (snap) {
+      var m = {};
+      snap.forEach(function (d) {
+        var v = d.data() || {};
+        var key = v.examId ? String(v.examId) : d.id;
+        var ids = normalizeTagDoc(v);
+        if (ids.length) m[key] = ids;
+      });
+      state.tagMap = m;
+    }).catch(function () {
+      state.tagMap = {};
+    });
+  }
+
+  /** 학생 한 명만 읽는다. */
+  function loadStudent(sid) {
+    return db.collection('students').where('id', '==', sid).limit(1).get().then(function (snap) {
+      if (snap.empty) return null;
+      var d = snap.docs[0];
+      var v = d.data() || {};
+      return {
+        fireId: d.id,
+        studentId: String(pick(v, ['id', 'studentId', 'sid', 'studentID']) || d.id),
+        name: pick(v, ['name', 'studentName', '이름']) || '학생',
+        grade: String(pick(v, ['grade', '학년', 'gradeLevel', 'schoolGrade']) || '').trim()
+      };
+    });
+  }
+
+  /** 이 학생의 채점 기록만 읽는다. */
+  function loadGrades(student) {
+    var seen = {};
+    var docs = [];
+
+    function q(value) {
+      if (!value) return Promise.resolve();
+      return db.collection('grades').where('studentId', '==', value).get().then(function (snap) {
+        snap.forEach(function (d) {
+          if (seen[d.id]) return;
+          seen[d.id] = true;
+          docs.push({ id: d.id, data: d.data() || {} });
+        });
+      }).catch(function () { /* 한쪽 쿼리가 막혀도 나머지로 진행한다 */ });
+    }
+
+    return q(student.studentId).then(function () {
+      return (student.fireId && student.fireId !== student.studentId) ? q(student.fireId) : null;
+    }).then(function () {
+      var recs = [];
+      var taken = 0;
+      for (var k = 0; k < docs.length; k++) {
+        var v = docs[k].data;
+        var t = docTally(v);
+        if (!t) continue;
+        taken++;
+        var ids = state.tagMap[examKeyOf(docs[k].id, v)] || [];
+        for (var s = 0; s < ids.length; s++) {
+          var node = CM.getNode(ids[s]);
+          if (!node) continue;
+          for (var i = 0; i < t.total; i++) {
+            recs.push({ conceptId: node.id, std: node.std, correct: i < t.correct });
+          }
+        }
+      }
+      state.records = recs;
+      state.examCount = taken;
+    });
+  }
+
+  /* ---------------- 렌더링 ---------------- */
+
+  function renderHero() {
+    var c = CM.countByStatus(state.analysis, null);
+    var set = CM.STYLE.parent;
+    var name = state.student ? state.student.name : '학생';
+    var grade = state.student ? gradeLabel(state.student.grade) : '';
+
+    var html = '<div class="hero-card">';
+    html += '<div class="hero-top"><div>'
+      + '<div class="hero-name">' + esc(name) + '</div>'
+      + '<div class="hero-meta">' + (grade ? esc(grade) + ' · ' : '')
+      + esc(CM.SUBJECT) + ' · ' + esc(CM.CURRICULUM) + '</div>'
+      + '</div><div class="hero-brand">' + esc(ACADEMY) + '</div></div>';
+
+    html += '<div class="hero-big"><b>' + c.ok + '</b><span>개 개념을 다졌습니다</span></div>';
+    html += '<div class="hero-sub">교육부 고시 성취기준을 ' + c.total + '개 개념으로 나누어 하나씩 확인하고 있습니다</div>';
+
+    html += CM.stackBar(c, VIEW, 'hero-bar');
+    html += '<div class="hero-key">'
+      + '<span><i style="background:' + set.ok.line + '"></i>다짐 ' + c.ok + '</span>'
+      + '<span><i style="background:' + set.warn.line + '"></i>다지는 중 ' + c.warn + '</span>'
+      + '<span><i style="background:' + set.weak.line + '"></i>집중 ' + c.weak + '</span>'
+      + '<span><i style="background:' + set.unknown.line + '"></i>예정 ' + (c.unknown + c.few) + '</span>'
+      + '</div>';
+
+    // 지금 잡아야 할 개념 — 딱 하나만, 항상 대응 계획과 함께 (링크 없음)
+    var fc = CM.focusCopy(state.analysis, { link: false });
+    html += '<div class="hero-focus">'
+      + '<div class="lbl">' + esc(fc.lbl) + '</div>'
+      + '<div class="nm">' + esc(fc.nm) + '</div>'
+      + '<div class="ds">' + fc.ds + (fc.plan ? '<br>' + esc(fc.plan) : '') + '</div>'
+      + '</div>';
+
+    html += '<div class="hero-date"><span>' + esc(todayLabel()) + ' 기준</span>'
+      + '<span>·</span><span>누적 평가 ' + state.examCount + '회</span></div>';
+    html += '</div>';
+
+    $('hero').innerHTML = html;
+  }
+
+  function renderAreaSummary() {
+    var html = '';
+    for (var k = 0; k < CM.AREAS.length; k++) {
+      var a = CM.AREAS[k];
+      var s = CM.areaState(state.analysis, a.id, VIEW);
+      html += '<div class="asum-row">'
+        + '<div class="asum-head">'
+        + '<span class="asum-name">' + esc(a.name) + '</span>'
+        + '<span class="asum-state" style="background:' + s.style.bg + ';color:' + s.style.fg + '">' + esc(s.label) + '</span>'
+        + '<span class="asum-num">' + esc(s.right) + '</span>'
+        + '</div>'
+        + CM.stackBar(s.counts, VIEW, 'asum-bar')
+        + '</div>';
+    }
+    $('areaSummary').innerHTML = html;
+  }
+
+  function renderTabs() {
+    var html = '';
+    for (var k = 0; k < CM.AREAS.length; k++) {
+      var a = CM.AREAS[k];
+      html += '<button class="tab' + (state.area === a.id ? ' on' : '') + '" data-area="' + a.id + '" type="button">'
+        + esc(a.name) + '</button>';
+    }
+    $('areaTabs').innerHTML = html;
+  }
+
+  /** 지도 — 노드는 <a> 가 아니라 일반 도형이다 (페이지 이탈 방지) */
+  function renderMap() {
+    var A = state.analysis;
+    var nodes = CM.byArea(state.area);
+    var depth = CM.levels();
+    var i, j;
+
+    var minD = Infinity;
+    for (i = 0; i < nodes.length; i++) minD = Math.min(minD, depth[nodes[i].id]);
+
+    var cols = {};
+    for (i = 0; i < nodes.length; i++) {
+      var d = depth[nodes[i].id] - minD;
+      if (!cols[d]) cols[d] = [];
+      cols[d].push(nodes[i]);
+    }
+    var keys = Object.keys(cols).map(Number).sort(function (a, b) { return a - b; });
+
+    var BW = 138, BH = 46, GX = 62, GY = 13, PAD = 18;
+    var maxRows = 0;
+    for (i = 0; i < keys.length; i++) maxRows = Math.max(maxRows, cols[keys[i]].length);
+
+    var W = PAD * 2 + keys.length * BW + Math.max(0, keys.length - 1) * GX;
+    var H = PAD * 2 + maxRows * BH + Math.max(0, maxRows - 1) * GY;
+
+    var pos = {};
+    for (i = 0; i < keys.length; i++) {
+      var list = cols[keys[i]];
+      var colH = list.length * BH + (list.length - 1) * GY;
+      var y0 = PAD + (H - PAD * 2 - colH) / 2;
+      for (j = 0; j < list.length; j++) {
+        pos[list[j].id] = { x: PAD + i * (BW + GX), y: y0 + j * (BH + GY) };
+      }
+    }
+
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" '
+      + 'xmlns="http://www.w3.org/2000/svg" role="img" aria-label="개념이 이어지는 순서를 보여 주는 지도">';
+    svg += '<defs><marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">'
+      + '<path d="M0 0 L8 4 L0 8 z" fill="#d8d8dd"/></marker></defs>';
+
+    for (i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      for (j = 0; j < n.prereq.length; j++) {
+        var p = pos[n.prereq[j]];
+        var q = pos[n.id];
+        if (!p || !q) continue;
+        var x1 = p.x + BW, y1 = p.y + BH / 2;
+        var x2 = q.x, y2 = q.y + BH / 2;
+        var mx = (x1 + x2) / 2;
+        var focusEdge = A && A.stats[n.prereq[j]] && A.stats[n.prereq[j]].status === 'weak';
+        svg += '<path d="M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ', ' + mx + ' ' + y2 + ', ' + x2 + ' ' + y2 + '" '
+          + 'fill="none" stroke="' + (focusEdge ? '#f59e0b' : '#e5e5ea') + '" stroke-width="' + (focusEdge ? 2 : 1.4) + '" marker-end="url(#ar)"/>';
+      }
+    }
+
+    for (i = 0; i < nodes.length; i++) {
+      var nd = nodes[i];
+      var pt = pos[nd.id];
+      var st = (A && A.stats[nd.id]) ? A.stats[nd.id] : { status: 'unknown', total: 0, rate: null };
+      var s = CM.styleOf(st.status, VIEW);
+      var label = nd.name.length > 11 ? nd.name.slice(0, 10) + '…' : nd.name;
+
+      svg += '<g role="listitem" aria-label="' + esc(nd.name) + ' ' + esc(s.label) + '">';
+      svg += '<rect x="' + pt.x + '" y="' + pt.y + '" width="' + BW + '" height="' + BH + '" rx="11" '
+        + 'fill="' + s.bg + '" stroke="' + s.line + '" stroke-width="1.4"/>';
+      svg += '<text x="' + (pt.x + BW / 2) + '" y="' + (pt.y + 19) + '" text-anchor="middle" font-size="12" font-weight="700" '
+        + 'fill="' + s.fg + '" font-family="-apple-system,BlinkMacSystemFont,sans-serif">' + esc(label) + '</text>';
+      svg += '<text x="' + (pt.x + BW / 2) + '" y="' + (pt.y + 34) + '" text-anchor="middle" font-size="10" opacity="0.75" '
+        + 'fill="' + s.fg + '" font-family="-apple-system,BlinkMacSystemFont,sans-serif">' + esc(s.label) + '</text>';
+      svg += '</g>';
+    }
+
+    svg += '</svg>';
+    $('mapbox').innerHTML = svg;
+
+    $('mapHint').textContent = '화살표는 개념이 이어지는 순서입니다. 왼쪽을 먼저 익혀야 오른쪽이 쉬워집니다.';
+
+    var lg = '';
+    for (i = 0; i < CM.STATUS_ORDER.length; i++) {
+      var kk = CM.STATUS_ORDER[i];
+      if (kk === 'few') continue;   // 학부모 화면은 라벨을 네 가지로 단순화한다
+      var t = CM.styleOf(kk, VIEW);
+      lg += '<span><i style="background:' + t.bg + ';border-color:' + t.line + '"></i>' + esc(t.label) + '</span>';
+    }
+    $('legend').innerHTML = lg;
+  }
+
+  function renderFocus() {
+    var fc = CM.focusCopy(state.analysis, { link: false });
+    $('focusBox').innerHTML = '<div class="focus">'
+      + '<h4>' + esc(fc.nm) + '</h4>'
+      + '<p>' + fc.ds + '</p>'
+      + (fc.plan ? '<div class="plan">' + esc(fc.plan) + '</div>' : '')
+      + (fc.why ? '<div class="why">' + esc(fc.why) + '</div>' : '')
+      + '</div>';
+  }
+
+  /** 개념별 표 — 실제로 평가한 개념만, 링크 없이 */
+  function renderTable() {
+    var A = state.analysis;
+    var nodes = CM.byArea(state.area).filter(function (n) {
+      var st = A && A.stats[n.id];
+      return !!(st && st.total > 0);
+    });
+
+    if (!nodes.length) {
+      $('tblNote').textContent = '이 영역은 앞으로 수업에서 다룰 예정입니다.';
+      $('tblBody').innerHTML = '<tr><td colspan="3" class="tbl-empty">'
+        + '이 영역은 앞으로 수업에서 다룰 예정입니다.<br>'
+        + '평가가 진행되면 확인한 개념이 하나씩 이곳에 쌓입니다.</td></tr>';
+      return;
+    }
+
+    $('tblNote').textContent = '지금까지 평가로 확인한 개념 ' + nodes.length
+      + '개입니다. 각 개념은 교육부가 고시한 성취기준에 연결해 관리합니다.';
+
+    var html = '';
+    for (var k = 0; k < nodes.length; k++) {
+      var n = nodes[k];
+      var st = A.stats[n.id];
+      var s = CM.styleOf(st.status, VIEW);
+      html += '<tr>'
+        + '<td class="c-std" title="' + esc(n.std) + '"><span class="muted">' + CM.stdCell(n.std) + '</span></td>'
+        + '<td class="c-name"><span>' + esc(n.name) + '</span></td>'
+        + '<td class="c-state"><span class="pill" style="background:' + s.bg + ';color:' + s.fg + '">' + esc(s.label) + '</span></td>'
+        + '</tr>';
+    }
+    $('tblBody').innerHTML = html;
+  }
+
+  function renderGuide() {
+    var rows = CM.GUIDE.parent;
+    var html = '<div class="guide-t">상태는 이렇게 나뉘고, 이렇게 관리합니다</div>';
+    html += '<div class="guide-mean" style="margin-bottom:0.9rem;color:#86868b">' + esc(CM.GUIDE_LEAD) + '</div>';
+    for (var k = 0; k < rows.length; k++) {
+      var g = rows[k];
+      var s = CM.styleOf(g.k, VIEW);
+      html += '<div class="guide-item">'
+        + '<div class="guide-l">'
+        + '<span class="pill" style="background:' + s.bg + ';color:' + s.fg + '">' + esc(s.label) + '</span>'
+        + '<span class="guide-cri">' + esc(CM.CRITERIA[g.k]) + '</span>'
+        + '</div>'
+        + '<div><div class="guide-mean">' + esc(g.mean) + '</div>'
+        + (g.plan ? '<div class="guide-plan"><b>이렇게 합니다</b> · ' + esc(g.plan) + '</div>' : '')
+        + '</div></div>';
+    }
+    $('guide').innerHTML = html;
+  }
+
+  function renderAll() {
+    renderHero();
+    renderAreaSummary();
+    renderTabs();
+    renderMap();
+    renderFocus();
+    renderTable();
+    renderGuide();
+  }
+
+  function bind() {
+    $('areaTabs').addEventListener('click', function (ev) {
+      var b = ev.target.closest ? ev.target.closest('[data-area]') : null;
+      if (!b) return;
+      state.area = Number(b.getAttribute('data-area'));
+      renderTabs();
+      renderMap();
+      renderTable();
+    });
+  }
+
+  /* ---------------- 시작 ---------------- */
+
+  function boot() {
+    if (!CM) { showError('페이지 구성 파일을 불러오지 못했습니다.<br>잠시 후 다시 열어 주세요.'); return; }
+
+    var sid = new URLSearchParams(window.location.search).get('id');
+    sid = String(sid == null ? '' : sid).trim();
+    if (!sid) { showError(); return; }
+    state.studentId = sid;
+
+    if (!initFirebase()) {
+      showError('지금은 정보를 불러올 수 없습니다.<br>잠시 후 다시 열어 주세요.');
+      return;
+    }
+
+    loadTags()
+      .then(function () { return loadStudent(sid); })
+      .then(function (student) {
+        if (!student) { showError(); return null; }
+        state.student = student;
+        document.title = student.name + ' · 과학 개념 지도 · ' + ACADEMY;
+        return loadGrades(student).then(function () {
+          state.analysis = CM.analyze(state.records);
+          bind();
+          renderAll();
+          showApp();
+        });
+      })
+      .catch(function () {
+        showError('지금은 정보를 불러올 수 없습니다.<br>잠시 후 다시 열어 주세요.');
+      });
+  }
+
+  // 테스트 전용 노출 (브라우저 동작에는 영향 없음)
+  window.__crTest = { state: state, renderAll: renderAll, bind: bind, showApp: showApp };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+</body>
+</html>
