@@ -58,7 +58,8 @@ body {
 
 /* — Controls — */
 .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-select, input[type=text] {
+select,
+input[type=text], input[type=email], input[type=password] {
   width: 100%; font-family: inherit; font-size: 14px; color: #1d1d1f;
   padding: 10px 12px; border: 1px solid #f3d6e6; border-radius: 11px; background: #fff;
   appearance: none; -webkit-appearance: none;
@@ -77,6 +78,18 @@ select[multiple] optgroup { font-size: 11px; color: #db2777; font-weight: 700; }
 .banner.info { background: #fdf2f8; border-color: #fbcfe8; color: #9d174d; }
 .banner.warnbox { background: #fffbeb; border-color: #fde68a; color: #92400e; }
 .banner.okbox { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+
+/* — 로그인 상태 — */
+.authbar { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.authdot { width: 9px; height: 9px; border-radius: 50%; background: #dc2626; flex-shrink: 0; }
+.authdot.on { background: #059669; }
+.authtxt { font-size: 13.5px; font-weight: 700; color: #1d1d1f; }
+.authtag { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: #fef2f2; color: #991b1b; }
+.authtag.on { background: #ecfdf5; color: #065f46; }
+.authsub { font-size: 12px; color: #86868b; line-height: 1.7; margin-top: 0.6rem; }
+.authform { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; margin-top: 0.85rem; }
+.authform .btn { white-space: nowrap; }
+.authmsg { font-size: 12px; color: #9d174d; font-weight: 600; margin-top: 0.6rem; line-height: 1.6; min-height: 1em; }
 
 /* ===== 학부모 히어로 카드 (학부모 화면에서만 표시) ===== */
 #hero { display: none; }
@@ -272,6 +285,7 @@ pre.dump {
   .exrow { grid-template-columns: 1fr; gap: 8px; }
   .exsel { min-width: 0; width: 100%; }
   .stat .v { font-size: 1.25rem; }
+  .authform { grid-template-columns: 1fr; }
   .hero-card { padding: 1.2rem; border-radius: 18px; }
   .hero-name { font-size: 1.15rem; }
   .hero-brand { font-size: 10px; padding: 5px 9px; }
@@ -385,6 +399,13 @@ pre.dump {
     <div class="guide" id="guide"></div>
   </div>
 
+  <!-- 로그인 상태 (저장 권한) -->
+  <div class="card" id="authCard">
+    <div class="card-title">저장 권한 <span class="tag">선생님 계정</span></div>
+    <div id="authBox"></div>
+    <div class="authmsg" id="authMsg"></div>
+  </div>
+
   <!-- 시험별 개념 연결 -->
   <div class="card" id="tagCard">
     <div class="card-title">시험 ↔ 개념 연결 <span class="tag">최초 1회</span></div>
@@ -411,6 +432,10 @@ pre.dump {
         Firestore에서 실제로 읽어온 내용입니다. 필드 이름이 맞지 않으면 여기에 그대로 나오니,
         이 내용을 복사해서 알려주시면 연결 코드를 맞춰 드릴 수 있습니다.
       </div>
+      <div style="margin-top:0.8rem; display:flex; gap:8px; flex-wrap:wrap">
+        <button class="btn ghost" id="btnPermCheck" type="button">쓰기 권한 점검</button>
+      </div>
+      <div class="muted" style="margin-top:0.6rem" id="permMsg"></div>
       <pre class="dump" id="diagDump">대기 중…</pre>
     </details>
   </div>
@@ -419,6 +444,7 @@ pre.dump {
 
 <script src="/concept-map.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 (function () {
@@ -486,6 +512,7 @@ pre.dump {
 
   var CM = window.ConceptMap;
   var db = null;
+  var auth = null;
   var LIVE = false;
 
   var state = {
@@ -503,6 +530,9 @@ pre.dump {
     examsSig: '',
     tagMap: {},             // examKey -> [conceptId]  (S2-xxx)
     tagError: '',
+    authSdk: false,         // firebase-auth-compat 로드 여부
+    authReady: false,       // onAuthStateChanged 가 한 번이라도 돈 뒤 true
+    user: null,             // 로그인된 선생님 계정
     analysis: null,
     diag: []
   };
@@ -611,7 +641,12 @@ pre.dump {
     return out;
   }
 
-  /* ---------------- Firestore 연결 ---------------- */
+  /* ---------------- Firestore / Auth 연결 ----------------
+     [중요] firebase-auth-compat.js 를 함께 불러오지 않으면
+     Firestore 요청에 로그인 토큰이 실리지 않는다.
+     그러면 read: if true 인 컬렉션은 읽히지만
+     write: if request.auth != null 인 쓰기는 항상 거부된다.
+     이 페이지에서 "저장 권한이 없습니다" 가 뜬 원인이 이것이었다. */
 
   function looksConfigured(cfg) {
     return cfg && cfg.apiKey && cfg.apiKey.indexOf('PASTE') === -1;
@@ -629,11 +664,158 @@ pre.dump {
     try {
       if (!firebase.apps || firebase.apps.length === 0) firebase.initializeApp(firebaseConfig);
       db = firebase.firestore();
+      if (typeof firebase.auth === 'function') {
+        auth = firebase.auth();
+        state.authSdk = true;
+      } else {
+        auth = null;
+        state.authSdk = false;
+        log('Auth SDK', 'firebase-auth-compat.js 가 로드되지 않았습니다. 쓰기 요청에 로그인 토큰이 실리지 않습니다.');
+      }
       return true;
     } catch (e) {
       log('Firebase 초기화 실패', String(e && e.message ? e.message : e));
       return false;
     }
+  }
+
+  /** 로그인 상태를 지켜본다. 다른 페이지에서 로그인해 두었다면
+      같은 도메인이므로 여기서도 그대로 로그인 상태로 잡힌다. */
+  function watchAuth() {
+    if (!LIVE || !auth) {
+      state.authReady = true;
+      renderAuth();
+      renderBanner();
+      return;
+    }
+    auth.onAuthStateChanged(function (u) {
+      state.user = u || null;
+      state.authReady = true;
+      log('로그인 상태', u
+        ? { uid: u.uid, email: u.email || '(이메일 없음)', 쓰기권한: 'request.auth != null 충족' }
+        : '로그아웃 상태입니다. request.auth 가 null 이라 쓰기가 거부됩니다.');
+      renderAuth();
+      renderBanner();
+    });
+  }
+
+  function authErrorText(e) {
+    var code = String(e && e.code ? e.code : '');
+    if (code.indexOf('user-not-found') !== -1) return '등록되지 않은 계정입니다.';
+    if (code.indexOf('wrong-password') !== -1) return '비밀번호가 맞지 않습니다.';
+    if (code.indexOf('invalid-credential') !== -1) return '이메일 또는 비밀번호가 맞지 않습니다.';
+    if (code.indexOf('invalid-email') !== -1) return '이메일 형식이 올바르지 않습니다.';
+    if (code.indexOf('too-many-requests') !== -1) return '시도가 많아 잠시 막혔습니다. 잠시 뒤 다시 시도해 주세요.';
+    if (code.indexOf('network') !== -1) return '네트워크 연결을 확인해 주세요.';
+    return String(e && e.message ? e.message : e);
+  }
+
+  function doLogin() {
+    var em = $('authEmail'), pw = $('authPw');
+    if (!em || !pw) return;
+    var email = String(em.value || '').trim();
+    var pass = String(pw.value || '');
+    if (!email || !pass) { $('authMsg').textContent = '이메일과 비밀번호를 모두 입력해 주세요.'; return; }
+    if (!auth) { $('authMsg').textContent = 'Auth SDK 를 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요.'; return; }
+    $('authMsg').textContent = '로그인 중…';
+    auth.signInWithEmailAndPassword(email, pass).then(function () {
+      pw.value = '';
+      $('authMsg').textContent = '로그인되었습니다. 이제 연결 저장이 가능합니다.';
+    }).catch(function (e) {
+      $('authMsg').textContent = '로그인하지 못했습니다 — ' + authErrorText(e);
+    });
+  }
+
+  function doLogout() {
+    if (!auth) return;
+    auth.signOut().then(function () {
+      $('authMsg').textContent = '로그아웃했습니다.';
+    }).catch(function (e) {
+      $('authMsg').textContent = '로그아웃하지 못했습니다: ' + authErrorText(e);
+    });
+  }
+
+  /** 로그인 상태 카드. 저장 버튼의 활성/비활성도 여기서 함께 결정한다. */
+  function renderAuth() {
+    var box = $('authBox');
+    if (!box) return;
+    var btn = $('btnSaveTags');
+    var can = false;
+    var html = '';
+
+    if (!LIVE) {
+      html = '<div class="authbar"><i class="authdot"></i>'
+        + '<span class="authtxt">샘플 모드</span>'
+        + '<span class="authtag">저장 안 됨</span></div>'
+        + '<div class="authsub">Firebase 설정이 연결되면 로그인 상태가 여기에 표시됩니다.</div>';
+    } else if (!state.authSdk) {
+      html = '<div class="authbar"><i class="authdot"></i>'
+        + '<span class="authtxt">인증 모듈 미로드</span>'
+        + '<span class="authtag">저장 불가</span></div>'
+        + '<div class="authsub">firebase-auth-compat.js 가 로드되지 않아 쓰기 요청에 로그인 토큰이 실리지 않습니다. '
+        + '페이지를 새로고침해도 같다면 파일 하단의 스크립트 태그를 확인해 주세요.</div>';
+    } else if (!state.authReady) {
+      html = '<div class="authbar"><i class="authdot"></i>'
+        + '<span class="authtxt">로그인 상태 확인 중…</span></div>';
+    } else if (state.user) {
+      can = true;
+      html = '<div class="authbar"><i class="authdot on"></i>'
+        + '<span class="authtxt">' + esc(state.user.email || state.user.uid) + '</span>'
+        + '<span class="authtag on">저장 가능</span>'
+        + '<button class="btn ghost" id="btnLogout" type="button" style="margin-left:auto">로그아웃</button></div>'
+        + '<div class="authsub">이 계정으로 conceptTags 컬렉션에 쓰기 요청이 전송됩니다.</div>';
+    } else {
+      html = '<div class="authbar"><i class="authdot"></i>'
+        + '<span class="authtxt">로그아웃 상태</span>'
+        + '<span class="authtag">저장 불가</span></div>'
+        + '<div class="authsub">보안 규칙이 <b>write: if request.auth != null</b> 이라, 로그인하지 않으면 '
+        + '읽기만 되고 저장은 거부됩니다. 선생님 계정으로 로그인해 주세요.</div>'
+        + '<div class="authform">'
+        + '<input type="email" id="authEmail" placeholder="이메일" autocomplete="username" inputmode="email">'
+        + '<input type="password" id="authPw" placeholder="비밀번호" autocomplete="current-password">'
+        + '<button class="btn" id="btnLogin" type="button">로그인</button>'
+        + '</div>';
+    }
+
+    box.innerHTML = html;
+    if (btn) btn.disabled = !can;
+
+    var bi = $('btnLogin');
+    if (bi) bi.addEventListener('click', doLogin);
+    var bo = $('btnLogout');
+    if (bo) bo.addEventListener('click', doLogout);
+    var pw = $('authPw');
+    if (pw) pw.addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
+  }
+
+  /** 쓰기 권한을 실제로 한 번 시험해 본다. 추측 대신 결과로 원인을 확정하기 위함이다. */
+  function permCheck() {
+    var out = [];
+    out.push('firebase.auth 로드: ' + (state.authSdk ? '예' : '아니오'));
+    out.push('로그인 상태: ' + (state.user ? (state.user.email || state.user.uid) : '로그아웃 (request.auth = null)'));
+    if (!LIVE || !db) {
+      out.push('Firestore 미연결 — 샘플 모드입니다.');
+      $('permMsg').textContent = out.join(' · ');
+      log('쓰기 권한 점검', out.join('\n'));
+      return;
+    }
+    $('permMsg').textContent = '점검 중…';
+    var ref = db.collection('conceptTags').doc('__permcheck__');
+    ref.set({ examId: '__permcheck__', concepts: [], standards: [], updatedAt: new Date().toISOString() })
+      .then(function () {
+        out.push('쓰기 결과: 성공 — 규칙과 로그인 모두 정상입니다.');
+        return ref.delete().catch(function () { /* 정리 실패는 무시 */ });
+      })
+      .catch(function (e) {
+        out.push('쓰기 결과: 실패 (' + (e && e.code ? e.code : 'unknown') + ') ' + (e && e.message ? e.message : ''));
+        out.push(state.user
+          ? '로그인은 되어 있으므로 보안 규칙 쪽을 확인해야 합니다.'
+          : '로그아웃 상태가 원인입니다. 위 카드에서 로그인한 뒤 다시 점검해 주세요.');
+      })
+      .then(function () {
+        $('permMsg').textContent = out.join(' · ');
+        log('쓰기 권한 점검', out.join('\n'));
+      });
   }
 
   function pick(obj, names) {
@@ -753,17 +935,54 @@ pre.dump {
     return String(key).replace(/[\/\\#\[\]*?]/g, '_').slice(0, 500) || '_';
   }
 
-  /* ---------------- 시험명 → 개념 자동 추천 ---------------- */
+  /* ==================================================================
+   * 시험명 → 개념 자동 추천
+   *
+   * [v2] 시험명은 대개 "7단원 - 전기와 자기 (① 전기)" 처럼
+   *      바깥(단원명) + 안쪽(소주제) 두 겹으로 되어 있다.
+   *      예전에는 괄호 안만 보고 개념명끼리 글자를 비교했기 때문에
+   *      안쪽이 '전기' 처럼 짧으면 「전자기 유도」를 잡지 못했다.
+   *
+   *      고친 점 세 가지
+   *      1) 바깥(단원명)도 함께 채점에 넣는다.
+   *      2) kw 배열 가중치를 올린다 (안쪽 18 / 바깥 13 / 전체 8).
+   *      3) 교과서 단원명 → 개념 묶음 힌트 사전(HINT_RULES)을 둔다.
+   *         단원명 어휘는 교과서마다 kw 와 다르게 쓰이므로 사전이 필요하다.
+   * ================================================================ */
 
-  /** '1-1. 진화와 생물다양성 (ⓐ 생물다양성과 보전)' → '생물다양성과 보전' */
-  function innerTopic(title) {
+  /** 앞머리 기호(ⓐ ① a. 1) 등)를 떼어 낸다. */
+  function stripMarks(s) {
+    return String(s == null ? '' : s)
+      .replace(/^[^0-9A-Za-z\uAC00-\uD7A3]+/, '')
+      .replace(/^[0-9A-Za-z]{1,2}[.)]\s*/, '')
+      .trim();
+  }
+
+  /** 시험명을 바깥(단원명)과 안쪽(소주제)으로 나눈다.
+      "7단원 - 전기와 자기 (① 전기)" → outer '전기와 자기' / inner '전기' */
+  function splitTitle(title) {
     var s = String(title == null ? '' : title).trim();
+    var inner = '';
+    var outer = s;
     var m = s.match(/[(（]([^()（）]*)[)）]\s*$/);
-    var inner = m ? m[1] : s;
-    // 앞머리 기호(ⓐ, ①, a., 1) 제거 — 한글/영문/숫자가 처음 나오는 지점부터 취한다
-    inner = inner.replace(/^[^0-9A-Za-z\uAC00-\uD7A3]+/, '').trim();
-    inner = inner.replace(/^[0-9A-Za-z]{1,2}[.)]\s*/, '').trim();
-    return inner || s;
+    if (m) {
+      inner = stripMarks(m[1]);
+      outer = s.slice(0, m.index).trim();
+    }
+    outer = outer
+      .replace(/^\s*\d+\s*[-–—]\s*\d+\s*[.)]?\s*/, '')   // 1-1.
+      .replace(/^\s*\d+\s*단원\s*/, '')                   // 7단원
+      .replace(/^\s*\d+\s*[.)]\s*/, '')                   // 3.
+      .replace(/^\s*[-–—·]\s*/, '')                       // - 전기와 자기
+      .trim();
+    outer = stripMarks(outer);
+    if (!inner) inner = outer;
+    return { inner: inner, outer: outer, full: s };
+  }
+
+  /** 예전 이름 유지 (테스트/호환용) */
+  function innerTopic(title) {
+    return splitTitle(title).inner;
   }
 
   /** 한글 2글자 조각으로 잘라 이름 유사도를 잰다. */
@@ -784,29 +1003,115 @@ pre.dump {
     return c;
   }
 
+  /** 공백·가운뎃점을 지운 비교용 문자열 */
+  function squeeze(s) {
+    return String(s == null ? '' : s).replace(/[\s·]/g, '');
+  }
+
+  /* 단원명 힌트 사전.
+     w = 가산 점수. 단원 전체를 가리키는 말일수록 높게 준다.
+     추천은 선생님이 확인 후 저장하는 값이므로, 놓치는 것보다
+     후보가 한둘 더 뜨는 쪽이 낫다는 기준으로 잡았다. */
+  var HINT_RULES = [
+    /* 영역1 — 변화와 다양성 */
+    { w: 40, ids: ['S2-101', 'S2-102', 'S2-103', 'S2-104'],
+      kw: ['지질시대', '지질 시대', '화석', '대멸종', '멸종', '지층', '고생대', '중생대', '신생대'] },
+    { w: 40, ids: ['S2-105', 'S2-106', 'S2-107', 'S2-108', 'S2-109'],
+      kw: ['변이', '자연선택', '자연 선택', '진화', '종분화', '생물다양성', '생물 다양성', '다양성과 보전', '보전'] },
+    { w: 38, ids: ['S2-110', 'S2-111', 'S2-112', 'S2-113', 'S2-114', 'S2-115'],
+      kw: ['산화', '환원', '산화와 환원', '산화 환원', '광합성', '세포호흡', '세포 호흡', '제련', '부식', '연소'] },
+    { w: 38, ids: ['S2-116', 'S2-117', 'S2-118', 'S2-119', 'S2-120', 'S2-121', 'S2-122'],
+      kw: ['산과 염기', '산 염기', '산·염기', '중화', '중화 반응', '지시약', '액성', '산성', '염기성', 'pH'] },
+    { w: 40, ids: ['S2-123', 'S2-124', 'S2-125'],
+      kw: ['에너지 출입', '발열', '흡열', '열의 출입', '반응에서 출입'] },
+
+    /* 영역2 — 환경과 에너지 */
+    { w: 36, ids: ['S2-201', 'S2-202', 'S2-203', 'S2-204', 'S2-205', 'S2-206'],
+      kw: ['생태계', '생물과 환경', '개체군', '군집', '먹이', '생태 피라미드', '평형과 교란'] },
+    { w: 36, ids: ['S2-207', 'S2-208', 'S2-209', 'S2-210', 'S2-211', 'S2-212'],
+      kw: ['기후 변화', '기후변화', '지구 온난화', '온난화', '온실', '복사 평형', '대기와 해양', '엘니뇨', '라니냐', '사막화', '탄소 중립'] },
+    { w: 38, ids: ['S2-213', 'S2-214', 'S2-215'],
+      kw: ['핵융합', '태양 에너지', '질량 결손', '태양의 에너지'] },
+    { w: 45, ids: ['S2-216', 'S2-217'],
+      kw: ['전기와 자기', '전자기', '전자기 유도', '자기장', '전자석', '자석', '유도 전류', '코일', '발전기', '터빈'] },
+    { w: 18, ids: ['S2-216', 'S2-217', 'S2-218', 'S2-219'],
+      kw: ['전기', '발전', '전력', '송전', '에너지 생산'] },
+    { w: 30, ids: ['S2-218', 'S2-219'],
+      kw: ['화력', '핵발전', '원자력', '핵분열', '발전소'] },
+    { w: 38, ids: ['S2-220', 'S2-221', 'S2-222', 'S2-223'],
+      kw: ['에너지 전환', '에너지 보존', '에너지 효율', '효율', '신재생', '재생 에너지', '태양광', '풍력', '지속가능', '지속 가능'] },
+
+    /* 영역3 — 과학과 미래 사회 */
+    { w: 40, ids: ['S2-301', 'S2-302', 'S2-303'],
+      kw: ['감염병', '병원체', '바이러스', '백신', '방역', '전염병'] },
+    { w: 38, ids: ['S2-304', 'S2-305', 'S2-306', 'S2-307'],
+      kw: ['빅데이터', '빅 데이터', '데이터', '인공지능', '인공 지능', 'AI', '로봇', '사물인터넷', '정보 통신'] },
+    { w: 34, ids: ['S2-308', 'S2-309'],
+      kw: ['과학기술', '과학 기술', '양면성', '윤리', '사회적 쟁점', 'SSI', '미래 사회'] }
+  ];
+
   var SUGGEST_MIN = 20;
   var SUGGEST_LIMIT = 6;
 
+  /** 단원명 힌트 사전을 적용해 개념별 가산점을 만든다. */
+  function hintBonus(t) {
+    var bonus = {};
+    var full = t.full;
+    var fullSq = squeeze(full);
+    for (var r = 0; r < HINT_RULES.length; r++) {
+      var rule = HINT_RULES[r];
+      var hit = false;
+      for (var k = 0; k < rule.kw.length; k++) {
+        var w = rule.kw[k];
+        if (full.indexOf(w) !== -1 || fullSq.indexOf(squeeze(w)) !== -1) { hit = true; break; }
+      }
+      if (!hit) continue;
+      for (var i = 0; i < rule.ids.length; i++) {
+        bonus[rule.ids[i]] = (bonus[rule.ids[i]] || 0) + rule.w;
+      }
+    }
+    return bonus;
+  }
+
+  /** 개념 하나에 대한 이름·키워드 점수 */
+  function scoreNode(n, t) {
+    var sc = 0, k;
+    var inner = t.inner, outer = t.outer, full = t.full;
+
+    if (inner && inner === n.name) sc += 110;
+    else if (inner.length >= 2 && inner.indexOf(n.name) !== -1) sc += 60;
+    else if (inner.length >= 2 && n.name.indexOf(inner) !== -1) sc += 50;
+
+    if (outer && outer !== inner) {
+      if (outer === n.name) sc += 70;
+      else if (outer.length >= 2 && n.name.indexOf(outer) !== -1) sc += 30;
+      else if (outer.length >= 2 && outer.indexOf(n.name) !== -1) sc += 40;
+    }
+
+    sc += 9 * sharedBigrams(n.name, inner);
+    if (outer && outer !== inner) sc += 5 * sharedBigrams(n.name, outer);
+
+    var kws = n.kw || [];
+    for (k = 0; k < kws.length; k++) {
+      var w = String(kws[k]);
+      // '물', '산', '철' 같은 한 글자 키워드는 엉뚱한 개념을 끌어오므로 제외한다
+      if (w.length < 2) continue;
+      if (inner && inner.indexOf(w) !== -1) sc += 18;
+      else if (outer && outer !== inner && outer.indexOf(w) !== -1) sc += 13;
+      else if (full.indexOf(w) !== -1) sc += 8;
+    }
+    return sc;
+  }
+
   /** 시험명에서 개념 노드 후보를 점수순으로 뽑는다. */
   function suggestNodes(title) {
-    var full = String(title == null ? '' : title);
-    var inner = innerTopic(full);
-    var out = [];
+    var t = splitTitle(title);
+    var bonus = hintBonus(t);
     var nodes = CM.NODES;
+    var out = [];
     for (var i = 0; i < nodes.length; i++) {
       var n = nodes[i];
-      var sc = 0;
-      if (inner === n.name) sc += 100;
-      else if (inner.indexOf(n.name) !== -1) sc += 60;
-      else if (n.name.indexOf(inner) !== -1) sc += 50;
-      sc += 8 * sharedBigrams(n.name, inner);
-      var kws = n.kw || [];
-      for (var k = 0; k < kws.length; k++) {
-        // '물', '산', '철' 같은 한 글자 키워드는 엉뚱한 개념을 끌어오므로 제외한다
-        if (String(kws[k]).length < 2) continue;
-        if (inner.indexOf(kws[k]) !== -1) sc += 12;
-        else if (full.indexOf(kws[k]) !== -1) sc += 4;
-      }
+      var sc = scoreNode(n, t) + (bonus[n.id] || 0);
       if (sc >= SUGGEST_MIN) out.push({ id: n.id, score: sc });
     }
     out.sort(function (a, b) {
@@ -967,6 +1272,11 @@ pre.dump {
 
   function saveTags() {
     if (!LIVE) { $('tagMsg').textContent = '샘플 모드에서는 저장되지 않습니다. Firebase 설정을 채우면 저장됩니다.'; return; }
+    if (!state.user) {
+      $('tagMsg').textContent = '로그아웃 상태에서는 저장할 수 없습니다. 위 「저장 권한」 카드에서 로그인해 주세요.';
+      if ($('authCard') && $('authCard').scrollIntoView) $('authCard').scrollIntoView({ block: 'center' });
+      return;
+    }
     var rows = document.querySelectorAll('[data-exam]');
     if (!rows.length) { $('tagMsg').textContent = '저장할 시험이 없습니다.'; return; }
     var batch = db.batch();
@@ -993,14 +1303,16 @@ pre.dump {
     }).catch(function (e) {
       var msg = String(e && e.message ? e.message : e);
       $('tagMsg').textContent = (msg.indexOf('permission') !== -1 || msg.indexOf('insufficient') !== -1)
-        ? '저장 권한이 없습니다. Firestore 보안 규칙에 conceptTags 컬렉션을 추가해 주세요.'
+        ? '저장 권한이 거부되었습니다. 「데이터 연결 진단 → 쓰기 권한 점검」으로 로그인 상태와 규칙 중 어느 쪽인지 확인해 주세요.'
         : '저장하지 못했습니다: ' + msg;
     });
   }
 
   function autoTag() {
     var rows = document.querySelectorAll('[data-exam]');
-    var filled = 0, empty = 0;
+    if (!rows.length) { $('tagMsg').textContent = '추천할 시험이 없습니다.'; return; }
+    var filled = 0;
+    var missed = [];
     for (var i = 0; i < rows.length; i++) {
       var title = rows[i].getAttribute('data-title') || rows[i].getAttribute('data-exam');
       var hits = suggestNodes(title);
@@ -1009,14 +1321,18 @@ pre.dump {
       for (var o = 0; o < rows[i].options.length; o++) {
         rows[i].options[o].selected = !!want[rows[i].options[o].value];
       }
-      if (hits.length) filled++; else empty++;
+      if (hits.length) filled++; else missed.push(title);
       var idx = rows[i].getAttribute('data-idx');
       var box = document.getElementById('chosen-' + idx);
       if (box) box.innerHTML = chosenText(selectedIds(rows[i]));
     }
-    $('tagMsg').textContent = filled > 0
-      ? filled + '개 시험에 추천을 채웠습니다' + (empty ? ' (' + empty + '개는 못 찾음)' : '') + '. 확인 후 저장하세요.'
-      : '시험명에서 개념을 찾지 못했습니다. 직접 골라 주세요.';
+    if (filled > 0) {
+      $('tagMsg').textContent = filled + '개 시험에 추천을 채웠습니다.'
+        + (missed.length ? ' 못 찾은 시험 ' + missed.length + '개 — ' + missed.slice(0, 5).join(' / ') : '')
+        + ' 확인 후 저장하세요.';
+    } else {
+      $('tagMsg').textContent = '시험명에서 개념을 찾지 못했습니다. 직접 골라 주세요.';
+    }
   }
 
   function chosenText(ids) {
@@ -1208,15 +1524,22 @@ pre.dump {
         + '</div>';
       return;
     }
+    if (state.authReady && !state.user) {
+      el.innerHTML = '<div class="banner warnbox">'
+        + '<b>로그아웃 상태입니다.</b><br>'
+        + '보기(읽기)는 되지만 <b>연결 저장</b>은 거부됩니다. 아래 <b>저장 권한</b> 카드에서 선생님 계정으로 로그인해 주세요.'
+        + '</div>';
+      return;
+    }
     var tagged = 0, untagged = 0;
     for (var i = 0; i < state.exams.length; i++) {
       if ((state.tagMap[state.exams[i].key] || []).length) tagged++; else untagged++;
     }
     if (state.tagError) {
       el.innerHTML = '<div class="banner warnbox">'
-        + '<b>conceptTags 컬렉션에 접근할 수 없습니다.</b><br>'
-        + 'Firestore 보안 규칙에 conceptTags 를 추가해야 개념 연결을 저장할 수 있습니다. '
-        + '규칙을 추가하기 전까지는 지도가 비어 있습니다.'
+        + '<b>conceptTags 컬렉션을 읽지 못했습니다.</b><br>'
+        + 'Firestore 보안 규칙에서 conceptTags 의 read 조건을 확인해 주세요. '
+        + '읽기가 막혀 있으면 지도가 비어 있습니다.'
         + '</div>';
     } else if (tagged === 0) {
       el.innerHTML = '<div class="banner info">'
@@ -1239,7 +1562,6 @@ pre.dump {
     var el = $('hero');
     if (state.view !== 'parent') { el.innerHTML = ''; return; }
 
-    var A = state.analysis;
     var stu = currentStudent();
     var name = stu ? stu.name : '학생';
     var grade = stu && stu.grade ? gradeLabel(stu.grade) : '';
@@ -1327,7 +1649,7 @@ pre.dump {
            + '<div class="s">' + ({ area: '영역 단위로 표시', std: '성취기준 단위로 표시', node: '개념 단위로 표시' })[g] + '</div></div>';
       $('sumTitle').textContent = '학습 현황 (내부용)';
       var areas = CM.AREAS.map(function (a) {
-        var s = A.areaSummary[a.id];
+        var s = A ? A.areaSummary[a.id] : { total: 0, rate: null };
         return a.name + ' ' + (s.total ? pct(s.rate) + ' (' + s.total + '문항)' : '기록 없음');
       }).join(' · ');
       $('sumNote').textContent = areas + ' · 응시 ' + state.examCount + '회';
@@ -1350,7 +1672,7 @@ pre.dump {
       var key;
       if (c.measured === 0) key = 'unknown';
       else if (c.weak > 0) key = 'weak';
-      else if (s.rate != null && s.rate >= 0.8) key = 'ok';
+      else if (s.rate != null && s.rate >= TH.warn) key = 'ok';
       else key = 'warn';
 
       var label;
@@ -1534,7 +1856,7 @@ pre.dump {
 
     $('mapHint').textContent = isP
       ? '화살표는 개념이 이어지는 순서입니다. 왼쪽을 먼저 익혀야 오른쪽이 쉬워집니다. 개념을 누르면 해당 단원 페이지가 열립니다.'
-      : '화살표는 선수 관계입니다. 왼쪽 개념이 무너지면 오른쪽이 따라 무너집니다. 개념을 누르면 해당 단원 페이지가 열립니다.';
+      : '화살표는 선수 관계입니다. 왼쪽 개념이 흔들리면 오른쪽이 따라 흔들립니다. 개념을 누르면 해당 단원 페이지가 열립니다.';
 
     var order = ['ok', 'warn', 'weak', 'few', 'unknown'];
     var lg = '';
@@ -1675,6 +1997,7 @@ pre.dump {
     renderTable();
     renderGuide();
     renderExams();
+    renderAuth();
   }
 
   function analyzeNow() {
@@ -1721,6 +2044,7 @@ pre.dump {
       var hide = state.view === 'parent' ? 'none' : '';
       $('tagCard').style.display = hide;
       $('diagCard').style.display = hide;
+      $('authCard').style.display = hide;
       $('brandSub').textContent = state.view === 'parent' ? ACADEMY : '통합과학2 · 2022 개정';
       document.body.classList.toggle('parentview', state.view === 'parent');
       renderAll();
@@ -1728,6 +2052,7 @@ pre.dump {
     });
     $('btnSaveTags').addEventListener('click', saveTags);
     $('btnAutoTag').addEventListener('click', autoTag);
+    $('btnPermCheck').addEventListener('click', permCheck);
   }
 
   /* ---------------- 시작 ---------------- */
@@ -1743,6 +2068,8 @@ pre.dump {
 
     LIVE = initFirebase();
     bind();
+    renderAuth();
+    watchAuth();
 
     loadTags()
       .then(loadStudents)
@@ -1759,8 +2086,10 @@ pre.dump {
 
   // 테스트 전용 노출 (브라우저 동작에는 영향 없음)
   window.__cmTest = {
-    suggestNodes: suggestNodes, innerTopic: innerTopic, stdLabel: stdLabel,
-    state: state, renderAll: renderAll, countByStatus: countByStatus,
+    suggestNodes: suggestNodes, innerTopic: innerTopic, splitTitle: splitTitle,
+    hintBonus: hintBonus, stdLabel: stdLabel,
+    state: state, renderAll: renderAll, renderAuth: renderAuth,
+    countByStatus: countByStatus, saveTags: saveTags, permCheck: permCheck,
     setView: function (v) {
       state.view = v;
       document.body.classList.toggle('parentview', v === 'parent');
