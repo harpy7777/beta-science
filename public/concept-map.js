@@ -1,1167 +1,1308 @@
-/*!
- * concept-map.js — 통합과학2 개념 지도 (2022 개정 교육과정)
- * 인후쌤 과학수업 관리 시스템 / beta-science
- *
- * [설계 원칙]
- *  1) 개념 노드는 "교과서 단원명"이 아니라 "성취기준 코드"에 붙인다.
- *     → 출판사(미래엔/비상/동아)마다 서술이 달라도 지도가 어긋나지 않는다.
- *     → 2028 수능 출제 범위가 통합과학1·2이므로 성취기준 = 출제 단위.
- *  2) 단원 페이지 링크는 {publisher}-science2-unit{unit}.html 규칙으로 자동 생성.
- *     영역1 → unit1 / 영역2 → unit2 / 영역3 → unit3
- *  3) prereq(선수관계)를 타고 올라가 "진짜 막힌 지점(root cause)"을 찾는다.
- *  4) [v2] 화면에 찍히는 상태 라벨·판정 기준·안내 문구·집중 개념 문장을
- *     이 파일에 모은다. 선생님 화면(concept-map.html)과
- *     학부모 화면(concept-report.html)이 같은 문구를 쓰게 하기 위함이다.
- *     → 톤을 고칠 때 이 파일 한 곳만 만지면 양쪽에 동시에 반영된다.
- *
- * [사용법]
- *   HTML 에서 <script src="/concept-map.js"> 로 먼저 불러온 뒤
- *   const CM = window.ConceptMap;
- *   CM.pageUrl('S2-120', 'visang');        // 'visang-science2-unit1.html'
- *   CM.matchConcepts('중화 반응에서 온도가...'); // 문항 자동 태깅
- *   CM.analyze(records);                    // 취약 개념 + 근본 원인 진단
- *   CM.focusCopy(analysis, { view: 'parent' }); // 집중 개념 문장 생성
- *
- * 전역 노출: window.ConceptMap
- */
-(function (global) {
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><script src="/favicon.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#db2777">
+<meta name="robots" content="noindex, nofollow">
+<title>인후쌤의 과학 수업 관리 시스템 · 과학 개념 지도</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  background: #fafafa; color: #1d1d1f; min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+/* — Header — */
+.header {
+  background: #fff; border-bottom: 1px solid #fce7f3;
+  padding: 0 1rem;
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  height: 54px;
+  display: flex; align-items: center; justify-content: center;
+  position: sticky; top: 0; z-index: 300;
+}
+.header-inner { display: flex; align-items: center; gap: 10px; min-width: 0; width: 100%; max-width: 1080px; }
+.logo {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg,#f472b6,#db2777);
+  border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  color: #fff; font-size: 15px; font-weight: 800;
+}
+.brand { font-size: 15px; font-weight: 700; color: #1d1d1f; line-height: 1.2; }
+.brand-sub { font-size: 11px; color: #db2777; font-weight: 600; margin-top: 1px; }
+.header-spacer { flex: 1; }
+.hbtn {
+  border: 1px solid #fce7f3; background: #fff; color: #db2777;
+  font-size: 12px; font-weight: 700; padding: 7px 11px; border-radius: 9px; cursor: pointer;
+  font-family: inherit; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center;
+  min-height: 34px;
+}
+.hbtn:hover { background: #fdf2f8; }
+
+/* — Layout — */
+.wrap { max-width: 1080px; margin: 0 auto; padding: 1rem; padding-bottom: 4rem; }
+.card {
+  background: #fff; border: 1px solid #fce7f3; border-radius: 18px;
+  padding: 1.25rem; margin-bottom: 1rem;
+  box-shadow: 0 4px 24px rgba(219,39,119,0.08);
+}
+.card-title { font-size: 1.05rem; font-weight: 700; color: #1d1d1f; margin-bottom: 0.9rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.card-title .tag { font-size: 11px; font-weight: 700; color: #db2777; background: #fdf2f8; padding: 3px 8px; border-radius: 999px; }
+.field-label { font-size: 11px; font-weight: 700; color: #db2777; letter-spacing: 0.05em; margin-bottom: 6px; display: block; }
+.muted { color: #86868b; font-size: 12px; line-height: 1.6; }
+
+/* — Controls — */
+.controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+select, input[type=text] {
+  width: 100%; font-family: inherit; font-size: 14px; color: #1d1d1f;
+  padding: 10px 12px; border: 1px solid #f3d6e6; border-radius: 11px; background: #fff;
+  appearance: none; -webkit-appearance: none;
+}
+select:focus, input:focus { outline: 2px solid #f9a8d4; outline-offset: 1px; }
+select[multiple] { padding: 6px; appearance: none; -webkit-appearance: none; }
+select[multiple] option { padding: 5px 7px; border-radius: 6px; font-size: 13px; }
+select[multiple] optgroup { font-size: 11px; color: #db2777; font-weight: 700; }
+
+/* — Banner — */
+.banner {
+  border-radius: 14px; padding: 0.85rem 1rem; margin-bottom: 1rem;
+  font-size: 13px; line-height: 1.65; border: 1px solid;
+}
+.banner b { font-weight: 700; }
+.banner.info { background: #fdf2f8; border-color: #fbcfe8; color: #9d174d; }
+.banner.warnbox { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+.banner.okbox { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+
+/* — Stat strip — */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.stat { background: #fdf2f8; border: 1px solid #fce7f3; border-radius: 14px; padding: 0.85rem; text-align: center; }
+.stat .v { font-size: 1.5rem; font-weight: 800; color: #db2777; line-height: 1.1; }
+.stat .l { font-size: 11px; color: #86868b; margin-top: 4px; font-weight: 600; }
+.stat .s { font-size: 10px; color: #b0b0b5; margin-top: 2px; }
+
+/* — 영역별 한 줄 요약 — */
+.asum { margin-bottom: 1rem; }
+.asum-row { padding: 0.7rem 0; border-bottom: 1px solid #f7f7f8; }
+.asum-row:last-child { border-bottom: none; }
+.asum-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.asum-name { font-size: 13.5px; font-weight: 700; color: #1d1d1f; }
+.asum-state { font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.asum-num { margin-left: auto; font-size: 11px; color: #b0b0b5; font-weight: 600; white-space: nowrap; }
+.asum-bar { display: flex; height: 7px; border-radius: 999px; overflow: hidden; background: #f1f1f4; margin-top: 8px; }
+.asum-bar i { display: block; height: 100%; }
+
+/* — Focus cards — */
+.focus { border: 1px solid #fde68a; background: #fffbeb; border-radius: 14px; padding: 1rem; margin-bottom: 10px; }
+.focus h4 { font-size: 15px; font-weight: 800; color: #1d1d1f; margin-bottom: 6px; }
+.focus p { font-size: 13px; line-height: 1.7; color: #4b4b50; }
+.focus .why { margin-top: 8px; font-size: 12px; color: #86868b; }
+.focus .go {
+  display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 700;
+  color: #db2777; background: #fff; border: 1px solid #fce7f3;
+  padding: 7px 12px; border-radius: 9px; text-decoration: none;
+}
+
+/* — Tabs — */
+.tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 0.9rem; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex-shrink: 0; font-family: inherit; font-size: 13px; font-weight: 700;
+  padding: 8px 14px; border-radius: 999px; border: 1px solid #fce7f3;
+  background: #fff; color: #86868b; cursor: pointer;
+}
+.tab.on { background: #db2777; color: #fff; border-color: #db2777; }
+
+/* — Map — */
+.mapbox { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; border-radius: 12px; background: #fdfdfd; border: 1px solid #f5f5f7; }
+.mapbox svg { display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 0.8rem; }
+.legend span { font-size: 11px; color: #86868b; display: flex; align-items: center; gap: 5px; font-weight: 600; }
+.legend i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; border: 1px solid rgba(0,0,0,0.08); }
+.maphint { font-size: 11px; color: #b0b0b5; margin-top: 6px; }
+
+/* — Table — */
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+.tbl th { font-size: 11px; color: #db2777; font-weight: 700; padding: 8px 10px; border-bottom: 1px solid #fce7f3; white-space: nowrap; }
+.tbl td { padding: 9px 10px; border-bottom: 1px solid #f7f7f8; vertical-align: middle; }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl .c-std   { width: 24%; text-align: center; }
+.tbl .c-name  { width: 28%; text-align: center; }
+.tbl .c-num   { width: 13%; text-align: center; }
+.tbl .c-rate  { width: 16%; text-align: center; }
+.tbl .c-state { width: 19%; text-align: center; }
+.pill { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; display: inline-block; }
+.nlink { color: #1d1d1f; text-decoration: none; font-weight: 600; }
+.nlink:hover { color: #db2777; text-decoration: underline; }
+.col-hide { display: table-cell; }
+
+/* — 상태 안내 (표 아래 범례 + 대응) — */
+.guide { margin-top: 1.15rem; border-top: 1px solid #f3f3f5; padding-top: 1rem; }
+.guide-t { font-size: 11px; font-weight: 800; color: #86868b; letter-spacing: 0.06em; margin-bottom: 0.85rem; }
+.guide-item { display: grid; grid-template-columns: 124px 1fr; gap: 14px; padding: 0.8rem 0; border-bottom: 1px solid #f7f7f8; align-items: start; }
+.guide-item:last-child { border-bottom: none; }
+.guide-l { text-align: center; }
+.guide-cri { display: block; font-size: 10.5px; color: #b0b0b5; margin-top: 6px; font-weight: 600; line-height: 1.45; }
+.guide-mean { font-size: 13px; line-height: 1.7; color: #3a3a3e; }
+
+/* — Exam tagging — */
+.exrow { display: grid; grid-template-columns: 1fr minmax(240px, 320px); gap: 12px; align-items: start; padding: 12px 0; border-bottom: 1px solid #f7f7f8; }
+.exrow:last-child { border-bottom: none; }
+.exname { font-size: 13px; font-weight: 600; color: #1d1d1f; word-break: break-all; }
+.exmeta { font-size: 11px; color: #b0b0b5; margin-top: 3px; }
+.exchosen { font-size: 11px; color: #db2777; font-weight: 600; margin-top: 5px; line-height: 1.6; }
+.exsel { width: 100%; }
+.btn {
+  font-family: inherit; font-size: 13px; font-weight: 700; padding: 10px 16px;
+  border-radius: 11px; border: none; cursor: pointer;
+  background: linear-gradient(135deg,#f472b6,#db2777); color: #fff;
+}
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn.ghost { background: #fff; color: #db2777; border: 1px solid #fce7f3; }
+
+details.diag { border: 1px solid #f3d6e6; border-radius: 12px; padding: 0.8rem 1rem; background: #fffdfe; }
+details.diag summary { cursor: pointer; font-size: 13px; font-weight: 700; color: #db2777; }
+pre.dump {
+  margin-top: 0.7rem; background: #1d1d1f; color: #e8e8ed; padding: 0.9rem;
+  border-radius: 10px; font-size: 11px; line-height: 1.6; overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; word-break: break-all;
+}
+
+@media (max-width: 640px) {
+  .wrap { padding: 0.75rem; }
+  .card { padding: 1rem; border-radius: 15px; }
+  .brand { font-size: 13px; }
+  .brand-sub { font-size: 10px; }
+  .col-hide { display: none; }
+  .tbl { font-size: 12px; }
+  .tbl th, .tbl td { padding: 8px 5px; }
+  .exrow { grid-template-columns: 1fr; gap: 8px; }
+  .exsel { min-width: 0; width: 100%; }
+  .stat .v { font-size: 1.25rem; }
+  .asum-num { margin-left: 0; width: 100%; }
+  .guide-item { grid-template-columns: 1fr; gap: 7px; }
+  .guide-l { text-align: left; }
+  .guide-cri { display: inline; margin-top: 0; margin-left: 7px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">과</div>
+    <div>
+      <div class="brand">과학 개념 지도</div>
+      <div class="brand-sub">통합과학2 · 2022 개정</div>
+    </div>
+    <div class="header-spacer"></div>
+    <a class="hbtn" href="/index.html">허브로</a>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div id="banner"></div>
+
+  <!-- 조회 조건 -->
+  <div class="card">
+    <div class="card-title">조회 조건</div>
+    <div class="controls">
+      <div>
+        <label class="field-label" for="selGrade">학년</label>
+        <select id="selGrade"><option value="">전체</option></select>
+      </div>
+      <div>
+        <label class="field-label" for="selStudent">학생</label>
+        <select id="selStudent"><option value="">불러오는 중…</option></select>
+      </div>
+      <div>
+        <label class="field-label" for="selPub">교과서</label>
+        <select id="selPub">
+          <option value="miraen">미래엔</option>
+          <option value="visang">비상교육</option>
+          <option value="donga">동아출판</option>
+        </select>
+      </div>
+      <div>
+        <label class="field-label" for="selGrain">보기 단위</label>
+        <select id="selGrain">
+          <option value="auto">자동 (데이터량에 맞춤)</option>
+          <option value="area">영역 3개</option>
+          <option value="std">성취기준 15개</option>
+          <option value="node">개념 57개</option>
+        </select>
+      </div>
+    </div>
+    <div class="muted" style="margin-top:0.7rem">교과서 선택은 개념을 눌렀을 때 열리는 단원 페이지에만 적용됩니다. 성취기준은 교육부 고시라 출판사가 달라도 동일합니다. 학부모용 화면은 <b>개별 학습 리포트</b>에서 학생별 링크로 열립니다.</div>
+  </div>
+
+  <!-- 요약 -->
+  <div class="card">
+    <div class="card-title" id="sumTitle">학습 현황 (내부용)</div>
+    <div class="stats" id="stats"></div>
+    <div class="muted" style="margin-top:0.8rem" id="sumNote"></div>
+  </div>
+
+  <!-- 공략 포인트 -->
+  <div class="card">
+    <div class="card-title">공략 포인트 <span class="tag">선수 개념 추적</span></div>
+    <div id="focusList"></div>
+  </div>
+
+  <!-- 지도 -->
+  <div class="card">
+    <div class="card-title">개념 지도</div>
+    <div class="asum" id="areaSummary"></div>
+    <div class="tabs" id="areaTabs"></div>
+    <div class="mapbox" id="mapbox"></div>
+    <div class="legend" id="legend"></div>
+    <div class="maphint" id="mapHint"></div>
+  </div>
+
+  <!-- 개념별 표 -->
+  <div class="card">
+    <div class="card-title">개념별 상세</div>
+    <div class="muted" id="tblNote" style="margin-bottom:0.8rem"></div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th class="c-std col-hide">성취기준</th>
+            <th class="c-name">개념</th>
+            <th class="c-num">문항</th>
+            <th class="c-rate">정답률</th>
+            <th class="c-state">상태</th>
+          </tr>
+        </thead>
+        <tbody id="tblBody"></tbody>
+      </table>
+    </div>
+    <div class="guide" id="guide"></div>
+  </div>
+
+  <!-- 시험별 개념 연결 -->
+  <div class="card" id="tagCard">
+    <div class="card-title">시험 ↔ 개념 연결 <span class="tag">최초 1회</span></div>
+    <div class="muted" style="margin-bottom:0.9rem">
+      시험마다 다루는 <b>개념</b>을 지정해 두면 이후 채점 결과가 자동으로 개념 지도에 반영됩니다.
+      성취기준(15개)이 아니라 개념(57개) 단위로 연결해야 선수 관계 추적이 작동합니다.
+      목록은 <b>전체 학생의 채점 기록</b>에서 모으므로, 학생을 바꿔 가며 반복할 필요가 없습니다.
+      여러 개를 고를 때는 <b>Cmd(⌘)</b> 또는 <b>Ctrl</b>을 누른 채 클릭하고, 같은 방법으로 선택을 해제합니다.
+      마스터테스트처럼 개념 지도에 넣지 않을 시험은 <b>아무것도 고르지 않은 채로</b> 두면 집계에서 제외됩니다.
+    </div>
+    <div id="examList"></div>
+    <div style="margin-top:1rem; display:flex; gap:8px; flex-wrap:wrap">
+      <button class="btn" id="btnSaveTags" type="button">연결 저장</button>
+      <button class="btn ghost" id="btnAutoTag" type="button">시험명으로 자동 추천</button>
+    </div>
+    <div class="muted" style="margin-top:0.7rem" id="tagMsg"></div>
+  </div>
+
+  <!-- 진단 -->
+  <div class="card" id="diagCard">
+    <details class="diag">
+      <summary>데이터 연결 진단</summary>
+      <div class="muted" style="margin-top:0.7rem">
+        Firestore에서 실제로 읽어온 내용입니다. 필드 이름이 맞지 않으면 여기에 그대로 나오니,
+        이 내용을 복사해서 알려주시면 연결 코드를 맞춰 드릴 수 있습니다.
+      </div>
+      <pre class="dump" id="diagDump">대기 중…</pre>
+    </details>
+  </div>
+
+</div>
+
+<script src="/concept-map.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(function () {
   'use strict';
 
-  /* ------------------------------------------------------------------
-   * 1. 기본 메타
-   * ---------------------------------------------------------------- */
-
-  var SUBJECT = '통합과학2';
-  var CURRICULUM = '2022 개정 교육과정';
-
-  var PUBLISHERS = {
-    miraen: '미래엔',
-    visang: '비상교육',
-    donga: '동아출판'
-  };
-
-  var DEFAULT_PUBLISHER = 'miraen';
-
-  // 영역 = 성취기준 대영역. unit = 실제 HTML 파일 번호.
-  var AREAS = [
-    { id: 1, unit: 1, name: '변화와 다양성', color: '#db2777' },
-    { id: 2, unit: 2, name: '환경과 에너지', color: '#2563eb' },
-    { id: 3, unit: 3, name: '과학과 미래 사회', color: '#059669' }
-  ];
-
-  // 물·화·생·지 구분 (지도 색상 및 과목별 취약도 집계용)
-  var DOMAINS = {
-    phys: { name: '물리', color: '#6366f1' },
-    chem: { name: '화학', color: '#db2777' },
-    bio: { name: '생명', color: '#059669' },
-    earth: { name: '지구', color: '#d97706' },
-    conv: { name: '융합', color: '#64748b' }
-  };
-
-  /* ------------------------------------------------------------------
-   * 2. 개념 노드 (57개)
-   *    id       : 고유 코드 (문항 태깅 시 사용)
-   *    name     : 화면 표시명
-   *    area     : 영역 번호 (1~3)
-   *    std      : 2022 개정 성취기준 코드
-   *    domain   : phys | chem | bio | earth | conv
-   *    prereq   : 선수 개념 id 배열 (이게 무너지면 뒤가 전부 흔들림)
-   *    related  : 참고 연결 (선수관계는 아니지만 함께 보면 좋은 개념)
-   *    cross    : 통합과학1 연계 성취기준 코드
-   *    kw       : 문항 자동 태깅용 키워드
-   * ---------------------------------------------------------------- */
-
-  var NODES = [
-    /* ===== 영역 1. 변화와 다양성 (unit1) ===== */
-
-    /* 10통과2-01-01 지질시대와 환경 변화 */
-    {
-      id: 'S2-101', name: '지질시대 구분', area: 1, std: '10통과2-01-01', domain: 'earth',
-      prereq: [], related: [], cross: [],
-      kw: ['지질시대', '선캄브리아', '고생대', '중생대', '신생대', '절대 연령', '상대 연령', '지층 누중']
-    },
-    {
-      id: 'S2-102', name: '화석과 표준화석', area: 1, std: '10통과2-01-01', domain: 'earth',
-      prereq: [], related: [], cross: [],
-      kw: ['화석', '표준화석', '시상화석', '삼엽충', '암모나이트', '화폐석', '매머드']
-    },
-    {
-      id: 'S2-103', name: '지질시대의 환경 변화', area: 1, std: '10통과2-01-01', domain: 'earth',
-      prereq: ['S2-101', 'S2-102'], related: [], cross: [],
-      kw: ['고기후', '빙하기', '간빙기', '대륙 분포', '산소 농도', '초대륙', '판게아']
-    },
-    {
-      id: 'S2-104', name: '대멸종', area: 1, std: '10통과2-01-01', domain: 'earth',
-      prereq: ['S2-103'], related: [], cross: [],
-      kw: ['대멸종', '멸종', '페름기', '백악기', '운석 충돌', '공룡', '화산 활동']
-    },
-
-    /* 10통과2-01-02 변이·자연선택·진화·생물다양성 */
-    {
-      id: 'S2-105', name: '변이', area: 1, std: '10통과2-01-02', domain: 'bio',
-      prereq: [], related: [], cross: ['10통과1-03-06'],
-      kw: ['변이', '돌연변이', '유전적 변이', '개체 차이', '형질']
-    },
-    {
-      id: 'S2-106', name: '자연선택', area: 1, std: '10통과2-01-02', domain: 'bio',
-      prereq: ['S2-105'], related: [], cross: [],
-      kw: ['자연선택', '다윈', '적자생존', '핀치', '항생제 내성', '살충제 저항성', '기린']
-    },
-    {
-      id: 'S2-107', name: '진화와 종분화', area: 1, std: '10통과2-01-02', domain: 'bio',
-      prereq: ['S2-106'], related: [], cross: [],
-      kw: ['진화', '종분화', '지리적 격리', '생식적 격리', '진화설']
-    },
-    {
-      id: 'S2-108', name: '생물다양성의 세 요소', area: 1, std: '10통과2-01-02', domain: 'bio',
-      prereq: ['S2-107', 'S2-104'], related: [], cross: [],
-      kw: ['생물다양성', '유전적 다양성', '종 다양성', '생태계 다양성']
-    },
-    {
-      id: 'S2-109', name: '생물다양성 보전', area: 1, std: '10통과2-01-02', domain: 'bio',
-      prereq: ['S2-108'], related: ['S2-206'], cross: [],
-      kw: ['보전', '서식지 파괴', '멸종위기종', '종자은행', '생태통로', '외래종']
-    },
-
-    /* 10통과2-01-03 산화·환원 */
-    {
-      id: 'S2-110', name: '산화·환원 (산소의 이동)', area: 1, std: '10통과2-01-03', domain: 'chem',
-      prereq: [], related: [], cross: ['10통과1-02-04'],
-      kw: ['산화', '환원', '산소', '연소', '산소를 얻는']
-    },
-    {
-      id: 'S2-111', name: '산화·환원 (전자의 이동)', area: 1, std: '10통과2-01-03', domain: 'chem',
-      prereq: ['S2-110'], related: [], cross: ['10통과1-02-03', '10통과1-02-04'],
-      kw: ['전자의 이동', '전자를 잃', '전자를 얻', '산화제', '환원제', '동시에 일어']
-    },
-    {
-      id: 'S2-112', name: '광합성과 세포호흡', area: 1, std: '10통과2-01-03', domain: 'chem',
-      prereq: ['S2-111'], related: ['S2-215'], cross: [],
-      kw: ['광합성', '세포호흡', '포도당', '엽록체', '이산화탄소', '산소 발생']
-    },
-    {
-      id: 'S2-113', name: '화석 연료의 연소', area: 1, std: '10통과2-01-03', domain: 'chem',
-      prereq: ['S2-111'], related: ['S2-208'], cross: [],
-      kw: ['화석 연료', '연소', '메테인', '탄화수소', '이산화탄소 배출']
-    },
-    {
-      id: 'S2-114', name: '철의 제련과 부식', area: 1, std: '10통과2-01-03', domain: 'chem',
-      prereq: ['S2-111'], related: [], cross: [],
-      kw: ['제련', '용광로', '철', '산화 철', '코크스', '녹', '부식', '도금']
-    },
-    {
-      id: 'S2-115', name: '생활 속 산화·환원', area: 1, std: '10통과2-01-03', domain: 'chem',
-      prereq: ['S2-111'], related: [], cross: [],
-      kw: ['갈변', '과산화수소', '표백', '살균', '산화 방지제', '변색']
-    },
-
-    /* 10통과2-01-04 산·염기와 중화 반응 */
-    {
-      id: 'S2-116', name: '산의 성질', area: 1, std: '10통과2-01-04', domain: 'chem',
-      prereq: [], related: [], cross: [],
-      kw: ['산', '신맛', '수소 이온', '금속과 반응', '수소 기체', '염산', '황산', '아세트산']
-    },
-    {
-      id: 'S2-117', name: '염기의 성질', area: 1, std: '10통과2-01-04', domain: 'chem',
-      prereq: [], related: [], cross: [],
-      kw: ['염기', '쓴맛', '미끈', '수산화 이온', '단백질', '수산화 나트륨', '암모니아']
-    },
-    {
-      id: 'S2-118', name: '아레니우스 산·염기 정의', area: 1, std: '10통과2-01-04', domain: 'chem',
-      prereq: ['S2-116', 'S2-117'], related: [], cross: ['10통과1-02-04'],
-      kw: ['아레니우스', '이온화', '수용액', '수소 이온', '수산화 이온', '정의']
-    },
-    {
-      id: 'S2-119', name: '지시약과 액성', area: 1, std: '10통과2-01-04', domain: 'chem',
-      prereq: ['S2-118'], related: [], cross: [],
-      kw: ['지시약', '리트머스', '페놀프탈레인', 'BTB', '메틸 오렌지', 'pH', '액성']
-    },
-    {
-      id: 'S2-120', name: '중화 반응', area: 1, std: '10통과2-01-04', domain: 'chem',
-      prereq: ['S2-118'], related: [], cross: [],
-      kw: ['중화', '중화 반응', '물이 생성', '염', '알짜 이온', '구경꾼 이온', '1:1']
-    },
-    {
-      id: 'S2-121', name: '중화점과 온도 변화', area: 1, std: '10통과2-01-04', domain: 'chem',
-      prereq: ['S2-120'], related: ['S2-123'], cross: [],
-      kw: ['중화점', '중화열', '최고 온도', '이온 수 변화', '그래프', '부피 관계']
-    },
-    {
-      id: 'S2-122', name: '생활 속 중화 반응', area: 1, std: '10통과2-01-04', domain: 'chem',
-      prereq: ['S2-120'], related: [], cross: [],
-      kw: ['제산제', '위산', '석회', '토양 산성화', '치약', '벌레 물린', '생석회']
-    },
-
-    /* 10통과2-01-05 물질 변화에서의 에너지 출입 */
-    {
-      id: 'S2-123', name: '발열 반응', area: 1, std: '10통과2-01-05', domain: 'chem',
-      prereq: [], related: [], cross: [],
-      kw: ['발열', '열을 방출', '주변 온도가 높아', '연소', '손난로', '산화 칼슘']
-    },
-    {
-      id: 'S2-124', name: '흡열 반응', area: 1, std: '10통과2-01-05', domain: 'chem',
-      prereq: [], related: [], cross: [],
-      kw: ['흡열', '열을 흡수', '주변 온도가 낮아', '냉각팩', '질산 암모늄', '탄산수소 나트륨']
-    },
-    {
-      id: 'S2-125', name: '에너지 출입의 활용', area: 1, std: '10통과2-01-05', domain: 'chem',
-      prereq: ['S2-123', 'S2-124'], related: [], cross: [],
-      kw: ['발열 도시락', '냉찜질', '온찜질', '제설제', '휴대용 발열']
-    },
-
-    /* ===== 영역 2. 환경과 에너지 (unit2) ===== */
-
-    /* 10통과2-02-01 생태계 구성 요소 */
-    {
-      id: 'S2-201', name: '생태계 구성 요소', area: 2, std: '10통과2-02-01', domain: 'bio',
-      prereq: [], related: [], cross: ['10통과1-03-01'],
-      kw: ['생태계', '생물적 요인', '비생물적 요인', '생산자', '소비자', '분해자']
-    },
-    {
-      id: 'S2-202', name: '생물과 환경의 상호 관계', area: 2, std: '10통과2-02-01', domain: 'bio',
-      prereq: ['S2-201'], related: [], cross: [],
-      kw: ['작용', '반작용', '상호작용', '빛의 세기', '온도', '물', '토양', '음지 식물']
-    },
-    {
-      id: 'S2-203', name: '개체군과 군집', area: 2, std: '10통과2-02-01', domain: 'bio',
-      prereq: ['S2-201'], related: [], cross: [],
-      kw: ['개체군', '군집', '개체군 밀도', '생장 곡선', '환경 저항', 'S자']
-    },
-
-    /* 10통과2-02-02 생태계 평형 */
-    {
-      id: 'S2-204', name: '먹이 사슬과 먹이 그물', area: 2, std: '10통과2-02-02', domain: 'bio',
-      prereq: ['S2-203'], related: [], cross: [],
-      kw: ['먹이 사슬', '먹이 그물', '영양 단계', '포식', '피식']
-    },
-    {
-      id: 'S2-205', name: '생태 피라미드', area: 2, std: '10통과2-02-02', domain: 'bio',
-      prereq: ['S2-204'], related: [], cross: [],
-      kw: ['생태 피라미드', '에너지양', '개체 수', '생물량', '상위 영양 단계']
-    },
-    {
-      id: 'S2-206', name: '생태계 평형과 교란', area: 2, std: '10통과2-02-02', domain: 'bio',
-      prereq: ['S2-205'], related: ['S2-109'], cross: [],
-      kw: ['생태계 평형', '교란', '복원력', '외래종', '남획', '서식지 단편화']
-    },
-
-    /* 10통과2-02-03 기후 변화 */
-    {
-      id: 'S2-207', name: '지구의 복사 평형', area: 2, std: '10통과2-02-03', domain: 'earth',
-      prereq: [], related: [], cross: ['10통과1-03-01'],
-      kw: ['복사 평형', '태양 복사', '지구 복사', '반사율', '흡수', '방출', '열수지']
-    },
-    {
-      id: 'S2-208', name: '온실 효과와 온실 기체', area: 2, std: '10통과2-02-03', domain: 'earth',
-      prereq: ['S2-207'], related: ['S2-113'], cross: [],
-      kw: ['온실 효과', '온실 기체', '이산화탄소', '메테인', '수증기', '재복사']
-    },
-    {
-      id: 'S2-209', name: '지구 온난화', area: 2, std: '10통과2-02-03', domain: 'earth',
-      prereq: ['S2-208'], related: [], cross: [],
-      kw: ['지구 온난화', '평균 기온', '해수면 상승', '빙하 감소', '기후 변화']
-    },
-    {
-      id: 'S2-210', name: '대기와 해양의 상호작용', area: 2, std: '10통과2-02-03', domain: 'earth',
-      prereq: ['S2-207'], related: [], cross: [],
-      kw: ['대기 대순환', '해류', '무역풍', '편서풍', '용승', '표층 순환']
-    },
-    {
-      id: 'S2-211', name: '엘니뇨와 라니냐', area: 2, std: '10통과2-02-03', domain: 'earth',
-      prereq: ['S2-210'], related: [], cross: [],
-      kw: ['엘니뇨', '라니냐', '무역풍 약화', '용승 약화', '동태평양', '수온 상승']
-    },
-    {
-      id: 'S2-212', name: '사막화와 기후 변화 대응', area: 2, std: '10통과2-02-03', domain: 'earth',
-      prereq: ['S2-209'], related: [], cross: [],
-      kw: ['사막화', '황사', '파리 협정', '탄소 중립', '온실가스 감축']
-    },
-
-    /* 10통과2-02-04 핵융합과 태양 에너지 */
-    {
-      id: 'S2-213', name: '태양의 수소 핵융합', area: 2, std: '10통과2-02-04', domain: 'phys',
-      prereq: [], related: [], cross: ['10통과1-02-02'],
-      kw: ['핵융합', '수소 핵융합', '헬륨', '태양 중심부', '고온 고압']
-    },
-    {
-      id: 'S2-214', name: '질량 결손과 에너지', area: 2, std: '10통과2-02-04', domain: 'phys',
-      prereq: ['S2-213'], related: [], cross: [],
-      kw: ['질량 결손', '질량 감소', '에너지로 전환', '질량-에너지']
-    },
-    {
-      id: 'S2-215', name: '태양 에너지의 전환과 순환', area: 2, std: '10통과2-02-04', domain: 'phys',
-      prereq: ['S2-214'], related: ['S2-112'], cross: [],
-      kw: ['태양 에너지', '에너지 흐름', '물의 순환', '대기 순환', '화학 에너지']
-    },
-
-    /* 10통과2-02-05 발전 */
-    {
-      id: 'S2-216', name: '전자기 유도', area: 2, std: '10통과2-02-05', domain: 'phys',
-      prereq: [], related: [], cross: [],
-      kw: ['전자기 유도', '코일', '자석', '유도 전류', '자기장 변화', '검류계']
-    },
-    {
-      id: 'S2-217', name: '발전기의 원리', area: 2, std: '10통과2-02-05', domain: 'phys',
-      prereq: ['S2-216'], related: [], cross: [],
-      kw: ['발전기', '터빈', '운동 에너지', '전기 에너지', '간이 발전기']
-    },
-    {
-      id: 'S2-218', name: '화력 발전', area: 2, std: '10통과2-02-05', domain: 'phys',
-      prereq: ['S2-217'], related: ['S2-113'], cross: [],
-      kw: ['화력 발전', '보일러', '증기', '화석 연료 연소', '대기 오염']
-    },
-    {
-      id: 'S2-219', name: '핵발전', area: 2, std: '10통과2-02-05', domain: 'phys',
-      prereq: ['S2-217'], related: ['S2-214'], cross: [],
-      kw: ['핵발전', '원자력', '핵분열', '우라늄', '원자로', '방사성 폐기물']
-    },
-
-    /* 10통과2-02-06 에너지 효율과 신재생 에너지 */
-    {
-      id: 'S2-220', name: '에너지 전환과 보존', area: 2, std: '10통과2-02-06', domain: 'phys',
-      prereq: ['S2-215'], related: [], cross: [],
-      kw: ['에너지 전환', '에너지 보존', '총량', '열에너지로 전환']
-    },
-    {
-      id: 'S2-221', name: '에너지 효율', area: 2, std: '10통과2-02-06', domain: 'phys',
-      prereq: ['S2-220'], related: [], cross: [],
-      kw: ['에너지 효율', '버려지는 열', '소비 효율 등급', 'LED', '열효율']
-    },
-    {
-      id: 'S2-222', name: '신재생 에너지', area: 2, std: '10통과2-02-06', domain: 'phys',
-      prereq: ['S2-221'], related: ['S2-218'], cross: [],
-      kw: ['신재생', '태양광', '풍력', '조력', '지열', '연료 전지', '바이오']
-    },
-    {
-      id: 'S2-223', name: '지속가능한 발전', area: 2, std: '10통과2-02-06', domain: 'conv',
-      prereq: ['S2-222', 'S2-212'], related: [], cross: [],
-      kw: ['지속가능', '적정 기술', '에너지 하베스팅', '탄소 발자국']
-    },
-
-    /* ===== 영역 3. 과학과 미래 사회 (unit3) ===== */
-
-    /* 10통과2-03-01 감염병 */
-    {
-      id: 'S2-301', name: '감염병과 병원체', area: 3, std: '10통과2-03-01', domain: 'bio',
-      prereq: [], related: [], cross: [],
-      kw: ['감염병', '병원체', '세균', '바이러스', '곰팡이', '원생생물', '변형 단백질']
-    },
-    {
-      id: 'S2-302', name: '감염병 진단 기술', area: 3, std: '10통과2-03-01', domain: 'bio',
-      prereq: ['S2-301'], related: [], cross: [],
-      kw: ['진단', 'PCR', '유전자 증폭', '항원', '항체', '신속 항원', '핵산']
-    },
-    {
-      id: 'S2-303', name: '감염병 확산과 대응', area: 3, std: '10통과2-03-01', domain: 'bio',
-      prereq: ['S2-301'], related: [], cross: [],
-      kw: ['확산', '역학 조사', '백신', '방역', '전파 경로', '집단 면역']
-    },
-
-    /* 10통과2-03-02 빅데이터 */
-    {
-      id: 'S2-304', name: '빅데이터의 활용', area: 3, std: '10통과2-03-02', domain: 'conv',
-      prereq: [], related: [], cross: [],
-      kw: ['빅데이터', '데이터 축적', '기상 관측', '유전체 분석', '신약 개발']
-    },
-    {
-      id: 'S2-305', name: '빅데이터의 한계와 문제점', area: 3, std: '10통과2-03-02', domain: 'conv',
-      prereq: ['S2-304'], related: [], cross: [],
-      kw: ['개인 정보', '데이터 편향', '보안', '오남용', '프라이버시']
-    },
-
-    /* 10통과2-03-03 인공지능과 로봇 */
-    {
-      id: 'S2-306', name: '인공지능과 과학 탐구', area: 3, std: '10통과2-03-03', domain: 'conv',
-      prereq: ['S2-304'], related: [], cross: [],
-      kw: ['인공지능', '기계 학습', '딥러닝', '과학 탐구', '예측 모델']
-    },
-    {
-      id: 'S2-307', name: '로봇과 사물인터넷', area: 3, std: '10통과2-03-03', domain: 'conv',
-      prereq: ['S2-306'], related: [], cross: [],
-      kw: ['로봇', '사물인터넷', 'IoT', '자율주행', '센서', '스마트']
-    },
-
-    /* 10통과2-03-04 과학기술과 윤리 */
-    {
-      id: 'S2-308', name: '과학기술의 양면성', area: 3, std: '10통과2-03-04', domain: 'conv',
-      prereq: [], related: [], cross: [],
-      kw: ['양면성', '유용성', '한계', '부작용', '기술 발전']
-    },
-    {
-      id: 'S2-309', name: '과학 윤리와 SSI', area: 3, std: '10통과2-03-04', domain: 'conv',
-      prereq: ['S2-308'], related: [], cross: [],
-      kw: ['과학 윤리', 'SSI', '사회적 쟁점', '생명 윤리', '연구 윤리', '의사 결정']
-    }
-  ];
-
-  /* ------------------------------------------------------------------
-   * 3. 인덱스 구축
-   * ---------------------------------------------------------------- */
-
-  var NODE_BY_ID = {};
-  var CHILDREN = {};   // id -> 이 개념을 선수로 삼는 하위 개념들
-  var AREA_BY_ID = {};
-  var i, j, n;
-
-  for (i = 0; i < AREAS.length; i++) {
-    AREA_BY_ID[AREAS[i].id] = AREAS[i];
-  }
-
-  for (i = 0; i < NODES.length; i++) {
-    n = NODES[i];
-    NODE_BY_ID[n.id] = n;
-    CHILDREN[n.id] = [];
-  }
-
-  for (i = 0; i < NODES.length; i++) {
-    n = NODES[i];
-    for (j = 0; j < n.prereq.length; j++) {
-      if (CHILDREN[n.prereq[j]]) {
-        CHILDREN[n.prereq[j]].push(n.id);
-      }
-    }
-  }
-
-  /* ------------------------------------------------------------------
-   * 4. 조회 헬퍼
-   * ---------------------------------------------------------------- */
-
-  function getNode(id) {
-    return NODE_BY_ID[id] || null;
-  }
-
-  function allNodes() {
-    return NODES.slice();
-  }
-
-  function byArea(areaId) {
-    return NODES.filter(function (x) { return x.area === Number(areaId); });
-  }
-
-  function byStandard(code) {
-    return NODES.filter(function (x) { return x.std === code; });
-  }
-
-  function byDomain(key) {
-    return NODES.filter(function (x) { return x.domain === key; });
-  }
-
-  function listStandards() {
-    var seen = {};
-    var out = [];
-    for (var k = 0; k < NODES.length; k++) {
-      if (!seen[NODES[k].std]) {
-        seen[NODES[k].std] = true;
-        out.push(NODES[k].std);
-      }
-    }
-    return out.sort();
-  }
-
-  /** 노드 id → 해당 단원 페이지 URL */
-  function pageUrl(id, publisher) {
-    var node = getNode(id);
-    if (!node) return null;
-    var pub = PUBLISHERS[publisher] ? publisher : DEFAULT_PUBLISHER;
-    var area = AREA_BY_ID[node.area];
-    if (!area) return null;
-    return pub + '-science2-unit' + area.unit + '.html';
-  }
-
-  /** 선수 개념 전체(조상) — 가까운 순서 */
-  function ancestors(id) {
-    var out = [];
-    var seen = {};
-    var queue = [id];
-    var cur, node, k;
-    seen[id] = true;
-    while (queue.length) {
-      cur = queue.shift();
-      node = getNode(cur);
-      if (!node) continue;
-      for (k = 0; k < node.prereq.length; k++) {
-        if (!seen[node.prereq[k]]) {
-          seen[node.prereq[k]] = true;
-          out.push(node.prereq[k]);
-          queue.push(node.prereq[k]);
-        }
-      }
-    }
-    return out;
-  }
-
-  /** 이 개념이 무너지면 함께 흔들리는 후속 개념 전체 */
-  function descendants(id) {
-    var out = [];
-    var seen = {};
-    var queue = [id];
-    var cur, kids, k;
-    seen[id] = true;
-    while (queue.length) {
-      cur = queue.shift();
-      kids = CHILDREN[cur] || [];
-      for (k = 0; k < kids.length; k++) {
-        if (!seen[kids[k]]) {
-          seen[kids[k]] = true;
-          out.push(kids[k]);
-          queue.push(kids[k]);
-        }
-      }
-    }
-    return out;
-  }
-
-  /** 위상 정렬 깊이 — 지도 세로 배치용 (0 = 뿌리 개념) */
-  function levels() {
-    var depth = {};
-    var k;
-
-    function calc(id, guard) {
-      if (depth[id] !== undefined) return depth[id];
-      if (guard[id]) return 0;               // 순환 방어
-      guard[id] = true;
-      var node = getNode(id);
-      var best = 0;
-      if (node) {
-        for (var m = 0; m < node.prereq.length; m++) {
-          var d = calc(node.prereq[m], guard) + 1;
-          if (d > best) best = d;
-        }
-      }
-      guard[id] = false;
-      depth[id] = best;
-      return best;
-    }
-
-    for (k = 0; k < NODES.length; k++) {
-      calc(NODES[k].id, {});
-    }
-    return depth;
-  }
-
-  /* ------------------------------------------------------------------
-   * 5. 문항 자동 태깅 (B안: 기존 데이터를 살리는 방식)
-   *    문항 지문/시험명에서 키워드를 찾아 개념 후보를 점수순으로 반환
-   * ---------------------------------------------------------------- */
-
-  function matchConcepts(text, options) {
-    if (!text || typeof text !== 'string') return [];
-    var opts = options || {};
-    var limit = opts.limit || 3;
-    var minScore = opts.minScore || 1;
-    var haystack = text.replace(/\s+/g, ' ');
-    var scored = [];
-    var k, m, kwList, hit, kw;
-
-    for (k = 0; k < NODES.length; k++) {
-      hit = 0;
-      kwList = NODES[k].kw;
-      for (m = 0; m < kwList.length; m++) {
-        kw = kwList[m];
-        if (haystack.indexOf(kw) !== -1) {
-          // 긴 키워드일수록 변별력이 높으므로 가중치를 준다
-          hit += (kw.length >= 4 ? 2 : 1);
-        }
-      }
-      // 개념명이 통째로 들어 있으면 강한 신호
-      if (haystack.indexOf(NODES[k].name) !== -1) hit += 3;
-      if (hit >= minScore) {
-        scored.push({ id: NODES[k].id, name: NODES[k].name, score: hit });
-      }
-    }
-
-    scored.sort(function (a, b) {
-      if (b.score !== a.score) return b.score - a.score;
-      return a.id < b.id ? -1 : 1;
-    });
-    return scored.slice(0, limit);
-  }
-
-  /* ------------------------------------------------------------------
-   * 6. 취약 개념 진단
-   *    records: [{ conceptId?, std?, correct: true|false }, ...]
-   *      - conceptId 가 있으면 그 노드에 집계 (정밀, A안)
-   *      - 없고 std 만 있으면 해당 성취기준의 모든 노드에 분산 집계 (B안)
-   * ---------------------------------------------------------------- */
-
-  var DEFAULT_THRESHOLD = {
-    minAttempts: 3,   // 이 횟수 미만이면 '판단 보류'
-    weak: 0.6,        // 정답률 60% 미만 → 취약
-    warn: 0.8         // 60~80% → 주의
-  };
-
-  function analyze(records, options) {
-    var opts = options || {};
-    var th = {
-      minAttempts: opts.minAttempts || DEFAULT_THRESHOLD.minAttempts,
-      weak: opts.weak || DEFAULT_THRESHOLD.weak,
-      warn: opts.warn || DEFAULT_THRESHOLD.warn
-    };
-
-    var stats = {};
-    var k, m, rec, targets, node, id;
-
-    for (k = 0; k < NODES.length; k++) {
-      stats[NODES[k].id] = { id: NODES[k].id, total: 0, correct: 0, rate: null, status: 'unknown' };
-    }
-
-    var list = Array.isArray(records) ? records : [];
-    for (k = 0; k < list.length; k++) {
-      rec = list[k];
-      if (!rec) continue;
-
-      targets = [];
-      if (rec.conceptId && NODE_BY_ID[rec.conceptId]) {
-        targets = [rec.conceptId];
-      } else if (rec.std) {
-        targets = byStandard(rec.std).map(function (x) { return x.id; });
-      }
-
-      for (m = 0; m < targets.length; m++) {
-        stats[targets[m]].total += 1;
-        if (rec.correct) stats[targets[m]].correct += 1;
-      }
-    }
-
-    for (k = 0; k < NODES.length; k++) {
-      id = NODES[k].id;
-      if (stats[id].total >= th.minAttempts) {
-        stats[id].rate = stats[id].correct / stats[id].total;
-        if (stats[id].rate < th.weak) stats[id].status = 'weak';
-        else if (stats[id].rate < th.warn) stats[id].status = 'warn';
-        else stats[id].status = 'ok';
-      } else if (stats[id].total > 0) {
-        stats[id].rate = stats[id].correct / stats[id].total;
-        stats[id].status = 'few';
-      }
-    }
-
-    // 취약 목록 (정답률 낮은 순)
-    var weak = [];
-    for (k = 0; k < NODES.length; k++) {
-      if (stats[NODES[k].id].status === 'weak') weak.push(NODES[k].id);
-    }
-    weak.sort(function (a, b) { return stats[a].rate - stats[b].rate; });
-
-    // 근본 원인: 취약하면서, 선수 개념 중에는 취약한 것이 없는 노드
-    var isWeak = {};
-    for (k = 0; k < weak.length; k++) isWeak[weak[k]] = true;
-
-    var roots = [];
-    for (k = 0; k < weak.length; k++) {
-      node = getNode(weak[k]);
-      var upstreamWeak = false;
-      for (m = 0; m < node.prereq.length; m++) {
-        if (isWeak[node.prereq[m]]) { upstreamWeak = true; break; }
-      }
-      if (!upstreamWeak) {
-        roots.push({
-          id: node.id,
-          name: node.name,
-          rate: stats[node.id].rate,
-          // 이 개념 때문에 함께 무너진 후속 개념들
-          blocking: descendants(node.id).filter(function (x) { return isWeak[x]; })
-        });
-      }
-    }
-    roots.sort(function (a, b) { return b.blocking.length - a.blocking.length; });
-
-    // 영역별 / 과목별 요약
-    var areaSummary = {};
-    for (k = 0; k < AREAS.length; k++) {
-      areaSummary[AREAS[k].id] = { id: AREAS[k].id, name: AREAS[k].name, total: 0, correct: 0, rate: null };
-    }
-    var domainSummary = {};
-    for (var key in DOMAINS) {
-      if (Object.prototype.hasOwnProperty.call(DOMAINS, key)) {
-        domainSummary[key] = { id: key, name: DOMAINS[key].name, total: 0, correct: 0, rate: null };
-      }
-    }
-    for (k = 0; k < NODES.length; k++) {
-      node = NODES[k];
-      areaSummary[node.area].total += stats[node.id].total;
-      areaSummary[node.area].correct += stats[node.id].correct;
-      domainSummary[node.domain].total += stats[node.id].total;
-      domainSummary[node.domain].correct += stats[node.id].correct;
-    }
-    for (k = 0; k < AREAS.length; k++) {
-      var a = areaSummary[AREAS[k].id];
-      a.rate = a.total > 0 ? a.correct / a.total : null;
-    }
-    for (var key2 in domainSummary) {
-      if (Object.prototype.hasOwnProperty.call(domainSummary, key2)) {
-        var d = domainSummary[key2];
-        d.rate = d.total > 0 ? d.correct / d.total : null;
-      }
-    }
-
-    return {
-      stats: stats,
-      weak: weak,
-      roots: roots,
-      areaSummary: areaSummary,
-      domainSummary: domainSummary,
-      answered: list.length
-    };
-  }
-
-  /** 상담용 한 줄 요약 문장 생성 */
-  function explainRoot(root) {
-    if (!root) return '';
-    var node = getNode(root.id);
-    if (!node) return '';
-    var pct = Math.round((root.rate || 0) * 100);
-    if (root.blocking && root.blocking.length > 0) {
-      var names = root.blocking.slice(0, 3).map(function (x) {
-        var t = getNode(x);
-        return t ? t.name : x;
-      });
-      return '「' + node.name + '」 정답률 ' + pct + '%. 이 개념이 무너져서 '
-        + names.join(', ')
-        + (root.blocking.length > 3 ? ' 등 ' + root.blocking.length + '개' : '')
-        + ' 개념이 함께 흔들리고 있습니다.';
-    }
-    return '「' + node.name + '」 정답률 ' + pct + '%로 보완이 필요합니다.';
-  }
-
   /* ==================================================================
-   * 7. [v2] 화면 공통 표현 계층
+   * concept-map.html — 선생님 전용 개념 지도
    *
-   *    선생님 화면(concept-map.html)과 학부모 화면(concept-report.html)이
-   *    같은 라벨·같은 기준·같은 문구를 쓰도록 여기에 모은다.
-   *
-   *    [중요] 학부모(parent) 쪽 문자열에는 아래 단어를 절대 쓰지 않는다.
-   *           취약 / 부족 / 결손 / 미달 / 못한다 / 무너짐 / 미측정
-   *           → validateCopy() 가 배포 전 자동으로 검사한다.
+   * 학부모 화면은 concept-report.html 로 분리했다.
+   * 이 파일에는 상태 라벨·판정 기준·안내 문구를 직접 정의하지 않는다.
+   * 전부 concept-map.js(7절)의 CM.* 를 호출해서 쓴다.
+   * → 톤이나 기준을 고칠 때 concept-map.js 한 곳만 만지면
+   *   선생님 화면과 학부모 화면에 동시에 반영된다.
    * ================================================================ */
 
-  var FORBIDDEN_PARENT = ['취약', '부족', '결손', '미달', '못한다', '무너짐', '미측정'];
+  var firebaseConfig = {
+    apiKey: 'AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k',
+    authDomain: 'beta-science.firebaseapp.com',
+    projectId: 'beta-science',
+    storageBucket: 'beta-science.firebasestorage.app',
+    messagingSenderId: '650652155367',
+    appId: '1:650652155367:web:41d2958e675cb4edd4d142'
+  };
 
-  /** HTML 이스케이프 — 화면 문구를 만들 때 함께 쓴다 */
-  function escapeHtml(s) {
-    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
-      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+  var VIEW = 'teacher';
+
+  var CM = window.ConceptMap;
+  var db = null;
+  var LIVE = false;
+
+  var state = {
+    area: 1,
+    students: [],
+    gradeList: [],
+    grade: '',              // '' = 전체
+    studentId: '',
+    publisher: 'miraen',
+    grain: 'auto',
+    records: [],
+    examCount: 0,           // 이 학생이 실제로 응시한 시험 수
+    exams: [],              // [{key, title, q, takers, mine}]
+    examsSig: '',
+    tagMap: {},             // examKey -> [conceptId]
+    tagError: '',
+    analysis: null,
+    diag: []
+  };
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return CM.escapeHtml(s); }
+  function pct(r) { return CM.pctText(r); }
+  function sty(status) { return CM.styleOf(status, VIEW); }
+
+  function log(label, obj) {
+    state.diag.push('■ ' + label + '\n' + (typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2)));
+    var el = $('diagDump');
+    if (el) el.textContent = state.diag.join('\n\n');
+  }
+
+  /* ---------------- 샘플 데이터 (연결 전 미리보기) ---------------- */
+
+  function sampleStudents() {
+    return [
+      { id: 'demo1', studentId: 'demo1', name: '샘플 학생 A', grade: '고등1학년' },
+      { id: 'demo2', studentId: 'demo2', name: '샘플 학생 B', grade: '고등2학년' }
+    ];
+  }
+
+  function sampleRecords(seed) {
+    var out = [];
+    function add(id, correct, n) { for (var i = 0; i < n; i++) out.push({ conceptId: id, correct: correct }); }
+    if (seed === 'demo2') {
+      add('S2-207', true, 4); add('S2-208', false, 5); add('S2-209', false, 4);
+      add('S2-210', true, 4); add('S2-211', false, 4);
+      add('S2-201', true, 5); add('S2-204', true, 4); add('S2-205', true, 4);
+      add('S2-216', true, 4); add('S2-217', true, 3);
+    } else {
+      add('S2-116', true, 4); add('S2-117', true, 4);
+      add('S2-118', false, 4); add('S2-118', true, 1);
+      add('S2-120', false, 5); add('S2-121', false, 4); add('S2-122', false, 3);
+      add('S2-110', true, 4); add('S2-111', true, 5); add('S2-113', true, 3);
+      add('S2-101', true, 4); add('S2-102', true, 4); add('S2-105', true, 3); add('S2-106', true, 4);
+    }
+    return out;
+  }
+
+  /* ---------------- Firestore 연결 ---------------- */
+
+  function looksConfigured(cfg) {
+    return cfg && cfg.apiKey && cfg.apiKey.indexOf('PASTE') === -1;
+  }
+
+  function initFirebase() {
+    if (!looksConfigured(firebaseConfig)) {
+      log('설정', 'firebaseConfig 가 아직 채워지지 않아 샘플 데이터로 실행합니다.');
+      return false;
+    }
+    if (typeof firebase === 'undefined' || !firebase.initializeApp) {
+      log('설정', 'Firebase SDK 를 불러오지 못했습니다.');
+      return false;
+    }
+    try {
+      if (!firebase.apps || firebase.apps.length === 0) firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      return true;
+    } catch (e) {
+      log('Firebase 초기화 실패', String(e && e.message ? e.message : e));
+      return false;
+    }
+  }
+
+  function pick(obj, names) {
+    for (var i = 0; i < names.length; i++) {
+      if (obj && obj[names[i]] !== undefined && obj[names[i]] !== null && obj[names[i]] !== '') return obj[names[i]];
+    }
+    return null;
+  }
+
+  function loadStudents() {
+    if (!LIVE) { state.students = sampleStudents(); return Promise.resolve(); }
+    return db.collection('students').get().then(function (snap) {
+      var arr = [];
+      var sampleShape = null;
+      snap.forEach(function (d) {
+        var v = d.data() || {};
+        if (!sampleShape) sampleShape = Object.keys(v);
+        var withdrawn = v.withdrawn === true || v.isWithdrawn === true || v.status === '퇴원' || v.active === false;
+        if (withdrawn) return;
+        arr.push({
+          id: d.id,
+          studentId: String(pick(v, ['id', 'studentId', 'sid', 'studentID', 'loginId']) || d.id).trim().toLowerCase(),
+          name: pick(v, ['name', 'studentName', '이름']) || d.id,
+          grade: String(pick(v, ['grade', '학년', 'gradeLevel', 'schoolGrade']) || '').trim()
+        });
+      });
+      arr.sort(function (a, b) {
+        var g = String(a.grade).localeCompare(String(b.grade), 'ko', { numeric: true });
+        if (g !== 0) return g;
+        return String(a.name).localeCompare(String(b.name), 'ko');
+      });
+      state.students = arr;
+      var gcount = {};
+      for (var q = 0; q < arr.length; q++) {
+        var gk = arr[q].grade || '(미지정)';
+        gcount[gk] = (gcount[gk] || 0) + 1;
+      }
+      log('students 컬렉션', { 읽은문서수: snap.size, 재원학생수: arr.length, 학년분포: gcount, 첫문서필드: sampleShape });
+    }).catch(function (e) {
+      log('students 읽기 실패', String(e && e.message ? e.message : e));
+      state.students = sampleStudents();
     });
   }
 
-  /** 정답률 표기 (null 이면 —) */
-  function pctText(r) {
-    return (r === null || r === undefined) ? '—' : Math.round(r * 100) + '%';
+  function num(x) {
+    if (x === null || x === undefined || x === '') return null;
+    var n = Number(x);
+    return isFinite(n) ? n : null;
   }
 
-  /* ---- 7-1. 상태 스타일 ---- */
-
-  var STYLE = {
-    teacher: {
-      ok:      { label: '안정',      fg: '#065f46', bg: '#ecfdf5', line: '#059669' },
-      warn:    { label: '주의',      fg: '#92400e', bg: '#fffbeb', line: '#d97706' },
-      weak:    { label: '취약',      fg: '#991b1b', bg: '#fef2f2', line: '#dc2626' },
-      few:     { label: '표본 부족',  fg: '#5b21b6', bg: '#f5f3ff', line: '#7c3aed' },
-      unknown: { label: '미측정',    fg: '#6b7280', bg: '#f9fafb', line: '#9ca3af' }
-    },
-    parent: {
-      ok:      { label: '탄탄해요',      fg: '#065f46', bg: '#ecfdf5', line: '#059669' },
-      warn:    { label: '다지는 중',     fg: '#155e75', bg: '#ecfeff', line: '#0891b2' },
-      weak:    { label: '집중 개념',     fg: '#92400e', bg: '#fffbeb', line: '#f59e0b' },
-      few:     { label: '확인 중',       fg: '#6b7280', bg: '#f9fafb', line: '#9ca3af' },
-      unknown: { label: '이번 학기 예정', fg: '#9ca3af', bg: '#fcfcfd', line: '#d1d5db' }
+  /** answers 필드가 배열이든 맵이든 정오를 세어 본다. 집계 필드가 없을 때만 쓴다. */
+  function parseAnswers(ans) {
+    var list = [];
+    if (Array.isArray(ans)) list = ans;
+    else if (ans && typeof ans === 'object') {
+      for (var k in ans) if (Object.prototype.hasOwnProperty.call(ans, k)) list.push(ans[k]);
     }
-  };
-
-  var STATUS_ORDER = ['ok', 'warn', 'weak', 'few', 'unknown'];
-
-  /** 상태 → 스타일 객체. view 는 'teacher' | 'parent' */
-  function styleOf(status, view) {
-    var set = STYLE[view] || STYLE.teacher;
-    return set[status] || set.unknown;
+    var total = 0, correct = 0;
+    for (var i = 0; i < list.length; i++) {
+      var it = list[i];
+      var c = null;
+      if (typeof it === 'boolean') c = it;
+      else if (it && typeof it === 'object') {
+        if (typeof it.correct === 'boolean') c = it.correct;
+        else if (typeof it.isCorrect === 'boolean') c = it.isCorrect;
+        else if (it.result !== undefined) c = (it.result === true || it.result === 'O' || it.result === 'correct');
+        else {
+          var key = pick(it, ['answer', 'correctAnswer', 'key']);
+          var mine = pick(it, ['userAnswer', 'studentAnswer', 'selected', 'input', 'value', 'my']);
+          if (key !== null && mine !== null) c = String(key).trim() === String(mine).trim();
+        }
+      }
+      if (c === null) continue;
+      total++; if (c) correct++;
+    }
+    return { total: total, correct: correct };
   }
 
-  /* ---- 7-2. 판정 기준 문구 ---- */
+  /** grades 문서 1개 = 시험 1회. 맞은 개수와 전체 문항 수를 뽑는다. */
+  function docTally(v) {
+    var total = num(v.totalQuestions);
+    var correct = num(v.score);
 
-  /** 임계값에서 "정답률 80% 이상" 같은 기준 문구를 만든다.
-      기준을 바꾸면 화면 문구가 자동으로 따라오게 하기 위함이다. */
-  function criteriaOf(th) {
-    var t = th || DEFAULT_THRESHOLD;
-    var p = function (v) { return Math.round(v * 100); };
-    return {
-      ok:      '정답률 ' + p(t.warn) + '% 이상',
-      warn:    '정답률 ' + p(t.weak) + '~' + (p(t.warn) - 1) + '%',
-      weak:    '정답률 ' + p(t.weak) + '% 미만',
-      few:     '평가 문항 ' + t.minAttempts + '개 미만',
-      unknown: '평가 기록 없음'
-    };
+    if (total === null) {
+      var oc = num(v.oxCount), mc = num(v.multiCount);
+      if (oc !== null || mc !== null) total = (oc || 0) + (mc || 0);
+    }
+    if (correct === null) {
+      var os = num(v.oxScore), ms = num(v.multiScore);
+      if (os !== null || ms !== null) correct = (os || 0) + (ms || 0);
+    }
+    if (total === null || correct === null) {
+      var p = parseAnswers(v.answers);
+      if (p.total > 0) { total = p.total; correct = p.correct; }
+    }
+    if (total === null || total <= 0) return null;
+    if (correct === null) return null;
+    // score 가 개수가 아니라 백분율로 저장된 경우를 보정한다
+    if (correct > total && correct <= 100) correct = Math.round(total * correct / 100);
+    if (correct > total) correct = total;
+    if (correct < 0) correct = 0;
+    return { total: total, correct: correct };
   }
 
-  var CRITERIA = criteriaOf(DEFAULT_THRESHOLD);
-
-  /* ---- 7-3. 상태 안내 (표 아래 범례) ---- */
-
-  var GUIDE_LEAD = '모든 개념은 아래 다섯 단계 중 하나로 관리됩니다. '
-    + '지금 점수가 낮게 나온 개념도 그대로 두지 않고, 단계마다 정해진 방식으로 끝까지 확인합니다.';
-
-  var GUIDE = {
-    parent: [
-      { k: 'ok',
-        mean: '평가에서 꾸준히 정확하게 풀어낸 개념입니다.',
-        plan: '새로 배우는 개념의 발판으로 활용하고, 복습 평가에서 한 번 더 확인해 유지합니다.' },
-      { k: 'warn',
-        mean: '큰 흐름은 이미 잡은 단계입니다. 묻는 방식이 달라졌을 때를 대비해 한 번 더 손보는 구간이라, 걱정하실 단계는 아닙니다.',
-        plan: '수업 도입부에서 짧게 되짚고, 조건을 바꾼 문항으로 한 번 더 확인합니다.' },
-      { k: 'weak',
-        mean: '배우는 과정에서 자연스럽게 나오는 구간입니다. 이 개념이 눈에 띄었다는 것은 어디를 손봐야 할지 정확히 찾았다는 뜻입니다.',
-        plan: '앞선 개념까지 거슬러 올라가 원인을 찾고, 다시 설명한 뒤 재평가로 확인합니다. 확인될 때까지 저희가 계속 따라갑니다.' },
-      { k: 'few',
-        mean: '아직 나온 문항이 적어, 섣불리 판단하지 않고 미뤄 둔 개념입니다.',
-        plan: '다음 평가에 문항을 더 넣어 상태를 정확히 확정합니다.' },
-      { k: 'unknown',
-        mean: '아직 수업에서 다루지 않은 개념입니다.',
-        plan: '진도에 맞춰 수업한 뒤, 같은 방식으로 평가해 확인합니다.' }
-    ],
-    teacher: [
-      { k: 'ok',      mean: '유지. 후속 개념의 발판으로 사용.' },
-      { k: 'warn',    mean: '변형 문항으로 재확인 필요.' },
-      { k: 'weak',    mean: '선수 개념까지 역추적 후 재수업 · 재평가.' },
-      { k: 'few',     mean: '판단 보류. 표본 확보 필요.' },
-      { k: 'unknown', mean: '미출제 구간. 진도 확인.' }
-    ]
-  };
-
-  /* ---- 7-4. 성취기준 코드 표기 ---- */
-
-  /* 예) 10통과2-01-01  ->  고1 통합과학2 1단원-1
-     앞자리 = 학년(군), 가운데 = 과목, 뒤 두 자리 = 단원(영역)-순번 */
-  var GRADE_LABEL = { '4': '초3~4', '6': '초5~6', '9': '중1~3', '10': '고1', '12': '고2~3' };
-  var SUBJ_LABEL = {
-    '통과1': '통합과학1', '통과2': '통합과학2',
-    '과탐1': '과학탐구실험1', '과탐2': '과학탐구실험2',
-    '화학1': '화학1', '화학2': '화학2',
-    '물리1': '물리학1', '물리2': '물리학2',
-    '생과1': '생명과학1', '생과2': '생명과학2',
-    '지구1': '지구과학1', '지구2': '지구과학2',
-    '과': '과학', '과학': '과학'
-  };
-
-  function stdLabel(code) {
-    var s = String(code == null ? '' : code).trim();
-    var m = s.match(/^(\d+)([^-]+)-(\d+)-(\d+)$/);
-    if (!m) return s;
-    var g = GRADE_LABEL[m[1]] || m[1];
-    var subj = SUBJ_LABEL[m[2]] || m[2];
-    return g + ' ' + subj + ' ' + Number(m[3]) + '단원-' + Number(m[4]);
+  function examKeyOf(id, data) {
+    var t = pick(data, ['examId', 'testName', 'examTitle', 'title', 'testId']);
+    return t ? String(t) : String(id);
   }
 
-  /** 표 안에서 쓸 성취기준 표기.
-      '고1 통합과학2 1단원-3' 에서 앞부분은 모바일에서 접을 수 있게 span 으로 분리한다. */
-  function stdCell(code) {
-    var s = stdLabel(code);
-    var m = s.match(/^(.*?)(\d+단원-\d+)$/);
-    if (!m) return escapeHtml(s);
-    return '<span class="std-pre">' + escapeHtml(m[1]) + '</span>' + escapeHtml(m[2]);
+  function examTitleOf(id, data) {
+    var t = pick(data, ['testName', 'examTitle', 'title', 'examId']);
+    return t ? String(t) : String(id);
   }
 
-  /* ---- 7-5. 상태별 집계 ---- */
+  /** Firestore 문서 ID 로 쓸 수 없는 문자를 치환한다. */
+  function safeDocId(key) {
+    return String(key).replace(/[\/\\#\[\]*?]/g, '_').slice(0, 500) || '_';
+  }
 
-  /** 전체 또는 특정 영역의 상태별 개념 수를 센다.
-      areaId 가 없거나 null 이면 전체 57개를 센다. */
-  function countByStatus(analysis, areaId) {
-    var nodes = (areaId === null || areaId === undefined || areaId === '')
-      ? NODES : byArea(areaId);
-    var c = { ok: 0, warn: 0, weak: 0, few: 0, unknown: 0, total: nodes.length, measured: 0 };
-    var k, st;
-    for (k = 0; k < nodes.length; k++) {
-      st = (analysis && analysis.stats && analysis.stats[nodes[k].id])
-        ? analysis.stats[nodes[k].id] : { status: 'unknown', total: 0 };
-      if (c[st.status] === undefined) c[st.status] = 0;
-      c[st.status] += 1;
-      if (st.total > 0) c.measured += 1;
+  /* ---------------- 시험명 → 개념 자동 추천 ---------------- */
+
+  /** '1-1. 진화와 생물다양성 (ⓐ 생물다양성과 보전)' → '생물다양성과 보전' */
+  function innerTopic(title) {
+    var s = String(title == null ? '' : title).trim();
+    var m = s.match(/[(（]([^()（）]*)[)）]\s*$/);
+    var inner = m ? m[1] : s;
+    inner = inner.replace(/^[^0-9A-Za-z\uAC00-\uD7A3]+/, '').trim();
+    inner = inner.replace(/^[0-9A-Za-z]{1,2}[.)]\s*/, '').trim();
+    return inner || s;
+  }
+
+  /** 한글 2글자 조각으로 잘라 이름 유사도를 잰다. */
+  function bigrams(s) {
+    var t = String(s == null ? '' : s).replace(/[\s·.,、()（）\-_/]/g, '');
+    var out = [];
+    for (var i = 0; i + 1 < t.length; i++) out.push(t.substr(i, 2));
+    return out;
+  }
+
+  function sharedBigrams(a, b) {
+    var A = bigrams(a), B = bigrams(b);
+    var set = {}, seen = {}, c = 0, i;
+    for (i = 0; i < B.length; i++) set[B[i]] = true;
+    for (i = 0; i < A.length; i++) {
+      if (set[A[i]] && !seen[A[i]]) { seen[A[i]] = true; c++; }
     }
     return c;
   }
 
-  /** 상태별 개수를 누적 막대 HTML 로 만든다. */
-  function stackBar(counts, view, className) {
-    var set = STYLE[view] || STYLE.teacher;
-    var cls = className || 'stack-bar';
-    var html = '<div class="' + escapeHtml(cls) + '">';
-    if (!counts || !counts.total) return html + '</div>';
-    for (var k = 0; k < STATUS_ORDER.length; k++) {
-      var num = counts[STATUS_ORDER[k]] || 0;
-      if (!num) continue;
-      var w = (num / counts.total * 100);
-      html += '<i style="width:' + w.toFixed(2) + '%;background:' + set[STATUS_ORDER[k]].line + '"></i>';
-    }
-    return html + '</div>';
-  }
+  var SUGGEST_MIN = 20;
+  var SUGGEST_LIMIT = 6;
 
-  /** 영역 하나의 상태 요약 — 지도 위 3줄 요약이 쓴다. */
-  function areaState(analysis, areaId, view) {
-    var isP = view === 'parent';
-    var c = countByStatus(analysis, areaId);
-    var s = (analysis && analysis.areaSummary && analysis.areaSummary[areaId])
-      ? analysis.areaSummary[areaId] : { total: 0, rate: null };
-
-    var key;
-    if (c.measured === 0) key = 'unknown';
-    else if (c.weak > 0) key = 'weak';
-    else if (s.rate !== null && s.rate !== undefined && s.rate >= DEFAULT_THRESHOLD.warn) key = 'ok';
-    else key = 'warn';
-
-    var label = isP
-      ? ({ unknown: '이번 학기 예정', weak: '집중 관리 중', warn: '다지는 중', ok: '탄탄합니다' })[key]
-      : styleOf(key, 'teacher').label;
-
-    var right = isP
-      ? (c.measured === 0 ? '개념 ' + c.total + '개' : '다진 개념 ' + c.ok + ' / ' + c.total)
-      : (s.total ? pctText(s.rate) + ' · ' + s.total + '문항' : '기록 없음');
-
-    return { key: key, label: label, right: right, counts: c, style: styleOf(key, view) };
-  }
-
-  /* ---- 7-6. 집중 개념 (focus) ---- */
-
-  /** 지금 화면에서 다룰 개념 하나를 고른다.
-      취약(root) → 주의 → 표본 부족 → 전부 안정 순으로 내려간다.
-      "다음 단원으로 넘어가도 좋다" 같은 두루뭉술한 마무리 대신
-      항상 구체적인 개념 하나와 대응 계획이 나오게 하기 위함이다. */
-  function focusTarget(analysis) {
-    if (!analysis || !analysis.stats) return null;
-
-    if (analysis.roots && analysis.roots.length) {
-      return { kind: 'weak', id: analysis.roots[0].id, blocking: analysis.roots[0].blocking || [] };
-    }
-
-    function lowestOf(status) {
-      var best = null;
-      for (var k = 0; k < NODES.length; k++) {
-        var id = NODES[k].id;
-        var st = analysis.stats[id];
-        if (!st || st.status !== status) continue;
-        if (best === null || (st.rate || 0) < (analysis.stats[best].rate || 0)) best = id;
+  /** 시험명에서 개념 노드 후보를 점수순으로 뽑는다. */
+  function suggestNodes(title) {
+    var full = String(title == null ? '' : title);
+    var inner = innerTopic(full);
+    var out = [];
+    var nodes = CM.NODES;
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      var sc = 0;
+      if (inner === n.name) sc += 100;
+      else if (inner.indexOf(n.name) !== -1) sc += 60;
+      else if (n.name.indexOf(inner) !== -1) sc += 50;
+      sc += 8 * sharedBigrams(n.name, inner);
+      var kws = n.kw || [];
+      for (var k = 0; k < kws.length; k++) {
+        // '물', '산', '철' 같은 한 글자 키워드는 엉뚱한 개념을 끌어오므로 제외한다
+        if (String(kws[k]).length < 2) continue;
+        if (inner.indexOf(kws[k]) !== -1) sc += 12;
+        else if (full.indexOf(kws[k]) !== -1) sc += 4;
       }
-      return best;
+      if (sc >= SUGGEST_MIN) out.push({ id: n.id, score: sc });
     }
-
-    var w = lowestOf('warn');
-    if (w) return { kind: 'warn', id: w, blocking: [] };
-    var f = lowestOf('few');
-    if (f) return { kind: 'few', id: f, blocking: [] };
-    if (countByStatus(analysis, null).measured > 0) return { kind: 'ok', id: null, blocking: [] };
-    return null;
+    out.sort(function (a, b) {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.id < b.id ? -1 : 1;
+    });
+    return out.slice(0, SUGGEST_LIMIT);
   }
 
-  /** focusTarget 을 학부모용 문장으로 바꾼다.
-      히어로 카드와 집중 개념 카드가 함께 쓴다.
-      options:
-        publisher — 단원 페이지 링크에 쓸 출판사 키
-        link      — false 면 url 을 만들지 않는다 (학부모 페이지 이탈 방지) */
-  function focusCopy(analysis, options) {
-    var opts = options || {};
-    var t = focusTarget(analysis);
-    var out = { kind: t ? t.kind : 'none', lbl: '현재 상태', nm: '', ds: '', plan: '', why: '', url: null };
+  /* ---------------- 데이터 로딩 ---------------- */
 
-    if (!t) {
-      out.nm = '학습 기록을 모으는 중입니다';
-      out.ds = '수업과 평가가 쌓이면 이곳에 이번 기간 집중 개념이 표시됩니다.';
+  function loadGrades(studentId) {
+    if (!LIVE) {
+      state.records = sampleRecords(studentId);
+      state.examCount = 2;
+      state.exams = [
+        { key: 'demo-1', title: '샘플 단원평가 1회', q: 12, takers: 2, mine: true },
+        { key: 'demo-2', title: '샘플 단원평가 2회', q: 10, takers: 2, mine: true }
+      ];
+      return Promise.resolve();
+    }
+    var target = String(studentId || '').trim().toLowerCase();
+    return db.collection('grades').get().then(function (snap) {
+      var recs = [];
+      var exams = {};
+      var firstShape = null;
+      var sampleShown = null;
+      var matched = 0, skipped = 0, taken = 0;
+      snap.forEach(function (d) {
+        var v = d.data() || {};
+        if (!firstShape) firstShape = { docId: d.id, 필드: Object.keys(v) };
+
+        var t = docTally(v);
+        var key = examKeyOf(d.id, v);
+        var sid = String(pick(v, ['studentId', 'sid', 'studentID', 'id']) || '').trim().toLowerCase();
+        var isMine = target && sid === target;
+
+        /* 시험 목록은 학생과 무관하게 전체 문서에서 모은다.
+           한 명씩 돌아가며 태그를 달 필요가 없도록 하기 위함이다. */
+        if (!exams[key]) exams[key] = { key: key, title: examTitleOf(d.id, v), q: 0, takers: 0, mine: false };
+        exams[key].takers += 1;
+        if (t && t.total > exams[key].q) exams[key].q = t.total;
+        if (isMine) exams[key].mine = true;
+
+        // 정답률 집계는 선택된 학생 문서만
+        if (!isMine) return;
+        matched++;
+        if (!t) { skipped++; return; }
+        taken++;
+
+        if (!sampleShown) {
+          sampleShown = {
+            시험: examTitleOf(d.id, v),
+            맞은개수: t.correct, 전체문항: t.total,
+            answers타입: Array.isArray(v.answers) ? '배열(' + v.answers.length + ')'
+              : (v.answers && typeof v.answers === 'object' ? '맵(' + Object.keys(v.answers).length + ')' : typeof v.answers)
+          };
+        }
+
+        var ids = state.tagMap[key] || [];
+        if (ids.length === 0) return;
+        for (var s = 0; s < ids.length; s++) {
+          var node = CM.getNode(ids[s]);
+          if (!node) continue;
+          for (var i = 0; i < t.total; i++) {
+            recs.push({ conceptId: node.id, std: node.std, correct: i < t.correct });
+          }
+        }
+      });
+      state.records = recs;
+      state.examCount = taken;
+      state.exams = Object.keys(exams).map(function (k) { return exams[k]; })
+        .sort(function (a, b) {
+          // 미연결 시험을 맨 위로 올려 남은 작업이 바로 보이게 한다
+          var au = (state.tagMap[a.key] || []).length === 0;
+          var bu = (state.tagMap[b.key] || []).length === 0;
+          if (au !== bu) return au ? -1 : 1;
+          if (a.mine !== b.mine) return a.mine ? -1 : 1;
+          if (b.takers !== a.takers) return b.takers - a.takers;
+          return String(a.title).localeCompare(String(b.title), 'ko', { numeric: true });
+        });
+      log('grades 컬렉션', {
+        전체문서수: snap.size, 이학생문서수: matched, 집계실패문서: skipped,
+        첫문서구조: firstShape, 표본: sampleShown,
+        전체시험수: state.exams.length, 연결된기록수: state.records.length
+      });
+    }).catch(function (e) {
+      log('grades 읽기 실패', String(e && e.message ? e.message : e));
+      state.records = [];
+      state.examCount = 0;
+      state.exams = [];
+    });
+  }
+
+  /** conceptTags 문서를 개념 id 배열로 정규화한다.
+      concepts(신규) 우선, 없으면 standards(구버전)를 노드로 펼친다. */
+  function normalizeTagDoc(v) {
+    if (Array.isArray(v.concepts) && v.concepts.length) {
+      var ids = [];
+      for (var i = 0; i < v.concepts.length; i++) {
+        if (CM.getNode(v.concepts[i])) ids.push(v.concepts[i]);
+      }
+      return ids;
+    }
+    if (Array.isArray(v.standards) && v.standards.length) {
+      var out = [];
+      for (var s = 0; s < v.standards.length; s++) {
+        var list = CM.byStandard(v.standards[s]) || [];
+        for (var g = 0; g < list.length; g++) out.push(list[g].id);
+      }
       return out;
     }
-    if (t.kind === 'ok') {
-      out.nm = '확인한 개념을 유지 관리합니다';
-      out.ds = '이번 기간 평가에서 확인한 개념이 모두 안정적으로 나왔습니다.';
-      out.plan = '다음 계획 — 복습 평가로 한 번 더 점검하고, 새로 배우는 개념의 발판으로 이어 갑니다.';
-      return out;
+    return [];
+  }
+
+  function loadTags() {
+    if (!LIVE) { state.tagMap = {}; return Promise.resolve(); }
+    return db.collection('conceptTags').get().then(function (snap) {
+      var m = {};
+      var legacy = 0;
+      snap.forEach(function (d) {
+        var v = d.data() || {};
+        var key = v.examId ? String(v.examId) : d.id;
+        var ids = normalizeTagDoc(v);
+        if (ids.length) {
+          m[key] = ids;
+          if (!Array.isArray(v.concepts) || !v.concepts.length) legacy++;
+        }
+      });
+      state.tagMap = m;
+      state.tagError = '';
+      log('conceptTags 컬렉션', { 저장된시험수: snap.size, 개념연결된시험: Object.keys(m).length, 구버전문서: legacy });
+    }).catch(function (e) {
+      var msg = String(e && e.message ? e.message : e);
+      state.tagMap = {};
+      state.tagError = msg;
+      log('conceptTags 읽기 실패', msg);
+    });
+  }
+
+  function selectedIds(sel) {
+    var chosen = [];
+    for (var o = 0; o < sel.options.length; o++) {
+      if (sel.options[o].selected && sel.options[o].value) chosen.push(sel.options[o].value);
     }
+    return chosen;
+  }
 
-    var node = getNode(t.id);
-    out.nm = node ? node.name : t.id;
-    out.why = node ? '성취기준 ' + stdLabel(node.std) : '';
-    if (opts.link !== false) out.url = pageUrl(t.id, opts.publisher);
-
-    if (t.kind === 'weak') {
-      out.lbl = '지금 집중하는 개념';
-      var names = [];
-      for (var k = 0; k < Math.min(t.blocking.length, 3); k++) {
-        var b = getNode(t.blocking[k]);
-        if (b) names.push(b.name);
-      }
-      out.ds = t.blocking.length
-        ? '이 개념 하나를 잡으면 <b>' + escapeHtml(names.join(', ')) + '</b>'
-          + (t.blocking.length > 3 ? ' 등 ' + t.blocking.length + '개' : '')
-          + ' 개념이 함께 풀립니다. 여러 개가 흔들려 보여도 원인은 대개 한 곳이라, 그 지점부터 다시 세우면 나머지는 따라옵니다.'
-        : '배우는 과정에서 자연스럽게 나오는 구간입니다. 어디를 손봐야 할지 정확히 찾았으니, 이 지점부터 다시 세우겠습니다.';
-      out.plan = '다음 계획 — 앞선 개념까지 거슬러 올라가 원인을 찾고, 다시 설명한 뒤 재평가로 확인합니다.';
-    } else if (t.kind === 'warn') {
-      out.lbl = '지금 다지는 개념';
-      out.ds = '큰 흐름은 이미 잡았습니다. 묻는 방식이 달라져도 흔들리지 않도록 굳히는 단계입니다.';
-      out.plan = '다음 계획 — 수업 도입부에서 짧게 되짚고, 조건을 바꾼 문항으로 한 번 더 확인합니다.';
-    } else {
-      out.lbl = '확인 중인 개념';
-      out.ds = '아직 나온 문항이 적어, 섣불리 판단하지 않고 미뤄 둔 개념입니다.';
-      out.plan = '다음 계획 — 다음 평가에 문항을 더 넣어 상태를 정확히 확정합니다.';
+  function stdsOf(ids) {
+    var seen = {}, out = [];
+    for (var i = 0; i < ids.length; i++) {
+      var n = CM.getNode(ids[i]);
+      if (n && !seen[n.std]) { seen[n.std] = true; out.push(n.std); }
     }
     return out;
   }
 
-  /* ---- 7-7. 학부모 문구 금지어 검사 ---- */
-
-  /** 학부모 화면에 나갈 수 있는 모든 고정 문자열을 훑어
-      금지어가 섞이지 않았는지 확인한다. 배포 전 자체 점검용.
-
-      hits         — 우리가 쓴 서술 문구의 금지어. 반드시 0 이어야 한다.
-      nameWarnings — 개념명(교육과정 용어)에 금지어 글자가 포함된 경우.
-                     예) '질량 결손과 에너지'(mass defect)는 물리 용어라
-                     문구 실수가 아니다. 오류로 막지 않고 알리기만 한다. */
-  function validateCopy() {
-    var hits = [];
-    var nameWarnings = [];
-
-    function scan(where, text) {
-      var s = String(text == null ? '' : text);
-      for (var k = 0; k < FORBIDDEN_PARENT.length; k++) {
-        if (s.indexOf(FORBIDDEN_PARENT[k]) !== -1) {
-          hits.push(where + ' → "' + FORBIDDEN_PARENT[k] + '"');
-        }
-      }
+  function saveTags() {
+    if (!LIVE) { $('tagMsg').textContent = '샘플 모드에서는 저장되지 않습니다. Firebase 설정을 채우면 저장됩니다.'; return; }
+    var rows = document.querySelectorAll('[data-exam]');
+    if (!rows.length) { $('tagMsg').textContent = '저장할 시험이 없습니다.'; return; }
+    var batch = db.batch();
+    var count = 0, linked = 0;
+    for (var i = 0; i < rows.length; i++) {
+      var key = rows[i].getAttribute('data-exam');
+      var chosen = selectedIds(rows[i]);
+      state.tagMap[key] = chosen;
+      if (chosen.length) linked++;
+      batch.set(db.collection('conceptTags').doc(safeDocId(key)), {
+        examId: key,
+        concepts: chosen,
+        standards: stdsOf(chosen),
+        updatedAt: new Date().toISOString()
+      });
+      count++;
     }
-
-    var key;
-    for (key in STYLE.parent) {
-      if (Object.prototype.hasOwnProperty.call(STYLE.parent, key)) {
-        scan('STYLE.parent.' + key, STYLE.parent[key].label);
-      }
-    }
-    scan('GUIDE_LEAD', GUIDE_LEAD);
-    for (var g = 0; g < GUIDE.parent.length; g++) {
-      scan('GUIDE.parent[' + GUIDE.parent[g].k + '].mean', GUIDE.parent[g].mean);
-      scan('GUIDE.parent[' + GUIDE.parent[g].k + '].plan', GUIDE.parent[g].plan);
-    }
-    for (var a = 0; a < AREAS.length; a++) {
-      scan('areaState(' + AREAS[a].id + ')', areaState(null, AREAS[a].id, 'parent').label);
-    }
-
-    // 개념명은 별도 집계 (교육과정 용어라 오류로 취급하지 않는다)
-    for (var d = 0; d < NODES.length; d++) {
-      for (var w = 0; w < FORBIDDEN_PARENT.length; w++) {
-        if (NODES[d].name.indexOf(FORBIDDEN_PARENT[w]) !== -1) {
-          nameWarnings.push(NODES[d].id + ' 「' + NODES[d].name + '」 → "' + FORBIDDEN_PARENT[w] + '"');
-        }
-      }
-    }
-
-    return {
-      ok: hits.length === 0,
-      hits: hits,
-      nameWarnings: nameWarnings,
-      words: FORBIDDEN_PARENT.slice()
-    };
+    $('tagMsg').textContent = '저장 중…';
+    batch.commit().then(function () {
+      $('tagMsg').textContent = count + '개 시험을 저장했습니다. (개념이 연결된 시험 ' + linked + '개)';
+      state.tagError = '';
+      state.examsSig = '';   // 저장 후에는 미연결 우선 정렬을 다시 반영한다
+      return refresh();
+    }).catch(function (e) {
+      var msg = String(e && e.message ? e.message : e);
+      $('tagMsg').textContent = (msg.indexOf('permission') !== -1 || msg.indexOf('insufficient') !== -1)
+        ? '저장 권한이 없습니다. Firestore 보안 규칙에 conceptTags 컬렉션을 추가해 주세요.'
+        : '저장하지 못했습니다: ' + msg;
+    });
   }
 
-  /* ------------------------------------------------------------------
-   * 8. 무결성 검증 (개발 중 데이터 실수 방지)
-   * ---------------------------------------------------------------- */
-
-  function validate() {
-    var errors = [];
-    var seen = {};
-    var k, m, node;
-
-    for (k = 0; k < NODES.length; k++) {
-      node = NODES[k];
-      if (seen[node.id]) errors.push('중복 id: ' + node.id);
-      seen[node.id] = true;
-      if (!AREA_BY_ID[node.area]) errors.push(node.id + ': 잘못된 area ' + node.area);
-      if (!DOMAINS[node.domain]) errors.push(node.id + ': 잘못된 domain ' + node.domain);
-      if (!node.std) errors.push(node.id + ': std 누락');
-      if (!node.kw || node.kw.length === 0) errors.push(node.id + ': 키워드 누락');
-      for (m = 0; m < node.prereq.length; m++) {
-        if (!NODE_BY_ID[node.prereq[m]]) errors.push(node.id + ': 없는 prereq ' + node.prereq[m]);
+  function autoTag() {
+    var rows = document.querySelectorAll('[data-exam]');
+    var filled = 0, empty = 0;
+    for (var i = 0; i < rows.length; i++) {
+      var title = rows[i].getAttribute('data-title') || rows[i].getAttribute('data-exam');
+      var hits = suggestNodes(title);
+      var want = {};
+      for (var h = 0; h < hits.length; h++) want[hits[h].id] = true;
+      for (var o = 0; o < rows[i].options.length; o++) {
+        rows[i].options[o].selected = !!want[rows[i].options[o].value];
       }
-      for (m = 0; m < node.related.length; m++) {
-        if (!NODE_BY_ID[node.related[m]]) errors.push(node.id + ': 없는 related ' + node.related[m]);
-      }
+      if (hits.length) filled++; else empty++;
+      var idx = rows[i].getAttribute('data-idx');
+      var box = document.getElementById('chosen-' + idx);
+      if (box) box.innerHTML = chosenText(selectedIds(rows[i]));
     }
-
-    // 순환 참조 검사
-    var state = {};
-    function dfs(id, path) {
-      if (state[id] === 2) return;
-      if (state[id] === 1) {
-        errors.push('순환 참조: ' + path.concat(id).join(' → '));
-        return;
-      }
-      state[id] = 1;
-      var nd = getNode(id);
-      if (nd) {
-        for (var p = 0; p < nd.prereq.length; p++) {
-          dfs(nd.prereq[p], path.concat(id));
-        }
-      }
-      state[id] = 2;
-    }
-    for (k = 0; k < NODES.length; k++) dfs(NODES[k].id, []);
-
-    // 학부모 문구 금지어도 함께 본다
-    var copy = validateCopy();
-    for (k = 0; k < copy.hits.length; k++) errors.push('학부모 금지어: ' + copy.hits[k]);
-
-    return { ok: errors.length === 0, errors: errors, count: NODES.length };
+    $('tagMsg').textContent = filled > 0
+      ? filled + '개 시험에 추천을 채웠습니다' + (empty ? ' (' + empty + '개는 못 찾음)' : '') + '. 확인 후 저장하세요.'
+      : '시험명에서 개념을 찾지 못했습니다. 직접 골라 주세요.';
   }
 
-  /* ------------------------------------------------------------------
-   * 9. 전역 노출
-   * ---------------------------------------------------------------- */
+  function chosenText(ids) {
+    if (!ids || !ids.length) return '<span style="color:#b0b0b5">선택된 개념 없음</span>';
+    var names = [];
+    for (var i = 0; i < ids.length; i++) {
+      var n = CM.getNode(ids[i]);
+      if (n) names.push(esc(n.name));
+    }
+    return '선택: ' + names.join(' · ');
+  }
 
-  var ConceptMap = {
-    SUBJECT: SUBJECT,
-    CURRICULUM: CURRICULUM,
-    PUBLISHERS: PUBLISHERS,
-    DEFAULT_PUBLISHER: DEFAULT_PUBLISHER,
-    AREAS: AREAS,
-    DOMAINS: DOMAINS,
-    NODES: NODES,
-    CHILDREN: CHILDREN,
+  /* ---------------- 학년 / 학생 선택 ---------------- */
 
-    getNode: getNode,
-    allNodes: allNodes,
-    byArea: byArea,
-    byStandard: byStandard,
-    byDomain: byDomain,
-    listStandards: listStandards,
-    pageUrl: pageUrl,
-    ancestors: ancestors,
-    descendants: descendants,
-    levels: levels,
+  function gradeLabel(g) {
+    var s = String(g == null ? '' : g).trim();
+    if (!s) return '학년 미지정';
+    if (/^\d+$/.test(s)) return s + '학년';
+    return s;
+  }
 
-    matchConcepts: matchConcepts,
-    analyze: analyze,
-    explainRoot: explainRoot,
-    validate: validate,
+  function renderGradeOptions() {
+    var seen = {}, list = [], i;
+    for (i = 0; i < state.students.length; i++) {
+      var g = state.students[i].grade || '';
+      if (!seen[g]) { seen[g] = true; list.push(g); }
+    }
+    list.sort(function (a, b) {
+      if (!a) return 1;              // 미지정은 항상 끝으로
+      if (!b) return -1;
+      return String(a).localeCompare(String(b), 'ko', { numeric: true });
+    });
+    state.gradeList = list;
 
-    /* --- v2 화면 공통 표현 계층 --- */
-    THRESHOLD: DEFAULT_THRESHOLD,
-    STYLE: STYLE,
-    STATUS_ORDER: STATUS_ORDER,
-    CRITERIA: CRITERIA,
-    GUIDE: GUIDE,
-    GUIDE_LEAD: GUIDE_LEAD,
-    FORBIDDEN_PARENT: FORBIDDEN_PARENT,
+    var html = '<option value="">전체 (' + state.students.length + '명)</option>';
+    for (i = 0; i < list.length; i++) {
+      var cnt = 0;
+      for (var k = 0; k < state.students.length; k++) {
+        if ((state.students[k].grade || '') === list[i]) cnt++;
+      }
+      html += '<option value="' + esc(list[i]) + '">' + esc(gradeLabel(list[i])) + ' (' + cnt + '명)</option>';
+    }
+    $('selGrade').innerHTML = html;
+    $('selGrade').value = state.grade;
+  }
 
-    escapeHtml: escapeHtml,
-    pctText: pctText,
-    styleOf: styleOf,
-    criteriaOf: criteriaOf,
-    stdLabel: stdLabel,
-    stdCell: stdCell,
-    countByStatus: countByStatus,
-    stackBar: stackBar,
-    areaState: areaState,
-    focusTarget: focusTarget,
-    focusCopy: focusCopy,
-    validateCopy: validateCopy
+  function filteredStudents() {
+    if (!state.grade) return state.students.slice();
+    var out = [];
+    for (var i = 0; i < state.students.length; i++) {
+      if ((state.students[i].grade || '') === state.grade) out.push(state.students[i]);
+    }
+    return out;
+  }
+
+  function renderStudentOptions() {
+    var arr = filteredStudents();
+    var html = '';
+    for (var i = 0; i < arr.length; i++) {
+      html += '<option value="' + esc(arr[i].studentId) + '">' + esc(arr[i].name) + '</option>';
+    }
+    $('selStudent').innerHTML = html || '<option value="">해당 학년 학생 없음</option>';
+    state.studentId = arr.length ? arr[0].studentId : '';
+    $('selStudent').value = state.studentId;
+  }
+
+  /* ---------------- 렌더링 ---------------- */
+
+  function renderBanner() {
+    var el = $('banner');
+    if (!LIVE) {
+      el.innerHTML = '<div class="banner warnbox">'
+        + '<b>샘플 데이터로 보고 있습니다.</b><br>'
+        + '화면 구성과 진단 방식을 먼저 확인하시라고 예시를 띄웠습니다. '
+        + '이 파일 위쪽 <b>firebaseConfig</b> 를 다른 페이지에 있는 것과 똑같이 바꿔 넣으면 실제 학생 데이터로 바뀝니다.'
+        + '</div>';
+      return;
+    }
+    var tagged = 0, untagged = 0;
+    for (var i = 0; i < state.exams.length; i++) {
+      if ((state.tagMap[state.exams[i].key] || []).length) tagged++; else untagged++;
+    }
+    if (state.tagError) {
+      el.innerHTML = '<div class="banner warnbox">'
+        + '<b>conceptTags 컬렉션에 접근할 수 없습니다.</b><br>'
+        + 'Firestore 보안 규칙에 conceptTags 를 추가해야 개념 연결을 저장할 수 있습니다. '
+        + '규칙을 추가하기 전까지는 지도가 비어 있습니다.'
+        + '</div>';
+    } else if (tagged === 0) {
+      el.innerHTML = '<div class="banner info">'
+        + '<b>아직 시험과 개념이 연결되지 않았습니다.</b><br>'
+        + '아래 <b>시험 ↔ 개념 연결</b>에서 시험마다 개념을 지정하면 지도가 채워집니다.'
+        + '</div>';
+    } else if (untagged > 0) {
+      el.innerHTML = '<div class="banner info">'
+        + '<b>개념이 연결되지 않은 시험 ' + untagged + '개</b>가 있습니다. '
+        + '아래 <b>시험 ↔ 개념 연결</b> 목록 <b>맨 위</b>에 모아 두었습니다. '
+        + '마스터테스트처럼 지도에 넣지 않을 시험이라면 그대로 두셔도 됩니다.'
+        + '</div>';
+    } else {
+      el.innerHTML = '';
+    }
+  }
+
+  function grainOf(total) {
+    if (state.grain !== 'auto') return state.grain;
+    if (total < 60) return 'area';
+    if (total < 200) return 'std';
+    return 'node';
+  }
+
+  function renderStats() {
+    var A = state.analysis;
+    var c = CM.countByStatus(A, null);
+    var total = A ? A.answered : 0;
+    var g = grainOf(total);
+    var html = '';
+
+    html += '<div class="stat"><div class="v">' + Math.round(c.measured / c.total * 100) + '%</div>'
+      + '<div class="l">개념 커버리지</div>'
+      + '<div class="s">' + c.measured + ' / ' + c.total + ' 개념</div></div>';
+    html += '<div class="stat"><div class="v">' + c.ok + '</div>'
+      + '<div class="l">안정 개념</div>'
+      + '<div class="s">' + esc(CM.CRITERIA.ok) + '</div></div>';
+    html += '<div class="stat"><div class="v">' + c.weak + '</div>'
+      + '<div class="l">' + esc(sty('weak').label) + ' 개념</div>'
+      + '<div class="s">' + esc(CM.CRITERIA.weak) + '</div></div>';
+    html += '<div class="stat"><div class="v">' + total + '</div>'
+      + '<div class="l">누적 문항</div>'
+      + '<div class="s">' + ({ area: '영역 단위로 표시', std: '성취기준 단위로 표시', node: '개념 단위로 표시' })[g] + '</div></div>';
+
+    $('stats').innerHTML = html;
+
+    var areas = CM.AREAS.map(function (a) {
+      var s = A && A.areaSummary[a.id] ? A.areaSummary[a.id] : { total: 0, rate: null };
+      return a.name + ' ' + (s.total ? pct(s.rate) + ' (' + s.total + '문항)' : '기록 없음');
+    }).join(' · ');
+    $('sumNote').textContent = areas + ' · 응시 ' + state.examCount + '회';
+  }
+
+  /** 지도 위 영역별 한 줄 요약 */
+  function renderAreaSummary() {
+    var html = '';
+    for (var i = 0; i < CM.AREAS.length; i++) {
+      var a = CM.AREAS[i];
+      var s = CM.areaState(state.analysis, a.id, VIEW);
+      html += '<div class="asum-row">'
+        + '<div class="asum-head">'
+        + '<span class="asum-name">' + esc(a.name) + '</span>'
+        + '<span class="asum-state" style="background:' + s.style.bg + ';color:' + s.style.fg + '">' + esc(s.label) + '</span>'
+        + '<span class="asum-num">' + esc(s.right) + '</span>'
+        + '</div>'
+        + CM.stackBar(s.counts, VIEW, 'asum-bar')
+        + '</div>';
+    }
+    $('areaSummary').innerHTML = html;
+  }
+
+  function renderFocus() {
+    var A = state.analysis;
+    var box = $('focusList');
+
+    if (!A || A.roots.length === 0) {
+      box.innerHTML = '<div class="banner okbox">' + (A && A.answered > 0
+        ? '<b>지금은 막힌 지점이 없습니다.</b> 선수 개념이 끊긴 곳 없이 잘 이어지고 있습니다.'
+        : '<b>아직 분석할 기록이 없습니다.</b> 시험 결과가 쌓이면 여기에 공략 포인트가 나타납니다.') + '</div>';
+      return;
+    }
+
+    var html = '';
+    for (var i = 0; i < Math.min(A.roots.length, 3); i++) {
+      var r = A.roots[i];
+      var node = CM.getNode(r.id);
+      var url = CM.pageUrl(r.id, state.publisher);
+      html += '<div class="focus">'
+        + '<h4>' + esc(node.name) + '</h4>'
+        + '<p>' + esc(CM.explainRoot(r)) + '</p>'
+        + '<div class="why">성취기준 ' + esc(CM.stdLabel(node.std))
+        + ' · 관련 문항 ' + A.stats[r.id].total + '개 · 정답률 ' + pct(r.rate) + '</div>'
+        + (url ? '<a class="go" href="/' + esc(url) + '">단원 페이지 열기 →</a>' : '')
+        + '</div>';
+    }
+    box.innerHTML = html;
+  }
+
+  function renderGuide() {
+    var rows = CM.GUIDE.teacher;
+    var html = '<div class="guide-t">판정 기준 · 대응</div>';
+    for (var i = 0; i < rows.length; i++) {
+      var g = rows[i];
+      var s = sty(g.k);
+      html += '<div class="guide-item">'
+        + '<div class="guide-l">'
+        + '<span class="pill" style="background:' + s.bg + ';color:' + s.fg + '">' + esc(s.label) + '</span>'
+        + '<span class="guide-cri">' + esc(CM.CRITERIA[g.k]) + '</span>'
+        + '</div>'
+        + '<div><div class="guide-mean">' + esc(g.mean) + '</div></div>'
+        + '</div>';
+    }
+    $('guide').innerHTML = html;
+  }
+
+  function renderTabs() {
+    var html = '';
+    for (var i = 0; i < CM.AREAS.length; i++) {
+      var a = CM.AREAS[i];
+      html += '<button class="tab' + (state.area === a.id ? ' on' : '') + '" data-area="' + a.id + '" type="button">'
+        + esc(a.name) + '</button>';
+    }
+    $('areaTabs').innerHTML = html;
+  }
+
+  function renderMap() {
+    var A = state.analysis;
+    var nodes = CM.byArea(state.area);
+    var depth = CM.levels();
+
+    // 레벨별 열 구성 (해당 영역 안에서 다시 0부터)
+    var minD = Infinity;
+    var i, j;
+    for (i = 0; i < nodes.length; i++) minD = Math.min(minD, depth[nodes[i].id]);
+    var cols = {};
+    for (i = 0; i < nodes.length; i++) {
+      var d = depth[nodes[i].id] - minD;
+      if (!cols[d]) cols[d] = [];
+      cols[d].push(nodes[i]);
+    }
+    var keys = Object.keys(cols).map(Number).sort(function (a, b) { return a - b; });
+
+    var BW = 138, BH = 46, GX = 62, GY = 13, PAD = 18;
+    var maxRows = 0;
+    for (i = 0; i < keys.length; i++) maxRows = Math.max(maxRows, cols[keys[i]].length);
+
+    var W = PAD * 2 + keys.length * BW + Math.max(0, keys.length - 1) * GX;
+    var H = PAD * 2 + maxRows * BH + Math.max(0, maxRows - 1) * GY;
+
+    var pos = {};
+    for (i = 0; i < keys.length; i++) {
+      var list = cols[keys[i]];
+      var colH = list.length * BH + (list.length - 1) * GY;
+      var y0 = PAD + (H - PAD * 2 - colH) / 2;
+      for (j = 0; j < list.length; j++) {
+        pos[list[j].id] = { x: PAD + i * (BW + GX), y: y0 + j * (BH + GY) };
+      }
+    }
+
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="개념 선수관계 지도">';
+    svg += '<defs><marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">'
+      + '<path d="M0 0 L8 4 L0 8 z" fill="#d8d8dd"/></marker></defs>';
+
+    // 간선
+    for (i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      for (j = 0; j < n.prereq.length; j++) {
+        var p = pos[n.prereq[j]];
+        var q = pos[n.id];
+        if (!p || !q) continue;
+        var x1 = p.x + BW, y1 = p.y + BH / 2;
+        var x2 = q.x, y2 = q.y + BH / 2;
+        var mx = (x1 + x2) / 2;
+        var weakEdge = A && A.stats[n.prereq[j]].status === 'weak';
+        svg += '<path d="M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ', ' + mx + ' ' + y2 + ', ' + x2 + ' ' + y2 + '" '
+          + 'fill="none" stroke="' + (weakEdge ? '#fbbf24' : '#e5e5ea') + '" stroke-width="' + (weakEdge ? 2 : 1.4) + '" marker-end="url(#ar)"/>';
+      }
+    }
+
+    // 노드
+    for (i = 0; i < nodes.length; i++) {
+      var nd = nodes[i];
+      var pt = pos[nd.id];
+      var st = A ? A.stats[nd.id] : { status: 'unknown', total: 0, rate: null };
+      var s = sty(st.status);
+      var url = CM.pageUrl(nd.id, state.publisher);
+      var label = nd.name.length > 11 ? nd.name.slice(0, 10) + '…' : nd.name;
+      var sub = st.total > 0 ? pct(st.rate) + ' · ' + st.total + '문항' : s.label;
+
+      svg += '<a href="/' + esc(url) + '" aria-label="' + esc(nd.name) + '">';
+      svg += '<rect x="' + pt.x + '" y="' + pt.y + '" width="' + BW + '" height="' + BH + '" rx="11" '
+        + 'fill="' + s.bg + '" stroke="' + s.line + '" stroke-width="1.4"/>';
+      svg += '<text x="' + (pt.x + BW / 2) + '" y="' + (pt.y + 19) + '" text-anchor="middle" font-size="12" font-weight="700" fill="' + s.fg + '" '
+        + 'font-family="-apple-system,BlinkMacSystemFont,sans-serif">' + esc(label) + '</text>';
+      svg += '<text x="' + (pt.x + BW / 2) + '" y="' + (pt.y + 34) + '" text-anchor="middle" font-size="10" fill="' + s.fg + '" opacity="0.75" '
+        + 'font-family="-apple-system,BlinkMacSystemFont,sans-serif">' + esc(sub) + '</text>';
+      svg += '</a>';
+    }
+
+    svg += '</svg>';
+    $('mapbox').innerHTML = svg;
+
+    $('mapHint').textContent = '화살표는 선수 관계입니다. 왼쪽 개념이 흔들리면 오른쪽이 따라 흔들립니다. 개념을 누르면 해당 단원 페이지가 열립니다.';
+
+    var lg = '';
+    for (i = 0; i < CM.STATUS_ORDER.length; i++) {
+      var t = sty(CM.STATUS_ORDER[i]);
+      lg += '<span><i style="background:' + t.bg + ';border-color:' + t.line + '"></i>' + esc(t.label) + '</span>';
+    }
+    $('legend').innerHTML = lg;
+  }
+
+  function renderTable() {
+    var A = state.analysis;
+    var nodes = CM.byArea(state.area);
+
+    $('tblNote').textContent = '성취기준은 교육부 고시 학습 목표 단위입니다. 학교 시험과 2028 수능이 이 단위로 출제됩니다. 칸에 마우스를 올리면 원본 코드가 보입니다.';
+
+    var html = '';
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      var st = A ? A.stats[n.id] : { status: 'unknown', total: 0, rate: null };
+      var s = sty(st.status);
+      var url = CM.pageUrl(n.id, state.publisher);
+      html += '<tr>'
+        + '<td class="c-std col-hide" title="' + esc(n.std) + '"><span class="muted">' + CM.stdCell(n.std) + '</span></td>'
+        + '<td class="c-name"><a class="nlink" href="/' + esc(url) + '">' + esc(n.name) + '</a></td>'
+        + '<td class="c-num">' + (st.total || '—') + '</td>'
+        + '<td class="c-rate">' + pct(st.rate) + '</td>'
+        + '<td class="c-state"><span class="pill" style="background:' + s.bg + ';color:' + s.fg + '">' + esc(s.label) + '</span></td>'
+        + '</tr>';
+    }
+    $('tblBody').innerHTML = html;
+  }
+
+  /** 개념 57개를 성취기준별 그룹으로 묶은 선택 항목 목록 */
+  function conceptOptions(chosen) {
+    var mark = {};
+    for (var c = 0; c < chosen.length; c++) mark[chosen[c]] = true;
+    var stds = CM.listStandards();
+    var html = '';
+    for (var s = 0; s < stds.length; s++) {
+      var group = CM.byStandard(stds[s]);
+      if (!group.length) continue;
+      html += '<optgroup label="' + esc(CM.stdLabel(stds[s])) + '">';
+      for (var g = 0; g < group.length; g++) {
+        html += '<option value="' + esc(group[g].id) + '"' + (mark[group[g].id] ? ' selected' : '') + '>'
+          + esc(group[g].name) + '</option>';
+      }
+      html += '</optgroup>';
+    }
+    return html;
+  }
+
+  function examMeta(ex) {
+    var chosen = state.tagMap[ex.key] || [];
+    return '문항 ' + ex.q + '개 · 응시 ' + ex.takers + '명'
+      + (ex.mine ? ' · 이 학생 응시' : ' · 이 학생 미응시')
+      + (chosen.length ? ' · 개념 ' + chosen.length + '개 연결됨' : ' · 미연결');
+  }
+
+  function renderExams() {
+    var box = $('examList');
+    if (!state.exams.length) {
+      box.innerHTML = '<div class="muted">채점 기록에서 시험을 찾지 못했습니다.</div>';
+      state.examsSig = '';
+      return;
+    }
+
+    var sig = state.exams.map(function (e) { return e.key; }).join('\u0001');
+    // 학생만 바뀐 경우에는 목록을 다시 그리지 않고 설명글만 갱신한다.
+    // (아직 저장하지 않은 선택이 날아가지 않도록)
+    if (sig === state.examsSig && box.querySelector('[data-exam]')) {
+      for (var m = 0; m < state.exams.length; m++) {
+        var mel = document.getElementById('meta-' + m);
+        if (mel) mel.textContent = examMeta(state.exams[m]);
+      }
+      return;
+    }
+    state.examsSig = sig;
+
+    var html = '';
+    for (var i = 0; i < state.exams.length; i++) {
+      var ex = state.exams[i];
+      var chosen = state.tagMap[ex.key] || [];
+      html += '<div class="exrow">'
+        + '<div><div class="exname">' + esc(ex.title) + '</div>'
+        + '<div class="exmeta" id="meta-' + i + '">' + esc(examMeta(ex)) + '</div>'
+        + '<div class="exchosen" id="chosen-' + i + '">' + chosenText(chosen) + '</div></div>'
+        + '<select class="exsel" multiple size="8" data-exam="' + esc(ex.key) + '" data-title="' + esc(ex.title) + '" data-idx="' + i + '">'
+        + conceptOptions(chosen) + '</select>'
+        + '</div>';
+    }
+    box.innerHTML = html;
+
+    var sels = box.querySelectorAll('[data-exam]');
+    for (var k = 0; k < sels.length; k++) {
+      sels[k].addEventListener('change', function () {
+        var idx = this.getAttribute('data-idx');
+        var el = document.getElementById('chosen-' + idx);
+        if (el) el.innerHTML = chosenText(selectedIds(this));
+      });
+    }
+  }
+
+  function renderAll() {
+    renderBanner();
+    renderStats();
+    renderFocus();
+    renderTabs();
+    renderAreaSummary();
+    renderMap();
+    renderTable();
+    renderGuide();
+    renderExams();
+  }
+
+  function analyzeNow() {
+    state.analysis = CM.analyze(state.records);
+  }
+
+  function refresh() {
+    return loadGrades(state.studentId).then(function () {
+      analyzeNow();
+      renderAll();
+    });
+  }
+
+  /* ---------------- 이벤트 ---------------- */
+
+  function bind() {
+    $('selGrade').addEventListener('change', function (e) {
+      state.grade = e.target.value;
+      renderStudentOptions();
+      refresh();
+    });
+    $('selStudent').addEventListener('change', function (e) {
+      state.studentId = e.target.value;
+      refresh();
+    });
+    $('selPub').addEventListener('change', function (e) {
+      state.publisher = e.target.value;
+      renderMap(); renderTable(); renderFocus();
+    });
+    $('selGrain').addEventListener('change', function (e) {
+      state.grain = e.target.value;
+      renderStats();
+    });
+    $('areaTabs').addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-area]') : null;
+      if (!b) return;
+      state.area = Number(b.getAttribute('data-area'));
+      renderTabs(); renderMap(); renderTable();
+    });
+    $('btnSaveTags').addEventListener('click', saveTags);
+    $('btnAutoTag').addEventListener('click', autoTag);
+  }
+
+  /* ---------------- 시작 ---------------- */
+
+  function boot() {
+    if (!CM) {
+      $('banner').innerHTML = '<div class="banner warnbox"><b>concept-map.js 를 찾지 못했습니다.</b><br>'
+        + 'public 폴더에 concept-map.js 가 올라가 있는지 확인해 주세요.</div>';
+      return;
+    }
+    var v = CM.validate();
+    log('개념 데이터', { 노드수: v.count, 무결성: v.ok ? '정상' : v.errors });
+
+    var copy = CM.validateCopy();
+    if (copy.nameWarnings.length) {
+      log('학부모 화면 개념명 확인', {
+        설명: '교육과정 용어라 오류가 아닙니다. 표시명을 바꾸려면 concept-map.js 의 name 을 수정하세요.',
+        해당개념: copy.nameWarnings
+      });
+    }
+
+    LIVE = initFirebase();
+    bind();
+
+    loadTags()
+      .then(loadStudents)
+      .then(function () {
+        renderGradeOptions();
+        renderStudentOptions();
+        return refresh();
+      })
+      .catch(function (e) {
+        log('시작 실패', String(e && e.message ? e.message : e));
+        state.records = []; analyzeNow(); renderAll();
+      });
+  }
+
+  // 테스트 전용 노출 (브라우저 동작에는 영향 없음)
+  window.__cmTest = {
+    suggestNodes: suggestNodes, innerTopic: innerTopic,
+    state: state, renderAll: renderAll
   };
 
-  global.ConceptMap = ConceptMap;
-
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = ConceptMap;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
   }
-})(typeof window !== 'undefined' ? window : globalThis);
+})();
+</script>
+</body>
+</html>
