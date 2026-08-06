@@ -139,6 +139,16 @@ body {
 }
 .jump-btn.show { display: inline-block; }
 
+/* ★ 미응답 안내줄 — 안 푼 문제가 있으면 항상 보인다 */
+.omr-warn {
+  display: none; margin-top: 9px; padding: 8px 11px;
+  background: #fffbeb; border: 1px solid #fde68a; border-radius: 11px;
+  font-size: 11.5px; font-weight: 700; color: #b45309; line-height: 1.55;
+  word-break: keep-all;
+}
+.omr-warn.show { display: block; }
+.omr-warn.ok { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
+
 /* 부(section) 바로가기 칩 */
 .part-chips { display: flex; gap: 6px; overflow-x: auto; margin-top: 9px; padding-bottom: 2px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .part-chips::-webkit-scrollbar { display: none; }
@@ -206,6 +216,7 @@ body {
 .submit-btn:hover { opacity: 0.88; }
 .submit-btn:active { transform: scale(0.995); }
 .submit-btn:disabled { background: #fce7f3; cursor: not-allowed; box-shadow: none; }
+.submit-btn.wait { background: linear-gradient(135deg,#fbbf24,#d97706); box-shadow: 0 4px 16px rgba(217,119,6,0.22); }
 
 /* ── 결과 ── */
 .result-card {
@@ -229,6 +240,10 @@ body {
 }
 .result-task-title { font-size: 11px; font-weight: 700; color: #854d0e; margin-bottom: 6px; }
 .result-task-text { font-size: 13px; color: #1d1d1f; line-height: 1.6; }
+.result-again {
+  font-size: 11.5px; color: #6e6e73; line-height: 1.65;
+  background: #f5f5f7; border-radius: 11px; padding: 9px 12px; margin-bottom: 1.2rem;
+}
 .home-btn {
   display: inline-block; padding: 13px 28px; min-height: 48px;
   background: linear-gradient(135deg,#f472b6,#db2777);
@@ -245,6 +260,17 @@ body {
 .screen { display: none; }
 .screen.active { display: block; }
 
+/* ★ 저장 중 덮개 */
+.saving-veil {
+  display: none; position: fixed; inset: 0; z-index: 900;
+  background: rgba(255,255,255,0.88);
+  align-items: center; justify-content: center; padding: 1.5rem;
+}
+.saving-veil.show { display: flex; }
+.saving-veil .sv-in { text-align: center; }
+.saving-veil .sv-t { font-size: 13.5px; font-weight: 700; color: #db2777; }
+.saving-veil .sv-s { font-size: 11.5px; color: #aeaeb2; margin-top: 5px; }
+
 /* ── 모바일 ── */
 @media (max-width: 560px) {
   .brand { font-size: 13.5px; }
@@ -259,6 +285,7 @@ body {
   .omr-grid { grid-template-columns: 1fr; gap: 6px; }
   .omr-q-num { flex: 0 0 32px; font-size: 11.5px; }
   .omr-choice { max-width: 52px; min-height: 42px; font-size: 13px; }
+  .omr-warn { font-size: 11px; padding: 8px 10px; }
   .result-card { margin: 1rem 0.8rem; padding: 2rem 1.3rem; }
 }
 @media (max-width: 340px) {
@@ -289,6 +316,15 @@ body {
     </div>
   </div>
 </header>
+
+<!-- ★ 저장 중 덮개 -->
+<div class="saving-veil" id="saving-veil">
+  <div class="sv-in">
+    <div class="spinner"></div>
+    <div class="sv-t">성적을 저장하고 있어요</div>
+    <div class="sv-s">창을 닫거나 새로고침하지 마세요</div>
+  </div>
+</div>
 
 <!-- ⓪ 자동 진입 로딩 (클리닉 링크로 들어올 때) -->
 <div class="screen" id="screen-autoload">
@@ -361,6 +397,7 @@ body {
           <button class="jump-btn" id="jump-btn" onclick="jumpToMissing()">안 푼 문제로 ↓</button>
         </div>
         <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="omr-warn" id="omr-warn"></div>
         <div class="part-chips" id="part-chips"></div>
       </div>
     </div>
@@ -384,6 +421,7 @@ body {
       <div class="result-score-lbl">총 100점 기준</div>
     </div>
     <div class="result-detail" id="result-detail"></div>
+    <div class="result-again" id="result-again" style="display:none;"></div>
     <div class="result-task-box" id="result-task-box" style="display:none;">
       <div class="result-task-title">📌 이번 과제</div>
       <div class="result-task-text" id="result-task-text">—</div>
@@ -395,7 +433,7 @@ body {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getFirestore, collection, getDocs, addDoc, doc, getDoc,
+  getFirestore, collection, getDocs, addDoc, setDoc, doc, getDoc,
   query, where, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -480,6 +518,12 @@ function sortedQNos(part) {
   return Object.keys((part && part.answers) || {}).sort((a,b) => qNumOf(a) - qNumOf(b));
 }
 
+// ★ 답이 실제로 채워져 있는가 (공백만 있는 값은 '안 푼 것'으로 센다)
+function hasAns(qno) {
+  const v = answers ? answers[qno] : undefined;
+  return v !== undefined && v !== null && String(v).trim() !== '';
+}
+
 // 등록일 문자열("2026. 07. 31.") 안전 파싱 → 정렬용 숫자
 function parseRegDate(s) {
   const m = String(s || '').match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
@@ -496,6 +540,11 @@ function showScreen(id) {
   window.scrollTo(0, 0);
 }
 window.goBack = (to) => showScreen(to);
+
+function setVeil(on) {
+  const v = document.getElementById('saving-veil');
+  if (v) v.classList.toggle('show', !!on);
+}
 
 // ── 학년 선택 ──
 window.selGrade = (g, el) => {
@@ -677,14 +726,15 @@ function buildOMR() {
 
   const btn = document.getElementById('submit-btn');
   btn.disabled = false;
-  btn.textContent = '✓ 답안 제출하기';
   submitting = false;
+  setVeil(false);
 
   updateProgress();
 }
 
 // ── 답 선택 ──
 window.pickAnswer = (qno, n) => {
+  if (submitting) return;
   for (let i = 1; i <= 5; i++) {
     const c = document.getElementById(`choice-${qno}-${i}`);
     if (c) c.classList.remove('sel');
@@ -699,22 +749,49 @@ window.pickAnswer = (qno, n) => {
   updateProgress();
 };
 
-// ── 진행률 + 부별 완료 표시 ──
+// ── 진행률 + 부별 완료 표시 + 미응답 안내 ──
 function updateProgress() {
-  const total = countQuestions(selectedTest);
-  const done  = Object.keys(answers).length;
-  const pct   = total ? Math.round(done / total * 100) : 0;
+  const total   = countQuestions(selectedTest);
+  const missing = missingQNos().length;
+  const done    = Math.max(0, total - missing);
+  const pct     = total ? Math.round(done / total * 100) : 0;
 
   document.getElementById('progress-txt').textContent  = `${done} / ${total}`;
   document.getElementById('progress-fill').style.width = pct + '%';
 
   const jump = document.getElementById('jump-btn');
-  const missing = total - done;
-  if (missing > 0 && done > 0) {
+  if (missing > 0) {
     jump.textContent = `안 푼 ${missing}문제 ↓`;
     jump.classList.add('show');
   } else {
     jump.classList.remove('show');
+  }
+
+  // ★ 미응답 안내줄 — 안 푼 문제가 있으면 항상 보인다
+  const warn = document.getElementById('omr-warn');
+  if (warn) {
+    if (missing > 0) {
+      warn.className = 'omr-warn show';
+      warn.textContent = `아직 ${missing}문제가 비어 있어요. 모든 문제를 풀어야 제출됩니다.`;
+    } else if (total > 0) {
+      warn.className = 'omr-warn show ok';
+      warn.textContent = '✓ 모든 문제를 풀었어요. 제출할 수 있습니다.';
+    } else {
+      warn.className = 'omr-warn';
+      warn.textContent = '';
+    }
+  }
+
+  // ★ 제출 버튼에도 남은 개수를 보여준다
+  const btn = document.getElementById('submit-btn');
+  if (btn && !submitting) {
+    if (missing > 0) {
+      btn.classList.add('wait');
+      btn.textContent = `안 푼 ${missing}문제가 남았어요`;
+    } else {
+      btn.classList.remove('wait');
+      btn.textContent = '✓ 답안 제출하기';
+    }
   }
 
   const parts = Array.isArray(selectedTest && selectedTest.parts) ? selectedTest.parts : [];
@@ -722,7 +799,7 @@ function updateProgress() {
     const chip = document.getElementById('chip-' + pi);
     if (!chip) return;
     const qNos = sortedQNos(part);
-    const allDone = qNos.length > 0 && qNos.every(q => answers[q]);
+    const allDone = qNos.length > 0 && qNos.every(q => hasAns(q));
     chip.classList.toggle('done', allDone);
   });
 }
@@ -731,7 +808,7 @@ function updateProgress() {
 function missingQNos() {
   const parts = Array.isArray(selectedTest && selectedTest.parts) ? selectedTest.parts : [];
   const list = [];
-  parts.forEach(part => { sortedQNos(part).forEach(q => { if (!answers[q]) list.push(q); }); });
+  parts.forEach(part => { sortedQNos(part).forEach(q => { if (!hasAns(q)) list.push(q); }); });
   return list;
 }
 function markMissing() {
@@ -753,28 +830,47 @@ window.jumpToPart = (pi) => {
   if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
-// ── 제출 ──
+// ──────────────────────────────────────────────
+// ★ 제출
+//   [바뀐 점 1] 안 푼 문제가 하나라도 있으면 저장하지 않는다.
+//     예전에는 "그래도 제출할까요?"에서 확인을 누르면 빈 문항이
+//     오답으로 굳어져 점수가 깎인 채 저장됐다.
+//   [바뀐 점 2] 문서 ID를 `${시험ID}__${학생ID}`로 고정한다.
+//     예전에는 addDoc(랜덤 ID)이라 두 번 제출하면 문서가 두 개 생겨
+//     응시 횟수가 2회로 잡혔다. 이제는 다시 봐도 1건으로 덮어쓴다.
+// ──────────────────────────────────────────────
+function masterDocId(examFireId, sid) {
+  return `${examFireId}__${String(sid || '').trim().toLowerCase()}`;
+}
+
 window.submitOMR = async () => {
   if (submitting) return;
 
   const parts = Array.isArray(selectedTest && selectedTest.parts) ? selectedTest.parts : [];
   const total = countQuestions(selectedTest);   // ★ 상한 없음 (50문항이면 50)
-  const done  = Object.keys(answers).length;
 
   if (total === 0) { alert('문항이 없는 시험입니다. 선생님께 문의하세요.'); return; }
 
-  if (done < total) {
-    const miss = markMissing();
-    if (!confirm(`아직 ${total - done}문제를 선택하지 않았어요. 그래도 제출할까요?`)) {
-      const row = miss.length ? document.getElementById('row-' + miss[0]) : null;
-      if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
+  // ★ 빈 문항이 있으면 저장하지 않고 그 문제로 보낸다
+  const miss = markMissing();
+  if (miss.length > 0) {
+    const nums = miss.slice(0, 10).map(qNumOf).join(', ');
+    const more = miss.length > 10 ? ` 외 ${miss.length - 10}문제` : '';
+    alert(`아직 ${miss.length}문제를 풀지 않았어요.\n\n${nums}번${more}\n\n모두 푼 뒤에 제출할 수 있습니다.`);
+    const row = document.getElementById('row-' + miss[0]);
+    if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
   }
 
+  const done = total - missingQNos().length;
+  if (done !== total) { alert('답안을 다시 확인해주세요.'); return; }
+
   submitting = true;
+  setVeil(true);
   const btn = document.getElementById('submit-btn');
-  btn.disabled = true; btn.textContent = '제출 중...';
+  btn.disabled = true;
+  btn.classList.remove('wait');
+  btn.textContent = '제출 중...';
 
   // 채점: 정답 맵 생성
   const correctMap = {};
@@ -789,7 +885,7 @@ window.submitOMR = async () => {
   const answersDetail = [];
   Object.entries(correctMap).forEach(([qno, correctAns]) => {
     const sa = answers[qno];
-    const isCorrect = sa === correctAns;
+    const isCorrect = String(sa == null ? '' : sa).trim() === String(correctAns).trim();
     if (isCorrect) correct++; else { wrong++; wrongNums.push(qNumOf(qno)); }
     answersDetail.push({
       question:      `Q${qNumOf(qno)}`,
@@ -809,12 +905,34 @@ window.submitOMR = async () => {
   let taskText = '';
   if (fp) taskText = wrong <= 2 ? (fp.taskLow || '') : wrong <= 4 ? (fp.taskMid || '') : (fp.taskHigh || '');
 
-  // ── Firebase 저장 (통일 구조: grades/{자동ID}, 1회 응시 = 문서 1개) ──
+  // ── Firebase 저장 (1인 1시험 = 문서 1개) ──
+  let attemptNo = 1;
   try {
     await ensureAuth();
-    await addDoc(collection(db, 'grades'), {
+
+    const sid = String(studentId || '').trim().toLowerCase();
+    const gid = sid ? masterDocId(selectedTest.fireId, sid) : '';
+
+    // 다시 본 경우: 첫 응시 시각과 응시 횟수를 이어받는다 (실패해도 저장은 진행)
+    let firstAt = null;
+    if (gid) {
+      try {
+        const prev = await getDoc(doc(db, 'grades', gid));
+        if (prev.exists()) {
+          const p = prev.data() || {};
+          firstAt = p.firstSubmittedAt || p.timestamp || null;
+          const n = Number(p.attemptCount);
+          attemptNo = (isFinite(n) && n > 0 ? n : 1) + 1;
+        }
+      } catch (e) {
+        console.warn('[OMR] 이전 기록 조회 실패(무시하고 저장):', e);
+      }
+    }
+
+    const now = Timestamp.now();
+    const payload = {
       // ── 식별 ──
-      studentId,
+      studentId: sid,
       studentName,
       grade: studentGrade,
       subject: selectedTest.subject || '',
@@ -828,11 +946,14 @@ window.submitOMR = async () => {
       score,
       totalCorrect: correct,
       totalQuestions: total,
+      answeredCount: total,
       // ── 문항별 상세 ──
       answers: answersDetail,
       wrongNums,
-      // ── 시간 (읽는 쪽이 timestamp로 정렬) ──
-      timestamp: Timestamp.now(),
+      // ── 시간 · 응시 횟수 ──
+      timestamp: now,
+      firstSubmittedAt: firstAt || now,
+      attemptCount: attemptNo,
       // ── 구버전 읽기 호환용 보조 필드 ──
       testType: 'master',
       testId: selectedTest.testId || '',
@@ -843,13 +964,25 @@ window.submitOMR = async () => {
       testGradeNorm: normalizeGrade(selectedTest.grade || ''),
       studentGrade,
       correct, wrong, total
-    });
+    };
+
+    if (gid) {
+      await setDoc(doc(db, 'grades', gid), payload);
+    } else {
+      // 학생 ID가 없는 예외적인 경우에만 새 문서 생성
+      await addDoc(collection(db, 'grades'), payload);
+    }
   } catch(e) {
-    alert('제출 실패: ' + e.message);
+    alert('제출 실패: ' + e.message + '\n\n네트워크를 확인하고 다시 제출해주세요.');
     submitting = false;
-    btn.disabled = false; btn.textContent = '✓ 답안 제출하기';
+    setVeil(false);
+    btn.disabled = false;
+    updateProgress();
     return;
   }
+
+  submitting = false;
+  setVeil(false);
 
   // 결과 화면
   const emoji = score>=90?'🎉':score>=70?'😊':score>=50?'😅':'💪';
@@ -859,6 +992,17 @@ window.submitOMR = async () => {
   document.getElementById('result-sub').textContent   = `${studentName}학생, ${msg}`;
   document.getElementById('result-score').textContent = score + '점';
   document.getElementById('result-detail').textContent = `총 ${total}문제 중 ${correct}문제 정답 · ${wrong}문제 오답`;
+
+  const againBox = document.getElementById('result-again');
+  if (againBox) {
+    if (attemptNo > 1) {
+      againBox.style.display = 'block';
+      againBox.textContent = `이 시험은 ${attemptNo}번째 응시입니다. 가장 최근 결과 하나만 기록됩니다.`;
+    } else {
+      againBox.style.display = 'none';
+    }
+  }
+
   if (taskText) {
     document.getElementById('result-task-box').style.display = 'block';
     document.getElementById('result-task-text').textContent  = taskText;
