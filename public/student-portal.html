@@ -33,7 +33,6 @@
 }
 html{-webkit-text-size-adjust:100%;overflow-x:hidden}
 body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;min-height:100dvh;overflow-x:hidden;overscroll-behavior-y:none;-webkit-font-smoothing:antialiased}
-/* 학부모가 붙여넣은 긴 단어·URL 이 카드를 밀어내지 않도록 */
 .ls-body,.ls-hw,.ls-fb-tx,.sc-row-val{overflow-wrap:anywhere}
 
 .loading-screen,.error-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;color:var(--mt);text-align:center;padding:24px}
@@ -128,7 +127,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-/* 출결 탭 · 개념 지도 탭 — 4칸 */
 .stat-row.at4{grid-template-columns:repeat(4,1fr)}
 .stat-box{border-radius:14px;padding:15px 10px 16px;text-align:center;border:1px solid #fbcfe8;background:var(--pink-lt);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:84px}
 .stat-box.blue{background:var(--blue-lt);border-color:#bfdbfe}
@@ -145,7 +143,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .info-card p{text-align:center;font-size:14px;color:var(--mt);line-height:1.9;font-weight:400}
 .info-card strong{color:var(--tx);font-weight:600}
 
-/* ══ 수업카드 안 선생님 메모 — 그 날짜에 작성된 경우에만 생성 ══ */
 .ls-fb{margin-top:11px;padding:12px 14px;background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:11px}
 .ls-fb+.ls-fb{margin-top:8px}
 .ls-fb b{display:block;font-size:11.5px;font-weight:800;color:var(--pink-dk);letter-spacing:.03em;margin-bottom:6px}
@@ -167,16 +164,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .at-st-결석{background:#fef2f2;border-color:#fecaca;color:#b91c1c}
 .at-st-보강{background:var(--blue-lt);border-color:#bfdbfe;color:#1d4ed8}
 .at-st-휴강{background:#f3f4f6;border-color:#e5e7eb;color:#6b7280}
+/* 같은 날 두 번째 칸(보강)임을 살짝 표시 */
+.at-dot.at-pair{box-shadow:0 0 0 2px rgba(59,130,246,.14)}
 .at-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:13px;font-size:11px;color:var(--mt)}
 .at-lg{display:flex;align-items:center;gap:5px}
 .at-lg i{width:11px;height:11px;border-radius:4px;display:inline-block;border:1.5px solid}
+.at-note{font-size:11.5px;color:var(--mt);line-height:1.75;margin-top:10px;word-break:keep-all}
 
 /* ══ 수업 기록 카드 (최신순) ══ */
 .ls-card{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px;margin-bottom:10px}
 .ls-card.latest{border-color:#fbcfe8;box-shadow:0 2px 12px rgba(236,72,153,.07)}
+.ls-card.mk{border-color:#bfdbfe}
 .ls-top{display:flex;align-items:center;gap:9px;margin-bottom:10px;flex-wrap:wrap;row-gap:6px}
 .ls-date{font-size:14px;font-weight:700;color:var(--tx)}
 .ls-badge{font-size:11.5px;font-weight:800;padding:3px 11px;border-radius:999px;border:1.5px solid;white-space:nowrap}
+.ls-slot{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;white-space:nowrap;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe}
 .ls-new{font-size:10.5px;font-weight:800;color:#fff;background:var(--pink);border-radius:999px;padding:3px 9px;letter-spacing:.02em}
 .ls-no{margin-left:auto;font-size:11.5px;font-weight:700;color:var(--mt);white-space:nowrap}
 .ls-unit{font-size:12px;font-weight:700;color:var(--pink-dk);background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:7px;padding:4px 10px;word-break:keep-all;margin-bottom:9px;display:inline-block}
@@ -186,12 +188,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .ls-hw b{color:var(--pink-dk);font-weight:700;display:block;margin-bottom:3px;font-size:12px;letter-spacing:.03em}
 .ls-more{text-align:center;font-size:12.5px;color:var(--mt);padding:14px 8px 4px;line-height:1.8}
 
-/* ══════════════════════════════════════════════════════════════
-   과학 개념 지도 탭
-   · 밖으로 나가는 링크를 만들지 않는다 (학부모 링크는 이 페이지 하나)
-   · 문구·색·상태 이름은 concept-map.js 7절에서 그대로 가져온다
-     → 선생님 화면과 학부모 화면이 어긋날 수 없다
-══════════════════════════════════════════════════════════════ */
+/* ══ 과학 개념 지도 탭 ══ */
 .cm-hero{
   background:linear-gradient(135deg,#f472b6 0%,#db2777 55%,#a21caf 100%);
   border-radius:var(--r);padding:20px;color:#fff;margin-bottom:20px;
@@ -272,9 +269,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .cm-g-plan{font-size:12.5px;line-height:1.85;color:var(--pink-dk);background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:10px;padding:9px 12px;margin-top:9px;word-break:keep-all}
 .cm-g-plan b{font-weight:800}
 
-/* ══ 점수 카드 (OX / 4지선다 / 마스터 공통) ══ */
-/* 점수는 백분율이 아니라 "맞은 문항 / 전체 문항" 으로 보여준다.
-   문항 수가 100으로 나눠떨어지지 않아도 학부모가 바로 이해할 수 있다. */
+/* ══ 점수 카드 ══ */
 .test-item{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:10px}
 .test-head{display:flex;align-items:center;gap:16px;justify-content:space-between}
 .score-circle{width:72px;height:72px;border-radius:50%;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
@@ -303,11 +298,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .desktop-only{display:none!important}
   .mobile-only{display:block!important}
   body{padding-bottom:calc(64px + var(--safe-bot))}
-  /* 출결 흐름 — 한 줄로 고정하고 가로 스크롤 (세로 공간 절약) */
   .at-line{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .at-dot{flex:0 0 auto;scroll-snap-align:start}
   .at-legend{gap:9px;font-size:10.5px}
-  /* 수업 카드 — 회차를 오른쪽 끝에 유지 */
   .ls-top{gap:7px}
   .ls-no{margin-left:auto}
   .sec-label{margin-bottom:11px}
@@ -333,7 +326,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .sc-row{gap:8px;font-size:13px}
   .sc-row-lbl{width:54px;font-size:11.5px}
   .sc-row-title .sc-row-val{font-size:15px}
-  /* 개념 지도 — 모바일 */
   .cm-hero{padding:17px}
   .cm-h-big b{font-size:2rem}
   .cm-h-big span{font-size:14px}
@@ -351,7 +343,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .cm-guide{padding:0 15px}
   .cm-g-mean{font-size:12.5px}
 }
-/* ── 아이폰 SE·미니 등 좁은 화면 ── */
 @media(max-width:380px){
   .mobile-body{padding:14px 12px 8px}
   .mobile-header{padding:calc(16px + var(--safe-top)) 16px 14px}
@@ -377,6 +368,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .ls-no{margin-left:0;font-size:11px}
   .ls-date{font-size:13px}
   .ls-badge{font-size:11px;padding:3px 9px}
+  .ls-slot{font-size:10px;padding:2px 8px}
   .ls-fb{padding:10px 11px}
   .ls-fb b{font-size:11px}
   .ls-fb-tx{font-size:12.5px;line-height:1.85}
@@ -389,7 +381,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .cm-tbl{font-size:11.5px}
   .cm-tbl th,.cm-tbl td{padding:9px 4px}
 }
-/* ── 폴더블 접힘 등 초협소 화면 안전망 ── */
 @media(max-width:340px){
   .mobile-body{padding:12px 10px 8px}
   .stat-row.at4{grid-template-columns:repeat(2,1fr);gap:7px}
@@ -417,15 +408,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .d-tab{font-size:13px;padding:16px 4px;gap:5px}
 }
 
-/* ══════════════════════════════════════════════════════════════
-   [스크롤 복구] 모바일에서 화면 아래가 안 내려가던 문제
-   ① body 의 overflow-x:hidden 이 body 를 별도 스크롤 박스로 만들어
-      sticky · 아래쪽 스크롤이 함께 깨졌다 → html 에만 남기고 해제
-   ② 하단 탭바 여백을 var(--safe-bot) 로 계산했는데, env() 를 커스텀
-      속성에 담아 calc 로 쓰면 일부 사파리에서 선언 전체가 무효가 되어
-      여백이 0 이 된다 → 고정값 먼저, env() 는 별도 선언으로 덧씀
-   ③ 100vh 는 iOS 주소창 높이를 포함해 첫 화면이 잘린다 → svh 보강
-══════════════════════════════════════════════════════════════ */
+/* ══ 스크롤 복구 (검증 완료 · 변경 없음) ══ */
 html { overflow-x: hidden; }
 body {
   overflow-x: visible;
@@ -555,10 +538,21 @@ if(!studentId){showError();}else{loadPortal(studentId);}
 
 const TAB_COUNT=5;
 
-/* 탭 0 = 출결 · 수업내용 (출결 4칸 + 흐름 + 수업 기록 최신순)
-   탭 1 = 과학 개념 지도 (concept-map.js 의 학부모 문구를 그대로 사용)
-   탭 2~4 = OX · 4지선다 · 마스터. 가운데·오른쪽 칸은 "맞은 문항 / 전체 문항" 누적.
-   선생님 메모는 별도 섹션이 아니라 그 날짜 수업카드 안(과제 아래)에 붙는다. */
+/* ════════════════════════════════════════════════════════════════
+   ★ 슬롯(slot) — 같은 날 본수업과 보강을 따로 담는다
+   students 문서의 recentAttendance · recentLessons 항목은
+   { d:'2026-08-05', k:'ls'|'mk', s:'출석' } 형태다.
+     · ls = 본수업 (출석 · 지각 · 결석 · 휴강)
+     · mk = 보강
+   k 가 없는 예전 기록은 모두 ls 로 읽는다. (그대로 표시된다)
+   같은 날짜에 ls 와 mk 가 모두 있으면 칸도 2개, 카드도 2장 나온다.
+════════════════════════════════════════════════════════════════ */
+const SLOT_LS='ls',SLOT_MK='mk';
+function normSlot(k){return String(k==null?'':k)===SLOT_MK?SLOT_MK:SLOT_LS;}
+function slotKey(d,k){return String(d)+'|'+normSlot(k);}
+function slotName(k){return normSlot(k)===SLOT_MK?'보강 수업':'본수업';}
+function cmpSlot(a,b){return String(a.d).localeCompare(String(b.d))||normSlot(a.k).localeCompare(normSlot(b.k));}
+
 function buildSections(){
   return`
   <div class="section active" id="sec0">
@@ -579,6 +573,7 @@ function buildSections(){
         <span class="at-lg"><i style="background:#eff6ff;border-color:#bfdbfe"></i>보강</span>
         <span class="at-lg"><i style="background:#f3f4f6;border-color:#e5e7eb"></i>휴강</span>
       </div>
+      <div class="at-note" id="at-note"></div>
     </div>
     <div class="sec-label">수업 내용 · 과제 · 메모</div>
     <div id="lessonList"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
@@ -658,20 +653,15 @@ async function loadPortal(sid){
     document.getElementById('mobileContent').innerHTML=html;
     document.getElementById('loadingScreen').style.display='none';
     document.getElementById('portalApp').style.display='block';
-    renderConcept();                                   // 먼저 뼈대를 그려 빈 탭이 보이지 않게 한다
+    renderConcept();
     renderAttendance(student);
     loadGrades(sid,student.fireId);
-    const fbList=await fetchFeedback(student.fireId);   // 메모를 먼저 받아 수업 기록에 얹는다
+    const fbList=await fetchFeedback(student.fireId);
     renderLessons(student,fbList);
   }catch(err){showError();}
 }
 
-/* ════════════════════════════════════════════════
-   선생님 메모 (feedbacks/{학생문서ID})
-   저장 구조: { entries:[{id,text,date,createdAt}], text, updatedAt }
-   · 작성된 항목이 하나도 없으면 섹션 자체를 표시하지 않는다.
-   · 불러오기에 실패한 경우에도 빈 안내를 띄우지 않고 조용히 숨긴다.
-════════════════════════════════════════════════ */
+/* ════════ 선생님 메모 (feedbacks/{학생문서ID}) ════════ */
 function fbMillis(v){
   if(v==null)return 0;
   if(typeof v==='number')return v;
@@ -704,8 +694,6 @@ function parseFbEntries(data){
   }
   return list.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||(b.createdAt-a.createdAt));
 }
-/* 메모를 읽어오기만 한다 (화면 표시는 수업 기록 쪽에서 담당)
-   실패하면 빈 배열 — 메모 때문에 수업 기록이 막히지 않게 한다. */
 async function fetchFeedback(fireId){
   try{
     const snap=await getDoc(doc(db,'feedbacks',fireId));
@@ -713,20 +701,17 @@ async function fetchFeedback(fireId){
   }catch(err){return[];}
 }
 
-/* 메모를 수업일에 배정한다
-   ① 같은 날짜의 수업이 있으면 그 수업카드 안으로
-   ② 없으면 그 날짜 '이전'의 가장 가까운 수업으로 (수업 뒤에 쓴 메모)
-   ③ 모든 수업보다 이른 메모 · 날짜 없는 메모는 독립 카드로
-   반환 { map:Map(수업날짜→[메모…]), orphans:[메모…] } */
-function assignFeedback(lessonDates,fbList){
+/* 메모를 수업 슬롯에 배정한다 (같은 날 2건이면 뒤쪽 = 보강 카드에 붙는다)
+   반환 { map:Map('날짜|슬롯' → [메모…]), orphans:[메모…] } */
+function assignFeedback(slots,fbList){
   const map=new Map(),orphans=[];
-  const sorted=[...lessonDates].sort();
+  const sorted=(Array.isArray(slots)?slots.slice():[]).sort(cmpSlot);
   (Array.isArray(fbList)?fbList:[]).forEach(fb=>{
     const d=String(fb&&fb.date||'');
     if(!atYmd(d)){orphans.push(fb);return;}
     let target='';
     for(let i=0;i<sorted.length;i++){
-      if(sorted[i]<=d)target=sorted[i];
+      if(String(sorted[i].d)<=d)target=slotKey(sorted[i].d,sorted[i].k);
       else break;
     }
     if(target){if(!map.has(target))map.set(target,[]);map.get(target).push(fb);}
@@ -738,14 +723,7 @@ function fbBlock(fb){
   return`<div class="ls-fb"><b>💬 선생님 메모</b><div class="ls-fb-tx">${e(fb&&fb.text||'')}</div></div>`;
 }
 
-/* ════════════════════════════════════════════════
-   출결 · 수업 회차 · 보강
-   · classCards 를 읽지 않는다 — 수업카드는 선생님 전용(내부 기록)
-   · students 문서에 집계된 값만 사용:
-     sessionCount / absentCount / makeupCount /
-     lastClassDate / recentAttendance / recentLessons
-   · 학생 문서 1개만 읽으므로 남의 학생 기록에 접근할 경로가 없다
-════════════════════════════════════════════════ */
+/* ════════ 출결 · 수업 회차 · 보강 ════════ */
 function atNum(v){return(typeof v==='number'&&isFinite(v))?v:null;}
 function atYmd(v){
   const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v==null?'':v).trim());
@@ -763,6 +741,14 @@ function atStatusOf(x){
   const st=String(x&&x.s!=null?x.s:'').trim();
   return AT_VALID.indexOf(st)>=0?st:'출석';
 }
+/* 같은 날짜가 2건 이상인 날 목록 */
+function pairedDates(list){
+  const cnt=new Map();
+  list.forEach(x=>cnt.set(x.d,(cnt.get(x.d)||0)+1));
+  const out=[];
+  cnt.forEach((n,d)=>{if(n>1)out.push(d);});
+  return out.sort();
+}
 function renderAttendance(student){
   try{
     const ses=atNum(student&&student.sessionCount);
@@ -774,30 +760,28 @@ function renderAttendance(student){
     document.querySelectorAll('#at-mk').forEach(el=>el.textContent=mk!=null?mk+'회':'—');
     document.querySelectorAll('#at-last').forEach(el=>el.textContent=last?atShortDate(last):'—');
 
-    // 출결 흐름 — recentAttendance: [{d:'2026-07-24', s:'출석'}, ...]
     const raw=Array.isArray(student&&student.recentAttendance)?student.recentAttendance:[];
-    // 저장 개수(30건)와 맞춘다. 12칸으로 자르면 그 밖의 보강·결석이
-    // 숫자에는 잡히는데 흐름에는 안 보여 학부모가 혼란스러워한다.
+    // 날짜 + 슬롯 순으로 정렬 — 같은 날이면 본수업 먼저, 보강 나중
     const flow=raw.filter(x=>x&&atYmd(x.d))
-      .map(x=>({d:String(x.d),s:atStatusOf(x)}))
-      .sort((a,b)=>a.d.localeCompare(b.d))
-      .slice(-30);
+      .map(x=>({d:String(x.d),k:normSlot(x.k),s:atStatusOf(x)}))
+      .sort(cmpSlot)
+      .slice(-40);
+    const pairs=new Set(pairedDates(flow));
     const flowHtml=flow.length
-      ?flow.map(x=>`<span class="at-dot at-st-${e(x.s)}">${e(x.s.charAt(0))}<span class="at-d">${e(atShortDate(x.d))}</span></span>`).join('')
+      ?flow.map(x=>`<span class="at-dot at-st-${e(x.s)}${pairs.has(x.d)?' at-pair':''}" title="${e(atLongDate(x.d))} ${e(slotName(x.k))} · ${e(x.s)}">${e(x.s.charAt(0))}<span class="at-d">${e(atShortDate(x.d))}</span></span>`).join('')
       :`<span class="at-wait">${ses?'출결 기록이 정리되는 중입니다.':'아직 기록된 수업이 없습니다.'}</span>`;
     document.querySelectorAll('#at-line').forEach(el=>el.innerHTML=flowHtml);
+    const noteEl=pairs.size
+      ?`같은 날에 본수업과 보강을 함께 진행한 날이 ${pairs.size}일 있습니다. 그 날은 칸이 두 개로 표시되고, 수업 회차도 두 번으로 계산됩니다.`
+      :'';
+    document.querySelectorAll('#at-note').forEach(el=>el.textContent=noteEl);
   }catch(err){
     ['#at-ses','#at-abs','#at-mk','#at-last'].forEach(sel=>document.querySelectorAll(sel).forEach(el=>el.textContent='—'));
     document.querySelectorAll('#at-line').forEach(el=>el.innerHTML='<span class="at-wait">출결을 불러오지 못했습니다.</span>');
   }
 }
 
-/* ════════════════════════════════════════════════
-   수업 내용 · 과제 — recentLessons (최근 30건, 최신순)
-   [{d:'2026-07-24', s:'출석', u:'단원', c:'수업 내용', h:'과제'}]
-   회차 번호는 출석 계열(출석·지각·보강)만 세어 매긴다.
-   아직 recentLessons 가 없는 학생은 lastHomework 로 대체 표시한다.
-════════════════════════════════════════════════ */
+/* ════════ 수업 내용 · 과제 — recentLessons ════════ */
 const LS_LESSON=['출석','지각','보강'];
 const LS_BADGE={
   '출석':'background:#ecfdf5;border-color:#6ee7b7;color:#047857',
@@ -810,28 +794,28 @@ function renderLessons(student,fbList){
   try{
     const raw=Array.isArray(student&&student.recentLessons)?student.recentLessons:[];
     const list=raw.filter(x=>x&&atYmd(x.d))
-      .map(x=>({d:String(x.d),s:atStatusOf(x),u:String(x.u||''),c:String(x.c||''),h:String(x.h||'')}))
-      .sort((a,b)=>a.d.localeCompare(b.d));   // 오래된 순으로 정렬해 회차 번호를 매긴다
+      .map(x=>({d:String(x.d),k:normSlot(x.k),s:atStatusOf(x),u:String(x.u||''),c:String(x.c||''),h:String(x.h||'')}))
+      .sort(cmpSlot);
 
     if(!list.length){renderLessonsFallback(student,fbList);return;}
 
+    const pairs=new Set(pairedDates(list));
     let no=0;
     const numbered=list.map(x=>{
       if(LS_LESSON.indexOf(x.s)>=0)no++;
       return{...x,no:LS_LESSON.indexOf(x.s)>=0?no:null};
     });
-    numbered.reverse();                        // 최신이 맨 위
+    numbered.reverse();
 
-    const{map,orphans}=assignFeedback(list.map(x=>x.d),fbList);
+    const{map,orphans}=assignFeedback(list.map(x=>({d:x.d,k:x.k})),fbList);
 
-    // 수업 카드 + 어느 수업에도 붙지 않은 메모 카드를 날짜순으로 합친다
-    const items=numbered.map(x=>({kind:'lesson',d:x.d,x}));
+    const items=numbered.map(x=>({kind:'lesson',d:x.d,k:x.k,x}));
     orphans.forEach(fb=>{
       const d=String(fb&&fb.date||'');
-      if(atYmd(d))items.push({kind:'fb',d,fb});
+      if(atYmd(d))items.push({kind:'fb',d,k:SLOT_MK,fb});
     });
-    items.sort((a,b)=>String(b.d).localeCompare(String(a.d)));
-    orphans.filter(fb=>!atYmd(String(fb&&fb.date||''))).forEach(fb=>items.unshift({kind:'fb',d:'',fb}));
+    items.sort((a,b)=>cmpSlot(b,a));
+    orphans.filter(fb=>!atYmd(String(fb&&fb.date||''))).forEach(fb=>items.unshift({kind:'fb',d:'',k:SLOT_LS,fb}));
 
     const html=items.map((it,i)=>{
       if(it.kind==='fb'){
@@ -852,12 +836,14 @@ function renderLessons(student,fbList){
          :'<div class="ls-body mute">수업 내용이 등록되지 않았습니다.</div>'));
       const hw=x.h?`<div class="ls-hw"><b>과제</b>${e(x.h)}</div>`:'';
       const unit=x.u?`<div class="ls-unit">📘 ${e(x.u)}</div>`:'';
-      // 메모는 과제 아래에, 그 날짜에 작성된 것이 있을 때만 생성된다
-      const fbs=(map.get(x.d)||[]).map(fbBlock).join('');
-      return`<div class="ls-card${i===0?' latest':''}">
+      // 같은 날 2건인 날에만 '본수업 / 보강 수업' 구분표를 붙인다
+      const slotTag=pairs.has(x.d)?`<span class="ls-slot">${e(slotName(x.k))}</span>`:'';
+      const fbs=(map.get(slotKey(x.d,x.k))||[]).map(fbBlock).join('');
+      return`<div class="ls-card${i===0?' latest':''}${x.k===SLOT_MK?' mk':''}">
         <div class="ls-top">
           <span class="ls-date">${e(atLongDate(x.d))}</span>
           <span class="ls-badge" style="${badge}">${e(x.s)}</span>
+          ${slotTag}
           ${i===0&&items.length>1?'<span class="ls-new">최신</span>':''}
           ${x.no?`<span class="ls-no">${x.no}회차</span>`:''}
         </div>
@@ -874,7 +860,6 @@ function renderLessons(student,fbList){
     document.querySelectorAll('#lessonList').forEach(el=>el.innerHTML='<div class="empty-box">수업 기록을 불러오지 못했습니다.</div>');
   }
 }
-// recentLessons 가 아직 없는 학생 — 예전 방식(lastHomework) + 메모만이라도 보여준다
 function renderLessonsFallback(student,fbList){
   const fbs=(Array.isArray(fbList)?fbList:[]);
   const fbHtml=fbs.map(fb=>`<div class="ls-card fbonly">
@@ -903,66 +888,106 @@ function renderLessonsFallback(student,fbList){
   document.querySelectorAll('#lessonList').forEach(el=>el.innerHTML=html);
 }
 
-/* ════════════════════════════════════════════════
-   시험 기록 (grades) — 관리자 페이지와 동일 컬렉션
-════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════════
+   ★ 시험 기록 (grades) — 점수 해석을 한 곳으로 통일
+   ────────────────────────────────────────────────────────────────
+   [무엇이 어긋나 있었나]
+   같은 oxScore · multiScore 를 두 곳이 다르게 읽고 있었다.
+     · 점수 카드 : 정답률(%)로 보고 맞은 문항 수를 역산  → 맞음
+     · 개념 지도 : 맞은 문항 수로 보고 그대로 합산        → 틀림
+   채점하는 쪽(examService.ts)을 확인한 결과
+     score = Math.round(정답 수 / 응시 문항 수 * 100)
+   즉 oxScore · multiScore · score 는 모두 백분율(%)이고,
+   맞은 문항 수는 ox.correct · multiple.correct · totalCorrect 에 있다.
+   → 아래 secOf() 하나로 통일했고, 개념 지도도 같은 값을 쓴다.
+
+   [0점이 사라지던 문제]
+   예전에는 "oxScore > 0" 이어야 응시로 봤다. 그래서 진짜 0점을 받은
+   시험이 화면에서 통째로 사라졌다.
+   → 응시 여부는 점수가 아니라 '그 파트 기록이 있는가'로 판단한다.
+     (examService 는 응시하지 않은 파트를 null 로 저장한다)
+════════════════════════════════════════════════════════════════ */
 function toNum(v){return(typeof v==='number')?v:(v!=null&&v!==''&&!isNaN(Number(v))?Number(v):null);}
+function hasBlock(v){return!!(v&&typeof v==='object');}
 function normalizeGrade(id,r){
+  const oxCorrect=toNum(r.oxCorrect!=null?r.oxCorrect:(r.ox&&r.ox.correct));
+  const multiCorrect=toNum(r.multiCorrect!=null?r.multiCorrect:(r.multiple&&r.multiple.correct));
+  const oxScore=toNum(r.oxScore!=null?r.oxScore:(r.ox&&r.ox.score));
+  const multiScore=toNum(r.multiScore!=null?r.multiScore:(r.multiple&&r.multiple.score));
   return{
     id,
     testName:r.testName||r.examTitle||r.unitName||'',
     subject:r.subject||r.studentSubject||'',
     grade:r.grade||'',
-    /* 실제 Firestore 평면 필드 */
-    oxScore:toNum(r.oxScore!=null?r.oxScore:(r.ox&&r.ox.score)),
+    oxScore,
     oxCount:toNum(r.oxCount!=null?r.oxCount:(r.ox&&r.ox.total)),
-    oxCorrect:toNum(r.oxCorrect!=null?r.oxCorrect:(r.ox&&r.ox.correct)),
-    multiScore:toNum(r.multiScore!=null?r.multiScore:(r.multiple&&r.multiple.score)),
+    oxCorrect,
+    /* 응시 여부 — 점수가 0이어도 기록이 있으면 응시로 본다 */
+    oxHas:hasBlock(r.ox)||oxScore!=null||oxCorrect!=null,
+    multiScore,
     multiCount:toNum(r.multiCount!=null?r.multiCount:(r.multiple&&r.multiple.total)),
-    multiCorrect:toNum(r.multiCorrect!=null?r.multiCorrect:(r.multiple&&r.multiple.correct)),
+    multiCorrect,
+    multiHas:hasBlock(r.multiple)||multiScore!=null||multiCorrect!=null,
     masterScore:toNum(r.masterScore!=null?r.masterScore:null),
     score:toNum(r.score!=null?r.score:(r.percentage!=null?r.percentage:null)),
     totalQuestions:toNum(r.totalQuestions!=null?r.totalQuestions:(r.totalQ!=null?r.totalQ:r.total)),
-    totalCorrect:toNum(r.totalCorrect!=null?r.totalCorrect:(r.correct!=null?r.correct:null)),
+    totalCorrect:toNum(r.totalCorrect!=null?r.totalCorrect:(r.correctCount!=null?r.correctCount:(r.correct!=null?r.correct:null))),
+    answeredCount:toNum(r.answeredCount),
     testType:String(r.testType||r.category||'').toLowerCase(),
     timestamp:r.timestamp||r.submittedTimestamp||r.submittedAt||r.date||null,
-    /* 개념 지도용 — concept-map.html 과 같은 규칙으로 뽑는다 */
     cmKey:cmExamKey(id,r),
-    cmTally:cmTally(r)
+    cmTally:null   // loadGrades 에서 아래 secOf 기준으로 채운다
   };
 }
 
-/* ── 한 기록에서 섹션별 결과 추출 {correct,total,rate} 또는 null ──
-   화면에는 "맞은 문항 / 전체 문항" 으로 표기하고, 정답률(%)은 보조로만 쓴다.
-   correct 가 저장돼 있으면 그 값을 그대로 쓰고, 없으면 점수(%)에서 되돌려 계산한다.
-   한 시험에 OX·4지선다 칸이 둘 다 있어도, 실제로 응시하지 않은
-   0점짜리 빈 섹션(상대 섹션만 채점된 경우)은 유령 항목으로 보이지 않게 거른다. */
 function isMasterRec(r){return r.testType==='master'||r.masterScore!=null;}
+/* 한 파트의 결과 {correct,total,rate} — 정답 수가 있으면 그것을 우선한다.
+   없으면 점수(%)에서 역산한다. (score 는 언제나 백분율) */
 function makeSec(correct,total,rate){
   let c=(correct!=null&&isFinite(correct))?correct:null;
   const t=(total!=null&&isFinite(total)&&total>0)?total:null;
   let pct=(rate!=null&&isFinite(rate))?rate:null;
-  if(c==null&&t!=null&&pct!=null)c=Math.round(pct/100*t);          // 정답 수가 없으면 점수에서 환산
-  if(pct==null&&t!=null&&c!=null)pct=Math.round(c/t*100);          // 점수가 없으면 정답 수에서 환산
-  if(c!=null&&t!=null&&c>t)c=t;                                    // 방어: 정답이 전체보다 클 수 없다
+  if(c==null&&t!=null&&pct!=null)c=Math.round(pct/100*t);
+  if(pct==null&&t!=null&&c!=null)pct=Math.round(c/t*100);
+  if(c!=null&&t!=null&&c>t)c=t;
+  if(c!=null&&c<0)c=0;
   if(c==null&&pct==null)return null;
   return{correct:c,total:t,rate:pct};
 }
 function oxOf(r){
   if(isMasterRec(r))return null;
-  if(!(r.oxCount>0&&r.oxScore!=null&&r.oxScore>0))return null;   // 0점 파트 = 미응시 → 숨김
+  if(!r.oxHas)return null;                       // 그 시험에 OX 응시 기록 자체가 없음
+  if(!(r.oxCount>0)&&r.oxCorrect==null)return null;
   return makeSec(r.oxCorrect,r.oxCount,r.oxScore);
 }
 function mcOf(r){
   if(isMasterRec(r))return null;
-  if(!(r.multiCount>0&&r.multiScore!=null&&r.multiScore>0))return null;   // 0점 파트 = 미응시 → 숨김
+  if(!r.multiHas)return null;
+  if(!(r.multiCount>0)&&r.multiCorrect==null)return null;
   return makeSec(r.multiCorrect,r.multiCount,r.multiScore);
 }
 function masterOf(r){
   if(!isMasterRec(r))return null;
   if(r.totalQuestions>0&&r.totalCorrect!=null)return makeSec(r.totalCorrect,r.totalQuestions,null);
+  if(r.multiCorrect!=null&&r.multiCount>0)return makeSec(r.multiCorrect,r.multiCount,r.multiScore);
   if(r.masterScore!=null)return makeSec(null,r.totalQuestions,r.masterScore);
   if(r.score!=null)return makeSec(null,r.totalQuestions,r.score);
+  return null;
+}
+/* 개념 지도용 집계 — 위와 똑같은 판정을 쓴다 (두 화면의 숫자가 어긋날 수 없다) */
+function tallyOf(r){
+  const parts=[oxOf(r),mcOf(r),masterOf(r)].filter(Boolean);
+  let c=0,t=0,any=false;
+  parts.forEach(s=>{if(s.correct!=null&&s.total!=null){c+=s.correct;t+=s.total;any=true;}});
+  if(any&&t>0)return{total:t,correct:Math.min(c,t)};
+  // 파트 정보가 없을 때만 전체 집계 필드로 폴백
+  const base=(r.answeredCount!=null&&r.answeredCount>0)?r.answeredCount:r.totalQuestions;
+  if(base!=null&&base>0){
+    if(r.totalCorrect!=null)return{total:base,correct:Math.max(0,Math.min(r.totalCorrect,base))};
+    if(r.score!=null)return{total:base,correct:Math.max(0,Math.min(base,Math.round(r.score/100*base)))};
+  }
+  const p=cmParseAnswers(r.rawAnswers);
+  if(p.total>0)return{total:p.total,correct:p.correct};
   return null;
 }
 
@@ -984,7 +1009,18 @@ async function loadGrades(sid,fireId){
   try{
     let docs=[];const seen=new Set();
     async function q(field,val){
-      try{const s=await getDocs(query(collection(db,'grades'),where(field,'==',val)));s.forEach(d=>{if(!seen.has(d.id)){seen.add(d.id);docs.push(normalizeGrade(d.id,d.data()));}});}catch(e){}
+      try{
+        const s=await getDocs(query(collection(db,'grades'),where(field,'==',val)));
+        s.forEach(d=>{
+          if(seen.has(d.id))return;
+          seen.add(d.id);
+          const raw=d.data()||{};
+          const g=normalizeGrade(d.id,raw);
+          g.rawAnswers=raw.answers;
+          g.cmTally=tallyOf(g);
+          docs.push(g);
+        });
+      }catch(e){}
     }
     await q('studentId',sid);
     if(fireId&&fireId!==sid)await q('studentId',fireId);
@@ -1000,21 +1036,17 @@ async function loadGrades(sid,fireId){
   }
 }
 
-/* 요약 3칸 — 응시 횟수 / 누적 정답(맞은 문항 합 / 전체 문항 합) / 최고 기록(한 시험 최고)
-   문항 수가 시험마다 달라도 "몇 문제 중 몇 개" 로 읽히도록 맞췄다. */
 function setStats(prefix,secs){
   const count=secs.length;
   const known=secs.filter(s=>s.correct!=null&&s.total!=null);
   const sumC=known.reduce((a,s)=>a+s.correct,0);
   const sumT=known.reduce((a,s)=>a+s.total,0);
-
   let best=null,bestRate=-1;
   secs.forEach(s=>{
     const rate=(s.rate!=null)?s.rate:((s.correct!=null&&s.total)?Math.round(s.correct/s.total*100):null);
     if(rate==null)return;
     if(rate>bestRate){bestRate=rate;best=s;}
   });
-
   document.querySelectorAll('#'+prefix+'-total').forEach(el=>el.textContent=count+'회');
   document.querySelectorAll('#'+prefix+'-sum').forEach(el=>{
     el.textContent=known.length?`${sumC}/${sumT}`:'—';
@@ -1044,9 +1076,6 @@ function renderMaster(docs){
   document.querySelectorAll('#masterTestList').forEach(el=>el.innerHTML=html);
 }
 
-/* OX / 4지선다 / 마스터 공통 카드
-   오른쪽 원 = "맞은 문항 / 전체 문항" (예: 40/50)
-   문항 수를 알 수 없는 옛 기록만 예외적으로 정답률(%)을 원에 표시한다. */
 function renderScoreCard(r,sec){
   const rate=(sec.rate!=null)?sec.rate:((sec.correct!=null&&sec.total)?Math.round(sec.correct/sec.total*100):null);
   const cls=(rate==null)?'sc-none':(rate>=80?'sc-high':rate>=60?'sc-mid':'sc-low');
@@ -1076,14 +1105,13 @@ function renderScoreCard(r,sec){
   </div>`;
 }
 
-/* ════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════════
    과학 개념 지도 (탭 1)
    · 개념·문구·색은 concept-map.js 한 곳에서만 관리한다
-   · conceptTags(시험↔개념 연결)는 공개 읽기, grades 는 이 학생 것만 읽는다
-   · 밖으로 나가는 링크를 만들지 않는다
-════════════════════════════════════════════════ */
+   · 문항 집계는 위의 tallyOf() 를 그대로 쓴다 (점수 카드와 동일)
+════════════════════════════════════════════════════════════════ */
 const CM=(typeof window!=='undefined'&&window.ConceptMap)?window.ConceptMap:null;
-let cmTagMap={},cmAnalysis=null,cmArea=1,cmExamCount=0,cmLoaded=false;
+let cmTagMap={},cmAnalysis=null,cmArea=1,cmExamCount=0;
 
 function cmNum(x){
   if(x===null||x===undefined||x==='')return null;
@@ -1100,7 +1128,6 @@ function cmExamKey(id,r){
   const t=cmPick(r,['examId','testName','examTitle','title','testId']);
   return t?String(t):String(id);
 }
-/* answers 필드가 배열이든 맵이든 정오를 세어 본다. 집계 필드가 없을 때만 쓴다. */
 function cmParseAnswers(ans){
   let list=[];
   if(Array.isArray(ans))list=ans;
@@ -1122,30 +1149,6 @@ function cmParseAnswers(ans){
     if(c===null)return;
     total++;if(c)correct++;
   });
-  return{total,correct};
-}
-/* grades 문서 1개 = 시험 1회. 맞은 개수와 전체 문항 수를 뽑는다.
-   concept-map.html 의 docTally() 와 같은 규칙이라 두 화면의 상태가 일치한다. */
-function cmTally(v){
-  let total=cmNum(v.totalQuestions);
-  let correct=cmNum(v.score);
-  if(total===null){
-    const oc=cmNum(v.oxCount),mc=cmNum(v.multiCount);
-    if(oc!==null||mc!==null)total=(oc||0)+(mc||0);
-  }
-  if(correct===null){
-    const os=cmNum(v.oxScore),ms=cmNum(v.multiScore);
-    if(os!==null||ms!==null)correct=(os||0)+(ms||0);
-  }
-  if(total===null||correct===null){
-    const p=cmParseAnswers(v.answers);
-    if(p.total>0){total=p.total;correct=p.correct;}
-  }
-  if(total===null||total<=0)return null;
-  if(correct===null)return null;
-  if(correct>total&&correct<=100)correct=Math.round(total*correct/100);   // 점수가 백분율로 저장된 경우 보정
-  if(correct>total)correct=total;
-  if(correct<0)correct=0;
   return{total,correct};
 }
 function cmNormalizeTag(v){
@@ -1176,8 +1179,6 @@ function buildConceptAnalysis(docs){
   if(!CM)return;
   const recs=[];let taken=0;
   (Array.isArray(docs)?docs:[]).forEach(r=>{
-    /* '누적 평가' 는 다른 탭(OX·4지선다·마스터)에 보이는 응시 기록과 같은 수를 센다.
-       개념 집계 자체는 아래 cmTally 가 있는 기록만 사용한다. */
     if(r.cmTally||oxOf(r)||mcOf(r)||masterOf(r))taken++;
     const t=r.cmTally;
     if(!t)return;
@@ -1190,7 +1191,6 @@ function buildConceptAnalysis(docs){
   });
   cmExamCount=taken;
   cmAnalysis=CM.analyze(recs);
-  cmLoaded=true;
 }
 
 function cmSet(sel,html){document.querySelectorAll(sel).forEach(el=>el.innerHTML=html);}
@@ -1200,9 +1200,6 @@ function cmToday(){
   return`${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
 }
 
-/* 개념 지도 SVG — 학부모 화면이므로 정답률·문항 수는 찍지 않는다.
-   한 시험에 개념을 여러 개 연결하면 문항이 개념마다 복제되어
-   서로 다른 개념이 같은 수치로 보이기 때문이다. */
 function cmMapSvg(areaId){
   const nodes=CM.byArea(areaId);
   if(!nodes.length)return'';
@@ -1252,8 +1249,6 @@ function cmMapSvg(areaId){
   return svg;
 }
 
-/* 영역 탭(칩) — 데스크탑·모바일 양쪽 마크업에 같은 내용이 들어 있으므로
-   querySelectorAll 로 두 벌을 함께 갱신한다. */
 function renderConceptArea(){
   if(!CM)return;
   const chips=CM.AREAS.map(a=>
@@ -1269,7 +1264,6 @@ function renderConceptArea(){
   }).join(''));
   cmSet('#cm-hint','화살표는 개념이 이어지는 순서입니다. 왼쪽을 먼저 익혀야 오른쪽이 쉬워집니다. 지도는 옆으로 밀어서 보실 수 있습니다.');
 
-  // 표는 실제로 평가한 개념만 — 아직 다루지 않은 칸이 먼저 눈에 들어오지 않게 한다
   const nodes=CM.byArea(cmArea).filter(n=>{
     const st=cmAnalysis&&cmAnalysis.stats[n.id];
     return!!(st&&st.total>0);
