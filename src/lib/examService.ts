@@ -164,7 +164,7 @@ export interface Exam {
 export interface SubmissionSummary {
   oxTotal: number;        // 시험지의 OX 문항 수
   multiTotal: number;     // 시험지의 4지선다 문항 수
-  oxDone: boolean;        // OX를 응시했는가
+  oxDone: boolean;        // OX를 응시했는가 (한 문항이라도 답이 있는가)
   multiDone: boolean;     // 4지선다를 응시했는가
   oxScore: number | null;
   multiScore: number | null;
@@ -174,6 +174,14 @@ export interface SubmissionSummary {
   totalCorrect: number;
   answeredCount: number;
   allDone: boolean;       // 이 시험지에 있는 유형을 전부 끝냈는가
+
+  // ★ 추가 — 유형별로 '빠짐없이' 풀었는지까지 구분한다
+  oxAnswered: number;     // OX 중 답이 채워진 문항 수
+  multiAnswered: number;  // 4지선다 중 답이 채워진 문항 수
+  oxComplete: boolean;    // OX 문항을 하나도 빠짐없이 풀었는가
+  multiComplete: boolean; // 4지선다 문항을 하나도 빠짐없이 풀었는가
+  oxFullScore: number | null;    // 전체 문항 기준 OX 점수 (저장되는 값)
+  multiFullScore: number | null; // 전체 문항 기준 4지선다 점수 (저장되는 값)
 }
 
 export interface StudentAnswer {
@@ -235,6 +243,24 @@ function normalizeStudentId(sid: string | undefined | null): string {
 
 function removeUndefined(obj: unknown): unknown {
   return JSON.parse(JSON.stringify(obj));
+}
+
+// ★ 정답 수 → 백분율. 분모는 언제나 '그 유형의 전체 문항 수'다.
+//   (예전에는 '학생이 푼 문항 수'를 분모로 써서, 20문항 중 15문항만 풀고
+//    15개를 맞히면 100%로 표시되는 문제가 있었다)
+function pct(correct: number, total: number): number {
+  if (!total || total <= 0) return 0;
+  const v = Math.round((correct / total) * 100);
+  if (v < 0) return 0;
+  if (v > 100) return 100;
+  return v;
+}
+
+// ★ 답이 실제로 채워져 있는가
+function hasAnswerValue(answers: Record<string, string> | undefined | null, qid: string): boolean {
+  if (!answers) return false;
+  const v = answers[qid];
+  return v !== undefined && v !== null && String(v).trim() !== '';
 }
 
 export async function getAcademyEntranceCode(): Promise<string | null> {
@@ -349,29 +375,114 @@ export async function getExamByCode(code: string): Promise<Exam | null> {
 }
 
 // ─────────────────────────────────────────────
+// ★ 안 푼 문항 찾기 (순수 함수, 네트워크 없음)
+//   scope 를 주면 그 유형만 검사한다. ('ox' 제출이면 OX만)
+//   scope 가 없으면 '학생이 손을 댄 유형'만 검사한다.
+//     → OX만 풀고 제출하는 정상 흐름은 막지 않는다.
+//     → 반대로 손을 댄 유형은 끝까지 다 채워야 저장된다.
+// ─────────────────────────────────────────────
+export interface UnansweredInfo {
+  type: QuestionType;
+  label: string;     // 'OX 퀴즈' | '4지선다'
+  ids: string[];     // 비어 있는 문항 id
+  numbers: number[]; // 그 유형 안에서의 문항 번호 (1부터)
+  total: number;     // 그 유형의 전체 문항 수
+}
+
+const TYPE_LABEL: Record<QuestionType, string> = {
+  ox: 'OX 퀴즈',
+  multiple: '4지선다',
+};
+
+export function findUnanswered(
+  questions: Question[],
+  answers: Record<string, string>,
+  scope?: QuestionType | null
+): UnansweredInfo[] {
+  const all = Array.isArray(questions) ? questions : [];
+  const types: QuestionType[] = ['ox', 'multiple'];
+  const out: UnansweredInfo[] = [];
+
+  types.forEach(t => {
+    const list = all.filter(q => q && q.type === t);
+    if (list.length === 0) return;
+
+    if (scope) {
+      // 이번에 제출하는 유형만 검사한다
+      if (scope !== t) return;
+    } else {
+      // 손도 대지 않은 유형은 '아직 안 본 시험'이므로 검사하지 않는다
+      const touched = list.some(q => hasAnswerValue(answers, q.id));
+      if (!touched) return;
+    }
+
+    const ids: string[] = [];
+    const numbers: number[] = [];
+    list.forEach((q, i) => {
+      if (!hasAnswerValue(answers, q.id)) {
+        ids.push(q.id);
+        numbers.push(i + 1);
+      }
+    });
+
+    if (ids.length > 0) {
+      out.push({ type: t, label: TYPE_LABEL[t], ids, numbers, total: list.length });
+    }
+  });
+
+  return out;
+}
+
+// ★ 학생에게 보여줄 경고 문구를 만든다
+export function unansweredMessage(list: UnansweredInfo[]): string {
+  if (!Array.isArray(list) || list.length === 0) return '';
+  const lines = list.map(u => {
+    const shown = u.numbers.slice(0, 10).join(', ');
+    const more = u.numbers.length > 10 ? ` 외 ${u.numbers.length - 10}문항` : '';
+    return `· ${u.label} ${u.numbers.length}문항이 비어 있습니다 (${shown}번${more})`;
+  });
+  return `아직 답을 고르지 않은 문항이 있습니다.\n\n${lines.join('\n')}\n\n모두 고른 뒤 다시 제출해 주세요.`;
+}
+
+// ★ 제출 전 미리 확인용 — 화면에서 경고창을 띄울 때 쓴다
+export function checkBeforeSubmit(
+  questions: Question[],
+  answers: Record<string, string>,
+  scope?: QuestionType | null
+): { ok: boolean; unanswered: UnansweredInfo[]; message: string } {
+  const unanswered = findUnanswered(questions, answers, scope ?? null);
+  return {
+    ok: unanswered.length === 0,
+    unanswered,
+    message: unansweredMessage(unanswered),
+  };
+}
+
+// ─────────────────────────────────────────────
 // ★ 답안 → 유형별 요약 (순수 함수, 네트워크 없음)
 //   "응시했다"의 기준은 그 유형 문항에 답이 하나라도 들어 있는가이다.
-//   점수는 응시한 문항만으로 계산하므로, 안 푼 유형이 0점으로 잡히지 않는다.
+//   점수는 그 유형의 전체 문항을 분모로 계산한다. (oxFullScore / multiFullScore)
+//   기존 oxScore / multiScore 는 예전 화면 호환을 위해 그대로 둔다.
 export function buildSubmissionSummary(
   questions: Question[],
   answers: Record<string, string>
 ): SubmissionSummary {
   const all = Array.isArray(questions) ? questions : [];
-  const oxQs    = all.filter(q => q.type === 'ox');
-  const multiQs = all.filter(q => q.type === 'multiple');
+  const oxQs    = all.filter(q => q && q.type === 'ox');
+  const multiQs = all.filter(q => q && q.type === 'multiple');
 
-  const hasAnswer = (qid: string): boolean => {
-    const v = answers ? answers[qid] : undefined;
-    return v !== undefined && v !== null && String(v).trim() !== '';
-  };
+  const hasAnswer = (qid: string): boolean => hasAnswerValue(answers, qid);
 
   const statOf = (list: Question[]) => {
     const done = list.filter(q => hasAnswer(q.id));
     const correct = done.filter(q => isAnswerCorrect(answers[q.id], q.answer)).length;
     return {
+      total: list.length,
       done: done.length,
       correct,
       score: done.length > 0 ? Math.round((correct / done.length) * 100) : null,
+      fullScore: done.length > 0 ? pct(correct, list.length) : null,
+      complete: list.length > 0 && done.length === list.length,
     };
   };
 
@@ -401,6 +512,13 @@ export function buildSubmissionSummary(
     totalCorrect,
     answeredCount: answered.length,
     allDone,
+
+    oxAnswered:     ox.done,
+    multiAnswered:  multi.done,
+    oxComplete:     ox.complete,
+    multiComplete:  multi.complete,
+    oxFullScore:    ox.fullScore,
+    multiFullScore: multi.fullScore,
   };
 }
 
@@ -445,13 +563,14 @@ export async function submitStudentAnswers(payload: {
   totalQuestions: number;
   grade?: string;
   subType?: QuestionType | null;   // 'ox' | 'multiple' | null(전체)
+  allowPartial?: boolean;          // ★ 예외적으로 미응답 저장을 허용할 때만 true
 }): Promise<string> {
   await ensureAuth();
   const exam = await getExam(payload.examId);
 
   const allQuestions      = exam?.questions ?? [];
-  const oxQuestions       = allQuestions.filter(q => q.type === 'ox');
-  const multipleQuestions = allQuestions.filter(q => q.type === 'multiple');
+  const oxQuestions       = allQuestions.filter(q => q && q.type === 'ox');
+  const multipleQuestions = allQuestions.filter(q => q && q.type === 'multiple');
 
   // ★ 학생 ID는 반드시 표준화해서 저장한다. (대시보드가 students.id와 대조함)
   const key = normalizeStudentId(payload.studentId);
@@ -464,6 +583,7 @@ export async function submitStudentAnswers(payload: {
   let prevAnswers: Record<string, string> = {};
   let prevSubTypes: QuestionType[] = [];
   let prevFirstAt: Timestamp | null = null;
+  let prevReadFailed = false;   // ★ 읽기 자체가 실패했는가 (문서 없음과 구별)
 
   if (gid) {
     try {
@@ -479,20 +599,50 @@ export async function submitStudentAnswers(payload: {
         prevFirstAt = (p && (p.firstSubmittedAt ?? p.timestamp)) ?? null;
       }
     } catch (e) {
-      console.warn('[examService] 이전 제출 조회 실패, 신규로 처리:', e);
+      prevReadFailed = true;
+      console.warn('[examService] 이전 제출 조회 실패:', e);
     }
   }
 
+  // ★ 이전 답안을 확인하지 못한 상태로 덮어쓰면 먼저 푼 OX 기록이 사라진다.
+  //   (2026-07-17 사고의 원인) → 저장하지 않고 다시 시도하게 한다.
+  if (prevReadFailed) {
+    const err = new Error(
+      '이전 답안을 확인하지 못해 저장을 중단했습니다.\n' +
+      '기존에 푼 기록을 지우지 않기 위한 조치입니다.\n' +
+      '네트워크 상태를 확인한 뒤 다시 제출해 주세요.'
+    );
+    (err as any).code = 'PREV_READ_FAILED';
+    throw err;
+  }
+
   const mergedAnswers: Record<string, string> = { ...prevAnswers, ...payload.answers };
+
+  // ★ 미응답 검사 — 빈 문항이 있으면 저장하지 않는다.
+  //   여기서 막으면 어떤 화면에서 제출하든 0점 오기록이 생기지 않는다.
+  if (!payload.allowPartial) {
+    const unanswered = findUnanswered(allQuestions, mergedAnswers, payload.subType ?? null);
+    if (unanswered.length > 0) {
+      const err = new Error(unansweredMessage(unanswered));
+      (err as any).code = 'UNANSWERED';
+      (err as any).unanswered = unanswered;
+      throw err;
+    }
+  }
+
   const summary = buildSubmissionSummary(allQuestions, mergedAnswers);
 
   // ★ 대시보드·학생상세가 우선적으로 읽는 구조화 필드.
   //   응시하지 않은 유형은 null로 두어 "0점 응시"로 오해되지 않게 한다.
+  //   점수 분모는 언제나 그 유형의 전체 문항 수다. (정답 수와 정답률이 어긋나지 않는다)
+  const oxScoreStored = summary.oxDone ? pct(summary.oxCorrect, oxQuestions.length) : null;
+  const multiScoreStored = summary.multiDone ? pct(summary.multiCorrect, multipleQuestions.length) : null;
+
   const oxBlock = summary.oxDone
-    ? { score: summary.oxScore ?? 0, correct: summary.oxCorrect, total: oxQuestions.length }
+    ? { score: oxScoreStored ?? 0, correct: summary.oxCorrect, total: oxQuestions.length }
     : null;
   const multiBlock = summary.multiDone
-    ? { score: summary.multiScore ?? 0, correct: summary.multiCorrect, total: multipleQuestions.length }
+    ? { score: multiScoreStored ?? 0, correct: summary.multiCorrect, total: multipleQuestions.length }
     : null;
 
   const subTypes: QuestionType[] = [];
@@ -513,11 +663,17 @@ export async function submitStudentAnswers(payload: {
     // 구조화 필드 (우선 사용됨)
     ox:               oxBlock,
     multiple:         multiBlock,
-    // 평면 필드 (기존 화면 호환)
-    oxScore:          summary.oxScore,
-    multiScore:       summary.multiScore,
+    // 평면 필드 (기존 화면 호환) — 구조화 필드와 반드시 같은 값을 쓴다
+    oxScore:          oxScoreStored,
+    multiScore:       multiScoreStored,
+    oxCorrect:        summary.oxDone ? summary.oxCorrect : null,
+    multiCorrect:     summary.multiDone ? summary.multiCorrect : null,
     oxCount:          oxQuestions.length,
     multiCount:       multipleQuestions.length,
+    // 유형별 완료 여부 (부분 제출이 남아 있는지 한눈에 확인용)
+    oxComplete:       summary.oxComplete,
+    multiComplete:    summary.multiComplete,
+    allDone:          summary.allDone,
     totalQuestions:   allQuestions.length > 0 ? allQuestions.length : payload.totalQuestions,
     subTypes,
     lastSubType:      payload.subType ?? null,
