@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#ffffff">
+<title>인후쌤의 과학 수업 관리 시스템 · 우리 반 주기율표 현황판</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'><polygon points='70,8 121,38 121,102 70,132 19,102 19,38' fill='none' stroke='%23E85D75' stroke-width='8' stroke-linejoin='round'/><circle cx='70' cy='8' r='10' fill='%23E85D75'/><circle cx='121' cy='38' r='10' fill='%23E85D75'/><circle cx='121' cy='102' r='10' fill='%23E85D75'/><circle cx='70' cy='132' r='10' fill='%23E85D75'/><circle cx='19' cy='102' r='10' fill='%23E85D75'/><circle cx='19' cy='38' r='10' fill='%23E85D75'/></svg>">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Arial,sans-serif;
+  background:#f0f4ff;color:#1d1d1f;min-height:100vh;-webkit-font-smoothing:antialiased;
+}
+:root{
+  --royal:#2355c3;--royal-light:#e8eefb;--royal-mid:#b8ccf4;
+  --royal-dark:#1a3e96;--royal-deep:#0f2660;
+  --border:#dde6f8;--border-light:#eef2fc;
+  --text:#1d1d1f;--muted:#6e7a9a;
+  --green:#0d9f5e;--green-bg:#e6f7ef;
+  --red:#dc2626;--red-bg:#fee2e2;
+  --gold:#b45309;--gold-bg:#fef3c7;
+}
+button,input,select{touch-action:manipulation;font-family:inherit;}
+:focus-visible{outline:2.5px solid var(--royal);outline-offset:2px;}
+
+.header{
+  background:rgba(255,255,255,.92);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border-light);
+  height:54px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:300;
+  padding:0 max(1.2rem,env(safe-area-inset-left)) 0 max(1.2rem,env(safe-area-inset-right));
+}
+.header-left{display:flex;align-items:center;gap:9px;}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,#2355c3,#1a3e96);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.brand-name{font-size:clamp(11px,3vw,14px);font-weight:600;letter-spacing:-.3px;}
+.header-badge{display:flex;align-items:center;gap:5px;background:var(--royal-light);border:1px solid var(--royal-mid);border-radius:20px;padding:5px 11px;font-size:10px;font-weight:700;color:var(--royal);white-space:nowrap;}
+.dot-blue{width:5px;height:5px;background:var(--royal);border-radius:50%;flex-shrink:0;}
+
+.wrap{
+  max-width:1100px;margin:0 auto;
+  padding:1rem .9rem 4rem;
+  padding-bottom:max(4rem,calc(3rem + env(safe-area-inset-bottom)));
+  padding-left:max(.9rem,env(safe-area-inset-left));
+  padding-right:max(.9rem,env(safe-area-inset-right));
+}
+
+.btn{padding:12px 18px;min-height:46px;background:linear-gradient(135deg,#3b6fd4,#1a3e96);border:none;border-radius:11px;font-size:14px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 3px 10px rgba(35,85,195,.22);transition:opacity .15s;white-space:nowrap;}
+.btn:active{opacity:.8;}
+.btn-wide{width:100%;margin-top:16px;}
+.btn-line{padding:11px 15px;min-height:44px;background:#fff;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn-line:hover{border-color:var(--royal-mid);color:var(--royal);background:var(--royal-light);}
+
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:1rem;}
+.search-box{flex:1;min-width:150px;padding:11px 14px;min-height:44px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;outline:none;-webkit-appearance:none;background:#fff;}
+.search-box:focus{border-color:var(--royal);}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem;}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:.9rem;display:flex;align-items:center;gap:10px;}
+.stat-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.stat-num{font-size:1.15rem;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--royal);}
+.stat-lbl{font-size:10.5px;color:var(--muted);margin-top:4px;font-weight:500;}
+
+.panel{background:#fff;border:1px solid var(--border);border-radius:18px;padding:1.2rem;margin-bottom:1rem;}
+.panel-title{font-size:14px;font-weight:700;color:var(--royal-deep);margin-bottom:.9rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.panel-note{font-size:11px;color:var(--muted);font-weight:500;}
+
+/* 약점 히트맵 */
+.heat-grid{display:grid;grid-template-columns:repeat(2,1fr) .5fr repeat(6,1fr);gap:4px;}
+.heat-cell{aspect-ratio:1/1.15;min-height:44px;border-radius:8px;border:1px solid var(--border);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+.heat-cell.void{visibility:hidden;}
+.heat-sym{font-size:clamp(11px,3.4vw,16px);font-weight:900;letter-spacing:-.5px;line-height:1.1;}
+.heat-name{font-size:7.5px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;opacity:.75;}
+.heat-cnt{font-size:9px;font-weight:800;margin-top:1px;}
+.heat-legend{display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-top:10px;font-size:10.5px;color:var(--muted);font-weight:600;}
+.heat-swatch{width:20px;height:12px;border-radius:3px;border:1px solid var(--border);}
+
+/* 표 */
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tbl{width:100%;border-collapse:collapse;min-width:640px;}
+.tbl th{font-size:11px;font-weight:700;color:var(--muted);text-align:left;padding:9px 10px;border-bottom:2px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;}
+.tbl th:hover{color:var(--royal);}
+.tbl th .arrow{font-size:9px;opacity:.5;margin-left:2px;}
+.tbl td{padding:11px 10px;border-bottom:1px solid var(--border-light);font-size:13px;white-space:nowrap;}
+.tbl tbody tr:hover td{background:var(--royal-light);}
+.tbl .name-cell{font-weight:700;color:var(--royal-deep);cursor:pointer;}
+.tbl .name-cell:hover{text-decoration:underline;}
+.num{font-weight:700;color:var(--royal);}
+.dim{color:var(--muted);}
+.stale{color:var(--red);font-weight:700;}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:var(--green-bg);color:var(--green);}
+.pill-off{background:var(--border-light);color:var(--muted);}
+.empty-msg{text-align:center;padding:26px;color:var(--muted);font-size:13px;}
+
+/* 상세 모달 */
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,38,96,.42);z-index:500;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
+.overlay.open{display:flex;}
+.modal{background:#fff;border-radius:20px;padding:22px;max-width:460px;width:100%;max-height:86vh;overflow-y:auto;box-shadow:0 12px 50px rgba(15,38,96,.22);}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px;}
+.modal-name{font-size:19px;font-weight:900;color:var(--royal-deep);letter-spacing:-.03em;}
+.modal-sub{font-size:11.5px;color:var(--muted);margin-top:3px;}
+.close-x{width:36px;height:36px;min-width:36px;border-radius:50%;background:var(--border-light);border:1px solid var(--border);font-size:15px;color:var(--muted);cursor:pointer;}
+.kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px;}
+.kv{background:var(--royal-light);border:1px solid var(--royal-mid);border-radius:11px;padding:9px 11px;}
+.kv-k{font-size:10px;color:var(--muted);font-weight:600;}
+.kv-v{font-size:15px;font-weight:800;color:var(--royal);margin-top:3px;letter-spacing:-.02em;}
+.weak-title{font-size:12px;font-weight:700;color:var(--red);margin-bottom:8px;}
+.weak-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.weak-tag{padding:5px 10px;border-radius:8px;font-size:12px;font-weight:700;background:var(--red-bg);color:var(--red);border:1px solid #fca5a5;}
+.modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;}
+
+.notice{background:var(--gold-bg);border:1px solid #fde68a;border-radius:13px;padding:12px 14px;font-size:12.5px;color:var(--gold);font-weight:600;line-height:1.6;margin-bottom:1rem;}
+.hidden{display:none!important;}
+
+@media(max-width:640px){
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .kv-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:420px){
+  .wrap{padding:.85rem .65rem 4rem;}
+  .panel{padding:1rem .8rem;}
+  .heat-cell{min-height:40px;}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <span class="brand-name">인후쌤의 과학 수업 관리 시스템</span>
+  </div>
+  <div class="header-badge"><span class="dot-blue"></span>우리 반 현황판</div>
+</header>
+
+<!-- 대시보드 -->
+<div class="wrap" id="dashWrap">
+
+  <div class="notice hidden" id="cfgNotice">
+    Firebase 설정값이 비어 있습니다. 파일 상단의 <b>FIREBASE_CONFIG</b>에 학생 페이지와 동일한 값을 넣어 주세요.
+  </div>
+
+  <div class="toolbar">
+    <input class="search-box" type="text" id="searchBox" placeholder="이름으로 찾기" oninput="renderAll()" autocomplete="off"/>
+    <button class="btn-line" onclick="loadData()">🔄 새로고침</button>
+    <button class="btn-line" onclick="exportCsv()">📄 CSV 내보내기</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--royal-light);">👥</div>
+      <div><div class="stat-num" id="kpiStudents">—</div><div class="stat-lbl">참여 학생</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--green-bg);">📅</div>
+      <div><div class="stat-num" id="kpiWeek" style="color:var(--green)">—</div><div class="stat-lbl">최근 7일 학습</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--gold-bg);">🔥</div>
+      <div><div class="stat-num" id="kpiPlays" style="color:var(--gold)">—</div><div class="stat-lbl">총 학습 횟수</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:var(--red-bg);">⚠️</div>
+      <div><div class="stat-num" id="kpiWeak" style="color:var(--red)">—</div><div class="stat-lbl">최다 오답 원소</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">🔥 우리 반 약점 지도 <span class="panel-note">색이 진할수록 여러 명이 자주 틀린 원소</span></div>
+    <div class="heat-grid" id="heatGrid"></div>
+    <div class="heat-legend">
+      <span>적음</span>
+      <span class="heat-swatch" style="background:#fff"></span>
+      <span class="heat-swatch" style="background:#fee2e2"></span>
+      <span class="heat-swatch" style="background:#fca5a5"></span>
+      <span class="heat-swatch" style="background:#dc2626"></span>
+      <span>많음</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">📋 우리 반 현황 <span class="panel-note" id="tableNote">이름을 누르면 자세히 볼 수 있습니다</span></div>
+    <div class="table-scroll">
+      <table class="tbl">
+        <thead><tr id="tblHead"></tr></thead>
+        <tbody id="tblBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- 상세 모달 -->
+<div class="overlay" id="detailOverlay" onclick="closeDetail()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div>
+        <div class="modal-name" id="dName">—</div>
+        <div class="modal-sub" id="dSub">—</div>
+      </div>
+      <button class="close-x" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="kv-grid" id="dKv"></div>
+    <div class="weak-title" id="dWeakTitle">자주 틀린 원소</div>
+    <div class="weak-tags" id="dWeak"></div>
+    <div class="modal-foot">
+      <button class="btn-line" onclick="closeDetail()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════
+   학생 페이지(periodic-table.html)와 똑같은 값을 넣으세요
+   ══════════════════════════════════════════════ */
+var FIREBASE_CONFIG={
+  apiKey:"",
+  authDomain:"",
+  projectId:"",
+  storageBucket:"",
+  messagingSenderId:"",
+  appId:""
+};
+var RANK_COLLECTION='periodicRanking';
+
+/* ══════════ 원소 ══════════ */
+var EL=[
+ {n:1, s:"H",  name:"수소",     g:1,  row:1},
+ {n:2, s:"He", name:"헬륨",     g:18, row:1},
+ {n:3, s:"Li", name:"리튬",     g:1,  row:2},
+ {n:4, s:"Be", name:"베릴륨",   g:2,  row:2},
+ {n:5, s:"B",  name:"붕소",     g:13, row:2},
+ {n:6, s:"C",  name:"탄소",     g:14, row:2},
+ {n:7, s:"N",  name:"질소",     g:15, row:2},
+ {n:8, s:"O",  name:"산소",     g:16, row:2},
+ {n:9, s:"F",  name:"플루오린", g:17, row:2},
+ {n:10,s:"Ne", name:"네온",     g:18, row:2},
+ {n:11,s:"Na", name:"나트륨",   g:1,  row:3},
+ {n:12,s:"Mg", name:"마그네슘", g:2,  row:3},
+ {n:13,s:"Al", name:"알루미늄", g:13, row:3},
+ {n:14,s:"Si", name:"규소",     g:14, row:3},
+ {n:15,s:"P",  name:"인",       g:15, row:3},
+ {n:16,s:"S",  name:"황",       g:16, row:3},
+ {n:17,s:"Cl", name:"염소",     g:17, row:3},
+ {n:18,s:"Ar", name:"아르곤",   g:18, row:3}
+];
+
+/* ══════════ 유틸 ══════════ */
+function $(id){return document.getElementById(id);}
+function setTxt(id,t){var e=$(id);if(e)e.textContent=t;}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function slotOf(g){return g<=2?g:g-9;}
+function elByN(n){for(var i=0;i<EL.length;i++){if(EL[i].n===Number(n))return EL[i];}return null;}
+function secTxt(ms){return ms?(ms/1000).toFixed(1)+'초':'—';}
+function dayTxt(ts){
+  if(!ts)return '기록 없음';
+  var diff=Date.now()-ts,day=Math.floor(diff/86400000);
+  if(day<=0)return '오늘';
+  if(day===1)return '어제';
+  if(day<30)return day+'일 전';
+  var d=new Date(ts);
+  return (d.getMonth()+1)+'월 '+d.getDate()+'일';
+}
+function totalPlays(u){return (u.playsRhythm||0)+(u.playsSpeed||0)+(u.playsQuiz||0)+(u.playsPuzzle||0);}
+
+/* ══════════ 접속 ══════════ */
+var FS=null,ROWS=[],sortKey='updatedAt',sortAsc=false;
+
+function cloudInit(){
+  try{
+    if(typeof firebase==='undefined'||!firebase.initializeApp)return false;
+    if(!FIREBASE_CONFIG||!FIREBASE_CONFIG.projectId)return false;
+    if(!firebase.apps||!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+    FS=firebase.firestore();
+    return true;
+  }catch(e){FS=null;return false;}
+}
+
+function loadData(){
+  if(!FS&&!cloudInit()){
+    $('cfgNotice').classList.remove('hidden');
+    ROWS=[];renderAll();
+    setTxt('tableNote','Firebase 설정이 필요합니다');
+    return;
+  }
+  $('cfgNotice').classList.add('hidden');
+  setTxt('tableNote','불러오는 중…');
+  $('tblBody').innerHTML='<tr><td colspan="9" class="empty-msg">불러오는 중…</td></tr>';
+  FS.collection(RANK_COLLECTION).limit(500).get().then(function(snap){
+    ROWS=[];
+    snap.forEach(function(doc){
+      var v=doc.data();
+      if(v)ROWS.push({id:doc.id,u:v});
+    });
+    setTxt('tableNote','이름을 누르면 상세가 열립니다 · '+ROWS.length+'명');
+    renderAll();
+  }).catch(function(err){
+    setTxt('tableNote','불러오지 못했습니다');
+    $('tblBody').innerHTML='<tr><td colspan="9" class="empty-msg">'+esc('불러오지 못했습니다 — '+(err&&err.message?err.message:'네트워크 또는 보안 규칙을 확인해 주세요'))+'</td></tr>';
+  });
+}
+
+/* ══════════ 표 ══════════ */
+var COLS=[
+ {k:'name',      t:'이름',     asc:true},
+ {k:'updatedAt', t:'마지막 학습',asc:false},
+ {k:'totalScore',t:'총점',     asc:false},
+ {k:'speedTapBest',t:'탭런',   asc:true},
+ {k:'speedBest', t:'타자런',   asc:true},
+ {k:'rhythmScore',t:'리듬',    asc:false},
+ {k:'quizBest',  t:'연상퀴즈', asc:false},
+ {k:'puzzleBest',t:'퍼즐',     asc:false},
+ {k:'plays',     t:'학습 횟수', asc:false}
+];
+function buildHead(){
+  var tr=$('tblHead');tr.innerHTML='';
+  for(var i=0;i<COLS.length;i++){
+    (function(c){
+      var th=document.createElement('th');
+      th.textContent=c.t;
+      var a=document.createElement('span');
+      a.className='arrow';
+      a.textContent=(sortKey===c.k)?(sortAsc?'▲':'▼'):'';
+      th.appendChild(a);
+      th.onclick=function(){
+        if(sortKey===c.k)sortAsc=!sortAsc;
+        else{sortKey=c.k;sortAsc=!!c.asc;}
+        buildHead();renderTable();
+      };
+      tr.appendChild(th);
+    })(COLS[i]);
+  }
+}
+function filtered(){
+  var q=$('searchBox').value.trim().toLowerCase();
+  if(!q)return ROWS.slice();
+  return ROWS.filter(function(r){return String(r.u.name||r.id).toLowerCase().indexOf(q)>=0;});
+}
+function sortRows(rows){
+  var timeKeys={speedTapBest:1,speedBest:1};
+  rows.sort(function(a,b){
+    var va,vb;
+    if(sortKey==='name'){va=String(a.u.name||a.id);vb=String(b.u.name||b.id);return sortAsc?va.localeCompare(vb):vb.localeCompare(va);}
+    if(sortKey==='plays'){va=totalPlays(a.u);vb=totalPlays(b.u);}
+    else{va=a.u[sortKey]||0;vb=b.u[sortKey]||0;}
+    /* 기록 없음(0)은 항상 뒤로 */
+    if(timeKeys[sortKey]){
+      if(!va&&!vb)return 0;
+      if(!va)return 1;
+      if(!vb)return -1;
+    }
+    return sortAsc?va-vb:vb-va;
+  });
+  return rows;
+}
+function renderTable(){
+  var rows=sortRows(filtered()),body=$('tblBody');
+  if(!rows.length){body.innerHTML='<tr><td colspan="9" class="empty-msg">표시할 학생이 없습니다</td></tr>';return;}
+  var html='';
+  for(var i=0;i<rows.length;i++){
+    var u=rows[i].u,id=rows[i].id;
+    var stale=u.updatedAt&&(Date.now()-u.updatedAt)>14*86400000;
+    html+='<tr>'+
+      '<td class="name-cell" data-id="'+esc(id)+'">'+esc(u.name||id)+'</td>'+
+      '<td class="'+(stale?'stale':'dim')+'">'+esc(dayTxt(u.updatedAt))+'</td>'+
+      '<td class="num">'+(u.totalScore||0)+'</td>'+
+      '<td>'+esc(secTxt(u.speedTapBest))+'</td>'+
+      '<td>'+esc(secTxt(u.speedBest))+'</td>'+
+      '<td>'+(u.rhythmScore?('<span class="pill">'+u.rhythmScore+'점</span>'):'<span class="pill pill-off">—</span>')+'</td>'+
+      '<td>'+(u.quizBest?('<span class="pill">'+u.quizBest+'점</span>'):'<span class="pill pill-off">—</span>')+'</td>'+
+      '<td>'+(u.puzzleBest?('<span class="pill">'+u.puzzleBest+'점</span>'):'<span class="pill pill-off">—</span>')+'</td>'+
+      '<td class="num">'+totalPlays(u)+'</td>'+
+    '</tr>';
+  }
+  body.innerHTML=html;
+  var cells=body.querySelectorAll('.name-cell');
+  for(var k=0;k<cells.length;k++){
+    (function(cell){cell.onclick=function(){openDetail(cell.getAttribute('data-id'));};})(cells[k]);
+  }
+}
+
+/* ══════════ 히트맵 ══════════ */
+function weakTotals(rows){
+  var t={};
+  for(var i=0;i<rows.length;i++){
+    var w=rows[i].u.weak||{};
+    for(var k in w){
+      if(!Object.prototype.hasOwnProperty.call(w,k))continue;
+      t[k]=(t[k]||0)+(w[k]||0);
+    }
+  }
+  return t;
+}
+function heatStyle(cnt,max){
+  if(!cnt||!max)return {bg:'#fff',fg:'var(--royal)',bd:'var(--border)'};
+  var r=cnt/max;
+  if(r>0.66)return {bg:'#dc2626',fg:'#fff',bd:'#dc2626'};
+  if(r>0.33)return {bg:'#fca5a5',fg:'#7f1d1d',bd:'#f87171'};
+  return {bg:'#fee2e2',fg:'#b91c1c',bd:'#fecaca'};
+}
+function buildHeat(rows){
+  var totals=weakTotals(rows),max=0,k;
+  for(k in totals){if(Object.prototype.hasOwnProperty.call(totals,k))max=Math.max(max,totals[k]);}
+  var map={},i;
+  for(i=0;i<EL.length;i++)map[EL[i].row+'_'+slotOf(EL[i].g)]=EL[i];
+  var grid=$('heatGrid');grid.innerHTML='';
+  for(var r=1;r<=3;r++){
+    for(var c=1;c<=9;c++){
+      var e=map[r+'_'+c],cell=document.createElement('div');
+      if(!e){cell.className='heat-cell void';grid.appendChild(cell);continue;}
+      var cnt=totals[e.n]||0,st=heatStyle(cnt,max);
+      cell.className='heat-cell';
+      cell.style.background=st.bg;cell.style.borderColor=st.bd;
+      cell.title=e.name+' — 오답 '+cnt+'회';
+      cell.innerHTML='<span class="heat-sym" style="color:'+st.fg+'">'+esc(e.s)+'</span>'+
+                     '<span class="heat-name" style="color:'+st.fg+'">'+esc(e.name)+'</span>'+
+                     '<span class="heat-cnt" style="color:'+st.fg+'">'+(cnt||'')+'</span>';
+      grid.appendChild(cell);
+    }
+  }
+  return totals;
+}
+
+/* ══════════ 요약 ══════════ */
+function renderKpi(rows,totals){
+  setTxt('kpiStudents',rows.length+'명');
+  var week=0,plays=0,i;
+  for(i=0;i<rows.length;i++){
+    var u=rows[i].u;
+    plays+=totalPlays(u);
+    if(u.updatedAt&&(Date.now()-u.updatedAt)<7*86400000)week++;
+  }
+  setTxt('kpiWeek',week+'명');
+  setTxt('kpiPlays',plays+'회');
+  var topN=null,topV=0,k;
+  for(k in totals){
+    if(!Object.prototype.hasOwnProperty.call(totals,k))continue;
+    if(totals[k]>topV){topV=totals[k];topN=k;}
+  }
+  var e=topN?elByN(topN):null;
+  setTxt('kpiWeak',e?(e.s+' '+e.name):'—');
+}
+
+function renderAll(){
+  var rows=filtered();
+  var totals=buildHeat(rows);
+  renderKpi(rows,totals);
+  renderTable();
+}
+
+/* ══════════ 상세 ══════════ */
+function openDetail(id){
+  var row=null,i;
+  for(i=0;i<ROWS.length;i++){if(ROWS[i].id===id){row=ROWS[i];break;}}
+  if(!row)return;
+  var u=row.u;
+  setTxt('dName',u.name||row.id);
+  setTxt('dSub','마지막 학습 '+dayTxt(u.updatedAt)+' · 총 '+totalPlays(u)+'회 학습');
+  var kv=[
+    ['총점',(u.totalScore||0)+'점'],
+    ['탭런 최고',secTxt(u.speedTapBest)],
+    ['타자런 최고',secTxt(u.speedBest)],
+    ['리듬 최고',(u.rhythmScore||0)+'점'],
+    ['연상퀴즈 최고',(u.quizBest||0)+'점'],
+    ['퍼즐 최고',(u.puzzleBest||0)+'점']
+  ];
+  var html='';
+  for(i=0;i<kv.length;i++)html+='<div class="kv"><div class="kv-k">'+esc(kv[i][0])+'</div><div class="kv-v">'+esc(kv[i][1])+'</div></div>';
+  $('dKv').innerHTML=html;
+
+  var w=u.weak||{},keys=[];
+  for(var k in w){if(Object.prototype.hasOwnProperty.call(w,k)&&w[k]>0)keys.push(k);}
+  keys.sort(function(a,b){return w[b]-w[a];});
+  if(!keys.length){
+    setTxt('dWeakTitle','자주 틀린 원소');
+    $('dWeak').innerHTML='<span class="dim" style="font-size:12.5px;">아직 오답 기록이 없습니다</span>';
+  }else{
+    setTxt('dWeakTitle','자주 틀린 원소 — 상위 '+Math.min(keys.length,12)+'개');
+    var tags='';
+    for(i=0;i<keys.length&&i<12;i++){
+      var e=elByN(keys[i]);
+      if(e)tags+='<span class="weak-tag">'+esc(e.s)+' '+esc(e.name)+' ×'+w[keys[i]]+'</span>';
+    }
+    $('dWeak').innerHTML=tags;
+  }
+  $('detailOverlay').classList.add('open');
+}
+function closeDetail(){$('detailOverlay').classList.remove('open');}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeDetail();});
+
+/* ══════════ CSV ══════════ */
+function csvCell(v){
+  var s=String(v==null?'':v);
+  return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;
+}
+function exportCsv(){
+  var rows=sortRows(filtered());
+  if(!rows.length){window.alert('내보낼 기록이 없습니다.');return;}
+  var head=['이름','마지막 학습','총점','탭런(초)','타자런(초)','리듬 점수','연상퀴즈','퍼즐','학습 횟수','자주 틀린 원소'];
+  var lines=[head.map(csvCell).join(',')];
+  for(var i=0;i<rows.length;i++){
+    var u=rows[i].u,w=u.weak||{},keys=[];
+    for(var k in w){if(Object.prototype.hasOwnProperty.call(w,k)&&w[k]>0)keys.push(k);}
+    keys.sort(function(a,b){return w[b]-w[a];});
+    var weakTxt=keys.slice(0,6).map(function(n){var e=elByN(n);return e?(e.s+'×'+w[n]):'';}).filter(Boolean).join(' ');
+    lines.push([
+      u.name||rows[i].id,
+      u.updatedAt?new Date(u.updatedAt).toLocaleDateString('ko-KR'):'',
+      u.totalScore||0,
+      u.speedTapBest?(u.speedTapBest/1000).toFixed(1):'',
+      u.speedBest?(u.speedBest/1000).toFixed(1):'',
+      u.rhythmScore||0,
+      u.quizBest||0,
+      u.puzzleBest||0,
+      totalPlays(u),
+      weakTxt
+    ].map(csvCell).join(','));
+  }
+  var blob=new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob),a=document.createElement('a');
+  var d=new Date(),stamp=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+  a.href=url;a.download='주기율표_학습현황_'+stamp+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);},1000);
+}
+
+/* ══════════ 시작 ══════════ */
+(function boot(){
+  cloudInit();
+  buildHead();buildHeat([]);
+  loadData();
+})();
+</script>
+</body>
+</html>
