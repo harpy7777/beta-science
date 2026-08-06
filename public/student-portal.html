@@ -776,10 +776,12 @@ function renderAttendance(student){
 
     // 출결 흐름 — recentAttendance: [{d:'2026-07-24', s:'출석'}, ...]
     const raw=Array.isArray(student&&student.recentAttendance)?student.recentAttendance:[];
+    // 저장 개수(30건)와 맞춘다. 12칸으로 자르면 그 밖의 보강·결석이
+    // 숫자에는 잡히는데 흐름에는 안 보여 학부모가 혼란스러워한다.
     const flow=raw.filter(x=>x&&atYmd(x.d))
       .map(x=>({d:String(x.d),s:atStatusOf(x)}))
       .sort((a,b)=>a.d.localeCompare(b.d))
-      .slice(-12);
+      .slice(-30);
     const flowHtml=flow.length
       ?flow.map(x=>`<span class="at-dot at-st-${e(x.s)}">${e(x.s.charAt(0))}<span class="at-d">${e(atShortDate(x.d))}</span></span>`).join('')
       :`<span class="at-wait">${ses?'출결 기록이 정리되는 중입니다.':'아직 기록된 수업이 없습니다.'}</span>`;
