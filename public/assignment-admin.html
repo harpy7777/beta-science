@@ -129,6 +129,8 @@ body {
 .stu-name { font-size:13px; font-weight:700; color:#1d1d1f; }
 .stu-sub { font-size:10px; color:#aeaeb2; margin-top:2px; }
 .stu-card.sel .stu-name { color:#be185d; }
+/* 개별 선택 카드에도 반 이름을 보여줘, 어떤 반으로 저장될지 미리 확인된다 */
+.stu-cls { font-size:10px; font-weight:700; color:#92400e; margin-top:3px; line-height:1.45; word-break:keep-all; }
 @media(max-width:520px){ .student-grid{ grid-template-columns:repeat(2,1fr); } }
 
 /* ── 추가 버튼들 ── */
@@ -304,6 +306,7 @@ body {
   .lrow { flex-direction: column; align-items: stretch; }
   .lr-actions { justify-content: flex-end; }
   .lr-btn { flex: 1 1 0; }
+  .stu-cls { font-size:9.5px; }
 }
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
@@ -490,6 +493,53 @@ function normalizeGrade(val){
   if(/중/.test(s)) return '중'+num;
   if(/고/.test(s)) return '고'+num;
   return s;
+}
+
+/* ══════════════════════════════════════════════════════════
+   ★ 반 이름 처리 (2026-08 수정)
+   ──────────────────────────────────────────────────────────
+   [무엇이 어긋나 있었나]
+   목록의 반 배지는 assignments 문서의 className 필드만 읽는다.
+   그런데 반 이름을 저장하던 곳은 saveBatch()(반별 배포) 하나뿐이었다.
+   saveSingle()(개별 배포)은 className 을 아예 저장하지 않았다.
+     → 개별 배포로 만든 클리닉은 학생에게 반이 배정돼 있어도
+       목록에서 반 배지가 영원히 나오지 않았다.
+
+   [어떻게 고쳤나] 두 겹으로 막는다.
+   1) 저장 시점 — saveSingle() 도 학생 문서의 classNames 를 함께 저장한다.
+      (className: 대표 1개, classNames: 배열 전체 — 한 학생이 두 반일 수 있다)
+   2) 표시 시점 — 문서에 반 기록이 없는 옛 클리닉은 students 에서
+      현재 반을 찾아 폴백 표시한다. 이미 만들어 둔 기록도 바로 보인다.
+      폴백으로 표시된 배지는 '현재 배정 기준'임을 툴팁으로 알린다.
+   ══════════════════════════════════════════════════════════ */
+function normClassList(v){
+  return (Array.isArray(v) ? v : []).map(x=>String(x==null?'':x).trim()).filter(Boolean);
+}
+/* studentId 로 학생을 찾는다. id(h01014) → 문서ID → 동명이인이 없을 때만 이름 */
+function findStudentRec(sid, name){
+  const list = Array.isArray(allStudents) ? allStudents : [];
+  const id = String(sid==null?'':sid).trim();
+  if(id){
+    const byId = list.find(s=>String(s.id==null?'':s.id).trim()===id);
+    if(byId) return byId;
+    const byDoc = list.find(s=>String(s.fireId==null?'':s.fireId).trim()===id);
+    if(byDoc) return byDoc;
+  }
+  const nm = String(name==null?'':name).trim();
+  if(nm){
+    const same = list.filter(s=>String(s.name==null?'':s.name).trim()===nm);
+    if(same.length===1) return same[0];   // 동명이인이면 추측하지 않는다
+  }
+  return null;
+}
+/* 목록 한 줄에 붙일 반 이름들 → { names:[], live:true면 현재 배정 기준 } */
+function classChipsOf(data){
+  const saved = normClassList(data && data.classNames);
+  if(saved.length) return { names:saved, live:false };
+  const one = String((data && data.className) || '').trim();
+  if(one) return { names:[one], live:false };
+  const rec = findStudentRec(data && data.studentId, data && data.studentName);
+  return { names: rec ? normClassList(rec.classNames) : [], live:true };
 }
 
 /* ── 생성일시 표기 ──
@@ -1022,13 +1072,19 @@ $('examModalClose').addEventListener('click',()=>$('examModal').classList.remove
 $('examModal').addEventListener('click',e=>{ if(e.target===$('examModal')) $('examModal').classList.remove('open'); });
 
 /* ── 학생 목록 (학년별) ── */
-let allStudents=null, selectedStudent=null;
-async function loadStudents(){
-  try{
-    const snap=await getDocs(collection(db,'students'));
-    // ★ 문서 데이터의 id(=학생ID, h01001 등)를 보존. 문서ID는 fireId로 따로 보관.
-    allStudents=snap.docs.map(d=>({ fireId:d.id, ...d.data() }));
-  }catch(err){ allStudents=[]; console.error(err); }
+let allStudents=null, studentsPromise=null, selectedStudent=null;
+/* 한 번만 읽고 재사용한다. 목록 렌더도 이 결과를 기다린다 (반 폴백에 필요) */
+function loadStudents(){
+  if(studentsPromise) return studentsPromise;
+  studentsPromise=(async()=>{
+    try{
+      const snap=await getDocs(collection(db,'students'));
+      // ★ 문서 데이터의 id(=학생ID, h01001 등)를 보존. 문서ID는 fireId로 따로 보관.
+      allStudents=snap.docs.map(d=>({ fireId:d.id, ...d.data() }));
+    }catch(err){ allStudents=[]; console.error(err); }
+    return allStudents;
+  })();
+  return studentsPromise;
 }
 function renderStudentGrid(){
   const grade=$('gradeSelect').value.trim();
@@ -1045,10 +1101,14 @@ function renderStudentGrid(){
     card.appendChild(el('div','stu-name', s.name||'(이름 없음)'));
     const subText = s.id ? s.id : (s.subject||'');
     if(subText) card.appendChild(el('div','stu-sub', subText));
+    // 어떤 반으로 기록될지 카드에서 미리 보인다 (반 미배정도 바로 눈에 띈다)
+    const cls=normClassList(s.classNames);
+    card.appendChild(el('div','stu-cls', cls.length ? '🏷️ '+cls.join(' / ') : '반 미배정'));
     card.addEventListener('click',()=>{
       document.querySelectorAll('.stu-card.sel').forEach(c=>c.classList.remove('sel'));
       card.classList.add('sel');
-      selectedStudent={ studentId:s.id||'', name:s.name||'', grade:s.grade||grade };
+      // ★ 반 이름도 함께 들고 간다 — saveSingle 이 이 값을 저장한다
+      selectedStudent={ studentId:s.id||'', name:s.name||'', grade:s.grade||grade, classNames:cls };
       toast((s.name||'학생')+' 선택됨');
     });
     grid.appendChild(card);
@@ -1074,9 +1134,7 @@ document.querySelectorAll('.mode-tab').forEach(t=>t.addEventListener('click',()=
 function getAllClassNames(){
   const set=new Set();
   (allStudents||[]).forEach(s=>{
-    (Array.isArray(s.classNames)?s.classNames:[]).forEach(c=>{
-      const v=String(c||'').trim(); if(v) set.add(v);
-    });
+    normClassList(s.classNames).forEach(c=>set.add(c));
   });
   return [...set].sort((a,b)=>a.localeCompare(b,'ko'));
 }
@@ -1095,7 +1153,7 @@ function renderClassSelect(){
 function classStudentList(className){
   if(!className) return [];
   return (allStudents||[])
-    .filter(s=>Array.isArray(s.classNames) && s.classNames.map(x=>String(x||'').trim()).includes(className))
+    .filter(s=>normClassList(s.classNames).includes(className))
     .sort((a,b)=>(a.name||'').localeCompare(b.name||'','ko'));
 }
 function renderClassStudents(){
@@ -1186,6 +1244,8 @@ async function saveSingle(){
   const studentName=selectedStudent.name;
   const studentGrade=selectedStudent.grade||'';
   const studentId=selectedStudent.studentId||'';
+  /* ★ 반 이름도 함께 기록한다 — 이게 빠져서 목록에 반 배지가 안 나왔다 */
+  const classNames=normClassList(selectedStudent.classNames);
   const weekLabel=$('rangeLabel').value.trim();
   let items;
   try{ items=collectItems(); }catch(msg){ toast(typeof msg==='string'?msg:'입력을 확인하세요.'); return; }
@@ -1194,6 +1254,8 @@ async function saveSingle(){
   try{
     await setDoc(doc(db,'assignments',token),{
       studentName, studentGrade, studentId, weekLabel, items,
+      className: classNames[0] || '',
+      classNames,
       createdAt: serverTimestamp(),
       createdBy: auth.currentUser ? auth.currentUser.uid : null
     });
@@ -1229,7 +1291,7 @@ async function saveBatch(){
     try{
       await setDoc(doc(db,'assignments',token),{
         studentName:stu.name, studentGrade:stu.grade||'', studentId:stu.studentId||'',
-        weekLabel, items, className, batchId,
+        weekLabel, items, className, classNames:[className], batchId,
         createdAt: serverTimestamp(),
         createdBy: auth.currentUser ? auth.currentUser.uid : null
       });
@@ -1279,10 +1341,11 @@ $('saveBtn').addEventListener('click', ()=>{ if(curMode==='class') saveBatch(); 
 $('copyLink').addEventListener('click',()=>{ copy($('resultLink').value).then(()=>toast('링크를 복사했습니다.')); });
 $('previewLink').addEventListener('click',()=>{ const v=$('resultLink').value; if(v) window.open(v,'_blank'); });
 
-/* ── 목록 (학생 이름 아래 생성날짜 · 단원명 · 클리닉 수) ── */
+/* ── 목록 (학생 이름 아래 생성날짜 · 단원명 · 클리닉 수 · 반) ── */
 async function loadList(){
   const box=$('list');
   try{
+    await loadStudents();   // 반 폴백에 필요 — 이미 읽었으면 즉시 반환
     const qy=query(collection(db,'assignments'), orderBy('createdAt','desc'));
     const snap=await getDocs(qy);
     if(snap.empty){ box.innerHTML='<div class="list-empty">아직 만든 클리닉이 없습니다.</div>'; return; }
@@ -1302,11 +1365,16 @@ async function loadList(){
       nameLine.appendChild(el('span','lr-date-inline', '🗓️ ' + fmtCreated(data.createdAt)));
       info.appendChild(nameLine);
 
-      // 2줄: 칩 — 단원명 / 클리닉 수 (+ 반)
+      // 2줄: 칩 — 단원명 / 클리닉 수 / 반(들)
       const sub=el('div','lr-sub');
       sub.appendChild(el('span','lr-chip unit', '📘 ' + (data.weekLabel && data.weekLabel.trim() ? data.weekLabel.trim() : '단원명 없음')));
       sub.appendChild(el('span','lr-chip cnt',  `📋 클리닉 ${cnt}개`));
-      if(data.className) sub.appendChild(el('span','lr-chip cls', '🏷️ ' + data.className));
+      const cls=classChipsOf(data);
+      cls.names.forEach(nm=>{
+        const chip=el('span','lr-chip cls', '🏷️ ' + nm);
+        if(cls.live) chip.title='보낼 당시 반 기록이 없어 현재 배정된 반을 보여드립니다.';
+        sub.appendChild(chip);
+      });
       info.appendChild(sub);
 
       const actions=el('div','lr-actions');
