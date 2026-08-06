@@ -181,26 +181,33 @@ button,.pt-cell,.syl-chip,.chal-slot,.quiz-opt,.tab-btn,.mode-chip,.sr-pad-key,.
 .syl-chip .syl-sym{font-size:8px;font-weight:700;letter-spacing:.02em;opacity:.6;margin-top:1px;}
 .syl-chip.lit{background:#7dd3fc;border-color:#7dd3fc;color:#0f2660;transform:translateY(-4px) scale(1.1);box-shadow:0 6px 16px rgba(125,211,252,.45);}
 .syl-chip.done{background:rgba(125,211,252,.2);border-color:rgba(125,211,252,.4);color:#bae6fd;}
+.syl-chip.blind{background:rgba(255,255,255,.05);border-style:dashed;color:rgba(255,255,255,.28);}
+.syl-chip.cur{background:#fbbf24;border-color:#fbbf24;color:#0f2660;transform:translateY(-4px) scale(1.12);box-shadow:0 6px 16px rgba(251,191,36,.45);}
+.syl-chip.miss{background:rgba(248,113,113,.24);border-color:rgba(248,113,113,.55);color:#fecaca;}
 .syl-gap{width:14px;}
 .rhythm-caption{text-align:center;color:#93b4e8;font-size:11px;margin-top:12px;font-weight:600;letter-spacing:.02em;min-height:16px;}
 
-/* 도전 트랙 */
-.chal-track{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;background:var(--royal-light);border:1.5px dashed var(--royal-mid);border-radius:12px;padding:10px 8px;margin-bottom:10px;min-height:56px;}
-.chal-slot{width:30px;height:34px;border-radius:7px;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--muted);}
-.chal-slot.filled{background:var(--royal);border-color:var(--royal);color:#fff;}
-.chal-pool{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
-.pool-chip{
-  min-width:44px;min-height:46px;padding:6px 8px;border-radius:11px;
-  background:#fff;border:1.5px solid var(--border);
-  font-size:17px;font-weight:800;color:var(--royal-deep);
+/* 비트 도전 */
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.qz-hud{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.qz-stat{background:var(--royal-light);border:1px solid var(--royal-mid);border-radius:12px;padding:9px 6px;text-align:center;}
+.qz-val{font-size:1.15rem;font-weight:900;color:var(--royal);line-height:1;letter-spacing:-.03em;}
+.qz-lbl{font-size:10px;color:var(--muted);margin-top:4px;font-weight:600;}
+.qz-gauge{height:9px;border-radius:5px;background:var(--border-light);overflow:hidden;margin-bottom:14px;}
+.qz-gauge-fill{height:100%;width:100%;background:linear-gradient(90deg,#5585e0,#2355c3);}
+.qz-gauge-fill.warn{background:linear-gradient(90deg,#fb923c,#dc2626);}
+.qz-ask{text-align:center;font-size:15px;font-weight:800;color:var(--royal-deep);margin-bottom:12px;letter-spacing:-.02em;}
+.qz-ask b{color:var(--royal);font-size:18px;}
+.qz-opts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.qz-opt{
+  min-height:64px;border-radius:13px;background:#fff;border:2px solid var(--border);
+  font-size:clamp(19px,6vw,23px);font-weight:900;color:var(--royal-deep);
   cursor:pointer;font-family:inherit;transition:all .12s;
 }
-.pool-chip:active{transform:scale(.92);}
-.pool-chip.used{opacity:.22;pointer-events:none;background:var(--border-light);}
-.pool-chip.shake{animation:shk .3s;background:var(--red-bg);border-color:#f87171;color:var(--red);}
-@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-.chal-meta{display:flex;justify-content:center;gap:16px;font-size:12px;color:var(--muted);margin:10px 0;font-weight:600;}
-.chal-meta b{color:var(--royal);font-weight:800;}
+.qz-opt:active{transform:scale(.94);}
+.qz-opt.good{background:#ecfdf5;border-color:#34d399;color:var(--green);}
+.qz-opt.bad{background:var(--red-bg);border-color:#f87171;color:var(--red);animation:shk .3s;}
+.qz-fb{text-align:center;font-size:13px;font-weight:700;min-height:22px;margin-top:11px;line-height:1.5;}
 
 /* ══ 스토리 체인 ══ */
 .story-box{background:linear-gradient(135deg,var(--royal-light),#dce7f9);border:1.5px solid var(--royal-mid);border-radius:16px;padding:16px 15px;margin-bottom:12px;font-size:14.5px;line-height:2;color:var(--royal-deep);font-weight:600;}
@@ -451,7 +458,7 @@ button,.pt-cell,.syl-chip,.chal-slot,.quiz-opt,.tab-btn,.mode-chip,.sr-pad-key,.
     </div>
     <div class="stat-card">
       <div class="stat-icon" style="background:var(--green-bg);">🎵</div>
-      <div><div class="stat-num" id="st2" style="color:var(--green)">—</div><div class="stat-lbl">리듬 최고기록</div></div>
+      <div><div class="stat-num" id="st2" style="color:var(--green)">—</div><div class="stat-lbl">리듬 최고점</div></div>
     </div>
     <div class="stat-card">
       <div class="stat-icon" style="background:var(--gold-bg);">⚡</div>
@@ -475,27 +482,45 @@ button,.pt-cell,.syl-chip,.chal-slot,.quiz-opt,.tab-btn,.mode-chip,.sr-pad-key,.
       </div>
 
       <div class="chip-row" style="margin-bottom:10px;">
-        <button class="mode-chip on" onclick="setBpm(84,this)">천천히</button>
-        <button class="mode-chip" onclick="setBpm(112,this)">보통</button>
-        <button class="mode-chip" onclick="setBpm(150,this)">빠르게</button>
+        <button class="mode-chip on" id="rhyLearnBtn" onclick="setRhyMode('learn')">🎧 듣기 연습</button>
+        <button class="mode-chip" id="rhyQuizBtn" onclick="setRhyMode('quiz')">🎯 비트 도전</button>
       </div>
-      <div class="chip-row">
-        <button class="btn-game" id="playBtn" onclick="togglePlay()">▶ 재생</button>
-        <button class="btn-game-outline" onclick="startChallenge()">🎤 순서 도전</button>
+
+      <div id="rhyLearnCtl">
+        <div class="chip-row" style="margin-bottom:10px;">
+          <button class="mode-chip on" onclick="setBpm(84,this)">천천히</button>
+          <button class="mode-chip" onclick="setBpm(112,this)">보통</button>
+          <button class="mode-chip" onclick="setBpm(150,this)">빠르게</button>
+        </div>
+        <div class="chip-row">
+          <button class="btn-game" id="playBtn" onclick="togglePlay()">▶ 재생</button>
+        </div>
+      </div>
+
+      <div id="rhyQuizCtl" class="hidden">
+        <div class="chip-row" style="margin-bottom:10px;">
+          <button class="mode-chip on" onclick="setQzLevel(3500,this)">여유 3.5초</button>
+          <button class="mode-chip" onclick="setQzLevel(2200,this)">보통 2.2초</button>
+          <button class="mode-chip" onclick="setQzLevel(1400,this)">빡셈 1.4초</button>
+        </div>
+        <div class="chip-row">
+          <button class="btn-game" id="qzStartBtn" onclick="qzStart()">🎯 도전 시작</button>
+        </div>
       </div>
     </div>
 
-    <div class="panel-card hidden" id="chalPanel">
-      <div class="panel-card-title">🎤 순서 도전 <span class="panel-note">1번부터 차례대로 탭하세요</span></div>
-      <div class="chal-track" id="chalTrack"></div>
-      <div class="chal-meta">
-        <span>시간 <b id="chalTime">0.0초</b></span>
-        <span>실수 <b id="chalMiss">0</b></span>
+    <div class="panel-card hidden" id="qzPanel">
+      <div class="qz-hud">
+        <div class="qz-stat"><div class="qz-val" id="qzNo">1/18</div><div class="qz-lbl">진행</div></div>
+        <div class="qz-stat"><div class="qz-val" id="qzComboV">0</div><div class="qz-lbl">콤보</div></div>
+        <div class="qz-stat"><div class="qz-val" id="qzScoreV">0</div><div class="qz-lbl">점수</div></div>
       </div>
-      <div class="chal-pool" id="chalPool"></div>
+      <div class="qz-gauge"><div class="qz-gauge-fill" id="qzGauge"></div></div>
+      <div class="qz-ask" id="qzAsk">준비</div>
+      <div class="qz-opts" id="qzOpts"></div>
+      <div class="qz-fb" id="qzFb"></div>
       <div class="chip-row mt10">
-        <button class="btn-outline" onclick="startChallenge()">↩ 다시 도전</button>
-        <button class="btn-outline" onclick="closeChallenge()">닫기</button>
+        <button class="btn-outline" onclick="qzStop(true)">그만두기</button>
       </div>
     </div>
   </div>
@@ -742,6 +767,13 @@ function cloudStatus(){
   if(badge)badge.innerHTML='<span class="dot-blue"></span>'+(cloudOn?'전체 랭킹 연결됨':'이 기기 저장');
   setTxt('loginNotice',cloudOn?'기록이 학원 전체 랭킹에 올라갑니다':'기록이 이 기기에 저장됩니다');
 }
+function mergeWeak(a,b){
+  var out={},k;
+  a=a||{};b=b||{};
+  for(k in a){if(Object.prototype.hasOwnProperty.call(a,k))out[k]=a[k]||0;}
+  for(k in b){if(Object.prototype.hasOwnProperty.call(b,k))out[k]=Math.max(out[k]||0,b[k]||0);}
+  return out;
+}
 /* 개인 최고기록만 올려 보냅니다. 시간 기록은 작을수록 좋으므로 최솟값으로 병합합니다. */
 function cloudPush(){
   if(!cloudOn||!FS||!CU)return;
@@ -759,9 +791,14 @@ function cloudPush(){
       totalScore:Math.max(p.totalScore||0,u.totalScore||0),
       quizBest:Math.max(p.quizBest||0,u.quizBest||0),
       puzzleBest:Math.max(p.puzzleBest||0,u.puzzleBest||0),
-      rhythmBest:better(p.rhythmBest||0,u.rhythmBest||0),
+      rhythmScore:Math.max(p.rhythmScore||0,u.rhythmScore||0),
       speedBest:better(p.speedBest||0,u.speedBest||0),
       speedTapBest:better(p.speedTapBest||0,u.speedTapBest||0),
+      playsRhythm:Math.max(p.playsRhythm||0,u.rhythmPlays||0),
+      playsSpeed:Math.max(p.playsSpeed||0,u.speedPlays||0),
+      playsQuiz:Math.max(p.playsQuiz||0,u.quizPlays||0),
+      playsPuzzle:Math.max(p.playsPuzzle||0,u.puzzlePlays||0),
+      weak:mergeWeak(p.weak,u.weak),
       updatedAt:Date.now()
     };
     return ref.set(payload,{merge:true});
@@ -777,7 +814,7 @@ function doLogin(){
   CU=name;
   unlockAudio();
   var d=DB();
-  if(!d[CU])d[CU]={name:name,totalScore:0,rhythmBest:0,rhythmPlays:0,speedBest:0,speedTapBest:0,speedPlays:0,quizBest:0,quizPlays:0,puzzleBest:0,weak:{},lastActive:Date.now()};
+  if(!d[CU])d[CU]={name:name,totalScore:0,rhythmScore:0,rhythmPlays:0,speedBest:0,speedTapBest:0,speedPlays:0,quizBest:0,quizPlays:0,puzzleBest:0,puzzlePlays:0,weak:{},lastActive:Date.now()};
   else d[CU].lastActive=Date.now();
   saveDB(d);
   show('loginWrap',false);show('mainWrap',true);
@@ -786,7 +823,7 @@ function doLogin(){
   buildRhythm();buildStory();buildGrid();buildSrDots();buildSrPad();srPadLock(true);updStats();renderRank();
 }
 function doLogout(){
-  stopPlay();srStop();closeChallenge();
+  stopPlay();srStop();qzStop(true);
   CU=null;show('loginWrap',true);show('mainWrap',false);
   $('logoutBtn').style.display='none';
   $('loginName').value='';
@@ -796,7 +833,7 @@ function doLogout(){
 function updStats(){
   var u=GU();if(!u)return;
   setTxt('st1',u.totalScore||0);
-  setTxt('st2',u.rhythmBest?fmtSec(u.rhythmBest)+'초':'—');
+  setTxt('st2',u.rhythmScore?u.rhythmScore+'점':'—');
   var srb=u[srBestField()]||0;
   setTxt('st3',srb?fmtSec(srb)+'초':'—');
   setTxt('st4',Object.keys(u.weak||{}).length);
@@ -806,7 +843,9 @@ function updStats(){
 }
 
 /* ══════════ 🎵 리듬 ══════════ */
-var BPM=84,playing=false,playTimer=null,beatIdx=0;
+var BPM=84,playing=false,playTimer=null,beatIdx=0,rhyMode='learn';
+var qzIdx=0,qzOk=0,qzMiss=0,qzCombo=0,qzMaxCombo=0,qzScore=0,qzLimit=3500;
+var qzRunning=false,qzTicker=null,qzDeadline=0,qzAnswered=false,qzWrong={},qzPulseN=0;
 
 function buildRhythm(){
   var wrapEl=$('sylGroups');wrapEl.innerHTML='';
@@ -818,7 +857,7 @@ function buildRhythm(){
         var e=EL[grp[k]];
         var c=document.createElement('div');
         c.className='syl-chip';c.id='syl-'+e.n;
-        c.innerHTML='<span>'+esc(e.syl)+'</span><span class="syl-sym">'+esc(e.s)+'</span>';
+        c.innerHTML='<span class="syl-main">'+esc(e.syl)+'</span><span class="syl-sym">'+esc(e.s)+'</span>';
         line.appendChild(c);
       }
       if(gi<LINES[li].length-1){var gap=document.createElement('div');gap.className='syl-gap';line.appendChild(gap);}
@@ -827,12 +866,51 @@ function buildRhythm(){
   }
   var bb=$('beatBar');bb.innerHTML='';
   for(var b=0;b<4;b++){var d=document.createElement('div');d.className='beat-dot';d.id='beat-'+b;bb.appendChild(d);}
+  renderTrack();
+}
+/* 도전 중에는 아직 지나지 않은 음절을 감춥니다 — 정답이 보이면 시험이 아니니까요. */
+function renderTrack(){
+  for(var i=0;i<EL.length;i++){
+    var e=EL[i],c=$('syl-'+e.n);
+    if(!c)continue;
+    var main=c.querySelector('.syl-main'),sym=c.querySelector('.syl-sym');
+    if(!main||!sym)continue;
+    c.classList.remove('lit','done','blind','cur','miss');
+    if(rhyMode==='learn'||i<qzIdx){
+      main.textContent=e.syl;sym.textContent=e.s;
+      if(rhyMode==='quiz'){c.classList.add('done');if(qzWrong[i])c.classList.add('miss');}
+    }else if(qzRunning&&i===qzIdx){
+      main.textContent='?';sym.textContent='';c.classList.add('cur');
+    }else{
+      main.textContent='·';sym.textContent='';c.classList.add('blind');
+    }
+  }
+}
+function setRhyMode(m){
+  if(m!=='learn'&&m!=='quiz')return;
+  stopPlay();qzStop(false);
+  rhyMode=m;
+  $('rhyLearnBtn').classList.toggle('on',m==='learn');
+  $('rhyQuizBtn').classList.toggle('on',m==='quiz');
+  show('rhyLearnCtl',m==='learn');
+  show('rhyQuizCtl',m==='quiz');
+  qzIdx=0;qzWrong={};
+  renderTrack();
+  setTxt('rhythmCaption',m==='learn'
+    ? '재생을 누르고 소리에 맞춰 따라 읽어보세요'
+    : '음절이 가려집니다 — 순서를 떠올려 제한 시간 안에 고르세요');
 }
 function clearLit(){
   for(var i=0;i<EL.length;i++){
     var c=$('syl-'+EL[i].n);
     if(c){c.classList.remove('lit');c.classList.remove('done');}
   }
+}
+function setQzLevel(ms,el){
+  qzLimit=ms;
+  var cs=document.querySelectorAll('#rhyQuizCtl .mode-chip');
+  for(var i=0;i<cs.length;i++)cs[i].classList.remove('on');
+  if(el)el.classList.add('on');
 }
 function setBpm(v,el){
   BPM=v;
@@ -842,6 +920,7 @@ function setBpm(v,el){
   if(playing){stopPlay();togglePlay();}
 }
 function togglePlay(){
+  if(rhyMode!=='learn')return;
   if(playing){stopPlay();return;}
   playing=true;beatIdx=0;clearLit();
   setTxt('playBtn','■ 정지');
@@ -881,74 +960,126 @@ function tick(){
   beatIdx++;
 }
 
-/* 순서 도전 */
-var chalStep=0,chalMiss=0,chalStart=0,chalTimer=null;
-function startChallenge(){
+/* 비트 도전 — 다음 음절 맞히기 (제한 시간) */
+function updQzHud(){
+  setTxt('qzNo',Math.min(qzIdx+1,EL.length)+'/'+EL.length);
+  setTxt('qzComboV',qzCombo);
+  setTxt('qzScoreV',qzScore);
+}
+function qzStart(){
   stopPlay();
-  show('chalPanel',true);
-  chalStep=0;chalMiss=0;chalStart=0;
-  if(chalTimer){clearInterval(chalTimer);chalTimer=null;}
-  setTxt('chalTime','0.0초');setTxt('chalMiss','0');
-
-  var track=$('chalTrack');track.innerHTML='';
-  for(var i=0;i<EL.length;i++){
-    var s=document.createElement('div');
-    s.className='chal-slot';s.id='slot-'+i;s.textContent=(i+1);
-    track.appendChild(s);
+  rhyMode='quiz';
+  $('rhyLearnBtn').classList.remove('on');
+  $('rhyQuizBtn').classList.add('on');
+  show('rhyLearnCtl',false);show('rhyQuizCtl',true);
+  qzIdx=0;qzOk=0;qzMiss=0;qzCombo=0;qzMaxCombo=0;qzScore=0;qzWrong={};qzRunning=true;
+  show('qzPanel',true);
+  setTxt('qzStartBtn','다시 도전');
+  updQzHud();renderTrack();
+  qzAsk();
+  $('qzPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function qzStop(quit){
+  qzRunning=false;
+  if(qzTicker){clearInterval(qzTicker);qzTicker=null;}
+  if(quit){
+    show('qzPanel',false);
+    qzIdx=0;qzWrong={};
+    renderTrack();
+    setTxt('qzStartBtn','도전 시작');
   }
-  var pool=$('chalPool');pool.innerHTML='';
-  var order=shuffle(EL.slice());
-  for(var k=0;k<order.length;k++){
-    (function(e){
+}
+function qzAsk(){
+  if(!qzRunning)return;
+  if(qzIdx>=EL.length){qzFinish();return;}
+  qzAnswered=false;qzPulseN=0;
+  var e=EL[qzIdx];
+  $('qzAsk').innerHTML='<b>'+(qzIdx+1)+'번째</b> 음절은?';
+  var others=shuffle(EL.filter(function(x){return x.n!==e.n;})).slice(0,3);
+  var opts=shuffle([e].concat(others));
+  var box=$('qzOpts');box.innerHTML='';
+  for(var i=0;i<opts.length;i++){
+    (function(o){
       var b=document.createElement('button');
-      b.className='pool-chip';b.type='button';b.id='pool-'+e.n;
-      b.textContent=e.syl;
-      b.onclick=function(){chalTap(e,b);};
-      pool.appendChild(b);
-    })(order[k]);
+      b.type='button';b.className='qz-opt';b.textContent=o.syl;
+      b.setAttribute('data-n',String(o.n));
+      b.onclick=function(){qzAnswer(o,b);};
+      box.appendChild(b);
+    })(opts[i]);
   }
-  $('chalPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+  setTxt('qzFb','');
+  renderTrack();updQzHud();
+  var g=$('qzGauge');g.classList.remove('warn');g.style.width='100%';
+  qzDeadline=Date.now()+qzLimit;
+  if(qzTicker)clearInterval(qzTicker);
+  qzTicker=setInterval(qzPulse,50);
 }
-function closeChallenge(){
-  if(chalTimer){clearInterval(chalTimer);chalTimer=null;}
-  show('chalPanel',false);
+function qzPulse(){
+  if(!qzRunning||qzAnswered)return;
+  var left=qzDeadline-Date.now();
+  var pct=Math.max(0,left/qzLimit*100);
+  var g=$('qzGauge');
+  g.style.width=pct.toFixed(1)+'%';
+  if(pct<35)g.classList.add('warn');
+  qzPulseN++;
+  if(qzPulseN%12===0)beep(200,0.04,0.05);
+  if(left<=0)qzAnswer(null,null);
 }
-function chalTap(e,btn){
-  if(chalStart===0){
-    chalStart=Date.now();
-    chalTimer=setInterval(function(){setTxt('chalTime',fmtSec(Date.now()-chalStart)+'초');},100);
+function qzAnswer(choice,btn){
+  if(!qzRunning||qzAnswered)return;
+  qzAnswered=true;
+  if(qzTicker){clearInterval(qzTicker);qzTicker=null;}
+  var e=EL[qzIdx],ok=!!(choice&&choice.n===e.n);
+  var btns=document.querySelectorAll('#qzOpts .qz-opt');
+  for(var i=0;i<btns.length;i++){
+    btns[i].disabled=true;
+    if(btns[i].getAttribute('data-n')===String(e.n))btns[i].classList.add('good');
   }
-  var want=EL[chalStep];
-  if(e.n===want.n){
-    beep(392+chalStep*22,0.13,0.16);
-    btn.classList.add('used');
-    var slot=$('slot-'+chalStep);
-    if(slot){slot.classList.add('filled');slot.textContent=e.syl;}
-    chalStep++;
-    if(chalStep>=EL.length)finishChallenge();
+  var fb=$('qzFb');
+  if(ok){
+    var left=Math.max(0,qzDeadline-Date.now());
+    var speedBonus=Math.round(left/qzLimit*20);
+    qzCombo++;if(qzCombo>qzMaxCombo)qzMaxCombo=qzCombo;
+    var gain=20+speedBonus+Math.min(30,(qzCombo-1)*3);
+    qzScore+=gain;qzOk++;
+    beep(520+qzIdx*12,0.12,0.15);
+    fb.style.color='var(--green)';
+    fb.textContent='정답 +'+gain+(qzCombo>=3?('  🔥 '+qzCombo+'콤보'):'');
   }else{
-    beep(150,0.18,0.14);
-    chalMiss++;markWeak(want.n);
-    setTxt('chalMiss',chalMiss);
-    btn.classList.add('shake');
-    setTimeout(function(){btn.classList.remove('shake');},320);
+    if(btn)btn.classList.add('bad');
+    qzCombo=0;qzMiss++;qzWrong[qzIdx]=1;markWeak(e.n);
+    beep(150,0.2,0.13);
+    fb.style.color='var(--red)';
+    fb.textContent=(choice?'아쉬워요':'시간 초과')+' — 정답은 '+e.syl+' ('+e.s+' '+e.name+')';
   }
+  updQzHud();
+  setTimeout(function(){
+    if(!qzRunning)return;
+    qzIdx++;
+    renderTrack();
+    qzAsk();
+  },ok?420:950);
 }
-function finishChallenge(){
-  if(chalTimer){clearInterval(chalTimer);chalTimer=null;}
-  var ms=Date.now()-chalStart;
-  setTxt('chalTime',fmtSec(ms)+'초');
-  var pts=Math.max(30,500-Math.round(ms/1000)*5-chalMiss*25);
+function qzFinish(){
+  qzRunning=false;
+  if(qzTicker){clearInterval(qzTicker);qzTicker=null;}
+  var acc=Math.round(qzOk/EL.length*100);
   var u=GU();
   if(u){
     u.rhythmPlays=(u.rhythmPlays||0)+1;
-    if(chalMiss===0&&(!u.rhythmBest||ms<u.rhythmBest))u.rhythmBest=ms;
+    if(qzScore>(u.rhythmScore||0))u.rhythmScore=qzScore;
     SU(u);
   }
-  addScore(pts);cloudPush();
-  var msg='기록 '+fmtSec(ms)+'초 · 실수 '+chalMiss+'회\n점수 +'+pts+'점';
-  if(chalMiss>0)msg+='\n(실수 없이 완주해야 최고기록에 올라갑니다)';
-  showPopup('🎵','18개 순서 완주',msg);
+  addScore(qzScore);cloudPush();
+  renderTrack();
+  $('qzAsk').innerHTML='도전 완료';
+  $('qzOpts').innerHTML='';
+  $('qzGauge').style.width='0%';
+  setTxt('qzFb','');
+  setTxt('qzStartBtn','다시 도전');
+  showPopup(acc===100?'🎉':'🎵','비트 도전 완료',
+    '정확도 '+acc+'% ('+qzOk+'/'+EL.length+')\n최고 콤보 '+qzMaxCombo+'\n점수 '+qzScore+'점');
+  updStats();
 }
 
 /* ══════════ 🧠 스토리 ══════════ */
@@ -1137,6 +1268,7 @@ function gradePuzzle(){
     }
   }
   puzGraded=true;
+  var uu=GU();if(uu){uu.puzzlePlays=(uu.puzzlePlays||0)+1;SU(uu);}
   var tot=puzBlanks.length,pct=Math.round(ok/tot*100);
   var badge=$('puzBadge');badge.textContent=ok+'/'+tot+' · '+pct+'점';badge.classList.remove('hidden');
   var u=GU();if(u&&pct>(u.puzzleBest||0)){u.puzzleBest=pct;SU(u);}
@@ -1338,9 +1470,9 @@ function renderRank(){
 function paintRank(rows,isCloud){
   var head='점수',myKey=isCloud?docId(CU||''):CU;
   if(rankMode==='rhythm'){
-    head='리듬 기록';
-    rows=rows.filter(function(r){return (r.u.rhythmBest||0)>0;});
-    rows.sort(function(a,b){return a.u.rhythmBest-b.u.rhythmBest;});
+    head='리듬 최고점';
+    rows=rows.filter(function(r){return (r.u.rhythmScore||0)>0;});
+    rows.sort(function(a,b){return (b.u.rhythmScore||0)-(a.u.rhythmScore||0);});
   }else if(rankMode==='speed'){
     head='타자런 기록';
     rows=rows.filter(function(r){return (r.u.speedBest||0)>0;});
@@ -1361,7 +1493,7 @@ function paintRank(rows,isCloud){
   for(var k=0;k<rows.length&&k<20;k++){
     var r=rows[k],u2=r.u,isMe=(r.key===myKey);
     var val;
-    if(rankMode==='rhythm')val=fmtSec(u2.rhythmBest)+'초';
+    if(rankMode==='rhythm')val=(u2.rhythmScore||0)+'점';
     else if(rankMode==='speed')val=fmtSec(u2.speedBest)+'초';
     else if(rankMode==='speedtap')val=fmtSec(u2.speedTapBest)+'초';
     else if(rankMode==='quiz')val=(u2.quizBest||0)+'점';
@@ -1383,7 +1515,7 @@ function showTab(id,el){
   var bs=document.querySelectorAll('#mainTabs .tab-btn');
   for(var k=0;k<bs.length;k++)bs[k].classList.remove('on');
   el.classList.add('on');
-  if(id!=='rhythm')stopPlay();
+  if(id!=='rhythm'){stopPlay();qzStop(false);}
   if(id!=='speed')srStop();
   if(id==='rank')renderRank();
   window.scrollTo({top:0,behavior:'smooth'});
