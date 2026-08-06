@@ -289,6 +289,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .sc-correct{color:#0d9488;font-weight:800}
 .sc-total{color:#1d4ed8;font-weight:800}
 .sc-rate{color:#7c8598;font-weight:700}
+.sc-retry{color:#be185d;font-weight:800}
+.sc-sub{font-size:11.5px;color:#a8b1bd;font-weight:600}
+.sc-badge{
+  display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.02em;
+  padding:3px 9px;border-radius:999px;background:var(--pink-lt);
+  color:var(--pink-dk);border:1px solid #fbcfe8;margin-left:7px;
+  vertical-align:middle;white-space:nowrap;
+}
 
 .desktop-only{display:block}
 .mobile-only{display:none}
@@ -326,6 +334,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .sc-row{gap:8px;font-size:13px}
   .sc-row-lbl{width:54px;font-size:11.5px}
   .sc-row-title .sc-row-val{font-size:15px}
+  .sc-badge{font-size:10px;padding:2px 8px;margin-left:6px}
   .cm-hero{padding:17px}
   .cm-h-big b{font-size:2rem}
   .cm-h-big span{font-size:14px}
@@ -358,6 +367,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
   .sc-row-lbl{width:auto;padding-top:0}
   .sc-row-title{align-items:flex-start}
   .sc-row-title .sc-row-val{font-size:15px}
+  .sc-badge{margin-left:0;margin-top:4px}
   .score-circle{width:58px;height:58px}
   .sc-pct{font-size:15px}
   .sc-unit{font-size:8.5px}
@@ -906,6 +916,23 @@ function renderLessonsFallback(student,fbList){
    시험이 화면에서 통째로 사라졌다.
    → 응시 여부는 점수가 아니라 '그 파트 기록이 있는가'로 판단한다.
      (examService 는 응시하지 않은 파트를 null 로 저장한다)
+
+   ★★ 응시 횟수 (attemptCount) — 2026-08 수정
+   ────────────────────────────────────────────────────────────────
+   [무엇이 어긋나 있었나]
+   grades 문서 ID 는 {시험ID}__{학생ID} 로 고정되어 있다.
+   재응시하면 같은 문서를 덮어쓰므로 문서는 언제나 1개다.
+   그런데 화면은 '문서 개수'를 세고 있었다.
+     → 2번 본 시험도 "1회"로 보였다.
+   재응시 횟수는 문서 안의 attemptCount 필드에 정상 저장되고 있다.
+   → attemptOf() 로 attemptCount 를 읽어 '응시 횟수'에 합산한다.
+     필드가 없는 옛 기록은 1회로 본다. (기존 화면과 동일)
+
+   [누적 정답 · 최고 기록은 왜 그대로인가]
+   문서에는 마지막 응시 결과 한 벌만 남는다. 이전 응시의 문항별
+   채점 결과는 남아 있지 않으므로 정답 수를 곱해서 부풀리지 않는다.
+   → 응시 횟수만 실제 횟수, 점수는 '가장 최근 기록' 기준.
+     카드에도 그 사실을 함께 적어 학부모가 오해하지 않게 한다.
 ════════════════════════════════════════════════════════════════ */
 function toNum(v){return(typeof v==='number')?v:(v!=null&&v!==''&&!isNaN(Number(v))?Number(v):null);}
 function hasBlock(v){return!!(v&&typeof v==='object');}
@@ -933,11 +960,28 @@ function normalizeGrade(id,r){
     totalQuestions:toNum(r.totalQuestions!=null?r.totalQuestions:(r.totalQ!=null?r.totalQ:r.total)),
     totalCorrect:toNum(r.totalCorrect!=null?r.totalCorrect:(r.correctCount!=null?r.correctCount:(r.correct!=null?r.correct:null))),
     answeredCount:toNum(r.answeredCount),
+    /* ★ 재응시 횟수 — 문서 1개 = 응시 1회가 아니다 */
+    attemptCount:toNum(
+      r.attemptCount!=null?r.attemptCount:
+      (r.attempts!=null?r.attempts:
+      (r.attemptNo!=null?r.attemptNo:
+      (r.tryCount!=null?r.tryCount:null)))
+    ),
     testType:String(r.testType||r.category||'').toLowerCase(),
     timestamp:r.timestamp||r.submittedTimestamp||r.submittedAt||r.date||null,
     cmKey:cmExamKey(id,r),
     cmTally:null   // loadGrades 에서 아래 secOf 기준으로 채운다
   };
+}
+
+/* ★ 실제 응시 횟수 — attemptCount 가 없거나 이상하면 1회로 본다 */
+function attemptOf(r){
+  const n=toNum(r&&r.attemptCount);
+  if(n==null||!isFinite(n))return 1;
+  const v=Math.floor(n);
+  if(v<1)return 1;
+  if(v>999)return 999;   // 잘못 기록된 값이 통계를 망가뜨리지 않게 한다
+  return v;
 }
 
 function isMasterRec(r){return r.testType==='master'||r.masterScore!=null;}
@@ -1036,8 +1080,11 @@ async function loadGrades(sid,fireId){
   }
 }
 
-function setStats(prefix,secs){
-  const count=secs.length;
+/* items = [{r, sec}] — 응시 횟수는 attemptCount 합, 점수는 최근 기록 기준 */
+function setStats(prefix,items){
+  const list=(Array.isArray(items)?items:[]).filter(x=>x&&x.sec);
+  const count=list.reduce((a,x)=>a+attemptOf(x.r),0);
+  const secs=list.map(x=>x.sec);
   const known=secs.filter(s=>s.correct!=null&&s.total!=null);
   const sumC=known.reduce((a,s)=>a+s.correct,0);
   const sumT=known.reduce((a,s)=>a+s.total,0);
@@ -1059,19 +1106,19 @@ function setStats(prefix,secs){
 
 function renderOx(docs){
   const items=docs.map(r=>({r,sec:oxOf(r)})).filter(x=>x.sec);
-  setStats('ox',items.map(x=>x.sec));
+  setStats('ox',items);
   const html=!items.length?emptyBox('⭕','아직 응시한 OX 퀴즈가 없습니다.'):items.map(x=>renderScoreCard(x.r,x.sec)).join('');
   document.querySelectorAll('#oxResultList').forEach(el=>el.innerHTML=html);
 }
 function renderMultiple(docs){
   const items=docs.map(r=>({r,sec:mcOf(r)})).filter(x=>x.sec);
-  setStats('ts',items.map(x=>x.sec));
+  setStats('ts',items);
   const html=!items.length?emptyBox('📝','아직 응시한 4지선다 테스트가 없습니다.'):items.map(x=>renderScoreCard(x.r,x.sec)).join('');
   document.querySelectorAll('#testResultList').forEach(el=>el.innerHTML=html);
 }
 function renderMaster(docs){
   const items=docs.map(r=>({r,sec:masterOf(r)})).filter(x=>x.sec);
-  setStats('ms',items.map(x=>x.sec));
+  setStats('ms',items);
   const html=!items.length?emptyBox('🎯','아직 응시한 마스터테스트가 없습니다.'):items.map(x=>renderScoreCard(x.r,x.sec)).join('');
   document.querySelectorAll('#masterTestList').forEach(el=>el.innerHTML=html);
 }
@@ -1082,11 +1129,16 @@ function renderScoreCard(r,sec){
   const dt=gradeDateStr(r)||'—';
   const hasFrac=(sec.correct!=null&&sec.total!=null);
   const title=e(r.testName||r.subject||'테스트');
+  const at=attemptOf(r);                 // ★ 실제 응시 횟수
+  const many=at>1;
 
   const rows=[];
-  rows.push(`<div class="sc-row sc-row-title"><span class="sc-row-lbl">단원명</span><span class="sc-row-val">${title}</span></div>`);
+  rows.push(`<div class="sc-row sc-row-title"><span class="sc-row-lbl">단원명</span><span class="sc-row-val">${title}${many?`<span class="sc-badge">${at}회 응시</span>`:''}</span></div>`);
   if(r.subject)rows.push(`<div class="sc-row"><span class="sc-row-lbl">과목</span><span class="sc-row-val">${e(r.subject)}</span></div>`);
-  rows.push(`<div class="sc-row"><span class="sc-row-lbl">응시 날짜</span><span class="sc-row-val sc-date">${dt}</span></div>`);
+  rows.push(`<div class="sc-row"><span class="sc-row-lbl">${many?'최근 응시':'응시 날짜'}</span><span class="sc-row-val sc-date">${dt}</span></div>`);
+  if(many){
+    rows.push(`<div class="sc-row"><span class="sc-row-lbl">응시 횟수</span><span class="sc-row-val">총 <b class="sc-retry">${at}</b>회 응시 <span class="sc-sub">· 아래 결과는 가장 최근 기록입니다</span></span></div>`);
+  }
   if(hasFrac){
     rows.push(`<div class="sc-row"><span class="sc-row-lbl">채점 결과</span><span class="sc-row-val">전체 <b class="sc-total">${sec.total}</b>문항 중 <b class="sc-correct">${sec.correct}</b>문항 정답${rate!=null?` <span class="sc-rate">(정답률 ${rate}%)</span>`:''}</span></div>`);
   }else if(rate!=null){
@@ -1109,6 +1161,7 @@ function renderScoreCard(r,sec){
    과학 개념 지도 (탭 1)
    · 개념·문구·색은 concept-map.js 한 곳에서만 관리한다
    · 문항 집계는 위의 tallyOf() 를 그대로 쓴다 (점수 카드와 동일)
+   · '누적 평가' 횟수도 attemptCount 를 합산한다 (탭 숫자와 일치)
 ════════════════════════════════════════════════════════════════ */
 const CM=(typeof window!=='undefined'&&window.ConceptMap)?window.ConceptMap:null;
 let cmTagMap={},cmAnalysis=null,cmArea=1,cmExamCount=0;
@@ -1179,7 +1232,9 @@ function buildConceptAnalysis(docs){
   if(!CM)return;
   const recs=[];let taken=0;
   (Array.isArray(docs)?docs:[]).forEach(r=>{
-    if(r.cmTally||oxOf(r)||mcOf(r)||masterOf(r))taken++;
+    /* 응시한 시험이면 실제 응시 횟수만큼 세어 탭의 '응시 횟수'와 맞춘다.
+       (개념 판정에 쓰는 문항 기록은 마지막 응시분 한 벌만 사용한다) */
+    if(r.cmTally||oxOf(r)||mcOf(r)||masterOf(r))taken+=attemptOf(r);
     const t=r.cmTally;
     if(!t)return;
     const ids=cmTagMap[r.cmKey]||[];
