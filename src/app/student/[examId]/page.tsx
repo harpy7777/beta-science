@@ -12,6 +12,36 @@ import toast from 'react-hot-toast';
 
 type Phase = 'name' | 'exam' | 'result';
 
+// ─────────────────────────────────────────────
+// ★ 미응답 판정 (순수 함수)
+//   [예전 문제] 아래 번호판으로 '마지막 문제'로 건너뛴 뒤 답을 고르면
+//   앞 문제를 안 풀었어도 그 자리에서 제출돼 버렸다.
+//   그래서 20문항짜리 OX가 1~2문항만 채워진 채 0점으로 저장되는 일이 생겼다.
+//   [지금 규칙] '마지막 번호'가 아니라 '빈 문항이 하나도 없을 때' 제출한다.
+// ─────────────────────────────────────────────
+function hasAns(answers: Record<string, string>, id: string): boolean {
+  const v = answers ? answers[id] : undefined;
+  return v !== undefined && v !== null && String(v).trim() !== '';
+}
+
+function unansweredIndexes(list: Exam['questions'], answers: Record<string, string>): number[] {
+  const out: number[] = [];
+  (list ?? []).forEach((q, i) => { if (!hasAns(answers, q.id)) out.push(i); });
+  return out;
+}
+
+// 현재 위치 다음부터 안 푼 문제를 찾고, 뒤에 없으면 앞쪽에서 찾는다.
+function nextUnansweredFrom(
+  list: Exam['questions'],
+  answers: Record<string, string>,
+  from: number
+): number {
+  const miss = unansweredIndexes(list, answers);
+  if (miss.length === 0) return -1;
+  const after = miss.find(i => i > from);
+  return after !== undefined ? after : miss[0];
+}
+
 function StudentExamInner() {
   const { examId } = useParams<{ examId: string }>();
   const searchParams = useSearchParams();
@@ -92,70 +122,107 @@ function StudentExamInner() {
     return e.questions.filter((q: any) => q.type === typeFilter);
   }
 
-  // 자동 제출
+  // ─────────────────────────────────────────────
+  // 제출 — 빈 문항이 하나도 없을 때만 저장한다.
+  // 저장에 실패하면 결과 화면으로 넘어가지 않는다.
+  // (예전에는 저장이 실패해도 "시험 끝!"이 떠서 학생이 정상 제출로 착각했다)
+  // ─────────────────────────────────────────────
   async function autoSubmit(finalAnswers: Record<string, string>, questionsForSubmit: Exam['questions']) {
     if (!exam) return;
+    if (submitting) return;
+
+    // ① 마지막 안전장치 — 빈 문항이 있으면 저장하지 않고 그 문제로 보낸다
+    const miss = unansweredIndexes(questionsForSubmit, finalAnswers);
+    if (miss.length > 0) {
+      toast.error(`아직 ${miss.length}문항이 비어 있어요. 모두 고른 뒤 제출됩니다.`);
+      setCurrent(miss[0]);
+      return;
+    }
 
     const virtualExam: Exam = { ...exam, questions: questionsForSubmit };
     const s = calculateScore(virtualExam, finalAnswers);
-    setScore(s);
 
-    // 우선 이번 세션 기준 요약을 즉시 세팅 (네트워크가 느려도 화면이 비지 않도록)
-    setSummary(buildSubmissionSummary(exam.questions ?? [], finalAnswers));
-
-    if (!isPreview) {
-      setSubmitting(true);
-      try {
-        await submitStudentAnswers({
-          examId: exam.id!,
-          studentName,
-          studentId,
-          answers: finalAnswers,
-          score: s,
-          totalQuestions: questionsForSubmit.length,
-          subType: typeFilter,
-        });
-        // 저장된 이전 답안까지 합친 정확한 요약으로 교체 (OX를 먼저 푼 기록 반영)
-        const merged = await getSubmissionSummary(exam.id!, studentId, finalAnswers);
-        if (merged) setSummary(merged);
-      } catch {
-        toast.error('제출 중 오류가 발생했습니다');
-      } finally {
-        setSubmitting(false);
-      }
+    // 미리보기는 저장하지 않고 이번 세션 기준으로만 보여준다
+    if (isPreview) {
+      setScore(s);
+      setSummary(buildSubmissionSummary(exam.questions ?? [], finalAnswers));
+      setPhase('result');
+      return;
     }
-    setPhase('result');
+
+    setSubmitting(true);
+    try {
+      await submitStudentAnswers({
+        examId: exam.id!,
+        studentName,
+        studentId,
+        answers: finalAnswers,
+        score: s,
+        totalQuestions: questionsForSubmit.length,
+        subType: typeFilter,
+      });
+
+      // 저장된 이전 답안까지 합친 정확한 요약 (OX를 먼저 푼 기록 반영)
+      let merged: SubmissionSummary | null = null;
+      try {
+        merged = await getSubmissionSummary(exam.id!, studentId, finalAnswers);
+      } catch {
+        merged = null;
+      }
+
+      setScore(s);
+      setSummary(merged ?? buildSubmissionSummary(exam.questions ?? [], finalAnswers));
+      setSubmitting(false);
+      setPhase('result');   // ★ 저장이 성공했을 때만 결과 화면으로
+    } catch (err: any) {
+      setSubmitting(false);
+      const code = err && err.code;
+      if (code === 'UNANSWERED' || code === 'PREV_READ_FAILED') {
+        // examService가 알려준 정확한 사유를 그대로 보여준다
+        toast.error(String(err.message || '제출할 수 없습니다'), { duration: 6000 });
+      } else {
+        toast.error('제출에 실패했습니다. 네트워크를 확인하고 다시 시도해주세요.', { duration: 6000 });
+      }
+      // 결과 화면으로 넘어가지 않는다 → 학생이 다시 제출할 수 있다
+    }
   }
 
   function handleAnswer(questionId: string, value: string) {
     if (!exam) return;
+    if (submitting) return;
     const filteredQs = getFilteredQuestions(exam);
     const newAnswers = { ...answers, [questionId]: value };
     setAnswers(newAnswers);
 
-    if (current < filteredQs.length - 1) {
-      setCurrent(c => c + 1);
-    } else {
+    // ★ 빈 문항이 하나도 없을 때만 제출한다 (푼 순서는 상관없다)
+    const nextIdx = nextUnansweredFrom(filteredQs, newAnswers, current);
+    if (nextIdx === -1) {
       autoSubmit(newAnswers, filteredQs);
+    } else {
+      setCurrent(nextIdx);
     }
   }
 
-  // 재풀기 답 선택
+  // 재풀기 답 선택 — 같은 규칙 적용
   function handleRetryAnswer(questionId: string, value: string) {
     const newAnswers = { ...retryAnswers, [questionId]: value };
     setRetryAnswers(newAnswers);
 
-    if (current < retryQuestions.length - 1) {
-      setCurrent(c => c + 1);
-    } else {
-      let correct = 0;
-      retryQuestions.forEach(item => {
-        if (isAnswerCorrect(newAnswers[item.id], item.answer)) correct++;
-      });
-      const s = Math.round((correct / retryQuestions.length) * 100);
-      setRetryScore(s);
-      setRetryPhase('result');
+    const nextIdx = nextUnansweredFrom(retryQuestions, newAnswers, current);
+    if (nextIdx !== -1) {
+      setCurrent(nextIdx);
+      return;
     }
+
+    let correct = 0;
+    retryQuestions.forEach(item => {
+      if (isAnswerCorrect(newAnswers[item.id], item.answer)) correct++;
+    });
+    const s = retryQuestions.length > 0
+      ? Math.round((correct / retryQuestions.length) * 100)
+      : 0;
+    setRetryScore(s);
+    setRetryPhase('result');
   }
 
   // 틀린 문제만 다시 풀기
@@ -264,7 +331,14 @@ function StudentExamInner() {
   const questions = isRetryMode ? retryQuestions : filteredQuestions;
   const currentAnswers = isRetryMode ? retryAnswers : answers;
   const q = questions[current];
-  const answered = Object.keys(currentAnswers).length;
+  const answered = Object.keys(currentAnswers).filter(k => hasAns(currentAnswers, k)).length;
+
+  // ★ 남은(비어 있는) 문항
+  const missingIdxs = unansweredIndexes(questions, currentAnswers);
+  const remaining = missingIdxs.length;
+  function goToFirstUnanswered() {
+    if (missingIdxs.length > 0) setCurrent(missingIdxs[0]);
+  }
 
   const wrongQuestions = filteredQuestions.filter(item => !isAnswerCorrect(answers[item.id], item.answer));
 
@@ -300,6 +374,18 @@ function StudentExamInner() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex flex-col">
+
+      {/* ★ 저장 중 오버레이 — 저장이 끝나기 전에 화면을 건드리지 못하게 한다 */}
+      {submitting && (
+        <div className="fixed inset-0 z-[60] bg-white/85 flex items-center justify-center px-6">
+          <div className="text-center">
+            <div className="w-9 h-9 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-sm font-bold text-green-700">성적을 저장하고 있어요</p>
+            <p className="text-xs text-gray-400 mt-1">창을 닫거나 새로고침하지 마세요</p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-white border-b border-green-100 sticky top-0 z-50">
         <div className="max-w-2xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
@@ -378,6 +464,9 @@ function StudentExamInner() {
               <button onClick={startExamWithName} className="btn-primary w-full mt-4">
                 시험 시작하기 →
               </button>
+              <p className="text-[11px] text-gray-400 mt-3 leading-relaxed">
+                {filteredQuestions.length}문항을 모두 풀어야 제출됩니다
+              </p>
             </div>
           </div>
         )}
@@ -393,6 +482,26 @@ function StudentExamInner() {
                 <button onClick={exitRetry} className="text-xs text-orange-500 underline">
                   결과로 돌아가기
                 </button>
+              </div>
+            )}
+
+            {/* ★ 빈 문항 경고 — 남은 문항이 있으면 항상 보인다 */}
+            {remaining > 0 && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 mb-4 flex items-center justify-between gap-3">
+                <span className="text-amber-800 text-xs font-bold leading-snug">
+                  아직 {remaining}문항이 비어 있어요 · 모두 풀어야 제출됩니다
+                </span>
+                <button
+                  onClick={goToFirstUnanswered}
+                  className="text-xs font-bold text-amber-700 underline shrink-0 whitespace-nowrap"
+                >
+                  안 푼 문제로 →
+                </button>
+              </div>
+            )}
+            {remaining === 0 && (
+              <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-2.5 mb-4 text-xs font-bold text-green-700">
+                ✓ 모든 문항을 풀었어요
               </div>
             )}
 
@@ -423,6 +532,7 @@ function StudentExamInner() {
                   {(['O', 'X'] as const).map(v => (
                     <button
                       key={v}
+                      disabled={submitting}
                       onClick={() => isRetryMode ? handleRetryAnswer(q.id, v) : handleAnswer(q.id, v)}
                       className={`ox-btn ${v === 'O' ? 'ox-btn-o' : 'ox-btn-x'} ${currentAnswers[q.id] === v ? 'selected' : ''}`}
                     >
@@ -437,6 +547,7 @@ function StudentExamInner() {
                   {q.options.map((opt, i) => (
                     <button
                       key={i}
+                      disabled={submitting}
                       onClick={() => isRetryMode ? handleRetryAnswer(q.id, String(i + 1)) : handleAnswer(q.id, String(i + 1))}
                       className={`choice-btn ${currentAnswers[q.id] === String(i + 1) ? 'selected' : ''}`}
                     >
@@ -463,7 +574,7 @@ function StudentExamInner() {
                     className={`w-8 h-8 shrink-0 rounded-full text-xs font-bold transition-all ${
                       i === current
                         ? 'bg-green-600 text-white'
-                        : currentAnswers[questions[i].id]
+                        : hasAns(currentAnswers, questions[i].id)
                         ? 'bg-green-100 text-green-700'
                         : 'bg-gray-100 text-gray-400'
                     }`}
@@ -573,7 +684,8 @@ function StudentExamInner() {
                 </div>
               </div>
 
-              {/* ★ 두 유형을 다 끝냈을 때만: 종합 점수 카드 */}
+              {/* ★ 두 유형을 다 끝냈을 때만: 종합 점수 카드
+                  점수는 저장값과 같은 '전체 문항 기준'을 쓴다 */}
               {allDone && examHasOx && examHasMulti && summary && (
                 <div className="rounded-2xl border-2 border-green-200 bg-white p-4 mb-4">
                   <div className="text-xs font-bold text-gray-400 tracking-wide mb-2">이 시험지 종합 결과</div>
@@ -587,14 +699,14 @@ function StudentExamInner() {
                     <div className="flex-1 rounded-xl bg-green-50 py-2.5">
                       <div className="text-[11px] font-bold text-green-700 mb-0.5">OX퀴즈</div>
                       <div className="text-lg font-black text-green-700">
-                        {summary.oxScore ?? 0}<span className="text-xs font-semibold ml-0.5">점</span>
+                        {summary.oxFullScore ?? 0}<span className="text-xs font-semibold ml-0.5">점</span>
                       </div>
                       <div className="text-[10px] text-gray-400">{summary.oxCorrect}/{summary.oxTotal}</div>
                     </div>
                     <div className="flex-1 rounded-xl bg-blue-50 py-2.5">
                       <div className="text-[11px] font-bold text-blue-700 mb-0.5">4지선다</div>
                       <div className="text-lg font-black text-blue-700">
-                        {summary.multiScore ?? 0}<span className="text-xs font-semibold ml-0.5">점</span>
+                        {summary.multiFullScore ?? 0}<span className="text-xs font-semibold ml-0.5">점</span>
                       </div>
                       <div className="text-[10px] text-gray-400">{summary.multiCorrect}/{summary.multiTotal}</div>
                     </div>
@@ -608,10 +720,6 @@ function StudentExamInner() {
                   아직 {nextTypeLabel}
                   {nextTypeCount > 0 ? ` ${nextTypeCount}문항이` : '가'} 남아 있어요
                 </div>
-              )}
-
-              {submitting && (
-                <div className="text-xs text-gray-400 mb-3">성적 저장 중...</div>
               )}
 
               {wrongQuestions.length > 0 && (
