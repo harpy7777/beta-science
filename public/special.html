@@ -407,28 +407,46 @@ function clsCell(full){
   return `<span class="cls-badge" title="${e(full)}">${e(label)}</span>`;
 }
 
-/* ── 점수 계산 (dashboard.html과 동일 로직) ── */
-function cSc(r){let o,mu,ma;if(r.oxScore!=null)o=+r.oxScore;else if(Array.isArray(r.oxAnswers)&&Array.isArray(r.oxCorrect)){let c=0;r.oxAnswers.forEach((a,i)=>{if(a===r.oxCorrect[i])c++;});o=Math.round(c/r.oxCorrect.length*100);}else if(r.testType==='ox'&&r.score!=null)o=+r.score;if(r.multiScore!=null)mu=+r.multiScore;else if(Array.isArray(r.multiAnswers)&&Array.isArray(r.multiCorrect)){let c=0;r.multiAnswers.forEach((a,i)=>{if(a===r.multiCorrect[i])c++;});mu=Math.round(c/r.multiCorrect.length*100);}else if(r.testType==='multiple'&&r.score!=null)mu=+r.score;if(r.testType==='master'&&r.score!=null)ma=+r.score;else if(r.masterScore!=null)ma=+r.masterScore;if(o==null&&mu==null&&ma==null){if(r.testType==='ox')o=+(r.score||0);else if(r.testType==='multiple')mu=+(r.score||0);}return{oxScore:o,multiScore:mu,masterScore:ma};}
+/* ══════════════════════════════════════════════════════════════
+   응시 파트별 점수 {ox, multi, master} — 안 본 파트는 null
+   ------------------------------------------------------------------
+   ★ dashboard.html 의 partScores() 와 반드시 동일해야 한다.
+     (한쪽만 고치면 두 페이지 숫자가 다시 어긋난다)
+
+   판정 기준은 "점수"가 아니라 "문항 수(total)"다.
+   examService.ts 는 답을 하나라도 채운 유형만 {score,correct,total} 로 저장하고
+   손대지 않은 유형은 null 로 둔다. 따라서 total>0 이면 응시한 것이고,
+   그때의 score 는 0점이어도 정상 점수다. (전부 틀린 경우)
+   ※ 예전처럼 score>0 인지로 거르면 "다 틀린 학생"이 미응시로 사라진다.
+      0점이야말로 가장 관리가 필요한 기록이므로 반드시 살린다.
+   ══════════════════════════════════════════════════════════════ */
 function partScores(r){
+  // 마스터: 응시해야 문서가 생기므로 score 를 그대로 쓴다 (0점 포함)
   if(r.category==='master'||r.testType==='master'){
-    const sc=(r.multiple&&typeof r.multiple==='object'&&r.multiple.score!=null)?+r.multiple.score:(r.score!=null?+r.score:null);
+    const sc=(r.multiple&&typeof r.multiple==='object'&&r.multiple.score!=null)?+r.multiple.score
+            :(r.score!=null?+r.score:null);
     return {ox:null,multi:null,master:sc};
   }
-  const hasOx=r.ox&&typeof r.ox==='object'&&r.ox.total;
-  const hasMu=r.multiple&&typeof r.multiple==='object'&&r.multiple.total;
+  // 새 구조 (examService.ts 저장분) — total>0 = 응시
+  const hasOx=r.ox&&typeof r.ox==='object'&&+r.ox.total>0;
+  const hasMu=r.multiple&&typeof r.multiple==='object'&&+r.multiple.total>0;
   if(hasOx||hasMu){
-    let ox=hasOx?(r.ox.score!=null?+r.ox.score:0):null;
-    let mu=hasMu?(r.multiple.score!=null?+r.multiple.score:0):null;
-    if(ox!=null&&!(ox>0))ox=null;
-    if(mu!=null&&!(mu>0))mu=null;
-    return {ox,multi:mu,master:null};
+    return {
+      ox:    hasOx?(r.ox.score!=null?+r.ox.score:0):null,
+      multi: hasMu?(r.multiple.score!=null?+r.multiple.score:0):null,
+      master:null
+    };
   }
-  const{oxScore:o,multiScore:mu,masterScore:ma}=cSc(r);
-  let ox=o==null?null:+o, m=mu==null?null:+mu, ms=ma==null?null:+ma;
-  if(ox!=null&&!(ox>0))ox=null;
-  if(m!=null&&!(m>0))m=null;
-  if(ox==null&&m==null&&ms==null&&r.score!=null&&+r.score>0)m=+r.score;
-  return {ox, multi:m, master:ms};
+  // 옛 구조 폴백 — 필드가 "존재하면" 채점이 돌았다는 뜻이므로 0점도 인정
+  let ox=null,mu=null,ma=null;
+  if(r.oxScore!=null)ox=+r.oxScore;
+  else if(r.testType==='ox'&&r.score!=null)ox=+r.score;
+  if(r.multiScore!=null)mu=+r.multiScore;
+  else if(r.testType==='multiple'&&r.score!=null)mu=+r.score;
+  if(r.masterScore!=null)ma=+r.masterScore;
+  // 유형 정보가 전혀 없는 빈 껍데기 문서는 제외 (유령 항목 방지)
+  if(ox==null&&mu==null&&ma==null&&r.score!=null&&+r.score>0)mu=+r.score;
+  return {ox,multi:mu,master:ma};
 }
 
 /* ── 입력 보존: 실시간 갱신(onSnapshot)이 와도 타이핑 중인 값·포커스·스크롤 유지 ── */
