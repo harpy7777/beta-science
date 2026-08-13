@@ -15,7 +15,9 @@ body {
   background: #fafafa; color: #1d1d1f; min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
+  -webkit-user-select: none; user-select: none;   /* ★ 화면 텍스트 드래그 복사 억제 */
 }
+input, textarea { -webkit-user-select: text; user-select: text; }   /* 입력칸은 예외 */
 
 /* ── Header ── */
 .header {
@@ -225,7 +227,7 @@ body {
 /* ── 결과 ── */
 .result-card {
   background: #fff; border: 1px solid #fce7f3; border-radius: 20px;
-  padding: 2.4rem 1.8rem; max-width: 520px; margin: 2rem auto; text-align: center;
+  padding: 2.4rem 1.8rem; max-width: 560px; margin: 2rem auto; text-align: center;
   box-shadow: 0 4px 24px rgba(219,39,119,0.1);
 }
 .result-emoji { font-size: 3rem; margin-bottom: 1rem; }
@@ -256,6 +258,56 @@ body {
   transition: opacity 0.15s; touch-action: manipulation;
 }
 .home-btn:hover { opacity: 0.88; }
+
+/* ★★ 문항별 정답 확인 (제출 후에만 나타남) ★★ */
+.review-box {
+  display: none; text-align: left; margin-bottom: 1.4rem;
+  border-top: 1px solid #fdf2f8; padding-top: 1.3rem;
+}
+.rv-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; flex-wrap: wrap; margin-bottom: 10px;
+}
+.rv-title { font-size: 13.5px; font-weight: 700; color: #1d1d1f; }
+.rv-tabs { display: flex; gap: 6px; }
+.rv-tab {
+  border: 1.5px solid #fce7f3; background: #fff; color: #6e6e73;
+  border-radius: 20px; padding: 6px 12px; min-height: 34px;
+  font-size: 11.5px; font-weight: 700; font-family: inherit;
+  cursor: pointer; white-space: nowrap; touch-action: manipulation;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.rv-tab.active { background: linear-gradient(135deg,#f472b6,#db2777); border-color: #db2777; color: #fff; }
+.rv-legend {
+  font-size: 11px; color: #aeaeb2; line-height: 1.6;
+  margin-bottom: 9px; word-break: keep-all;
+}
+.rv-list {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px;
+  max-height: 360px; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding-right: 2px;
+}
+.rv-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 10px; border-radius: 12px;
+  border: 1.5px solid #d1fae5; background: #f6fdfa;
+}
+.rv-row.bad { border-color: #fecaca; background: #fff5f5; }
+.rv-num { flex: 0 0 40px; font-size: 12px; font-weight: 800; color: #059669; }
+.rv-row.bad .rv-num { color: #dc2626; }
+.rv-pair { display: flex; align-items: center; gap: 5px; flex: 1 1 auto; min-width: 0; flex-wrap: wrap; }
+.rv-chip { font-size: 11px; font-weight: 700; border-radius: 8px; padding: 4px 8px; white-space: nowrap; }
+.rv-chip.mine { background: #eef0f3; color: #6e6e73; }
+.rv-row.bad .rv-chip.mine { background: #fee2e2; color: #b91c1c; }
+.rv-chip.ans { background: #d1fae5; color: #047857; }
+.rv-mark { flex: 0 0 auto; font-size: 14px; font-weight: 800; }
+.rv-mark.ok { color: #059669; }
+.rv-mark.no { color: #dc2626; }
+.rv-empty {
+  grid-column: 1 / -1; text-align: center; padding: 1.6rem 1rem;
+  font-size: 12.5px; color: #059669; font-weight: 700;
+  background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; line-height: 1.7;
+}
 
 .loading { text-align: center; padding: 3rem 1rem; color: #db2777; font-size: 13px; }
 .spinner { width: 32px; height: 32px; border: 3px solid #fce7f3; border-top-color: #db2777; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
@@ -291,19 +343,66 @@ body {
   .omr-choice { max-width: 52px; min-height: 42px; font-size: 13px; }
   .omr-warn { font-size: 11px; padding: 8px 10px; }
   .result-card { margin: 1rem 0.8rem; padding: 2rem 1.3rem; }
+  .result-card { margin-left: max(0.8rem, env(safe-area-inset-left)); margin-right: max(0.8rem, env(safe-area-inset-right)); }
+
+  /* 문항별 정답 확인 — 모바일은 1열 + 스크롤 영역 축소 */
+  .rv-head { gap: 6px; }
+  .rv-title { font-size: 12.5px; }
+  .rv-tab { font-size: 11px; padding: 6px 10px; }
+  .rv-list { grid-template-columns: 1fr; max-height: 320px; gap: 5px; }
+  .rv-row { padding: 8px 9px; gap: 6px; }
+  .rv-num { flex: 0 0 36px; font-size: 11.5px; }
+  .rv-chip { font-size: 10.5px; padding: 4px 7px; }
 }
 @media (max-width: 340px) {
   .omr-q { gap: 6px; padding: 4px 3px; }
   .omr-choices { gap: 4px; }
   .omr-q-num { flex: 0 0 28px; }
   .omr-choice { min-height: 38px; }
+  .rv-num { flex: 0 0 32px; }
+  .rv-chip { font-size: 10px; padding: 3px 6px; }
 }
 /* 가로 모드 등 넓은 화면에서 3열까지 */
 @media (min-width: 900px) {
   .omr-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
 }
 </style>
-<script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
+<script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script>
+
+<!-- ★ 개발자 도구·소스보기 진입 억제 (완전 차단은 아님 · 아래 설명 참고) -->
+<script>
+(function(){
+  // 우클릭 / 길게 누르기 메뉴 차단
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); }, { capture:true });
+
+  // 개발자 도구 단축키 차단
+  document.addEventListener('keydown', function(e){
+    var k = (e.key || '').toLowerCase();
+    var meta = e.ctrlKey || e.metaKey;
+    if (k === 'f12') { e.preventDefault(); e.stopPropagation(); return false; }
+    if (meta && e.shiftKey && (k === 'i' || k === 'j' || k === 'c' || k === 'k')) {
+      e.preventDefault(); e.stopPropagation(); return false;
+    }
+    if (meta && (k === 'u' || k === 's' || k === 'p')) {   // 소스보기 / 저장 / 인쇄
+      e.preventDefault(); e.stopPropagation(); return false;
+    }
+  }, { capture:true });
+
+  // 드래그로 텍스트 긁어가기 차단 (입력칸은 제외)
+  document.addEventListener('selectstart', function(e){
+    var t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+    e.preventDefault();
+  }, { capture:true });
+
+  // 콘솔 경고
+  try {
+    console.log('%c잠깐!', 'font-size:26px;font-weight:800;color:#db2777;');
+    console.log('%c이 창은 개발자용입니다. 시험 중에는 사용하지 마세요.', 'font-size:13px;color:#6e6e73;');
+  } catch(e) {}
+})();
+</script>
+</head>
 <body>
 
 <header class="header">
@@ -429,6 +528,20 @@ body {
     </div>
     <div class="result-detail" id="result-detail"></div>
     <div class="result-again" id="result-again" style="display:none;"></div>
+
+    <!-- ★★ 문항별 정답 확인 ★★ -->
+    <div class="review-box" id="review-box">
+      <div class="rv-head">
+        <div class="rv-title">📝 문항별 채점 결과</div>
+        <div class="rv-tabs">
+          <button class="rv-tab active" id="rv-tab-all"   onclick="setReviewMode('all')">전체</button>
+          <button class="rv-tab"        id="rv-tab-wrong" onclick="setReviewMode('wrong')">틀린 문제</button>
+        </div>
+      </div>
+      <div class="rv-legend">틀린 문항에는 정답이 함께 표시됩니다. 오답 노트에 옮겨 적고 다시 풀어보세요.</div>
+      <div class="rv-list" id="rv-list"></div>
+    </div>
+
     <div class="result-task-box" id="result-task-box" style="display:none;">
       <div class="result-task-title">📌 이번 과제</div>
       <div class="result-task-text" id="result-task-text">—</div>
@@ -511,6 +624,10 @@ let submitting   = false;
 
 // ★ 현재 시험의 문항 배치 (중복 번호 제거 후) — buildOMR에서 채워진다
 let omrPlan = { groups: [], total: 0, dup: [] };
+
+// ★★ 제출 후 문항별 채점 결과 (결과 화면에서만 채워짐) ★★
+let reviewRows = [];          // [{ num, mine, ans, ok }]
+let reviewMode = 'all';       // 'all' | 'wrong'
 
 // 문항 번호 순 정렬용 (q1, q2, … q50)
 function qNumOf(qno) { return Number(String(qno).replace('q','')) || 0; }
@@ -710,6 +827,10 @@ window.selectTest = (fireId) => {
 function buildOMR() {
   omrPlan = buildPlan(selectedTest);
 
+  // 새 시험을 열면 이전 채점 결과는 비운다
+  reviewRows = [];
+  reviewMode = 'all';
+
   document.getElementById('omr-test-title').textContent = selectedTest.unitName || '—';
   const metaBits = [selectedTest.subject || '', normalizeGrade(selectedTest.grade || ''), omrPlan.total + '문제'];
   document.getElementById('omr-test-meta').textContent = metaBits.filter(Boolean).join(' · ');
@@ -821,7 +942,7 @@ function updateProgress() {
       warn.textContent = `아직 ${missing}문제가 비어 있어요. 모든 문제를 풀어야 제출됩니다.`;
     } else if (total > 0) {
       warn.className = 'omr-warn show ok';
-      warn.textContent = '✓ 모든 문제를 풀었어요. 제출할 수 있습니다.';
+      warn.textContent = '✓ 모든 문제를 풀었어요. 제출하면 정답과 채점 결과를 볼 수 있습니다.';
     } else {
       warn.className = 'omr-warn';
       warn.textContent = '';
@@ -876,6 +997,58 @@ window.jumpToPart = (pi) => {
 };
 
 // ──────────────────────────────────────────────
+// ★★ 문항별 채점 결과 표시 ★★
+//   제출이 끝난 뒤에만 reviewRows가 채워지고, 그때만 화면에 그린다.
+// ──────────────────────────────────────────────
+const RV_SYM = ['', '①', '②', '③', '④', '⑤'];
+function rvSym(v) {
+  const n = Number(v);
+  if (n >= 1 && n <= 5) return RV_SYM[n];
+  return (v === null || v === undefined || String(v).trim() === '') ? '무응답' : String(v);
+}
+
+function renderReview() {
+  const box  = document.getElementById('review-box');
+  const list = document.getElementById('rv-list');
+  if (!box || !list) return;
+
+  if (!reviewRows.length) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+
+  const wrongCount = reviewRows.filter(r => !r.ok).length;
+
+  // 탭 라벨 · 활성 상태
+  const tabAll   = document.getElementById('rv-tab-all');
+  const tabWrong = document.getElementById('rv-tab-wrong');
+  if (tabAll)   { tabAll.textContent = `전체 ${reviewRows.length}`; tabAll.classList.toggle('active', reviewMode === 'all'); }
+  if (tabWrong) { tabWrong.textContent = `틀린 문제 ${wrongCount}`;  tabWrong.classList.toggle('active', reviewMode === 'wrong'); }
+
+  const rows = (reviewMode === 'wrong') ? reviewRows.filter(r => !r.ok) : reviewRows;
+
+  if (!rows.length) {
+    list.innerHTML = '<div class="rv-empty">틀린 문제가 하나도 없어요. 완벽합니다! 🎉</div>';
+    return;
+  }
+
+  list.innerHTML = rows.map(r => `
+    <div class="rv-row ${r.ok ? '' : 'bad'}">
+      <div class="rv-num">${r.num}번</div>
+      <div class="rv-pair">
+        <span class="rv-chip mine">내 답 ${esc(rvSym(r.mine))}</span>
+        ${r.ok ? '' : `<span class="rv-chip ans">정답 ${esc(rvSym(r.ans))}</span>`}
+      </div>
+      <div class="rv-mark ${r.ok ? 'ok' : 'no'}">${r.ok ? '○' : '✕'}</div>
+    </div>`).join('');
+}
+
+window.setReviewMode = (mode) => {
+  reviewMode = (mode === 'wrong') ? 'wrong' : 'all';
+  renderReview();
+  const list = document.getElementById('rv-list');
+  if (list) list.scrollTop = 0;
+};
+
+// ──────────────────────────────────────────────
 // ★ 제출
 //   [바뀐 점 1] 안 푼 문제가 하나라도 있으면 저장하지 않는다.
 //   [바뀐 점 2] 문서 ID를 `${시험ID}__${학생ID}`로 고정한다.
@@ -883,6 +1056,7 @@ window.jumpToPart = (pi) => {
 //   [바뀐 점 3] 학생 ID가 없으면 저장 자체를 막는다.
 //     예전에는 랜덤 ID로 새 문서를 만들어, 학생과 연결되지 않은
 //     유령 성적이 남거나 서로 덮어쓸 수 있었다.
+//   [바뀐 점 4] 저장이 끝나면 문항별 채점 결과(내 답 / 정답 / O·X)를 보여준다.
 // ──────────────────────────────────────────────
 function masterDocId(examFireId, sid) {
   return `${examFireId}__${String(sid || '').trim().toLowerCase()}`;
@@ -1044,6 +1218,16 @@ window.submitOMR = async () => {
       againBox.style.display = 'none';
     }
   }
+
+  // ★★ 문항별 채점 결과 채우기 — 제출이 끝난 지금부터 정답이 보인다
+  reviewRows = answersDetail.map(d => ({
+    num:  Number(String(d.question).replace('Q','')) || 0,
+    mine: d.studentAnswer,
+    ans:  d.correctAnswer,
+    ok:   !!d.isCorrect
+  }));
+  reviewMode = (wrong > 0) ? 'wrong' : 'all';   // 틀린 게 있으면 오답부터 보여준다
+  renderReview();
 
   if (taskText) {
     document.getElementById('result-task-box').style.display = 'block';
