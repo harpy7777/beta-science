@@ -16,6 +16,7 @@ body {
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
   -webkit-user-select: none; user-select: none;   /* ★ 화면 텍스트 드래그 복사 억제 */
+  -webkit-touch-callout: none;                    /* ★ iOS 길게누르기 복사 메뉴 차단 */
 }
 input, textarea { -webkit-user-select: text; user-select: text; }   /* 입력칸은 예외 */
 
@@ -394,12 +395,6 @@ input, textarea { -webkit-user-select: text; user-select: text; }   /* 입력칸
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
     e.preventDefault();
   }, { capture:true });
-
-  // 콘솔 경고
-  try {
-    console.log('%c잠깐!', 'font-size:26px;font-weight:800;color:#db2777;');
-    console.log('%c이 창은 개발자용입니다. 시험 중에는 사용하지 마세요.', 'font-size:13px;color:#6e6e73;');
-  } catch(e) {}
 })();
 </script>
 </head>
@@ -827,9 +822,10 @@ window.selectTest = (fireId) => {
 function buildOMR() {
   omrPlan = buildPlan(selectedTest);
 
-  // 새 시험을 열면 이전 채점 결과는 비운다
+  // 새 시험을 열면 이전 채점 결과는 비우고 화면에서도 감춘다
   reviewRows = [];
   reviewMode = 'all';
+  renderReview();
 
   document.getElementById('omr-test-title').textContent = selectedTest.unitName || '—';
   const metaBits = [selectedTest.subject || '', normalizeGrade(selectedTest.grade || ''), omrPlan.total + '문제'];
