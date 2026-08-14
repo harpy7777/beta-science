@@ -711,26 +711,49 @@ async function fetchFeedback(fireId){
   }catch(err){return[];}
 }
 
-/* 메모를 수업 슬롯에 배정한다 (같은 날 2건이면 뒤쪽 = 보강 카드에 붙는다)
-   반환 { map:Map('날짜|슬롯' → [메모…]), orphans:[메모…] } */
+/* ════════════════════════════════════════════════════════════════
+   ★ 메모를 수업 슬롯에 배정한다 — 2026-08 수정
+   ────────────────────────────────────────────────────────────────
+   [무엇이 어긋나 있었나]
+   예전에는 "메모 날짜보다 앞선 수업 중 가장 가까운 것"에 무조건
+   붙였다. 그래서 마지막 수업이 7/31 이면 8/7 에 쓴 메모까지
+   7월 31일 카드 속으로 빨려 들어갔다.
+   화면에서는 8월 메모가 통째로 7월에 머물러 있는 것처럼 보였고,
+   달이 바뀌어도 날짜가 넘어가지 않는 것처럼 느껴졌다.
+
+   [지금 규칙]
+   · 같은 날짜에 수업 기록이 있을 때만 그 카드 안에 붙인다.
+   · 수업이 없는 날 쓴 메모는 자기 날짜로 된 카드 한 장을 따로 만든다.
+     (renderLessons 에서 orphans 로 처리 → 목록 맨 위에 8/7 로 뜬다)
+   · 같은 날 본수업 + 보강이 모두 있으면 뒤쪽(보강) 카드에 붙인다.
+   반환 { map:Map('날짜|슬롯' → [메모…]), orphans:[메모…] }
+════════════════════════════════════════════════════════════════ */
 function assignFeedback(slots,fbList){
   const map=new Map(),orphans=[];
-  const sorted=(Array.isArray(slots)?slots.slice():[]).sort(cmpSlot);
+  const byDate=new Map();
+  (Array.isArray(slots)?slots:[]).forEach(s=>{
+    if(!s||!atYmd(s.d))return;
+    const d=String(s.d),k=normSlot(s.k);
+    if(!byDate.has(d))byDate.set(d,[]);
+    const arr=byDate.get(d);
+    if(arr.indexOf(k)<0)arr.push(k);
+  });
   (Array.isArray(fbList)?fbList:[]).forEach(fb=>{
     const d=String(fb&&fb.date||'');
-    if(!atYmd(d)){orphans.push(fb);return;}
-    let target='';
-    for(let i=0;i<sorted.length;i++){
-      if(String(sorted[i].d)<=d)target=slotKey(sorted[i].d,sorted[i].k);
-      else break;
-    }
-    if(target){if(!map.has(target))map.set(target,[]);map.get(target).push(fb);}
-    else orphans.push(fb);
+    const ks=atYmd(d)?byDate.get(d):null;
+    if(!ks||!ks.length){orphans.push(fb);return;}
+    const k=(ks.indexOf(SLOT_MK)>=0)?SLOT_MK:ks[0];
+    const key=slotKey(d,k);
+    if(!map.has(key))map.set(key,[]);
+    map.get(key).push(fb);
   });
   return{map,orphans};
 }
+/* 메모 블록 — 작성 날짜를 항상 함께 보여준다 (어느 달 메모인지 바로 확인) */
 function fbBlock(fb){
-  return`<div class="ls-fb"><b>💬 선생님 메모</b><div class="ls-fb-tx">${e(fb&&fb.text||'')}</div></div>`;
+  const d=String(fb&&fb.date||'');
+  const tag=atYmd(d)?(' · '+atLongDate(d)):'';
+  return`<div class="ls-fb"><b>💬 선생님 메모${e(tag)}</b><div class="ls-fb-tx">${e(fb&&fb.text||'')}</div></div>`;
 }
 
 /* ════════ 출결 · 수업 회차 · 보강 ════════ */
@@ -829,10 +852,11 @@ function renderLessons(student,fbList){
 
     const html=items.map((it,i)=>{
       if(it.kind==='fb'){
-        return`<div class="ls-card fbonly">
+        return`<div class="ls-card fbonly${i===0?' latest':''}">
           <div class="ls-top">
             <span class="ls-date">${e(it.d?atLongDate(it.d):'작성일 미상')}</span>
             <span class="ls-badge" style="${LS_BADGE['보강']}">선생님 메모</span>
+            ${i===0&&items.length>1?'<span class="ls-new">최신</span>':''}
           </div>
           ${fbBlock(it.fb)}
         </div>`;
@@ -909,7 +933,7 @@ function renderLessonsFallback(student,fbList){
      score = Math.round(정답 수 / 응시 문항 수 * 100)
    즉 oxScore · multiScore · score 는 모두 백분율(%)이고,
    맞은 문항 수는 ox.correct · multiple.correct · totalCorrect 에 있다.
-   → 아래 secOf() 하나로 통일했고, 개념 지도도 같은 값을 쓴다.
+   → 아래 판정 함수 하나로 통일했고, 개념 지도도 같은 값을 쓴다.
 
    [0점이 사라지던 문제]
    예전에는 "oxScore > 0" 이어야 응시로 봤다. 그래서 진짜 0점을 받은
@@ -919,20 +943,16 @@ function renderLessonsFallback(student,fbList){
 
    ★★ 응시 횟수 (attemptCount) — 2026-08 수정
    ────────────────────────────────────────────────────────────────
-   [무엇이 어긋나 있었나]
    grades 문서 ID 는 {시험ID}__{학생ID} 로 고정되어 있다.
    재응시하면 같은 문서를 덮어쓰므로 문서는 언제나 1개다.
    그런데 화면은 '문서 개수'를 세고 있었다.
      → 2번 본 시험도 "1회"로 보였다.
-   재응시 횟수는 문서 안의 attemptCount 필드에 정상 저장되고 있다.
    → attemptOf() 로 attemptCount 를 읽어 '응시 횟수'에 합산한다.
-     필드가 없는 옛 기록은 1회로 본다. (기존 화면과 동일)
+     필드가 없는 옛 기록은 1회로 본다.
 
    [누적 정답 · 최고 기록은 왜 그대로인가]
    문서에는 마지막 응시 결과 한 벌만 남는다. 이전 응시의 문항별
    채점 결과는 남아 있지 않으므로 정답 수를 곱해서 부풀리지 않는다.
-   → 응시 횟수만 실제 횟수, 점수는 '가장 최근 기록' 기준.
-     카드에도 그 사실을 함께 적어 학부모가 오해하지 않게 한다.
 ════════════════════════════════════════════════════════════════ */
 function toNum(v){return(typeof v==='number')?v:(v!=null&&v!==''&&!isNaN(Number(v))?Number(v):null);}
 function hasBlock(v){return!!(v&&typeof v==='object');}
@@ -970,7 +990,7 @@ function normalizeGrade(id,r){
     testType:String(r.testType||r.category||'').toLowerCase(),
     timestamp:r.timestamp||r.submittedTimestamp||r.submittedAt||r.date||null,
     cmKey:cmExamKey(id,r),
-    cmTally:null   // loadGrades 에서 아래 secOf 기준으로 채운다
+    cmTally:null   // loadGrades 에서 tallyOf 기준으로 채운다
   };
 }
 
