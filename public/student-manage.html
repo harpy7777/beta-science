@@ -550,6 +550,15 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
 .bt-memo-inp:focus { border-color:#a21caf; }
 .bt-empty { padding:2rem 1rem; text-align:center; font-size:12.5px; color:#aeaeb2; line-height:1.8; }
 .bt-common { border-top:1px solid #f3f4f6; padding-top:0.9rem; margin-top:0.5rem; }
+/* ★ 일괄 작성 — 보강 연결(결석 선택) 칸 */
+.bt-mkpick { display:none; margin-top:6px; }
+.bt-mkpick.open { display:block; }
+.bt-mksel {
+  width:100%; min-height:40px; padding:8px 10px; border:1.5px solid #bfdbfe; border-radius:9px;
+  font-size:16px; font-family:inherit; color:#1d4ed8; background:#fff; outline:none;
+  -webkit-appearance:none; appearance:none;
+}
+.bt-mksel:focus { border-color:#3b82f6; }
 
 @media (max-width:600px) {
   .sm-search { flex:1 1 100%; max-width:none; min-width:0; }
@@ -571,6 +580,7 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
   .bt-quick { width:100%; }
   .bt-qbtn { flex:1; min-height:44px; }
   .bt-note, .bt-loaded { font-size:10.5px; padding:8px 9px; }
+  .bt-mksel { min-height:44px; }
   .logout-btn { min-height:40px; padding:8px 15px; }
   .sm-subj-label { min-height:44px; }
   .sm-idbtn { min-height:42px; padding:9px 13px; }
@@ -883,7 +893,7 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
   <div class="sm-modal bt-modal">
     <div class="sm-modal-title">📋 반별 수업카드 일괄 작성</div>
     <div class="sm-draft" id="bt-draft"><span></span><button type="button" onclick="resetBTDraft()">새로 작성</button></div>
-    <div class="bt-note">반 · 날짜를 고르면 그 반 학생이 모두 나옵니다. <b>수업 내용은 한 번만</b> 쓰면 전원에게 저장되고, 출결과 개별 메모만 학생별로 다르게 넣습니다.<br><b>같은 날 본수업과 보강은 따로 저장됩니다.</b> 이미 그 날 보강이 기록돼 있으면 학생 이름 아래에 표시되고, 여기서 저장해도 <b>보강 기록은 지워지지 않습니다.</b></div>
+    <div class="bt-note">반 · 날짜를 고르면 그 반 학생이 모두 나옵니다. <b>수업 내용은 한 번만</b> 쓰면 전원에게 저장되고, 출결과 개별 메모만 학생별로 다르게 넣습니다.<br><b>같은 날 본수업과 보강은 따로 저장됩니다.</b> 이미 그 날 보강이 기록돼 있으면 학생 이름 아래에 표시되고, 여기서 저장해도 <b>보강 기록은 지워지지 않습니다.</b><br>출결을 <b>보강</b>으로 고르면 <b>어떤 결석의 보강인지 고르는 칸</b>이 바로 아래에 열립니다.</div>
     <div class="bt-loaded" id="bt-loaded"></div>
     <div class="sm-row2">
       <div class="sm-field">
@@ -1449,9 +1459,42 @@ function absentDatesOf(s) {
   const list = Array.isArray(s && s.recentAttendance) ? s.recentAttendance : [];
   return list.filter(x => x && x.s === '결석' && parseYMD(x.d)).map(x => String(x.d)).sort();
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   ★★ 2026-08 수정 — "보강을 다 했는데도 미보강 결석으로 뜨던" 문제
+   ────────────────────────────────────────────────────────────────────
+   [무엇이 어긋나 있었나]
+   미보강 판정이 makeupFors(결석 날짜 ↔ 보강 연결 목록) 하나만 봤다.
+   그런데 보강을 저장할 때 「어떤 결석의 보강인가요?」를 지정하지 않으면
+   makeupCount(보강 횟수)만 오르고 makeupFors 는 비어 있는 채로 남는다.
+   그 결과 학생 카드의 「보강 대기 0회」와 일괄 작성의 「미보강 결석 1회」가
+   서로 다른 말을 했다. (같은 학생, 같은 데이터인데 숫자가 어긋남)
+
+   [지금 규칙]
+   날짜 연결이 빠진 보강도 '보강한 것'으로 인정한다.
+   연결되지 않은 보강 횟수만큼, 오래된 결석부터 차례로 채워진 것으로 본다.
+   → 두 화면의 숫자가 항상 같아진다.
+════════════════════════════════════════════════════════════════════ */
 function openAbsentDates(s) {
   const done = new Set(makeupForsOf(s));
-  return absentDatesOf(s).filter(d => !done.has(d));
+  const all = absentDatesOf(s);
+  const rest = all.filter(d => !done.has(d));          // 아직 연결 안 된 결석
+  const linked = all.filter(d => done.has(d)).length;  // 실제 결석과 이어진 보강 수
+  const unlinked = Math.max(0, makeupOf(s) - linked);  // 날짜 연결이 빠진 보강 수
+  return unlinked ? rest.slice(unlinked) : rest;       // 오래된 결석부터 보강 처리
+}
+/* 연결이 빠진 보강을 오래된 결석부터 자동으로 이어 붙인 목록을 만든다.
+   (재집계에서 makeupFors 를 채울 때 사용) */
+function autoLinkFors(forsArr, absentArr, mkCount) {
+  const abs = (Array.isArray(absentArr) ? absentArr : []).map(String).sort();
+  const set = new Set((Array.isArray(forsArr) ? forsArr : []).map(String).filter(d => abs.includes(d)));
+  let need = Math.max(0, (Number(mkCount) || 0) - set.size);
+  for (const d of abs) {
+    if (!need) break;
+    if (set.has(d)) continue;
+    set.add(d); need--;
+  }
+  return [...set].sort().slice(-MKF_MAX);
 }
 function lastMakeupOf(s) {
   const m = s && s.lastMakeup;
@@ -1741,10 +1784,14 @@ window.delOff = async function(id) {
      (예전 개별 저장이 랜덤 ID였던 탓에 생긴 중복 카드를 정리)
    · 같은 날짜라도 슬롯이 다르면(본수업 + 보강) 2건으로 센다
      → 덮여서 사라졌던 보강이 이 버튼 한 번으로 되살아난다
+   · ★ 2026-08 추가 — 카드에 makeupFor(연결 대상 결석일)가 비어 있어도
+     보강 횟수만큼 오래된 결석부터 자동으로 이어 붙인다.
+     예전에는 이 값이 비면 makeupFors 를 통째로 비워 버려서,
+     재집계를 누를수록 「미보강 결석」이 되살아나는 문제가 있었다.
 ════════════════════════════════════════════════════════════════════ */
 window.recalcAll = async function() {
   if (!students.length) { alert('학생 데이터를 먼저 불러온 뒤 실행하세요.'); return; }
-  if (!confirm('모든 수업카드를 읽어 학생별 회차 · 4주 단위 · 결석 · 보강 · 첫 수업일과\n학부모 화면용 수업 기록을 다시 계산합니다.\n\n같은 날 본수업과 보강이 함께 있으면 둘 다 살아납니다.\n계속하시겠습니까?')) return;
+  if (!confirm('모든 수업카드를 읽어 학생별 회차 · 4주 단위 · 결석 · 보강 · 첫 수업일과\n학부모 화면용 수업 기록을 다시 계산합니다.\n\n같은 날 본수업과 보강이 함께 있으면 둘 다 살아납니다.\n연결 정보가 없는 보강도 오래된 결석부터 자동으로 이어 붙입니다.\n계속하시겠습니까?')) return;
   const btn = document.getElementById('sm-recalc-btn');
   btn.disabled = true; btn.textContent = '집계 중...';
   try {
@@ -1789,7 +1836,7 @@ window.recalcAll = async function() {
         st === '결석' ? '' : c.homeworkContent));
       agg.set(sid, o);
     });
-    let batch = writeBatch(db), pend = 0, done = 0;
+    let batch = writeBatch(db), pend = 0, done = 0, linked = 0;
     for (const s of students) {
       const keys = new Set([String(s.id == null ? '' : s.id), String(s.fireId)].filter(k => k && k !== ''));
       let ses = 0, abs = 0, mk = 0, first = '', last = '', rec = [], hw = null, fors = [], lastMk = null, lessons = [];
@@ -1836,9 +1883,13 @@ window.recalcAll = async function() {
         seenL.add(kk); lesU.unshift(lessons[i]);
       }
       const forsU = addMakeupFor(fors, '');
+      // ★ 연결이 빠진 보강은 오래된 결석부터 자동으로 이어 붙인다
+      const absAll = recU.filter(x => x.s === '결석').map(x => x.d);
+      const forsFix = autoLinkFors(forsU, absAll, mk);
+      if (forsFix.length > forsU.length) linked += (forsFix.length - forsU.length);
       const patch = {
         sessionCount: ses, absentCount: abs, makeupCount: mk,
-        makeupFors: forsU, makeupPending: Math.max(0, abs - mk),
+        makeupFors: forsFix, makeupPending: Math.max(0, abs - mk),
         lastClassDate: last, recentAttendance: recU.slice(-REC_MAX),
         recentLessons: lesU.slice(-LESSON_MAX)
       };
@@ -1851,7 +1902,7 @@ window.recalcAll = async function() {
       if (pend >= 400) { await batch.commit(); batch = writeBatch(db); pend = 0; }
     }
     if (pend) await batch.commit();
-    alert(`재집계 완료\n학생 ${done}명 · 수업카드 ${snap.size}건 · 실제 반영 ${uniq.size}건\n(같은 날 본수업 + 보강은 각각 1회로 반영됩니다)`);
+    alert(`재집계 완료\n학생 ${done}명 · 수업카드 ${snap.size}건 · 실제 반영 ${uniq.size}건\n(같은 날 본수업 + 보강은 각각 1회로 반영됩니다)${linked ? `\n🔁 연결이 없던 보강 ${linked}건을 결석과 자동으로 이어 붙였습니다.` : ''}`);
   } catch (e) {
     alert('재집계 오류: ' + e.message);
   } finally {
@@ -1864,6 +1915,9 @@ window.recalcAll = async function() {
    · 본수업 슬롯(ls)과 보강 슬롯(mk)을 따로 읽고 따로 저장한다
    · 여기서 저장해도 같은 날의 '다른 슬롯' 기록은 절대 지우지 않는다
    · 날짜는 언제나 오늘로 열린다 (지난 draft 가 날짜를 되돌리지 않는다)
+   · ★ 2026-08 추가 — 「보강」을 고르면 어떤 결석의 보강인지 고르는 칸이
+     학생 줄 안에 바로 열린다. 예전에는 화면에 보이지 않고 자동으로만
+     잡혀서, 후보가 없으면 연결 없이 저장되고 결석이 계속 미보강으로 남았다.
 ════════════════════════════════════════════════════════════════════ */
 const BT_ST = ['출석','지각','결석','보강'];
 let btRows = [];
@@ -1919,13 +1973,31 @@ window.toggleBatchMemo = function(i) {
   const el = document.getElementById('bt-memo-' + i);
   if (el) el.classList.toggle('open');
 };
+/* ★ 보강 연결(어떤 결석의 보강인지) 직접 선택 */
+window.btMkForInput = function(i, v) {
+  const r = btRows[i];
+  if (!r) return;
+  r.mkFor = parseYMD(v) ? String(v) : '';
+  paintBtMk(i);
+  saveBTDraft();
+};
+function btMkOptions(r) {
+  const list = Array.isArray(r.cand) ? r.cand : [];
+  return '<option value="">지정 안 함</option>'
+    + list.map(d => `<option value="${esc(d)}"${r.mkFor === d ? ' selected' : ''}>${esc(fmtYMD(d))} 결석의 보강</option>`).join('');
+}
 function paintBtMk(i) {
   const r = btRows[i];
   const el = document.getElementById('bt-mkfor-' + i);
+  const pick = document.getElementById('bt-mkpick-' + i);
+  const sel = document.getElementById('bt-mksel-' + i);
   if (!r || !el) return;
+  if (pick) pick.classList.toggle('open', r.status === '보강');
+  if (sel && sel.value !== (r.mkFor || '')) sel.value = r.mkFor || '';
   if (r.status === '보강') {
     if (r.mkFor) { el.className = 'bt-mkfor'; el.textContent = `🔁 ${shortDate(r.mkFor)} 결석의 보강`; }
-    else { el.className = 'bt-mkfor wait'; el.textContent = '🔁 보강 (연결할 결석 기록 없음)'; }
+    else if (r.cand.length) { el.className = 'bt-mkfor wait'; el.textContent = '🔁 보강 (아래에서 어떤 결석의 보강인지 골라주세요)'; }
+    else { el.className = 'bt-mkfor'; el.textContent = '🔁 보강 (연결할 결석 기록 없음 · 보강 1회로 집계)'; }
   } else if (r.openCnt > 0) {
     el.className = 'bt-mkfor wait'; el.textContent = `⚠️ 미보강 결석 ${r.openCnt}회`;
   } else {
@@ -1967,7 +2039,7 @@ window.setBatchStatus = function(i, st) {
   if (!btRows[i]) return;
   const r = btRows[i];
   r.status = BT_ST.includes(st) ? st : '';
-  if (r.status === '보강') { if (!r.mkFor) r.mkFor = r.cand.length ? r.cand[0] : ''; }
+  if (r.status === '보강') { if (!r.mkFor) r.mkFor = r.prevMkFor || (r.cand.length ? r.cand[r.cand.length - 1] : ''); }
   else { r.mkFor = ''; }
   const row = document.getElementById('bt-row-' + i);
   if (row) {
@@ -1984,7 +2056,7 @@ window.setBatchStatus = function(i, st) {
 window.setAllBatch = function(st) {
   btRows.forEach(r => {
     r.status = BT_ST.includes(st) ? st : '';
-    if (r.status === '보강') { if (!r.mkFor) r.mkFor = r.cand.length ? r.cand[0] : ''; }
+    if (r.status === '보강') { if (!r.mkFor) r.mkFor = r.prevMkFor || (r.cand.length ? r.cand[r.cand.length - 1] : ''); }
     else r.mkFor = '';
   });
   renderBatch();
@@ -2015,6 +2087,9 @@ function renderBatch() {
         <div class="bt-av" style="background:${bg};color:${col};">${esc(sh)}</div>
         <div class="bt-nm">${esc(r.name)}${r.prevLs ? `<span class="bt-sub">이미 저장됨 · ${esc(r.prevLs)}</span>` : ''}<span class="bt-cyc" id="bt-cyc-${i}"></span><span class="bt-other" id="bt-other-${i}"></span><span class="bt-mkfor" id="bt-mkfor-${i}"></span></div>
         <div class="bt-seg">${BT_ST.map(st => `<button class="bt-sbtn${r.status === st ? ' on' : ''}" data-st="${st}" onclick="setBatchStatus(${i},'${st}')">${st}</button>`).join('')}</div>
+      </div>
+      <div class="bt-mkpick${r.status === '보강' ? ' open' : ''}" id="bt-mkpick-${i}">
+        <select class="bt-mksel" id="bt-mksel-${i}" onchange="btMkForInput(${i},this.value)">${btMkOptions(r)}</select>
       </div>
       <button class="bt-memo-btn" onclick="toggleBatchMemo(${i})">＋ 개별 메모 · 결석 사유${r.memo ? ' (작성됨)' : ''}</button>
       <div class="bt-memo-wrap${r.memo ? ' open' : ''}" id="bt-memo-${i}">
@@ -2073,7 +2148,8 @@ window.loadBatch = async function() {
     const sl = slots[i];
     const lsCard = sl.ls, mkCard = sl.mk;
     const prevMkFor = (mkCard && parseYMD(mkCard.makeupFor)) ? String(mkCard.makeupFor) : '';
-    const openA = openAbsentDates(s).filter(d => d < date);
+    // ★ 같은 날 결석 → 같은 날 보강도 연결할 수 있도록 d <= date 로 넓혔다
+    const openA = openAbsentDates(s).filter(d => d <= date);
     const cand = (prevMkFor && !openA.includes(prevMkFor)) ? [prevMkFor].concat(openA).sort() : openA;
     return {
       fireId: s.fireId, sid: btStudentId(s),
@@ -2102,12 +2178,12 @@ window.loadBatch = async function() {
       if (x.memo) r.memo = x.memo;
       if (r.status === '보강') {
         if (x.mkFor && parseYMD(x.mkFor)) r.mkFor = String(x.mkFor);
-        else if (!r.mkFor) r.mkFor = r.prevMkFor || (r.cand.length ? r.cand[0] : '');
+        else if (!r.mkFor) r.mkFor = r.prevMkFor || (r.cand.length ? r.cand[r.cand.length - 1] : '');
       } else if (x.status) { r.mkFor = ''; }
     });
   }
   btRows.forEach(r => {
-    if (r.status === '보강' && !r.mkFor) r.mkFor = r.prevMkFor || (r.cand.length ? r.cand[0] : '');
+    if (r.status === '보강' && !r.mkFor) r.mkFor = r.prevMkFor || (r.cand.length ? r.cand[r.cand.length - 1] : '');
   });
   const lsFound = btRows.filter(r => r.prevLs).length;
   const mkFound = btRows.filter(r => r.prevMk).length;
