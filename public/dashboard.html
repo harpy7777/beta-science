@@ -312,7 +312,9 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
   <!-- Stats -->
   <div class="section-heading">OVERVIEW</div>
   <div class="stats-grid">
-    <a href="students.html" class="stat-card">
+    <!-- 등록 학생 수: 옆의 보조 문구는 "이번 달에 새로 등록된 학생 수"만 표시한다.
+         (지난달과 비교한 증감이 아니라 순수 신규 등록 인원) -->
+    <a href="students.html" class="stat-card" title="옆 숫자는 이번 달에 새로 등록된 학생 수입니다">
       <div class="stat-icon" style="background:#fff0f7">👩‍🎓</div>
       <div class="stat-body">
         <div class="stat-num" id="stat-total-students" style="color:#db2777">-</div>
@@ -562,7 +564,32 @@ window.downloadStudentsBackup=async function(){try{const snap=await getDocs(coll
 function iSW(){onSnapshot(collection(db,"students"),s=>{studentDocs=s.docs;studentsLoaded=true;rebuildStudentMaps();renderRecentAttempts();renderPending();renderLowStat();});}
 function pRD(r){if(!r)return null;if(r&&typeof r==='object'&&r.seconds)return new Date(r.seconds*1000);if(typeof r!=='string')return null;const m=r.match(/(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);const d=new Date(r);return isNaN(d)?null:d;}
 function tD(ts){if(!ts)return new Date(0);if(ts&&typeof ts==='object'&&ts.seconds)return new Date(ts.seconds*1000);if(ts&&typeof ts.toDate==='function')return ts.toDate();return new Date(ts);}
-function cSC(docs){const n=new Date(),y=n.getFullYear(),m=n.getMonth(),sT=new Date(y,m,1),sL=new Date(y,m-1,1),eL=new Date(y,m,0,23,59,59);let tN=0,lN=0;docs.forEach(d=>{const dt=pRD(d.data().regDate);if(!dt)return;if(dt>=sT)tN++;else if(dt>=sL&&dt<=eL)lN++;});const el=document.getElementById('stat-student-change');if(!el)return;const d=tN-lN;if(d>0){el.textContent=`+${d}명`;el.className='stat-sub up';}else if(d<0){el.textContent=`${d}명`;el.className='stat-sub down';}else{el.textContent='변동 없음';el.className='stat-sub same';}}
+
+/* ══════════════════════════════════════════════════════════════
+   등록 학생 수 옆 보조 문구 — "이번 달 신규 등록 인원"만 표시
+   ------------------------------------------------------------------
+   예전에는 (이번 달 등록 수 − 지난달 등록 수) 를 계산해서
+   지난달에 많이 등록했으면 −15명 같은 음수가 나왔다.
+   지금은 지난달과 비교하지 않고, 이번 달에 새로 등록된 학생 수만 센다.
+   regDate 가 이번 달 1일 이후인 학생만 집계하며, 0명이면 문구를 비운다.
+   ══════════════════════════════════════════════════════════════ */
+function cSC(docs){
+  const n=new Date(),sT=new Date(n.getFullYear(),n.getMonth(),1);
+  let newCnt=0;
+  docs.forEach(d=>{
+    const dt=pRD((d.data()||{}).regDate);
+    if(dt&&!isNaN(dt)&&dt>=sT)newCnt++;
+  });
+  const el=document.getElementById('stat-student-change');
+  if(!el)return;
+  if(newCnt>0){
+    el.textContent=`이번달 신규 ${newCnt}명`;
+    el.className='stat-sub up';
+  }else{
+    el.textContent='';
+    el.className='stat-sub same';
+  }
+}
 
 
 /* ══════════════════════════════════════════════════════════════
