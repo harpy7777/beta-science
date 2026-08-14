@@ -193,6 +193,8 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
 .sm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr)); gap:12px; }
 .sm-card { background:#fff; border:1px solid #fce7f3; border-radius:16px; padding:1.1rem 1.2rem; min-width:0; transition:transform .18s, box-shadow .18s, border-color .18s; }
 .sm-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(219,39,119,0.1); border-color:#fbcfe8; }
+/* ★ 카드 본체 클릭 → 학생 성적 상세(student-detail.html) 이동 */
+.sm-card.clickable { cursor:pointer; }
 .sm-card-top { display:flex; align-items:center; gap:11px; margin-bottom:0.8rem; }
 .sm-av { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; }
 .sm-name { font-size:15px; font-weight:700; color:#1d1d1f; letter-spacing:-0.02em; }
@@ -238,6 +240,8 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
 .sm-btn.danger { color:#dc2626; border-color:#fca5a5; flex:0 0 auto; padding:9px 13px; }
 .sm-btn.danger:hover { background:#fef2f2; }
 .sm-empty { padding:3rem 1rem; text-align:center; color:#aeaeb2; font-size:13px; background:#fff; border:1px solid #fce7f3; border-radius:16px; grid-column:1/-1; }
+/* 카드 클릭 안내 (버튼이 아니라 안내문 — 클릭 대상은 카드 전체) */
+.sm-tap { font-size:10.5px; color:#c7c7cc; margin-top:8px; text-align:center; line-height:1.5; }
 
 /* ══════════════════════════════════════════════════════════════════
    모달 — 스크롤 규칙 (검증 완료 · 이번 수정에서 건드리지 않았다)
@@ -427,6 +431,45 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
 }
 .sm-tool-btn.primary:hover { background:#fce7f3; }
 
+/* ══════════════════════════════════════════════════════════════════
+   ★ 선생님 피드백 — student-detail.html 의 스타일을 그대로 이식
+     (컬렉션 · 필드 구조도 동일: feedbacks/{학생 문서ID})
+══════════════════════════════════════════════════════════════════ */
+.fb-note { font-size:10.5px; color:#0e7490; background:#ecfeff; border:1px solid #cffafe; border-radius:9px; padding:8px 10px; line-height:1.6; margin-bottom:0.9rem; }
+.fb-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.8rem; flex-wrap:wrap; gap:8px; }
+.fb-title { font-size:13px; font-weight:700; color:#1d1d1f; display:flex; align-items:center; gap:6px; }
+.fb-icon { width:22px; height:22px; background:#fdf2f8; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.fb-count-chip { font-size:10.5px; font-weight:700; color:#db2777; background:#fdf2f8; border:1px solid #fce7f3; border-radius:999px; padding:2px 9px; }
+.fb-edit { font-size:11.5px; font-weight:700; color:#db2777; background:#fdf2f8; border:1.5px solid #fce7f3; border-radius:9px; padding:9px 14px; cursor:pointer; font-family:inherit; min-height:40px; white-space:nowrap; }
+.fb-edit:hover { background:#fce7f3; }
+.fb-editor { display:none; background:#fffbf5; border:1.5px solid #fed7aa; border-radius:12px; padding:0.9rem 1rem; margin-bottom:12px; }
+.fb-editor.open { display:block; }
+.fb-editor-top { display:flex; align-items:center; gap:10px; margin-bottom:9px; flex-wrap:wrap; }
+.fb-editor-lbl { font-size:11.5px; font-weight:800; color:#b45309; }
+.fb-date-input { padding:9px 10px; border:1.5px solid #fed7aa; border-radius:9px; font-size:16px; font-family:inherit; color:#1d1d1f; background:#fff; outline:none; min-height:44px; -webkit-appearance:none; appearance:none; }
+.fb-date-input:focus { border-color:#f59e0b; }
+.fb-ta { width:100%; min-height:118px; resize:vertical; border:1.5px solid #fed7aa; border-radius:10px; padding:0.8rem 1rem; font-size:16px; font-family:inherit; line-height:1.8; color:#1d1d1f; background:#fff; outline:none; -webkit-appearance:none; appearance:none; }
+.fb-ta:focus { border-color:#f59e0b; }
+.fb-editor-btns { display:flex; gap:8px; margin-top:10px; }
+.fb-save { flex:1; padding:11px 20px; background:#db2777; border:none; border-radius:9px; font-size:13px; font-weight:700; color:#fff; cursor:pointer; font-family:inherit; min-height:46px; }
+.fb-save:hover { background:#be185d; }
+.fb-save:disabled { opacity:0.55; cursor:default; }
+.fb-cancel { padding:11px 20px; background:#fff; border:1.5px solid #fce7f3; border-radius:9px; font-size:13px; font-weight:700; color:#6e6e73; cursor:pointer; font-family:inherit; min-height:46px; }
+.fb-cancel:hover { background:#fafafa; }
+.fb-item { border:1px solid #fce7f3; border-radius:12px; margin-bottom:9px; overflow:hidden; }
+.fb-item:last-child { margin-bottom:0; }
+.fb-item-top { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 13px; background:#fdf2f8; border-bottom:1px solid #fce7f3; flex-wrap:wrap; }
+.fb-item-date { font-size:12px; font-weight:700; color:#be185d; }
+.fb-item-btns { display:flex; gap:6px; }
+.fb-mini { padding:7px 12px; border-radius:7px; font-size:11.5px; font-weight:700; cursor:pointer; font-family:inherit; border:1.5px solid #fce7f3; background:#fff; color:#6e6e73; min-height:36px; }
+.fb-mini.edit:hover { background:#fdf2f8; color:#db2777; }
+.fb-mini.del { border-color:#fecaca; color:#dc2626; }
+.fb-mini.del:hover { background:#fef2f2; }
+.fb-item-body { padding:12px 13px; font-size:13px; color:#3c3c43; line-height:1.85; white-space:pre-wrap; word-break:break-word; }
+.fb-empty { padding:1.6rem 1rem; text-align:center; font-size:12.5px; color:#aeaeb2; line-height:1.9; background:#fafafa; border:1px dashed #f0e4ec; border-radius:12px; }
+
+.sm-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
 /* ── 반별 일괄 수업카드 ── */
 .bt-modal { max-width:660px; }
 .bt-note { font-size:11px; color:#0e7490; background:#ecfeff; border:1px solid #cffafe; border-radius:9px; padding:8px 10px; line-height:1.6; margin-bottom:0.9rem; }
@@ -495,8 +538,6 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
 .bt-empty { padding:2rem 1rem; text-align:center; font-size:12.5px; color:#aeaeb2; line-height:1.8; }
 .bt-common { border-top:1px solid #f3f4f6; padding-top:0.9rem; margin-top:0.5rem; }
 
-.sm-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-
 @media (max-width:600px) {
   .sm-search { flex:1 1 100%; max-width:none; min-width:0; }
   .sm-class-filter { flex:1 1 calc(50% - 4px); max-width:none; min-width:0; }
@@ -548,6 +589,18 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
   .sm-cycbar { flex-wrap:wrap; gap:5px; }
   .sm-cycbar .cb-tx { font-size:10px; }
   .sm-stat { font-size:10.5px; gap:4px; }
+  .sm-tap { font-size:10px; }
+
+  /* 피드백 모달 모바일 */
+  .fb-head { gap:7px; }
+  .fb-edit { width:100%; min-height:44px; font-size:12.5px; }
+  .fb-editor { padding:0.85rem 0.9rem; }
+  .fb-editor-btns { flex-direction:column; }
+  .fb-cancel { width:100%; }
+  .fb-date-input { width:100%; }
+  .fb-item-top { padding:9px 11px; }
+  .fb-item-body { padding:11px 11px; }
+  .fb-note { font-size:10px; }
 }
 @media (max-width:400px) {
   .sm-class-filter, .sm-sort { flex:1 1 100%; }
@@ -562,6 +615,7 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
   .sm-cycbar .cb-d { width:13px; }
   .sm-chip { font-size:9.5px; padding:2px 6px; margin-left:4px; }
   .sm-warnline .wl-d { padding:7px 9px; font-size:11px; }
+  .fb-item-top { flex-wrap:wrap; }
 }
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script>
@@ -613,7 +667,7 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
       <div class="welcome-avatar">👩‍🎓</div>
       <div>
         <div class="welcome-greeting">학생 관리</div>
-        <div class="welcome-sub">같은 날 본수업과 보강을 함께 기록할 수 있습니다</div>
+        <div class="welcome-sub">카드를 누르면 성적 상세 · 피드백 버튼으로 바로 작성</div>
       </div>
     </div>
     <button class="cc-write-btn" onclick="openAdd()">+ 신규 학생 등록</button>
@@ -915,6 +969,36 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
   </div>
 </div>
 
+<!-- ★ 선생님 피드백 모달 (student-detail.html 과 동일한 구조 · 같은 컬렉션) -->
+<div class="sm-modal-bg" id="fb-modal-bg">
+  <div class="sm-modal">
+    <div class="sm-modal-title" id="fb-modal-title">💬 선생님 피드백</div>
+    <div class="student-grade-info" id="fb-stu-info" style="margin-top:0;margin-bottom:0.9rem;">학생</div>
+    <div class="fb-note">여기에 적은 내용은 <b>학생 성적 상세 · 학부모 리포트 · 문자 발송 화면</b>에 그대로 표시됩니다. (같은 저장소를 씁니다)</div>
+    <div class="fb-head">
+      <div class="fb-title">
+        <div class="fb-icon"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M14 2H2a1 1 0 00-1 1v8a1 1 0 001 1h4l2 2 2-2h4a1 1 0 001-1V3a1 1 0 00-1-1z" stroke="#db2777" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+        선생님 피드백
+        <span class="fb-count-chip" id="fb-count-chip">0건</span>
+      </div>
+      <button type="button" class="fb-edit" id="fb-toggle" onclick="fbOpenNew()">+ 새 피드백</button>
+    </div>
+    <div class="fb-editor" id="fb-editor">
+      <div class="fb-editor-top">
+        <span class="fb-editor-lbl" id="fb-editor-lbl">✏️ 새 피드백 작성</span>
+        <input type="date" class="fb-date-input" id="fb-date">
+      </div>
+      <textarea class="fb-ta" id="fb-ta" placeholder="학생의 학습 상황, 태도, 보완할 점 등을 적어주세요. 이 내용은 학부모 리포트에 그대로 표시됩니다."></textarea>
+      <div class="fb-editor-btns">
+        <button type="button" class="fb-save" id="fb-save-btn" onclick="fbSave()">저장하기</button>
+        <button type="button" class="fb-cancel" onclick="fbCloseEditor()">취소</button>
+      </div>
+    </div>
+    <div id="fb-list"><div class="fb-empty">불러오는 중...</div></div>
+    <div class="sm-modal-footer"><button class="btn-secondary" onclick="closeFb()">닫기</button></div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -935,6 +1019,12 @@ const db = getFirestore(app);
 const GBG    = {'중등1학년':'#eff6ff','중등2학년':'#f0fdf4','중등3학년':'#fefce8','고등1학년':'#fdf4ff','고등2학년':'#fff7ed','고등3학년':'#fdf2f8'};
 const GCOL   = {'중등1학년':'#1d4ed8','중등2학년':'#15803d','중등3학년':'#a16207','고등1학년':'#7e22ce','고등2학년':'#c2410c','고등3학년':'#db2777'};
 const GSHORT = {'중등1학년':'중1','중등2학년':'중2','중등3학년':'중3','고등1학년':'고1','고등2학년':'고2','고등3학년':'고3'};
+
+/* ?student=1 잠금 — 학생 화면에서는 다른 페이지로 넘어가지 않는다 */
+const STUDENT_LOCK = (function(){
+  try { return new URLSearchParams(location.search).get('student') === '1'; }
+  catch (e) { return false; }
+})();
 
 let students = [];
 let editId = null;
@@ -2198,7 +2288,7 @@ onAuthStateChanged(auth, async u => {
     initOffs();
   } catch (e) { location.replace('/login.html'); }
 });
-window.doLogout = async () => { await signOut(auth); location.replace('/login.html'); };
+window.doLogout = async () => { fbUnsubscribe(); await signOut(auth); location.replace('/login.html'); };
 
 /* ════════ 실시간 로드 ════════ */
 function initTimetable() {
@@ -2240,6 +2330,23 @@ window.onSearchInput = function() {
   searchTimer = setTimeout(renderCards, 150);
 };
 const onlyDigits = v => String(v || '').replace(/\D/g, '');
+
+/* ════════════════════════════════════════════════════════════════════
+   ★ 카드 본체 클릭 → 학생 성적 상세(student-detail.html) 이동
+   ────────────────────────────────────────────────────────────────────
+   예전에는 「📊 테스트 결과」 버튼이 유일한 이동 경로였다.
+   그 버튼을 「💬 피드백」으로 바꾸면서, 카드 본체를 누르면 상세로 가도록
+   옮겼다. 카드 안의 버튼(수정 · 삭제 · 수업카드 · 피드백)을 누른 경우에는
+   이동하지 않는다.
+════════════════════════════════════════════════════════════════════ */
+window.goDetail = function(e, href) {
+  if (!href || STUDENT_LOCK) return;
+  const t = e && e.target;
+  if (t && typeof t.closest === 'function' && t.closest('button, a, input, textarea, select, label')) return;
+  const sel = (typeof window.getSelection === 'function') ? String(window.getSelection() || '') : '';
+  if (sel) return;   // 글자를 끌어 선택한 경우에는 이동하지 않는다
+  location.href = href;
+};
 
 /* ════════ 카드 렌더 ════════ */
 window.renderCards = function() {
@@ -2406,10 +2513,17 @@ window.renderCards = function() {
         `${miss.unknown > 0 ? `<span class="wl-more">날짜 미확인 ${miss.unknown}회</span>` : ''}</span></div>`;
     }
     const newBadge = isNewStudent(s.startDate) ? '<span class="sm-new-badge">NEW</span>' : '';
-    const gradeBtn = sid
-      ? `<a class="sm-btn primary" href="student-detail.html?id=${encodeURIComponent(sid)}">📊 테스트 결과</a>`
-      : `<button class="sm-btn" disabled style="opacity:0.5;">📊 테스트 결과</button>`;
-    return `<div class="sm-card">
+    /* ★ 「📊 테스트 결과」 버튼 → 「💬 피드백」 버튼으로 교체.
+       성적 상세로 가는 길은 카드 본체 클릭이 대신한다. */
+    const fbBtn = `<button class="sm-btn primary" title="선생님 피드백 작성" onclick="openFeedback('${esc(s.fireId)}')">💬 피드백</button>`;
+    const detailHref = sid ? `student-detail.html?id=${encodeURIComponent(sid)}` : '';
+    const tapHtml = detailHref
+      ? (STUDENT_LOCK ? '' : '<div class="sm-tap">카드를 누르면 📊 테스트 결과 · 분석 리포트가 열립니다</div>')
+      : '<div class="sm-tap">학생 ID가 없어 테스트 결과로 이동할 수 없습니다</div>';
+    const cardOpen = (detailHref && !STUDENT_LOCK)
+      ? `<div class="sm-card clickable" onclick="goDetail(event,'${esc(detailHref)}')">`
+      : '<div class="sm-card">';
+    return `${cardOpen}
       <div class="sm-card-top">
         <div class="sm-av" style="background:${bg};color:${col};">${esc(short)}</div>
         <div style="min-width:0;">
@@ -2427,11 +2541,12 @@ window.renderCards = function() {
       ${dblHtml}
       <div class="sm-meta"><span class="ml">첫 수업</span> ${startHtml}<br><span class="ml">선생님</span> ${esc(teacher)}<br><span class="ml">학부모</span> ${esc(phone)}</div>
       <div class="sm-actions">
-        ${gradeBtn}
+        ${fbBtn}
         <button class="sm-btn icon" title="수정" onclick="openEdit('${esc(s.fireId)}')">✏️</button>
         <button class="sm-btn danger" title="삭제" onclick="delStudent('${esc(s.fireId)}','${esc(name)}')">🗑</button>
       </div>
       <button class="sm-btn primary" style="width:100%;margin-top:6px;" title="수업카드 작성" onclick="openClassCard('${esc(s.fireId)}')">📝 수업카드 작성</button>
+      ${tapHtml}
     </div>`;
   }).join('');
 };
@@ -2734,6 +2849,228 @@ window.delStudent = async function(fireId, name) {
   try { await deleteDoc(doc(db,'students',fireId)); }
   catch (e) { alert('삭제 오류: ' + e.message); }
 };
+
+/* ════════════════════════════════════════════════════════════════════
+   ★ 선생님 피드백 — student-detail.html 의 코드를 그대로 이식
+   ────────────────────────────────────────────────────────────────────
+   저장 위치 : feedbacks/{학생 문서 ID}   ← students 컬렉션의 문서 ID
+               (student-manage 에서는 s.fireId, student-detail 에서는 stu.uid)
+   저장 구조 : { entries:[{id,text,date,createdAt}], text, updatedAt }
+   text 만 있는 옛 구조도 항목 1개로 읽어준다.
+   → student-detail.html · student-portal-admin.html 과 자동으로 연동된다.
+════════════════════════════════════════════════════════════════════ */
+let fbFireId = '';
+let fbList = [];
+let fbEditId = null;
+let fbUnsub = null;
+
+function fbMillis(v) {
+  if (v == null) return 0;
+  if (typeof v === 'number') return v;
+  if (typeof v === 'object') {
+    if (typeof v.toMillis === 'function') { try { return v.toMillis(); } catch (e) { return 0; } }
+    if (v.seconds != null) return v.seconds * 1000;
+    if (v instanceof Date) return v.getTime();
+    return 0;
+  }
+  const t = Date.parse(v); return isNaN(t) ? 0 : t;
+}
+function fbDateFromMs(ms) {
+  if (!ms) return '';
+  const d = new Date(ms); if (isNaN(d.getTime())) return '';
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function sortFb(list) {
+  return list.slice().sort((a, b) =>
+    String(b.date || '').localeCompare(String(a.date || '')) || (b.createdAt - a.createdAt));
+}
+function parseFbEntries(data) {
+  if (!data) return [];
+  let list = [];
+  if (Array.isArray(data.entries)) {
+    list = data.entries.filter(x => x && String(x.text || '').trim()).map((x, i) => ({
+      id: String(x.id || ('e' + i)),
+      text: String(x.text || ''),
+      date: String(x.date || fbDateFromMs(fbMillis(x.createdAt))),
+      createdAt: fbMillis(x.createdAt)
+    }));
+  } else if (String(data.text || '').trim()) {
+    const ms = fbMillis(data.updatedAt);
+    list = [{ id: 'legacy-1', text: String(data.text), date: fbDateFromMs(ms), createdAt: ms }];
+  }
+  return sortFb(list);
+}
+function fbDateLabel(ds) {
+  if (!ds) return '작성일 미상';
+  const p = String(ds).split('-');
+  if (p.length < 3) return String(ds);
+  const y = parseInt(p[0], 10), m = parseInt(p[1], 10), d = parseInt(p[2], 10);
+  if (isNaN(y) || isNaN(m) || isNaN(d)) return String(ds);
+  return `${y}년 ${m}월 ${d}일`;
+}
+/* onclick 속성 안에 넣을 문자열 — JS 이스케이프 후 HTML 이스케이프 */
+function escJs(s) { return String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+function fbAttr(s) { return esc(escJs(s)); }
+
+function fbUnsubscribe() {
+  if (fbUnsub) { try { fbUnsub(); } catch (e) {} fbUnsub = null; }
+}
+function subscribeFeedback(fireId) {
+  fbUnsubscribe();
+  fbUnsub = onSnapshot(doc(db, 'feedbacks', fireId), snap => {
+    if (fbFireId !== fireId) return;   // 다른 학생으로 바뀐 뒤 늦게 도착한 응답 무시
+    fbList = parseFbEntries(snap.exists() ? snap.data() : null);
+    fbRenderList();
+  }, err => {
+    console.error('feedbacks onSnapshot error:', err);
+    if (fbFireId !== fireId) return;
+    fbList = [];
+    const el = document.getElementById('fb-list');
+    if (el) el.innerHTML = `<div class="fb-empty">피드백을 불러오지 못했습니다.<br>${esc(err && err.message ? err.message : '권한을 확인해주세요.')}</div>`;
+    const chip = document.getElementById('fb-count-chip');
+    if (chip) chip.textContent = '—';
+  });
+}
+function fbRenderList() {
+  const chip = document.getElementById('fb-count-chip');
+  if (chip) chip.textContent = fbList.length + '건';
+  const el = document.getElementById('fb-list');
+  if (!el) return;
+  if (!fbList.length) {
+    el.innerHTML = '<div class="fb-empty">아직 작성된 피드백이 없습니다.<br>「+ 새 피드백」을 눌러 작성하면 학부모 리포트에 바로 표시됩니다.</div>';
+    return;
+  }
+  el.innerHTML = fbList.map(x => `<div class="fb-item">
+    <div class="fb-item-top">
+      <span class="fb-item-date">🗓 ${esc(fbDateLabel(x.date))}</span>
+      <span class="fb-item-btns">
+        <button type="button" class="fb-mini edit" onclick="fbEdit('${fbAttr(x.id)}')">수정</button>
+        <button type="button" class="fb-mini del" onclick="fbDelete('${fbAttr(x.id)}')">삭제</button>
+      </span>
+    </div>
+    <div class="fb-item-body">${esc(x.text)}</div>
+  </div>`).join('');
+}
+window.openFeedback = function(fireId) {
+  const s = students.find(x => x.fireId === fireId);
+  if (!s) { alert('학생 정보를 찾을 수 없습니다.'); return; }
+  fbFireId = fireId;
+  fbEditId = null;
+  fbList = [];
+  document.getElementById('fb-modal-title').textContent = `💬 ${s.name || '학생'} · 선생님 피드백`;
+  document.getElementById('fb-stu-info').innerHTML =
+    `<span style="font-size:11px;">💬</span><strong>${esc(s.name || '학생')}</strong>`
+    + (s.grade ? `<span style="margin-left:6px;color:#a21caf;">${esc(s.grade)}</span>` : '')
+    + (s.id ? `<span style="margin-left:6px;color:#aeaeb2;">${esc(s.id)}</span>` : '');
+  fbCloseEditor();
+  const chip = document.getElementById('fb-count-chip');
+  if (chip) chip.textContent = '—';
+  const listEl = document.getElementById('fb-list');
+  if (listEl) listEl.innerHTML = '<div class="fb-empty">불러오는 중...</div>';
+  subscribeFeedback(fireId);
+  showModalBg('fb-modal-bg');
+};
+window.closeFb = function() {
+  const ed = document.getElementById('fb-editor');
+  const ta = document.getElementById('fb-ta');
+  if (ed && ed.classList.contains('open') && ta && ta.value.trim()) {
+    if (!confirm('작성 중인 피드백이 있습니다.\n저장하지 않고 닫을까요?')) return;
+  }
+  fbUnsubscribe();
+  fbFireId = ''; fbList = []; fbEditId = null;
+  fbCloseEditor();
+  hideModalBg('fb-modal-bg');
+};
+window.fbOpenNew = function() {
+  if (!fbFireId) return;
+  fbEditId = null;
+  document.getElementById('fb-ta').value = '';
+  document.getElementById('fb-date').value = todayStr();
+  document.getElementById('fb-editor-lbl').textContent = '✏️ 새 피드백 작성';
+  document.getElementById('fb-editor').classList.add('open');
+  document.getElementById('fb-ta').focus();
+};
+window.fbCloseEditor = function() {
+  fbEditId = null;
+  const ed = document.getElementById('fb-editor');
+  if (ed) ed.classList.remove('open');
+  const ta = document.getElementById('fb-ta');
+  if (ta) ta.value = '';
+  const lbl = document.getElementById('fb-editor-lbl');
+  if (lbl) lbl.textContent = '✏️ 새 피드백 작성';
+};
+window.fbEdit = function(entryId) {
+  const x = fbList.find(v => v.id === entryId);
+  if (!x) { alert('항목을 찾을 수 없습니다.'); return; }
+  fbEditId = entryId;
+  document.getElementById('fb-ta').value = x.text;
+  document.getElementById('fb-date').value = x.date || todayStr();
+  document.getElementById('fb-editor-lbl').textContent = '✏️ 피드백 수정';
+  document.getElementById('fb-editor').classList.add('open');
+  document.getElementById('fb-ta').focus();
+};
+window.fbSave = async function() {
+  if (!fbFireId) { alert('학생이 선택되지 않았습니다.'); return; }
+  const ta = document.getElementById('fb-ta');
+  const txt = ta.value.trim();
+  if (!txt) { alert('피드백 내용을 입력해주세요.'); ta.focus(); return; }
+  const date = document.getElementById('fb-date').value || todayStr();
+  const btn = document.getElementById('fb-save-btn');
+  btn.disabled = true; btn.textContent = '저장 중...';
+  let list = fbList.slice();
+  if (fbEditId) {
+    list = list.map(x => x.id === fbEditId ? { ...x, text: txt, date: date } : x);
+  } else {
+    list.push({ id: 'f' + Date.now() + '-' + Math.random().toString(16).slice(2, 8), text: txt, date: date, createdAt: Date.now() });
+  }
+  try {
+    await fbWrite(list);
+    fbCloseEditor();
+  } catch (e) {
+    alert('저장 실패: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '저장하기';
+  }
+};
+window.fbDelete = async function(entryId) {
+  if (!fbFireId) return;
+  if (!confirm('이 피드백을 삭제할까요?\n삭제하면 되돌릴 수 없습니다.')) return;
+  try {
+    await fbWrite(fbList.filter(x => x.id !== entryId));
+    if (fbEditId === entryId) fbCloseEditor();
+  } catch (e) { alert('삭제 실패: ' + e.message); }
+};
+async function fbWrite(list) {
+  const target = fbFireId;
+  if (!target) throw new Error('학생이 선택되지 않았습니다.');
+  const sorted = sortFb(list);
+  await setDoc(doc(db, 'feedbacks', target), {
+    entries: sorted.map(x => ({ id: x.id, text: x.text, date: x.date || '', createdAt: x.createdAt || 0 })),
+    text: sorted.length ? sorted[0].text : '',
+    updatedAt: Date.now()
+  });
+  // 실시간 구독이 늦게 도착해도 화면이 즉시 반영되도록
+  if (fbFireId === target) { fbList = sorted; fbRenderList(); }
+}
+/* 피드백 모달 닫기 동작 — 배경 클릭 · ESC (다른 모달의 검증된 로직은 건드리지 않는다) */
+(function(){
+  const bg = document.getElementById('fb-modal-bg');
+  if (!bg) return;
+  let downOnBg = false;
+  ['pointerdown','mousedown','touchstart'].forEach(ev =>
+    bg.addEventListener(ev, e => { downOnBg = (e.target === bg); }, { passive: true }));
+  bg.addEventListener('click', e => {
+    if (e.target !== bg || !downOnBg) return;
+    downOnBg = false;
+    closeFb();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (!bg.classList.contains('open')) return;
+    e.stopPropagation();
+    closeFb();
+  }, true);
+})();
 
 /* ════════════════════════════════════════════════════════════════════
    ★ 개별 수업카드 작성
