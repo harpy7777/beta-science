@@ -975,7 +975,25 @@ function cardDocId(sid, date, kind) { return `${sid}__${date}__${normSlot(kind)}
 function legacyCardId(classId, date, sid) { return `${classId}__${date}__${sid}`; }
 
 /* ════════════════════════════════════════════════════════════════════
-   입력 보호 — 작성 중 내용이 사라지지 않게 (기존 동작 유지)
+   입력 보호 — 작성 중 내용이 사라지지 않게
+
+   ★★ 2026-08 수정 — 날짜가 지난 달에 머물던 원인
+   ────────────────────────────────────────────────────────────────────
+   [무엇이 어긋나 있었나]
+   임시보관(draft)에는 날짜 칸까지 담겨 있었다.
+   모달을 열 때 날짜를 '오늘'로 채운 다음 draft 를 덮어썼으므로
+   7월에 쓰다 만 draft 가 남아 있으면 8월에 열어도 날짜가 7월로
+   되돌아갔다. 그대로 저장하면 7월 카드를 덮어써서 8월 기록이
+   아예 생기지 않았다.
+   (모달 바깥을 누르거나 ESC 로 닫으면 draft 가 남는 구조여서
+    브라우저 탭을 켜 둔 채로 며칠 지나면 반드시 재현됐다)
+
+   [지금 규칙]
+   · draft 에 만든 날(day)을 함께 적어 둔다.
+   · 만든 날이 오늘이 아니면 '날짜 칸만' 복원하지 않고 오늘로 둔다.
+     (적어 둔 글은 그대로 살아난다 — 내용은 잃지 않는다)
+   · 저장 직전 날짜를 한 번 더 검사한다. 미래 날짜거나 60일보다
+     오래된 날짜면 확인창을 띄운다.
 ════════════════════════════════════════════════════════════════════ */
 const DIRTY = new Set();
 let hydrating = false;
@@ -1051,6 +1069,17 @@ function putFields(ids, vals) {
   if (!vals) return;
   ids.forEach(id => { const el = document.getElementById(id); if (el && vals[id] != null) el.value = vals[id]; });
 }
+/* ★ draft 를 만든 날이 오늘인지 — 아니면 날짜 칸을 복원하지 않는다 */
+function draftFresh(d) { return !!(d && d.day === todayStr()); }
+/* ★ 날짜 칸만 빼고 복원한다 */
+function putFieldsKeepToday(ids, vals, dateIds) {
+  const skip = Array.isArray(dateIds) ? dateIds : [dateIds];
+  putFields(ids.filter(id => skip.indexOf(id) < 0), vals);
+}
+function draftNoteText(d, base) {
+  if (!d) return base;
+  return draftFresh(d) ? base : (base + ' 수업 날짜는 오늘로 다시 맞췄습니다.');
+}
 function showDraftNote(id, on, txt) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -1060,13 +1089,14 @@ function showDraftNote(id, on, txt) {
 }
 function saveCCDraft() {
   if (hydrating || !ccStudent) return;
-  ccDraft = { fireId: ccStudent.fireId, vals: grabFields(CC_FIELDS), status: ccStatus };
+  ccDraft = { fireId: ccStudent.fireId, day: todayStr(), vals: grabFields(CC_FIELDS), status: ccStatus };
   DIRTY.add('cc-modal-bg');
 }
 function saveBTDraft() {
   if (hydrating) return;
   const cs = document.getElementById('bt-class'), ds = document.getElementById('bt-date');
   btDraft = {
+    day: todayStr(),
     cls: cs ? cs.value : '',
     date: ds ? ds.value : '',
     vals: grabFields(BT_FIELDS),
@@ -1078,6 +1108,7 @@ function saveSMDraft() {
   if (hydrating) return;
   smDraft = {
     editId,
+    day: todayStr(),
     vals: grabFields(SM_FIELDS),
     subs: [...document.querySelectorAll('.sm-subj-chk:checked')].map(c => c.value),
     classes: getCheckedClasses()
@@ -1129,6 +1160,21 @@ function daysSince(v) {
   if (!d) return null;
   const t = new Date(); t.setHours(0,0,0,0);
   return Math.round((t.getTime() - d.getTime()) / 86400000);
+}
+/* ★ 저장 직전 날짜 확인 — 미래 날짜거나 너무 오래된 날짜면 되묻는다.
+   false 를 돌려주면 저장을 멈춘다. */
+const DATE_WARN_DAYS = 60;
+function confirmClassDate(date, what) {
+  const gap = daysSince(date);
+  if (gap === null) return true;
+  const label = what || '수업 날짜';
+  if (gap < 0) {
+    return confirm(`${label}가 ${fmtYMD(date)} 입니다.\n아직 오지 않은 날짜입니다. 이대로 저장할까요?`);
+  }
+  if (gap > DATE_WARN_DAYS) {
+    return confirm(`${label}가 ${fmtYMD(date)} 입니다.\n오늘보다 ${gap}일 전입니다. 날짜가 맞습니까?`);
+  }
+  return true;
 }
 function sessionNo(v) {
   const dd = daysSince(v);
@@ -1708,6 +1754,7 @@ window.recalcAll = async function() {
    ★ 반별 수업카드 일괄 작성
    · 본수업 슬롯(ls)과 보강 슬롯(mk)을 따로 읽고 따로 저장한다
    · 여기서 저장해도 같은 날의 '다른 슬롯' 기록은 절대 지우지 않는다
+   · 날짜는 언제나 오늘로 열린다 (지난 draft 가 날짜를 되돌리지 않는다)
 ════════════════════════════════════════════════════════════════════ */
 const BT_ST = ['출석','지각','결석','보강'];
 let btRows = [];
@@ -1718,6 +1765,7 @@ window.openBatch = function() {
   const sel = document.getElementById('bt-class');
   sel.innerHTML = '<option value="">선택</option>' + ttClasses.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
   const d = btDraft;
+  const fresh = draftFresh(d);
   if (d && d.cls && ttClasses.includes(d.cls)) {
     sel.value = d.cls;
   } else {
@@ -1725,7 +1773,8 @@ window.openBatch = function() {
     const todayCls = ttClasses.filter(c => String(nameToId.get(c) || '').split('-')[0] === dayCh);
     sel.value = (todayCls.length === 1) ? todayCls[0] : '';
   }
-  document.getElementById('bt-date').value = (d && parseYMD(d.date)) ? d.date : todayStr();
+  // ★ 오늘 만든 draft 가 아니면 날짜는 오늘로 둔다
+  document.getElementById('bt-date').value = (fresh && parseYMD(d.date)) ? d.date : todayStr();
   document.getElementById('bt-off').checked = false;
   ['bt-teacher','bt-unit','bt-content','bt-homework'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('bt-hw').value = '보통';
@@ -1932,7 +1981,9 @@ window.loadBatch = async function() {
       cyc: cycleOf(s)
     };
   });
-  const dr = (btDraft && btDraft.cls === cls && btDraft.date === date) ? btDraft : null;
+  /* ★ 임시보관 복원은 '같은 반 · 같은 날짜 · 오늘 만든 것'일 때만.
+     날짜가 다르면 남의 날 기록이 섞이므로 아예 쓰지 않는다. */
+  const dr = (draftFresh(btDraft) && btDraft.cls === cls && btDraft.date === date) ? btDraft : null;
   if (dr && Array.isArray(dr.rows)) {
     const m = new Map(dr.rows.map(r => [String(r.sid), r]));
     btRows.forEach(r => {
@@ -2014,6 +2065,8 @@ window.saveBatch = async function() {
     if (!teacher) { alert('담당 선생님을 입력하세요.'); return; }
     if (marked.some(r => isLessonStatus(r.status)) && !content) { alert('수업 내용을 입력하세요.'); return; }
   }
+  // ★ 저장 직전 날짜 확인 — 지난 달 날짜로 잘못 저장되는 것을 막는다
+  if (!confirmClassDate(date, '수업 날짜')) return;
   const reason = isOff ? (prompt('휴강 사유를 입력하세요 (선택)', '') || '') : '';
 
   const btn = document.getElementById('bt-save-btn');
@@ -2125,7 +2178,7 @@ window.saveBatch = async function() {
     closeBatch(true);
     alert(isOff
       ? `${cls}\n${date} 휴강으로 저장했습니다.${nDel ? `\n기존 수업카드 ${nDel}건 삭제 · 회차 차감 완료` : ''}`
-      : `${cls}\n수업카드 ${nCard}건을 저장했습니다.${nMk ? `\n보강 ${nMk}건이 함께 기록됐습니다.` : ''}${nCycDone ? `\n📗 ${CYCLE}/${CYCLE}회차를 마친 학생 ${nCycDone}명 — 다음 4주 안내를 확인하세요.` : ''}\n학부모 리포트에 바로 반영됩니다.`);
+      : `${cls}\n${fmtYMD(date)} 수업카드 ${nCard}건을 저장했습니다.${nMk ? `\n보강 ${nMk}건이 함께 기록됐습니다.` : ''}${nCycDone ? `\n📗 ${CYCLE}/${CYCLE}회차를 마친 학생 ${nCycDone}명 — 다음 4주 안내를 확인하세요.` : ''}\n학부모 리포트에 바로 반영됩니다.`);
   } catch (e) {
     alert('일괄 저장 오류: ' + e.message);
   } finally {
@@ -2543,7 +2596,9 @@ window.openAdd = function() {
   renderClassChecks([]);
   const d = (smDraft && !smDraft.editId) ? smDraft : null;
   if (d) {
-    putFields(SM_FIELDS, d.vals);
+    // ★ 오늘 만든 draft 가 아니면 첫 수업일은 오늘로 둔다
+    if (draftFresh(d)) putFields(SM_FIELDS, d.vals);
+    else putFieldsKeepToday(SM_FIELDS, d.vals, ['sm-start']);
     setSubjChecks(d.subs);
     renderClassChecks(d.classes);
     DIRTY.add('sm-modal-bg');
@@ -2581,7 +2636,9 @@ window.openEdit = function(fireId) {
   renderClassChecks(studentClassNames(s));
   const d = (smDraft && smDraft.editId === fireId) ? smDraft : null;
   if (d) {
-    putFields(SM_FIELDS, d.vals);
+    // ★ 오늘 만든 draft 가 아니면 첫 수업일은 저장된 값을 그대로 둔다
+    if (draftFresh(d)) putFields(SM_FIELDS, d.vals);
+    else putFieldsKeepToday(SM_FIELDS, d.vals, ['sm-start']);
     setSubjChecks(d.subs);
     renderClassChecks(d.classes);
     DIRTY.add('sm-modal-bg');
@@ -2683,6 +2740,7 @@ window.delStudent = async function(fireId, name) {
    · 문서 ID = `${학생ID}__${날짜}__${ls|mk}` (고정)
      → 같은 날 본수업과 보강이 서로 다른 문서라 둘 다 남는다
      → 같은 카드를 두 번 저장해도 회차가 중복으로 오르지 않는다
+   · 날짜는 언제나 오늘로 열린다 (지난 draft 가 날짜를 되돌리지 않는다)
 ════════════════════════════════════════════════════════════════════ */
 function fillMkForOptions(s, dateStr) {
   const sel = document.getElementById('cc-w-mkfor');
@@ -2740,7 +2798,9 @@ window.openClassCard = function(fireId) {
   setCCStatus('출석');
   const d = (ccDraft && ccDraft.fireId === fireId) ? ccDraft : null;
   if (d) {
-    putFields(CC_FIELDS, d.vals);
+    // ★ 오늘 만든 draft 가 아니면 수업 날짜는 오늘 그대로 둔다
+    if (draftFresh(d)) putFields(CC_FIELDS, d.vals);
+    else putFieldsKeepToday(CC_FIELDS, d.vals, ['cc-w-date']);
     setCCStatus(d.status || '출석');
     const mkEl = document.getElementById('cc-w-mkfor');
     const want = d.vals ? d.vals['cc-w-mkfor'] : '';
@@ -2749,7 +2809,7 @@ window.openClassCard = function(fireId) {
   } else {
     DIRTY.delete('cc-modal-bg');
   }
-  showDraftNote('cc-draft', !!d, '✍️ 저장하지 않고 닫았던 내용을 이어서 불러왔습니다.');
+  showDraftNote('cc-draft', !!d, draftNoteText(d, '✍️ 저장하지 않고 닫았던 내용을 이어서 불러왔습니다.'));
   showModalBg('cc-modal-bg');
   hydrating = false;
 };
@@ -2828,6 +2888,8 @@ window.saveClassCard = async function() {
   if (!parseYMD(classDate)) { alert('수업 날짜를 올바르게 선택하세요'); return; }
   if (lesson && !content) { alert('수업 내용을 입력하세요'); return; }
   if (status === '보강' && makeupFor && makeupFor > String(classDate)) { alert('보강 대상 결석일이 수업 날짜보다 늦습니다.\n날짜를 확인해주세요.'); return; }
+  // ★ 저장 직전 날짜 확인 — 지난 달 날짜로 잘못 저장되는 것을 막는다
+  if (!confirmClassDate(classDate, '수업 날짜')) return;
   const studentId = (ccStudent.id && ccStudent.id !== '') ? ccStudent.id : ccStudent.fireId;
   const classId = className ? (nameToId.get(className) || '') : '';
   const kind = slotOf(status);
@@ -2923,10 +2985,10 @@ window.saveClassCard = async function() {
     alert(status === '보강'
       ? (makeupFor
           ? `보강으로 저장했습니다.\n${fmtYMD(makeupFor)} 결석 → ${fmtYMD(classDate)} 보강 완료로 표시됩니다.${cycMsg}${again}`
-          : `보강으로 저장했습니다. 보강 1회가 기록됩니다.${cycMsg}${again}`)
+          : `${fmtYMD(classDate)} 보강으로 저장했습니다. 보강 1회가 기록됩니다.${cycMsg}${again}`)
       : (lesson
-          ? `${status} 처리되었습니다. 수업카드가 저장되고 회차가 1 올라갑니다.${cycMsg}${again}`
-          : `결석으로 기록되었습니다. 회차는 올라가지 않습니다.${again}`));
+          ? `${fmtYMD(classDate)} ${status} 처리되었습니다. 수업카드가 저장되고 회차가 1 올라갑니다.${cycMsg}${again}`
+          : `${fmtYMD(classDate)} 결석으로 기록되었습니다. 회차는 올라가지 않습니다.${again}`));
   } catch (e) {
     alert('저장 오류: ' + e.message);
   } finally {
