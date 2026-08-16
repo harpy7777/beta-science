@@ -823,6 +823,30 @@ const LS_BADGE={
   '보강':'background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8',
   '휴강':'background:#f3f4f6;border-color:#e5e7eb;color:#6b7280'
 };
+
+/* ════════════════════════════════════════════════════════════════
+   ★★ 2026-08 수정 — 회차 번호가 40회를 넘으면 어긋나던 문제
+   ────────────────────────────────────────────────────────────────
+   [무엇이 어긋나 있었나]
+   students 문서의 recentLessons 는 최근 40칸만 보관한다.
+   (선생님 화면의 LESSON_MAX = 40)
+   그런데 이 화면은 배열 안에서 1부터 다시 세고 있었다.
+     let no=0; ... no++
+   그래서 총 45회 다닌 학생은 배열에 40칸만 남아 있으므로
+   실제 6회차인 수업이 화면에 「1회차」로 찍혔다.
+   위쪽 통계는 "수업 회차 45회"라고 나오는데 아래 카드는 1~40회차라
+   학부모가 보기에 숫자가 서로 맞지 않았다.
+   (지금은 40회를 넘은 학생이 없어 드러나지 않지만,
+    주 1회 기준 10개월쯤 지나면 여러 학생이 한꺼번에 넘어간다)
+
+   [지금 규칙]
+   밀려난 회차 수(cut)를 sessionCount 에서 역산해 시작 번호로 쓴다.
+     cut = 총 회차(sessionCount) − 배열에 남은 수업 수
+     첫 카드 번호 = cut + 1
+   45회 중 40칸이 남았으면 6회차부터 시작한다.
+   sessionCount 가 없거나 배열보다 작으면(집계 전 · 재집계 직후 등)
+   cut = 0 이 되어 예전처럼 1부터 센다. → 40회 이하 학생은 화면 변화 없음.
+════════════════════════════════════════════════════════════════ */
 function renderLessons(student,fbList){
   try{
     const raw=Array.isArray(student&&student.recentLessons)?student.recentLessons:[];
@@ -833,7 +857,13 @@ function renderLessons(student,fbList){
     if(!list.length){renderLessonsFallback(student,fbList);return;}
 
     const pairs=new Set(pairedDates(list));
-    let no=0;
+
+    /* ★ 회차 번호 보정 — 배열에서 밀려난 만큼 시작 번호를 올린다 */
+    const shown=list.filter(x=>LS_LESSON.indexOf(x.s)>=0).length;   // 지금 보이는 수업 수
+    const total=atNum(student&&student.sessionCount);               // 실제 총 회차
+    const cut=(total!=null&&total>shown)?(total-shown):0;           // 밀려난 회차 수
+
+    let no=cut;
     const numbered=list.map(x=>{
       if(LS_LESSON.indexOf(x.s)>=0)no++;
       return{...x,no:LS_LESSON.indexOf(x.s)>=0?no:null};
@@ -885,10 +915,9 @@ function renderLessons(student,fbList){
       </div>`;
     }).join('');
 
-    const total=atNum(student&&student.sessionCount);
-    const shown=numbered.filter(x=>x.no).length;
-    const more=(total!=null&&total>shown)
-      ?`<div class="ls-more">최근 ${shown}회 수업을 보여드리고 있습니다.<br>그 이전 기록은 학원으로 문의해 주세요.</div>`:'';
+    /* ★ 몇 회가 빠졌는지 분명히 알려준다 (학부모 문의를 줄인다) */
+    const more=cut>0
+      ?`<div class="ls-more">최근 ${shown}회 수업(${cut+1}회차 ~ ${cut+shown}회차)을 보여드리고 있습니다.<br>그 이전 ${cut}회 기록은 학원으로 문의해 주세요.</div>`:'';
     document.querySelectorAll('#lessonList').forEach(el=>el.innerHTML=html+more);
   }catch(err){
     document.querySelectorAll('#lessonList').forEach(el=>el.innerHTML='<div class="empty-box">수업 기록을 불러오지 못했습니다.</div>');
@@ -941,7 +970,7 @@ function renderLessonsFallback(student,fbList){
    → 응시 여부는 점수가 아니라 '그 파트 기록이 있는가'로 판단한다.
      (examService 는 응시하지 않은 파트를 null 로 저장한다)
 
-   ★★ 응시 횟수 (attemptCount) — 2026-08 수정
+   ★★ 응시 횟수 (attemptCount)
    ────────────────────────────────────────────────────────────────
    grades 문서 ID 는 {시험ID}__{학생ID} 로 고정되어 있다.
    재응시하면 같은 문서를 덮어쓰므로 문서는 언제나 1개다.
