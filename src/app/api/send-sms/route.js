@@ -27,6 +27,14 @@
      SOLAPI_SENDER       발신번호 (하이픈 없이 · 예 01012345678)
 
    추가 npm 설치 없음 — Node 내장 crypto 와 fetch 만 사용한다.
+
+   ────────────────────────────────────────────────────────────────────
+   ★ 2026-08 수정 — LMS 제목 기본값
+     예전 기본값이 옛 학원 이름으로 되어 있었다. 이 값은 평소에는
+     쓰이지 않지만(HTML 이 subject 를 함께 보내준다), 그 값이 빠지거나
+     빈 문자열로 오면 학부모 휴대폰에 그대로 제목으로 찍힌다.
+     기본값을 ACADEMY_NAME 상수 하나로 모아 「인후쌤 과학수업」으로
+     통일했다. 앞으로 이름을 바꿀 일이 생기면 이 상수 한 곳만 고치면 된다.
 ════════════════════════════════════════════════════════════════════ */
 
 import crypto from 'crypto';
@@ -39,6 +47,9 @@ const SOLAPI_SEND     = 'https://api.solapi.com/messages/v4/send-many/detail';
 const SOLAPI_BALANCE  = 'https://api.solapi.com/cash/v1/balance';
 const IDENTITY_LOOKUP = 'https://identitytoolkit.googleapis.com/v1/accounts:lookup';
 const FIRESTORE_BASE  = 'https://firestore.googleapis.com/v1/projects';
+
+/* ★ 학원 이름 — LMS 제목 기본값으로 쓰인다. 이 한 곳만 고치면 전체 반영된다. */
+const ACADEMY_NAME = '인후쌤 과학수업';
 
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID || 'beta-science';
 // 웹 API 키는 원래 HTML 에 공개되는 값이라 여기 있어도 보안 문제가 없다.
@@ -240,7 +251,7 @@ export async function GET() {
    요청 형식
      {
        "idToken": "...",                      // Firebase 로그인 토큰 (필수)
-       "subject": "아이들 과학관",              // LMS 제목 (선택)
+       "subject": "인후쌤 과학수업",            // LMS 제목 (선택)
        "messages": [                          // 1~50건
          { "to": "010-1234-5678", "text": "..." },
          ...
@@ -308,8 +319,11 @@ export async function POST(req) {
 
   /* ⑤ SMS / LMS 자동 판별
         90바이트 이하면 SMS(저렴), 넘으면 LMS.
-        리포트 링크가 들어가면 거의 항상 LMS 가 된다. */
-  const subject = cutBytes(String(body.subject || '아이들 과학관').trim(), SUBJECT_BYTE_LIMIT);
+        리포트 링크가 들어가면 거의 항상 LMS 가 된다.
+        ★ 제목이 비어 오거나 공백만 오면 학원 이름으로 채운다.
+          (빈 제목이 그대로 학부모 휴대폰에 찍히는 것을 막는다) */
+  const subjectRaw = String(body.subject == null ? '' : body.subject).trim();
+  const subject = cutBytes(subjectRaw || ACADEMY_NAME, SUBJECT_BYTE_LIMIT) || ACADEMY_NAME;
   const messages = list.map(m => {
     const isLms = byteLen(m.text) > SMS_BYTE_LIMIT;
     const one = { to: m.to, from: sender, text: m.text, type: isLms ? 'LMS' : 'SMS' };
@@ -326,6 +340,7 @@ export async function POST(req) {
       요청: raw.length,
       발송대상: list.length,
       종류: kind,
+      제목: subject,
       발신번호: sender.slice(0, 3) + '-****-' + sender.slice(-4),
       미리보기: messages.slice(0, 3).map(m => ({
         받는번호: m.to.slice(0, 3) + '-****-' + m.to.slice(-4),
