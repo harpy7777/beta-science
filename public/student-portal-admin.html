@@ -661,13 +661,19 @@ window.filterStudents=function(){
    · 로그인한 선생님의 Firebase ID 토큰을 함께 보내 서버가 검증한다
    · 학부모 번호는 students 문서의 phone 필드를 쓴다
      (미입력 시 '-' 로 저장돼 있으므로 형식 검사로 걸러낸다)
+
+   ★ 2026-08 수정 — 학원 이름 표기 통일
+     문자 제목(LMS)과 기본 문구 첫 줄을 「인후쌤 과학수업」으로 맞췄다.
+     기본 문구를 바꿨으므로 저장 키를 v2 → v3 으로 올린다.
+     (키를 그대로 두면 브라우저에 저장된 예전 문구가 계속 불려와
+      화면에서는 바뀌지 않는다)
 ════════════════════════════════════════════════════════════════ */
 const SMS_API='/api/send-sms';
 // 기본 문구를 바꿀 때는 KEY 뒤 번호(v2, v3...)도 같이 올린다.
 // 안 그러면 브라우저에 저장된 예전 문구가 계속 불려와 바뀌지 않는다.
-const SMS_TPL_KEY='beta-science.smsTpl.v2';
-const SMS_SUBJECT='인후쌤 과학';
-const SMS_TPL_DEFAULT='[인후쌤 과학]\n{이름} 학생 학습 리포트입니다.\n선생님 피드백과 테스트 결과를 확인해 주세요.\n\n{링크}';
+const SMS_TPL_KEY='beta-science.smsTpl.v3';
+const SMS_SUBJECT='인후쌤 과학수업';
+const SMS_TPL_DEFAULT='[인후쌤 과학수업]\n{이름} 학생 학습 리포트입니다.\n선생님 피드백과 테스트 결과를 확인해 주세요.\n\n{링크}';
 const SMS_MAX=50;                 // 솔라피 개인계정 일일 한도
 const SMS_BYTE_SMS=90;            // 이 이하 SMS, 넘으면 LMS
 const SMS_BYTE_MAX=1900;          // LMS 본문 상한
@@ -841,6 +847,7 @@ window.smsSend=async function(dryRun){
       box.className='smsm-result show ok';
       box.innerHTML=`<b>🔍 검사 완료 — 요금은 발생하지 않았습니다</b><br>`
         +`보낼 수 있는 대상 <b>${d['발송대상']!=null?d['발송대상']:smsTargets.length}명</b> · 종류 <b>${e(d['종류']||'')}</b><br>`
+        +(d['제목']?`제목 <b>${e(d['제목'])}</b><br>`:'')
         +`발신번호 <b>${e(d['발신번호']||'')}</b>`
         +(fails.length?`<ul>${fails.map(f=>`<li>${e(f.name||'')} — ${e(f.reason||'')}</li>`).join('')}</ul>`:'')
         +`<br><span style="font-weight:600">문제가 없으면 아래 <b>📨 실제 발송</b>을 눌러주세요.</span>`;
