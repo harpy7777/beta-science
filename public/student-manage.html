@@ -560,6 +560,43 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
 }
 .bt-mksel:focus { border-color:#3b82f6; }
 
+/* ══════════════════════════════════════════════════════════════════
+   ★★ 2026-08 추가 — 개별 수업카드 「기존 기록 불러오기 + 삭제」
+   ────────────────────────────────────────────────────────────────────
+   [무엇이 불편했나]
+   개별 수업카드 모달은 언제나 빈 칸으로 열렸다. 그래서 잘못 쓴 카드를
+   고치려면 수업 내용을 처음부터 다시 타이핑해야 했고, 지우는 방법은
+   Firebase 콘솔에 직접 들어가는 것뿐이었다.
+   특히 「보강으로 잘못 저장 → 출석으로 다시 저장」을 하면 슬롯이 달라
+   보강 카드가 그대로 남아 그 날 회차가 2회로 잡히는 문제가 있었다.
+
+   [지금 규칙]
+   · 학생 · 날짜 · 구분(본수업/보강)이 정해지면 그 카드를 즉시 읽어와
+     비어 있는 칸을 채우고, 이 안내줄을 띄운다.
+   · 안내줄의 「🗑 이 카드 삭제」로 카드 1건만 지우고 회차 · 결석 · 보강
+     집계와 학부모 화면 기록까지 함께 되돌린다.
+══════════════════════════════════════════════════════════════════ */
+.cc-exist {
+  display:none; align-items:center; justify-content:space-between; gap:9px; flex-wrap:wrap;
+  font-size:11.5px; font-weight:700; color:#1d4ed8; line-height:1.6;
+  background:#eff6ff; border:1px solid #bfdbfe; border-radius:11px;
+  padding:9px 11px; margin-bottom:0.9rem; word-break:keep-all;
+}
+.cc-exist.show { display:flex; }
+.cc-exist.checking { color:#8e8e93; background:#f5f5f7; border-color:#ececef; }
+.cc-exist .cc-exist-tx { flex:1 1 auto; min-width:0; }
+.cc-exist .cc-exist-tx b { font-weight:900; }
+.cc-del-btn {
+  flex-shrink:0; min-height:40px; padding:9px 14px; border-radius:9px;
+  border:1.5px solid #fca5a5; background:#fff; color:#dc2626;
+  font-family:inherit; font-size:11.5px; font-weight:800; cursor:pointer; white-space:nowrap;
+  transition:background .15s;
+}
+.cc-del-btn:hover { background:#fef2f2; }
+.cc-del-btn:active { transform:scale(0.97); }
+.cc-del-btn:disabled { opacity:0.55; cursor:default; }
+.cc-exist.checking .cc-del-btn { display:none; }
+
 @media (max-width:600px) {
   .sm-search { flex:1 1 100%; max-width:none; min-width:0; }
   .sm-class-filter { flex:1 1 calc(50% - 4px); max-width:none; min-width:0; }
@@ -586,6 +623,10 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
   .sm-idbtn { min-height:42px; padding:9px 13px; }
   .off-item .oi-x { min-height:44px; padding:0 14px; }
   .off-item { padding:10px 11px; }
+
+  /* 개별 수업카드 — 기존 기록 안내줄 (삭제 버튼은 한 줄 전체 · 44px) */
+  .cc-exist { font-size:10.5px; padding:8px 9px; gap:8px; }
+  .cc-del-btn { width:100%; min-height:44px; font-size:12.5px; }
 
   .sm-modal-bg {
     padding:0.7rem 0.6rem;
@@ -645,6 +686,7 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
   .sm-chip { font-size:9.5px; padding:2px 6px; margin-left:4px; }
   .sm-warnline .wl-d { padding:7px 9px; font-size:11px; }
   .fb-item-top { flex-wrap:wrap; }
+  .cc-exist { font-size:10px; }
 }
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script>
@@ -810,6 +852,11 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
     <div class="sm-modal-title" id="cc-modal-title">📝 수업카드 작성</div>
     <div class="sm-draft" id="cc-draft"><span></span><button type="button" onclick="resetCCDraft()">새로 작성</button></div>
     <div class="student-grade-info" id="cc-stu-info" style="margin-top:0;margin-bottom:1rem;">학생</div>
+    <!-- ★ 같은 학생 · 같은 날짜 · 같은 구분의 기존 카드 안내 + 삭제 -->
+    <div class="cc-exist" id="cc-exist">
+      <span class="cc-exist-tx" id="cc-exist-tx"></span>
+      <button type="button" class="cc-del-btn" id="cc-del-btn" onclick="deleteClassCard()">🗑 이 카드 삭제</button>
+    </div>
     <div class="sm-field">
       <span class="cc-label">출결 상태 <span class="req">*</span></span>
       <div class="seg" id="cc-seg">
@@ -1064,6 +1111,14 @@ let sortMode = 'reg';
 let ccStudent = null;
 let ccStatus = '출석';
 let offs = [];
+
+/* ★ 개별 수업카드 — 지금 화면에 걸려 있는 기존 카드 정보
+   ccLoaded  : { sid, date, kind, canon, legacyId, data, status } · 없으면 null
+   ccLookupSeq : 늦게 도착한 조회 응답이 최신 화면을 덮어쓰지 않도록 쓰는 번호표
+   ccFilledKey : 이미 칸을 채워 넣은 카드 키 (같은 카드를 두 번 채우지 않는다) */
+let ccLoaded = null;
+let ccLookupSeq = 0;
+let ccFilledKey = '';
 
 /* ════════════════════════════════════════════════════════════════════
    ★ 같은 날 두 건 저장 — 슬롯(slot) 규칙
@@ -2640,7 +2695,7 @@ window.renderCards = function() {
         <button class="sm-btn icon" title="수정" onclick="openEdit('${esc(s.fireId)}')">✏️</button>
         <button class="sm-btn danger" title="삭제" onclick="delStudent('${esc(s.fireId)}','${esc(name)}')">🗑</button>
       </div>
-      <button class="sm-btn primary" style="width:100%;margin-top:6px;" title="수업카드 작성" onclick="openClassCard('${esc(s.fireId)}')">📝 수업카드 작성</button>
+      <button class="sm-btn primary" style="width:100%;margin-top:6px;" title="수업카드 작성 · 수정 · 삭제" onclick="openClassCard('${esc(s.fireId)}')">📝 수업카드 작성 · 수정</button>
       ${tapHtml}
     </div>`;
   }).join('');
@@ -3168,11 +3223,13 @@ async function fbWrite(list) {
 })();
 
 /* ════════════════════════════════════════════════════════════════════
-   ★ 개별 수업카드 작성
+   ★ 개별 수업카드 작성 · 수정 · 삭제
    · 문서 ID = `${학생ID}__${날짜}__${ls|mk}` (고정)
      → 같은 날 본수업과 보강이 서로 다른 문서라 둘 다 남는다
      → 같은 카드를 두 번 저장해도 회차가 중복으로 오르지 않는다
    · 날짜는 언제나 오늘로 열린다 (지난 draft 가 날짜를 되돌리지 않는다)
+   · ★ 2026-08 추가 — 학생 · 날짜 · 구분이 정해지면 그 카드를 바로 읽어와
+     비어 있는 칸을 채우고, 안내줄과 「🗑 이 카드 삭제」 버튼을 띄운다.
 ════════════════════════════════════════════════════════════════════ */
 function fillMkForOptions(s, dateStr) {
   const sel = document.getElementById('cc-w-mkfor');
@@ -3195,12 +3252,175 @@ function fillMkForOptions(s, dateStr) {
     }
   }
 }
+
+/* ── 기존 카드 안내줄 지우기 ── */
+function ccClearExist() {
+  ccLoaded = null;
+  const box = document.getElementById('cc-exist');
+  if (box) { box.classList.remove('show'); box.classList.remove('checking'); }
+  const tx = document.getElementById('cc-exist-tx');
+  if (tx) tx.innerHTML = '';
+}
+/* ── 읽어온 카드로 '비어 있는 칸만' 채운다 (작성 중인 글은 지우지 않는다) ── */
+function ccFillFrom(card) {
+  const fillIfEmpty = (id, v) => {
+    const el = document.getElementById(id);
+    if (!el || v == null) return;
+    if (String(el.value || '').trim() !== '') return;
+    el.value = String(v);
+  };
+  const setSel = (id, v) => {
+    const el = document.getElementById(id);
+    if (!el || !v) return;
+    if ([...el.options].some(o => o.value === String(v))) el.value = String(v);
+  };
+  setSel('cc-w-subj', card.subject);
+  setSel('cc-w-class', card.className);
+  fillIfEmpty('cc-w-teacher', card.teacher);
+  fillIfEmpty('cc-w-unit', card.unit);
+  fillIfEmpty('cc-w-content', card.content);
+  fillIfEmpty('cc-w-homework', card.homeworkContent);
+  fillIfEmpty('cc-w-reason', card.absenceReason || card.studentNote);
+  setSel('cc-w-hw', card.homework);
+  setSel('cc-w-attitude', card.attitude);
+  setSel('cc-w-homework-done', card.homeworkDone);
+}
+/* ── 학생 · 날짜 · 구분에 해당하는 기존 카드를 찾는다 ──
+   새 ID(학생ID__날짜__슬롯)를 먼저 보고, 없으면 옛 ID(반ID__날짜__학생ID)를 훑는다.
+   ccLookupSeq 번호표로, 늦게 도착한 응답이 최신 화면을 덮어쓰지 않게 막는다. */
+async function ccLookup() {
+  const bg = document.getElementById('cc-modal-bg');
+  if (!bg || !bg.classList.contains('open')) return;
+  if (!ccStudent) return;
+  const dateEl = document.getElementById('cc-w-date');
+  const date = dateEl ? String(dateEl.value || '') : '';
+  const kind = slotOf(ccStatus);
+  const fireId = ccStudent.fireId;
+  const seq = ++ccLookupSeq;
+  ccLoaded = null;
+  const box = document.getElementById('cc-exist');
+  const tx = document.getElementById('cc-exist-tx');
+  if (!parseYMD(date)) { ccClearExist(); return; }
+  if (box && tx) {
+    box.classList.add('show'); box.classList.add('checking');
+    tx.textContent = '📂 이 날 기존 기록을 확인하는 중...';
+  }
+  const sid = (ccStudent.id && ccStudent.id !== '') ? String(ccStudent.id) : String(ccStudent.fireId);
+  let data = null, canon = false, legacyId = '';
+  try {
+    const s1 = await getDoc(doc(db, 'classCards', cardDocId(sid, date, kind)));
+    if (s1.exists()) { data = s1.data() || {}; canon = true; }
+  } catch (e) {}
+  if (!data) {
+    const cands = [];
+    const clsSel = document.getElementById('cc-w-class');
+    const cid0 = (clsSel && clsSel.value) ? (nameToId.get(clsSel.value) || '') : '';
+    if (cid0) cands.push(String(cid0));
+    studentClassIds(ccStudent).forEach(x => { if (cands.indexOf(String(x)) < 0) cands.push(String(x)); });
+    for (const cid of cands) {
+      try {
+        const s2 = await getDoc(doc(db, 'classCards', legacyCardId(cid, date, sid)));
+        if (s2.exists()) {
+          const v = s2.data() || {};
+          if (slotOf(v.status || '출석') === kind) { data = v; legacyId = legacyCardId(cid, date, sid); break; }
+        }
+      } catch (e) {}
+    }
+  }
+  // 그 사이에 날짜 · 구분 · 학생이 바뀌었으면 이 응답은 버린다
+  if (seq !== ccLookupSeq) return;
+  if (!ccStudent || ccStudent.fireId !== fireId) return;
+  if (box) box.classList.remove('checking');
+  if (!data) { ccClearExist(); return; }
+  const st = String(data.status || '출석');
+  ccLoaded = { sid, date, kind, canon, legacyId, data, status: st };
+  const key = sid + '|' + date + '|' + kind;
+  if (ccFilledKey !== key) {
+    const was = hydrating; hydrating = true;
+    ccFillFrom(data);
+    hydrating = was;
+    ccFilledKey = key;
+  }
+  if (tx) {
+    const same = (st === ccStatus);
+    tx.innerHTML = `📂 <b>${esc(fmtYMD(date))} ${esc(slotLabel(kind))}</b> 기록이 이미 있습니다 — 저장된 출결 <b>${esc(st)}</b>.`
+      + `<br>비어 있던 칸을 그 내용으로 채웠습니다. 그대로 저장하면 <b>덮어쓰기(수정)</b>되고 회차는 중복으로 오르지 않습니다.`
+      + (same ? '' : `<br>지금 고른 <b>${esc(ccStatus)}</b>(으)로 저장하면 출결이 <b>${esc(st)} → ${esc(ccStatus)}</b>로 바뀝니다.`);
+  }
+  if (box) box.classList.add('show');
+}
+
+/* ── 카드 1건 삭제 — 회차 · 결석 · 보강 · 학부모 화면 기록까지 함께 되돌린다 ── */
+window.deleteClassCard = async function() {
+  if (!ccStudent || !ccLoaded) { alert('삭제할 기존 기록이 없습니다.\n날짜와 출결 구분(본수업 · 보강)을 먼저 확인해주세요.'); return; }
+  const info = ccLoaded;
+  const stu = students.find(x => x.fireId === ccStudent.fireId) || ccStudent;
+  const prevSt = info.status;
+  const back = [];
+  if (isLessonStatus(prevSt)) back.push('회차 1회');
+  if (prevSt === '결석') back.push('결석 1회');
+  if (prevSt === '보강') back.push('보강 1회');
+  if (!confirm(`${fmtYMD(info.date)} ${slotLabel(info.kind)} 수업카드(${prevSt})를 삭제할까요?\n\n· ${back.length ? back.join(' · ') + '가 차감됩니다.' : '집계 변화는 없습니다.'}\n· 학부모 화면의 그 날 기록도 함께 사라집니다.\n· 삭제하면 되돌릴 수 없습니다.`)) return;
+  const btn = document.getElementById('cc-del-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '삭제 중...'; }
+  try {
+    if (info.canon) await deleteDoc(doc(db, 'classCards', cardDocId(info.sid, info.date, info.kind)));
+    if (info.legacyId) await deleteDoc(doc(db, 'classCards', info.legacyId));
+
+    const patch = {};
+    const dSes = isLessonStatus(prevSt) ? -1 : 0;
+    const dAbs = (prevSt === '결석') ? -1 : 0;
+    const dMk  = (prevSt === '보강') ? -1 : 0;
+    if (hasCounter(stu)) {
+      if (dSes) patch.sessionCount = increment(dSes);
+      if (dAbs) patch.absentCount = increment(dAbs);
+      if (dMk)  patch.makeupCount = increment(dMk);
+      const nAbs = Math.max(0, absentOf(stu) + dAbs);
+      const nMk  = Math.max(0, makeupOf(stu) + dMk);
+      patch.makeupPending = Math.max(0, nAbs - nMk);
+      const nextSes = Math.max(0, (typeof stu.sessionCount === 'number' ? stu.sessionCount : 0) + dSes);
+      Object.assign(patch, cycleFields(nextSes));
+    }
+    // 보강 ↔ 결석 연결 해제
+    let fors = makeupForsOf(stu);
+    if (prevSt === '보강') {
+      const mf = parseYMD(info.data.makeupFor) ? String(info.data.makeupFor) : '';
+      if (mf) fors = removeMakeupFor(fors, mf);
+      const pl = lastMakeupOf(stu);
+      if (pl && pl.date === String(info.date)) patch.lastMakeup = null;
+    }
+    patch.makeupFors = fors;
+    // 학부모 공개용 요약에서 그 날 · 그 슬롯만 뺀다
+    const ra = mergeRecent(stu.recentAttendance, info.date, info.kind, null);
+    const rl = mergeLesson(stu.recentLessons, info.date, info.kind, null);
+    patch.recentAttendance = ra;
+    patch.recentLessons = rl;
+    // 최근 수업일이 지운 날이면 남아 있는 기록에서 다시 고른다
+    if (String(stu.lastClassDate || '') === String(info.date)) {
+      const left = ra.filter(x => isLessonStatus(x.s)).map(x => x.d).sort();
+      patch.lastClassDate = left.length ? left[left.length - 1] : '';
+    }
+    await setDoc(doc(db, 'students', ccStudent.fireId), patch, { merge: true });
+
+    ccDraft = null; DIRTY.delete('cc-modal-bg'); showDraftNote('cc-draft', false);
+    ccClearExist(); ccFilledKey = '';
+    closeCCModal(true);
+    alert(`${fmtYMD(info.date)} ${slotLabel(info.kind)} 수업카드를 삭제했습니다.\n${back.length ? back.join(' · ') + ' 차감 완료' : ''}\n\n숫자가 이상해 보이면 「🔄 회차 재집계」를 한 번 눌러주세요.`);
+  } catch (e) {
+    alert('삭제 오류: ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '🗑 이 카드 삭제'; }
+  }
+};
+
 window.openClassCard = function(fireId) {
   const s = students.find(x => x.fireId === fireId);
   if (!s) return;
   if (!s.id) { alert('이 학생은 학생 ID가 없어 수업카드를 연동할 수 없습니다.\n먼저 학생 정보를 수정해 ID를 부여해주세요.'); return; }
   hydrating = true;
   ccStudent = s;
+  ccLoaded = null; ccFilledKey = ''; ccLookupSeq++;
+  ccClearExist();
   const cycS = cycleOf(s);
   document.getElementById('cc-modal-title').textContent = `📝 ${s.name || '학생'} · 수업카드 작성`;
   document.getElementById('cc-stu-info').innerHTML =
@@ -3244,6 +3464,8 @@ window.openClassCard = function(fireId) {
   showDraftNote('cc-draft', !!d, draftNoteText(d, '✍️ 저장하지 않고 닫았던 내용을 이어서 불러왔습니다.'));
   showModalBg('cc-modal-bg');
   hydrating = false;
+  // ★ 모달이 열린 뒤에 기존 기록을 확인한다 (열기 전에는 조회하지 않는다)
+  ccLookup();
 };
 window.setCCStatus = function(st) {
   ccStatus = (LESSON_ST.includes(st) || st === '결석') ? st : '출석';
@@ -3285,17 +3507,24 @@ window.setCCStatus = function(st) {
   else if (ccStatus === '지각') hint.textContent = '지각도 수업 1회로 집계됩니다.' + cycTx;
   else hint.textContent = '출석 · 지각 · 보강은 회차에 포함되고, 결석은 결석 횟수로만 집계됩니다.' + cycTx;
   saveCCDraft();
+  // ★ 본수업 ↔ 보강을 오가면 보는 슬롯이 달라지므로 기존 기록을 다시 확인한다
+  ccLookup();
 };
 (function(){
   const el = document.getElementById('cc-w-date');
   if (!el) return;
   el.addEventListener('change', () => {
     if (ccStatus === '보강' && ccStudent) fillMkForOptions(ccStudent, el.value);
+    // ★ 날짜가 바뀌면 그 날 기존 기록을 다시 확인한다
+    ccLookup();
   });
 })();
 window.closeCCModal = function(keep) {
   if (!keep && DIRTY.has('cc-modal-bg') && !confirm('작성 중인 내용을 버리고 닫을까요?')) return;
   if (!keep) { ccDraft = null; DIRTY.delete('cc-modal-bg'); showDraftNote('cc-draft', false); }
+  ccLookupSeq++;
+  ccClearExist();
+  ccFilledKey = '';
   hideModalBg('cc-modal-bg');
 };
 
