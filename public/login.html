@@ -28,7 +28,7 @@
       justify-content: center;
       padding: 20px;
       background: #FFFFFF;
-      overflow: hidden;
+      overflow-x: hidden;
     }
 
     /* 배경 글로우 */
@@ -107,31 +107,21 @@
         0 0 0 1px var(--pink-border);
     }
 
-    /* 탭 */
-    .tab-group {
-      display: flex;
-      background: var(--pink-pale);
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 28px;
-      border: 1px solid var(--pink-border);
+    /* 카드 상단 제목 (탭 대체) */
+    .card-head {
+      text-align: center;
+      margin-bottom: 26px;
     }
-
-    .tab-btn {
-      flex: 1; padding: 10px;
-      border: none; background: transparent;
-      border-radius: 9px;
-      font-family: 'Noto Sans KR', sans-serif;
-      font-size: 14px; font-weight: 500;
-      color: var(--pink-light);
-      cursor: pointer; transition: all 0.2s;
-    }
-
-    .tab-btn.active {
-      background: white;
-      color: var(--pink);
+    .card-head h1 {
+      font-size: 17px;
       font-weight: 700;
-      box-shadow: 0 2px 10px rgba(232,55,90,0.14);
+      color: var(--dark);
+      letter-spacing: -0.3px;
+    }
+    .card-head p {
+      font-size: 12.5px;
+      color: var(--pink-light);
+      margin-top: 5px;
     }
 
     /* 폼 */
@@ -148,7 +138,7 @@
       border: 1.5px solid #EDF0F5;
       border-radius: 11px;
       font-family: 'Noto Sans KR', sans-serif;
-      font-size: 14px; color: var(--dark);
+      font-size: 16px; color: var(--dark);
       background: var(--gray-light);
       transition: all 0.2s; outline: none;
     }
@@ -222,7 +212,16 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    #signupForm { display: none; }
+    /* ── 모바일 최적화 ── */
+    @media (max-width: 420px) {
+      body { padding: 16px; }
+      .card { padding: 28px 20px; border-radius: 18px; }
+      .logo-title { font-size: 18px; }
+      .logo-icon { width: 23px; height: 23px; }
+      .logo-sub { font-size: 12px; }
+      .logo-area { margin-bottom: 20px; }
+      .card-head h1 { font-size: 16px; }
+    }
   </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
 <body>
@@ -251,50 +250,28 @@
 
     <!-- 카드 -->
     <div class="card">
-      <div class="tab-group">
-        <button class="tab-btn active" onclick="switchTab('login')">로그인</button>
-        <button class="tab-btn" onclick="switchTab('signup')">가입 신청</button>
+      <div class="card-head">
+        <h1>로그인</h1>
+        <p>등록된 선생님 계정으로 로그인하세요</p>
       </div>
 
       <!-- 로그인 -->
       <div id="loginForm">
         <div id="loginAlert" class="alert"></div>
         <div class="form-group">
-          <label>이메일</label>
-          <input type="email" id="loginEmail" placeholder="이메일 주소를 입력하세요">
+          <label for="loginEmail">이메일</label>
+          <input type="email" id="loginEmail" autocomplete="username" placeholder="이메일 주소를 입력하세요">
         </div>
         <div class="form-group">
-          <label>비밀번호</label>
-          <input type="password" id="loginPassword" placeholder="비밀번호를 입력하세요"
+          <label for="loginPassword">비밀번호</label>
+          <input type="password" id="loginPassword" autocomplete="current-password" placeholder="비밀번호를 입력하세요"
             onkeydown="if(event.key==='Enter')doLogin()">
         </div>
         <button class="btn-primary" id="loginBtn" onclick="doLogin()">로그인</button>
       </div>
 
-      <!-- 가입 신청 -->
-      <div id="signupForm">
-        <div id="signupAlert" class="alert"></div>
-        <div class="form-group">
-          <label>이름</label>
-          <input type="text" id="signupName" placeholder="실명을 입력하세요">
-        </div>
-        <div class="form-group">
-          <label>이메일</label>
-          <input type="email" id="signupEmail" placeholder="이메일 주소를 입력하세요">
-        </div>
-        <div class="form-group">
-          <label>비밀번호</label>
-          <input type="password" id="signupPassword" placeholder="8자 이상 입력하세요">
-        </div>
-        <div class="form-group">
-          <label>비밀번호 확인</label>
-          <input type="password" id="signupPasswordConfirm" placeholder="비밀번호를 한 번 더 입력하세요">
-        </div>
-        <button class="btn-primary" id="signupBtn" onclick="doSignup()">가입 신청하기</button>
-      </div>
-
       <div class="pink-divider"></div>
-      <div class="foot-note">승인된 선생님만 로그인 가능합니다</div>
+      <div class="foot-note">등록된 선생님만 로그인 가능합니다</div>
     </div>
 
     <div class="back-link">
@@ -304,8 +281,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
@@ -329,50 +306,26 @@
       try {
         const c = await signInWithEmailAndPassword(auth, email, password);
         const snap = await getDoc(doc(db,'users',c.user.uid));
-        if (!snap.exists()) { showAlert('loginAlert','error','계정 정보를 찾을 수 없습니다.'); await auth.signOut(); return; }
+        if (!snap.exists()) { showAlert('loginAlert','error','계정 정보를 찾을 수 없습니다. 관리자에게 문의하세요.'); await auth.signOut(); return; }
         const d = snap.data();
         if (d.status==='pending')  { showAlert('loginAlert','warning','⏳ 승인 대기 중입니다. 관리자 승인 후 이용 가능합니다.'); await auth.signOut(); return; }
         if (d.status==='rejected') { showAlert('loginAlert','error','가입이 거절되었습니다. 관리자에게 문의하세요.'); await auth.signOut(); return; }
-        if (d.status==='approved') { sessionStorage.setItem('teacher_uid',c.user.uid); sessionStorage.setItem('teacher_name',d.name); window.location.href='index.html'; }
-      } catch(err) {
-        showAlert('loginAlert','error', (err.code==='auth/invalid-credential'||err.code==='auth/wrong-password') ? '이메일 또는 비밀번호가 올바르지 않습니다.' : '오류가 발생했습니다.');
-      } finally { btn.disabled=false; btn.innerHTML='로그인'; }
-    };
-
-    window.doSignup = async function() {
-      const name=document.getElementById('signupName').value.trim();
-      const email=document.getElementById('signupEmail').value.trim();
-      const pw=document.getElementById('signupPassword').value;
-      const pw2=document.getElementById('signupPasswordConfirm').value;
-      const btn=document.getElementById('signupBtn');
-      if (!name||!email||!pw||!pw2) { showAlert('signupAlert','error','모든 항목을 입력해주세요.'); return; }
-      if (pw.length<8) { showAlert('signupAlert','error','비밀번호는 8자 이상이어야 합니다.'); return; }
-      if (pw!==pw2) { showAlert('signupAlert','error','비밀번호가 일치하지 않습니다.'); return; }
-      btn.disabled=true; btn.innerHTML='<span class="spinner"></span>신청 중...';
-      try {
-        const c=await createUserWithEmailAndPassword(auth,email,pw);
-        await setDoc(doc(db,'users',c.user.uid),{name,email,role:'teacher',status:'pending',createdAt:serverTimestamp()});
+        if (d.status==='approved') {
+          sessionStorage.setItem('teacher_uid', c.user.uid);
+          sessionStorage.setItem('teacher_name', d.name || '');
+          window.location.href='index.html';
+          return;
+        }
+        showAlert('loginAlert','error','접근 권한이 없는 계정입니다. 관리자에게 문의하세요.');
         await auth.signOut();
-        showAlert('signupAlert','success','✅ 신청 완료! 관리자 승인 후 로그인 가능합니다.');
-        btn.innerHTML='신청 완료 ✓';
       } catch(err) {
-        showAlert('signupAlert','error',err.code==='auth/email-already-in-use'?'이미 사용 중인 이메일입니다.':'오류가 발생했습니다.');
-        btn.disabled=false; btn.innerHTML='가입 신청하기';
-      }
+        showAlert('loginAlert','error', (err.code==='auth/invalid-credential'||err.code==='auth/wrong-password'||err.code==='auth/user-not-found') ? '이메일 또는 비밀번호가 올바르지 않습니다.' : '오류가 발생했습니다.');
+      } finally { btn.disabled=false; btn.innerHTML='로그인'; }
     };
 
     function showAlert(id,type,msg) {
       const el=document.getElementById(id);
       el.className=`alert ${type}`; el.textContent=msg; el.style.display='block';
-    }
-  </script>
-
-  <script>
-    function switchTab(t) {
-      const [a,b]=document.querySelectorAll('.tab-btn');
-      const lf=document.getElementById('loginForm'), sf=document.getElementById('signupForm');
-      if(t==='login'){a.classList.add('active');b.classList.remove('active');lf.style.display='block';sf.style.display='none';}
-      else{a.classList.remove('active');b.classList.add('active');lf.style.display='none';sf.style.display='block';}
     }
   </script>
 </body>
