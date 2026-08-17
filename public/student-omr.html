@@ -629,6 +629,12 @@ function showBlocked(reason) {
   } else if (reason === 'empty') {
     if (t) t.textContent = '문항이 없는 시험입니다';
     if (x) x.innerHTML = '아직 정답이 등록되지 않은 시험입니다.<br>선생님께 말씀해 주세요.';
+  } else if (reason === 'link') {
+    if (t) t.textContent = '링크를 확인할 수 없습니다';
+    if (x) x.innerHTML = '링크가 만료되었거나 지워졌습니다.<br>선생님께 링크를 다시 받아주세요.';
+  } else if (reason === 'notinlink') {
+    if (t) t.textContent = '이 링크에 없는 시험입니다';
+    if (x) x.innerHTML = '선생님이 보내주신 링크에 담긴 시험만 풀 수 있습니다.<br>클리닉으로 돌아가 목록에 있는 시험을 눌러주세요.';
   } else if (reason === 'error') {
     if (t) t.textContent = '시험을 여는 중 문제가 생겼습니다';
     if (x) x.innerHTML = '인터넷 연결을 확인한 뒤 링크를 다시 눌러주세요.<br>계속 안 되면 선생님께 말씀해 주세요.';
@@ -1083,28 +1089,69 @@ async function getMasterTestById(testId) {
   return null;
 }
 
+/* 클리닉 문서(assignments/{토큰})를 읽어 학생과 허용 시험을 확인한다.
+   토큰은 클리닉이 학생 한 명당 하나씩 만든 24자 무작위 문자열이라
+   다른 학생 것으로 바꿔 넣을 수 없다. */
+async function loadClinic(token) {
+  try {
+    const snap = await getDoc(doc(db, 'assignments', token));
+    if (snap.exists()) return snap.data() || {};
+  } catch (e) {
+    console.warn('[OMR] clinic load fail:', e);
+  }
+  return null;
+}
+/* 이 클리닉에 그 마스터테스트가 실제로 담겨 있는가 */
+function clinicHasTest(clinic, testId) {
+  const items = (clinic && Array.isArray(clinic.items)) ? clinic.items : [];
+  return items.some(it =>
+    it && it.type === 'examlink' && it.source === 'master' &&
+    String(it.examId || '') === String(testId)
+  );
+}
+
 async function initFromURL() {
   const params = new URLSearchParams(location.search);
   const testId = (params.get('testId') || '').trim();
-  const sid    = (params.get('sid') || '').trim().toLowerCase();
+  const token  = (params.get('t') || '').trim();
+  let   sid    = (params.get('sid') || '').trim().toLowerCase();
 
   // 클리닉에서 들어왔으면 결과 화면에 "클리닉으로 돌아가기"를 띄운다
   // (사이트 내부 경로만 허용 — 오픈 리다이렉트 방지)
   const fromRaw = params.get('from') || '';
+  const homeBtn = document.getElementById('omr-home-btn');
+  const note    = document.getElementById('omr-done-note');
+  let backHref  = '';
   if (fromRaw && fromRaw.startsWith('/') && !fromRaw.startsWith('//')) {
-    const homeBtn = document.getElementById('omr-home-btn');
-    const note    = document.getElementById('omr-done-note');
-    if (homeBtn) { homeBtn.setAttribute('href', fromRaw); homeBtn.style.display = 'inline-block'; }
+    backHref = fromRaw;
+  } else if (token) {
+    // from 이 없어도 토큰이 있으면 그 클리닉으로 돌아갈 수 있다
+    backHref = '/assignment.html?t=' + encodeURIComponent(token);
+  }
+  if (backHref) {
+    if (homeBtn) { homeBtn.setAttribute('href', backHref); homeBtn.style.display = 'inline-block'; }
     if (note) note.style.display = 'none';
   }
 
-  // ★ 링크에 시험과 학생이 모두 담겨 있어야 한다
-  if (!testId || !sid) { showBlocked('nolink'); return; }
+  // ★ 시험이 지정돼 있고, 학생을 확인할 수단(토큰 또는 옛 링크의 sid)이 있어야 한다
+  if (!testId || (!token && !sid)) { showBlocked('nolink'); return; }
 
   showScreen('autoload');
 
   try {
     await ensureAuth();
+
+    /* ★ 토큰이 있으면 학생 ID를 주소에서 읽지 않고 클리닉 문서에서 가져온다.
+       주소의 학생 ID를 고쳐 다른 학생 성적을 덮어쓰는 것을 막는다.
+       또한 그 클리닉에 담긴 시험만 열 수 있게 한다.
+       토큰이 없는 옛 링크(sid 방식)는 그대로 동작시켜 이미 보낸 링크가 죽지 않게 한다. */
+    if (token) {
+      const clinic = await loadClinic(token);
+      if (!clinic) { showBlocked('link'); return; }
+      sid = String(clinic.studentId || '').trim().toLowerCase();
+      if (!sid) { showBlocked('student'); return; }
+      if (!clinicHasTest(clinic, testId)) { showBlocked('notinlink'); return; }
+    }
 
     const student = await getStudentById(sid);
     if (!student) { showBlocked('student'); return; }
