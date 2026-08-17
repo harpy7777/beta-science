@@ -6,1175 +6,1615 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#db2777">
-<meta name="robots" content="noindex, nofollow">
-<title>인후쌤의 과학 수업 관리 시스템 · 마스터테스트 OMR</title>
+<title>인후쌤의 과학 수업 관리 시스템 · 자료실</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { -webkit-text-size-adjust: 100%; }
+:root {
+  --pink: #db2777; --pink-light: #ec4899; --pink-pale: #fce7f3; --pink-soft: #fdf2f8;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
   background: #fafafa; color: #1d1d1f; min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  overscroll-behavior-y: none;
-  -webkit-user-select: none; user-select: none;   /* ★ 화면 텍스트 드래그 복사 억제 */
-  -webkit-touch-callout: none;                    /* ★ iOS 길게누르기 복사 메뉴 차단 */
+  -webkit-font-smoothing: antialiased; visibility: hidden;
+  overflow-x: hidden; padding-left: var(--safe-left); padding-right: var(--safe-right);
 }
-input, textarea { -webkit-user-select: text; user-select: text; }   /* 입력칸은 예외 */
 
 /* ── Header ── */
 .header {
-  background: #fff; border-bottom: 1px solid #fce7f3;
-  padding: 0 1rem;
-  padding-left: max(1rem, env(safe-area-inset-left));
-  padding-right: max(1rem, env(safe-area-inset-right));
-  height: 54px;
-  display: flex; align-items: center; justify-content: center;
-  position: sticky; top: 0; z-index: 300;
+  background: rgba(255,255,255,0.92); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--pink-pale); padding: 0 1.2rem; padding-top: var(--safe-top);
+  height: calc(54px + var(--safe-top)); display: flex; align-items: center;
+  justify-content: space-between; position: sticky; top: 0; z-index: 300;
 }
-.header-inner { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.logo {
-  width: 32px; height: 32px;
-  background: linear-gradient(135deg,#f472b6,#db2777);
-  border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+.header-left { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.logo-mark {
+  width: 30px; height: 30px; background: linear-gradient(135deg,#f472b6 0%,#db2777 100%);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.brand { font-size: 15px; font-weight: 700; color: #1d1d1f; line-height: 1.2; }
-.brand-sub { font-size: 11px; color: #db2777; font-weight: 600; margin-top: 1px; }
+.brand-name { font-size: 14px; font-weight: 700; color: #1d1d1f; letter-spacing: -0.3px; line-height: 1.2; white-space: nowrap; }
+.brand-sub { font-size: 10.5px; color: var(--pink); font-weight: 600; margin-top: 1px; }
+.header-right { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+.h-btn {
+  padding: 6px 13px; background: transparent; border: 1.5px solid var(--pink-pale); border-radius: 20px;
+  font-family: inherit; font-size: 11px; font-weight: 600; color: var(--pink); cursor: pointer;
+  white-space: nowrap; min-height: 32px; text-decoration: none; display: inline-flex; align-items: center;
+  touch-action: manipulation; transition: background 0.15s;
+}
+.h-btn:active { background: var(--pink-soft); transform: scale(0.97); }
 
-/* ── 공통 카드 ── */
+/* ── Layout ── */
+.wrap {
+  max-width: 860px; margin: 0 auto;
+  padding: 1.1rem 0.9rem calc(2.5rem + var(--safe-bottom));
+}
 .card {
-  background: #fff; border: 1px solid #fce7f3; border-radius: 18px;
-  padding: 2rem; max-width: 520px; margin: 2rem auto;
-  box-shadow: 0 4px 24px rgba(219,39,119,0.08);
+  background: #fff; border: 1px solid var(--pink-pale); border-radius: 16px;
+  padding: 1.1rem 1.15rem; margin-bottom: 12px;
+  box-shadow: 0 3px 18px rgba(219,39,119,0.05);
 }
+.card-title {
+  font-size: 14px; font-weight: 700; color: #1d1d1f; margin-bottom: 0.9rem;
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+}
+.pill { background: var(--pink-soft); color: var(--pink); font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 6px; white-space: nowrap; }
 
-/* ── 링크 없이 들어왔을 때 안내 ── */
-.blk-wrap { text-align: center; }
-.blk-icon {
-  width: 62px; height: 62px; border-radius: 50%;
-  background: #fdf2f8; border: 1px solid #fce7f3;
+/* ── 학년 탭 ── */
+.grade-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 3px; margin-bottom: 12px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.grade-tabs::-webkit-scrollbar { display: none; }
+.g-tab {
+  flex: 1 0 auto; min-width: 62px; border: 1.5px solid var(--pink-pale); background: #fff; color: #6e6e73;
+  border-radius: 12px; padding: 9px 12px; min-height: 44px;
+  font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;
+  white-space: nowrap; touch-action: manipulation; transition: all 0.15s;
+}
+.g-tab.sel { background: linear-gradient(135deg,#f472b6,#db2777); color: #fff; border-color: var(--pink); }
+.g-tab .g-cnt { font-size: 10px; font-weight: 700; opacity: 0.75; margin-left: 4px; }
+
+/* ── 폼 ── */
+.field { margin-bottom: 11px; }
+.field-label { font-size: 11px; font-weight: 700; color: var(--pink); letter-spacing: 0.04em; margin-bottom: 6px; display: block; }
+.inp, .ta {
+  width: 100%; padding: 11px 13px; min-height: 46px; border: 1.5px solid var(--pink-pale);
+  border-radius: 11px; font-size: 16px; font-family: inherit; color: #1d1d1f;
+  outline: none; background: #fff; transition: border 0.15s; -webkit-appearance: none; appearance: none;
+}
+.ta { min-height: 96px; resize: vertical; line-height: 1.6; }
+.inp:focus, .ta:focus { border-color: var(--pink); }
+.hint { font-size: 11px; color: #aeaeb2; margin-top: 5px; line-height: 1.55; word-break: keep-all; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+
+/* 파일 선택 */
+.file-drop {
+  border: 1.8px dashed var(--pink-pale); border-radius: 13px; background: var(--pink-soft);
+  padding: 1.1rem 1rem; text-align: center; cursor: pointer; transition: all 0.15s;
+  touch-action: manipulation;
+}
+.file-drop:hover, .file-drop.over { border-color: var(--pink); background: #fff5fa; }
+.fd-icon { font-size: 1.5rem; margin-bottom: 5px; }
+.fd-main { font-size: 12.5px; font-weight: 700; color: var(--pink); }
+.fd-sub { font-size: 11px; color: #aeaeb2; margin-top: 4px; line-height: 1.55; word-break: keep-all; }
+.fd-picked { font-size: 12.5px; font-weight: 700; color: #1d1d1f; word-break: break-all; }
+
+.btn {
+  width: 100%; padding: 13px; min-height: 50px;
+  background: linear-gradient(135deg,#f472b6,#db2777); border: none; border-radius: 13px;
+  font-size: 15px; font-weight: 700; color: #fff; cursor: pointer; font-family: inherit;
+  transition: opacity 0.15s; touch-action: manipulation;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.btn:hover { opacity: 0.88; }
+.btn:disabled { background: var(--pink-pale); color: #fff; cursor: not-allowed; }
+.btn.ghost { background: #fff; color: var(--pink); border: 1.5px solid var(--pink-pale); }
+.btn.ghost:hover { background: var(--pink-soft); opacity: 1; }
+.btn.gray { background: #f3f4f6; color: #6b7280; border: 1.5px solid #e5e7eb; }
+.btn.gray:hover { background: #eceef1; opacity: 1; }
+
+/* 진행바 */
+.prog-wrap { display: none; margin-top: 10px; }
+.prog-wrap.show { display: block; }
+.prog-track { height: 8px; background: var(--pink-pale); border-radius: 99px; overflow: hidden; }
+.prog-fill { height: 100%; width: 0%; background: linear-gradient(90deg,#f472b6,#db2777); border-radius: 99px; transition: width 0.25s ease; }
+.prog-txt { font-size: 11.5px; font-weight: 700; color: var(--pink); margin-top: 6px; }
+
+/* 알림 */
+.msg { padding: 10px 13px; border-radius: 11px; font-size: 12px; line-height: 1.6; margin-top: 10px; display: none; word-break: keep-all; white-space: pre-line; }
+.msg.show { display: block; }
+.msg.ok   { background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; }
+.msg.err  { background: #fff5f5; border: 1px solid #fecaca; color: #b91c1c; }
+.msg.warn { background: #fffbeb; border: 1px solid #fde68a; color: #b45309; }
+
+/* ── 자료 목록 ── */
+.res-list { display: flex; flex-direction: column; gap: 10px; }
+.res-item {
+  border: 1.5px solid var(--pink-pale); border-radius: 14px; background: #fff;
+  padding: 0.85rem 0.95rem; transition: border-color 0.15s;
+}
+.res-item:hover { border-color: #fbcfe8; }
+.res-head { display: flex; align-items: flex-start; gap: 9px; }
+.res-ico {
+  width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.7rem; margin: 0 auto 1.1rem;
+  font-size: 10px; font-weight: 800; letter-spacing: -0.02em;
 }
-.blk-title { font-size: 1.05rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px; letter-spacing: -0.02em; }
-.blk-text { font-size: 13px; color: #6e6e73; line-height: 1.75; word-break: keep-all; }
-.blk-help {
-  margin-top: 1.3rem; padding: 0.95rem 1.1rem;
-  background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 13px;
-  font-size: 12px; color: #075985; line-height: 1.75; text-align: left; word-break: keep-all;
-}
-.blk-help b { font-weight: 800; }
-
-/* ── OMR 화면 ── */
-.omr-wrap {
-  max-width: 780px; margin: 0 auto;
-  padding: 1.1rem 0.85rem 1rem;
-  padding-left: max(0.85rem, env(safe-area-inset-left));
-  padding-right: max(0.85rem, env(safe-area-inset-right));
-}
-.omr-header-card {
-  background: #fff; border: 1px solid #fce7f3; border-radius: 18px;
-  padding: 1rem 1.2rem; margin-bottom: 10px;
-  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
-}
-.omr-title { font-size: 1rem; font-weight: 700; color: #1d1d1f; line-height: 1.35; word-break: keep-all; }
-.omr-meta { font-size: 12px; color: #db2777; margin-top: 3px; }
-.omr-student-badge {
-  background: #fdf2f8; border: 1px solid #fce7f3; border-radius: 10px;
-  padding: 6px 12px; font-size: 12px; font-weight: 700; color: #db2777; white-space: nowrap;
-}
-
-/* ── 진행바 (스크롤해도 위에 고정) ── */
-.progress-dock {
-  position: sticky; top: 54px; z-index: 200;
-  background: rgba(250,250,250,0.94);
-  -webkit-backdrop-filter: saturate(180%) blur(10px);
-  backdrop-filter: saturate(180%) blur(10px);
-  padding: 8px 0 10px; margin: 0 -0.15rem 10px;
-}
-.progress-bar-wrap { background: #fff; border: 1px solid #fce7f3; border-radius: 14px; padding: 10px 14px; }
-.progress-label { font-size: 11.5px; font-weight: 700; color: #db2777; margin-bottom: 7px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.progress-left { display: flex; align-items: center; gap: 7px; min-width: 0; }
-.progress-track { height: 8px; background: #fce7f3; border-radius: 99px; overflow: hidden; }
-.progress-fill { height: 100%; background: linear-gradient(90deg,#f472b6,#db2777); border-radius: 99px; transition: width 0.3s ease; width: 0%; }
-.jump-btn {
-  border: 1px solid #fecaca; background: #fff5f5; color: #dc2626;
-  border-radius: 20px; padding: 5px 11px; min-height: 32px;
+.res-ico.pdf { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.res-ico.hwp { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+.res-body { min-width: 0; flex: 1; }
+.res-name { font-size: 13.5px; font-weight: 700; color: #1d1d1f; line-height: 1.4; word-break: keep-all; }
+.res-meta { font-size: 11px; color: #aeaeb2; margin-top: 3px; line-height: 1.5; word-break: break-all; }
+.res-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+.tag { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+.tag.sub { background: var(--pink-soft); color: var(--pink); }
+.tag.key { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.tag.nokey { background: #f5f5f7; color: #8e8e93; }
+.res-acts { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-top: 10px; }
+.act {
+  border: 1.5px solid var(--pink-pale); background: #fff; color: #6e6e73;
+  border-radius: 10px; padding: 8px 4px; min-height: 42px;
   font-size: 11px; font-weight: 700; font-family: inherit; cursor: pointer;
-  white-space: nowrap; display: none; touch-action: manipulation;
+  touch-action: manipulation; transition: all 0.15s; white-space: nowrap;
 }
-.jump-btn.show { display: inline-block; }
+.act:hover { border-color: #fbcfe8; color: var(--pink); background: var(--pink-soft); }
+.act.main { border-color: var(--pink); color: #fff; background: linear-gradient(135deg,#f472b6,#db2777); }
+.act.main:hover { opacity: 0.88; color: #fff; }
+.act.danger { color: #dc2626; border-color: #fecaca; }
+.act.danger:hover { background: #fff5f5; color: #dc2626; border-color: #fca5a5; }
+.act:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* ★ 미응답 안내줄 — 안 푼 문제가 있으면 항상 보인다 */
-.omr-warn {
-  display: none; margin-top: 9px; padding: 8px 11px;
-  background: #fffbeb; border: 1px solid #fde68a; border-radius: 11px;
-  font-size: 11.5px; font-weight: 700; color: #b45309; line-height: 1.55;
-  word-break: keep-all;
+.empty { text-align: center; padding: 2.2rem 1rem; font-size: 12.5px; color: #aeaeb2; line-height: 1.75; word-break: keep-all; }
+.empty .e-emoji { font-size: 2rem; margin-bottom: 8px; }
+.loading { text-align: center; padding: 2.2rem 1rem; color: var(--pink); font-size: 12.5px; }
+.spinner { width: 30px; height: 30px; border: 3px solid var(--pink-pale); border-top-color: var(--pink); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 11px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── 모달 ── */
+.modal {
+  display: none; position: fixed; inset: 0; z-index: 800;
+  background: rgba(29,29,31,0.45); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  padding: 1rem; overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
-.omr-warn.show { display: block; }
-.omr-warn.ok { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
+.modal.show { display: block; }
+.modal-box {
+  background: #fff; border-radius: 18px; max-width: 640px; margin: 1.2rem auto;
+  padding: 1.3rem 1.25rem calc(1.3rem + var(--safe-bottom));
+  box-shadow: 0 12px 48px rgba(0,0,0,0.2);
+}
+.modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 1rem; }
+.modal-title { font-size: 15px; font-weight: 700; color: #1d1d1f; line-height: 1.4; word-break: keep-all; }
+.modal-sub { font-size: 11.5px; color: #aeaeb2; margin-top: 3px; word-break: break-all; }
+.x-btn {
+  border: none; background: #f5f5f7; color: #6e6e73; width: 32px; height: 32px; flex-shrink: 0;
+  border-radius: 50%; font-size: 17px; cursor: pointer; font-family: inherit; line-height: 1;
+  touch-action: manipulation;
+}
+.x-btn:hover { background: #eceef1; }
 
-/* ★ 번호 중복 안내 (헤더 카드 아래 독립 배너) */
-#omr-dup-warn { margin: 0 0 10px; }
+/* 정답 그리드 */
+.ak-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(238px,1fr)); gap: 6px; max-height: 340px; overflow-y: auto; padding: 3px; -webkit-overflow-scrolling: touch; }
+.ak-q { display: flex; align-items: center; gap: 7px; padding: 4px 6px; border: 1.5px solid transparent; border-radius: 11px; }
+.ak-q.filled { background: #fdf7fa; }
+.ak-q.blank { border-color: #fecaca; background: #fff5f5; }
+.ak-num { flex: 0 0 34px; text-align: center; font-size: 11.5px; font-weight: 800; color: #6e6e73; }
+.ak-q.filled .ak-num { color: var(--pink); }
+.ak-ch { display: flex; gap: 4px; flex: 1 1 auto; min-width: 0; }
+.ak-c {
+  flex: 1 1 0; min-width: 0; max-width: 42px; aspect-ratio: 1/1; min-height: 34px;
+  border-radius: 50%; border: 2px solid var(--pink-pale); background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11.5px; font-weight: 700; color: #6e6e73; cursor: pointer;
+  transition: all 0.12s; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+}
+.ak-c:hover { border-color: #fbcfe8; color: var(--pink); }
+.ak-c.sel { background: linear-gradient(135deg,#f472b6,#db2777); border-color: var(--pink); color: #fff; }
+.ak-stat { font-size: 11.5px; font-weight: 700; color: var(--pink); margin: 9px 0 7px; }
+.mini-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 
-/* 부(section) 바로가기 칩 */
-.part-chips { display: flex; gap: 6px; overflow-x: auto; margin-top: 9px; padding-bottom: 2px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-.part-chips::-webkit-scrollbar { display: none; }
-.part-chip {
-  flex-shrink: 0; border: 1.5px solid #fce7f3; background: #fff; color: #6e6e73;
-  border-radius: 20px; padding: 6px 13px; min-height: 34px;
+/* 배포 안내 (배포는 주간 학습 클리닉에서 한다) */
+.deploy-note {
+  background: #eff6ff; border: 1px solid #bfdbfe; border-left: 3px solid #2563eb;
+  border-radius: 11px; padding: 10px 12px; margin-top: 11px;
+  font-size: 11.5px; line-height: 1.7; color: #1e40af; word-break: keep-all;
+}
+.deploy-note b { font-weight: 800; }
+.deploy-note.done { background: #ecfdf5; border-color: #a7f3d0; border-left-color: #059669; color: #065f46; }
+
+/* ── 자료 종류 (시험지 / 수업자료) ── */
+.kind-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.kind-btn {
+  border: 1.5px solid var(--pink-pale); background: #fff; color: #6e6e73;
+  border-radius: 11px; padding: 10px 8px; min-height: 48px;
+  font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;
+  touch-action: manipulation; transition: all 0.15s; line-height: 1.35;
+}
+.kind-btn .kb-sub { display: block; font-size: 10.5px; font-weight: 600; opacity: 0.7; margin-top: 2px; }
+.kind-btn.sel { background: linear-gradient(135deg,#f472b6,#db2777); color: #fff; border-color: var(--pink); }
+.kind-btn.sel.mat { background: linear-gradient(135deg,#60a5fa,#2563eb); border-color: #2563eb; }
+.tag.ke { background: var(--pink-soft); color: var(--pink); border: 1px solid var(--pink-pale); }
+.tag.km { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.kfilter { display: flex; gap: 6px; margin-bottom: 11px; }
+.kf-btn {
+  flex: 1; border: 1.5px solid var(--pink-pale); background: #fff; color: #6e6e73;
+  border-radius: 10px; padding: 8px 6px; min-height: 42px;
+  font-size: 12px; font-weight: 700; font-family: inherit; cursor: pointer;
+  touch-action: manipulation; white-space: nowrap;
+}
+.kf-btn.on { background: var(--pink-soft); color: var(--pink); border-color: #f9a8d4; }
+.res-acts.three { grid-template-columns: repeat(3,1fr); }
+
+/* ── 시험 스튜디오에서 만든 시험 ── */
+.st-list { display: flex; flex-direction: column; gap: 10px; }
+.st-item { border: 1.5px solid #bfdbfe; background: #f7fbff; border-radius: 14px; padding: 0.85rem 0.95rem; }
+.st-name { font-size: 13.5px; font-weight: 700; color: #1e3a8a; line-height: 1.4; word-break: keep-all; }
+.st-meta { font-size: 11px; color: #64748b; margin-top: 3px; line-height: 1.5; }
+.st-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+.tag.st1 { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.tag.st2 { background: #fff; color: #475569; border: 1px solid #cbd5e1; }
+.st-acts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
+.st-btn {
+  border: 1.5px solid #bfdbfe; background: #fff; color: #1d4ed8;
+  border-radius: 10px; padding: 8px 4px; min-height: 42px;
+  font-size: 11.5px; font-weight: 700; font-family: inherit; cursor: pointer;
+  touch-action: manipulation; white-space: nowrap; transition: all 0.15s;
+}
+.st-btn:hover { background: #eff6ff; }
+.st-btn.main { background: linear-gradient(135deg,#60a5fa,#2563eb); color: #fff; border-color: transparent; }
+.st-btn.main:hover { opacity: 0.88; }
+.st-tabs { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 11px; padding-bottom: 2px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.st-tabs::-webkit-scrollbar { display: none; }
+.st-tab {
+  flex: 0 0 auto; border: 1.5px solid #bfdbfe; background: #fff; color: #475569;
+  border-radius: 20px; padding: 7px 13px; min-height: 38px;
   font-size: 11.5px; font-weight: 700; font-family: inherit; cursor: pointer;
   white-space: nowrap; touch-action: manipulation;
 }
-.part-chip.done { border-color: #a7f3d0; background: #ecfdf5; color: #059669; }
-
-/* ── OMR 문항 ── */
-.omr-section {
-  background: #fff; border: 1px solid #fce7f3; border-radius: 16px;
-  padding: 1rem 1rem 1.1rem; margin-bottom: 10px;
-  scroll-margin-top: 150px;
+.st-tab.on { background: #2563eb; color: #fff; border-color: #2563eb; }
+.st-guard {
+  background: #fffbeb; border: 1px solid #fde68a; border-left: 3px solid #d97706;
+  border-radius: 11px; padding: 9px 11px; margin-bottom: 11px;
+  font-size: 11.5px; line-height: 1.65; color: #92400e; word-break: keep-all;
 }
-.omr-section-title {
-  font-size: 13px; font-weight: 700; color: #1d1d1f; margin-bottom: 12px;
-  padding-bottom: 9px; border-bottom: 1px solid #fdf2f8;
-  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
-}
-.part-tag { background:#fdf2f8; color:#db2777; font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:6px; white-space:nowrap; }
-
-/* 한 문항 = 한 줄 (번호 + ①②③④⑤) — 넓은 화면에서는 자동 2~3열 */
-.omr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 7px; }
-.omr-q {
-  display: flex; align-items: center; gap: 8px;
-  padding: 5px 7px; border: 1.5px solid transparent; border-radius: 12px;
-  transition: background 0.15s, border-color 0.15s;
-  scroll-margin-top: 160px;
-}
-.omr-q.answered { background: #fdf7fa; }
-.omr-q.missing { border-color: #fecaca; background: #fff5f5; }
-.omr-q-num { flex: 0 0 36px; text-align: center; font-size: 12px; font-weight: 800; color: #6e6e73; }
-.omr-q.answered .omr-q-num { color: #db2777; }
-.omr-choices { display: flex; gap: 5px; flex: 1 1 auto; min-width: 0; }
-.omr-choice {
-  flex: 1 1 0; min-width: 0; max-width: 48px; aspect-ratio: 1 / 1; min-height: 38px;
-  border-radius: 50%; border: 2px solid #fce7f3; background: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; color: #6e6e73; cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
-  -webkit-user-select: none; user-select: none; touch-action: manipulation;
-}
-.omr-choice:hover { border-color: #fbcfe8; color: #db2777; }
-.omr-choice:active { transform: scale(0.93); }
-.omr-choice.sel { background: linear-gradient(135deg,#f472b6,#db2777); border-color: #db2777; color: #fff; }
-
-/* ── 제출 (아래 고정) ── */
-.submit-dock {
-  position: sticky; bottom: 0; z-index: 200;
-  padding: 10px 0;
-  padding-bottom: max(10px, env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, rgba(250,250,250,0) 0%, rgba(250,250,250,0.95) 32%, #fafafa 100%);
-}
-.submit-btn {
-  width: 100%; padding: 15px; min-height: 54px;
-  background: linear-gradient(135deg,#f472b6,#db2777);
-  border: none; border-radius: 16px; font-size: 16px; font-weight: 700;
-  color: #fff; cursor: pointer; font-family: inherit;
-  transition: opacity 0.15s; box-shadow: 0 4px 16px rgba(219,39,119,0.25);
-  touch-action: manipulation;
-}
-.submit-btn:hover { opacity: 0.88; }
-.submit-btn:active { transform: scale(0.995); }
-.submit-btn:disabled { background: #fce7f3; cursor: not-allowed; box-shadow: none; }
-.submit-btn.wait { background: linear-gradient(135deg,#fbbf24,#d97706); box-shadow: 0 4px 16px rgba(217,119,6,0.22); }
-
-/* ── 결과 ── */
-.result-card {
-  background: #fff; border: 1px solid #fce7f3; border-radius: 20px;
-  padding: 2.4rem 1.8rem; max-width: 560px; margin: 2rem auto; text-align: center;
-  box-shadow: 0 4px 24px rgba(219,39,119,0.1);
-}
-.result-emoji { font-size: 3rem; margin-bottom: 1rem; }
-.result-title { font-size: 1.3rem; font-weight: 700; color: #1d1d1f; margin-bottom: 6px; }
-.result-sub { font-size: 13px; color: #6e6e73; margin-bottom: 1.8rem; line-height: 1.6; }
-.result-score-box {
-  background: #fdf2f8; border: 1px solid #fce7f3; border-radius: 16px;
-  padding: 1.4rem; margin-bottom: 1.2rem;
-}
-.result-score-num { font-size: 2.5rem; font-weight: 700; color: #db2777; letter-spacing: -0.05em; }
-.result-score-lbl { font-size: 12px; color: #6e6e73; margin-top: 4px; }
-.result-detail { font-size: 12.5px; color: #6e6e73; margin-bottom: 1.2rem; line-height: 1.7; }
-.result-task-box {
-  background: #fef9c3; border: 1px solid #fde68a; border-radius: 14px;
-  padding: 1rem 1.2rem; text-align: left; margin-bottom: 1.4rem;
-}
-.result-task-title { font-size: 11px; font-weight: 700; color: #854d0e; margin-bottom: 6px; }
-.result-task-text { font-size: 13px; color: #1d1d1f; line-height: 1.6; }
-.result-again {
-  font-size: 11.5px; color: #6e6e73; line-height: 1.65;
-  background: #f5f5f7; border-radius: 11px; padding: 9px 12px; margin-bottom: 1.2rem;
-}
-.home-btn {
-  display: inline-block; padding: 13px 28px; min-height: 48px;
-  background: linear-gradient(135deg,#f472b6,#db2777);
-  border: none; border-radius: 14px; font-size: 14px; font-weight: 700;
-  color: #fff; cursor: pointer; font-family: inherit; text-decoration: none;
-  transition: opacity 0.15s; touch-action: manipulation;
-}
-.home-btn:hover { opacity: 0.88; }
-.done-note { font-size: 11.5px; color: #aeaeb2; line-height: 1.7; word-break: keep-all; }
-
-/* ★★ 문항별 정답 확인 (제출 후에만 나타남) ★★ */
-.review-box {
-  display: none; text-align: left; margin-bottom: 1.4rem;
-  border-top: 1px solid #fdf2f8; padding-top: 1.3rem;
-}
-.rv-head {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 8px; flex-wrap: wrap; margin-bottom: 10px;
-}
-.rv-title { font-size: 13.5px; font-weight: 700; color: #1d1d1f; }
-.rv-tabs { display: flex; gap: 6px; }
-.rv-tab {
-  border: 1.5px solid #fce7f3; background: #fff; color: #6e6e73;
-  border-radius: 20px; padding: 6px 12px; min-height: 34px;
-  font-size: 11.5px; font-weight: 700; font-family: inherit;
-  cursor: pointer; white-space: nowrap; touch-action: manipulation;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-}
-.rv-tab.active { background: linear-gradient(135deg,#f472b6,#db2777); border-color: #db2777; color: #fff; }
-.rv-legend {
-  font-size: 11px; color: #aeaeb2; line-height: 1.6;
-  margin-bottom: 9px; word-break: keep-all;
-}
-.rv-list {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px;
-  max-height: 360px; overflow-y: auto; -webkit-overflow-scrolling: touch;
-  padding-right: 2px;
-}
-.rv-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 9px 10px; border-radius: 12px;
-  border: 1.5px solid #d1fae5; background: #f6fdfa;
-}
-.rv-row.bad { border-color: #fecaca; background: #fff5f5; }
-.rv-num { flex: 0 0 40px; font-size: 12px; font-weight: 800; color: #059669; }
-.rv-row.bad .rv-num { color: #dc2626; }
-.rv-pair { display: flex; align-items: center; gap: 5px; flex: 1 1 auto; min-width: 0; flex-wrap: wrap; }
-.rv-chip { font-size: 11px; font-weight: 700; border-radius: 8px; padding: 4px 8px; white-space: nowrap; }
-.rv-chip.mine { background: #eef0f3; color: #6e6e73; }
-.rv-row.bad .rv-chip.mine { background: #fee2e2; color: #b91c1c; }
-.rv-chip.ans { background: #d1fae5; color: #047857; }
-.rv-mark { flex: 0 0 auto; font-size: 14px; font-weight: 800; }
-.rv-mark.ok { color: #059669; }
-.rv-mark.no { color: #dc2626; }
-.rv-empty {
-  grid-column: 1 / -1; text-align: center; padding: 1.6rem 1rem;
-  font-size: 12.5px; color: #059669; font-weight: 700;
-  background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; line-height: 1.7;
+.st-ro { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border: 1.5px solid #e5e7eb; background: #fff; border-radius: 11px; }
+.st-ro-num { flex: 0 0 34px; text-align: center; font-size: 11.5px; font-weight: 800; color: #6e6e73; }
+.st-ro-ans { font-size: 14px; font-weight: 800; color: #1d4ed8; }
+.st-ro.blank { border-color: #fecaca; background: #fff5f5; }
+.st-ro.blank .st-ro-ans { color: #dc2626; font-size: 11.5px; font-weight: 700; }
+.st-chg {
+  font-size: 11.5px; font-weight: 700; color: #b45309; line-height: 1.7;
+  background: #fffbeb; border: 1px solid #fde68a; border-radius: 11px;
+  padding: 9px 11px; margin-top: 10px; word-break: keep-all;
 }
 
-.loading { text-align: center; padding: 3rem 1rem; color: #db2777; font-size: 13px; }
-.spinner { width: 32px; height: 32px; border: 3px solid #fce7f3; border-top-color: #db2777; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.screen { display: none; }
-.screen.active { display: block; }
-
-/* ★ 저장 중 덮개 */
-.saving-veil {
-  display: none; position: fixed; inset: 0; z-index: 900;
-  background: rgba(255,255,255,0.88);
-  align-items: center; justify-content: center; padding: 1.5rem;
-}
-.saving-veil.show { display: flex; }
-.saving-veil .sv-in { text-align: center; }
-.saving-veil .sv-t { font-size: 13.5px; font-weight: 700; color: #db2777; }
-.saving-veil .sv-s { font-size: 11.5px; color: #aeaeb2; margin-top: 5px; }
+/* 덮개 */
+.veil { display: none; position: fixed; inset: 0; z-index: 900; background: rgba(255,255,255,0.9); align-items: center; justify-content: center; padding: 1.5rem; }
+.veil.show { display: flex; }
+.veil-t { font-size: 13px; font-weight: 700; color: var(--pink); text-align: center; }
+.veil-s { font-size: 11.5px; color: #aeaeb2; margin-top: 5px; text-align: center; }
 
 /* ── 모바일 ── */
-@media (max-width: 560px) {
-  .brand { font-size: 13.5px; }
+@media (max-width: 600px) {
+  .wrap { padding: 0.9rem 0.7rem calc(2rem + var(--safe-bottom)); }
+  .card { padding: 0.95rem 0.9rem; border-radius: 14px; }
+  .brand-name { font-size: 13px; }
   .brand-sub { font-size: 10px; }
-  .card { margin: 1rem 0.8rem; padding: 1.6rem 1.2rem; border-radius: 16px; }
-  .card { margin-left: max(0.8rem, env(safe-area-inset-left)); margin-right: max(0.8rem, env(safe-area-inset-right)); }
-  .blk-icon { width: 56px; height: 56px; font-size: 1.5rem; }
-  .blk-title { font-size: 1rem; }
-  .blk-text { font-size: 12.5px; }
-  .blk-help { font-size: 11.5px; padding: 0.85rem 0.95rem; }
-  .omr-wrap { padding: 0.9rem 0.7rem 0.8rem; }
-  .omr-header-card { padding: 0.9rem 1rem; border-radius: 16px; }
-  .omr-title { font-size: 0.95rem; }
-  .omr-student-badge { font-size: 11.5px; padding: 5px 10px; }
-  .omr-section { padding: 0.9rem 0.75rem 1rem; }
-  .omr-grid { grid-template-columns: 1fr; gap: 6px; }
-  .omr-q-num { flex: 0 0 32px; font-size: 11.5px; }
-  .omr-choice { max-width: 52px; min-height: 42px; font-size: 13px; }
-  .omr-warn { font-size: 11px; padding: 8px 10px; }
-  .result-card { margin: 1rem 0.8rem; padding: 2rem 1.3rem; }
-  .result-card { margin-left: max(0.8rem, env(safe-area-inset-left)); margin-right: max(0.8rem, env(safe-area-inset-right)); }
-
-  /* 문항별 정답 확인 — 모바일은 1열 + 스크롤 영역 축소 */
-  .rv-head { gap: 6px; }
-  .rv-title { font-size: 12.5px; }
-  .rv-tab { font-size: 11px; padding: 6px 10px; }
-  .rv-list { grid-template-columns: 1fr; max-height: 320px; gap: 5px; }
-  .rv-row { padding: 8px 9px; gap: 6px; }
-  .rv-num { flex: 0 0 36px; font-size: 11.5px; }
-  .rv-chip { font-size: 10.5px; padding: 4px 7px; }
+  .row2 { grid-template-columns: 1fr; gap: 0; }
+  .res-acts { grid-template-columns: repeat(2,1fr); }
+  .res-acts.three { grid-template-columns: repeat(3,1fr); }
+  .kind-btn { font-size: 12.5px; }
+  .kf-btn { font-size: 11.5px; }
+  .st-item { padding: 0.8rem 0.8rem; border-radius: 12px; }
+  .st-name { font-size: 13px; }
+  .st-guard { font-size: 11px; padding: 8px 10px; }
+  .st-ro { padding: 8px 9px; }
+  .ak-grid { grid-template-columns: 1fr; max-height: 300px; }
+  .ak-c { max-width: 46px; min-height: 38px; font-size: 12.5px; }
+  .modal { padding: 0.6rem; }
+  .modal-box { padding: 1.1rem 0.95rem calc(1.1rem + var(--safe-bottom)); border-radius: 16px; margin: 0.6rem auto; }
+  .mini-row { grid-template-columns: 1fr; }
+  .g-tab { min-width: 56px; padding: 9px 9px; font-size: 12.5px; }
 }
-@media (max-width: 340px) {
-  .omr-q { gap: 6px; padding: 4px 3px; }
-  .omr-choices { gap: 4px; }
-  .omr-q-num { flex: 0 0 28px; }
-  .omr-choice { min-height: 38px; }
-  .rv-num { flex: 0 0 32px; }
-  .rv-chip { font-size: 10px; padding: 3px 6px; }
-  .blk-help { font-size: 11px; }
+@media (max-width: 375px) {
+  .header { padding: 0 0.8rem; padding-top: var(--safe-top); }
+  .brand-name { font-size: 12px; }
+  .h-btn { padding: 5px 9px; font-size: 10px; }
+  .res-name { font-size: 12.5px; }
+  .act { font-size: 10.5px; padding: 8px 2px; }
+  .g-tab { min-width: 50px; font-size: 12px; }
+  .kind-btn { font-size: 12px; padding: 10px 6px; }
+  .kind-btn .kb-sub { font-size: 10px; }
+  .kf-btn { font-size: 11px; padding: 8px 3px; }
+  .st-btn { font-size: 11px; padding: 8px 2px; }
+  .st-tab { font-size: 11px; padding: 7px 11px; }
 }
-/* 가로 모드 등 넓은 화면에서 3열까지 */
-@media (min-width: 900px) {
-  .omr-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+@media (max-width: 320px) {
+  .res-acts { grid-template-columns: repeat(2,1fr); gap: 5px; }
+  .ak-num { flex: 0 0 28px; }
+  .ak-c { min-height: 32px; max-width: 40px; }
+  .kind-row { grid-template-columns: 1fr; }
+  .st-acts { grid-template-columns: 1fr; }
+  .kf-btn { font-size: 10.5px; }
 }
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script>
-
-<!-- ★ 개발자 도구·소스보기 진입 억제 (완전 차단은 아님 · 아래 설명 참고) -->
-<script>
-(function(){
-  // 우클릭 / 길게 누르기 메뉴 차단
-  document.addEventListener('contextmenu', function(e){ e.preventDefault(); }, { capture:true });
-
-  // 개발자 도구 단축키 차단
-  document.addEventListener('keydown', function(e){
-    var k = (e.key || '').toLowerCase();
-    var meta = e.ctrlKey || e.metaKey;
-    if (k === 'f12') { e.preventDefault(); e.stopPropagation(); return false; }
-    if (meta && e.shiftKey && (k === 'i' || k === 'j' || k === 'c' || k === 'k')) {
-      e.preventDefault(); e.stopPropagation(); return false;
-    }
-    if (meta && (k === 'u' || k === 's' || k === 'p')) {   // 소스보기 / 저장 / 인쇄
-      e.preventDefault(); e.stopPropagation(); return false;
-    }
-  }, { capture:true });
-
-  // 드래그로 텍스트 긁어가기 차단 (입력칸은 제외)
-  document.addEventListener('selectstart', function(e){
-    var t = e.target;
-    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
-    e.preventDefault();
-  }, { capture:true });
-})();
-</script>
 </head>
 <body>
 
 <header class="header">
-  <div class="header-inner">
-    <div class="logo">
+  <div class="header-left">
+    <div class="logo-mark">
       <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
         <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
         <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
       </svg>
     </div>
     <div>
-      <div class="brand">인후쌤의 과학 수업 관리 시스템</div>
-      <div class="brand-sub">마스터테스트 OMR</div>
+      <div class="brand-name">인후쌤의 과학 수업 관리 시스템</div>
+      <div class="brand-sub">자료실</div>
     </div>
+  </div>
+  <div class="header-right">
+    <a class="h-btn" href="index.html">← 허브</a>
+    <button class="h-btn" onclick="doLogout()">로그아웃</button>
   </div>
 </header>
 
-<!-- ★ 저장 중 덮개 -->
-<div class="saving-veil" id="saving-veil">
-  <div class="sv-in">
+<div class="veil" id="veil">
+  <div>
     <div class="spinner"></div>
-    <div class="sv-t">성적을 저장하고 있어요</div>
-    <div class="sv-s">창을 닫거나 새로고침하지 마세요</div>
+    <div class="veil-t" id="veil-t">처리 중입니다</div>
+    <div class="veil-s">창을 닫거나 새로고침하지 마세요</div>
   </div>
 </div>
 
-<!-- ⓪ 자동 진입 로딩 (클리닉 링크로 들어올 때) — 첫 화면 -->
-<div class="screen active" id="screen-autoload">
-  <div class="loading" style="padding:5rem 1rem;"><div class="spinner"></div>시험을 여는 중...</div>
-</div>
+<div class="wrap">
 
-<!-- ① 링크 없이 들어왔을 때 안내 화면
-     ★ 예전에는 여기에 학생 ID·학년을 넣는 입장 화면이 있었고,
-       그러면 그 학년에 등록된 시험 전체 목록이 보였다.
-       배포하지 않은 시험까지 미리 풀고 정답을 볼 수 있었으므로 없앴다.
-       이제 선생님이 만든 링크(testId + sid)로만 시험이 열린다. -->
-<div class="screen" id="screen-blocked">
+  <!-- 학년 탭 -->
+  <div class="grade-tabs" id="grade-tabs"></div>
+
+  <!-- 업로드 -->
   <div class="card">
-    <div class="blk-wrap">
-      <div class="blk-icon">🔒</div>
-      <div class="blk-title" id="blk-title">선생님께 받은 링크로 들어와 주세요</div>
-      <div class="blk-text" id="blk-text">
-        이 화면에서는 시험을 열 수 없습니다.<br>
-        카카오톡으로 받은 <b>주간 학습 클리닉</b> 링크를 다시 눌러주세요.
+    <div class="card-title">📤 자료 올리기 <span class="pill" id="up-grade">중1</span></div>
+
+    <div class="field">
+      <span class="field-label">자료 종류</span>
+      <div class="kind-row">
+        <button class="kind-btn sel" id="kind-exam" onclick="setUpKind('exam')">📝 시험지<span class="kb-sub">정답키 등록 · OMR 응시</span></button>
+        <button class="kind-btn mat" id="kind-material" onclick="setUpKind('material')">📘 수업자료<span class="kb-sub">인쇄·배부용 (정답키 없음)</span></button>
       </div>
-      <div class="blk-help">
-        <b>이렇게 해보세요</b><br>
-        ① 카카오톡에서 선생님이 보낸 링크를 찾습니다<br>
-        ② 링크를 눌러 클리닉을 엽니다<br>
-        ③ 클리닉 안에서 시험을 눌러 풉니다<br><br>
-        링크를 못 찾았거나 열리지 않으면 선생님께 말씀해 주세요.
+      <div class="hint" id="kind-hint">시험지로 올리면 정답키를 등록해 학생이 OMR로 풀 수 있습니다.</div>
+    </div>
+
+    <input type="file" id="file-input" accept=".pdf,.hwp,.hwpx,application/pdf" style="display:none"
+      onchange="onPickFile(this.files)">
+
+    <div class="file-drop" id="file-drop" onclick="document.getElementById('file-input').click()">
+      <div class="fd-icon">📄</div>
+      <div class="fd-main" id="fd-main">파일 선택 · 여기로 끌어다 놓기</div>
+      <div class="fd-sub" id="fd-sub">PDF · HWP · HWPX · 최대 50MB<br>인쇄 버튼은 PDF에서만 작동합니다</div>
+    </div>
+
+    <div class="field" style="margin-top:11px;">
+      <label class="field-label" for="up-title">자료 이름</label>
+      <input class="inp" type="text" id="up-title" placeholder="예: 1학기 중간 대비 3단원 문제">
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label class="field-label" for="up-subject">과목</label>
+        <select class="inp" id="up-subject">
+          <option value="">선택</option>
+          <option value="중1과학">중1과학</option>
+          <option value="중2과학">중2과학</option>
+          <option value="중3과학">중3과학</option>
+          <option value="통합과학1">통합과학1</option>
+          <option value="통합과학2">통합과학2</option>
+          <option value="화학">화학</option>
+          <option value="물질과 에너지">물질과 에너지</option>
+          <option value="화학 반응의 세계">화학 반응의 세계</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label" for="up-unit">단원 (선택)</label>
+        <input class="inp" type="text" id="up-unit" placeholder="예: 3단원 화학 반응">
       </div>
     </div>
+
+    <button class="btn" id="up-btn" onclick="doUpload()">업로드</button>
+
+    <div class="prog-wrap" id="prog-wrap">
+      <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+      <div class="prog-txt" id="prog-txt">0%</div>
+    </div>
+    <div class="msg" id="up-msg"></div>
   </div>
+
+  <!-- 목록 -->
+  <div class="card">
+    <div class="card-title">📚 <span id="list-grade">중1</span> 자료 <span class="pill" id="list-cnt">0개</span></div>
+    <div class="kfilter" id="kfilter">
+      <button class="kf-btn on" id="kf-all"      onclick="setListKind('all')">전체</button>
+      <button class="kf-btn"    id="kf-exam"     onclick="setListKind('exam')">📝 시험지</button>
+      <button class="kf-btn"    id="kf-material" onclick="setListKind('material')">📘 수업자료</button>
+    </div>
+    <div id="list-wrap"><div class="loading"><div class="spinner"></div>불러오는 중...</div></div>
+  </div>
+
+  <!-- 시험 스튜디오에서 만든 시험 -->
+  <div class="card">
+    <div class="card-title">🧪 시험 스튜디오에서 만든 시험 <span class="pill" id="studio-cnt">0개</span></div>
+    <div class="hint" style="margin:-4px 0 11px;">이 학년(<span id="studio-grade">중1</span>)에 등록된 시험 중 시험 스튜디오에서 만든 것입니다. 여기서 <b>정답만</b> 확인하고 고칠 수 있습니다.</div>
+    <div id="studio-wrap"><div class="loading"><div class="spinner"></div>불러오는 중...</div></div>
+  </div>
+
 </div>
 
-<!-- ② OMR 화면 -->
-<div class="screen" id="screen-omr">
-  <div class="omr-wrap">
-    <div class="omr-header-card">
+<!-- ── 정답키 모달 ── -->
+<div class="modal" id="ak-modal">
+  <div class="modal-box">
+    <div class="modal-head">
       <div style="min-width:0">
-        <div class="omr-title" id="omr-test-title">—</div>
-        <div class="omr-meta" id="omr-test-meta">—</div>
+        <div class="modal-title" id="ak-title">마스터테스트 정답키</div>
+        <div class="modal-sub" id="ak-sub">—</div>
       </div>
-      <div class="omr-student-badge" id="omr-student-badge">—</div>
+      <button class="x-btn" onclick="closeAK()">×</button>
     </div>
 
-    <!-- ★ 문항 번호 중복 안내 -->
-    <div class="omr-warn" id="omr-dup-warn"></div>
-
-    <div class="progress-dock">
-      <div class="progress-bar-wrap">
-        <div class="progress-label">
-          <span class="progress-left">
-            <span>답안 작성 현황</span>
-            <span id="progress-txt">0 / 0</span>
-          </span>
-          <button class="jump-btn" id="jump-btn" onclick="jumpToMissing()">안 푼 문제로 ↓</button>
-        </div>
-        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-        <div class="omr-warn" id="omr-warn"></div>
-        <div class="part-chips" id="part-chips"></div>
+    <div class="row2">
+      <div class="field">
+        <label class="field-label" for="ak-name">시험 이름 <span style="color:#dc2626">*</span></label>
+        <input class="inp" type="text" id="ak-name" placeholder="OMR 목록에 보일 이름">
+      </div>
+      <div class="field">
+        <label class="field-label" for="ak-subject">과목 <span style="color:#dc2626">*</span></label>
+        <select class="inp" id="ak-subject">
+          <option value="">선택</option>
+          <option value="중1과학">중1과학</option>
+          <option value="중2과학">중2과학</option>
+          <option value="중3과학">중3과학</option>
+          <option value="통합과학1">통합과학1</option>
+          <option value="통합과학2">통합과학2</option>
+          <option value="화학">화학</option>
+          <option value="물질과 에너지">물질과 에너지</option>
+          <option value="화학 반응의 세계">화학 반응의 세계</option>
+        </select>
       </div>
     </div>
 
-    <div id="omr-sections"></div>
+    <div class="field">
+      <label class="field-label" for="ak-paste">정답 붙여넣기</label>
+      <textarea class="ta" id="ak-paste" placeholder="1.③ 2.① 3.⑤ 4.② 5.④   또는   3 1 5 2 4   또는   ③①⑤②④"></textarea>
+      <div class="hint">번호가 있으면 번호대로, 없으면 앞에서부터 순서대로 채웁니다. 아래 표에서 직접 고쳐도 됩니다.</div>
+    </div>
 
-    <div class="submit-dock">
-      <button class="submit-btn" id="submit-btn" onclick="submitOMR()">✓ 답안 제출하기</button>
+    <div class="mini-row">
+      <button class="btn ghost" onclick="applyPaste()">붙여넣은 정답 적용</button>
+      <button class="btn gray" onclick="clearAK()">전체 지우기</button>
+    </div>
+
+    <div class="ak-stat" id="ak-stat">0 / 0 문항 입력됨</div>
+    <div class="ak-grid" id="ak-grid"></div>
+
+    <div class="field" style="margin-top:12px;">
+      <label class="field-label" for="ak-count">문항 수</label>
+      <input class="inp" type="number" id="ak-count" min="1" max="200" value="20" onchange="setCount(this.value)">
+      <div class="hint">문항 수를 바꾸면 표가 다시 그려집니다. 이미 고른 답은 유지됩니다.</div>
+    </div>
+
+    <div class="msg" id="ak-msg"></div>
+
+    <button class="btn" id="ak-save" onclick="saveAK()" style="margin-top:11px;">정답키 저장</button>
+
+    <div class="deploy-note" id="ak-deploy">
+      저장한 시험은 <b>주간 학습 클리닉</b>에서 배포합니다 — 클리닉 → <b>📚 시험 담기</b> → <b>📝 마스터테스트</b> 탭에서 이 시험을 담아 학생·반별로 보내세요. 점수는 자동으로 성적에 기록됩니다.
     </div>
   </div>
 </div>
 
-<!-- ③ 결과 화면 -->
-<div class="screen" id="screen-result">
-  <div class="result-card">
-    <div class="result-emoji" id="result-emoji">🎉</div>
-    <div class="result-title" id="result-title">제출 완료!</div>
-    <div class="result-sub" id="result-sub">수고했어요!</div>
-    <div class="result-score-box">
-      <div class="result-score-num" id="result-score">—</div>
-      <div class="result-score-lbl">총 100점 기준</div>
-    </div>
-    <div class="result-detail" id="result-detail"></div>
-    <div class="result-again" id="result-again" style="display:none;"></div>
-
-    <!-- ★★ 문항별 정답 확인 ★★ -->
-    <div class="review-box" id="review-box">
-      <div class="rv-head">
-        <div class="rv-title">📝 문항별 채점 결과</div>
-        <div class="rv-tabs">
-          <button class="rv-tab active" id="rv-tab-all"   onclick="setReviewMode('all')">전체</button>
-          <button class="rv-tab"        id="rv-tab-wrong" onclick="setReviewMode('wrong')">틀린 문제</button>
-        </div>
+<!-- ── 시험 스튜디오 시험: 정답 보기 / 고치기 ── -->
+<div class="modal" id="st-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div style="min-width:0">
+        <div class="modal-title" id="st-title">—</div>
+        <div class="modal-sub" id="st-sub">—</div>
       </div>
-      <div class="rv-legend">틀린 문항에는 정답이 함께 표시됩니다. 오답 노트에 옮겨 적고 다시 풀어보세요.</div>
-      <div class="rv-list" id="rv-list"></div>
+      <button class="x-btn" onclick="closeStudio()">×</button>
     </div>
 
-    <div class="result-task-box" id="result-task-box" style="display:none;">
-      <div class="result-task-title">📌 이번 과제</div>
-      <div class="result-task-text" id="result-task-text">—</div>
-    </div>
-
-    <!-- 클리닉에서 들어온 경우에만 돌아가기 버튼이 나온다 (from 파라미터) -->
-    <a href="#" id="omr-home-btn" class="home-btn" style="display:none;">← 클리닉으로 돌아가기</a>
-    <div class="done-note" id="omr-done-note">제출이 끝났습니다. 이 창은 닫아도 됩니다.</div>
+    <div class="st-guard" id="st-guard">—</div>
+    <div class="st-tabs" id="st-tabs"></div>
+    <div class="ak-stat" id="st-stat">—</div>
+    <div class="ak-grid" id="st-grid"></div>
+    <div class="st-chg" id="st-chg" style="display:none;">—</div>
+    <div class="msg" id="st-msg"></div>
+    <div class="mini-row" id="st-acts"></div>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, collection, getDocs, setDoc, doc, getDoc,
-  query, where, Timestamp
+  getFirestore, collection, query, where, getDocs,
+  doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-const cfg = {
-  apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
-  authDomain:"beta-science.firebaseapp.com",
-  projectId:"beta-science",
-  storageBucket:"beta-science.firebasestorage.app",
-  messagingSenderId:"650652155367",
-  appId:"1:650652155367:web:41d2958e675cb4edd4d142"
+const firebaseConfig = {
+  apiKey: "AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
+  authDomain: "beta-science.firebaseapp.com",
+  projectId: "beta-science",
+  storageBucket: "beta-science.firebasestorage.app",
+  messagingSenderId: "650652155367",
+  appId: "1:650652155367:web:41d2958e675cb4edd4d142"
 };
-const app = initializeApp(cfg);
-const db  = getFirestore(app);
-const auth = getAuth(app);
 
-// ──────────────────────────────────────────────
-// ★ 학생 인증 보장 (선생님 로그인은 건드리지 않음)
-// ──────────────────────────────────────────────
-let _authReady = null;
-function waitForAuthReady() {
-  if (_authReady) return _authReady;
-  _authReady = new Promise((resolve) => {
-    const unsub = onAuthStateChanged(auth, () => { unsub(); resolve(); });
-  });
-  return _authReady;
-}
-async function ensureAuth() {
-  try {
-    await waitForAuthReady();
-    if (!auth.currentUser) {
-      await signInAnonymously(auth);
-    }
-  } catch (e) {
-    console.warn('[OMR] ensureAuth skipped:', e);
-  }
-}
+const app     = initializeApp(firebaseConfig);
+const auth    = getAuth(app);
+const db      = getFirestore(app);
+const storage = getStorage(app);
 
-// ──────────────────────────────────────────────
-// 학년 정규화 테이블
-// ──────────────────────────────────────────────
+const GRADES = ['중1','중2','중3','고1','고2','고3'];
+
+/* exam-studio(마스터테스트 만들기)는 학년을 '중등1학년' 형태로 저장하고
+   목록 필터에서 완전일치로 비교한다. 자료실 탭은 '중1' 표기를 쓰므로
+   master-tests 에 저장할 때만 아래 표기로 바꿔서 넣는다.
+   student-omr.html 의 GRADE_VARIANTS 에도 두 표기가 모두 들어 있어
+   학생 응시 화면에서는 어느 쪽이든 정상 인식된다. */
+const GRADE_FULL = {
+  '중1':'중등1학년', '중2':'중등2학년', '중3':'중등3학년',
+  '고1':'고등1학년', '고2':'고등2학년', '고3':'고등3학년'
+};
+
+/* 학생 OMR·시험 스튜디오의 학년 표기를 자료실 탭 표기('중1')로 맞춘다.
+   스튜디오는 '중등1학년' 형식으로 저장하므로 목록을 걸러낼 때 필요하다. */
 const GRADE_VARIANTS = {
   '중1': ['중1','중1학년','중학1학년','중학교1학년','중학교 1학년','중 1학년','중등1학년'],
   '중2': ['중2','중2학년','중학2학년','중학교2학년','중학교 2학년','중 2학년','중등2학년'],
   '중3': ['중3','중3학년','중학3학년','중학교3학년','중학교 3학년','중 3학년','중등3학년'],
   '고1': ['고1','고1학년','고등1학년','고등학교1학년','고등학교 1학년','고 1학년'],
   '고2': ['고2','고2학년','고등2학년','고등학교2학년','고등학교 2학년','고 2학년'],
-  '고3': ['고3','고3학년','고등3학년','고등학교3학년','고등학교 3학년','고 3학년'],
+  '고3': ['고3','고3학년','고등3학년','고등학교3학년','고등학교 3학년','고 3학년']
 };
-
-function normalizeGrade(raw) {
-  const s = String(raw || '').replace(/\s/g, '');
-  for (const [uiGrade, variants] of Object.entries(GRADE_VARIANTS)) {
-    if (variants.some(v => v.replace(/\s/g,'') === s)) return uiGrade;
+function normalizeGrade(raw){
+  const s = String(raw || '').replace(/\s/g,'');
+  for (const [ui, variants] of Object.entries(GRADE_VARIANTS)){
+    if (variants.some(v => v.replace(/\s/g,'') === s)) return ui;
   }
   return String(raw || '');
 }
 
-// ── 상태 ──
-let studentName      = '';
-let studentId        = '';
-let studentGrade     = '';   // 화면 표시용 (학생 문서의 학년을 정규화한 값)
-let studentGradeReal = '';   // ★ 저장에 쓰는 값
-let selectedTest = null;
-let answers      = {};
-let submitting   = false;
+const MAX_BYTES = 50 * 1024 * 1024;
 
-// ★ 현재 시험의 문항 배치 (중복 번호 제거 후) — buildOMR에서 채워진다
-let omrPlan = { groups: [], total: 0, dup: [] };
+let curGrade  = '중1';
+let pickedFile = null;
+let resources  = [];      // 현재 학년 자료 목록
+let counts     = {};      // 학년별 개수
+let akTarget   = null;    // 정답키 편집 중인 자료
+let akAnswers  = {};      // { 1:'3', 2:'1', ... }
+let akCount    = 20;
+let busy       = false;
+let upKind     = 'exam';    // 업로드할 자료 종류 (exam=시험지 / material=수업자료)
+let curKind    = 'all';     // 목록 종류 필터
+/* 시험 스튜디오에서 만든 시험 (자료실이 만든 것은 제외) */
+let studioTests  = [];
+let studioShown  = [];      // 현재 학년 탭에 보이는 목록
+let studioLoaded = false;
+let stTarget = null;        // 정답 보기·고치기 대상 시험
+let stIdx    = 0;           // 편집 중인 부(part) 인덱스
+let stMode   = 'view';      // 'view' | 'edit'
+let stOrig   = {};          // 편집 시작 시점의 정답
+let stEdit   = {};          // 편집 중인 정답
 
-// ★★ 제출 후 문항별 채점 결과 (결과 화면에서만 채워짐) ★★
-let reviewRows = [];          // [{ num, mine, ans, ok }]
-let reviewMode = 'all';       // 'all' | 'wrong'
-
-// 문항 번호 순 정렬용 (q1, q2, … q50)
-function qNumOf(qno) { return Number(String(qno).replace('q','')) || 0; }
-
-// ──────────────────────────────────────────────
-// ★ 문항 배치 계산 — 30문항 상한 없음 (50문항 이상도 그대로 지원)
-//   부(part)끼리 같은 문항 번호가 겹치면 뒤에 나온 쪽을 건너뛴다.
-// ──────────────────────────────────────────────
-function buildPlan(test) {
-  const parts = (test && Array.isArray(test.parts)) ? test.parts : [];
-  const seen = new Set();
-  const dup = [];
-  const groups = [];
-  let total = 0;
-
-  parts.forEach((part, pi) => {
-    const src = (part && part.answers) || {};
-    const qnos = [];
-    Object.keys(src).sort((a, b) => qNumOf(a) - qNumOf(b)).forEach(q => {
-      if (seen.has(q)) { dup.push(q); return; }
-      seen.add(q);
-      qnos.push(q);
-    });
-    total += qnos.length;
-    groups.push({ pi, part, qnos });
-  });
-
-  return { groups, total, dup };
+/* ── 유틸 ── */
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function fmtSize(b){
+  const n = Number(b)||0;
+  if (n < 1024) return n + ' B';
+  if (n < 1024*1024) return (n/1024).toFixed(0) + ' KB';
+  return (n/1024/1024).toFixed(1) + ' MB';
 }
-
-// ★ 답이 실제로 채워져 있는가 (공백만 있는 값은 '안 푼 것'으로 센다)
-function hasAns(qno) {
-  const v = answers ? answers[qno] : undefined;
-  return v !== undefined && v !== null && String(v).trim() !== '';
+function fmtDate(ts){
+  try {
+    const d = ts && ts.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+    if (!d || isNaN(d.getTime())) return '';
+    const p = (x)=>String(x).padStart(2,'0');
+    return `${d.getFullYear()}. ${p(d.getMonth()+1)}. ${p(d.getDate())}.`;
+  } catch(e){ return ''; }
 }
-
-// ── 화면 전환 ──
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const target = document.getElementById('screen-' + id);
-  if (target) target.classList.add('active');
-  window.scrollTo(0, 0);
+function todayStr(){
+  const d = new Date(); const p = (x)=>String(x).padStart(2,'0');
+  return `${d.getFullYear()}. ${p(d.getMonth()+1)}. ${p(d.getDate())}.`;
 }
-
-/* ★ 링크 없이 들어왔을 때 안내 화면
-   이유별로 문구만 바꾸고, 시험 목록은 어떤 경우에도 보여주지 않는다. */
-function showBlocked(reason) {
-  const t = document.getElementById('blk-title');
-  const x = document.getElementById('blk-text');
-  if (reason === 'student') {
-    if (t) t.textContent = '학생 정보를 확인하지 못했습니다';
-    if (x) x.innerHTML = '링크에 담긴 학생 정보가 맞지 않습니다.<br>선생님께 링크를 다시 받아주세요.';
-  } else if (reason === 'test') {
-    if (t) t.textContent = '시험을 찾을 수 없습니다';
-    if (x) x.innerHTML = '이 시험이 지워졌거나 링크가 잘못되었습니다.<br>선생님께 말씀해 주세요.';
-  } else if (reason === 'empty') {
-    if (t) t.textContent = '문항이 없는 시험입니다';
-    if (x) x.innerHTML = '아직 정답이 등록되지 않은 시험입니다.<br>선생님께 말씀해 주세요.';
-  } else if (reason === 'link') {
-    if (t) t.textContent = '링크를 확인할 수 없습니다';
-    if (x) x.innerHTML = '링크가 만료되었거나 지워졌습니다.<br>선생님께 링크를 다시 받아주세요.';
-  } else if (reason === 'notinlink') {
-    if (t) t.textContent = '이 링크에 없는 시험입니다';
-    if (x) x.innerHTML = '선생님이 보내주신 링크에 담긴 시험만 풀 수 있습니다.<br>클리닉으로 돌아가 목록에 있는 시험을 눌러주세요.';
-  } else if (reason === 'error') {
-    if (t) t.textContent = '시험을 여는 중 문제가 생겼습니다';
-    if (x) x.innerHTML = '인터넷 연결을 확인한 뒤 링크를 다시 눌러주세요.<br>계속 안 되면 선생님께 말씀해 주세요.';
-  } else {
-    if (t) t.textContent = '선생님께 받은 링크로 들어와 주세요';
-    if (x) x.innerHTML = '이 화면에서는 시험을 열 수 없습니다.<br>카카오톡으로 받은 <b>주간 학습 클리닉</b> 링크를 다시 눌러주세요.';
-  }
-  showScreen('blocked');
+function extOf(name){
+  const m = String(name||'').toLowerCase().match(/\.([a-z0-9]+)$/);
+  return m ? m[1] : '';
 }
-
-function setVeil(on) {
-  const v = document.getElementById('saving-veil');
+function isPDF(r){ return extOf(r.fileName) === 'pdf' || r.contentType === 'application/pdf'; }
+/* 자료 종류 — kind 필드가 없는 예전 자료는 모두 시험지로 본다 */
+function kindOf(r){ return (r && r.kind === 'material') ? 'material' : 'exam'; }
+function kindLabel(k){ return k === 'material' ? '📘 수업자료' : '📝 시험지'; }
+/* 등록일 문자열("2026. 08. 17.") → 정렬용 숫자 */
+function parseRegDate(s){
+  const m = String(s || '').match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+  if (!m) return 0;
+  const t = new Date(Number(m[1]), Number(m[2])-1, Number(m[3])).getTime();
+  return isNaN(t) ? 0 : t;
+}
+/* 문항 번호 오름차순 키 목록 (q1, q2, … q50) */
+function qNumOf(q){ return Number(String(q).replace('q','')) || 0; }
+function sortedQKeys(answers){
+  return Object.keys(answers || {}).sort((a,b) => qNumOf(a) - qNumOf(b));
+}
+function partsOf(t){ return (t && Array.isArray(t.parts)) ? t.parts : []; }
+function totalQOf(t){
+  let n = 0;
+  partsOf(t).forEach(p => { n += Object.keys((p && p.answers) || {}).length; });
+  return n;
+}
+function showMsg(id, type, text){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'msg show ' + type;
+  el.textContent = text;
+}
+function hideMsg(id){
+  const el = document.getElementById(id);
+  if (el) el.className = 'msg';
+}
+function setVeil(on, text){
+  const v = document.getElementById('veil');
+  const t = document.getElementById('veil-t');
+  if (t && text) t.textContent = text;
   if (v) v.classList.toggle('show', !!on);
 }
 
-// ── 학생 ID 조회 ──
-async function getStudentById(id) {
-  const q = query(collection(db, 'students'), where('id', '==', String(id).toLowerCase()));
-  const snap = await getDocs(q);
-  if (snap.empty) return null;
-  return { fireId: snap.docs[0].id, ...snap.docs[0].data() };
+/* ── 로그인 가드 (index.html과 동일 방식) ── */
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { window.location.replace('/login.html'); return; }
+  try {
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (!snap.exists() || snap.data().status !== 'approved') {
+      await signOut(auth); window.location.replace('/login.html'); return;
+    }
+    document.body.style.visibility = 'visible';
+    renderTabs();
+    await loadAll();
+    await loadStudioTests();
+    renderStudioList();
+  } catch(err) {
+    window.location.replace('/login.html');
+  }
+});
+window.doLogout = async function(){ await signOut(auth); window.location.replace('/login.html'); };
+
+/* ── 학년 탭 ── */
+function renderTabs(){
+  document.getElementById('grade-tabs').innerHTML = GRADES.map(g =>
+    `<button class="g-tab ${g===curGrade?'sel':''}" id="tab-${g}" onclick="selGrade('${g}')">${g}<span class="g-cnt" id="cnt-${g}"></span></button>`
+  ).join('');
+}
+function paintCounts(){
+  GRADES.forEach(g => {
+    const el = document.getElementById('cnt-'+g);
+    if (el) el.textContent = counts[g] ? String(counts[g]) : '';
+  });
+}
+window.selGrade = async (g) => {
+  if (busy) return;
+  /* 학년을 바꾸면 열려 있던 시험 창은 닫는다 — 다른 학년 시험이 남아 있으면 헷갈린다 */
+  closeStudioSilent();
+  curGrade = g;
+  document.querySelectorAll('.g-tab').forEach(b => b.classList.remove('sel'));
+  const t = document.getElementById('tab-'+g);
+  if (t) t.classList.add('sel');
+  document.getElementById('up-grade').textContent    = g;
+  document.getElementById('list-grade').textContent  = g;
+  document.getElementById('studio-grade').textContent = g;
+  await loadList();
+  renderStudioList();
+};
+
+/* ── 전체 불러오기 (학년별 개수 + 현재 목록) ── */
+async function loadAll(){
+  try {
+    const snap = await getDocs(collection(db, 'resources'));
+    counts = {};
+    snap.forEach(d => {
+      const g = (d.data()||{}).grade;
+      if (g) counts[g] = (counts[g]||0) + 1;
+    });
+    paintCounts();
+  } catch(e){
+    console.warn('[자료실] 개수 집계 실패:', e);
+  }
+  await loadList();
 }
 
-// ──────────────────────────────────────────────
-// OMR 구성 — 5지선다 / 문항 수 제한 없음
-// ──────────────────────────────────────────────
-function buildOMR() {
-  omrPlan = buildPlan(selectedTest);
+/* ── 업로드 자료 종류 ── */
+window.setUpKind = (k) => {
+  upKind = (k === 'material') ? 'material' : 'exam';
+  const be = document.getElementById('kind-exam');
+  const bm = document.getElementById('kind-material');
+  if (be) be.classList.toggle('sel', upKind === 'exam');
+  if (bm) bm.classList.toggle('sel', upKind === 'material');
+  const hint = document.getElementById('kind-hint');
+  if (hint) hint.textContent = upKind === 'material'
+    ? '수업자료는 인쇄·열기만 됩니다. 정답키 버튼이 붙지 않습니다.'
+    : '시험지로 올리면 정답키를 등록해 학생이 OMR로 풀 수 있습니다.';
+};
 
-  // 새 시험을 열면 이전 채점 결과는 비우고 화면에서도 감춘다
-  reviewRows = [];
-  reviewMode = 'all';
-  renderReview();
+/* ── 목록 종류 필터 ── */
+window.setListKind = (k) => {
+  curKind = (k === 'exam' || k === 'material') ? k : 'all';
+  ['all','exam','material'].forEach(x => {
+    const b = document.getElementById('kf-' + x);
+    if (b) b.classList.toggle('on', curKind === x);
+  });
+  paintList();
+};
 
-  document.getElementById('omr-test-title').textContent = selectedTest.unitName || '—';
-  const metaBits = [selectedTest.subject || '', normalizeGrade(selectedTest.grade || ''), omrPlan.total + '문제'];
-  document.getElementById('omr-test-meta').textContent = metaBits.filter(Boolean).join(' · ');
-  document.getElementById('omr-student-badge').textContent = `${studentName} (${studentGrade})`;
-
-  // ★ 번호가 겹친 경우 안내 (채점에는 영향 없음)
-  const dupWarn = document.getElementById('omr-dup-warn');
-  if (dupWarn) {
-    if (omrPlan.dup.length) {
-      const nums = [...new Set(omrPlan.dup.map(qNumOf))].sort((a, b) => a - b).join(', ');
-      dupWarn.className = 'omr-warn show';
-      dupWarn.textContent = `안내: 이 시험에 같은 번호(${nums}번)가 두 번 들어 있어 한 번만 표시했습니다. 채점은 정상으로 진행됩니다.`;
-    } else {
-      dupWarn.className = 'omr-warn';
-      dupWarn.textContent = '';
-    }
+/* ── 목록 ── */
+async function loadList(){
+  const wrap = document.getElementById('list-wrap');
+  wrap.innerHTML = '<div class="loading"><div class="spinner"></div>불러오는 중...</div>';
+  try {
+    const snap = await getDocs(query(collection(db,'resources'), where('grade','==',curGrade)));
+    resources = [];
+    snap.forEach(d => resources.push({ fireId: d.id, ...d.data() }));
+    // 색인 없이 동작하도록 클라이언트에서 정렬
+    resources.sort((a,b) => {
+      const ta = a.uploadedAt && a.uploadedAt.toMillis ? a.uploadedAt.toMillis() : 0;
+      const tb = b.uploadedAt && b.uploadedAt.toMillis ? b.uploadedAt.toMillis() : 0;
+      return tb - ta;
+    });
+  } catch(e){
+    wrap.innerHTML = `<div class="empty">목록을 불러오지 못했습니다<br><span style="font-size:11px">${esc(e.message)}</span></div>`;
+    return;
   }
 
-  const symbols = ['①','②','③','④','⑤'];
-  let html = '';
-  let chipHtml = '';
-  let shownIdx = 0;
+  paintList();
+}
 
-  omrPlan.groups.forEach(g => {
-    const qNos = g.qnos;
-    if (!qNos.length) return;
-    shownIdx++;
+/* 목록 그리기 — 종류 필터만 바뀔 때는 다시 읽지 않고 이 함수만 부른다.
+   버튼에 넘기는 번호는 항상 resources 배열의 원래 위치라, 필터를 걸어도 어긋나지 않는다. */
+function paintList(){
+  const wrap = document.getElementById('list-wrap');
+  if (!wrap) return;
 
-    const pi   = g.pi;
-    const part = g.part || {};
-    const secId = 'omr-part-' + pi;
-    const rangeText = part.range || (qNumOf(qNos[0]) + '-' + qNumOf(qNos[qNos.length - 1]));
-    chipHtml += `<button class="part-chip" id="chip-${pi}" onclick="jumpToPart(${pi})">${shownIdx}부 · ${esc(rangeText)}</button>`;
+  const nExam = resources.filter(r => kindOf(r) === 'exam').length;
+  const nMat  = resources.length - nExam;
+  const be = document.getElementById('kf-exam');
+  const bm = document.getElementById('kf-material');
+  const ba = document.getElementById('kf-all');
+  if (ba) ba.textContent = `전체 ${resources.length}`;
+  if (be) be.textContent = `📝 시험지 ${nExam}`;
+  if (bm) bm.textContent = `📘 수업자료 ${nMat}`;
 
-    html += `<div class="omr-section" id="${secId}" data-part="${pi}">
-      <div class="omr-section-title">
-        <span class="part-tag">${shownIdx}부 · ${esc(rangeText)}번</span>
-        ${part.sectionName ? `<span>${esc(part.sectionName)}</span>` : ''}
-      </div>
-      <div class="omr-grid">`;
+  const rows = resources
+    .map((r,i) => ({ r, i }))
+    .filter(({r}) => curKind === 'all' || kindOf(r) === curKind);
 
-    qNos.forEach(qno => {
-      const num = qNumOf(qno);
-      html += `<div class="omr-q" id="row-${qno}" data-part="${pi}">
-        <div class="omr-q-num">${num}번</div>
-        <div class="omr-choices">
-          ${symbols.map((sym, idx) => {
-            const n = idx + 1;
-            return `<div class="omr-choice" id="choice-${qno}-${n}" onclick="pickAnswer('${qno}',${n})">${sym}</div>`;
-          }).join('')}
+  document.getElementById('list-cnt').textContent = rows.length + '개';
+
+  if (!resources.length){
+    wrap.innerHTML = `<div class="empty"><div class="e-emoji">📭</div>
+      ${esc(curGrade)} 자료가 아직 없습니다<br>
+      <span style="font-size:11px">위에서 파일을 올려보세요</span></div>`;
+    return;
+  }
+  if (!rows.length){
+    wrap.innerHTML = `<div class="empty"><div class="e-emoji">🗂️</div>
+      ${esc(curGrade)}에 ${curKind === 'material' ? '수업자료' : '시험지'}가 없습니다<br>
+      <span style="font-size:11px">위 「전체」를 누르면 모두 볼 수 있습니다</span></div>`;
+    return;
+  }
+
+  wrap.innerHTML = '<div class="res-list">' + rows.map(({r,i}) => {
+    const pdf    = isPDF(r);
+    const ext    = pdf ? 'PDF' : (extOf(r.fileName)||'FILE').toUpperCase();
+    const kind   = kindOf(r);
+    const isExam = kind === 'exam';
+    const hasKey = !!r.examId;
+    const bits   = [r.subject, r.unitName].filter(Boolean).map(esc).join(' · ');
+    return `<div class="res-item">
+      <div class="res-head">
+        <div class="res-ico ${pdf?'pdf':'hwp'}">${esc(ext)}</div>
+        <div class="res-body">
+          <div class="res-name">${esc(r.title || r.fileName || '이름 없음')}</div>
+          <div class="res-meta">${esc(r.fileName||'')} · ${fmtSize(r.size)} · ${fmtDate(r.uploadedAt)}</div>
+          <div class="res-tags">
+            <span class="tag ${isExam?'ke':'km'}">${kindLabel(kind)}</span>
+            ${bits ? `<span class="tag sub">${bits}</span>` : ''}
+            ${isExam
+              ? (hasKey
+                  ? `<span class="tag key">정답키 ${Number(r.answerCount)||0}문항</span>`
+                  : `<span class="tag nokey">정답키 없음</span>`)
+              : ''}
+          </div>
         </div>
-      </div>`;
-    });
-
-    html += `</div></div>`;
-  });
-
-  document.getElementById('omr-sections').innerHTML = html;
-  document.getElementById('part-chips').innerHTML = chipHtml;
-
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = false;
-  submitting = false;
-  setVeil(false);
-
-  updateProgress();
-}
-
-// ── 답 선택 ──
-window.pickAnswer = (qno, n) => {
-  if (submitting) return;
-  for (let i = 1; i <= 5; i++) {
-    const c = document.getElementById(`choice-${qno}-${i}`);
-    if (c) c.classList.remove('sel');
-  }
-  const picked = document.getElementById(`choice-${qno}-${n}`);
-  if (picked) picked.classList.add('sel');
-  answers[qno] = String(n);
-
-  const row = document.getElementById('row-' + qno);
-  if (row) { row.classList.add('answered'); row.classList.remove('missing'); }
-
-  updateProgress();
-};
-
-// ── 진행률 + 부별 완료 표시 + 미응답 안내 ──
-function updateProgress() {
-  const total   = omrPlan.total;
-  const missing = missingQNos().length;
-  const done    = Math.max(0, total - missing);
-  const pct     = total ? Math.round(done / total * 100) : 0;
-
-  document.getElementById('progress-txt').textContent  = `${done} / ${total}`;
-  document.getElementById('progress-fill').style.width = pct + '%';
-
-  const jump = document.getElementById('jump-btn');
-  if (missing > 0) {
-    jump.textContent = `안 푼 ${missing}문제 ↓`;
-    jump.classList.add('show');
-  } else {
-    jump.classList.remove('show');
-  }
-
-  // ★ 미응답 안내줄 — 안 푼 문제가 있으면 항상 보인다
-  const warn = document.getElementById('omr-warn');
-  if (warn) {
-    if (missing > 0) {
-      warn.className = 'omr-warn show';
-      warn.textContent = `아직 ${missing}문제가 비어 있어요. 모든 문제를 풀어야 제출됩니다.`;
-    } else if (total > 0) {
-      warn.className = 'omr-warn show ok';
-      warn.textContent = '✓ 모든 문제를 풀었어요. 제출하면 정답과 채점 결과를 볼 수 있습니다.';
-    } else {
-      warn.className = 'omr-warn';
-      warn.textContent = '';
-    }
-  }
-
-  // ★ 제출 버튼에도 남은 개수를 보여준다
-  const btn = document.getElementById('submit-btn');
-  if (btn && !submitting) {
-    if (missing > 0) {
-      btn.classList.add('wait');
-      btn.textContent = `안 푼 ${missing}문제가 남았어요`;
-    } else {
-      btn.classList.remove('wait');
-      btn.textContent = '✓ 답안 제출하기';
-    }
-  }
-
-  omrPlan.groups.forEach(g => {
-    const chip = document.getElementById('chip-' + g.pi);
-    if (!chip) return;
-    const allDone = g.qnos.length > 0 && g.qnos.every(q => hasAns(q));
-    chip.classList.toggle('done', allDone);
-  });
-}
-
-// ── 안 푼 문제 목록 / 이동 ──
-function missingQNos() {
-  const list = [];
-  omrPlan.groups.forEach(g => {
-    g.qnos.forEach(q => { if (!hasAns(q)) list.push(q); });
-  });
-  return list;
-}
-function markMissing() {
-  const miss = missingQNos();
-  miss.forEach(q => {
-    const row = document.getElementById('row-' + q);
-    if (row) row.classList.add('missing');
-  });
-  return miss;
-}
-window.jumpToMissing = () => {
-  const miss = markMissing();
-  if (!miss.length) return;
-  const row = document.getElementById('row-' + miss[0]);
-  if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-};
-window.jumpToPart = (pi) => {
-  const sec = document.getElementById('omr-part-' + pi);
-  if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-};
-
-// ──────────────────────────────────────────────
-// ★★ 문항별 채점 결과 표시 ★★
-//   제출이 끝난 뒤에만 reviewRows가 채워지고, 그때만 화면에 그린다.
-// ──────────────────────────────────────────────
-const RV_SYM = ['', '①', '②', '③', '④', '⑤'];
-function rvSym(v) {
-  const n = Number(v);
-  if (n >= 1 && n <= 5) return RV_SYM[n];
-  return (v === null || v === undefined || String(v).trim() === '') ? '무응답' : String(v);
-}
-
-function renderReview() {
-  const box  = document.getElementById('review-box');
-  const list = document.getElementById('rv-list');
-  if (!box || !list) return;
-
-  if (!reviewRows.length) { box.style.display = 'none'; return; }
-  box.style.display = 'block';
-
-  const wrongCount = reviewRows.filter(r => !r.ok).length;
-
-  // 탭 라벨 · 활성 상태
-  const tabAll   = document.getElementById('rv-tab-all');
-  const tabWrong = document.getElementById('rv-tab-wrong');
-  if (tabAll)   { tabAll.textContent = `전체 ${reviewRows.length}`; tabAll.classList.toggle('active', reviewMode === 'all'); }
-  if (tabWrong) { tabWrong.textContent = `틀린 문제 ${wrongCount}`;  tabWrong.classList.toggle('active', reviewMode === 'wrong'); }
-
-  const rows = (reviewMode === 'wrong') ? reviewRows.filter(r => !r.ok) : reviewRows;
-
-  if (!rows.length) {
-    list.innerHTML = '<div class="rv-empty">틀린 문제가 하나도 없어요. 완벽합니다! 🎉</div>';
-    return;
-  }
-
-  list.innerHTML = rows.map(r => `
-    <div class="rv-row ${r.ok ? '' : 'bad'}">
-      <div class="rv-num">${r.num}번</div>
-      <div class="rv-pair">
-        <span class="rv-chip mine">내 답 ${esc(rvSym(r.mine))}</span>
-        ${r.ok ? '' : `<span class="rv-chip ans">정답 ${esc(rvSym(r.ans))}</span>`}
       </div>
-      <div class="rv-mark ${r.ok ? 'ok' : 'no'}">${r.ok ? '○' : '✕'}</div>
-    </div>`).join('');
+      <div class="res-acts${isExam?'':' three'}">
+        <button class="act ${pdf?'main':''}" onclick="doPrint(${i})" ${pdf?'':'disabled'}>🖨 인쇄</button>
+        <button class="act" onclick="doOpen(${i})">👁 열기</button>
+        ${isExam ? `<button class="act" onclick="openAK(${i})">✎ 정답키</button>` : ''}
+        <button class="act danger" onclick="doDelete(${i})">🗑 삭제</button>
+      </div>
+    </div>`;
+  }).join('') + '</div>';
 }
 
-window.setReviewMode = (mode) => {
-  reviewMode = (mode === 'wrong') ? 'wrong' : 'all';
-  renderReview();
-  const list = document.getElementById('rv-list');
-  if (list) list.scrollTop = 0;
+/* ── 파일 선택 ── */
+window.onPickFile = (files) => {
+  hideMsg('up-msg');
+  const f = files && files[0];
+  if (!f) return;
+  if (f.size > MAX_BYTES){
+    pickedFile = null;
+    showMsg('up-msg','err', `파일이 너무 큽니다 (${fmtSize(f.size)}). 50MB 이하만 올릴 수 있습니다.`);
+    return;
+  }
+  const ex = extOf(f.name);
+  if (!['pdf','hwp','hwpx'].includes(ex)){
+    pickedFile = null;
+    showMsg('up-msg','err','PDF · HWP · HWPX 파일만 올릴 수 있습니다.');
+    return;
+  }
+  pickedFile = f;
+  document.getElementById('fd-main').innerHTML = `<span class="fd-picked">${esc(f.name)}</span>`;
+  document.getElementById('fd-sub').textContent = fmtSize(f.size) + (ex==='pdf' ? ' · 인쇄 가능' : ' · 다운로드 전용 (인쇄 불가)');
+  const t = document.getElementById('up-title');
+  if (!t.value.trim()) t.value = f.name.replace(/\.[^.]+$/,'');
+  if (ex !== 'pdf') showMsg('up-msg','warn','한글 파일은 브라우저에서 인쇄할 수 없습니다. 인쇄까지 하시려면 PDF로도 함께 올려주세요.');
 };
 
-// ──────────────────────────────────────────────
-// ★ 제출
-//   · 안 푼 문제가 하나라도 있으면 저장하지 않는다.
-//   · 문서 ID를 `${시험ID}__${학생ID}`로 고정한다 (다시 봐도 1건으로 덮어쓴다).
-//   · 학생 ID가 없으면 저장 자체를 막는다.
-//   · 저장이 끝나면 문항별 채점 결과(내 답 / 정답 / O·X)를 보여준다.
-// ──────────────────────────────────────────────
-function masterDocId(examFireId, sid) {
-  return `${examFireId}__${String(sid || '').trim().toLowerCase()}`;
-}
+/* 드래그 앤 드롭 */
+(function(){
+  const dz = document.getElementById('file-drop');
+  if (!dz) return;
+  ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('over'); }));
+  ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('over'); }));
+  dz.addEventListener('drop', e => { if (e.dataTransfer && e.dataTransfer.files) window.onPickFile(e.dataTransfer.files); });
+})();
 
-window.submitOMR = async () => {
-  if (submitting) return;
+/* ── 업로드 ── */
+window.doUpload = () => {
+  if (busy) return;
+  hideMsg('up-msg');
+  if (!pickedFile){ showMsg('up-msg','err','먼저 파일을 선택해주세요.'); return; }
+  const title = document.getElementById('up-title').value.trim();
+  if (!title){ showMsg('up-msg','err','자료 이름을 입력해주세요.'); return; }
 
-  const total = omrPlan.total;   // ★ 상한 없음 · 중복 번호 제외
+  const subject = document.getElementById('up-subject').value.trim();
+  const unit    = document.getElementById('up-unit').value.trim();
+  const grade   = curGrade;
+  const kind    = upKind;      // 시험지 / 수업자료
+  const file    = pickedFile;
 
-  if (total === 0) { alert('문항이 없는 시험입니다. 선생님께 문의하세요.'); return; }
+  const safe = file.name.replace(/[#?\[\]*]/g, '_').replace(/\s+/g,'_');
+  const path = `resources/${grade}/${Date.now()}_${safe}`;
 
-  // ★ 빈 문항이 있으면 저장하지 않고 그 문제로 보낸다
-  const miss = markMissing();
-  if (miss.length > 0) {
-    const nums = miss.slice(0, 10).map(qNumOf).join(', ');
-    const more = miss.length > 10 ? ` 외 ${miss.length - 10}문제` : '';
-    alert(`아직 ${miss.length}문제를 풀지 않았어요.\n\n${nums}번${more}\n\n모두 푼 뒤에 제출할 수 있습니다.`);
-    const row = document.getElementById('row-' + miss[0]);
-    if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
-  }
+  busy = true;
+  const btn = document.getElementById('up-btn');
+  btn.disabled = true; btn.textContent = '업로드 중...';
+  document.getElementById('prog-wrap').classList.add('show');
+  document.getElementById('prog-fill').style.width = '0%';
+  document.getElementById('prog-txt').textContent = '0%';
 
-  // ★ 학생 ID가 없으면 저장하지 않는다 (성적이 엉뚱한 곳에 남는 것을 막는다)
-  const sid = String(studentId || '').trim().toLowerCase();
-  if (!sid) {
-    alert('학생 정보가 확인되지 않아 제출할 수 없습니다.\n\n선생님께 받은 링크로 다시 들어와 주세요.');
-    return;
-  }
+  const task = uploadBytesResumable(ref(storage, path), file, { contentType: file.type || 'application/octet-stream' });
 
-  submitting = true;
-  setVeil(true);
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.classList.remove('wait');
-  btn.textContent = '제출 중...';
+  task.on('state_changed',
+    (snap) => {
+      const pct = snap.totalBytes ? Math.round(snap.bytesTransferred / snap.totalBytes * 100) : 0;
+      document.getElementById('prog-fill').style.width = pct + '%';
+      document.getElementById('prog-txt').textContent = pct + '% (' + fmtSize(snap.bytesTransferred) + ' / ' + fmtSize(snap.totalBytes) + ')';
+    },
+    (err) => {
+      busy = false;
+      btn.disabled = false; btn.textContent = '업로드';
+      document.getElementById('prog-wrap').classList.remove('show');
+      const code = err && err.code ? err.code : '';
+      let hint = err && err.message ? err.message : '알 수 없는 오류';
+      if (code === 'storage/unauthorized') hint = 'Storage 보안 규칙에서 막혔습니다. 규칙에 resources 경로 쓰기 권한이 있는지 확인하세요.';
+      if (code === 'storage/retry-limit-exceeded') hint = '네트워크가 불안정합니다. 다시 시도해주세요.';
+      showMsg('up-msg','err','업로드 실패: ' + hint);
+    },
+    async () => {
+      try {
+        const url = await getDownloadURL(task.snapshot.ref);
+        await addDoc(collection(db,'resources'), {
+          grade, title, subject, unitName: unit,
+          kind,
+          fileName: file.name,
+          storagePath: path,
+          downloadURL: url,
+          contentType: file.type || '',
+          size: file.size,
+          examId: '',
+          answerCount: 0,
+          uploadedAt: Timestamp.now()
+        });
 
-  // 채점: 정답 맵 생성 (화면에 그린 문항과 정확히 같은 집합)
-  const correctMap = {};
-  omrPlan.groups.forEach(g => {
-    const src = (g.part && g.part.answers) || {};
-    g.qnos.forEach(q => { correctMap[q] = String(src[q]); });
-  });
-
-  let correct = 0, wrong = 0;
-  const wrongNums = [];
-  const answersDetail = [];
-  Object.entries(correctMap).forEach(([qno, correctAns]) => {
-    const sa = answers[qno];
-    const isCorrect = String(sa == null ? '' : sa).trim() === String(correctAns).trim();
-    if (isCorrect) correct++; else { wrong++; wrongNums.push(qNumOf(qno)); }
-    answersDetail.push({
-      question:      `Q${qNumOf(qno)}`,
-      studentAnswer: sa || null,
-      correctAnswer: correctAns,
-      isCorrect,
-      type:          'master'
-    });
-  });
-  answersDetail.sort((a, b) => Number(a.question.replace('Q','')) - Number(b.question.replace('Q','')));
-  wrongNums.sort((a, b) => a - b);
-
-  const score = total > 0 ? Math.round((correct / total) * 100) : 0;
-
-  // 과제 결정 (첫 부의 과제 기준 — 기존 동작 유지)
-  const fp = omrPlan.groups.length ? (omrPlan.groups[0].part || null) : null;
-  let taskText = '';
-  if (fp) taskText = wrong <= 2 ? (fp.taskLow || '') : wrong <= 4 ? (fp.taskMid || '') : (fp.taskHigh || '');
-
-  // 저장에 쓸 학년 — 학생 문서의 실제 학년
-  const gradeForSave = studentGradeReal || studentGrade;
-
-  // ── Firebase 저장 (1인 1시험 = 문서 1개) ──
-  let attemptNo = 1;
-  try {
-    await ensureAuth();
-
-    const gid = masterDocId(selectedTest.fireId, sid);
-
-    // 다시 본 경우: 첫 응시 시각과 응시 횟수를 이어받는다 (실패해도 저장은 진행)
-    let firstAt = null;
-    try {
-      const prev = await getDoc(doc(db, 'grades', gid));
-      if (prev.exists()) {
-        const p = prev.data() || {};
-        firstAt = p.firstSubmittedAt || p.timestamp || null;
-        const n = Number(p.attemptCount);
-        attemptNo = (isFinite(n) && n > 0 ? n : 1) + 1;
+        pickedFile = null;
+        document.getElementById('file-input').value = '';
+        document.getElementById('up-title').value = '';
+        document.getElementById('up-unit').value = '';
+        document.getElementById('fd-main').textContent = '파일 선택 · 여기로 끌어다 놓기';
+        document.getElementById('fd-sub').innerHTML = 'PDF · HWP · HWPX · 최대 50MB<br>인쇄 버튼은 PDF에서만 작동합니다';
+        showMsg('up-msg','ok','업로드가 끝났습니다.');
+        counts[grade] = (counts[grade]||0) + 1;
+        paintCounts();
+        await loadList();
+      } catch(e){
+        showMsg('up-msg','err','파일은 올라갔지만 목록 저장에 실패했습니다: ' + e.message);
+      } finally {
+        busy = false;
+        btn.disabled = false; btn.textContent = '업로드';
+        document.getElementById('prog-wrap').classList.remove('show');
       }
-    } catch (e) {
-      console.warn('[OMR] 이전 기록 조회 실패(무시하고 저장):', e);
     }
+  );
+};
 
-    const now = Timestamp.now();
-    const payload = {
-      // ── 식별 ──
-      studentId: sid,
-      studentName,
-      grade: gradeForSave,
-      subject: selectedTest.subject || '',
-      examId: selectedTest.fireId,                       // master-tests 문서 id (대시보드 삭제 연동 키)
-      testName: selectedTest.unitName || '마스터테스트 OMR',
-      category: 'master',                                // 마스터 OMR
-      // ── 파트별 점수 (마스터는 객관식 → multiple에, ox는 null) ──
-      ox: null,
-      multiple: { correct, total, score },
-      // ── 대표 점수/집계 ──
-      score,
-      totalCorrect: correct,
-      totalQuestions: total,
-      answeredCount: total,
-      // ── 문항별 상세 ──
-      answers: answersDetail,
-      wrongNums,
-      // ── 시간 · 응시 횟수 ──
-      timestamp: now,
-      firstSubmittedAt: firstAt || now,
-      attemptCount: attemptNo,
-      // ── 구버전 읽기 호환용 보조 필드 ──
-      testType: 'master',
-      testId: selectedTest.testId || '',
-      testFireId: selectedTest.fireId,
-      unitName: selectedTest.unitName || '',
-      examTitle: selectedTest.unitName || '마스터테스트 OMR',
-      testGrade: selectedTest.grade || '',
-      testGradeNorm: normalizeGrade(selectedTest.grade || ''),
-      studentGrade: gradeForSave,
-      correct, wrong, total
-    };
+/* ── 열기 ── */
+window.doOpen = (i) => {
+  const r = resources[i];
+  if (!r) return;
+  window.open(r.downloadURL, '_blank', 'noopener');
+};
 
-    await setDoc(doc(db, 'grades', gid), payload);
-  } catch(e) {
-    alert('제출 실패: ' + e.message + '\n\n네트워크를 확인하고 다시 제출해주세요.');
-    submitting = false;
+/* ── 인쇄 (PDF 전용) ──
+   1순위: 파일을 받아 숨긴 iframe에 넣고 바로 인쇄창을 띄운다.
+   실패(CORS 등) 시: 새 탭으로 열어 브라우저 PDF 뷰어의 인쇄 기능을 쓰게 한다. */
+window.doPrint = (i) => {
+  const r = resources[i];
+  if (!r) return;
+  if (!isPDF(r)){ alert('한글 파일은 브라우저에서 인쇄할 수 없습니다.\n\n다운로드해서 한글 프로그램으로 인쇄하거나,\nPDF로 변환해 다시 올려주세요.'); return; }
+
+  /* 새 탭은 클릭과 같은 순간에 열어야 크롬 팝업 차단에 걸리지 않는다.
+     fetch 를 기다린 뒤에 열면 "사용자가 누른 것"으로 인정되지 않아 막힌다.
+     그래서 빈 탭을 먼저 확보해 두고, 그다음에 파일을 받아본다.
+       - 파일 받기 성공(CORS 설정됨) → 빈 탭 닫고 원클릭 인쇄
+       - 실패                        → 확보해 둔 탭에 PDF를 띄움 (차단되지 않음) */
+  let holder = null;
+  try { holder = window.open('', '_blank'); } catch(e){ holder = null; }
+
+  setVeil(true, '인쇄 준비 중입니다');
+
+  (async () => {
+    let objUrl = null;
+    try {
+      const res = await fetch(r.downloadURL);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const blob = await res.blob();
+      objUrl = URL.createObjectURL(blob);
+
+      // 원클릭 인쇄가 가능하므로 예비 탭은 닫는다
+      if (holder && !holder.closed){ try { holder.close(); } catch(e){} }
+      holder = null;
+
+      const old = document.getElementById('print-frame');
+      if (old) old.remove();
+
+      const ifr = document.createElement('iframe');
+      ifr.id = 'print-frame';
+      ifr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;';
+      document.body.appendChild(ifr);
+
+      let done = false;
+      ifr.onload = () => {
+        if (done) return; done = true;
+        setTimeout(() => {
+          setVeil(false);
+          try { ifr.contentWindow.focus(); ifr.contentWindow.print(); }
+          catch(e){ window.open(objUrl, '_blank'); }
+          setTimeout(() => { if (objUrl) URL.revokeObjectURL(objUrl); }, 120000);
+        }, 400);
+      };
+      ifr.src = objUrl;
+      setTimeout(() => setVeil(false), 7000);
+
+    } catch(e){
+      setVeil(false);
+      if (objUrl){ URL.revokeObjectURL(objUrl); objUrl = null; }
+      if (holder && !holder.closed){
+        // 미리 열어둔 탭에 PDF를 띄운다 — 차단되지 않는다
+        try { holder.location.href = r.downloadURL; return; } catch(e2){}
+      }
+      const w = window.open(r.downloadURL, '_blank');
+      if (!w) alert('브라우저가 새 탭을 막았습니다.\n\n「열기」 버튼으로 PDF를 띄운 뒤\n⌘+P (윈도우는 Ctrl+P) 로 인쇄해주세요.');
+    }
+  })();
+};
+
+/* ── 삭제 ── */
+window.doDelete = async (i) => {
+  const r = resources[i];
+  if (!r || busy) return;
+  const extra = r.examId ? '\n\n연결된 마스터테스트 정답키도 함께 삭제됩니다.' : '';
+  if (!confirm(`「${r.title || r.fileName}」 자료를 삭제할까요?${extra}\n\n되돌릴 수 없습니다.`)) return;
+
+  busy = true;
+  setVeil(true, '삭제하는 중입니다');
+  try {
+    if (r.storagePath){
+      try { await deleteObject(ref(storage, r.storagePath)); }
+      catch(e){ console.warn('[자료실] 파일 삭제 건너뜀:', e); }
+    }
+    if (r.examId){
+      try { await deleteDoc(doc(db,'master-tests', r.examId)); }
+      catch(e){ console.warn('[자료실] 시험 삭제 건너뜀:', e); }
+    }
+    await deleteDoc(doc(db,'resources', r.fireId));
+    counts[curGrade] = Math.max(0, (counts[curGrade]||1) - 1);
+    paintCounts();
+    await loadList();
+  } catch(e){
+    alert('삭제 실패: ' + e.message);
+  } finally {
+    busy = false;
     setVeil(false);
-    btn.disabled = false;
-    updateProgress();
+  }
+};
+
+/* ══════════════════════════════════════
+   정답키 (5지선다 객관식 전용)
+   master-tests 문서 구조를 student-omr.html이
+   읽는 형식과 정확히 같게 맞춘다.
+   parts[0].answers = { q1:'3', q2:'1', ... }
+   1번부터 문항 수까지 빈칸 없이 모두 채워야 저장된다.
+   ══════════════════════════════════════ */
+const CIRCLE = { '①':'1','②':'2','③':'3','④':'4','⑤':'5' };
+const SYM    = ['','①','②','③','④','⑤'];
+function normDigit(ch){ return CIRCLE[ch] || ch; }
+
+function parseAnswerText(raw){
+  let t = String(raw||'');
+  t = t.replace(/[\uFF10-\uFF19]/g, d => String.fromCharCode(d.charCodeAt(0) - 0xFEE0));
+  const map = {};
+
+  // 번호가 명시된 형식: "12.③"  "12) 3"  "12번 ④"  "12: 5"
+  const strict = /(\d{1,3})\s*(?:번\s*[.)\]:=-]?|[.)\]:=-])\s*([1-5]|[\u2460-\u2464])/g;
+  const hits = [];
+  let m;
+  while ((m = strict.exec(t)) !== null) hits.push([Number(m[1]), normDigit(m[2])]);
+
+  if (hits.length >= 2){
+    hits.forEach(([n,a]) => { if (n >= 1 && n <= 200) map[n] = a; });
+    return map;
+  }
+
+  // 번호가 없는 형식: 원 숫자가 있으면 원 숫자만, 없으면 1~5 숫자만 순서대로
+  const circles = t.match(/[\u2460-\u2464]/g);
+  const seq = (circles && circles.length) ? circles.map(normDigit) : (t.match(/[1-5]/g) || []);
+  seq.forEach((a, idx) => { map[idx+1] = a; });
+  return map;
+}
+
+function renderAK(){
+  const grid = document.getElementById('ak-grid');
+  let html = '';
+  for (let n = 1; n <= akCount; n++){
+    const v = akAnswers[n];
+    html += `<div class="ak-q ${v?'filled':'blank'}" id="akq-${n}">
+      <div class="ak-num">${n}번</div>
+      <div class="ak-ch">
+        ${[1,2,3,4,5].map(c =>
+          `<div class="ak-c ${String(v)===String(c)?'sel':''}" id="akc-${n}-${c}" onclick="pickAK(${n},${c})">${SYM[c]}</div>`
+        ).join('')}
+      </div>
+    </div>`;
+  }
+  grid.innerHTML = html;
+  updateAKStat();
+}
+function updateAKStat(){
+  let filled = 0;
+  for (let n = 1; n <= akCount; n++) if (akAnswers[n]) filled++;
+  const el = document.getElementById('ak-stat');
+  el.textContent = `${filled} / ${akCount} 문항 입력됨` + (filled < akCount ? ` · ${akCount-filled}문항 비어 있음` : ' · 모두 입력 완료');
+  el.style.color = (filled === akCount && akCount > 0) ? '#047857' : '#db2777';
+}
+window.pickAK = (n, c) => {
+  if (String(akAnswers[n]) === String(c)) delete akAnswers[n];
+  else akAnswers[n] = String(c);
+  for (let i = 1; i <= 5; i++){
+    const el = document.getElementById(`akc-${n}-${i}`);
+    if (el) el.classList.toggle('sel', String(akAnswers[n]) === String(i));
+  }
+  const row = document.getElementById('akq-'+n);
+  if (row){
+    row.classList.toggle('filled', !!akAnswers[n]);
+    row.classList.toggle('blank',  !akAnswers[n]);
+  }
+  updateAKStat();
+};
+window.setCount = (v) => {
+  let n = Math.max(1, Math.min(200, Number(v)||1));
+  akCount = n;
+  document.getElementById('ak-count').value = n;
+  Object.keys(akAnswers).forEach(k => { if (Number(k) > n) delete akAnswers[k]; });
+  renderAK();
+};
+window.applyPaste = () => {
+  hideMsg('ak-msg');
+  const txt = document.getElementById('ak-paste').value;
+  if (!txt.trim()){ showMsg('ak-msg','err','붙여넣은 내용이 없습니다.'); return; }
+  const parsed = parseAnswerText(txt);
+  const nums = Object.keys(parsed).map(Number);
+  if (!nums.length){ showMsg('ak-msg','err','정답을 찾지 못했습니다. 1~5 또는 ①~⑤ 형태로 넣어주세요.'); return; }
+  const maxN = Math.max(...nums);
+  if (maxN > akCount){ akCount = Math.min(200, maxN); document.getElementById('ak-count').value = akCount; }
+  Object.entries(parsed).forEach(([k,v]) => { akAnswers[Number(k)] = String(v); });
+  renderAK();
+  showMsg('ak-msg','ok', `${nums.length}문항을 적용했습니다. 표에서 확인하고 저장하세요.`);
+};
+window.clearAK = () => {
+  if (!confirm('입력한 정답을 모두 지울까요?')) return;
+  akAnswers = {};
+  renderAK();
+  hideMsg('ak-msg');
+};
+window.closeAK = () => {
+  document.getElementById('ak-modal').classList.remove('show');
+  akTarget = null;
+};
+
+window.openAK = async (i) => {
+  const r = resources[i];
+  if (!r) return;
+  if (kindOf(r) !== 'exam'){
+    alert('수업자료에는 정답키를 등록하지 않습니다.\n\n시험지로 쓰실 자료라면 다시 올릴 때 종류를 「시험지」로 선택해주세요.');
+    return;
+  }
+  akTarget  = r;
+  akAnswers = {};
+  akCount   = 20;
+  hideMsg('ak-msg');
+  document.getElementById('ak-paste').value = '';
+  setDeployNote(false);
+  document.getElementById('ak-title').textContent = '마스터테스트 정답키';
+  document.getElementById('ak-sub').textContent   = `${r.grade} · ${r.title || r.fileName}`;
+  document.getElementById('ak-name').value    = r.title || '';
+  document.getElementById('ak-subject').value = r.subject || '';
+  document.getElementById('ak-count').value   = akCount;
+  document.getElementById('ak-modal').classList.add('show');
+  renderAK();
+
+  // 이미 만들어둔 정답키가 있으면 불러와 채운다
+  if (r.examId){
+    try {
+      const snap = await getDoc(doc(db,'master-tests', r.examId));
+      if (!snap.exists()){
+        /* 시험 스튜디오에서 해당 시험을 지운 경우.
+           끊긴 연결을 남겨두면 다음 저장이 엉뚱한 문서를 만들므로 여기서 정리한다. */
+        await updateDoc(doc(db,'resources', r.fireId), { examId:'', answerCount:0 });
+        r.examId = ''; r.answerCount = 0; akTarget.examId = '';
+        showMsg('ak-msg','warn','연결돼 있던 시험이 삭제되어 연결을 해제했습니다. 새로 저장하면 다시 만들어집니다.');
+        await loadList();
+      }
+      if (snap.exists()){
+        const d = snap.data() || {};
+        const parts = Array.isArray(d.parts) ? d.parts : [];
+        let maxN = 0;
+        parts.forEach(p => {
+          const src = (p && p.answers) || {};
+          Object.entries(src).forEach(([q,v]) => {
+            const n = Number(String(q).replace('q','')) || 0;
+            if (n > 0){ akAnswers[n] = String(v); if (n > maxN) maxN = n; }
+          });
+        });
+        if (maxN > 0) akCount = maxN;
+        /* 이미 붙어 있는 testId 를 기억해 둔다.
+           기억하지 않으면 다시 저장할 때마다 testId 가 새 값으로 갈아치워진다. */
+        if (d.testId) akTarget.testId = d.testId;
+        document.getElementById('ak-count').value   = akCount;
+        document.getElementById('ak-name').value     = d.unitName || r.title || '';
+        document.getElementById('ak-subject').value  = d.subject  || r.subject || '';
+        renderAK();
+        setDeployNote(true);
+        showMsg('ak-msg','ok','저장된 정답키를 불러왔습니다. 배포는 주간 학습 클리닉에서 하세요.');
+      }
+    } catch(e){
+      showMsg('ak-msg','warn','기존 정답키를 불러오지 못했습니다: ' + e.message);
+    }
+  }
+};
+
+/* ── 배포 안내 (배포는 주간 학습 클리닉에서 한다) ── */
+function setDeployNote(saved){
+  const el = document.getElementById('ak-deploy');
+  if (!el) return;
+  el.className = saved ? 'deploy-note done' : 'deploy-note';
+  el.innerHTML = saved
+    ? '✅ 이 시험은 <b>주간 학습 클리닉</b>에 올라가 있습니다 — 클리닉 → <b>📚 시험 담기</b> → <b>📝 마스터테스트</b> 탭에서 담아 배포하세요. 점수는 자동으로 성적에 기록됩니다.'
+    : '저장한 시험은 <b>주간 학습 클리닉</b>에서 배포합니다 — 클리닉 → <b>📚 시험 담기</b> → <b>📝 마스터테스트</b> 탭에서 이 시험을 담아 학생·반별로 보내세요. 점수는 자동으로 성적에 기록됩니다.';
+}
+
+window.saveAK = async () => {
+  if (!akTarget || busy) return;
+  hideMsg('ak-msg');
+
+  const name = document.getElementById('ak-name').value.trim();
+  if (!name){ showMsg('ak-msg','err','시험 이름을 입력해주세요.'); return; }
+
+  const blanks = [];
+  for (let n = 1; n <= akCount; n++) if (!akAnswers[n]) blanks.push(n);
+  if (blanks.length){
+    const head = blanks.slice(0,12).join(', ');
+    const more = blanks.length > 12 ? ` 외 ${blanks.length-12}문항` : '';
+    showMsg('ak-msg','err', `비어 있는 문항이 있습니다: ${head}번${more}\n모두 채워야 채점이 정확합니다.`);
+    const first = document.getElementById('akq-'+blanks[0]);
+    if (first) first.scrollIntoView({ behavior:'smooth', block:'center' });
     return;
   }
 
-  submitting = false;
-  setVeil(false);
+  const answers = {};
+  for (let n = 1; n <= akCount; n++) answers['q'+n] = String(akAnswers[n]);
 
-  // 결과 화면
-  const emoji = score>=90?'🎉':score>=70?'😊':score>=50?'😅':'💪';
-  const msg   = score>=90?'훌륭해요!':score>=70?'잘했어요!':score>=50?'더 열심히 해봐요!':'다음엔 더 잘할 수 있어요!';
-  document.getElementById('result-emoji').textContent = emoji;
-  document.getElementById('result-title').textContent = '제출 완료!';
-  document.getElementById('result-sub').textContent   = `${studentName}학생, ${msg}`;
-  document.getElementById('result-score').textContent = score + '점';
-  document.getElementById('result-detail').textContent = `총 ${total}문제 중 ${correct}문제 정답 · ${wrong}문제 오답`;
+  const subject = document.getElementById('ak-subject').value.trim();
+  if (!subject){ showMsg('ak-msg','err','과목을 선택해주세요. 시험 관리 화면의 과목 필터에 필요합니다.'); return; }
 
-  const againBox = document.getElementById('result-again');
-  if (againBox) {
-    if (attemptNo > 1) {
-      againBox.style.display = 'block';
-      againBox.textContent = `이 시험은 ${attemptNo}번째 응시입니다. 가장 최근 결과 하나만 기록됩니다.`;
+  const subUnit = akTarget.unitName || '';
+
+  /* exam-studio 가 저장하는 구조와 필드를 정확히 동일하게 맞춘다.
+     testId / parts[].id / sectionContent 가 빠지면 시험 관리 화면에서
+     항목이 어긋나 보일 수 있으므로 모두 채워 넣는다. */
+  const payload = {
+    testId:   akTarget.examId ? (akTarget.testId || 'test-' + Date.now()) : 'test-' + Date.now(),
+    subject:  subject,
+    grade:    GRADE_FULL[akTarget.grade] || akTarget.grade,
+    unitName: name,
+    subUnit:  subUnit,
+    regDate:  todayStr(),
+    parts: [{
+      id: 1,
+      range: `1-${akCount}`,
+      sectionName: subUnit,
+      sectionContent: '',
+      answers,
+      taskLow:  '시험지에 오답문제 정리해오기',
+      taskMid:  '수업노트 필기 다시하고 오답문제 정리하기',
+      taskHigh: '동영상 수업 내용복습, 수업노트 필기, 오답정리해오기'
+    }],
+    source: 'resource-room',
+    resourceId: akTarget.fireId,
+    resourceFile: akTarget.fileName || '',
+    updatedAt: Timestamp.now()
+  };
+
+  busy = true;
+  setVeil(true, '정답키를 저장하는 중입니다');
+  try {
+    let examId = akTarget.examId || '';
+    if (examId){
+      await setDoc(doc(db,'master-tests', examId), payload, { merge: true });
     } else {
-      againBox.style.display = 'none';
+      payload.createdAt = Timestamp.now();
+      const created = await addDoc(collection(db,'master-tests'), payload);
+      examId = created.id;
     }
-  }
 
-  // ★★ 문항별 채점 결과 채우기 — 제출이 끝난 지금부터 정답이 보인다
-  reviewRows = answersDetail.map(d => ({
-    num:  Number(String(d.question).replace('Q','')) || 0,
-    mine: d.studentAnswer,
-    ans:  d.correctAnswer,
-    ok:   !!d.isCorrect
-  }));
-  reviewMode = (wrong > 0) ? 'wrong' : 'all';   // 틀린 게 있으면 오답부터 보여준다
-  renderReview();
+    await updateDoc(doc(db,'resources', akTarget.fireId), {
+      examId, answerCount: akCount, kind: 'exam'
+    });
 
-  if (taskText) {
-    document.getElementById('result-task-box').style.display = 'block';
-    document.getElementById('result-task-text').textContent  = taskText;
+    akTarget.examId = examId;
+    akTarget.answerCount = akCount;
+    akTarget.kind = 'exam';
+    akTarget.testId = payload.testId;
+    setDeployNote(true);
+    showMsg('ak-msg','ok', `정답키 ${akCount}문항을 저장했습니다. 주간 학습 클리닉의 「시험 담기 → 마스터테스트」에서 담아 배포하세요.`);
+    await loadList();
+  } catch(e){
+    showMsg('ak-msg','err','저장 실패: ' + e.message);
+  } finally {
+    busy = false;
+    setVeil(false);
   }
-  showScreen('result');
 };
 
-function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-
-// ──────────────────────────────────────────────
-// ★ 링크 전용 진입: ?testId=문서ID&sid=학생ID
-//   testId 와 sid 가 모두 있어야 시험이 열린다.
-//   하나라도 없거나 조회에 실패하면 안내 화면만 보여주고,
-//   시험 목록은 어떤 경우에도 만들지 않는다.
-// ──────────────────────────────────────────────
-async function getMasterTestById(testId) {
+/* ══════════════════════════════════════
+   시험 스튜디오에서 만든 시험
+   ──────────────────────────────────────
+   · master-tests 를 모두 읽어 자료실이 만든 것(source:'resource-room')은 빼고 모은다
+   · 학년은 스튜디오가 '중등1학년' 형식으로 저장하므로 정규화해서 탭과 맞춘다
+   · 이 화면에서 바꿀 수 있는 것은 「정답」뿐이다.
+     문항 수 · 과제 문구 · 단원명 · 부 구성은 건드리지 않는다.
+     저장할 때도 고른 부의 answers 만 갈아끼우고 나머지 부는 원본 그대로 넘긴다.
+   ══════════════════════════════════════ */
+async function loadStudioTests(force){
+  if (studioLoaded && !force) return studioTests;
   try {
-    const snap = await getDoc(doc(db, 'master-tests', testId));
-    if (snap.exists()) return { fireId: snap.id, ...snap.data() };
-  } catch (e) {
-    console.warn('[OMR] master-test load fail:', e);
+    const snap = await getDocs(collection(db,'master-tests'));
+    const list = [];
+    snap.forEach(d => {
+      const v = d.data() || {};
+      if (v.source === 'resource-room') return;   // 자료실이 만든 시험은 위 자료 목록에서 관리
+      list.push({ fireId: d.id, ...v });
+    });
+    list.sort((a,b) => parseRegDate(b.regDate) - parseRegDate(a.regDate));
+    studioTests  = list;
+    studioLoaded = true;
+  } catch(e){
+    console.warn('[자료실] 스튜디오 시험 목록 실패:', e);
+    studioTests = [];
   }
-  return null;
+  return studioTests;
 }
 
-/* 클리닉 문서(assignments/{토큰})를 읽어 학생과 허용 시험을 확인한다.
-   토큰은 클리닉이 학생 한 명당 하나씩 만든 24자 무작위 문자열이라
-   다른 학생 것으로 바꿔 넣을 수 없다. */
-async function loadClinic(token) {
-  try {
-    const snap = await getDoc(doc(db, 'assignments', token));
-    if (snap.exists()) return snap.data() || {};
-  } catch (e) {
-    console.warn('[OMR] clinic load fail:', e);
+function renderStudioList(){
+  const wrap = document.getElementById('studio-wrap');
+  if (!wrap) return;
+  studioShown = studioTests.filter(t => normalizeGrade(t.grade) === curGrade);
+  const cnt = document.getElementById('studio-cnt');
+  if (cnt) cnt.textContent = studioShown.length + '개';
+
+  if (!studioShown.length){
+    wrap.innerHTML = `<div class="empty"><div class="e-emoji">🧪</div>
+      ${esc(curGrade)}에 시험 스튜디오에서 만든 시험이 없습니다<br>
+      <span style="font-size:11px">시험 스튜디오 → 마스터테스트 만들기에서 등록합니다</span></div>`;
+    return;
   }
-  return null;
+
+  wrap.innerHTML = '<div class="st-list">' + studioShown.map((t,i) => {
+    const nParts = partsOf(t).length;
+    const totalQ = totalQOf(t);
+    const sub    = t.subUnit ? ' · ' + esc(t.subUnit) : '';
+    return `<div class="st-item">
+      <div class="st-name">${esc(t.unitName || '(단원명 없음)')}${sub}</div>
+      <div class="st-meta">등록일 ${esc(t.regDate || '—')}</div>
+      <div class="st-tags">
+        ${t.subject ? `<span class="tag st1">${esc(t.subject)}</span>` : ''}
+        <span class="tag st2">${totalQ}문항</span>
+        <span class="tag st2">${nParts}부</span>
+      </div>
+      <div class="st-acts">
+        <button class="st-btn" onclick="viewStudio(${i})">👁 정답 보기</button>
+        <button class="st-btn main" onclick="editStudio(${i})">✎ 정답 고치기</button>
+      </div>
+    </div>`;
+  }).join('') + '</div>';
 }
-/* 이 클리닉에 그 마스터테스트가 실제로 담겨 있는가 */
-function clinicHasTest(clinic, testId) {
-  const items = (clinic && Array.isArray(clinic.items)) ? clinic.items : [];
-  return items.some(it =>
-    it && it.type === 'examlink' && it.source === 'master' &&
-    String(it.examId || '') === String(testId)
-  );
+
+const ST_SYM = ['','①','②','③','④','⑤'];
+function stSym(v){
+  const n = Number(v);
+  return (n >= 1 && n <= 5) ? ST_SYM[n] : '미입력';
+}
+function stPart(){ return partsOf(stTarget)[stIdx] || null; }
+function stKeys(){ const p = stPart(); return p ? sortedQKeys(p.answers) : []; }
+
+window.viewStudio = (i) => openStudio(i, 'view');
+window.editStudio = (i) => openStudio(i, 'edit');
+
+function openStudio(i, mode){
+  const t = studioShown[i];
+  if (!t) return;
+  if (!partsOf(t).length || totalQOf(t) === 0){
+    alert('이 시험에는 문항이 없습니다.\n\n시험 스튜디오에서 확인해주세요.');
+    return;
+  }
+  stTarget = t;
+  stIdx    = 0;
+  hideMsg('st-msg');
+  document.getElementById('st-title').textContent = t.unitName || '(단원명 없음)';
+  document.getElementById('st-sub').textContent   =
+    [t.subject || '', normalizeGrade(t.grade || ''), totalQOf(t) + '문항', partsOf(t).length + '부', t.regDate || '']
+      .filter(Boolean).join(' · ');
+  document.getElementById('st-modal').classList.add('show');
+  setStMode(mode);
 }
 
-async function initFromURL() {
-  const params = new URLSearchParams(location.search);
-  const testId = (params.get('testId') || '').trim();
-  const token  = (params.get('t') || '').trim();
-  let   sid    = (params.get('sid') || '').trim().toLowerCase();
-
-  // 클리닉에서 들어왔으면 결과 화면에 "클리닉으로 돌아가기"를 띄운다
-  // (사이트 내부 경로만 허용 — 오픈 리다이렉트 방지)
-  const fromRaw = params.get('from') || '';
-  const homeBtn = document.getElementById('omr-home-btn');
-  const note    = document.getElementById('omr-done-note');
-  let backHref  = '';
-  if (fromRaw && fromRaw.startsWith('/') && !fromRaw.startsWith('//')) {
-    backHref = fromRaw;
-  } else if (token) {
-    // from 이 없어도 토큰이 있으면 그 클리닉으로 돌아갈 수 있다
-    backHref = '/assignment.html?t=' + encodeURIComponent(token);
+function closeStudioSilent(){
+  const m = document.getElementById('st-modal');
+  if (m) m.classList.remove('show');
+  stTarget = null; stMode = 'view'; stIdx = 0; stOrig = {}; stEdit = {};
+}
+window.closeStudio = () => {
+  if (stMode === 'edit' && hasStChanges()){
+    if (!confirm('고친 정답을 저장하지 않고 닫을까요?')) return;
   }
-  if (backHref) {
-    if (homeBtn) { homeBtn.setAttribute('href', backHref); homeBtn.style.display = 'inline-block'; }
-    if (note) note.style.display = 'none';
+  document.getElementById('st-modal').classList.remove('show');
+  stTarget = null; stMode = 'view'; stOrig = {}; stEdit = {};
+};
+
+function setStMode(mode){
+  stMode = (mode === 'edit') ? 'edit' : 'view';
+  const p = stPart();
+  if (stMode === 'edit' && p){
+    stOrig = {};
+    stKeys().forEach(q => { stOrig[q] = String((p.answers || {})[q] || ''); });
+    stEdit = { ...stOrig };
+  }
+  renderStModal();
+}
+
+window.setStPart = (idx) => {
+  const n = Number(idx) || 0;
+  if (n === stIdx) return;
+  if (stMode === 'edit' && hasStChanges()){
+    if (!confirm('이 부에서 고친 정답을 저장하지 않고 다른 부로 넘어갈까요?')) return;
+  }
+  stIdx = n;
+  hideMsg('st-msg');
+  setStMode(stMode);
+};
+
+function hasStChanges(){
+  return stKeys().some(q => String(stOrig[q] || '') !== String(stEdit[q] || ''));
+}
+function stChangeList(){
+  return stKeys()
+    .filter(q => String(stOrig[q] || '') !== String(stEdit[q] || ''))
+    .map(q => `${qNumOf(q)}번 ${stSym(stOrig[q])} → ${stSym(stEdit[q])}`);
+}
+
+window.pickSt = (q, c) => {
+  if (stMode !== 'edit') return;
+  stEdit[q] = String(c);
+  for (let i = 1; i <= 5; i++){
+    const el = document.getElementById(`stc-${q}-${i}`);
+    if (el) el.classList.toggle('sel', String(stEdit[q]) === String(i));
+  }
+  const row = document.getElementById('stq-' + q);
+  if (row){ row.classList.add('filled'); row.classList.remove('blank'); }
+  paintStChanges();
+};
+
+function paintStChanges(){
+  const box = document.getElementById('st-chg');
+  if (!box) return;
+  if (stMode !== 'edit'){ box.style.display = 'none'; return; }
+  const list = stChangeList();
+  if (!list.length){ box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  box.textContent = `고친 정답 ${list.length}곳 — ` + list.join(' / ');
+}
+
+function renderStModal(){
+  const p = stPart();
+  const parts = partsOf(stTarget);
+
+  // 부 탭
+  const tabs = document.getElementById('st-tabs');
+  if (tabs){
+    tabs.innerHTML = parts.length > 1
+      ? parts.map((pp,idx) => {
+          const range = (pp && pp.range) ? pp.range : (() => {
+            const ks = sortedQKeys(pp && pp.answers);
+            return ks.length ? qNumOf(ks[0]) + '-' + qNumOf(ks[ks.length-1]) : '—';
+          })();
+          return `<button class="st-tab ${idx===stIdx?'on':''}" onclick="setStPart(${idx})">${idx+1}부 · ${esc(range)}</button>`;
+        }).join('')
+      : '';
   }
 
-  // ★ 시험이 지정돼 있고, 학생을 확인할 수단(토큰 또는 옛 링크의 sid)이 있어야 한다
-  if (!testId || (!token && !sid)) { showBlocked('nolink'); return; }
+  // 안내
+  const guard = document.getElementById('st-guard');
+  if (guard){
+    guard.textContent = stMode === 'edit'
+      ? `고친 정답만 저장됩니다. 문항 수·과제 문구·단원명은 그대로 남고, 다른 부의 정답도 건드리지 않습니다.${parts.length>1 ? ' 지금 ' + (stIdx+1) + '부를 고치고 있습니다.' : ''}`
+      : '여기서는 정답만 확인하고 고칠 수 있습니다. 문항을 늘리거나 과제 문구를 바꾸려면 시험 스튜디오에서 하세요.';
+  }
 
-  showScreen('autoload');
+  const keys = stKeys();
+  const grid = document.getElementById('st-grid');
+  const stat = document.getElementById('st-stat');
 
-  try {
-    await ensureAuth();
-
-    /* ★ 토큰이 있으면 학생 ID를 주소에서 읽지 않고 클리닉 문서에서 가져온다.
-       주소의 학생 ID를 고쳐 다른 학생 성적을 덮어쓰는 것을 막는다.
-       또한 그 클리닉에 담긴 시험만 열 수 있게 한다.
-       토큰이 없는 옛 링크(sid 방식)는 그대로 동작시켜 이미 보낸 링크가 죽지 않게 한다. */
-    if (token) {
-      const clinic = await loadClinic(token);
-      if (!clinic) { showBlocked('link'); return; }
-      sid = String(clinic.studentId || '').trim().toLowerCase();
-      if (!sid) { showBlocked('student'); return; }
-      if (!clinicHasTest(clinic, testId)) { showBlocked('notinlink'); return; }
+  if (!p || !keys.length){
+    if (grid) grid.innerHTML = '<div class="empty">이 부에는 문항이 없습니다.</div>';
+    if (stat) stat.textContent = '—';
+  } else if (stMode === 'edit'){
+    if (grid){
+      grid.innerHTML = keys.map(q => {
+        const v = stEdit[q];
+        return `<div class="ak-q ${v?'filled':'blank'}" id="stq-${q}">
+          <div class="ak-num">${qNumOf(q)}번</div>
+          <div class="ak-ch">
+            ${[1,2,3,4,5].map(c =>
+              `<div class="ak-c ${String(v)===String(c)?'sel':''}" id="stc-${q}-${c}" onclick="pickSt('${q}',${c})">${ST_SYM[c]}</div>`
+            ).join('')}
+          </div>
+        </div>`;
+      }).join('');
     }
-
-    const student = await getStudentById(sid);
-    if (!student) { showBlocked('student'); return; }
-
-    studentId        = student.id;
-    studentName      = student.name || '';
-    studentGrade     = normalizeGrade(student.grade);
-    studentGradeReal = studentGrade;
-
-    const test = await getMasterTestById(testId);
-    if (!test) { showBlocked('test'); return; }
-
-    selectedTest = test;
-    answers = {};
-    buildOMR();
-    if (omrPlan.total === 0) { showBlocked('empty'); return; }
-    showScreen('omr');
-  } catch (e) {
-    console.warn('[OMR] initFromURL error:', e);
-    showBlocked('error');
+    if (stat) stat.textContent = `${parts.length>1 ? (stIdx+1)+'부 · ' : ''}${keys.length}문항 — 고칠 번호의 답을 누르세요`;
+  } else {
+    if (grid){
+      grid.innerHTML = keys.map(q => {
+        const v = (p.answers || {})[q];
+        const blank = !(Number(v) >= 1 && Number(v) <= 5);
+        return `<div class="st-ro ${blank?'blank':''}">
+          <div class="st-ro-num">${qNumOf(q)}번</div>
+          <div class="st-ro-ans">${esc(stSym(v))}</div>
+        </div>`;
+      }).join('');
+    }
+    if (stat) stat.textContent = `${parts.length>1 ? (stIdx+1)+'부 · ' : ''}정답 ${keys.length}문항`;
   }
+
+  // 버튼
+  const acts = document.getElementById('st-acts');
+  if (acts){
+    acts.innerHTML = stMode === 'edit'
+      ? `<button class="btn" onclick="saveStudio()">💾 고친 정답 저장</button>
+         <button class="btn gray" onclick="cancelStudioEdit()">편집 취소</button>`
+      : `<button class="btn" onclick="setStMode2('edit')">✎ 정답 고치기</button>
+         <button class="btn gray" onclick="closeStudio()">닫기</button>`;
+  }
+  paintStChanges();
 }
-initFromURL();
+window.setStMode2 = (m) => { hideMsg('st-msg'); setStMode(m); };
+window.cancelStudioEdit = () => {
+  if (hasStChanges() && !confirm('고친 정답을 버릴까요?')) return;
+  hideMsg('st-msg');
+  setStMode('view');
+};
+
+window.saveStudio = async () => {
+  if (!stTarget || busy) return;
+  hideMsg('st-msg');
+  const parts = partsOf(stTarget);
+  const p = parts[stIdx];
+  if (!p){ showMsg('st-msg','err','편집할 부를 찾지 못했습니다. 창을 닫고 다시 열어주세요.'); return; }
+
+  const keys = stKeys();
+  const blanks = keys.filter(q => !(Number(stEdit[q]) >= 1 && Number(stEdit[q]) <= 5));
+  if (blanks.length){
+    const head = blanks.slice(0,12).map(qNumOf).join(', ');
+    const more = blanks.length > 12 ? ` 외 ${blanks.length-12}문항` : '';
+    showMsg('st-msg','err', `정답이 비어 있는 문항이 있습니다: ${head}번${more}\n모두 채워야 저장됩니다.`);
+    return;
+  }
+
+  const changes = stChangeList();
+  if (!changes.length){ showMsg('st-msg','warn','바뀐 정답이 없습니다.'); return; }
+
+  const partLabel = parts.length > 1 ? `${stIdx+1}부 ` : '';
+  const ok = confirm(
+    `${partLabel}정답 ${changes.length}곳을 고칩니다.\n\n${changes.join('\n')}\n\n` +
+    `저장하면 이후 응시부터 새 정답으로 채점됩니다.\n이미 제출된 성적은 다시 채점되지 않습니다.\n\n저장할까요?`
+  );
+  if (!ok) return;
+
+  busy = true;
+  setVeil(true, '정답을 저장하는 중입니다');
+  try {
+    /* 고른 부만 갈아끼운다 — 다른 부와 과제 문구는 원본 객체를 그대로 넘긴다 */
+    const newParts = parts.map((pp, idx) => idx === stIdx ? { ...pp, answers: { ...stEdit } } : pp);
+    await updateDoc(doc(db,'master-tests', stTarget.fireId), {
+      parts: newParts,
+      updatedAt: Timestamp.now(),
+      answersEditedAt: Timestamp.now(),
+      answersEditedFrom: 'resource-room'
+    });
+    stTarget.parts = newParts;
+    stOrig = { ...stEdit };
+    setStMode('view');
+    showMsg('st-msg','ok', `${partLabel}정답 ${changes.length}곳을 고쳤습니다.`);
+    await loadStudioTests(true);
+    renderStudioList();
+  } catch(e){
+    showMsg('st-msg','err','저장 실패: ' + e.message);
+  } finally {
+    busy = false;
+    setVeil(false);
+  }
+};
+
+/* 모달 바깥 클릭으로 닫기 */
+document.getElementById('ak-modal').addEventListener('click', function(e){
+  if (e.target === this) window.closeAK();
+});
+document.getElementById('st-modal').addEventListener('click', function(e){
+  if (e.target === this) window.closeStudio();
+});
 </script>
 </body>
 </html>
