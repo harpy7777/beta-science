@@ -113,6 +113,7 @@ body {
 .btn.ghost:hover { background: var(--pink-soft); opacity: 1; }
 .btn.gray { background: #f3f4f6; color: #6b7280; border: 1.5px solid #e5e7eb; }
 .btn.gray:hover { background: #eceef1; opacity: 1; }
+.btn.sm { padding: 10px; min-height: 44px; font-size: 13px; border-radius: 11px; }
 
 /* 진행바 */
 .prog-wrap { display: none; margin-top: 10px; }
@@ -122,7 +123,7 @@ body {
 .prog-txt { font-size: 11.5px; font-weight: 700; color: var(--pink); margin-top: 6px; }
 
 /* 알림 */
-.msg { padding: 10px 13px; border-radius: 11px; font-size: 12px; line-height: 1.6; margin-top: 10px; display: none; word-break: keep-all; }
+.msg { padding: 10px 13px; border-radius: 11px; font-size: 12px; line-height: 1.6; margin-top: 10px; display: none; word-break: keep-all; white-space: pre-line; }
 .msg.show { display: block; }
 .msg.ok   { background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; }
 .msg.err  { background: #fff5f5; border: 1px solid #fecaca; color: #b91c1c; }
@@ -214,10 +215,15 @@ body {
 .mini-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 
 /* 배포 링크 */
-.link-box { background: #f5f5f7; border-radius: 11px; padding: 10px 12px; margin-top: 11px; display: none; }
+.link-box { background: #f5f5f7; border-radius: 11px; padding: 11px 12px; margin-top: 11px; display: none; }
 .link-box.show { display: block; }
 .link-lbl { font-size: 10.5px; font-weight: 700; color: #6e6e73; margin-bottom: 5px; letter-spacing: 0.04em; }
-.link-url { font-size: 11.5px; color: #1d1d1f; word-break: break-all; line-height: 1.55; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.link-url {
+  font-size: 11.5px; color: #1d1d1f; word-break: break-all; line-height: 1.55;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 9px; padding: 9px 10px;
+}
+.link-note { font-size: 10.5px; color: #aeaeb2; margin-top: 6px; line-height: 1.6; word-break: break-all; }
 
 /* 덮개 */
 .veil { display: none; position: fixed; inset: 0; z-index: 900; background: rgba(255,255,255,0.9); align-items: center; justify-content: center; padding: 1.5rem; }
@@ -234,6 +240,7 @@ body {
   .row2 { grid-template-columns: 1fr; gap: 0; }
   .res-acts { grid-template-columns: repeat(2,1fr); }
   .ak-grid { grid-template-columns: 1fr; max-height: 300px; }
+  .ak-c { max-width: 46px; min-height: 38px; font-size: 12.5px; }
   .modal { padding: 0.6rem; }
   .modal-box { padding: 1.1rem 0.95rem calc(1.1rem + var(--safe-bottom)); border-radius: 16px; margin: 0.6rem auto; }
   .mini-row { grid-template-columns: 1fr; }
@@ -250,7 +257,7 @@ body {
 @media (max-width: 320px) {
   .res-acts { grid-template-columns: repeat(2,1fr); gap: 5px; }
   .ak-num { flex: 0 0 28px; }
-  .ak-c { min-height: 32px; }
+  .ak-c { min-height: 32px; max-width: 40px; }
 }
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script>
@@ -402,9 +409,20 @@ body {
     <button class="btn" id="ak-save" onclick="saveAK()" style="margin-top:11px;">정답키 저장</button>
 
     <div class="link-box" id="ak-link">
-      <div class="link-lbl">학생 배포 링크 (sid는 학생 ID로 바꿔서 사용)</div>
+      <div class="link-lbl">학생 배포 링크</div>
+      <div class="field" style="margin-bottom:9px;">
+        <label class="field-label" for="ak-sid">학생 선택</label>
+        <select class="inp" id="ak-sid" onchange="onPickStudent()">
+          <option value="">학생 선택</option>
+        </select>
+        <div class="hint" id="ak-sid-hint">학생을 고르면 sid가 채워진 완성 링크가 만들어집니다.</div>
+      </div>
       <div class="link-url" id="ak-link-url">—</div>
-      <button class="btn ghost" style="margin-top:9px;" onclick="copyLink()">링크 복사</button>
+      <div class="link-note">클리닉(주간 학습 클리닉)이 만드는 OMR 링크와 같은 형식입니다 · /student-omr.html?testId=…&amp;sid=…</div>
+      <div class="mini-row">
+        <button class="btn ghost sm" onclick="copyLink()">링크 복사</button>
+        <button class="btn gray sm" onclick="copyAllLinks()">이 학년 전체 복사</button>
+      </div>
     </div>
   </div>
 </div>
@@ -446,6 +464,24 @@ const GRADE_FULL = {
   '고1':'고등1학년', '고2':'고등2학년', '고3':'고등3학년'
 };
 
+/* 학생 문서의 grade 표기가 제각각이어도 '중1' 같은 탭 표기로 맞춘다.
+   (student-omr.html 의 GRADE_VARIANTS 와 같은 표를 쓴다) */
+const GRADE_VARIANTS = {
+  '중1': ['중1','중1학년','중학1학년','중학교1학년','중학교 1학년','중 1학년','중등1학년'],
+  '중2': ['중2','중2학년','중학2학년','중학교2학년','중학교 2학년','중 2학년','중등2학년'],
+  '중3': ['중3','중3학년','중학3학년','중학교3학년','중학교 3학년','중 3학년','중등3학년'],
+  '고1': ['고1','고1학년','고등1학년','고등학교1학년','고등학교 1학년','고 1학년'],
+  '고2': ['고2','고2학년','고등2학년','고등학교2학년','고등학교 2학년','고 2학년'],
+  '고3': ['고3','고3학년','고등3학년','고등학교3학년','고등학교 3학년','고 3학년']
+};
+function normalizeGrade(raw){
+  const s = String(raw || '').replace(/\s/g,'');
+  for (const [ui, variants] of Object.entries(GRADE_VARIANTS)){
+    if (variants.some(v => v.replace(/\s/g,'') === s)) return ui;
+  }
+  return String(raw || '');
+}
+
 const MAX_BYTES = 50 * 1024 * 1024;
 
 let curGrade  = '중1';
@@ -456,6 +492,8 @@ let akTarget   = null;    // 정답키 편집 중인 자료
 let akAnswers  = {};      // { 1:'3', 2:'1', ... }
 let akCount    = 20;
 let busy       = false;
+let students   = [];      // 배포 링크용 학생 목록
+let studentsLoaded = false;
 
 /* ── 유틸 ── */
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
@@ -510,6 +548,7 @@ onAuthStateChanged(auth, async (user) => {
     document.body.style.visibility = 'visible';
     renderTabs();
     await loadAll();
+    loadStudents();   // 배포 링크용 — 늦게 와도 되므로 기다리지 않는다
   } catch(err) {
     window.location.replace('/login.html');
   }
@@ -553,6 +592,28 @@ async function loadAll(){
     console.warn('[자료실] 개수 집계 실패:', e);
   }
   await loadList();
+}
+
+/* ── 학생 목록 (배포 링크용) ── */
+async function loadStudents(){
+  if (studentsLoaded) return students;
+  try {
+    const snap = await getDocs(collection(db, 'students'));
+    const list = [];
+    snap.forEach(d => {
+      const v = d.data() || {};
+      const sid = String(v.id || '').trim();
+      if (!sid) return;   // 학생 ID가 없으면 링크를 만들 수 없다
+      list.push({ fireId: d.id, id: sid, name: String(v.name || '').trim(), grade: v.grade || '' });
+    });
+    list.sort((a,b) => (a.name||'').localeCompare(b.name||'','ko'));
+    students = list;
+    studentsLoaded = true;
+  } catch(e){
+    console.warn('[자료실] 학생 목록 불러오기 실패:', e);
+    students = [];
+  }
+  return students;
 }
 
 /* ── 목록 ── */
@@ -824,10 +885,11 @@ window.doDelete = async (i) => {
 };
 
 /* ══════════════════════════════════════
-   정답키
+   정답키 (5지선다 객관식 전용)
    master-tests 문서 구조를 student-omr.html이
    읽는 형식과 정확히 같게 맞춘다.
    parts[0].answers = { q1:'3', q2:'1', ... }
+   1번부터 문항 수까지 빈칸 없이 모두 채워야 저장된다.
    ══════════════════════════════════════ */
 const CIRCLE = { '①':'1','②':'2','③':'3','④':'4','⑤':'5' };
 const SYM    = ['','①','②','③','④','⑤'];
@@ -938,8 +1000,12 @@ window.openAK = async (i) => {
   document.getElementById('ak-sub').textContent   = `${r.grade} · ${r.title || r.fileName}`;
   document.getElementById('ak-name').value    = r.title || '';
   document.getElementById('ak-subject').value = r.subject || '';
+  document.getElementById('ak-count').value   = akCount;
   document.getElementById('ak-modal').classList.add('show');
   renderAK();
+
+  // 배포 링크용 학생 드롭다운 (자료 학년 학생이 위로 온다)
+  fillStudentSelect();
 
   // 이미 만들어둔 정답키가 있으면 불러와 채운다
   if (r.examId){
@@ -965,9 +1031,12 @@ window.openAK = async (i) => {
           });
         });
         if (maxN > 0) akCount = maxN;
-        document.getElementById('ak-count').value  = akCount;
-        document.getElementById('ak-name').value    = d.unitName || r.title || '';
-        document.getElementById('ak-subject').value = d.subject  || r.subject || '';
+        /* 이미 붙어 있는 testId 를 기억해 둔다.
+           기억하지 않으면 다시 저장할 때마다 testId 가 새 값으로 갈아치워진다. */
+        if (d.testId) akTarget.testId = d.testId;
+        document.getElementById('ak-count').value   = akCount;
+        document.getElementById('ak-name').value     = d.unitName || r.title || '';
+        document.getElementById('ak-subject').value  = d.subject  || r.subject || '';
         renderAK();
         showLink(r.examId);
         showMsg('ak-msg','ok','저장된 정답키를 불러왔습니다.');
@@ -978,15 +1047,102 @@ window.openAK = async (i) => {
   }
 };
 
-function showLink(examId){
-  const url = `${location.origin}/student-omr.html?testId=${examId}&sid=학생ID`;
-  document.getElementById('ak-link-url').textContent = url;
-  document.getElementById('ak-link').classList.add('show');
+/* ══════════════════════════════════════
+   배포 링크
+   ★ 클리닉(assignment-admin.html → assignment.html)이 만드는 OMR 링크와
+     같은 형식으로 맞춘다. student-omr.html 의 initFromURL() 이 읽는 값은
+       testId = master-tests 문서 ID   (필수)
+       sid    = 학생 문서의 id 필드    (필수 · 없으면 입장 화면으로 빠진다)
+       from   = 돌아갈 사이트 내부 경로 (선택 · 클리닉에서만 사용)
+     자료실은 카카오톡으로 바로 보내는 링크이므로 from 없이 testId+sid 만 넣는다.
+   ══════════════════════════════════════ */
+function omrLink(examId, sid){
+  const base = `${location.origin}/student-omr.html?testId=${encodeURIComponent(examId)}`;
+  return `${base}&sid=${sid ? encodeURIComponent(sid) : '학생ID'}`;
 }
+async function fillStudentSelect(){
+  const sel = document.getElementById('ak-sid');
+  if (!sel) return;
+  await loadStudents();
+  if (!students.length){
+    sel.innerHTML = '<option value="">학생 목록을 불러오지 못했습니다</option>';
+    renderLink();
+    return;
+  }
+  const g = normalizeGrade(akTarget ? akTarget.grade : '');
+  const same   = students.filter(s => normalizeGrade(s.grade) === g);
+  const others = students.filter(s => normalizeGrade(s.grade) !== g);
+  const opt = (s, withGrade) =>
+    `<option value="${esc(s.id)}">${esc(s.name || '이름 없음')} · ${esc(s.id)}${withGrade && s.grade ? ' · ' + esc(normalizeGrade(s.grade)) : ''}</option>`;
+
+  let html = '<option value="">학생 선택 (비우면 sid를 직접 수정)</option>';
+  if (same.length)   html += `<optgroup label="${esc(g || '해당 학년')} ${same.length}명">${same.map(s => opt(s,false)).join('')}</optgroup>`;
+  if (others.length) html += `<optgroup label="다른 학년 ${others.length}명">${others.map(s => opt(s,true)).join('')}</optgroup>`;
+  sel.innerHTML = html;
+  renderLink();
+}
+function renderLink(){
+  const urlEl = document.getElementById('ak-link-url');
+  const hint  = document.getElementById('ak-sid-hint');
+  if (!urlEl) return;
+  const examId = (akTarget && akTarget.examId) ? akTarget.examId : '';
+  if (!examId){
+    urlEl.textContent = '—';
+    if (hint) hint.textContent = '정답키를 저장하면 링크가 만들어집니다.';
+    return;
+  }
+  const sel = document.getElementById('ak-sid');
+  const sid = sel ? sel.value : '';
+  urlEl.textContent = omrLink(examId, sid);
+  if (hint){
+    if (sid){
+      const s = students.find(x => x.id === sid);
+      hint.textContent = s
+        ? `${s.name} 학생 전용 링크입니다. 이 링크로 풀면 점수가 ${s.name} 학생에게 기록됩니다.`
+        : '선택한 학생의 링크입니다.';
+    } else {
+      hint.textContent = '학생을 고르면 sid가 채워진 완성 링크가 만들어집니다.';
+    }
+  }
+}
+window.onPickStudent = () => { renderLink(); hideMsg('ak-msg'); };
+
+function showLink(examId){
+  if (akTarget) akTarget.examId = examId;
+  document.getElementById('ak-link').classList.add('show');
+  renderLink();
+}
+
 window.copyLink = async () => {
   const txt = document.getElementById('ak-link-url').textContent;
-  try { await navigator.clipboard.writeText(txt); showMsg('ak-msg','ok','링크를 복사했습니다.'); }
-  catch(e){ showMsg('ak-msg','warn','복사에 실패했습니다. 링크를 길게 눌러 직접 복사해주세요.'); }
+  if (!txt || txt === '—'){ showMsg('ak-msg','warn','먼저 정답키를 저장해주세요.'); return; }
+  const sel = document.getElementById('ak-sid');
+  const picked = sel && sel.value;
+  try {
+    await navigator.clipboard.writeText(txt);
+    showMsg('ak-msg', picked ? 'ok' : 'warn',
+      picked ? '링크를 복사했습니다. 그대로 보내면 됩니다.'
+             : '링크를 복사했습니다. 학생을 고르지 않았으므로 sid=학생ID 부분을 직접 바꿔야 합니다.');
+  } catch(e){
+    showMsg('ak-msg','warn','복사에 실패했습니다. 링크를 길게 눌러 직접 복사해주세요.');
+  }
+};
+
+/* 이 자료 학년의 학생 전원 링크를 한 번에 복사 */
+window.copyAllLinks = async () => {
+  const examId = (akTarget && akTarget.examId) ? akTarget.examId : '';
+  if (!examId){ showMsg('ak-msg','warn','먼저 정답키를 저장해주세요.'); return; }
+  await loadStudents();
+  const g = normalizeGrade(akTarget.grade);
+  const list = students.filter(s => normalizeGrade(s.grade) === g);
+  if (!list.length){ showMsg('ak-msg','warn', `${akTarget.grade} 학생이 없어 전체 링크를 만들 수 없습니다.`); return; }
+  const text = list.map(s => `${s.name || s.id}: ${omrLink(examId, s.id)}`).join('\n');
+  try {
+    await navigator.clipboard.writeText(text);
+    showMsg('ak-msg','ok', `${akTarget.grade} 학생 ${list.length}명의 링크를 복사했습니다.`);
+  } catch(e){
+    showMsg('ak-msg','warn','복사에 실패했습니다. 링크를 길게 눌러 직접 복사해주세요.');
+  }
 };
 
 window.saveAK = async () => {
@@ -1061,7 +1217,7 @@ window.saveAK = async () => {
     akTarget.answerCount = akCount;
     akTarget.testId = payload.testId;
     showLink(examId);
-    showMsg('ak-msg','ok', `정답키 ${akCount}문항을 저장했습니다. 학생이 OMR에서 바로 응시할 수 있습니다.`);
+    showMsg('ak-msg','ok', `정답키 ${akCount}문항을 저장했습니다. 아래에서 학생을 골라 링크를 보내세요.`);
     await loadList();
   } catch(e){
     showMsg('ak-msg','err','저장 실패: ' + e.message);
