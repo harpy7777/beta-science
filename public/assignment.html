@@ -389,16 +389,44 @@ function renderLink(it){
 }
 
 /* ── 시험 바로가기 (온라인 테스트 / 마스터테스트) ── */
+let clinicToken = '';       // 이 클리닉 링크의 토큰 (load에서 설정)
 let clinicStudentId = '';   // 클리닉 문서의 studentId (load에서 설정)
 let clinicStudentName = ''; // 클리닉 문서의 studentName (load에서 설정) — 표시 이름을 sid와 일치시키기 위해 링크에 실어 보냄
 let clinicReturnHref = '';  // 시험 끝낸 뒤 돌아올 이 클리닉 첫 페이지 주소 (load에서 설정)
+
+/* ══════════════════════════════════════════════════════════
+   ★ 2026-08 변경 — 마스터테스트(OMR) 링크에 학생 ID를 싣지 않는다
+   ──────────────────────────────────────────────────────────
+   [무엇이 문제였나]
+   예전에는 /student-omr.html?testId=…&sid=m01001 형태로 넘겼다.
+   학생이 주소창에서 sid 를 친구 ID로 바꾸면 친구 이름으로 점수가
+   기록돼 친구 성적을 덮어쓸 수 있었다.
+
+   [어떻게 고쳤나]
+   학생 ID 대신 이 클리닉의 토큰(t)을 넘긴다.
+   student-omr.html 이 토큰으로 assignments 문서를 읽어
+     ① 학생이 누구인지 스스로 확인하고
+     ② 그 클리닉에 담긴 시험만 열어준다.
+   토큰은 24자 무작위 문자열이라 다른 학생 것으로 바꿔 넣을 수 없다.
+   주소에 학생 ID가 아예 나오지 않으므로 고칠 대상 자체가 없어진다.
+
+   [건드리지 않은 것]
+   OX·4지선다(온라인 테스트) 링크는 /student/{examId} 로 가는
+   별도 페이지가 받는다. 그 페이지는 sid·sname 을 읽어 성적을 남기므로
+   형식을 그대로 유지한다.
+   ══════════════════════════════════════════════════════════ */
 function buildExamHref(it){
   // 시험을 끝낸 학생이 "시험 목록으로" 누르면 이 클리닉 첫 페이지로 돌아오도록 from 전달
   const fromPart = clinicReturnHref ? ('from='+encodeURIComponent(clinicReturnHref)) : '';
   if(it.source==='master'){
     const qs=[];
-    if(clinicStudentId) qs.push('sid='+encodeURIComponent(clinicStudentId));
-    if(clinicStudentName) qs.push('sname='+encodeURIComponent(clinicStudentName));
+    if(clinicToken){
+      qs.push('t='+encodeURIComponent(clinicToken));   // ★ 학생 ID 대신 토큰
+    } else {
+      // 토큰을 못 읽은 예외 상황에서만 예전 방식으로 되돌린다 (성적 누락 방지)
+      if(clinicStudentId) qs.push('sid='+encodeURIComponent(clinicStudentId));
+      if(clinicStudentName) qs.push('sname='+encodeURIComponent(clinicStudentName));
+    }
     if(fromPart) qs.push(fromPart);
     let url='/student-omr.html?testId='+encodeURIComponent(it.examId||'');
     if(qs.length) url += '&'+qs.join('&');
@@ -407,8 +435,8 @@ function buildExamHref(it){
  // online: /student/{examId}?type=ox|multiple&sid=학생ID&sname=학생이름
   const qs=[];
   if(it.examType) qs.push('type='+encodeURIComponent(it.examType));
-  if(clinicStudentId) qs.push('sid='+encodeURIComponent(clinicStudentId)); // ★ 마스터(OMR)와 동일하게 학생ID를 링크에 실어 보냄 → 성적이 그 학생에게 정확히 기록
-  if(clinicStudentName) qs.push('sname='+encodeURIComponent(clinicStudentName)); // ★ 이름도 실어 보내 표시·저장 이름을 sid와 100% 일치시킴 (다른 학생 기기 오염 방지)
+  if(clinicStudentId) qs.push('sid='+encodeURIComponent(clinicStudentId)); // ★ 온라인 테스트 페이지가 읽는 형식 — 그대로 유지
+  if(clinicStudentName) qs.push('sname='+encodeURIComponent(clinicStudentName)); // ★ 이름도 실어 보내 표시·저장 이름을 sid와 100% 일치시킴
   if(fromPart) qs.push(fromPart);
   let url='/student/'+encodeURIComponent(it.examId||'');
   if(qs.length) url += '?'+qs.join('&');
@@ -608,6 +636,7 @@ async function load(){
   const token=params.get('t');
   if(!token){ showError('잘못된 접근입니다. 선생님이 보내주신 링크로 다시 접속해 주세요.'); return; }
   storeKey='clinic_state_'+token;
+  clinicToken=token;          // ★ 마스터테스트 링크에 실어 보낼 토큰
 
   let snap;
   try{ snap=await getDoc(doc(db,'assignments',token)); }
