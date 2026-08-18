@@ -461,6 +461,48 @@ function statLines(stat, targets) {
   return lines;
 }
 
+/* ---------- 원본 데이터 진단 ---------- */
+async function diagnose() {
+  const out = [];
+  let snap;
+  try {
+    snap = await getDocs(collection(db, "grades"));
+  } catch (e) {
+    out.push("grades 컬렉션을 읽지 못했습니다: " + ((e && e.code) || (e && e.message) || "오류"));
+    return out;
+  }
+
+  out.push(`grades 문서 총 ${snap.size}건`);
+  if (!snap.size) {
+    out.push("컬렉션이 비어 있거나 읽기 권한이 없습니다. Firestore 규칙에서 grades의 list 권한을 확인해 주세요.");
+    return out;
+  }
+
+  const docIds = [], sids = new Set(), fields = new Set();
+  let noSid = 0;
+  snap.forEach((d) => {
+    const v = d.data() || {};
+    if (docIds.length < 3) docIds.push(d.id);
+    Object.keys(v).forEach((k) => fields.add(k));
+    const s = norm(v.studentId);
+    if (s) sids.add(s); else noSid++;
+  });
+
+  out.push(`문서ID 예시: ${docIds.join(" / ")}`);
+  out.push(`필드 이름: ${Array.from(fields).sort().join(", ")}`);
+  out.push(`studentId 값 예시(${sids.size}종): ${Array.from(sids).slice(0, 6).join(", ") || "없음"}`);
+  if (noSid) out.push(`studentId 필드가 없는 문서 ${noSid}건`);
+
+  const linked = Object.keys(portalBySid);
+  out.push(`포털에 저장된 학생 ID(${linked.length}명): ${linked.slice(0, 6).join(", ") || "없음"}`);
+  const sample = students.slice(0, 6).map((s) => `${s.name}=${s.sid}`).join(", ");
+  out.push(`students의 id 필드 예시: ${sample || "없음"}`);
+
+  const hit = Array.from(sids).filter((x) => linked.some((y) => nkey(y) === nkey(x))).length;
+  out.push(hit ? `→ 두 값이 ${hit}종 일치합니다.` : "→ 두 값이 한 개도 일치하지 않습니다. ID 체계가 서로 다릅니다.");
+  return out;
+}
+
 function errText(e) {
   if (e && e.code === "permission-denied")
     return "grades 컬렉션을 읽을 권한이 없습니다. Firestore 규칙에서 grades의 list 권한을 확인해 주세요.";
@@ -475,11 +517,12 @@ $("checkBtn").addEventListener("click", async () => {
   const btn = $("checkBtn"); btn.disabled = true;
   showMsg("성적을 확인하는 중입니다…");
   try {
+    const diag = await diagnose();
     const { bySid, stat } = await collectGrades(targets, (t) => showMsg(t));
     const withData = targets.filter((sid) => (bySid[sid] || []).length).length;
     const lines = [`점검 결과입니다. 저장은 하지 않았습니다.`,
-                   `학생 ${targets.length}명 중 ${withData}명에게 표시할 성적이 있습니다.`]
-                  .concat(statLines(stat, targets));
+                   `학생 ${targets.length}명 중 ${withData}명에게 표시할 성적이 있습니다.`, ""]
+                  .concat(statLines(stat, targets)).concat([""]).concat(diag);
     showMsg(lines);
   } catch (e) {
     console.error(e);
