@@ -3,206 +3,126 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>내 성적 기록 · 인후쌤 과학수업</title>
-<meta name="theme-color" content="#F5F6F2" />
+<title>내 성적 · 인후쌤 과학수업</title>
+<meta name="theme-color" content="#16263F" />
 <meta name="robots" content="noindex, nofollow" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" as="style" crossorigin
   href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
-<link rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: { extend: {
+      colors: { navy:{950:'#101D33',900:'#16263F',800:'#1E3352'},
+                brand:{50:'#F2F5F9',100:'#E3EAF3',200:'#C6D4E6',300:'#A7BBD6',500:'#4E6E9B',600:'#3B5B8C',700:'#2F4A75'} },
+      fontFamily: { sans:['Pretendard Variable','Pretendard','-apple-system','system-ui','sans-serif'] },
+      boxShadow: { card:'0 1px 2px 0 rgba(22,38,63,0.05)' },
+      maxWidth: { shell:'44rem' }
+    }}
+  };
+</script>
 <style>
-:root{
-  --paper:#F5F6F2;
-  --card:#FFFFFF;
-  --ink:#15181B;
-  --ink-2:#5C645E;
-  --ink-3:#949B94;
-  --line:#E3E6DF;
-  --line-2:#EEF0EA;
-  --accent:#1B6B58;
-  --accent-2:#2E8C73;
-  --accent-soft:#E7EFEA;
-  --down:#9AA29B;
-  --sans:'Pretendard Variable',Pretendard,-apple-system,system-ui,sans-serif;
-  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{
-  background:var(--paper);color:var(--ink);font-family:var(--sans);
-  letter-spacing:-.02em;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;
-}
-.wrap{max-width:560px;margin:0 auto;padding:0 20px calc(env(safe-area-inset-bottom) + 56px)}
-.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
-
-/* ── 눈금 라벨 ─────────────────────────── */
-.tick{
-  font-family:var(--mono);font-size:10.5px;font-weight:500;
-  letter-spacing:.14em;color:var(--ink-3);text-transform:uppercase;
-}
-
-/* ── 머리말 ────────────────────────────── */
-.top{padding:30px 0 22px;border-bottom:1px solid var(--line)}
-.top .brand{display:flex;align-items:center;gap:8px}
-.top .brand::before{content:"";width:14px;height:1px;background:var(--accent);flex:none}
-.name{margin:14px 0 0;font-size:27px;font-weight:800;letter-spacing:-.045em;line-height:1.15}
-.meta{margin:7px 0 0;font-size:13.5px;color:var(--ink-2)}
-.meta span+span::before{content:"·";margin:0 7px;color:var(--ink-3)}
-
-/* ── 최근 점수 ─────────────────────────── */
-.hero{padding:30px 0 26px;border-bottom:1px solid var(--line)}
-.hero-row{display:flex;align-items:flex-end;gap:14px}
-.big{
-  font-family:var(--mono);font-size:64px;font-weight:600;line-height:.86;
-  letter-spacing:-.05em;font-variant-numeric:tabular-nums;
-}
-.unit{font-family:var(--mono);font-size:16px;color:var(--ink-3);padding-bottom:5px}
-.delta{
-  margin-left:auto;display:inline-flex;align-items:center;gap:5px;
-  font-family:var(--mono);font-size:13px;font-weight:600;padding:5px 9px;border-radius:3px;
-}
-.delta.up{color:var(--accent);background:var(--accent-soft)}
-.delta.down{color:var(--down);background:#F0F1EE}
-.delta.flat{color:var(--ink-3);background:#F0F1EE}
-.hero-sub{margin:16px 0 0;font-size:14px;color:var(--ink-2);line-height:1.5}
-.hero-sub b{font-weight:600;color:var(--ink)}
-
-/* ── 요약 3칸 ──────────────────────────── */
-.stats{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--line)}
-.stat{padding:20px 0}
-.stat+.stat{border-left:1px solid var(--line-2);padding-left:16px}
-.stat .v{font-family:var(--mono);font-size:21px;font-weight:600;letter-spacing:-.03em;margin-top:7px;display:block}
-
-/* ── 추이 그래프 ───────────────────────── */
-.chart-sec{padding:28px 0 22px;border-bottom:1px solid var(--line)}
-.chart-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px}
-.chart-note{font-size:12.5px;color:var(--ink-3)}
-svg.chart{width:100%;height:auto;display:block;overflow:visible}
-.grid-line{stroke:var(--line);stroke-width:1;stroke-dasharray:2 3}
-.grid-label{font-family:var(--mono);font-size:8px;fill:var(--ink-3)}
-.x-label{font-family:var(--mono);font-size:8px;fill:var(--ink-3);text-anchor:middle}
-.trend{fill:none;stroke:var(--accent);stroke-width:1.75;stroke-linejoin:round;stroke-linecap:round}
-.dot{fill:var(--card);stroke:var(--accent);stroke-width:1.5}
-.dot-last{fill:var(--accent)}
-.halo{fill:var(--accent);opacity:.14}
-.area{fill:var(--accent);opacity:.05}
-
-/* ── 회차 목록 ─────────────────────────── */
-.list-sec{padding:28px 0 0}
-.list-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
-.row{padding:18px 0;border-bottom:1px solid var(--line-2)}
-.row:last-child{border-bottom:0}
-.row-top{display:flex;align-items:baseline;gap:12px}
-.idx{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent);flex:none;width:20px;letter-spacing:.02em}
-.title{font-size:15px;font-weight:600;letter-spacing:-.03em;flex:1;min-width:0;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pt{font-family:var(--mono);font-size:17px;font-weight:600;letter-spacing:-.03em;flex:none}
-.row-sub{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:9px 0 0 32px}
-.chip{
-  font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--ink-2);
-  border:1px solid var(--line);border-radius:3px;padding:3px 6px;background:var(--card);
-}
-.chip.date{border-color:transparent;background:transparent;color:var(--ink-3);padding-left:0}
-.bar{height:3px;background:var(--line-2);border-radius:2px;margin:11px 0 0 32px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--accent);border-radius:2px;width:0;
-  transition:width .7s cubic-bezier(.2,.7,.3,1)}
-
-/* ── 상태 화면 ─────────────────────────── */
-.state{padding:70px 0;text-align:center}
-.state h2{margin:16px 0 0;font-size:17px;font-weight:700;letter-spacing:-.035em}
-.state p{margin:9px 0 0;font-size:14px;color:var(--ink-2);line-height:1.6}
-.state .mark{width:30px;height:30px;margin:0 auto;border:1px solid var(--line);
-  border-radius:50%;display:grid;place-items:center;font-family:var(--mono);
-  font-size:12px;color:var(--ink-3)}
-
-/* ── 꼬리말 ────────────────────────────── */
-.foot{margin-top:34px;padding-top:20px;border-top:1px solid var(--line)}
-.foot p{margin:0;font-size:12px;color:var(--ink-3);line-height:1.65}
-
-.hidden{display:none !important}
-
-@media (max-width:380px){
-  .big{font-size:54px}
-  .stat .v{font-size:19px}
-}
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{transition-duration:.01ms !important;animation-duration:.01ms !important}
-}
+  body{letter-spacing:-0.02em;-webkit-text-size-adjust:100%}
+  .num{font-variant-numeric:tabular-nums;letter-spacing:-0.03em}
+  .tight{letter-spacing:-0.035em}
+  :focus-visible{outline:2px solid #3B5B8C;outline-offset:3px;border-radius:6px}
+  .on-navy :focus-visible{outline-color:#fff}
+  .safe-b{padding-bottom:calc(env(safe-area-inset-bottom) + 4rem)}
+  @media (prefers-reduced-motion: reduce){*,*::before,*::after{transition-duration:.01ms !important;animation-duration:.01ms !important}}
 </style>
 </head>
-<body>
-<div class="wrap">
+<body class="bg-slate-50 font-sans text-navy-900 antialiased">
 
-  <!-- 불러오는 중 -->
-  <div id="loading" class="state">
-    <div class="mark mono">···</div>
-    <h2>기록을 불러오는 중입니다</h2>
+<!-- 로딩 -->
+<div id="loading" class="flex min-h-screen items-center justify-center">
+  <p class="text-[14px] text-slate-400">불러오는 중입니다…</p>
+</div>
+
+<!-- 오류 -->
+<div id="errorView" class="hidden min-h-screen items-center justify-center px-6">
+  <div class="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-card">
+    <h1 class="tight text-[18px] font-bold">주소를 확인해 주세요</h1>
+    <p id="errorMsg" class="mt-3 text-[14px] leading-relaxed text-slate-500">링크가 올바르지 않습니다.</p>
+    <p class="mt-5 text-[13px] text-slate-400">선생님께 링크를 다시 요청해 주세요.</p>
   </div>
+</div>
 
-  <!-- 오류 -->
-  <div id="errorView" class="state hidden">
-    <div class="mark mono">!</div>
-    <h2 id="errTitle">기록을 열 수 없습니다</h2>
-    <p id="errBody">주소가 정확한지 확인해 주세요. 계속 같은 화면이 나오면 선생님께 링크를 다시 받아 주세요.</p>
-  </div>
+<!-- 본문 -->
+<div id="app" class="hidden">
 
-  <!-- 본문 -->
-  <main id="app" class="hidden">
-
-    <header class="top">
-      <div class="brand tick">인후쌤 과학수업</div>
-      <h1 class="name" id="sName">—</h1>
-      <p class="meta" id="sMeta"></p>
-    </header>
-
-    <section class="hero" id="hero">
-      <div class="tick">최근 점수</div>
-      <div class="hero-row" style="margin-top:14px">
-        <span class="big" id="lastScore">0</span>
-        <span class="unit">점</span>
-        <span class="delta flat mono" id="delta">—</span>
+  <header class="on-navy bg-navy-900">
+    <div class="mx-auto max-w-shell px-5 py-6 sm:px-6 sm:py-8">
+      <div class="flex items-center gap-2.5">
+        <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9.5 3v6.2L4.8 17.4A2.4 2.4 0 0 0 6.9 21h10.2a2.4 2.4 0 0 0 2.1-3.6L14.5 9.2V3"/><path d="M8.2 3h7.6"/><path d="M7.4 14.4h9.2"/>
+          </svg>
+        </span>
+        <span class="text-[13.5px] font-semibold text-white/70">인후쌤 과학수업</span>
       </div>
-      <p class="hero-sub" id="heroSub"></p>
+
+      <p class="mt-6 text-[14px] text-white/50" id="hSub">—</p>
+      <h1 class="tight mt-1 text-[24px] font-bold text-white sm:text-[27px]"><span id="hName">—</span> 학생의 성적표</h1>
+
+      <div class="mt-7 grid grid-cols-3 gap-4">
+        <div>
+          <p class="text-[12.5px] text-white/45">최근 점수</p>
+          <p class="num mt-1 text-[20px] font-bold text-white sm:text-[22px]" id="sLatest">—</p>
+        </div>
+        <div>
+          <p class="text-[12.5px] text-white/45">지난 회차 대비</p>
+          <p class="num mt-1 text-[20px] font-bold sm:text-[22px]" id="sDelta">—</p>
+        </div>
+        <div>
+          <p class="text-[12.5px] text-white/45">나의 최고 기록</p>
+          <p class="num mt-1 text-[20px] font-bold text-white sm:text-[22px]" id="sBest">—</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="safe-b mx-auto max-w-shell px-5 pt-8 sm:px-6">
+
+    <!-- 응원 문구 -->
+    <div id="msgBox" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+      <p id="msgText" class="text-[15px] leading-relaxed text-navy-900">—</p>
+    </div>
+
+    <!-- 점수 추이 -->
+    <section class="mt-8" id="chartSection">
+      <h2 class="tight text-[16px] font-bold">점수 추이</h2>
+      <div class="mt-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
+        <div id="chartWrap" class="w-full"></div>
+        <p class="mt-3 text-[12.5px] text-slate-400">최근 회차 순서대로 표시됩니다.</p>
+      </div>
     </section>
 
-    <section class="stats" id="stats">
-      <div class="stat">
-        <span class="tick">기록</span>
-        <span class="v" id="stCount">0</span>
+    <!-- 유형별 -->
+    <section class="mt-8" id="typeSection">
+      <h2 class="tight text-[16px] font-bold">유형별 최근 성적</h2>
+      <div class="mt-3 grid grid-cols-2 gap-3">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+          <p class="text-[13px] font-medium text-slate-500">OX 문제</p>
+          <p class="num mt-2 text-[22px] font-bold" id="tOx">—</p>
+          <p class="mt-1 text-[12.5px] text-slate-400" id="tOxNote">—</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+          <p class="text-[13px] font-medium text-slate-500">객관식 문제</p>
+          <p class="num mt-2 text-[22px] font-bold" id="tMulti">—</p>
+          <p class="mt-1 text-[12.5px] text-slate-400" id="tMultiNote">—</p>
+        </div>
       </div>
-      <div class="stat">
-        <span class="tick">평균</span>
-        <span class="v" id="stAvg">0</span>
-      </div>
-      <div class="stat">
-        <span class="tick">최고</span>
-        <span class="v" id="stMax">0</span>
+      <p id="typeAdvice" class="mt-3 text-[13.5px] leading-relaxed text-slate-500"></p>
+    </section>
+
+    <!-- 회차 목록 -->
+    <section class="mt-8">
+      <h2 class="tight text-[16px] font-bold">시험 기록</h2>
+      <div class="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
+        <ul id="examList" class="divide-y divide-slate-100"></ul>
       </div>
     </section>
 
-    <section class="chart-sec" id="chartSec">
-      <div class="chart-head">
-        <span class="tick">점수 추이</span>
-        <span class="chart-note" id="chartNote"></span>
-      </div>
-      <svg class="chart" id="chart" viewBox="0 0 320 168" preserveAspectRatio="xMidYMid meet"
-           role="img" aria-label="회차별 점수 추이 그래프"></svg>
-    </section>
-
-    <section class="list-sec">
-      <div class="list-head">
-        <span class="tick">회차별 기록</span>
-        <span class="chart-note">최근이 아래</span>
-      </div>
-      <div id="rows"></div>
-    </section>
-
-    <footer class="foot">
-      <p>이 페이지는 본인만 볼 수 있는 링크입니다. 다른 사람에게 공유하지 마세요.<br />
-         점수가 실제와 다르면 선생님께 알려 주세요.</p>
-    </footer>
+    <p class="mt-8 text-center text-[12.5px] text-slate-400" id="updatedAt">—</p>
   </main>
 </div>
 
@@ -219,202 +139,224 @@ const firebaseConfig = {
   appId: "1:650652155367:web:41d2958e675cb4edd4d142"
 };
 
+/* 강조색 — 여기 한 줄만 바꾸면 그래프 색이 모두 따라 바뀝니다 */
+const ACCENT = "#3B5B8C";
+
 const $ = (id) => document.getElementById(id);
+const showError = (m) => {
+  $("loading").classList.add("hidden");
+  $("errorView").classList.remove("hidden");
+  $("errorView").classList.add("flex");
+  if (m) $("errorMsg").textContent = m;
+};
 const esc = (s) => String(s == null ? "" : s)
   .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-const num = (x) => (x === null || x === undefined || x === "" || isNaN(Number(x)) ? null : Number(x));
-const pad2 = (n) => String(n).padStart(2, "0");
+const r1 = (n) => Math.round(Number(n) * 10) / 10;
 
-function fmtDate(row){
-  if (row.date) {
-    const m = String(row.date).match(/(\d{4})[.\-/]?\s?(\d{1,2})[.\-/]?\s?(\d{1,2})/);
-    if (m) return `${m[2]}.${pad2(m[3])}`;
-    return String(row.date);
+function fmtDate(r) {
+  if (r && typeof r.ts === "number" && isFinite(r.ts)) {
+    const d = new Date(r.ts);
+    return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
   }
-  if (row.ts) { const d = new Date(row.ts); return `${d.getMonth()+1}.${pad2(d.getDate())}`; }
-  return "";
-}
-function fmtScore(v){ return Number.isInteger(v) ? String(v) : String(Math.round(v*10)/10); }
-
-function showError(title, body){
-  $("loading").classList.add("hidden");
-  $("app").classList.add("hidden");
-  if (title) $("errTitle").textContent = title;
-  if (body) $("errBody").textContent = body;
-  $("errorView").classList.remove("hidden");
+  return r && r.date ? String(r.date) : "";
 }
 
-/* ── 그래프 ───────────────────────────── */
-function drawChart(rows){
-  const svg = $("chart");
-  const W = 320, H = 168, L = 24, R = 8, T = 12, B = 22;
-  const iw = W - L - R, ih = H - T - B;
-
-  const scores = rows.map(r => r.score);
-  const top = Math.max(100, Math.ceil(Math.max(...scores) / 10) * 10);
-  const x = (i) => rows.length === 1 ? L + iw/2 : L + (iw * i) / (rows.length - 1);
-  const y = (v) => T + ih * (1 - v / top);
-
-  let out = "";
-  [0, top/2, top].forEach(g => {
-    out += `<line class="grid-line" x1="${L}" y1="${y(g).toFixed(1)}" x2="${W-R}" y2="${y(g).toFixed(1)}" vector-effect="non-scaling-stroke"/>`;
-    out += `<text class="grid-label" x="${L-6}" y="${(y(g)+2.8).toFixed(1)}" text-anchor="end">${g}</text>`;
-  });
-
-  const pts = rows.map((r,i) => [x(i), y(r.score)]);
-  if (pts.length > 1){
-    const d = pts.map((p,i) => `${i?"L":"M"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
-    out += `<path class="area" d="${d} L${pts[pts.length-1][0].toFixed(1)},${y(0).toFixed(1)} L${pts[0][0].toFixed(1)},${y(0).toFixed(1)} Z"/>`;
-    out += `<path class="trend" id="trendPath" d="${d}" vector-effect="non-scaling-stroke"/>`;
-  }
-
-  const step = Math.ceil(rows.length / 8);
-  pts.forEach((p,i) => {
-    const last = i === pts.length - 1;
-    if (last) out += `<circle class="halo" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="7"/>`;
-    out += `<circle class="dot ${last?"dot-last":""}" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${last?3.4:2.4}" vector-effect="non-scaling-stroke"/>`;
-    if (i % step === 0 || last)
-      out += `<text class="x-label" x="${p[0].toFixed(1)}" y="${H - B + 13}">${pad2(i+1)}</text>`;
-  });
-
-  svg.innerHTML = out;
-
-  const path = document.getElementById("trendPath");
-  if (path && !window.matchMedia("(prefers-reduced-motion: reduce)").matches){
-    const len = path.getTotalLength();
-    path.style.strokeDasharray = len;
-    path.style.strokeDashoffset = len;
-    path.getBoundingClientRect();
-    path.style.transition = "stroke-dashoffset 900ms cubic-bezier(.2,.7,.3,1)";
-    path.style.strokeDashoffset = "0";
-  }
-}
-
-/* ── 화면 그리기 ──────────────────────── */
-function render(p){
-  $("sName").textContent = p.name || "학생";
-  const meta = [p.grade, p.subject].filter(Boolean).map(esc).map(t => `<span>${t}</span>`).join("");
-  $("sMeta").innerHTML = meta;
-
-  const rows = (Array.isArray(p.results) ? p.results : [])
-    .map(r => ({ ...r, score: num(r.score) }))
-    .filter(r => r.score !== null)
-    .sort((a,b) => (a.ts || 0) - (b.ts || 0));
-
-  $("loading").classList.add("hidden");
-  $("app").classList.remove("hidden");
-
-  if (!rows.length){
-    $("hero").classList.add("hidden");
-    $("stats").classList.add("hidden");
-    $("chartSec").classList.add("hidden");
-    $("rows").innerHTML = `<div class="state" style="padding:48px 0">
-      <div class="mark mono">0</div>
-      <h2>아직 기록된 시험이 없습니다</h2>
-      <p>시험을 풀고 나면 이 자리에 회차별 점수가 쌓입니다.</p></div>`;
+/* 꺾은선 차트 (외부 라이브러리 없이 SVG로 직접 그립니다) */
+function drawChart(rows) {
+  const wrap = $("chartWrap");
+  if (!rows.length) { wrap.innerHTML = '<p class="py-6 text-center text-[13.5px] text-slate-400">아직 기록이 없습니다.</p>'; return; }
+  if (rows.length === 1) {
+    wrap.innerHTML = `<p class="py-6 text-center text-[13.5px] text-slate-400">회차가 2번 이상 쌓이면 추이가 그려집니다.</p>`;
     return;
   }
 
-  const last = rows[rows.length - 1];
-  const prev = rows.length > 1 ? rows[rows.length - 2] : null;
+  const W = 640, H = 220, PL = 38, PR = 14, PT = 18, PB = 34;
+  const iw = W - PL - PR, ih = H - PT - PB;
+  const n = rows.length;
+  const x = (i) => PL + (n === 1 ? iw / 2 : (iw * i) / (n - 1));
+  const y = (v) => PT + ih - (ih * Math.max(0, Math.min(100, v))) / 100;
 
-  $("lastScore").textContent = fmtScore(last.score);
+  let grid = "";
+  [0, 25, 50, 75, 100].forEach((v) => {
+    grid += `<line x1="${PL}" y1="${y(v)}" x2="${W - PR}" y2="${y(v)}" stroke="#E5E9EF" stroke-width="1"/>`;
+    grid += `<text x="${PL - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="#9AA5B4">${v}</text>`;
+  });
 
-  const dEl = $("delta");
-  if (prev){
-    const diff = Math.round((last.score - prev.score) * 10) / 10;
-    dEl.className = "delta mono " + (diff > 0 ? "up" : diff < 0 ? "down" : "flat");
-    dEl.textContent = diff > 0 ? `▲ ${fmtScore(diff)}` : diff < 0 ? `▼ ${fmtScore(Math.abs(diff))}` : "= 0";
-  } else {
-    dEl.className = "delta flat mono";
-    dEl.textContent = "첫 기록";
+  const pts = rows.map((r, i) => `${x(i)},${y(r.score)}`).join(" ");
+  const area = `${PL},${y(0)} ${pts} ${x(n - 1)},${y(0)}`;
+
+  let dots = "", labels = "";
+  rows.forEach((r, i) => {
+    const last = i === n - 1;
+    dots += `<circle cx="${x(i)}" cy="${y(r.score)}" r="${last ? 5.5 : 4}" fill="${last ? ACCENT : "#fff"}" stroke="${ACCENT}" stroke-width="2"/>`;
+    if (last) dots += `<text x="${x(i)}" y="${y(r.score) - 12}" text-anchor="middle" font-size="12" font-weight="700" fill="${ACCENT}">${r1(r.score)}</text>`;
+    if (n <= 6 || i === 0 || last || i % 2 === 0) {
+      labels += `<text x="${x(i)}" y="${H - 10}" text-anchor="middle" font-size="10.5" fill="#9AA5B4">${esc(r.shortDate)}</text>`;
+    }
+  });
+
+  wrap.innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" class="h-auto w-full" role="img" aria-label="회차별 점수 추이">
+      ${grid}
+      <polygon points="${area}" fill="${ACCENT}" fill-opacity="0.07"/>
+      <polyline points="${pts}" fill="none" stroke="${ACCENT}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      ${dots}${labels}
+    </svg>`;
+}
+
+function render(p) {
+  $("hName").textContent = p.name || "학생";
+  const sub = [p.grade, p.subject].filter(Boolean).join(" · ");
+  $("hSub").textContent = sub || "안녕하세요";
+
+  const rows = (Array.isArray(p.results) ? p.results.slice() : [])
+    .filter((r) => r && isFinite(Number(r.score)))
+    .map((r) => ({
+      examId: r.examId || "",
+      testName: r.testName || "시험",
+      score: Number(r.score),
+      oxScore: isFinite(Number(r.oxScore)) && r.oxScore !== null ? Number(r.oxScore) : null,
+      multiScore: isFinite(Number(r.multiScore)) && r.multiScore !== null ? Number(r.multiScore) : null,
+      correctCount: isFinite(Number(r.correctCount)) && r.correctCount !== null ? Number(r.correctCount) : null,
+      totalQuestions: isFinite(Number(r.totalQuestions)) && r.totalQuestions !== null ? Number(r.totalQuestions) : null,
+      ts: isFinite(Number(r.ts)) && r.ts !== null ? Number(r.ts) : null,
+      date: r.date || ""
+    }))
+    .sort((a, b) => (a.ts || 0) - (b.ts || 0));
+
+  rows.forEach((r) => {
+    const d = r.ts ? new Date(r.ts) : null;
+    r.shortDate = d ? `${d.getMonth() + 1}/${d.getDate()}` : "";
+    r.fullDate = fmtDate(r);
+  });
+
+  if (!rows.length) {
+    $("sLatest").textContent = "—";
+    $("sDelta").textContent = "—";
+    $("sBest").textContent = "—";
+    $("msgText").textContent = "아직 등록된 시험 기록이 없어요. 첫 시험을 보고 나면 여기에 점수가 쌓입니다.";
+    $("chartSection").classList.add("hidden");
+    $("typeSection").classList.add("hidden");
+    $("examList").innerHTML = '<li class="px-6 py-8 text-center text-[13.5px] text-slate-400">기록이 없습니다.</li>';
+    finish(p);
+    return;
   }
 
-  const parts = [`<b>${esc(last.testName || "시험")}</b>`];
-  const dt = fmtDate(last); if (dt) parts.push(dt);
-  if (last.correctCount !== null && last.correctCount !== undefined &&
-      last.totalQuestions) parts.push(`${last.correctCount} / ${last.totalQuestions}문항`);
-  $("heroSub").innerHTML = parts.join(" · ") + (prev ? ` · 지난 회차 ${fmtScore(prev.score)}점` : "");
+  const latest = rows[rows.length - 1];
+  const prev = rows.length >= 2 ? rows[rows.length - 2] : null;
+  const best = rows.reduce((a, b) => (b.score > a.score ? b : a), rows[0]);
 
-  const sum = rows.reduce((a,r) => a + r.score, 0);
-  $("stCount").textContent = rows.length;
-  $("stAvg").textContent = fmtScore(Math.round((sum / rows.length) * 10) / 10);
-  $("stMax").textContent = fmtScore(Math.max(...rows.map(r => r.score)));
+  $("sLatest").textContent = r1(latest.score) + "점";
+  $("sBest").textContent = r1(best.score) + "점";
 
-  const shown = rows.slice(-12);
-  $("chartNote").textContent = rows.length > 12 ? `최근 12회` : `전체 ${rows.length}회`;
-  drawChart(shown);
+  const dEl = $("sDelta");
+  if (!prev) {
+    dEl.textContent = "첫 회차";
+    dEl.className = "num mt-1 text-[20px] font-bold text-white/70 sm:text-[22px]";
+  } else {
+    const diff = r1(latest.score - prev.score);
+    if (diff > 0) { dEl.textContent = "+" + diff + "점"; dEl.className = "num mt-1 text-[20px] font-bold text-brand-200 sm:text-[22px]"; }
+    else if (diff < 0) { dEl.textContent = diff + "점"; dEl.className = "num mt-1 text-[20px] font-bold text-white/60 sm:text-[22px]"; }
+    else { dEl.textContent = "동점"; dEl.className = "num mt-1 text-[20px] font-bold text-white/70 sm:text-[22px]"; }
+  }
 
-  const offset = rows.length - shown.length;
-  $("rows").innerHTML = rows.map((r,i) => {
-    const chips = [];
-    const d = fmtDate(r); if (d) chips.push(`<span class="chip date">${esc(d)}</span>`);
-    if (num(r.oxScore) !== null) chips.push(`<span class="chip">OX ${fmtScore(num(r.oxScore))}</span>`);
-    if (num(r.multiScore) !== null) chips.push(`<span class="chip">객관식 ${fmtScore(num(r.multiScore))}</span>`);
-    if (num(r.correctCount) !== null && num(r.totalQuestions))
-      chips.push(`<span class="chip">${num(r.correctCount)}/${num(r.totalQuestions)}문항</span>`);
-    const pct = Math.max(0, Math.min(100, r.score));
-    return `<div class="row">
-      <div class="row-top">
-        <span class="idx">${pad2(i+1)}</span>
-        <span class="title">${esc(r.testName || "시험")}</span>
-        <span class="pt">${fmtScore(r.score)}</span>
+  // 응원 문구 — 하락을 지적하지 않고 다음 행동으로 연결합니다.
+  let msg;
+  if (!prev) msg = "첫 기록이 등록되었어요. 앞으로 회차가 쌓이면 변화가 한눈에 보입니다.";
+  else if (latest.score > prev.score) msg = `지난 회차보다 ${r1(latest.score - prev.score)}점 올랐어요. 지금 방식이 잘 맞고 있다는 뜻입니다.`;
+  else if (latest.score === prev.score) msg = "지난 회차와 같은 점수를 유지했어요. 틀린 문제 유형만 확인해 보면 다음에 올릴 수 있습니다.";
+  else msg = "이번 회차는 지난번보다 조금 내려갔어요. 아래 유형별 점수를 보고 약한 쪽부터 다시 보면 됩니다.";
+  if (latest.score >= best.score && rows.length >= 2) msg = "지금까지 중 가장 높은 점수예요. 잘하고 있습니다.";
+  $("msgText").textContent = msg;
+
+  drawChart(rows.slice(-10));
+
+  // 유형별
+  const ox = latest.oxScore, mu = latest.multiScore;
+  $("tOx").textContent = ox == null ? "—" : r1(ox) + "점";
+  $("tMulti").textContent = mu == null ? "—" : r1(mu) + "점";
+  $("tOxNote").textContent = ox == null ? "이번 회차에 없음" : "100점 만점 환산";
+  $("tMultiNote").textContent = mu == null ? "이번 회차에 없음" : "100점 만점 환산";
+
+  let advice = "";
+  if (ox != null && mu != null) {
+    const gap = r1(Math.abs(ox - mu));
+    if (gap >= 15) advice = ox > mu
+      ? "객관식이 OX보다 낮아요. 개념은 잡혀 있으니 보기를 비교하는 연습을 늘리면 좋습니다."
+      : "OX가 객관식보다 낮아요. 헷갈리는 개념의 정의를 다시 정리해 보면 좋습니다.";
+    else advice = "두 유형의 점수 차이가 크지 않아요. 고르게 준비되어 있습니다.";
+  }
+  $("typeAdvice").textContent = advice;
+
+  // 시험 기록 목록 (최신순)
+  const list = rows.slice().reverse().map((r) => {
+    const detail = (r.correctCount != null && r.totalQuestions != null)
+      ? `${r.correctCount} / ${r.totalQuestions}문항` : "";
+    return `<li class="flex items-center gap-4 px-5 py-4 sm:px-6">
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-[14.5px] font-medium">${esc(r.testName)}</p>
+        <p class="num mt-1 text-[12.5px] text-slate-400">${esc(r.fullDate)}${detail ? " · " + esc(detail) : ""}</p>
       </div>
-      ${chips.length ? `<div class="row-sub">${chips.join("")}</div>` : ""}
-      <div class="bar"><i data-w="${pct}"></i></div>
-    </div>`;
+      <p class="num shrink-0 text-[16px] font-bold">${r1(r.score)}점</p>
+    </li>`;
   }).join("");
+  $("examList").innerHTML = list;
 
-  requestAnimationFrame(() => {
-    document.querySelectorAll(".bar i").forEach((el, k) => {
-      setTimeout(() => { el.style.width = el.getAttribute("data-w") + "%"; }, 40 + k * 30);
-    });
-  });
-
-  void offset;
+  finish(p);
 }
 
-/* ── 데이터 ───────────────────────────── */
-const params = new URLSearchParams(location.search);
-const token = (params.get("t") || "").trim();
-
-if (params.get("demo") === "1"){
-  const base = Date.now() - 1000 * 60 * 60 * 24 * 70;
-  render({
-    name: "신재영", grade: "고등1학년", subject: "통합과학",
-    results: [
-      { testName:"물질의 규칙성 1회", score:62, ts:base,                    oxScore:30, multiScore:32, correctCount:12, totalQuestions:20 },
-      { testName:"화학 결합 진단",     score:71, ts:base+864e5*9,           oxScore:36, multiScore:35, correctCount:14, totalQuestions:20 },
-      { testName:"산화·환원 1회",      score:68, ts:base+864e5*17,          correctCount:17, totalQuestions:25 },
-      { testName:"산과 염기",          score:79, ts:base+864e5*24,          oxScore:40, multiScore:39 },
-      { testName:"중화 반응 단원평가", score:85, ts:base+864e5*33,          correctCount:17, totalQuestions:20 },
-      { testName:"역학적 시스템",      score:74, ts:base+864e5*41 },
-      { testName:"지구 시스템 1회",    score:88, ts:base+864e5*52,          oxScore:44, multiScore:44 },
-      { testName:"중간 대비 모의",     score:93, ts:base+864e5*63,          correctCount:28, totalQuestions:30 }
-    ]
-  });
-} else if (!token){
-  showError("링크가 올바르지 않습니다", "선생님께 받은 주소를 그대로 열어 주세요. 주소 뒷부분이 잘렸을 수 있습니다.");
-} else {
-  const db = getFirestore(initializeApp(firebaseConfig));
-  getDoc(doc(db, "portals", token))
-    .then((snap) => {
-      if (!snap.exists()) {
-        showError("기록을 찾을 수 없습니다", "링크가 새로 발급되었을 수 있습니다. 선생님께 최신 링크를 받아 주세요.");
-        return;
-      }
-      const p = snap.data() || {};
-      if (p.active === false) {
-        showError("사용이 중지된 링크입니다", "선생님께 새 링크를 요청해 주세요.");
-        return;
-      }
-      render(p);
-    })
-    .catch((e) => {
-      console.error(e);
-      showError("기록을 열지 못했습니다", "잠시 후 다시 시도해 주세요. 계속 같은 화면이면 선생님께 알려 주세요.");
-    });
+function finish(p) {
+  let t = "";
+  if (p.updatedAt && typeof p.updatedAt.toDate === "function") {
+    const d = p.updatedAt.toDate();
+    t = `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}. 기준`;
+  }
+  $("updatedAt").textContent = t || "";
+  $("loading").classList.add("hidden");
+  $("app").classList.remove("hidden");
 }
+
+(async function () {
+  try {
+    const params = new URLSearchParams(location.search);
+
+    // 색 확인용 미리보기 (실제 데이터는 건드리지 않습니다)
+    if (params.get("demo") === "1") {
+      const base = Date.now() - 864e5 * 70;
+      render({
+        name: "신재영", grade: "고등1학년", subject: "통합과학",
+        results: [
+          { testName:"물질의 규칙성 1회",  score:62, ts:base,          oxScore:70, multiScore:54, correctCount:12, totalQuestions:20 },
+          { testName:"화학 결합 진단",     score:71, ts:base+864e5*9,  oxScore:76, multiScore:66, correctCount:14, totalQuestions:20 },
+          { testName:"산화·환원 1회",      score:68, ts:base+864e5*17, correctCount:17, totalQuestions:25 },
+          { testName:"산과 염기",          score:79, ts:base+864e5*24, oxScore:84, multiScore:74 },
+          { testName:"중화 반응 단원평가", score:85, ts:base+864e5*33, correctCount:17, totalQuestions:20 },
+          { testName:"역학적 시스템",      score:74, ts:base+864e5*41 },
+          { testName:"지구 시스템 1회",    score:88, ts:base+864e5*52, oxScore:90, multiScore:86 },
+          { testName:"중간 대비 모의",     score:93, ts:base+864e5*63, oxScore:96, multiScore:90, correctCount:28, totalQuestions:30 }
+        ]
+      });
+      return;
+    }
+
+    const token = params.get("t");
+    if (!token || !/^[A-Za-z0-9_-]{12,64}$/.test(token)) { showError("링크에 필요한 정보가 없습니다."); return; }
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const snap = await getDoc(doc(db, "portals", token));
+    if (!snap.exists()) { showError("만료되었거나 존재하지 않는 링크입니다."); return; }
+
+    const p = snap.data();
+    if (p.active === false) { showError("현재 사용할 수 없는 링크입니다."); return; }
+
+    render(p);
+  } catch (e) {
+    console.error(e);
+    showError("정보를 불러오지 못했습니다. 잠시 후 다시 열어 주세요.");
+  }
+})();
 </script>
 </body>
 </html>
