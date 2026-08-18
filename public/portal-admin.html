@@ -104,20 +104,24 @@ tbody td{font-size:13px;padding:10px 12px;text-align:center;color:#475467;white-
 .act{display:flex;gap:6px;justify-content:center}
 
 /* ── Find tabs ── */
-.find-tabs{display:flex;gap:2px;border-bottom:1px solid #E3E7EE;margin-bottom:0;overflow-x:auto;scrollbar-width:none}
+.find-tabs{display:flex;justify-content:center;gap:2px;border-bottom:1px solid #E3E7EE;margin-bottom:0;overflow-x:auto;scrollbar-width:none}
 .find-tabs::-webkit-scrollbar{display:none}
 .find-tab{height:38px;padding:0 14px;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;font-size:13px;font-weight:600;color:#98A2B3;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:color .15s,border-color .15s}
 .find-tab:hover{color:#101828}
 .find-tab.on{color:#004AAD;border-bottom-color:#004AAD}
-.find-panel{padding:.9rem 0 .2rem}
+.find-panel{padding:.9rem 0 .2rem;text-align:center}
 .find-panel .input{width:220px}
-.chip-row{display:flex;flex-wrap:wrap;gap:6px}
+.chip-row{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.find-center{display:flex;justify-content:center}
 .chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:8px;border:1px solid #E3E7EE;background:#fff;font-family:inherit;font-size:12.5px;font-weight:600;color:#475467;cursor:pointer;transition:border-color .15s,color .15s,background .15s}
 .chip:hover{border-color:#C9D2E0;color:#101828}
 .chip .cnt{font-size:11px;font-weight:700;color:#667085;background:#F4F6F9;border-radius:20px;padding:1px 7px;font-variant-numeric:tabular-nums}
 .chip.on{background:#004AAD;border-color:#004AAD;color:#fff}
 .chip.on .cnt{background:rgba(255,255,255,.22);color:#fff}
-.find-empty{font-size:12px;color:#98A2B3;padding:2px 0}
+.chip.zero{color:#B6BDC9;border-color:#EDF0F5}
+.chip.zero .cnt{color:#B6BDC9}
+.chip.zero.on{color:#fff;border-color:#004AAD}
+.find-empty{font-size:12px;color:#98A2B3;padding:2px 0;text-align:center}
 
 /* ── Login ── */
 .login-wrap{max-width:380px;margin:0 auto;padding:3.5rem 1.2rem}
@@ -407,13 +411,32 @@ async function loadAll() {
 }
 
 /* ---------- 찾기: 학년 · 반 · 이름 ----------
-   위 탭에서 방식을 고르면 아래에 대상이 나오고, 고른 조건만 목록에 적용됩니다.
+   세 조건은 서로 연계되어 함께 걸립니다. 하나를 고르면 다른 탭의 인원수도
+   즉시 다시 계산되고 표도 바로 바뀝니다.
    students 문서의 grade / classNames 값은 읽기만 하며 바꾸지 않습니다. */
-let findMode = "grade";   // grade | class | name
-let pickGrade = "전체";
+let findMode = "grade";      // grade | class | name
+let pickGrade = "전체";      // 학년 코드 (M1~H3 / 기타 / 학년없음)
 let pickClass = "전체";
 let keyword = "";
 const NO_CLASS = "반 미배정";
+const NO_GRADE = "학년없음";
+
+/* 중등1학년 · 중1 처럼 표기가 달라도 같은 학년으로 묶습니다 */
+function gradeKey(g) {
+  const t = norm(g);
+  if (!t) return NO_GRADE;
+  const n = (t.match(/\d+/) || [""])[0];
+  if (t.indexOf("고") >= 0 && n) return "H" + n;
+  if (t.indexOf("중") >= 0 && n) return "M" + n;
+  return "X:" + t;
+}
+const BASE_GRADES = [["M1","중1"],["M2","중2"],["M3","중3"],["H1","고1"],["H2","고2"],["H3","고3"]];
+function gradeOrder(k) {
+  if (k === NO_GRADE) return 999;
+  if (k.charAt(0) === "M") return 10 + (+k.slice(1) || 0);
+  if (k.charAt(0) === "H") return 20 + (+k.slice(1) || 0);
+  return 900;
+}
 
 /* 학생의 반 이름 목록 (문자열 배열 · 객체 배열 모두 대응) */
 function classesOf(s) {
@@ -425,39 +448,54 @@ function classesOf(s) {
   }).filter(Boolean);
 }
 
-/* 중1 → 고3 순서로 정렬합니다 */
-function gradeRank(g) {
-  const t = String(g || "");
-  const n = (t.match(/\d+/) || [0])[0] * 1;
-  if (t.indexOf("고") >= 0) return 100 + n;
-  if (t.indexOf("중") >= 0) return n;
-  return 900;
+/* 조건별 판정 — 필요한 조건만 빼고 계산할 수 있게 나눠 둡니다 */
+function okGrade(s) { return pickGrade === "전체" || gradeKey(s.grade) === pickGrade; }
+function okClass(s) {
+  if (pickClass === "전체") return true;
+  const cs = classesOf(s);
+  if (pickClass === NO_CLASS) return cs.length === 0;
+  return cs.indexOf(pickClass) >= 0;
 }
+function okName(s) { return !keyword || s.name.includes(keyword); }
+function matchFind(s) { return okGrade(s) && okClass(s) && okName(s); }
 
-function gradeList() {
-  const m = new Map();
+/* 화면에 늘 보여 줄 전체 학년 목록 (중1~고3은 인원이 0명이어도 표시) */
+function gradeItems() {
+  const label = new Map(BASE_GRADES);
+  const seen = new Set(label.keys());
+  let hasNone = false;
   students.forEach((s) => {
-    const g = norm(s.grade) || "학년 미입력";
-    m.set(g, (m.get(g) || 0) + 1);
+    const k = gradeKey(s.grade);
+    if (k === NO_GRADE) { hasNone = true; return; }
+    if (!label.has(k)) label.set(k, norm(s.grade));
+    seen.add(k);
   });
-  return Array.from(m.entries()).sort((a, b) => gradeRank(a[0]) - gradeRank(b[0]));
+  const keys = Array.from(seen).sort((a, b) => gradeOrder(a) - gradeOrder(b));
+  if (hasNone) { keys.push(NO_GRADE); label.set(NO_GRADE, "학년 미입력"); }
+  // 인원수는 반 · 이름 조건을 반영해 셉니다 (연계)
+  const base = students.filter((s) => okClass(s) && okName(s));
+  return keys.map((k) => [k, label.get(k), base.filter((s) => gradeKey(s.grade) === k).length]);
 }
 
-function classList() {
-  const m = new Map();
-  let none = 0;
+/* 화면에 늘 보여 줄 전체 반 목록 (선택한 학년에 0명이어도 표시) */
+function classItems() {
+  const names = new Set();
+  let hasNone = false;
   students.forEach((s) => {
     const cs = classesOf(s);
-    if (!cs.length) { none++; return; }
-    cs.forEach((c) => m.set(c, (m.get(c) || 0) + 1));
+    if (!cs.length) { hasNone = true; return; }
+    cs.forEach((c) => names.add(c));
   });
-  const out = Array.from(m.entries()).sort((a, b) => a[0].localeCompare(b[0], "ko"));
-  if (none) out.push([NO_CLASS, none]);
+  const keys = Array.from(names).sort((a, b) => a.localeCompare(b, "ko"));
+  // 인원수는 학년 · 이름 조건을 반영해 셉니다 (연계)
+  const base = students.filter((s) => okGrade(s) && okName(s));
+  const out = keys.map((c) => [c, c, base.filter((s) => classesOf(s).indexOf(c) >= 0).length]);
+  if (hasNone) out.push([NO_CLASS, NO_CLASS, base.filter((s) => classesOf(s).length === 0).length]);
   return out;
 }
 
 function chipHtml(kind, key, label, count, on) {
-  return `<button type="button" class="chip${on ? " on" : ""}" data-pick="${kind}" data-key="${esc(key)}">`
+  return `<button type="button" class="chip${on ? " on" : ""}${count ? "" : " zero"}" data-pick="${kind}" data-key="${esc(key)}">`
        + `${esc(label)}<span class="cnt">${count}</span></button>`;
 }
 
@@ -466,41 +504,38 @@ function renderFindPanel() {
   const panel = $("findPanel");
 
   if (findMode === "name") {
-    panel.innerHTML = `<input id="search" class="input" type="search" placeholder="학생 이름 입력" value="${esc(keyword)}">`;
+    panel.innerHTML = `<div class="find-center"><input id="search" class="input" type="search" placeholder="학생 이름 입력" value="${esc(keyword)}"></div>`;
     const el = $("search");
-    el.addEventListener("input", () => { keyword = el.value.trim(); renderRows(); });
+    el.addEventListener("input", () => { keyword = el.value.trim(); renderFindPanel(); renderRows(); });
     el.focus();
+    const v = el.value; el.value = ""; el.value = v;   // 커서를 끝으로
     return;
   }
 
-  if (findMode === "grade") {
-    const gs = gradeList();
-    if (!gs.length) { panel.innerHTML = '<p class="find-empty">등록된 학년 정보가 없습니다.</p>'; return; }
-    let h = chipHtml("grade", "전체", "전체", students.length, pickGrade === "전체");
-    gs.forEach(([g, c]) => { h += chipHtml("grade", g, g, c, pickGrade === g); });
-    panel.innerHTML = `<div class="chip-row">${h}</div>`;
+  const items = findMode === "grade" ? gradeItems() : classItems();
+  const kind = findMode === "grade" ? "grade" : "class";
+  const now = findMode === "grade" ? pickGrade : pickClass;
+  const total = students.filter((s) => (findMode === "grade" ? okClass(s) : okGrade(s)) && okName(s)).length;
+
+  if (!items.length) {
+    panel.innerHTML = `<p class="find-empty">등록된 ${findMode === "grade" ? "학년" : "반"} 정보가 없습니다.</p>`;
     return;
   }
-
-  const cs = classList();
-  if (!cs.length) { panel.innerHTML = '<p class="find-empty">등록된 반 정보가 없습니다.</p>'; return; }
-  let h = chipHtml("class", "전체", "전체", students.length, pickClass === "전체");
-  cs.forEach(([c, n]) => { h += chipHtml("class", c, c, n, pickClass === c); });
+  let h = chipHtml(kind, "전체", "전체", total, now === "전체");
+  items.forEach(([k, label, c]) => { h += chipHtml(kind, k, label, c, now === k); });
   panel.innerHTML = `<div class="chip-row">${h}</div>`;
 }
 
-/* 탭 전환 — 다른 방식의 선택은 초기화해 결과가 헷갈리지 않게 합니다 */
+/* 탭 전환 — 고른 조건은 유지한 채 보여 줄 목록만 바꿉니다 */
 $("findTabs").addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-mode]");
   if (!btn) return;
   findMode = btn.getAttribute("data-mode");
-  pickGrade = "전체"; pickClass = "전체"; keyword = "";
   Array.from($("findTabs").children).forEach((b) => b.classList.toggle("on", b === btn));
   renderFindPanel();
-  renderRows();
 });
 
-/* 선택 영역 클릭 */
+/* 선택 즉시 반영 */
 $("findPanel").addEventListener("click", (e) => {
   const btn = e.target.closest("button[data-pick]");
   if (!btn) return;
@@ -510,21 +545,6 @@ $("findPanel").addEventListener("click", (e) => {
   renderFindPanel();
   renderRows();
 });
-
-/* 지금 고른 조건에 맞는 학생인지 판단합니다 */
-function matchFind(s) {
-  if (findMode === "grade") {
-    if (pickGrade === "전체") return true;
-    return (norm(s.grade) || "학년 미입력") === pickGrade;
-  }
-  if (findMode === "class") {
-    if (pickClass === "전체") return true;
-    const cs = classesOf(s);
-    if (pickClass === NO_CLASS) return cs.length === 0;
-    return cs.indexOf(pickClass) >= 0;
-  }
-  return !keyword || s.name.includes(keyword);
-}
 
 function renderRows() {
   const list = students.filter(matchFind);
