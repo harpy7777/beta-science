@@ -19,42 +19,47 @@
   }}};
 </script>
 <style>
-  body{letter-spacing:-0.02em}
+  body{letter-spacing:-0.02em;-webkit-text-size-adjust:100%}
   .num{font-variant-numeric:tabular-nums;letter-spacing:-0.03em}
   .tight{letter-spacing:-0.035em}
   :focus-visible{outline:2px solid #2563EB;outline-offset:3px;border-radius:6px}
+  /* 모바일: iOS 자동 확대 방지 + 터치 영역 확보 */
+  input,button,select,textarea{font-size:16px}
+  @media (min-width:640px){input,button,select,textarea{font-size:inherit}}
+  button{min-height:40px;touch-action:manipulation}
+  .safe-b{padding-bottom:calc(env(safe-area-inset-bottom) + 1.25rem)}
   @media (prefers-reduced-motion: reduce){*,*::before,*::after{transition-duration:.01ms !important}}
 </style>
 </head>
 <body class="bg-slate-50 font-sans text-navy-900 antialiased">
 
-<header class="bg-navy-900">
-  <div class="mx-auto flex max-w-shell items-center justify-between px-5 py-5 sm:px-6">
-    <div>
+<header class="sticky top-0 z-40 bg-navy-900">
+  <div class="mx-auto flex max-w-shell items-center justify-between gap-3 px-5 py-4 sm:px-6 sm:py-5">
+    <div class="min-w-0">
       <p class="text-[12.5px] text-white/50">인후쌤 과학수업</p>
-      <h1 class="tight mt-0.5 text-[17px] font-bold text-white">학생 성적 링크 관리</h1>
+      <h1 class="tight mt-0.5 truncate text-[16px] font-bold text-white sm:text-[17px]">학생 성적 링크 관리</h1>
     </div>
-    <button id="logoutBtn" class="hidden rounded-lg px-3 py-2 text-[13px] font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white">로그아웃</button>
+    <button id="logoutBtn" class="hidden shrink-0 rounded-lg px-3 py-2 text-[13px] font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white">로그아웃</button>
   </div>
 </header>
 
 <!-- 로그인 -->
-<div id="loginView" class="hidden px-5 py-16">
-  <div class="mx-auto w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-7 shadow-card">
+<div id="loginView" class="hidden px-5 py-12 sm:py-16">
+  <div class="mx-auto w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-card sm:p-7">
     <h2 class="tight text-[17px] font-bold">관리자 로그인</h2>
     <label class="mt-5 block text-[13px] font-medium text-slate-600" for="email">이메일</label>
-    <input id="email" type="email" autocomplete="username" class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-[14.5px] outline-none focus:border-brand-600" />
+    <input id="email" type="email" autocomplete="username" inputmode="email" class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-3 outline-none focus:border-brand-600 sm:py-2.5 sm:text-[14.5px]" />
     <label class="mt-4 block text-[13px] font-medium text-slate-600" for="pw">비밀번호</label>
-    <input id="pw" type="password" autocomplete="current-password" class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-[14.5px] outline-none focus:border-brand-600" />
-    <button id="loginBtn" class="mt-6 w-full rounded-xl bg-brand-600 py-3 text-[14.5px] font-semibold text-white transition-colors hover:bg-brand-700">로그인</button>
+    <input id="pw" type="password" autocomplete="current-password" class="mt-1.5 w-full rounded-xl border border-slate-200 px-3.5 py-3 outline-none focus:border-brand-600 sm:py-2.5 sm:text-[14.5px]" />
+    <button id="loginBtn" class="mt-6 w-full rounded-xl bg-brand-600 py-3 font-semibold text-white transition-colors hover:bg-brand-700 sm:text-[14.5px]">로그인</button>
     <p id="loginErr" class="mt-3 hidden text-[13px] text-red-600"></p>
   </div>
 </div>
 
 <!-- 본문 -->
-<main id="app" class="mx-auto hidden max-w-shell px-5 pb-20 pt-8 sm:px-6">
+<main id="app" class="safe-b mx-auto hidden max-w-shell px-5 pt-6 sm:px-6 sm:pt-8">
 
-  <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+  <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h2 class="tight text-[16px] font-bold">성적 반영하기</h2>
@@ -63,17 +68,22 @@
           기존 성적 데이터는 읽기만 하며, 변경하지 않습니다.
         </p>
       </div>
-      <button id="syncBtn" class="shrink-0 rounded-xl bg-brand-600 px-5 py-3 text-[14.5px] font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50">
-        전체 성적 반영
-      </button>
+      <div class="flex shrink-0 gap-2">
+        <button id="checkBtn" class="flex-1 rounded-xl border border-slate-200 px-4 py-3 text-[14px] font-semibold transition-colors hover:bg-slate-50 disabled:opacity-50 sm:flex-none">
+          데이터 점검
+        </button>
+        <button id="syncBtn" class="flex-1 rounded-xl bg-brand-600 px-5 py-3 text-[14px] font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50 sm:flex-none sm:text-[14.5px]">
+          전체 성적 반영
+        </button>
+      </div>
     </div>
-    <p id="syncMsg" class="mt-4 hidden rounded-xl bg-slate-50 px-4 py-3 text-[13.5px] text-slate-600"></p>
+    <p id="syncMsg" class="mt-4 hidden rounded-xl bg-slate-50 px-4 py-3 text-[13.5px] leading-relaxed text-slate-600"></p>
   </section>
 
-  <section class="mt-8">
+  <section class="mt-6 sm:mt-8">
     <div class="flex flex-wrap items-end justify-between gap-3">
       <h2 class="tight text-[16px] font-bold">학생 목록 <span id="cnt" class="num ml-1 text-[14px] font-medium text-slate-400"></span></h2>
-      <input id="search" type="search" placeholder="이름으로 찾기" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-[14px] outline-none focus:border-brand-600 sm:w-56" />
+      <input id="search" type="search" placeholder="이름으로 찾기" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 outline-none focus:border-brand-600 sm:w-56 sm:text-[14px]" />
     </div>
 
     <div class="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
@@ -99,7 +109,6 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut }
 import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, serverTimestamp, query, where }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-/* ★★★ 여기에 기존 파일의 firebaseConfig를 그대로 붙여넣으세요 ★★★ */
 const firebaseConfig = {
   apiKey: "AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",
   authDomain: "beta-science.firebaseapp.com",
@@ -117,6 +126,21 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s)
   .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 
+/* 값 정리용 도우미 */
+const norm = (v) => String(v == null ? "" : v).trim();
+const nkey = (v) => norm(v).toLowerCase();
+const num  = (x) => (x === null || x === undefined || x === "" || isNaN(Number(x)) ? null : Number(x));
+
+function toMillis(x) {
+  if (x == null || x === "") return null;
+  if (typeof x === "object" && typeof x.toMillis === "function") return x.toMillis();
+  if (x instanceof Date) return x.getTime();
+  if (typeof x === "number") return x < 1e11 ? x * 1000 : x;
+  if (typeof x === "object" && typeof x.seconds === "number") return x.seconds * 1000;
+  if (typeof x === "string") { const t = Date.parse(x); return isNaN(t) ? null : t; }
+  return null;
+}
+
 let toastTimer = null;
 function toast(msg) {
   const t = $("toast");
@@ -124,6 +148,12 @@ function toast(msg) {
   t.style.opacity = "1";
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { t.style.opacity = "0"; }, 2200);
+}
+
+function showMsg(lines) {
+  const box = $("syncMsg");
+  box.classList.remove("hidden");
+  box.innerHTML = (Array.isArray(lines) ? lines : [lines]).map(esc).join("<br>");
 }
 
 function newToken() {
@@ -175,7 +205,7 @@ async function loadAll() {
     students = [];
     sSnap.forEach((d) => {
       const v = d.data() || {};
-      const sid = v.id != null ? String(v.id) : "";
+      const sid = norm(v.id);
       if (!sid) return;                       // id 필드가 없는 문서는 건너뜁니다
       students.push({
         docId: d.id, sid,
@@ -191,7 +221,8 @@ async function loadAll() {
     portalBySid = {};
     pSnap.forEach((d) => {
       const v = d.data() || {};
-      if (v.studentId) portalBySid[String(v.studentId)] = { token: d.id, data: v };
+      const sid = norm(v.studentId);
+      if (sid) portalBySid[sid] = { token: d.id, data: v };
     });
 
     renderRows();
@@ -213,10 +244,11 @@ function renderRows() {
 
   $("rows").innerHTML = list.map((s) => {
     const p = portalBySid[s.sid];
-    const cntTxt = p && Array.isArray(p.data.results) ? `${p.data.results.length}회차 반영됨` : "반영 대기";
+    const n = p && Array.isArray(p.data.results) ? p.data.results.length : 0;
+    const cntTxt = p ? (n ? `${n}회차 반영됨` : "반영 대기") : "";
     const status = p
-      ? `<span class="inline-flex items-center gap-1.5 text-[13px] font-medium text-brand-700">
-           <span class="h-1.5 w-1.5 rounded-full bg-brand-600"></span>발급됨 · ${esc(cntTxt)}</span>`
+      ? `<span class="inline-flex items-center gap-1.5 text-[13px] font-medium ${n ? "text-brand-700" : "text-slate-400"}">
+           <span class="h-1.5 w-1.5 rounded-full ${n ? "bg-brand-600" : "bg-slate-300"}"></span>발급됨 · ${esc(cntTxt)}</span>`
       : `<span class="text-[13px] text-slate-400">아직 링크 없음</span>`;
 
     const actions = p
@@ -225,8 +257,11 @@ function renderRows() {
       : `<button data-act="create" data-sid="${esc(s.sid)}" class="rounded-lg bg-navy-900 px-3 py-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-navy-800">링크 만들기</button>`;
 
     return `<li class="flex flex-col gap-2.5 px-5 py-4 sm:flex-row sm:items-center sm:gap-0">
-      <span class="w-36 text-[14.5px] font-medium">${esc(s.name)}</span>
-      <span class="w-24 text-[13.5px] text-slate-500">${esc(s.grade)}</span>
+      <span class="flex items-baseline gap-2 sm:w-36 sm:block">
+        <span class="text-[15px] font-medium sm:text-[14.5px]">${esc(s.name)}</span>
+        <span class="text-[13px] text-slate-500 sm:hidden">${esc(s.grade)}</span>
+      </span>
+      <span class="hidden w-24 text-[13.5px] text-slate-500 sm:block">${esc(s.grade)}</span>
       <span class="flex-1">${status}</span>
       <span class="flex shrink-0 gap-2 sm:w-52 sm:justify-end">${actions}</span>
     </li>`;
@@ -258,20 +293,22 @@ $("rows").addEventListener("click", async (e) => {
     btn.disabled = true;
     try {
       const old = portalBySid[sid];
+      const keepResults = old && Array.isArray(old.data.results) ? old.data.results : [];
       const token = newToken();
       await setDoc(doc(db, "portals", token), {
         studentId: s.sid,
         studentDocId: s.docId,
         name: s.name, grade: s.grade, subject: s.subject, teacher: s.teacher,
         classNames: s.classNames,
-        results: old && Array.isArray(old.data.results) ? old.data.results : [],
+        results: keepResults,
+        resultCount: keepResults.length,
         active: true,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
-      if (old) await deleteDoc(doc(db, "portals", old.token));
+      if (old && old.token !== token) await deleteDoc(doc(db, "portals", old.token));
 
-      portalBySid[sid] = { token, data: { studentId: s.sid, results: (old && old.data.results) || [] } };
+      portalBySid[sid] = { token, data: { studentId: s.sid, studentDocId: s.docId, name: s.name, results: keepResults } };
       renderRows();
       try { await navigator.clipboard.writeText(linkBase + token); toast("링크를 만들고 복사했습니다"); }
       catch { toast("링크를 만들었습니다"); }
@@ -284,64 +321,212 @@ $("rows").addEventListener("click", async (e) => {
   }
 });
 
+/* ---------- 성적 매칭 로직 ---------- */
+
+/* 학생 ID와 학생 문서ID를 모두 키로 등록합니다 (공백·대소문자 무시) */
+function buildKeyMap(targets) {
+  const map = new Map();
+  const put = (k, sid) => { const kk = nkey(k); if (kk && !map.has(kk)) map.set(kk, sid); };
+  for (const sid of targets) {
+    put(sid, sid);
+    const p = portalBySid[sid];
+    if (p && p.data) put(p.data.studentDocId, sid);
+    const s = students.find((x) => x.sid === sid);
+    if (s) put(s.docId, sid);
+  }
+  return map;
+}
+
+/* 최후 수단: 동명이인이 없는 학생만 이름으로 연결합니다 */
+function buildNameMap(targets) {
+  const count = new Map();
+  for (const s of students) { const k = nkey(s.name); if (k) count.set(k, (count.get(k) || 0) + 1); }
+  const map = new Map();
+  for (const sid of targets) {
+    const s = students.find((x) => x.sid === sid);
+    if (!s) continue;
+    const k = nkey(s.name);
+    if (k && count.get(k) === 1) map.set(k, sid);
+  }
+  return map;
+}
+
+function extractRow(docId, v) {
+  let score = num(v.score);
+  if (score === null) {
+    const c = num(v.correctCount), t = num(v.totalQuestions);
+    if (c !== null && t !== null && t > 0) score = (c / t) * 100;
+  }
+  if (score === null) return null;
+
+  let ts = toMillis(v.timestamp);
+  if (ts === null) ts = toMillis(v.firstSubmittedAt);
+  if (ts === null) ts = toMillis(v.submittedAt);
+  if (ts === null) ts = toMillis(v.updatedAt);
+  if (ts === null) ts = toMillis(v.createdAt);
+  if (ts === null) ts = toMillis(v.date);
+
+  return {
+    examId: norm(v.examId) || String(docId).split("__")[0] || "",
+    testName: norm(v.testName) || norm(v.examName) || "시험",
+    date: norm(v.date),
+    ts: ts,
+    score: Math.round(score * 10) / 10,
+    oxScore: num(v.oxScore),
+    multiScore: num(v.multiScore),
+    correctCount: num(v.correctCount),
+    totalQuestions: num(v.totalQuestions)
+  };
+}
+
+/* grades를 읽어 학생별로 묶습니다. write는 하지 않습니다. */
+async function collectGrades(targets, onProgress) {
+  const keyMap = buildKeyMap(targets);
+  const nameMap = buildNameMap(targets);
+
+  const stat = { scanned: 0, matched: 0, byName: 0, noScore: 0, fullScan: false, unmatched: new Map() };
+  let bySid = {};
+
+  const consume = (docId, v) => {
+    stat.scanned++;
+    let sid = null;
+
+    const tail = String(docId).split("__").slice(1).join("__");
+    const cands = [v.studentId, v.sid, v.student_id, v.studentDocId, tail];
+    for (const c of cands) {
+      const k = nkey(c);
+      if (k && keyMap.has(k)) { sid = keyMap.get(k); break; }
+    }
+
+    if (!sid) {
+      const nk = nkey(v.studentName || v.name);
+      if (nk && nameMap.has(nk)) { sid = nameMap.get(nk); stat.byName++; }
+    }
+
+    if (!sid) {
+      const shown = norm(v.studentId) || String(docId);
+      stat.unmatched.set(shown, (stat.unmatched.get(shown) || 0) + 1);
+      return;
+    }
+
+    const row = extractRow(docId, v);
+    if (!row) { stat.noScore++; return; }
+    (bySid[sid] = bySid[sid] || []).push(row);
+    stat.matched++;
+  };
+
+  // 1차: 정확히 일치하는 값만 조회합니다 (읽기 비용이 가장 적습니다)
+  for (let i = 0; i < targets.length; i += 30) {
+    const chunk = targets.slice(i, i + 30);
+    const qs = await getDocs(query(collection(db, "grades"), where("studentId", "in", chunk)));
+    qs.forEach((d) => consume(d.id, d.data() || {}));
+    if (onProgress) onProgress(`성적을 읽는 중입니다… (${Math.min(i + 30, targets.length)}/${targets.length}명)`);
+  }
+
+  // 2차: 한 명이라도 비어 있으면 전체를 읽어 유연하게 연결합니다
+  if (Object.keys(bySid).length < targets.length) {
+    stat.fullScan = true;
+    bySid = {};
+    stat.scanned = 0; stat.matched = 0; stat.byName = 0; stat.noScore = 0;
+    stat.unmatched = new Map();
+    if (onProgress) onProgress("값이 정확히 맞지 않아 전체 성적을 확인하는 중입니다…");
+    const all = await getDocs(collection(db, "grades"));
+    all.forEach((d) => consume(d.id, d.data() || {}));
+  }
+
+  // 같은 시험이 여러 번 저장된 경우 마지막 것만 남깁니다
+  for (const sid of Object.keys(bySid)) {
+    const seen = new Map();
+    for (const r of bySid[sid]) {
+      const key = r.examId || (r.testName + "|" + r.date);
+      const prev = seen.get(key);
+      if (!prev || (r.ts || 0) >= (prev.ts || 0)) seen.set(key, r);
+    }
+    bySid[sid] = Array.from(seen.values()).sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  }
+
+  return { bySid, stat };
+}
+
+function statLines(stat, targets) {
+  const lines = [];
+  lines.push(`성적 문서 ${stat.scanned}건 확인 · 연결 ${stat.matched}건`
+    + (stat.byName ? ` (이름으로 연결 ${stat.byName}건)` : "")
+    + (stat.noScore ? ` · 점수 없음 ${stat.noScore}건` : "")
+    + (stat.fullScan ? " · 전체 조회 사용" : ""));
+  if (stat.unmatched.size) {
+    lines.push(`연결하지 못한 값 ${stat.unmatched.size}종 · grades 쪽 예시: ${Array.from(stat.unmatched.keys()).slice(0, 5).join(", ")}`);
+    lines.push(`포털에 저장된 학생 ID 예시: ${targets.slice(0, 5).join(", ")}`);
+  }
+  return lines;
+}
+
+function errText(e) {
+  if (e && e.code === "permission-denied")
+    return "grades 컬렉션을 읽을 권한이 없습니다. Firestore 규칙에서 grades의 list 권한을 확인해 주세요.";
+  return "처리하지 못했습니다: " + ((e && e.message) || "알 수 없는 오류");
+}
+
+/* ---------- 데이터 점검 (저장하지 않습니다) ---------- */
+$("checkBtn").addEventListener("click", async () => {
+  const targets = Object.keys(portalBySid);
+  if (!targets.length) { alert("먼저 학생 링크를 만들어 주세요."); return; }
+
+  const btn = $("checkBtn"); btn.disabled = true;
+  showMsg("성적을 확인하는 중입니다…");
+  try {
+    const { bySid, stat } = await collectGrades(targets, (t) => showMsg(t));
+    const withData = targets.filter((sid) => (bySid[sid] || []).length).length;
+    const lines = [`점검 결과입니다. 저장은 하지 않았습니다.`,
+                   `학생 ${targets.length}명 중 ${withData}명에게 표시할 성적이 있습니다.`]
+                  .concat(statLines(stat, targets));
+    showMsg(lines);
+  } catch (e) {
+    console.error(e);
+    showMsg(errText(e));
+  } finally {
+    btn.disabled = false;
+  }
+});
+
 /* ---------- 성적 반영 ---------- */
 $("syncBtn").addEventListener("click", async () => {
   const targets = Object.keys(portalBySid);
   if (!targets.length) { alert("먼저 학생 링크를 만들어 주세요."); return; }
 
-  const btn = $("syncBtn");
-  btn.disabled = true;
-  const msg = $("syncMsg");
-  msg.classList.remove("hidden");
-  msg.textContent = "성적을 읽는 중입니다…";
+  const btn = $("syncBtn"); btn.disabled = true;
+  $("checkBtn").disabled = true;
+  showMsg("성적을 읽는 중입니다…");
 
   try {
-    const bySid = {};
-    // 링크가 있는 학생만 조회합니다. (Firestore in 조건은 30개까지라 나눠서 요청합니다)
-    for (let i = 0; i < targets.length; i += 30) {
-      const chunk = targets.slice(i, i + 30);
-      const qs = await getDocs(query(collection(db, "grades"), where("studentId", "in", chunk)));
-      qs.forEach((d) => {
-        const v = d.data() || {};
-        const sid = String(v.studentId || "");
-        if (!sid || !isFinite(Number(v.score))) return;
-        let ts = null;
-        if (v.timestamp && typeof v.timestamp.toMillis === "function") ts = v.timestamp.toMillis();
-        else if (v.firstSubmittedAt && typeof v.firstSubmittedAt.toMillis === "function") ts = v.firstSubmittedAt.toMillis();
-        (bySid[sid] = bySid[sid] || []).push({
-          examId: v.examId || d.id.split("__")[0] || "",
-          testName: v.testName || "시험",
-          date: v.date || "",
-          ts,
-          score: Number(v.score),
-          oxScore: isFinite(Number(v.oxScore)) ? Number(v.oxScore) : null,
-          multiScore: isFinite(Number(v.multiScore)) ? Number(v.multiScore) : null,
-          correctCount: isFinite(Number(v.correctCount)) ? Number(v.correctCount) : null,
-          totalQuestions: isFinite(Number(v.totalQuestions)) ? Number(v.totalQuestions) : null
-        });
-      });
-      msg.textContent = `성적을 읽는 중입니다… (${Math.min(i + 30, targets.length)}/${targets.length}명)`;
-    }
+    const { bySid, stat } = await collectGrades(targets, (t) => showMsg(t));
 
     let done = 0, withData = 0;
     for (const sid of targets) {
       const p = portalBySid[sid];
-      const rows = (bySid[sid] || []).sort((a, b) => (a.ts || 0) - (b.ts || 0)).slice(-40);
-      await setDoc(doc(db, "portals", p.token), { results: rows, updatedAt: serverTimestamp() }, { merge: true });
+      const rows = (bySid[sid] || []).slice(-40);
+      await setDoc(doc(db, "portals", p.token), {
+        results: rows,
+        resultCount: rows.length,
+        syncedAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
       p.data.results = rows;
       done++;
       if (rows.length) withData++;
-      msg.textContent = `학생 화면에 반영하는 중입니다… (${done}/${targets.length}명)`;
+      showMsg(`학생 화면에 반영하는 중입니다… (${done}/${targets.length}명)`);
     }
 
-    msg.textContent = `반영을 마쳤습니다. 학생 ${done}명 중 ${withData}명에게 성적이 표시됩니다.`;
+    showMsg([`반영을 마쳤습니다. 학생 ${done}명 중 ${withData}명에게 성적이 표시됩니다.`]
+            .concat(statLines(stat, targets)));
     renderRows();
     toast("반영을 마쳤습니다");
   } catch (e) {
     console.error(e);
-    msg.textContent = "반영에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+    showMsg(errText(e));
   } finally {
     btn.disabled = false;
+    $("checkBtn").disabled = false;
   }
 });
 </script>
