@@ -366,17 +366,52 @@ function extractRow(docId, v) {
   if (ts === null) ts = toMillis(v.createdAt);
   if (ts === null) ts = toMillis(v.date);
 
-  return {
+  const isMaster = nkey(v.testType) === "master" || nkey(v.category) === "master";
+  const subs = Array.isArray(v.subTypes) ? v.subTypes.map(norm).filter(Boolean) : [];
+
+  const row = {
     examId: norm(v.examId) || String(docId).split("__")[0] || "",
-    testName: norm(v.testName) || norm(v.examName) || "시험",
+    testName: norm(v.testName) || norm(v.examTitle) || norm(v.examName) || "시험",
     date: norm(v.date),
     ts: ts,
     score: Math.round(score * 10) / 10,
-    oxScore: num(v.oxScore),
-    multiScore: num(v.multiScore),
+    // 유형 구분
+    master: isMaster,
+    subTypes: subs,
+    lastSubType: norm(v.lastSubType),
+    // 전체
     correctCount: num(v.correctCount),
-    totalQuestions: num(v.totalQuestions)
+    totalQuestions: num(v.totalQuestions),
+    totalCorrect: num(v.totalCorrect),
+    total: num(v.total),
+    correct: num(v.correct),
+    // OX
+    oxScore: num(v.oxScore),
+    oxCount: num(v.oxCount),
+    oxCorrect: num(v.oxCorrect),
+    oxDone: v.oxComplete === true,
+    // 사지선다
+    multiScore: num(v.multiScore),
+    multiCount: num(v.multiCount),
+    multiCorrect: num(v.multiCorrect),
+    multiDone: v.multiComplete === true
   };
+
+  // 중첩 객체(ox / multiple)에만 값이 있는 경우를 보완합니다
+  if (v.ox && typeof v.ox === "object") {
+    if (row.oxScore === null) row.oxScore = num(v.ox.score);
+    if (row.oxCorrect === null) row.oxCorrect = num(v.ox.correct);
+    if (row.oxCount === null) row.oxCount = num(v.ox.total);
+  }
+  if (v.multiple && typeof v.multiple === "object") {
+    if (row.multiScore === null) row.multiScore = num(v.multiple.score);
+    if (row.multiCorrect === null) row.multiCorrect = num(v.multiple.correct);
+    if (row.multiCount === null) row.multiCount = num(v.multiple.total);
+  }
+
+  // undefined 는 Firestore 에 저장할 수 없으므로 제거합니다
+  Object.keys(row).forEach((k) => { if (row[k] === undefined) row[k] = null; });
+  return row;
 }
 
 /* grades를 읽어 학생별로 묶습니다. write는 하지 않습니다. */
