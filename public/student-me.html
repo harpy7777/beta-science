@@ -50,10 +50,12 @@ button{font-family:inherit;touch-action:manipulation}
 .block:last-child{margin-bottom:0}
 
 /* ── Stats ── */
-.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.stat-label{font-size:11.5px;color:#667085;font-weight:600}
-.stat-num{font-size:20px;font-weight:700;color:#101828;letter-spacing:-.03em;margin-top:5px;line-height:1.2}
-.stat-note{font-size:11px;color:#98A2B3;margin-top:4px;line-height:1.5;font-weight:600}
+.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:1.4rem}
+.stat-card{background:#fff;border:1px solid #E3E7EE;border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);
+  padding:1.15rem 1rem;min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.stat-num{font-size:23px;font-weight:700;color:#101828;letter-spacing:-.03em;line-height:1.15}
+.stat-label{font-size:12px;color:#667085;font-weight:600;margin-top:8px}
+.stat-note{font-size:11px;color:#98A2B3;margin-top:4px;line-height:1.5;font-weight:600;min-height:16px}
 
 /* ── Message ── */
 .msg-card{background:#fff;border:1px solid #E3E7EE;border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:1rem 1.3rem;margin-bottom:1.4rem}
@@ -88,7 +90,7 @@ button{font-family:inherit;touch-action:manipulation}
 .chart-note{margin-top:12px;font-size:11.5px;line-height:1.7;color:#98A2B3}
 
 /* ── Type cards ── */
-.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .type-item{border:1px solid #E3E7EE;border-radius:10px;padding:.7rem .75rem;display:flex;flex-direction:column;justify-content:center;min-width:0}
 .type-chip{display:inline-block;border-radius:6px;padding:2px 8px;font-size:11.5px;font-weight:700;white-space:nowrap}
 .type-item .type-chip{align-self:flex-start}
@@ -97,7 +99,7 @@ button{font-family:inherit;touch-action:manipulation}
 .type-advice{margin-top:.85rem;font-size:12px;line-height:1.7;color:#475467}
 .type-advice:empty{display:none}
 @media(min-width:1024px){
-  .type-grid{flex:1;grid-template-columns:1fr;grid-template-rows:repeat(3,1fr);gap:10px}
+  .type-grid{flex:1;grid-template-columns:1fr;grid-template-rows:repeat(3,1fr);gap:14px}
   .type-item{flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:.75rem 1rem}
   .type-body{text-align:right}
   .type-score{margin-top:0;font-size:22px}
@@ -141,10 +143,11 @@ button{font-family:inherit;touch-action:manipulation}
   .section-card{padding:.9rem 1rem}
   .msg-card{padding:.9rem 1rem;margin-bottom:1.1rem}
   .msg-text{font-size:13.5px}
-  .stat-grid{gap:8px}
-  .stat-num{font-size:18px}
-  .stat-label{font-size:11px}
-  .stat-note{font-size:10.5px}
+  .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:1.1rem}
+  .stat-card{padding:.85rem .6rem;min-height:88px}
+  .stat-num{font-size:19px}
+  .stat-label{font-size:11px;margin-top:6px}
+  .stat-note{font-size:10.5px;min-height:0}
   .seg-btn{padding:0 10px;font-size:11.5px}
   .p-label{min-width:8rem;font-size:12.5px}
   .type-item{padding:.6rem .65rem}
@@ -159,7 +162,8 @@ button{font-family:inherit;touch-action:manipulation}
   .block{margin-bottom:1.1rem}
 }
 @media(max-width:380px){
-  .stat-num{font-size:16.5px}
+  .stat-num{font-size:17px}
+  .stat-card{padding:.75rem .5rem;min-height:82px}
   .type-grid{gap:7px}
   .type-item{padding:.55rem .5rem}
   .type-chip{padding:2px 6px;font-size:11px}
@@ -227,23 +231,26 @@ button{font-family:inherit;touch-action:manipulation}
 
     <!-- 요약 -->
     <div class="section-heading">SUMMARY</div>
-    <div class="section-card">
-      <div class="stat-grid">
-        <div>
-          <p class="stat-label">최근 점수</p>
-          <p class="stat-num" id="sLatest">—</p>
-          <p class="stat-note" id="sLatestNote"></p>
-        </div>
-        <div>
-          <p class="stat-label">지난 회차 대비</p>
-          <p class="stat-num" id="sDelta">—</p>
-          <p class="stat-note" id="sDeltaNote"></p>
-        </div>
-        <div>
-          <p class="stat-label">나의 최고 기록</p>
-          <p class="stat-num" id="sBest">—</p>
-          <p class="stat-note" id="sBestNote"></p>
-        </div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <p class="stat-num" id="sTotal">—</p>
+        <p class="stat-label">총 응시</p>
+        <p class="stat-note" id="sTotalNote"></p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-num" id="sLatest">—</p>
+        <p class="stat-label">최근 점수</p>
+        <p class="stat-note" id="sLatestNote"></p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-num" id="sDelta">—</p>
+        <p class="stat-label">지난 회차 대비</p>
+        <p class="stat-note" id="sDeltaNote"></p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-num" id="sBest">—</p>
+        <p class="stat-label">나의 최고 기록</p>
+        <p class="stat-note" id="sBestNote"></p>
       </div>
     </div>
 
@@ -260,9 +267,9 @@ button{font-family:inherit;touch-action:manipulation}
         <div class="section-card">
           <div class="section-header">
             <span class="section-title">시험 점수 분포도</span>
-            <div class="seg" role="group" aria-label="기간 길이">
-              <button id="r3" type="button" class="seg-btn">3개월</button>
-              <button id="r6" type="button" class="seg-btn">6개월</button>
+            <div class="seg" role="group" aria-label="보여 줄 회차 수">
+              <button id="r3" type="button" class="seg-btn">최근 10회</button>
+              <button id="r6" type="button" class="seg-btn">최근 20회</button>
               <button id="rAll" type="button" class="seg-btn">전체</button>
             </div>
           </div>
@@ -477,7 +484,7 @@ function splitParts(r) {
    OX 와 사지선다를 함께 본 회차는 두 줄로 나뉩니다.        */
 function buildEntries(rows) {
   const list = [];
-  rows.forEach((r) => {
+  rows.forEach((r, si) => {
     const parts = r.parts || {};
     let keys = Object.keys(parts).filter((k) => parts[k] && isNum(parts[k].score));
 
@@ -491,6 +498,7 @@ function buildEntries(rows) {
       const p = parts[k];
       list.push({
         type: k,
+        sIdx: si,                 // 몇 회차인지 (0부터)
         examId: r.examId,
         testName: r.testName,
         score: Number(p.score),
@@ -504,133 +512,87 @@ function buildEntries(rows) {
   });
 
   list.sort((a, b) => {
-    const d = (a.ts || 0) - (b.ts || 0);
+    const d = a.sIdx - b.sIdx;
     if (d !== 0) return d;
     return styleOf(a.type).order - styleOf(b.type).order;
   });
   return list;
 }
 
-/* ── 기간 나누기 ─────────────────────────────────────────
-   이번 달이 끝이 되도록 잡습니다. 8월이고 3개월이면
-   6월 1일 ~ 오늘 이 가장 최근 화면이고, 그 앞은 3~5월입니다. */
-function buildPeriodsMonthly(entries, months) {
-  const dated = entries.filter((e) => isNum(e.ts));
-  if (!dated.length) return [];
-
-  let minT = dated[0].ts;
-  dated.forEach((e) => { if (e.ts < minT) minT = e.ts; });
-
-  const now = new Date();
-  const Y = now.getFullYear(), M = now.getMonth();
-  const today = now.getTime();
-
+/* ── 회차 묶음 나누기 ─────────────────────────────────────
+   x축을 날짜가 아니라 회차 번호로 씁니다. 회차 간격이 늘 같아서
+   시험을 몰아 본 구간에서도 점이 붙어 보이지 않습니다.        */
+function buildWindows(total, size) {
+  if (!total) return [];
+  if (!size || total <= size) return [{ from: 0, to: total - 1, label: `1~${total}회차` }];
   const out = [];
-  for (let k = 0; k < 400; k++) {
-    const sMonth = M - (months - 1) - months * k;   // 이 화면의 첫 달
-    const eMonth = M - months * k;                  // 이 화면의 마지막 달
-    const start = new Date(Y, sMonth, 1).getTime();
-    const end = k === 0 ? today : new Date(Y, eMonth + 1, 1).getTime() - 1;
-
-    const items = dated.filter((x) => x.ts >= start && x.ts <= end);
-    if (items.length) {
-      const sd = new Date(start), ed = new Date(end);
-      const label = sd.getFullYear() === ed.getFullYear()
-        ? `${sd.getFullYear()}년 ${sd.getMonth() + 1}~${ed.getMonth() + 1}월`
-        : `${sd.getFullYear()}년 ${sd.getMonth() + 1}월 ~ ${ed.getFullYear()}년 ${ed.getMonth() + 1}월`;
-      out.push({ key: -k, label, start, end, items });
-    }
-    if (start <= minT) break;
+  let end = total - 1;
+  while (end >= 0) {
+    const from = Math.max(0, end - size + 1);
+    out.push({ from, to: end, label: `${from + 1}~${end + 1}회차` });
+    end = from - 1;
   }
   return out.reverse();
 }
 
-function buildPeriodAll(entries) {
-  const dated = entries.filter((e) => isNum(e.ts));
-  if (!dated.length) return [];
-  let maxT = dated[0].ts, minT = dated[0].ts;
-  dated.forEach((e) => { if (e.ts > maxT) maxT = e.ts; if (e.ts < minT) minT = e.ts; });
-  const pad = Math.max((maxT - minT) * 0.04, 864e5 * 3);
-  return [{ key: 0, label: "전체 기간", start: minT - pad, end: maxT + pad, items: dated }];
-}
-
-/* ── 앞뒤 기간에서 이어 그릴 기록을 찾습니다 ─────────────
-   dir 이 -1 이면 그 시각 바로 앞, +1 이면 바로 뒤 기록입니다. */
-function neighborOf(type, ts, dir) {
+/* 화면 밖 앞뒤 회차를 찾아 선을 이어 줍니다 */
+function neighborOf(type, idx, dir) {
   let found = null;
   for (const e of allEntries) {
-    if (e.type !== type || !isNum(e.ts)) continue;
-    if (dir < 0 && e.ts < ts) found = e;               // 계속 갱신 → 가장 가까운 앞 기록
-    if (dir > 0 && e.ts > ts) { found = e; break; }    // 처음 만나는 뒤 기록
+    if (e.type !== type) continue;
+    if (dir < 0 && e.sIdx < idx) found = e;            // 계속 갱신 → 가장 가까운 앞 회차
+    if (dir > 0 && e.sIdx > idx) { found = e; break; } // 처음 만나는 뒤 회차
   }
   return found;
 }
 
 /* ── 꺾은선 차트 ─────────────────────────────────────────
-   x축은 그 기간 전체를 그대로 씁니다. 기간 밖의 앞뒤 기록까지
-   이어 그린 뒤 가장자리에서 잘라내기 때문에, 선이 중간에 뚝
-   끊기지 않고 계속 흘러가는 것처럼 보입니다.                */
-function drawChart(period) {
+   회차를 같은 간격으로 세워 두고, 그 위에 유형별 선을 겹칩니다.
+   앞뒤 회차의 기록까지 이어 그린 뒤 가장자리에서 잘라내기 때문에
+   선이 중간에 뚝 끊기지 않습니다.                            */
+function drawChart(win) {
   const wrap = $("chartWrap");
-  const pts = ((period && period.items) || []).filter((e) => isNum(e.ts));
+  const inWin = win ? allEntries.filter((e) => e.sIdx >= win.from && e.sIdx <= win.to) : [];
 
-  if (!pts.length) {
-    wrap.innerHTML = '<p class="chart-empty">이 기간에는 기록이 없습니다.</p>';
+  if (!inWin.length) {
+    wrap.innerHTML = '<p class="chart-empty">이 구간에는 기록이 없습니다.</p>';
     return [];
   }
 
-  const W = 640, H = 236, PL = 36, PR = 16, PT = 26, PB = 34;
+  const from = win.from, to = win.to, n = to - from + 1;
+  const W = 640, H = 252, PL = 34, PR = 18, PT = 26, PB = 40;
   const gx0 = PL, gx1 = W - PR;
-  const x0 = PL + 10, x1 = W - PR - 10;
+  const x0 = PL + 20, x1 = W - PR - 20;
   const ih = H - PT - PB;
 
-  let dMin = period.start, dMax = period.end;
-  if (!isNum(dMin) || !isNum(dMax) || dMax <= dMin) {
-    dMin = pts[0].ts; dMax = pts[0].ts;
-    pts.forEach((p) => { if (p.ts < dMin) dMin = p.ts; if (p.ts > dMax) dMax = p.ts; });
-  }
-  const dSpan = dMax - dMin;
-
-  const X = (t) => (dSpan > 0 ? x0 + (x1 - x0) * ((t - dMin) / dSpan) : (x0 + x1) / 2);
-  // 기간 밖 기록은 화면 밖 좌표로 보냅니다 (잘라내기로 가려집니다)
-  const Xo = (t) => {
-    if (dSpan <= 0) return t < dMin ? gx0 - 40 : (t > dMax ? gx1 + 40 : (x0 + x1) / 2);
-    return Math.max(gx0 - 1200, Math.min(gx1 + 1200, X(t)));
-  };
+  const X = (i) => (n > 1 ? x0 + (x1 - x0) * ((i - from) / (n - 1)) : (x0 + x1) / 2);
   const Y = (v) => PT + ih - (ih * Math.max(0, Math.min(100, Number(v)))) / 100;
 
+  // 가로 눈금
   let grid = "";
   [0, 25, 50, 75, 100].forEach((v) => {
     grid += `<line x1="${gx0}" y1="${Y(v)}" x2="${gx1}" y2="${Y(v)}" stroke="#EBEEF3" stroke-width="1"/>`;
     grid += `<text x="${gx0 - 8}" y="${Y(v) + 4}" text-anchor="end" font-size="10.5" fill="#98A2B3">${v}</text>`;
   });
 
-  /* 달 구분 — 어느 달 구간인지 바로 읽히도록 세로선과 이름을 넣습니다 */
-  let months = [];
-  {
-    let c = new Date(new Date(dMin).getFullYear(), new Date(dMin).getMonth(), 1);
-    while (c.getTime() < dMax && months.length < 400) {
-      const nxt = new Date(c.getFullYear(), c.getMonth() + 1, 1);
-      const s = Math.max(c.getTime(), dMin), e = Math.min(nxt.getTime(), dMax);
-      if (e > s) months.push({ s, e, d: new Date(c) });
-      c = nxt;
-    }
+  // 회차 눈금 — 라벨은 겹치지 않을 만큼만 띄워 적습니다
+  const step = Math.max(1, Math.ceil(n / 9));
+  const labelAt = [];
+  for (let i = from; i <= to; i += step) labelAt.push(i);
+  const lastLabeled = labelAt[labelAt.length - 1];
+  if (lastLabeled !== to && to - lastLabeled >= Math.ceil(step / 2)) labelAt.push(to);
+
+  let xAxis = "";
+  for (let i = from; i <= to; i++) {
+    if (n > 1) xAxis += `<line x1="${X(i)}" y1="${PT}" x2="${X(i)}" y2="${PT + ih}" stroke="#F5F7FA" stroke-width="1"/>`;
   }
-  const mStep = Math.max(1, Math.ceil(months.length / 8));
-  let mAxis = "";
-  months.forEach((m, i) => {
-    if (i > 0 && m.s > dMin) {
-      mAxis += `<line x1="${X(m.s)}" y1="${PT}" x2="${X(m.s)}" y2="${PT + ih}" stroke="#F1F3F7" stroke-width="1"/>`;
-    }
-    if (i % mStep !== 0 && i !== months.length - 1) return;
-    const mid = (X(m.s) + X(m.e)) / 2;
-    const txt = m.d.getMonth() === 0 ? `${m.d.getFullYear()}. 1월` : `${m.d.getMonth() + 1}월`;
-    mAxis += `<text x="${mid}" y="${H - 10}" text-anchor="middle" font-size="10.5" fill="#98A2B3">${txt}</text>`;
+  labelAt.forEach((i) => {
+    xAxis += `<text x="${X(i)}" y="${H - 12}" text-anchor="middle" font-size="10.5" fill="#98A2B3">${i + 1}회차</text>`;
   });
 
-  // 유형별로 묶습니다 (pts 는 이미 날짜순입니다)
+  // 유형별로 묶습니다 (allEntries 는 이미 회차순입니다)
   const groups = new Map();
-  pts.forEach((p) => { if (!groups.has(p.type)) groups.set(p.type, []); groups.get(p.type).push(p); });
+  inWin.forEach((p) => { if (!groups.has(p.type)) groups.set(p.type, []); groups.get(p.type).push(p); });
   const types = Array.from(groups.keys()).sort((a, b) => styleOf(a).order - styleOf(b).order);
 
   let lines = "", dots = "", marks = "";
@@ -641,21 +603,21 @@ function drawChart(period) {
     const col = styleOf(t).line;
     const shape = styleOf(t).shape;
 
-    // 앞뒤 기간의 이웃 기록을 붙여 선을 잇습니다
+    // 앞뒤 구간의 이웃 회차를 붙여 선을 잇습니다
     const seq = [];
-    const before = neighborOf(t, g[0].ts, -1);
+    const before = neighborOf(t, g[0].sIdx, -1);
     if (before) seq.push(before);
     seq.push.apply(seq, g);
-    const after = neighborOf(t, g[g.length - 1].ts, 1);
+    const after = neighborOf(t, g[g.length - 1].sIdx, 1);
     if (after) seq.push(after);
 
     if (seq.length >= 2) {
-      lines += `<polyline points="${seq.map((p) => `${Xo(p.ts)},${Y(p.score)}`).join(" ")}" fill="none" stroke="${col}" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/>`;
+      lines += `<polyline points="${seq.map((p) => `${X(p.sIdx)},${Y(p.score)}`).join(" ")}" fill="none" stroke="${col}" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/>`;
     }
 
     g.forEach((p, i) => {
       const last = i === g.length - 1;
-      const cx = X(p.ts), cy = Y(p.score);
+      const cx = X(p.sIdx), cy = Y(p.score);
 
       // 회차마다 점을 찍되, 속을 색으로 꽉 채운 작은 점으로 그립니다
       dots += markerSvg(shape, cx, cy, last ? 3.2 : 2.4, col, col, 0);
@@ -664,10 +626,10 @@ function drawChart(period) {
         // 마지막 점수는 겹치지 않는 자리에 적습니다
         const cands = [cy - 11, cy + 17, cy - 26, cy + 32];
         let ly = cands.find((c) => c > PT + 6 && c < H - PB + 4
-          && !placed.some((q) => Math.abs(q.x - cx) < 36 && Math.abs(q.y - c) < 13));
-        if (ly === undefined) ly = cy - 13;
+          && !placed.some((q) => Math.abs(q.x - cx) < 34 && Math.abs(q.y - c) < 13));
+        if (ly === undefined) ly = cy - 11;
         placed.push({ x: cx, y: ly });
-        marks += `<text x="${cx}" y="${ly}" text-anchor="middle" font-size="12" font-weight="700" fill="${col}">${r1(p.score)}</text>`;
+        marks += `<text x="${cx}" y="${ly}" text-anchor="middle" font-size="11.5" font-weight="700" fill="${col}">${r1(p.score)}</text>`;
       }
     });
   });
@@ -679,7 +641,7 @@ function drawChart(period) {
           <rect x="${gx0 - 1}" y="${PT - 18}" width="${gx1 - gx0 + 2}" height="${ih + 26}"/>
         </clipPath>
       </defs>
-      ${mAxis}${grid}
+      ${xAxis}${grid}
       <g clip-path="url(#plotClip)">${lines}</g>
       ${dots}${marks}
     </svg>`;
@@ -701,29 +663,30 @@ function drawLegend(types) {
 
 /* ── 화면 상태 ─────────────────────────────────────────── */
 let allEntries = [];
-let months = 3;          // 3 | 6 | 0(전체)
-let periods = [];
-let pIdx = 0;
+let sessionCount = 0;    // 전체 회차 수
+let pageSize = 10;       // 10 | 20 | 0(전체)
+let windows = [];
+let wIdx = 0;
 let listItems = [];      // 최신순
 let lPage = 0;
 
 function paintSegs() {
-  $("r3").className   = months === 3 ? "seg-btn on" : "seg-btn";
-  $("r6").className   = months === 6 ? "seg-btn on" : "seg-btn";
-  $("rAll").className = months === 0 ? "seg-btn on" : "seg-btn";
-  [["r3", months === 3], ["r6", months === 6], ["rAll", months === 0]]
+  $("r3").className   = pageSize === 10 ? "seg-btn on" : "seg-btn";
+  $("r6").className   = pageSize === 20 ? "seg-btn on" : "seg-btn";
+  $("rAll").className = pageSize === 0  ? "seg-btn on" : "seg-btn";
+  [["r3", pageSize === 10], ["r6", pageSize === 20], ["rAll", pageSize === 0]]
     .forEach(([id, on]) => $(id).setAttribute("aria-pressed", String(on)));
 }
 
 function rebuild() {
-  periods = months === 0 ? buildPeriodAll(allEntries) : buildPeriodsMonthly(allEntries, months);
-  pIdx = Math.max(0, periods.length - 1);
+  windows = buildWindows(sessionCount, pageSize);
+  wIdx = Math.max(0, windows.length - 1);
   paintSegs();
   renderPeriod();
 }
 
 function renderPeriod() {
-  if (!periods.length) {
+  if (!windows.length) {
     $("chartWrap").innerHTML = '<p class="chart-empty">아직 기록이 없습니다.</p>';
     $("pLabel").textContent = "—";
     $("pPrev").disabled = true;
@@ -732,20 +695,18 @@ function renderPeriod() {
     $("chartNote").textContent = "";
     return;
   }
-  const p = periods[pIdx];
-  $("pLabel").textContent = p.label;
-  $("pPrev").disabled = pIdx <= 0;
-  $("pNext").disabled = pIdx >= periods.length - 1;
+  const w = windows[wIdx];
+  $("pLabel").textContent = w.label;
+  $("pPrev").disabled = wIdx <= 0;
+  $("pNext").disabled = wIdx >= windows.length - 1;
 
-  const types = drawChart(p);
+  const types = drawChart(w);
   drawLegend(types);
 
-  const how = months === 0
-    ? "지금까지의 기록을 한 화면에 모았습니다."
-    : `이번 달까지 ${months}개월씩 끊어 보여 드립니다.`;
-  const link = months === 0 ? "" : " 선은 앞뒤 기간까지 이어집니다.";
+  const n = w.to - w.from + 1;
+  const link = windows.length > 1 ? " 선은 앞뒤 구간까지 이어집니다." : "";
   $("chartNote").textContent =
-    `${how} 이 화면에는 ${p.items.length}개의 기록이 있습니다.${link} 선의 색과 점 모양으로 유형을 구분합니다.`;
+    `${n}개 회차를 같은 간격으로 세워 놓고 비교합니다.${link} 선의 색과 점 모양으로 유형을 구분합니다.`;
 }
 
 function renderList() {
@@ -785,12 +746,12 @@ function renderList() {
   }
 }
 
-$("r3").addEventListener("click",   () => { if (months !== 3) { months = 3; rebuild(); } });
-$("r6").addEventListener("click",   () => { if (months !== 6) { months = 6; rebuild(); } });
-$("rAll").addEventListener("click", () => { if (months !== 0) { months = 0; rebuild(); } });
+$("r3").addEventListener("click",   () => { if (pageSize !== 10) { pageSize = 10; rebuild(); } });
+$("r6").addEventListener("click",   () => { if (pageSize !== 20) { pageSize = 20; rebuild(); } });
+$("rAll").addEventListener("click", () => { if (pageSize !== 0)  { pageSize = 0;  rebuild(); } });
 
-$("pPrev").addEventListener("click", () => { if (pIdx > 0) { pIdx--; renderPeriod(); } });
-$("pNext").addEventListener("click", () => { if (pIdx < periods.length - 1) { pIdx++; renderPeriod(); } });
+$("pPrev").addEventListener("click", () => { if (wIdx > 0) { wIdx--; renderPeriod(); } });
+$("pNext").addEventListener("click", () => { if (wIdx < windows.length - 1) { wIdx++; renderPeriod(); } });
 $("lPrev").addEventListener("click", () => {
   if (lPage > 0) { lPage--; renderList(); $("examList").scrollIntoView({ block: "start", behavior: "smooth" }); }
 });
@@ -837,6 +798,10 @@ function render(p) {
 
   const entries = buildEntries(rows);
   allEntries = entries;
+
+  sessionCount = rows.length;
+  $("sTotal").textContent = rows.length + "회";
+  $("sTotalNote").textContent = rows.length ? "지금까지 본 시험" : "";
 
   if (!entries.length) {
     $("sLatest").textContent = "—";
