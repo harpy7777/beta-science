@@ -102,6 +102,16 @@ tbody td{font-size:13px;padding:10px 12px;text-align:center;color:#475467;white-
 .dot-on{background:#004AAD}.dot-wait{background:#EA580C}
 .act{display:flex;gap:6px;justify-content:center}
 
+/* ── Filter chips ── */
+.filter-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.7rem}
+.filter-bar:last-of-type{margin-bottom:1rem}
+.filter-lbl{display:inline-flex;align-items:center;font-size:11px;font-weight:700;color:#98A2B3;letter-spacing:.04em;margin-right:2px;flex-shrink:0}
+.chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:8px;border:1px solid #E3E7EE;background:#fff;font-family:inherit;font-size:12.5px;font-weight:600;color:#475467;cursor:pointer;transition:border-color .15s,color .15s,background .15s}
+.chip:hover{border-color:#C9D2E0;color:#101828}
+.chip .cnt{font-size:11px;font-weight:700;color:#667085;background:#F4F6F9;border-radius:20px;padding:1px 7px;font-variant-numeric:tabular-nums}
+.chip.on{background:#004AAD;border-color:#004AAD;color:#fff}
+.chip.on .cnt{background:rgba(255,255,255,.22);color:#fff}
+
 /* ── Login ── */
 .login-wrap{max-width:380px;margin:0 auto;padding:3.5rem 1.2rem}
 .login-card{background:#fff;border:1px solid #E3E7EE;border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:1.6rem 1.5rem}
@@ -231,6 +241,8 @@ tbody td{font-size:13px;padding:10px 12px;text-align:center;color:#475467;white-
         <input id="search" class="input" type="search" placeholder="이름으로 찾기">
       </div>
     </div>
+    <div class="filter-bar" id="gradeFilter"></div>
+    <div class="filter-bar" id="classFilter"></div>
     <div class="table-wrap">
       <table style="min-width:640px">
         <colgroup><col style="width:20%"><col style="width:12%"><col style="width:24%"><col style="width:44%"></colgroup>
@@ -376,6 +388,7 @@ async function loadAll() {
       if (sid) portalBySid[sid] = { token: d.id, data: v };
     });
 
+    renderFilters();
     renderRows();
   } catch (e) {
     console.error(e);
@@ -383,9 +396,102 @@ async function loadAll() {
   }
 }
 
+/* ---------- 학년 · 반 필터 ----------
+   students 문서의 grade / classNames 값을 읽어 칩을 자동으로 만듭니다.
+   저장된 값은 읽기만 하며 바꾸지 않습니다. */
+let activeGrade = "전체";
+let activeClass = "전체";
+const NO_CLASS = "반 미배정";
+
+/* 학생의 반 이름 목록 (문자열 배열 · 객체 배열 모두 대응) */
+function classesOf(s) {
+  const arr = Array.isArray(s.classNames) ? s.classNames : [];
+  const out = arr.map((x) => {
+    if (typeof x === "string") return x.trim();
+    if (x && typeof x === "object") return String(x.className || x.name || x.title || "").trim();
+    return "";
+  }).filter(Boolean);
+  return out;
+}
+
+/* 중1 → 고3 순서로 정렬합니다 */
+function gradeRank(g) {
+  const t = String(g || "");
+  const n = (t.match(/\d+/) || [0])[0] * 1;
+  if (t.indexOf("고") >= 0) return 100 + n;
+  if (t.indexOf("중") >= 0) return n;
+  return 900;
+}
+
+function matchGrade(s) { return activeGrade === "전체" || norm(s.grade) === activeGrade; }
+function matchClass(s) {
+  if (activeClass === "전체") return true;
+  const cs = classesOf(s);
+  if (activeClass === NO_CLASS) return cs.length === 0;
+  return cs.indexOf(activeClass) >= 0;
+}
+
+function chipHtml(kind, key, label, count, on) {
+  return `<button type="button" class="chip${on ? " on" : ""}" data-filter="${kind}" data-key="${esc(key)}">`
+       + `${esc(label)}<span class="cnt">${count}</span></button>`;
+}
+
+function renderFilters() {
+  /* 학년 칩 — 전체 학생 기준 */
+  const gCount = new Map();
+  students.forEach((s) => {
+    const g = norm(s.grade) || "학년 미입력";
+    gCount.set(g, (gCount.get(g) || 0) + 1);
+  });
+  const grades = Array.from(gCount.keys()).sort((a, b) => gradeRank(a) - gradeRank(b));
+
+  let gh = `<span class="filter-lbl">학년</span>`;
+  gh += chipHtml("grade", "전체", "전체", students.length, activeGrade === "전체");
+  grades.forEach((g) => { gh += chipHtml("grade", g, g, gCount.get(g), activeGrade === g); });
+  $("gradeFilter").innerHTML = gh;
+
+  /* 반 칩 — 선택한 학년에 속한 학생 기준 */
+  const inGrade = students.filter(matchGrade);
+  const cCount = new Map();
+  let noClass = 0;
+  inGrade.forEach((s) => {
+    const cs = classesOf(s);
+    if (!cs.length) { noClass++; return; }
+    cs.forEach((c) => cCount.set(c, (cCount.get(c) || 0) + 1));
+  });
+  const classes = Array.from(cCount.keys()).sort((a, b) => a.localeCompare(b, "ko"));
+
+  // 학년을 바꿔 사라진 반이 선택돼 있으면 전체로 되돌립니다
+  if (activeClass !== "전체" && activeClass !== NO_CLASS && classes.indexOf(activeClass) < 0) activeClass = "전체";
+  if (activeClass === NO_CLASS && !noClass) activeClass = "전체";
+
+  if (!classes.length && !noClass) {
+    $("classFilter").innerHTML = "";
+    return;
+  }
+  let ch = `<span class="filter-lbl">반</span>`;
+  ch += chipHtml("class", "전체", "전체", inGrade.length, activeClass === "전체");
+  classes.forEach((c) => { ch += chipHtml("class", c, c, cCount.get(c), activeClass === c); });
+  if (noClass) ch += chipHtml("class", NO_CLASS, NO_CLASS, noClass, activeClass === NO_CLASS);
+  $("classFilter").innerHTML = ch;
+}
+
+function onFilterClick(e) {
+  const btn = e.target.closest("button[data-filter]");
+  if (!btn) return;
+  const kind = btn.getAttribute("data-filter");
+  const key = btn.getAttribute("data-key");
+  if (kind === "grade") { activeGrade = key; activeClass = "전체"; }
+  else { activeClass = key; }
+  renderFilters();
+  renderRows();
+}
+$("gradeFilter").addEventListener("click", onFilterClick);
+$("classFilter").addEventListener("click", onFilterClick);
+
 function renderRows() {
   const kw = $("search").value.trim();
-  const list = kw ? students.filter((s) => s.name.includes(kw)) : students;
+  const list = students.filter((s) => matchGrade(s) && matchClass(s) && (!kw || s.name.includes(kw)));
   $("cnt").textContent = `${list.length}명`;
 
   if (!list.length) {
