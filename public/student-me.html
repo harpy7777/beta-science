@@ -252,7 +252,7 @@ body {
     </div>
     <div class="trend-card">
       <div class="trend-head">
-        <span class="trend-title">점수 추이 (회차별)</span>
+        <span class="trend-title">점수 추이 (날짜별)</span>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <span class="trend-badge tb-fl" id="rp-trend-badge">—</span>
           <div class="legend">
@@ -472,63 +472,71 @@ function rpDrawRadar(oxA,mcA,msA){
   });
 }
 
-/* 점수 추이 — 유형(OX/4지선다/마스터)별로 각각 회차를 매김.
-   각 유형은 그 유형의 응시 순서대로 1회차,2회차…(날짜 오름차순).
-   유형별로 TREND_MIN회 이상 쌓인 라인만 표시. */
-const TREND_MIN=4;
+/* 점수 추이 — x축은 실제 응시 날짜(균등 간격).
+   한 번의 시험에서 푼 유형만 점을 찍고, 안 푼 유형은 건너뛰며 선을 잇습니다.
+   그래서 마스터처럼 응시 횟수가 적은 유형도 그대로 나타납니다. */
+function fmtMD(ts){
+  const d=toDate(ts); if(d.getTime()===0) return '';
+  return `${d.getMonth()+1}/${d.getDate()}`;
+}
 function rpDrawTrend(filtered){
   const canvas=document.getElementById('rp-trend');
   const empty=document.getElementById('rp-trend-empty');
   const badge=document.getElementById('rp-trend-badge');
   if(trendInst){ trendInst.destroy(); trendInst=null; }
 
-  const seqOf=(kind)=> filtered.filter(r=>hasType(r,kind))
-      .slice().sort((a,b)=>toDate(a.ts)-toDate(b.ts))
-      .map(r=>typeScore(r,kind));
-  const oxSeq=seqOf('ox'), mcSeq=seqOf('mc'), msSeq=seqOf('master');
+  const rows=filtered.slice().sort((a,b)=>toDate(a.ts)-toDate(b.ts));
+  const labels=rows.map(r=> fmtMD(r.ts) || String(r.date||'') || '—');
 
   const types=[
-    {label:'OX',      seq:oxSeq, color:'#1e40af', bg:'rgba(30,64,175,0.06)'},
-    {label:'4지선다',  seq:mcSeq, color:'#5b21b6', bg:'rgba(91,33,182,0.06)'},
-    {label:'마스터',   seq:msSeq, color:'#db2777', bg:'rgba(219,39,119,0.06)'}
-  ];
-  const qualified=types.filter(t=>t.seq.length>=TREND_MIN);
+    {key:'ox',     label:'OX',      color:'#1e40af', bg:'rgba(30,64,175,0.06)'},
+    {key:'mc',     label:'4지선다',  color:'#5b21b6', bg:'rgba(91,33,182,0.06)'},
+    {key:'master', label:'마스터',   color:'#db2777', bg:'rgba(219,39,119,0.06)'}
+  ].map(t=>({ ...t, data: rows.map(r=> hasType(r,t.key) ? typeScore(r,t.key) : null) }));
+  const shown=types.filter(t=>t.data.some(v=>v!==null));
 
-  if(!qualified.length){
+  if(!shown.length){
     canvas.style.display='none';
     empty.style.display='flex';
-    empty.innerHTML=`각 유형별 ${TREND_MIN}회 이상 응시하면 점수 추이가 표시됩니다.<br>`+
-      `<span style="font-size:12px;color:#6e6e73;font-weight:600;margin-top:6px;display:inline-block;">`+
-      `OX ${oxSeq.length}/${TREND_MIN} · 4지선다 ${mcSeq.length}/${TREND_MIN} · 마스터 ${msSeq.length}/${TREND_MIN}</span>`;
-    badge.textContent='데이터 부족'; badge.className='trend-badge tb-fl';
+    empty.innerHTML='아직 표시할 점수가 없습니다.<br>시험을 보고 나면 날짜별로 점수가 이어집니다.';
+    badge.textContent='기록 없음'; badge.className='trend-badge tb-fl';
     return;
   }
 
   canvas.style.display='block';
   empty.style.display='none';
 
-  const maxLen=Math.max(...qualified.map(t=>t.seq.length));
-  const labels=Array.from({length:maxLen},(_,i)=>`${i+1}회차`);
-  const datasets=qualified.map(t=>({
+  const datasets=shown.map(t=>({
     label:t.label,
-    data:labels.map((_,i)=> i<t.seq.length ? t.seq[i] : null),
+    data:t.data,
     borderColor:t.color, backgroundColor:t.bg,
-    tension:0.35, spanGaps:true, pointRadius:4, pointBackgroundColor:t.color
+    tension:0.35, spanGaps:true, pointRadius:4, pointHoverRadius:6, pointBackgroundColor:t.color
   }));
 
-  const diffs=qualified.map(t=>t.seq[t.seq.length-1]-t.seq[0]);
-  const avgDiff=Math.round(diffs.reduce((a,v)=>a+v,0)/diffs.length);
-  if(avgDiff>0){ badge.textContent=`상승세 (+${avgDiff}점)`; badge.className='trend-badge tb-up'; }
-  else if(avgDiff<0){ badge.textContent=`하락세 (${avgDiff}점)`; badge.className='trend-badge tb-dn'; }
-  else { badge.textContent='보합세'; badge.className='trend-badge tb-fl'; }
+  // 추세 배지 — 2회 이상 본 유형들의 (마지막 − 처음) 평균
+  const withTwo=shown.map(t=>t.data.filter(v=>v!==null)).filter(v=>v.length>=2);
+  if(!withTwo.length){
+    badge.textContent='기록 누적 중'; badge.className='trend-badge tb-fl';
+  } else {
+    const diffs=withTwo.map(v=>v[v.length-1]-v[0]);
+    const avgDiff=Math.round(diffs.reduce((a,v)=>a+v,0)/diffs.length);
+    if(avgDiff>0){ badge.textContent=`상승세 (+${avgDiff}점)`; badge.className='trend-badge tb-up'; }
+    else if(avgDiff<0){ badge.textContent=`하락세 (${avgDiff}점)`; badge.className='trend-badge tb-dn'; }
+    else { badge.textContent='보합세'; badge.className='trend-badge tb-fl'; }
+  }
 
   trendInst=new Chart(canvas.getContext('2d'),{
     type:'line',
     data:{labels,datasets},
     options:{responsive:true,maintainAspectRatio:false,animation:false,
-      plugins:{legend:{display:false}},
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{
+          title:(items)=>{ const r=rows[items[0].dataIndex]; return (fmtDateShort(r.ts)||String(r.date||'')) + ' · ' + (r.testName||''); },
+          label:(item)=> `${item.dataset.label} ${item.formattedValue}점`
+        }}},
       scales:{y:{min:0,max:100,ticks:{stepSize:25,font:{size:10},color:'#aeaeb2'},grid:{color:'#f5f5f7'}},
-              x:{ticks:{font:{size:10},color:'#aeaeb2'},grid:{display:false}}}}
+              x:{ticks:{font:{size:10},color:'#aeaeb2',autoSkip:true,maxRotation:0,maxTicksLimit:9},grid:{display:false}}}}
   });
 }
 
