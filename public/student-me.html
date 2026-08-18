@@ -1,208 +1,337 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta charset="UTF-8"><script src="/favicon.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex, nofollow">
 <title>내 성적 · 인후쌤의 과학 수업 관리 시스템</title>
-<meta name="theme-color" content="#004AAD" />
-<meta name="robots" content="noindex, nofollow" />
 <link rel="stylesheet" as="style" crossorigin
-  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: { extend: {
-      colors: {
-        ink:   { 900:'#101828', 700:'#475467', 500:'#667085', 300:'#98A2B3' },
-        brand: { 50:'#EEF3FB',100:'#DCE6F6',600:'#004AAD',700:'#003A88' },
-        edge:  { DEFAULT:'#E3E7EE', soft:'#EFF1F5' }
-      },
-      fontFamily: { sans:['Pretendard Variable','Pretendard','-apple-system','system-ui','sans-serif'] },
-      boxShadow: { card:'0 1px 2px 0 rgba(16,24,40,0.05)' },
-      maxWidth: { shell:'78rem' }
-    }}
-  };
-</script>
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
-  body{letter-spacing:-0.02em;-webkit-text-size-adjust:100%;background:#F4F6F9}
-  .num{font-variant-numeric:tabular-nums;letter-spacing:-0.03em}
-  .tight{letter-spacing:-0.035em}
-  :focus-visible{outline:2px solid #004AAD;outline-offset:3px;border-radius:8px}
-  .on-blue :focus-visible{outline-color:#fff}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif;
+  background:#F4F6F9;color:#101828;min-height:100vh;-webkit-font-smoothing:antialiased;letter-spacing:-.02em;
+  overscroll-behavior:none;-webkit-text-size-adjust:100%}
+.hidden{display:none !important}
+.num,.stat-num,.type-score,.exam-score,.p-label{font-variant-numeric:tabular-nums}
+button{font-family:inherit;touch-action:manipulation}
+:focus-visible{outline:2px solid #004AAD;outline-offset:2px;border-radius:6px}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms !important;animation-duration:.01ms !important}}
 
-  /* 제목 앞 눈금 — 색은 하나로 통일합니다 */
-  .rule{display:inline-block;width:3px;height:14px;border-radius:2px;background:#004AAD;flex:none}
+/* ── Header ── */
+.header{background:#fff;border-bottom:1px solid #E3E7EE;padding:0 1.2rem;padding-left:max(1.2rem,env(safe-area-inset-left));padding-right:max(1.2rem,env(safe-area-inset-right));height:54px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:300}
+.header-left{display:flex;align-items:center;gap:9px;min-width:0}
+.logo-mark{width:30px;height:30px;background:#004AAD;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:clamp(11px,3vw,14px);font-weight:700;color:#101828;letter-spacing:-.03em;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header-badge{display:inline-flex;align-items:center;background:#fff;border:1px solid #E3E7EE;border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;color:#475467;white-space:nowrap;flex-shrink:0}
 
-  /* 모바일: 터치 영역 확보 */
-  button{touch-action:manipulation}
-  .navbtn{min-height:34px;min-width:34px}
-  .pagebtn{min-height:38px}
-  .segbtn{min-height:32px;transition:background-color .15s,color .15s}
-  .safe-b{padding-bottom:calc(env(safe-area-inset-bottom) + 4rem)}
-  @media (prefers-reduced-motion: reduce){*,*::before,*::after{transition-duration:.01ms !important;animation-duration:.01ms !important}}
+/* ── Wrap ── */
+.wrap{max-width:78rem;margin:0 auto;padding:1.4rem 1.2rem;padding-bottom:max(4rem,calc(3rem + env(safe-area-inset-bottom)));padding-left:max(1.2rem,env(safe-area-inset-left));padding-right:max(1.2rem,env(safe-area-inset-right))}
+
+/* ── Page Hero ── */
+.page-hero{background:#fff;border:1px solid #E3E7EE;border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:1.1rem 1.3rem;margin-bottom:1.4rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.hero-left{display:flex;align-items:center;gap:12px;min-width:0}
+.hero-icon{width:44px;height:44px;border-radius:10px;background:#EFF5FD;border:1px solid #DCE8FA;color:#004AAD;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hero-title{font-size:1.05rem;font-weight:700;letter-spacing:-.03em;line-height:1.3}
+.hero-sub{font-size:11.5px;color:#667085;margin-top:3px}
+.hero-date{text-align:right}
+.hero-date-main{font-size:1rem;font-weight:700;color:#004AAD;letter-spacing:-.02em}
+.hero-date-day{font-size:11px;color:#98A2B3;margin-top:3px;font-weight:600}
+
+/* ── Section ── */
+.section-heading{font-size:11px;font-weight:700;color:#98A2B3;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.8rem}
+.section-card{background:#fff;border:1px solid #E3E7EE;border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:1.1rem 1.3rem;margin-bottom:1rem}
+.section-header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:1rem}
+.section-title{font-size:14px;font-weight:700;color:#101828}
+.section-count{font-size:12px;color:#98A2B3;font-weight:600}
+.block{margin-bottom:1.4rem}
+.block:last-child{margin-bottom:0}
+
+/* ── Stats ── */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat-label{font-size:11.5px;color:#667085;font-weight:600}
+.stat-num{font-size:20px;font-weight:700;color:#101828;letter-spacing:-.03em;margin-top:5px;line-height:1.2}
+.stat-note{font-size:11px;color:#98A2B3;margin-top:4px;line-height:1.5;font-weight:600}
+
+/* ── Message ── */
+.msg-card{background:#fff;border:1px solid #E3E7EE;border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:1rem 1.3rem;margin-bottom:1.4rem}
+.msg-text{font-size:14px;line-height:1.75;color:#475467}
+
+/* ── Layout ── */
+.grid-main{display:grid;gap:1.4rem;align-items:start}
+@media(min-width:1024px){.grid-main{grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:1.1rem}}
+
+/* ── Segmented ── */
+.seg{display:inline-flex;background:#F4F6F9;border:1px solid #E3E7EE;border-radius:9px;padding:2px;gap:2px}
+.seg-btn{height:30px;padding:0 12px;border:none;background:none;border-radius:7px;font-size:12px;font-weight:600;color:#667085;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
+.seg-btn:hover{color:#101828}
+.seg-btn.on{background:#004AAD;color:#fff}
+
+/* ── Chart ── */
+.chart-nav{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px}
+.navbtn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid #E3E7EE;background:#fff;border-radius:8px;color:#475467;cursor:pointer;transition:background .15s,color .15s}
+.navbtn:hover{background:#F4F6F9;color:#101828}
+.navbtn:disabled{opacity:.3;cursor:not-allowed}
+.p-label{min-width:9.5rem;text-align:center;font-size:13px;font-weight:700;color:#101828;white-space:nowrap}
+.chart-svg{display:block;width:100%;height:auto}
+.chart-empty{padding:2.2rem 0;text-align:center;font-size:12.5px;color:#98A2B3}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:14px}
+.legend-item{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700}
+.chart-note{margin-top:12px;font-size:11.5px;line-height:1.7;color:#98A2B3}
+
+/* ── Type cards ── */
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.type-card{background:#fff;border:1px solid #E3E7EE;border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:.85rem .9rem}
+.type-chip{display:inline-block;border-radius:6px;padding:2px 8px;font-size:11.5px;font-weight:700}
+.type-score{font-size:20px;font-weight:700;letter-spacing:-.03em;margin-top:9px;line-height:1.2;color:#101828}
+.type-note{font-size:11px;color:#667085;margin-top:4px;line-height:1.5}
+.type-advice{margin-top:.8rem;font-size:12.5px;line-height:1.75;color:#475467}
+@media(min-width:1024px){
+  .type-grid{grid-template-columns:1fr;gap:12px}
+  .type-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:1rem 1.1rem}
+  .type-body{text-align:right}
+  .type-score{margin-top:0;font-size:22px}
+}
+
+/* ── Exam list ── */
+.list-card{background:#fff;border:1px solid #E3E7EE;border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);overflow:hidden}
+.exam-list{list-style:none}
+.exam-item{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-bottom:1px solid #EFF1F5}
+.exam-list li:last-child{border-bottom:none}
+.exam-main{flex:1;min-width:0}
+.exam-top{display:flex;flex-wrap:wrap;align-items:center;gap:7px}
+.exam-name{font-size:14px;font-weight:600;color:#101828;line-height:1.45;min-width:0}
+.exam-sub{font-size:11.5px;color:#98A2B3;margin-top:4px;font-variant-numeric:tabular-nums}
+.exam-score{font-size:17px;font-weight:700;flex-shrink:0;letter-spacing:-.03em}
+.exam-empty{padding:2.5rem 1rem;text-align:center;font-size:12.5px;color:#98A2B3}
+.pager{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #E3E7EE;background:#FAFBFD;padding:10px 14px}
+.pagebtn{height:36px;padding:0 14px;border:1px solid #E3E7EE;background:#fff;border-radius:8px;font-size:12.5px;font-weight:600;color:#475467;cursor:pointer;transition:background .15s,color .15s}
+.pagebtn:hover{background:#F4F6F9;color:#101828}
+.pagebtn:disabled{opacity:.35;cursor:not-allowed}
+.page-num{font-size:12.5px;font-weight:600;color:#98A2B3;font-variant-numeric:tabular-nums}
+
+.foot-note{margin-top:1.6rem;text-align:center;font-size:11.5px;color:#98A2B3}
+
+/* ── Loading / Error ── */
+.center-wrap{min-height:70vh;display:flex;align-items:center;justify-content:center;padding:1.5rem 1.2rem}
+.center-text{font-size:13.5px;color:#667085}
+.err-card{width:100%;max-width:380px;background:#fff;border:1px solid #E3E7EE;border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:1.6rem 1.5rem;text-align:center}
+.err-title{font-size:15px;font-weight:700;letter-spacing:-.03em}
+.err-msg{margin-top:10px;font-size:13px;line-height:1.7;color:#475467}
+.err-sub{margin-top:14px;font-size:12px;color:#98A2B3}
+
+/* ── Responsive ── */
+@media(max-width:520px){
+  .header{padding:0 .9rem;height:50px}
+  .header-badge{display:none}
+  .wrap{padding:.9rem .85rem;padding-bottom:calc(3rem + env(safe-area-inset-bottom))}
+  .page-hero{padding:.9rem 1rem;margin-bottom:1.1rem}
+  .hero-icon{width:38px;height:38px}
+  .hero-title{font-size:1rem}
+  .hero-date{display:none}
+  .section-card{padding:.9rem 1rem}
+  .msg-card{padding:.9rem 1rem;margin-bottom:1.1rem}
+  .msg-text{font-size:13.5px}
+  .stat-grid{gap:8px}
+  .stat-num{font-size:18px}
+  .stat-label{font-size:11px}
+  .stat-note{font-size:10.5px}
+  .seg-btn{padding:0 10px;font-size:11.5px}
+  .p-label{min-width:8rem;font-size:12.5px}
+  .type-card{padding:.75rem .8rem}
+  .type-score{font-size:18px}
+  .type-note{font-size:10.5px}
+  .exam-item{padding:12px 13px}
+  .exam-name{font-size:13.5px}
+  .exam-score{font-size:16px}
+  .grid-main{gap:1.1rem}
+  .block{margin-bottom:1.1rem}
+}
+@media(max-width:380px){
+  .stat-num{font-size:16.5px}
+  .type-grid{gap:7px}
+  .type-card{padding:.65rem .6rem}
+  .type-chip{padding:2px 6px;font-size:11px}
+  .type-score{font-size:16.5px}
+  .seg-btn{padding:0 8px;font-size:11px}
+  .pagebtn{padding:0 11px;font-size:12px}
+}
 </style>
 </head>
-<body class="font-sans text-ink-900 antialiased">
+<body>
 
 <!-- 로딩 -->
-<div id="loading" class="flex min-h-screen items-center justify-center">
-  <p class="text-[14px] text-ink-500">불러오는 중입니다…</p>
+<div id="loading" class="center-wrap">
+  <p class="center-text">불러오는 중입니다…</p>
 </div>
 
 <!-- 오류 -->
-<div id="errorView" class="hidden min-h-screen items-center justify-center px-6">
-  <div class="w-full max-w-sm rounded-xl border border-edge bg-white p-8 text-center shadow-card">
-    <h1 class="tight text-[18px] font-bold">주소를 확인해 주세요</h1>
-    <p id="errorMsg" class="mt-3 text-[14px] leading-relaxed text-ink-700">링크가 올바르지 않습니다.</p>
-    <p class="mt-5 text-[13px] text-ink-500">선생님께 링크를 다시 요청해 주세요.</p>
+<div id="errorView" class="center-wrap hidden">
+  <div class="err-card">
+    <div class="err-title">주소를 확인해 주세요</div>
+    <p id="errorMsg" class="err-msg">링크가 올바르지 않습니다.</p>
+    <p class="err-sub">선생님께 링크를 다시 요청해 주세요.</p>
   </div>
 </div>
 
 <!-- 본문 -->
 <div id="app" class="hidden">
 
-  <!-- 상단 바 -->
-  <header class="sticky top-0 z-40 border-b border-edge bg-white">
-    <div class="mx-auto flex max-w-shell items-center justify-between gap-3 px-5 py-3 sm:px-6">
-      <div class="flex min-w-0 items-center gap-2.5">
-        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-600">
-          <svg class="h-[22px] w-[22px]" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="8.2" r="3.4"/><path d="M4.9 20a7.1 7.1 0 0 1 14.2 0"/>
-          </svg>
-        </span>
-        <span class="tight truncate text-[14.5px] font-bold sm:text-[15.5px]">인후쌤의 과학 수업 관리 시스템</span>
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-mark">
+        <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <circle cx="9" cy="7" r="3" fill="#fff"/>
+          <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        </svg>
       </div>
-      <span id="hBadge" class="hidden shrink-0 rounded-full border border-edge px-3 py-1 text-[12.5px] font-semibold text-ink-700 sm:inline-block"></span>
+      <span class="brand-name">인후쌤의 과학 수업 관리 시스템</span>
     </div>
+    <span id="hBadge" class="header-badge hidden"></span>
   </header>
 
-  <!-- 학생 요약 -->
-  <section class="on-blue bg-brand-600">
-    <div class="mx-auto max-w-shell px-5 py-6 sm:px-6 sm:py-8">
-      <p class="text-[13.5px] text-white/60" id="hSub">—</p>
-      <h1 class="tight mt-1 text-[24px] font-bold text-white sm:text-[27px]"><span id="hName">—</span> 학생의 성적표</h1>
+  <div class="wrap">
 
-      <div class="mt-7 grid max-w-2xl grid-cols-3 gap-3 sm:gap-6">
-        <div>
-          <p class="text-[12.5px] text-white/55">최근 점수</p>
-          <p class="num mt-1 text-[20px] font-bold text-white sm:text-[22px]" id="sLatest">—</p>
-          <p class="mt-0.5 text-[11.5px] leading-snug text-white/50" id="sLatestNote"></p>
+    <div class="page-hero">
+      <div class="hero-left">
+        <div class="hero-icon">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 19V6"/><path d="M4 19h16"/><path d="M7.5 15.5l3.5-4 3 2.5 4.5-6"/>
+          </svg>
         </div>
         <div>
-          <p class="text-[12.5px] text-white/55">지난 회차 대비</p>
-          <p class="num mt-1 text-[20px] font-bold sm:text-[22px]" id="sDelta">—</p>
-          <p class="mt-0.5 text-[11.5px] leading-snug text-white/50" id="sDeltaNote"></p>
+          <div class="hero-title"><span id="hName">—</span> 학생의 성적표</div>
+          <div class="hero-sub" id="hSub">—</div>
+        </div>
+      </div>
+      <div class="hero-date">
+        <div class="hero-date-main" id="today-date">—</div>
+        <div class="hero-date-day" id="today-day">—</div>
+      </div>
+    </div>
+
+    <!-- 요약 -->
+    <div class="section-heading">SUMMARY</div>
+    <div class="section-card">
+      <div class="stat-grid">
+        <div>
+          <p class="stat-label">최근 점수</p>
+          <p class="stat-num" id="sLatest">—</p>
+          <p class="stat-note" id="sLatestNote"></p>
         </div>
         <div>
-          <p class="text-[12.5px] text-white/55">나의 최고 기록</p>
-          <p class="num mt-1 text-[20px] font-bold text-white sm:text-[22px]" id="sBest">—</p>
-          <p class="mt-0.5 text-[11.5px] leading-snug text-white/50" id="sBestNote"></p>
+          <p class="stat-label">지난 회차 대비</p>
+          <p class="stat-num" id="sDelta">—</p>
+          <p class="stat-note" id="sDeltaNote"></p>
+        </div>
+        <div>
+          <p class="stat-label">나의 최고 기록</p>
+          <p class="stat-num" id="sBest">—</p>
+          <p class="stat-note" id="sBestNote"></p>
         </div>
       </div>
     </div>
-  </section>
-
-  <main class="safe-b mx-auto max-w-shell px-5 pt-6 sm:px-6 sm:pt-8">
 
     <!-- 응원 문구 -->
-    <div id="msgBox" class="rounded-xl border border-edge bg-white p-5 shadow-card sm:p-6">
-      <div class="flex gap-3">
-        <span class="mt-0.5 h-5 w-[3px] shrink-0 rounded-sm bg-brand-600"></span>
-        <p id="msgText" class="text-[15px] leading-relaxed text-ink-900">—</p>
-      </div>
+    <div id="msgBox" class="msg-card">
+      <p id="msgText" class="msg-text">—</p>
     </div>
 
-    <div class="mt-6 grid items-start gap-6 lg:grid-cols-3 lg:gap-5">
+    <div class="grid-main">
 
       <!-- 점수 추이 -->
-      <section id="chartSection" class="lg:col-span-2">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <h2 class="tight flex items-center gap-2 text-[15.5px] font-bold">
-            <span class="rule"></span>점수 추이
-          </h2>
-          <div class="inline-flex rounded-lg border border-edge bg-white p-0.5 shadow-card" role="group" aria-label="기간 길이">
-            <button id="r3"   type="button" class="segbtn rounded-md px-2.5 text-[12.5px] font-semibold">3개월</button>
-            <button id="r6"   type="button" class="segbtn rounded-md px-2.5 text-[12.5px] font-semibold">6개월</button>
-            <button id="rAll" type="button" class="segbtn rounded-md px-2.5 text-[12.5px] font-semibold">전체</button>
+      <section id="chartSection">
+        <div class="section-heading">TREND</div>
+        <div class="section-card" style="margin-bottom:0">
+          <div class="section-header">
+            <span class="section-title">점수 추이</span>
+            <div class="seg" role="group" aria-label="기간 길이">
+              <button id="r3" type="button" class="seg-btn">3개월</button>
+              <button id="r6" type="button" class="seg-btn">6개월</button>
+              <button id="rAll" type="button" class="seg-btn">전체</button>
+            </div>
           </div>
-        </div>
 
-        <div class="mt-3 rounded-xl border border-edge bg-white p-5 shadow-card sm:p-6">
-          <div class="mb-3 flex items-center justify-center gap-1.5">
-            <button id="pPrev" type="button" aria-label="이전 기간 보기"
-              class="navbtn flex items-center justify-center rounded-md border border-edge bg-white px-2 text-ink-700 transition-colors hover:bg-brand-50 hover:text-brand-600 disabled:opacity-25">
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+          <div class="chart-nav">
+            <button id="pPrev" type="button" class="navbtn" aria-label="이전 기간 보기">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
             </button>
-            <span id="pLabel" class="num min-w-[9.5rem] whitespace-nowrap text-center text-[13px] font-bold">—</span>
-            <button id="pNext" type="button" aria-label="다음 기간 보기"
-              class="navbtn flex items-center justify-center rounded-md border border-edge bg-white px-2 text-ink-700 transition-colors hover:bg-brand-50 hover:text-brand-600 disabled:opacity-25">
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+            <span id="pLabel" class="p-label">—</span>
+            <button id="pNext" type="button" class="navbtn" aria-label="다음 기간 보기">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
             </button>
           </div>
 
-          <div id="chartWrap" class="w-full"></div>
-          <div id="legendType" class="mt-4 flex flex-wrap gap-x-5 gap-y-2"></div>
-          <p class="mt-3 text-[12.5px] leading-relaxed text-ink-500" id="chartNote">—</p>
+          <div id="chartWrap"></div>
+          <div id="legendType" class="legend"></div>
+          <p class="chart-note" id="chartNote">—</p>
         </div>
       </section>
 
       <!-- 유형별 -->
       <section id="typeSection">
-        <h2 class="tight flex items-center gap-2 text-[15.5px] font-bold"><span class="rule"></span>유형별 최근 성적</h2>
-        <div class="mt-3 grid grid-cols-3 gap-2.5 lg:grid-cols-1 lg:gap-3">
+        <div class="section-heading">BY TYPE</div>
 
-          <div class="rounded-xl border border-edge bg-white p-3.5 shadow-card sm:p-5 lg:flex lg:items-center lg:justify-between lg:gap-3">
-            <span class="inline-block rounded px-2 py-0.5 text-[11.5px] font-bold" style="background:#E7F6EC;color:#15803D">OX</span>
-            <div class="lg:text-right">
-              <p class="num mt-2.5 text-[20px] font-bold sm:text-[23px] lg:mt-0" id="tOx">—</p>
-              <p class="mt-1 text-[11.5px] leading-snug text-ink-500 sm:text-[12.5px]" id="tOxNote">—</p>
+        <div class="type-grid">
+          <div class="type-card">
+            <span class="type-chip" style="background:#E7F6EC;color:#15803D">OX</span>
+            <div class="type-body">
+              <p class="type-score" id="tOx">—</p>
+              <p class="type-note" id="tOxNote">—</p>
             </div>
           </div>
-
-          <div class="rounded-xl border border-edge bg-white p-3.5 shadow-card sm:p-5 lg:flex lg:items-center lg:justify-between lg:gap-3">
-            <span class="inline-block rounded px-2 py-0.5 text-[11.5px] font-bold" style="background:#E4EBFB;color:#1D4ED8">사지선다</span>
-            <div class="lg:text-right">
-              <p class="num mt-2.5 text-[20px] font-bold sm:text-[23px] lg:mt-0" id="tMulti">—</p>
-              <p class="mt-1 text-[11.5px] leading-snug text-ink-500 sm:text-[12.5px]" id="tMultiNote">—</p>
+          <div class="type-card">
+            <span class="type-chip" style="background:#E4EBFB;color:#1D4ED8">사지선다</span>
+            <div class="type-body">
+              <p class="type-score" id="tMulti">—</p>
+              <p class="type-note" id="tMultiNote">—</p>
             </div>
           </div>
-
-          <div class="rounded-xl border border-edge bg-white p-3.5 shadow-card sm:p-5 lg:flex lg:items-center lg:justify-between lg:gap-3">
-            <span class="inline-block rounded px-2 py-0.5 text-[11.5px] font-bold" style="background:#FDEEE3;color:#C2410C">마스터</span>
-            <div class="lg:text-right">
-              <p class="num mt-2.5 text-[20px] font-bold sm:text-[23px] lg:mt-0" id="tMaster">—</p>
-              <p class="mt-1 text-[11.5px] leading-snug text-ink-500 sm:text-[12.5px]" id="tMasterNote">—</p>
+          <div class="type-card">
+            <span class="type-chip" style="background:#FDEEE3;color:#C2410C">마스터</span>
+            <div class="type-body">
+              <p class="type-score" id="tMaster">—</p>
+              <p class="type-note" id="tMasterNote">—</p>
             </div>
           </div>
-
         </div>
-        <p id="typeAdvice" class="mt-3 text-[13.5px] leading-relaxed text-ink-700"></p>
+
+        <p id="typeAdvice" class="type-advice"></p>
       </section>
 
     </div>
 
-    <!-- 회차 목록 -->
-    <section class="mt-8">
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <h2 class="tight flex items-center gap-2 text-[15.5px] font-bold"><span class="rule"></span>시험 기록</h2>
-        <span id="listCount" class="num text-[12.5px] text-ink-500"></span>
+    <!-- 시험 기록 -->
+    <section style="margin-top:1.6rem">
+      <div class="section-heading">RECORDS</div>
+      <div class="section-header" style="margin-bottom:.7rem">
+        <span class="section-title">시험 기록</span>
+        <span id="listCount" class="section-count"></span>
       </div>
-      <div class="mt-3 overflow-hidden rounded-xl border border-edge bg-white shadow-card">
-        <ul id="examList" class="divide-y divide-edge-soft"></ul>
-
-        <div id="listPager" class="hidden items-center justify-between gap-3 border-t border-edge bg-[#FAFBFC] px-4 py-3">
-          <button id="lPrev" type="button"
-            class="pagebtn rounded-md border border-edge bg-white px-3.5 text-[13px] font-semibold text-ink-700 transition-colors hover:bg-brand-50 hover:text-brand-600 disabled:opacity-30">이전</button>
-          <span id="lPage" class="num text-[13px] font-medium text-ink-500">1 / 1</span>
-          <button id="lNext" type="button"
-            class="pagebtn rounded-md border border-edge bg-white px-3.5 text-[13px] font-semibold text-ink-700 transition-colors hover:bg-brand-50 hover:text-brand-600 disabled:opacity-30">다음</button>
+      <div class="list-card">
+        <ul id="examList" class="exam-list"></ul>
+        <div id="listPager" class="pager hidden">
+          <button id="lPrev" type="button" class="pagebtn">이전</button>
+          <span id="lPage" class="page-num">1 / 1</span>
+          <button id="lNext" type="button" class="pagebtn">다음</button>
         </div>
       </div>
     </section>
 
-    <p class="mt-8 text-center text-[12.5px] text-ink-500" id="updatedAt">—</p>
-  </main>
+    <p class="foot-note" id="updatedAt">—</p>
+  </div>
 </div>
+
+<script>
+(function(){
+  var n=new Date(),days=['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+  var a=document.getElementById('today-date'),b=document.getElementById('today-day');
+  if(a)a.textContent=n.getFullYear()+'년 '+(n.getMonth()+1)+'월 '+n.getDate()+'일';
+  if(b)b.textContent=days[n.getDay()];
+})();
+</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -218,9 +347,11 @@ const firebaseConfig = {
 };
 
 /* ── 색 설정 ─────────────────────────────────────────────
-   기본은 #004AAD 와 회색이고, 색은 데이터에만 씁니다.
-   채도를 낮춘 한 벌로 맞춰 화면이 튀지 않게 했습니다.      */
-const UP_COLOR = "#7DD3AC";   // 헤더에서 점수가 올랐을 때
+   기본은 #004AAD 와 회색이고, 색은 데이터에만 씁니다.      */
+const UP_COLOR   = "#15803D";   // 점수가 올랐을 때
+const FLAT_COLOR = "#667085";   // 동점 · 하락 (지적하지 않습니다)
+const INK        = "#101828";
+
 const BANDS = [
   { min: 90, color: "#15803D", label: "90점 이상" },
   { min: 75, color: "#1D4ED8", label: "75~89점" },
@@ -258,7 +389,6 @@ const $ = (id) => document.getElementById(id);
 const showError = (m) => {
   $("loading").classList.add("hidden");
   $("errorView").classList.remove("hidden");
-  $("errorView").classList.add("flex");
   if (m) $("errorMsg").textContent = m;
 };
 const esc = (s) => String(s == null ? "" : s)
@@ -427,7 +557,7 @@ function drawChart(period) {
   const pts = ((period && period.items) || []).filter((e) => isNum(e.ts));
 
   if (!pts.length) {
-    wrap.innerHTML = '<p class="py-8 text-center text-[13.5px] text-ink-500">이 기간에는 기록이 없습니다.</p>';
+    wrap.innerHTML = '<p class="chart-empty">이 기간에는 기록이 없습니다.</p>';
     return [];
   }
 
@@ -524,7 +654,7 @@ function drawChart(period) {
   });
 
   wrap.innerHTML =
-    `<svg viewBox="0 0 ${W} ${H}" class="h-auto w-full" role="img" aria-label="유형별 점수 추이">
+    `<svg viewBox="0 0 ${W} ${H}" class="chart-svg" role="img" aria-label="유형별 점수 추이">
       <defs>
         <clipPath id="plotClip">
           <rect x="${gx0 - 1}" y="${PT - 18}" width="${gx1 - gx0 + 2}" height="${ih + 26}"/>
@@ -541,7 +671,7 @@ function drawChart(period) {
 function drawLegend(types) {
   $("legendType").innerHTML = (types || []).map((t) => {
     const st = styleOf(t);
-    return `<span class="inline-flex items-center gap-1.5 text-[12.5px] font-semibold" style="color:${st.fg}">
+    return `<span class="legend-item" style="color:${st.fg}">
               <svg width="26" height="12" viewBox="0 0 26 12" aria-hidden="true">
                 <line x1="1" y1="6" x2="25" y2="6" stroke="${st.line}" stroke-width="2.6" stroke-linecap="round"/>
                 ${markerSvg(st.shape, 13, 6, 3.6, st.line, st.line, 0)}
@@ -558,14 +688,10 @@ let pIdx = 0;
 let listItems = [];      // 최신순
 let lPage = 0;
 
-const SEG = "segbtn rounded-md px-2.5 text-[12.5px] font-semibold ";
-const SEG_ON  = SEG + "bg-brand-600 text-white";
-const SEG_OFF = SEG + "text-ink-500 hover:text-ink-900";
-
 function paintSegs() {
-  $("r3").className   = months === 3 ? SEG_ON : SEG_OFF;
-  $("r6").className   = months === 6 ? SEG_ON : SEG_OFF;
-  $("rAll").className = months === 0 ? SEG_ON : SEG_OFF;
+  $("r3").className   = months === 3 ? "seg-btn on" : "seg-btn";
+  $("r6").className   = months === 6 ? "seg-btn on" : "seg-btn";
+  $("rAll").className = months === 0 ? "seg-btn on" : "seg-btn";
   [["r3", months === 3], ["r6", months === 6], ["rAll", months === 0]]
     .forEach(([id, on]) => $(id).setAttribute("aria-pressed", String(on)));
 }
@@ -579,7 +705,7 @@ function rebuild() {
 
 function renderPeriod() {
   if (!periods.length) {
-    $("chartWrap").innerHTML = '<p class="py-8 text-center text-[13.5px] text-ink-500">아직 기록이 없습니다.</p>';
+    $("chartWrap").innerHTML = '<p class="chart-empty">아직 기록이 없습니다.</p>';
     $("pLabel").textContent = "—";
     $("pPrev").disabled = true;
     $("pNext").disabled = true;
@@ -611,27 +737,24 @@ function renderList() {
   const slice = listItems.slice(lPage * PER_PAGE, lPage * PER_PAGE + PER_PAGE);
 
   if (!slice.length) {
-    $("examList").innerHTML = '<li class="px-6 py-8 text-center text-[13.5px] text-ink-500">기록이 없습니다.</li>';
+    $("examList").innerHTML = '<li class="exam-empty">기록이 없습니다.</li>';
   } else {
     $("examList").innerHTML = slice.map((e) => {
       const st = styleOf(e.type);
-      const chip = `<span class="inline-block shrink-0 rounded px-1.5 py-0.5 text-[11px] font-bold"
-                          style="background:${st.bg};color:${st.fg}">${esc(st.label)}</span>`;
+      const chip = `<span class="type-chip" style="background:${st.bg};color:${st.fg}">${esc(st.label)}</span>`;
       const detail = (isNum(e.correct) && e.total) ? `${e.correct} / ${e.total}문항` : "";
       const sub = [e.fullDate, detail].filter(Boolean).map(esc).join(" · ");
       const c = bandOf(e.score).color;
 
-      return `<li class="px-5 py-4 sm:px-6">
-        <div class="flex items-start gap-3">
-          <div class="min-w-0 flex-1">
-            <div class="flex flex-wrap items-center gap-2">
-              ${chip}
-              <p class="min-w-0 text-[14.5px] font-medium leading-snug">${esc(e.testName)}</p>
-            </div>
-            <p class="num mt-1 text-[12.5px] text-ink-500">${sub}</p>
+      return `<li class="exam-item">
+        <div class="exam-main">
+          <div class="exam-top">
+            ${chip}
+            <p class="exam-name">${esc(e.testName)}</p>
           </div>
-          <p class="num shrink-0 text-[17px] font-bold" style="color:${c}">${r1(e.score)}점</p>
+          <p class="exam-sub">${sub}</p>
         </div>
+        <p class="exam-score" style="color:${c}">${r1(e.score)}점</p>
       </li>`;
     }).join("");
   }
@@ -639,13 +762,11 @@ function renderList() {
   const pager = $("listPager");
   if (listItems.length > PER_PAGE) {
     pager.classList.remove("hidden");
-    pager.classList.add("flex");
     $("lPage").textContent = `${lPage + 1} / ${totalPages}`;
     $("lPrev").disabled = lPage <= 0;
     $("lNext").disabled = lPage >= totalPages - 1;
   } else {
     pager.classList.add("hidden");
-    pager.classList.remove("flex");
   }
 }
 
@@ -730,23 +851,23 @@ function render(p) {
   const best = entries.reduce((a, b) => (b.score > a.score ? b : a), entries[0]);
 
   $("sLatest").textContent = r1(latest.score) + "점";
+  $("sLatest").style.color = bandOf(latest.score).color;
   $("sLatestNote").textContent = [latestStyle.label, latest.shortDate].filter(Boolean).join(" · ");
 
   $("sBest").textContent = r1(best.score) + "점";
+  $("sBest").style.color = bandOf(best.score).color;
   $("sBestNote").textContent = [styleOf(best.type).label, best.shortDate].filter(Boolean).join(" · ");
 
   const dEl = $("sDelta");
-  const baseCls = "num mt-1 text-[20px] font-bold sm:text-[22px] ";
   if (!prevSame) {
     dEl.textContent = "첫 회차";
-    dEl.className = baseCls + "text-white/75";
-    dEl.style.color = "";
+    dEl.style.color = INK;
     $("sDeltaNote").textContent = `${latestStyle.label} 첫 기록`;
   } else {
     const diff = r1(latest.score - prevSame.score);
-    if (diff > 0) { dEl.textContent = "+" + diff + "점"; dEl.className = baseCls; dEl.style.color = UP_COLOR; }
-    else if (diff < 0) { dEl.textContent = diff + "점"; dEl.className = baseCls + "text-white/70"; dEl.style.color = ""; }
-    else { dEl.textContent = "동점"; dEl.className = baseCls + "text-white/75"; dEl.style.color = ""; }
+    if (diff > 0) { dEl.textContent = "+" + diff + "점"; dEl.style.color = UP_COLOR; }
+    else if (diff < 0) { dEl.textContent = diff + "점"; dEl.style.color = FLAT_COLOR; }
+    else { dEl.textContent = "동점"; dEl.style.color = FLAT_COLOR; }
     $("sDeltaNote").textContent = `${latestStyle.label} 기준`;
   }
 
@@ -773,13 +894,11 @@ function render(p) {
     const e = latestOf(key);
     if (!e) {
       $(scoreId).textContent = "—";
-      $(scoreId).className = "num mt-2.5 text-[20px] font-bold sm:text-[23px]";
       $(scoreId).style.color = "#C4C9D2";
       $(noteId).textContent = "아직 기록 없음";
       return null;
     }
     $(scoreId).textContent = r1(e.score) + "점";
-    $(scoreId).className = "num mt-2.5 text-[20px] font-bold sm:text-[23px]";
     $(scoreId).style.color = bandOf(e.score).color;
     const bits = [];
     if (isNum(e.correct) && e.total) bits.push(`${e.correct}/${e.total}문항`);
