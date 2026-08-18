@@ -61,7 +61,13 @@ button{font-family:inherit;touch-action:manipulation}
 
 /* ── Layout ── */
 .grid-main{display:grid;gap:1.4rem;align-items:start}
-@media(min-width:1024px){.grid-main{grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:1.1rem}}
+.grid-main .section-card{margin-bottom:0}
+.grid-col{display:flex;flex-direction:column;min-width:0}
+@media(min-width:1024px){
+  .grid-main{grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:1.1rem;align-items:stretch}
+  .grid-col{height:100%}
+  .grid-col .section-card{flex:1;display:flex;flex-direction:column}
+}
 
 /* ── Segmented ── */
 .seg{display:inline-flex;background:#F4F6F9;border:1px solid #E3E7EE;border-radius:9px;padding:2px;gap:2px}
@@ -83,14 +89,16 @@ button{font-family:inherit;touch-action:manipulation}
 
 /* ── Type cards ── */
 .type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.type-card{background:#fff;border:1px solid #E3E7EE;border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:.85rem .9rem}
-.type-chip{display:inline-block;border-radius:6px;padding:2px 8px;font-size:11.5px;font-weight:700}
-.type-score{font-size:20px;font-weight:700;letter-spacing:-.03em;margin-top:9px;line-height:1.2;color:#101828}
-.type-note{font-size:11px;color:#667085;margin-top:4px;line-height:1.5}
-.type-advice{margin-top:.8rem;font-size:12.5px;line-height:1.75;color:#475467}
+.type-item{border:1px solid #E3E7EE;border-radius:10px;padding:.7rem .75rem;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.type-chip{display:inline-block;border-radius:6px;padding:2px 8px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.type-item .type-chip{align-self:flex-start}
+.type-score{font-size:20px;font-weight:700;letter-spacing:-.03em;margin-top:8px;line-height:1.2;color:#101828}
+.type-note{font-size:11px;color:#667085;margin-top:3px;line-height:1.5}
+.type-advice{margin-top:.85rem;font-size:12px;line-height:1.7;color:#475467}
+.type-advice:empty{display:none}
 @media(min-width:1024px){
-  .type-grid{grid-template-columns:1fr;gap:12px}
-  .type-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:1rem 1.1rem}
+  .type-grid{flex:1;grid-template-columns:1fr;grid-template-rows:repeat(3,1fr);gap:10px}
+  .type-item{flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:.75rem 1rem}
   .type-body{text-align:right}
   .type-score{margin-top:0;font-size:22px}
 }
@@ -98,13 +106,12 @@ button{font-family:inherit;touch-action:manipulation}
 /* ── Exam list ── */
 .list-card{background:#fff;border:1px solid #E3E7EE;border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);overflow:hidden}
 .exam-list{list-style:none}
-.exam-item{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-bottom:1px solid #EFF1F5}
+.exam-item{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid #EFF1F5}
 .exam-list li:last-child{border-bottom:none}
-.exam-main{flex:1;min-width:0}
-.exam-top{display:flex;flex-wrap:wrap;align-items:center;gap:7px}
-.exam-name{font-size:14px;font-weight:600;color:#101828;line-height:1.45;min-width:0}
-.exam-sub{font-size:11.5px;color:#98A2B3;margin-top:4px;font-variant-numeric:tabular-nums}
-.exam-score{font-size:17px;font-weight:700;flex-shrink:0;letter-spacing:-.03em}
+.exam-item .type-chip{width:60px;text-align:center;flex-shrink:0;padding:2px 0}
+.exam-name{flex:1;min-width:0;font-size:13.5px;font-weight:600;color:#101828;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exam-meta{font-size:11.5px;color:#98A2B3;font-weight:600;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums}
+.exam-score{width:62px;text-align:right;font-size:16px;font-weight:700;flex-shrink:0;letter-spacing:-.03em}
 .exam-empty{padding:2.5rem 1rem;text-align:center;font-size:12.5px;color:#98A2B3}
 .pager{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #E3E7EE;background:#FAFBFD;padding:10px 14px}
 .pagebtn{height:36px;padding:0 14px;border:1px solid #E3E7EE;background:#fff;border-radius:8px;font-size:12.5px;font-weight:600;color:#475467;cursor:pointer;transition:background .15s,color .15s}
@@ -140,23 +147,29 @@ button{font-family:inherit;touch-action:manipulation}
   .stat-note{font-size:10.5px}
   .seg-btn{padding:0 10px;font-size:11.5px}
   .p-label{min-width:8rem;font-size:12.5px}
-  .type-card{padding:.75rem .8rem}
+  .type-item{padding:.6rem .65rem}
   .type-score{font-size:18px}
   .type-note{font-size:10.5px}
-  .exam-item{padding:12px 13px}
-  .exam-name{font-size:13.5px}
-  .exam-score{font-size:16px}
+  .exam-item{padding:10px 12px;gap:8px}
+  .exam-item .type-chip{width:50px;font-size:10.5px}
+  .exam-name{font-size:12.5px}
+  .exam-meta{font-size:10.5px}
+  .exam-score{width:52px;font-size:14.5px}
   .grid-main{gap:1.1rem}
   .block{margin-bottom:1.1rem}
 }
 @media(max-width:380px){
   .stat-num{font-size:16.5px}
   .type-grid{gap:7px}
-  .type-card{padding:.65rem .6rem}
+  .type-item{padding:.55rem .5rem}
   .type-chip{padding:2px 6px;font-size:11px}
   .type-score{font-size:16.5px}
   .seg-btn{padding:0 8px;font-size:11px}
   .pagebtn{padding:0 11px;font-size:12px}
+  .exam-item{padding:10px}
+  .exam-item .type-chip{width:44px;font-size:10px;padding:2px 0}
+  .exam-meta{font-size:10px}
+  .exam-score{width:46px;font-size:13.5px}
 }
 </style>
 </head>
@@ -241,12 +254,12 @@ button{font-family:inherit;touch-action:manipulation}
 
     <div class="grid-main">
 
-      <!-- 점수 추이 -->
-      <section id="chartSection">
+      <!-- 시험 점수 분포도 -->
+      <section id="chartSection" class="grid-col">
         <div class="section-heading">TREND</div>
-        <div class="section-card" style="margin-bottom:0">
+        <div class="section-card">
           <div class="section-header">
-            <span class="section-title">점수 추이</span>
+            <span class="section-title">시험 점수 분포도</span>
             <div class="seg" role="group" aria-label="기간 길이">
               <button id="r3" type="button" class="seg-btn">3개월</button>
               <button id="r6" type="button" class="seg-btn">6개월</button>
@@ -270,35 +283,40 @@ button{font-family:inherit;touch-action:manipulation}
         </div>
       </section>
 
-      <!-- 유형별 -->
-      <section id="typeSection">
-        <div class="section-heading">BY TYPE</div>
+      <!-- 최근 시험 점수 -->
+      <section id="typeSection" class="grid-col">
+        <div class="section-heading">RECENT</div>
+        <div class="section-card">
+          <div class="section-header" style="margin-bottom:.8rem">
+            <span class="section-title">최근 시험 점수</span>
+          </div>
 
-        <div class="type-grid">
-          <div class="type-card">
-            <span class="type-chip" style="background:#E7F6EC;color:#15803D">OX</span>
-            <div class="type-body">
-              <p class="type-score" id="tOx">—</p>
-              <p class="type-note" id="tOxNote">—</p>
+          <div class="type-grid">
+            <div class="type-item">
+              <span class="type-chip" style="background:#E7F6EC;color:#15803D">OX</span>
+              <div class="type-body">
+                <p class="type-score" id="tOx">—</p>
+                <p class="type-note" id="tOxNote">—</p>
+              </div>
+            </div>
+            <div class="type-item">
+              <span class="type-chip" style="background:#E4EBFB;color:#1D4ED8">사지선다</span>
+              <div class="type-body">
+                <p class="type-score" id="tMulti">—</p>
+                <p class="type-note" id="tMultiNote">—</p>
+              </div>
+            </div>
+            <div class="type-item">
+              <span class="type-chip" style="background:#FDEEE3;color:#C2410C">마스터</span>
+              <div class="type-body">
+                <p class="type-score" id="tMaster">—</p>
+                <p class="type-note" id="tMasterNote">—</p>
+              </div>
             </div>
           </div>
-          <div class="type-card">
-            <span class="type-chip" style="background:#E4EBFB;color:#1D4ED8">사지선다</span>
-            <div class="type-body">
-              <p class="type-score" id="tMulti">—</p>
-              <p class="type-note" id="tMultiNote">—</p>
-            </div>
-          </div>
-          <div class="type-card">
-            <span class="type-chip" style="background:#FDEEE3;color:#C2410C">마스터</span>
-            <div class="type-body">
-              <p class="type-score" id="tMaster">—</p>
-              <p class="type-note" id="tMasterNote">—</p>
-            </div>
-          </div>
+
+          <p id="typeAdvice" class="type-advice"></p>
         </div>
-
-        <p id="typeAdvice" class="type-advice"></p>
       </section>
 
     </div>
@@ -632,18 +650,19 @@ function drawChart(period) {
     if (after) seq.push(after);
 
     if (seq.length >= 2) {
-      lines += `<polyline points="${seq.map((p) => `${Xo(p.ts)},${Y(p.score)}`).join(" ")}" fill="none" stroke="${col}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`;
+      lines += `<polyline points="${seq.map((p) => `${Xo(p.ts)},${Y(p.score)}`).join(" ")}" fill="none" stroke="${col}" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/>`;
     }
 
     g.forEach((p, i) => {
       const last = i === g.length - 1;
       const cx = X(p.ts), cy = Y(p.score);
 
-      dots += markerSvg(shape, cx, cy, last ? 4.8 : 3.8, last ? col : "#fff", col, 2.1);
+      // 회차마다 점을 찍되, 속을 색으로 꽉 채운 작은 점으로 그립니다
+      dots += markerSvg(shape, cx, cy, last ? 3.2 : 2.4, col, col, 0);
 
       if (last) {
         // 마지막 점수는 겹치지 않는 자리에 적습니다
-        const cands = [cy - 13, cy + 20, cy - 30, cy + 37];
+        const cands = [cy - 11, cy + 17, cy - 26, cy + 32];
         let ly = cands.find((c) => c > PT + 6 && c < H - PB + 4
           && !placed.some((q) => Math.abs(q.x - cx) < 36 && Math.abs(q.y - c) < 13));
         if (ly === undefined) ly = cy - 13;
@@ -654,7 +673,7 @@ function drawChart(period) {
   });
 
   wrap.innerHTML =
-    `<svg viewBox="0 0 ${W} ${H}" class="chart-svg" role="img" aria-label="유형별 점수 추이">
+    `<svg viewBox="0 0 ${W} ${H}" class="chart-svg" role="img" aria-label="시험 점수 분포도">
       <defs>
         <clipPath id="plotClip">
           <rect x="${gx0 - 1}" y="${PT - 18}" width="${gx1 - gx0 + 2}" height="${ih + 26}"/>
@@ -673,8 +692,8 @@ function drawLegend(types) {
     const st = styleOf(t);
     return `<span class="legend-item" style="color:${st.fg}">
               <svg width="26" height="12" viewBox="0 0 26 12" aria-hidden="true">
-                <line x1="1" y1="6" x2="25" y2="6" stroke="${st.line}" stroke-width="2.6" stroke-linecap="round"/>
-                ${markerSvg(st.shape, 13, 6, 3.6, st.line, st.line, 0)}
+                <line x1="1" y1="6" x2="25" y2="6" stroke="${st.line}" stroke-width="1.9" stroke-linecap="round"/>
+                ${markerSvg(st.shape, 13, 6, 3, st.line, st.line, 0)}
               </svg>${esc(st.label)}
             </span>`;
   }).join("");
@@ -742,19 +761,15 @@ function renderList() {
     $("examList").innerHTML = slice.map((e) => {
       const st = styleOf(e.type);
       const chip = `<span class="type-chip" style="background:${st.bg};color:${st.fg}">${esc(st.label)}</span>`;
-      const detail = (isNum(e.correct) && e.total) ? `${e.correct} / ${e.total}문항` : "";
-      const sub = [e.fullDate, detail].filter(Boolean).map(esc).join(" · ");
+      const detail = e.total ? `${e.total}문항` : "";
+      const meta = [e.fullDate, detail].filter(Boolean).map(esc).join(" · ");
       const c = bandOf(e.score).color;
 
       return `<li class="exam-item">
-        <div class="exam-main">
-          <div class="exam-top">
-            ${chip}
-            <p class="exam-name">${esc(e.testName)}</p>
-          </div>
-          <p class="exam-sub">${sub}</p>
-        </div>
-        <p class="exam-score" style="color:${c}">${r1(e.score)}점</p>
+        ${chip}
+        <span class="exam-name">${esc(e.testName)}</span>
+        <span class="exam-meta">${meta}</span>
+        <span class="exam-score" style="color:${c}">${r1(e.score)}점</span>
       </li>`;
     }).join("");
   }
