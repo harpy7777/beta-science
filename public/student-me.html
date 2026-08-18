@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>내 성적 · 인후쌤 과학수업</title>
+<title>내 성적 · 인후쌤의 과학 수업 관리 시스템</title>
 <meta name="theme-color" content="#004AAD" />
 <meta name="robots" content="noindex, nofollow" />
 <link rel="stylesheet" as="style" crossorigin
@@ -19,7 +19,7 @@
       },
       fontFamily: { sans:['Pretendard Variable','Pretendard','-apple-system','system-ui','sans-serif'] },
       boxShadow: { card:'0 1px 2px 0 rgba(16,24,40,0.05)' },
-      maxWidth: { shell:'44rem' }
+      maxWidth: { shell:'78rem' }
     }}
   };
 </script>
@@ -28,15 +28,7 @@
   .num{font-variant-numeric:tabular-nums;letter-spacing:-0.03em}
   .tight{letter-spacing:-0.035em}
   :focus-visible{outline:2px solid #004AAD;outline-offset:3px;border-radius:8px}
-  .on-hero :focus-visible{outline-color:#fff}
-
-  /* 상단 배너 */
-  .hero{position:relative;overflow:hidden;
-        background:linear-gradient(118deg,#002F6E 0%,#004AAD 58%,#1668C9 100%)}
-  .hero::after{content:"";position:absolute;right:-14%;bottom:-74%;width:64%;aspect-ratio:1;
-        border-radius:9999px;pointer-events:none;
-        background:radial-gradient(circle,rgba(255,255,255,.14),rgba(255,255,255,0) 68%)}
-  .hero > *{position:relative;z-index:1}
+  .on-blue :focus-visible{outline-color:#fff}
 
   /* 제목 앞 눈금 — 색은 하나로 통일합니다 */
   .rule{display:inline-block;width:3px;height:14px;border-radius:2px;background:#004AAD;flex:none}
@@ -69,21 +61,28 @@
 <!-- 본문 -->
 <div id="app" class="hidden">
 
-  <header class="hero on-hero">
-    <div class="mx-auto max-w-shell px-5 py-6 sm:px-6 sm:py-8">
-      <div class="flex items-center gap-2.5">
-        <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-white/12">
-          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M9.5 3v6.2L4.8 17.4A2.4 2.4 0 0 0 6.9 21h10.2a2.4 2.4 0 0 0 2.1-3.6L14.5 9.2V3"/><path d="M8.2 3h7.6"/><path d="M7.4 14.4h9.2"/>
+  <!-- 상단 바 -->
+  <header class="sticky top-0 z-40 border-b border-edge bg-white">
+    <div class="mx-auto flex max-w-shell items-center justify-between gap-3 px-5 py-3 sm:px-6">
+      <div class="flex min-w-0 items-center gap-2.5">
+        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-600">
+          <svg class="h-[22px] w-[22px]" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="8.2" r="3.4"/><path d="M4.9 20a7.1 7.1 0 0 1 14.2 0"/>
           </svg>
         </span>
-        <span class="text-[13.5px] font-semibold text-white/80">인후쌤 과학수업</span>
+        <span class="tight truncate text-[14.5px] font-bold sm:text-[15.5px]">인후쌤의 과학 수업 관리 시스템</span>
       </div>
+      <span id="hBadge" class="hidden shrink-0 rounded-full border border-edge px-3 py-1 text-[12.5px] font-semibold text-ink-700 sm:inline-block"></span>
+    </div>
+  </header>
 
-      <p class="mt-6 text-[13.5px] text-white/60" id="hSub">—</p>
+  <!-- 학생 요약 -->
+  <section class="on-blue bg-brand-600">
+    <div class="mx-auto max-w-shell px-5 py-6 sm:px-6 sm:py-8">
+      <p class="text-[13.5px] text-white/60" id="hSub">—</p>
       <h1 class="tight mt-1 text-[24px] font-bold text-white sm:text-[27px]"><span id="hName">—</span> 학생의 성적표</h1>
 
-      <div class="mt-7 grid grid-cols-3 gap-3 sm:gap-4">
+      <div class="mt-7 grid max-w-2xl grid-cols-3 gap-3 sm:gap-6">
         <div>
           <p class="text-[12.5px] text-white/55">최근 점수</p>
           <p class="num mt-1 text-[20px] font-bold text-white sm:text-[22px]" id="sLatest">—</p>
@@ -101,9 +100,9 @@
         </div>
       </div>
     </div>
-  </header>
+  </section>
 
-  <main class="safe-b mx-auto max-w-shell px-5 pt-8 sm:px-6">
+  <main class="safe-b mx-auto max-w-shell px-5 pt-6 sm:px-6 sm:pt-8">
 
     <!-- 응원 문구 -->
     <div id="msgBox" class="rounded-xl border border-edge bg-white p-5 shadow-card sm:p-6">
@@ -113,65 +112,74 @@
       </div>
     </div>
 
-    <!-- 점수 추이 -->
-    <section class="mt-8" id="chartSection">
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <h2 class="tight flex items-center gap-2 text-[15.5px] font-bold">
-          <span class="rule"></span>점수 추이
-        </h2>
-        <div class="inline-flex rounded-lg border border-edge bg-white p-0.5 shadow-card" role="group" aria-label="기간 길이">
-          <button id="r3"   type="button" class="segbtn rounded-md px-2.5 text-[12.5px] font-semibold">3개월</button>
-          <button id="r6"   type="button" class="segbtn rounded-md px-2.5 text-[12.5px] font-semibold">6개월</button>
-          <button id="rAll" type="button" class="segbtn rounded-md px-2.5 text-[12.5px] font-semibold">전체</button>
-        </div>
-      </div>
+    <div class="mt-6 grid items-start gap-6 lg:grid-cols-3 lg:gap-5">
 
-      <div class="mt-3 rounded-xl border border-edge bg-white p-5 shadow-card sm:p-6">
-        <div class="mb-3 flex items-center justify-center gap-1.5">
-          <button id="pPrev" type="button" aria-label="이전 기간 보기"
-            class="navbtn flex items-center justify-center rounded-md border border-edge bg-white px-2 text-ink-700 transition-colors hover:bg-brand-50 hover:text-brand-600 disabled:opacity-25">
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
-          <span id="pLabel" class="num min-w-[9.5rem] whitespace-nowrap text-center text-[13px] font-bold">—</span>
-          <button id="pNext" type="button" aria-label="다음 기간 보기"
-            class="navbtn flex items-center justify-center rounded-md border border-edge bg-white px-2 text-ink-700 transition-colors hover:bg-brand-50 hover:text-brand-600 disabled:opacity-25">
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
-          </button>
+      <!-- 점수 추이 -->
+      <section id="chartSection" class="lg:col-span-2">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 class="tight flex items-center gap-2 text-[15.5px] font-bold">
+            <span class="rule"></span>점수 추이
+          </h2>
+          <div class="inline-flex rounded-lg border border-edge bg-white p-0.5 shadow-card" role="group" aria-label="기간 길이">
+            <button id="r3"   type="button" class="segbtn rounded-md px-2.5 text-[12.5px] font-semibold">3개월</button>
+            <button id="r6"   type="button" class="segbtn rounded-md px-2.5 text-[12.5px] font-semibold">6개월</button>
+            <button id="rAll" type="button" class="segbtn rounded-md px-2.5 text-[12.5px] font-semibold">전체</button>
+          </div>
         </div>
 
-        <div id="chartWrap" class="w-full"></div>
-        <div id="legendType" class="mt-4 flex flex-wrap gap-x-4 gap-y-2"></div>
-        <div id="legendBand" class="mt-2.5 flex flex-wrap gap-x-3 gap-y-1.5"></div>
-        <p class="mt-3 text-[12.5px] leading-relaxed text-ink-500" id="chartNote">—</p>
-      </div>
-    </section>
+        <div class="mt-3 rounded-xl border border-edge bg-white p-5 shadow-card sm:p-6">
+          <div class="mb-3 flex items-center justify-center gap-1.5">
+            <button id="pPrev" type="button" aria-label="이전 기간 보기"
+              class="navbtn flex items-center justify-center rounded-md border border-edge bg-white px-2 text-ink-700 transition-colors hover:bg-brand-50 hover:text-brand-600 disabled:opacity-25">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <span id="pLabel" class="num min-w-[9.5rem] whitespace-nowrap text-center text-[13px] font-bold">—</span>
+            <button id="pNext" type="button" aria-label="다음 기간 보기"
+              class="navbtn flex items-center justify-center rounded-md border border-edge bg-white px-2 text-ink-700 transition-colors hover:bg-brand-50 hover:text-brand-600 disabled:opacity-25">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
 
-    <!-- 유형별 -->
-    <section class="mt-8" id="typeSection">
-      <h2 class="tight flex items-center gap-2 text-[15.5px] font-bold"><span class="rule"></span>유형별 최근 성적</h2>
-      <div class="mt-3 grid grid-cols-3 gap-2.5">
-
-        <div class="rounded-xl border border-edge bg-white p-3.5 shadow-card sm:p-5">
-          <span class="inline-block rounded px-2 py-0.5 text-[11.5px] font-bold" style="background:#E4F1F2;color:#0B6169">OX</span>
-          <p class="num mt-2.5 text-[20px] font-bold sm:text-[23px]" id="tOx">—</p>
-          <p class="mt-1 text-[11.5px] leading-snug text-ink-500 sm:text-[12.5px]" id="tOxNote">—</p>
+          <div id="chartWrap" class="w-full"></div>
+          <div id="legendType" class="mt-4 flex flex-wrap gap-x-5 gap-y-2"></div>
+          <p class="mt-3 text-[12.5px] leading-relaxed text-ink-500" id="chartNote">—</p>
         </div>
+      </section>
 
-        <div class="rounded-xl border border-edge bg-white p-3.5 shadow-card sm:p-5">
-          <span class="inline-block rounded px-2 py-0.5 text-[11.5px] font-bold" style="background:#E6EDF9;color:#003C8C">사지선다</span>
-          <p class="num mt-2.5 text-[20px] font-bold sm:text-[23px]" id="tMulti">—</p>
-          <p class="mt-1 text-[11.5px] leading-snug text-ink-500 sm:text-[12.5px]" id="tMultiNote">—</p>
+      <!-- 유형별 -->
+      <section id="typeSection">
+        <h2 class="tight flex items-center gap-2 text-[15.5px] font-bold"><span class="rule"></span>유형별 최근 성적</h2>
+        <div class="mt-3 grid grid-cols-3 gap-2.5 lg:grid-cols-1 lg:gap-3">
+
+          <div class="rounded-xl border border-edge bg-white p-3.5 shadow-card sm:p-5 lg:flex lg:items-center lg:justify-between lg:gap-3">
+            <span class="inline-block rounded px-2 py-0.5 text-[11.5px] font-bold" style="background:#E7F6EC;color:#15803D">OX</span>
+            <div class="lg:text-right">
+              <p class="num mt-2.5 text-[20px] font-bold sm:text-[23px] lg:mt-0" id="tOx">—</p>
+              <p class="mt-1 text-[11.5px] leading-snug text-ink-500 sm:text-[12.5px]" id="tOxNote">—</p>
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-edge bg-white p-3.5 shadow-card sm:p-5 lg:flex lg:items-center lg:justify-between lg:gap-3">
+            <span class="inline-block rounded px-2 py-0.5 text-[11.5px] font-bold" style="background:#E4EBFB;color:#1D4ED8">사지선다</span>
+            <div class="lg:text-right">
+              <p class="num mt-2.5 text-[20px] font-bold sm:text-[23px] lg:mt-0" id="tMulti">—</p>
+              <p class="mt-1 text-[11.5px] leading-snug text-ink-500 sm:text-[12.5px]" id="tMultiNote">—</p>
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-edge bg-white p-3.5 shadow-card sm:p-5 lg:flex lg:items-center lg:justify-between lg:gap-3">
+            <span class="inline-block rounded px-2 py-0.5 text-[11.5px] font-bold" style="background:#FDEEE3;color:#C2410C">마스터</span>
+            <div class="lg:text-right">
+              <p class="num mt-2.5 text-[20px] font-bold sm:text-[23px] lg:mt-0" id="tMaster">—</p>
+              <p class="mt-1 text-[11.5px] leading-snug text-ink-500 sm:text-[12.5px]" id="tMasterNote">—</p>
+            </div>
+          </div>
+
         </div>
+        <p id="typeAdvice" class="mt-3 text-[13.5px] leading-relaxed text-ink-700"></p>
+      </section>
 
-        <div class="rounded-xl border border-edge bg-white p-3.5 shadow-card sm:p-5">
-          <span class="inline-block rounded px-2 py-0.5 text-[11.5px] font-bold" style="background:#F4EDE1;color:#8A5410">마스터</span>
-          <p class="num mt-2.5 text-[20px] font-bold sm:text-[23px]" id="tMaster">—</p>
-          <p class="mt-1 text-[11.5px] leading-snug text-ink-500 sm:text-[12.5px]" id="tMasterNote">—</p>
-        </div>
-
-      </div>
-      <p id="typeAdvice" class="mt-3 text-[13.5px] leading-relaxed text-ink-700"></p>
-    </section>
+    </div>
 
     <!-- 회차 목록 -->
     <section class="mt-8">
@@ -214,20 +222,34 @@ const firebaseConfig = {
    채도를 낮춘 한 벌로 맞춰 화면이 튀지 않게 했습니다.      */
 const UP_COLOR = "#7DD3AC";   // 헤더에서 점수가 올랐을 때
 const BANDS = [
-  { min: 90, color: "#0F7A55", label: "90점 이상" },
-  { min: 75, color: "#004AAD", label: "75~89점" },
-  { min: 60, color: "#B26A00", label: "60~74점" },
-  { min: -1, color: "#B0234A", label: "60점 미만" }
+  { min: 90, color: "#15803D", label: "90점 이상" },
+  { min: 75, color: "#1D4ED8", label: "75~89점" },
+  { min: 60, color: "#C2410C", label: "60~74점" },
+  { min: -1, color: "#B91C1C", label: "60점 미만" }
 ];
 const bandOf = (v) => BANDS.find((b) => v >= b.min) || BANDS[BANDS.length - 1];
 
-/* 유형별 색 · 정렬 순서 (line 은 그래프 선 색입니다) */
+/* 유형별 색 · 점 모양 · 정렬 순서
+   색은 뚜렷하게 갈리는 네 가지를 쓰고, 점 모양까지 달리해
+   색을 구분하기 어려운 화면에서도 유형이 보이게 했습니다.   */
 const TYPE_STYLE = {
-  ox:     { label: "OX",      bg: "#E4F1F2", fg: "#0B6169", line: "#0E7C86", order: 1 },
-  multi:  { label: "사지선다", bg: "#E6EDF9", fg: "#003C8C", line: "#004AAD", order: 2 },
-  master: { label: "마스터",   bg: "#F4EDE1", fg: "#8A5410", line: "#B26A00", order: 3 },
-  total:  { label: "시험",     bg: "#F1F3F6", fg: "#475467", line: "#667085", order: 4 }
+  ox:     { label: "OX",      bg: "#E7F6EC", fg: "#15803D", line: "#16A34A", shape: "circle",   order: 1 },
+  multi:  { label: "사지선다", bg: "#E4EBFB", fg: "#1D4ED8", line: "#2563EB", shape: "square",   order: 2 },
+  master: { label: "마스터",   bg: "#FDEEE3", fg: "#C2410C", line: "#EA580C", shape: "diamond",  order: 3 },
+  total:  { label: "시험",     bg: "#FCE9E9", fg: "#B91C1C", line: "#DC2626", shape: "triangle", order: 4 }
 };
+
+/* 점 모양을 그립니다 */
+function markerSvg(shape, cx, cy, r, fill, stroke, sw) {
+  const a = `fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"`;
+  if (shape === "square")
+    return `<rect x="${cx - r}" y="${cy - r}" width="${r * 2}" height="${r * 2}" rx="1" ${a}/>`;
+  if (shape === "diamond")
+    return `<polygon points="${cx},${cy - r * 1.3} ${cx + r * 1.3},${cy} ${cx},${cy + r * 1.3} ${cx - r * 1.3},${cy}" ${a}/>`;
+  if (shape === "triangle")
+    return `<polygon points="${cx},${cy - r * 1.35} ${cx + r * 1.25},${cy + r * 0.92} ${cx - r * 1.25},${cy + r * 0.92}" ${a}/>`;
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" ${a}/>`;
+}
 const styleOf = (k) => TYPE_STYLE[k] || TYPE_STYLE.total;
 
 const PER_PAGE = 10;   // 시험 기록 한 페이지에 보여줄 개수
@@ -469,6 +491,7 @@ function drawChart(period) {
   types.forEach((t) => {
     const g = groups.get(t);
     const col = styleOf(t).line;
+    const shape = styleOf(t).shape;
 
     // 앞뒤 기간의 이웃 기록을 붙여 선을 잇습니다
     const seq = [];
@@ -479,14 +502,14 @@ function drawChart(period) {
     if (after) seq.push(after);
 
     if (seq.length >= 2) {
-      lines += `<polyline points="${seq.map((p) => `${Xo(p.ts)},${Y(p.score)}`).join(" ")}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`;
+      lines += `<polyline points="${seq.map((p) => `${Xo(p.ts)},${Y(p.score)}`).join(" ")}" fill="none" stroke="${col}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`;
     }
 
     g.forEach((p, i) => {
       const last = i === g.length - 1;
       const cx = X(p.ts), cy = Y(p.score);
 
-      dots += `<circle cx="${cx}" cy="${cy}" r="${last ? 5.2 : 4}" fill="${last ? col : "#fff"}" stroke="${col}" stroke-width="2.1"/>`;
+      dots += markerSvg(shape, cx, cy, last ? 4.8 : 3.8, last ? col : "#fff", col, 2.1);
 
       if (last) {
         // 마지막 점수는 겹치지 않는 자리에 적습니다
@@ -518,15 +541,13 @@ function drawChart(period) {
 function drawLegend(types) {
   $("legendType").innerHTML = (types || []).map((t) => {
     const st = styleOf(t);
-    return `<span class="inline-flex items-center gap-1.5 text-[12px] font-medium text-ink-700">
-              <span class="h-[3px] w-5 rounded-sm" style="background:${st.line}"></span>${esc(st.label)}
+    return `<span class="inline-flex items-center gap-1.5 text-[12.5px] font-semibold" style="color:${st.fg}">
+              <svg width="26" height="12" viewBox="0 0 26 12" aria-hidden="true">
+                <line x1="1" y1="6" x2="25" y2="6" stroke="${st.line}" stroke-width="2.6" stroke-linecap="round"/>
+                ${markerSvg(st.shape, 13, 6, 3.6, st.line, st.line, 0)}
+              </svg>${esc(st.label)}
             </span>`;
   }).join("");
-
-  $("legendBand").innerHTML = (types && types.length) ? BANDS.map((b) =>
-    `<span class="inline-flex items-center gap-1.5 text-[11.5px] text-ink-500">
-       <span class="h-2 w-2 rounded-full" style="background:${b.color}"></span>${esc(b.label)}
-     </span>`).join("") : "";
 }
 
 /* ── 화면 상태 ─────────────────────────────────────────── */
@@ -579,7 +600,7 @@ function renderPeriod() {
     : `이번 달까지 ${months}개월씩 끊어 보여 드립니다.`;
   const link = months === 0 ? "" : " 선은 앞뒤 기간까지 이어집니다.";
   $("chartNote").textContent =
-    `${how} 이 화면에는 ${p.items.length}개의 기록이 있습니다.${link} 선의 색은 유형, 점수 색은 점수대를 나타냅니다.`;
+    `${how} 이 화면에는 ${p.items.length}개의 기록이 있습니다.${link} 선의 색과 점 모양으로 유형을 구분합니다.`;
 }
 
 function renderList() {
@@ -646,6 +667,8 @@ function render(p) {
   $("hName").textContent = p.name || "학생";
   const sub = [p.grade, p.subject].filter(Boolean).join(" · ");
   $("hSub").textContent = sub || "안녕하세요";
+  const badge = [p.name, p.grade].filter(Boolean).join(" · ");
+  if (badge) { $("hBadge").textContent = badge; $("hBadge").classList.remove("hidden"); }
 
   const rows = (Array.isArray(p.results) ? p.results.slice() : [])
     .filter((r) => r && isFinite(Number(r.score)))
