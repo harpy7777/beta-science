@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>내 성적 · 인후쌤 과학수업</title>
-<meta name="theme-color" content="#16263F" />
+<meta name="theme-color" content="#1B2545" />
 <meta name="robots" content="noindex, nofollow" />
 <link rel="stylesheet" as="style" crossorigin
   href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
@@ -12,10 +12,10 @@
 <script>
   tailwind.config = {
     theme: { extend: {
-      colors: { navy:{950:'#101D33',900:'#16263F',800:'#1E3352'},
-                brand:{50:'#F2F5F9',100:'#E3EAF3',200:'#C6D4E6',300:'#A7BBD6',500:'#4E6E9B',600:'#3B5B8C',700:'#2F4A75'} },
+      colors: { navy:{950:'#141C36',900:'#1B2545',800:'#26325A'},
+                brand:{50:'#F4F5FB',100:'#E6E9F6',200:'#C9CFEC',300:'#A8B2DF',500:'#6272BC',600:'#4C5FA8',700:'#3E4E8C'} },
       fontFamily: { sans:['Pretendard Variable','Pretendard','-apple-system','system-ui','sans-serif'] },
-      boxShadow: { card:'0 1px 2px 0 rgba(22,38,63,0.05)' },
+      boxShadow: { card:'0 1px 2px 0 rgba(27,37,69,0.05)' },
       maxWidth: { shell:'44rem' }
     }}
   };
@@ -24,7 +24,7 @@
   body{letter-spacing:-0.02em;-webkit-text-size-adjust:100%}
   .num{font-variant-numeric:tabular-nums;letter-spacing:-0.03em}
   .tight{letter-spacing:-0.035em}
-  :focus-visible{outline:2px solid #3B5B8C;outline-offset:3px;border-radius:6px}
+  :focus-visible{outline:2px solid #4C5FA8;outline-offset:3px;border-radius:6px}
   .on-navy :focus-visible{outline-color:#fff}
   .safe-b{padding-bottom:calc(env(safe-area-inset-bottom) + 4rem)}
   @media (prefers-reduced-motion: reduce){*,*::before,*::after{transition-duration:.01ms !important;animation-duration:.01ms !important}}
@@ -92,24 +92,34 @@
       <h2 class="tight text-[16px] font-bold">점수 추이</h2>
       <div class="mt-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
         <div id="chartWrap" class="w-full"></div>
-        <p class="mt-3 text-[12.5px] text-slate-400">최근 회차 순서대로 표시됩니다.</p>
+        <div id="legend" class="mt-4 flex flex-wrap gap-x-4 gap-y-2"></div>
+        <p class="mt-3 text-[12.5px] text-slate-400">점의 색은 그 회차의 점수대를 나타냅니다.</p>
       </div>
     </section>
 
     <!-- 유형별 -->
     <section class="mt-8" id="typeSection">
       <h2 class="tight text-[16px] font-bold">유형별 최근 성적</h2>
-      <div class="mt-3 grid grid-cols-2 gap-3">
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-          <p class="text-[13px] font-medium text-slate-500">OX 문제</p>
-          <p class="num mt-2 text-[22px] font-bold" id="tOx">—</p>
-          <p class="mt-1 text-[12.5px] text-slate-400" id="tOxNote">—</p>
+      <div class="mt-3 grid grid-cols-3 gap-2.5">
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-3.5 shadow-card sm:p-5">
+          <span class="inline-block rounded-md bg-[#CCFBF1] px-2 py-0.5 text-[11.5px] font-bold text-[#0F766E]">OX</span>
+          <p class="num mt-2.5 text-[20px] font-bold sm:text-[23px]" id="tOx">—</p>
+          <p class="mt-1 text-[11.5px] leading-snug text-slate-400 sm:text-[12.5px]" id="tOxNote">—</p>
         </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-          <p class="text-[13px] font-medium text-slate-500">객관식 문제</p>
-          <p class="num mt-2 text-[22px] font-bold" id="tMulti">—</p>
-          <p class="mt-1 text-[12.5px] text-slate-400" id="tMultiNote">—</p>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-3.5 shadow-card sm:p-5">
+          <span class="inline-block rounded-md bg-brand-100 px-2 py-0.5 text-[11.5px] font-bold text-brand-700">사지선다</span>
+          <p class="num mt-2.5 text-[20px] font-bold sm:text-[23px]" id="tMulti">—</p>
+          <p class="mt-1 text-[11.5px] leading-snug text-slate-400 sm:text-[12.5px]" id="tMultiNote">—</p>
         </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-3.5 shadow-card sm:p-5">
+          <span class="inline-block rounded-md bg-[#FEF3C7] px-2 py-0.5 text-[11.5px] font-bold text-[#B45309]">마스터</span>
+          <p class="num mt-2.5 text-[20px] font-bold sm:text-[23px]" id="tMaster">—</p>
+          <p class="mt-1 text-[11.5px] leading-snug text-slate-400 sm:text-[12.5px]" id="tMasterNote">—</p>
+        </div>
+
       </div>
       <p id="typeAdvice" class="mt-3 text-[13.5px] leading-relaxed text-slate-500"></p>
     </section>
@@ -139,8 +149,23 @@ const firebaseConfig = {
   appId: "1:650652155367:web:41d2958e675cb4edd4d142"
 };
 
-/* 강조색 — 여기 한 줄만 바꾸면 그래프 색이 모두 따라 바뀝니다 */
-const ACCENT = "#3B5B8C";
+/* ── 색 설정 ─────────────────────────────────────────────
+   ACCENT : 기본 강조색
+   BANDS  : 점수대별 점 색깔 (위에서부터 높은 점수)          */
+const ACCENT = "#4C5FA8";
+const BANDS = [
+  { min: 90, color: "#10B981", label: "90점 이상" },
+  { min: 75, color: "#4C5FA8", label: "75~89점" },
+  { min: 60, color: "#F59E0B", label: "60~74점" },
+  { min: -1, color: "#A78BFA", label: "60점 미만" }
+];
+const bandOf = (v) => BANDS.find((b) => v >= b.min) || BANDS[BANDS.length - 1];
+
+const TYPE_STYLE = {
+  ox:     { label: "OX",     bg: "#CCFBF1", fg: "#0F766E" },
+  multi:  { label: "사지선다", bg: "#E6E9F6", fg: "#3E4E8C" },
+  master: { label: "마스터",  bg: "#FEF3C7", fg: "#B45309" }
+};
 
 const $ = (id) => document.getElementById(id);
 const showError = (m) => {
@@ -152,6 +177,8 @@ const showError = (m) => {
 const esc = (s) => String(s == null ? "" : s)
   .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const r1 = (n) => Math.round(Number(n) * 10) / 10;
+const n0 = (x) => (x === null || x === undefined || x === "" || isNaN(Number(x)) ? null : Number(x));
+const pick = (...xs) => { for (const x of xs) if (x !== null && x !== undefined) return x; return null; };
 
 function fmtDate(r) {
   if (r && typeof r.ts === "number" && isFinite(r.ts)) {
@@ -161,24 +188,73 @@ function fmtDate(r) {
   return r && r.date ? String(r.date) : "";
 }
 
-/* 꺾은선 차트 (외부 라이브러리 없이 SVG로 직접 그립니다) */
-function drawChart(rows) {
-  const wrap = $("chartWrap");
-  if (!rows.length) { wrap.innerHTML = '<p class="py-6 text-center text-[13.5px] text-slate-400">아직 기록이 없습니다.</p>'; return; }
-  if (rows.length === 1) {
-    wrap.innerHTML = `<p class="py-6 text-center text-[13.5px] text-slate-400">회차가 2번 이상 쌓이면 추이가 그려집니다.</p>`;
-    return;
+/* 점수와 문항 수로 맞은 개수를 역산합니다 */
+function calcCorrect(score, total) {
+  if (score === null || total === null || total <= 0) return null;
+  return Math.round((score / 100) * total);
+}
+
+/* ── 한 회차가 어떤 유형을 포함하는지 판별합니다 ─────────── */
+function splitParts(r) {
+  const out = {};
+
+  if (r.master) {
+    const total = pick(r.total, r.totalQuestions);
+    out.master = {
+      score: r.score,
+      total: total,
+      correct: pick(r.totalCorrect, r.correct, r.correctCount, calcCorrect(r.score, total))
+    };
+    return out;
   }
 
-  const W = 640, H = 220, PL = 38, PR = 14, PT = 18, PB = 34;
+  const oxc = n0(r.oxCount), muc = n0(r.multiCount), tq = n0(r.totalQuestions);
+  const subs = Array.isArray(r.subTypes) ? r.subTypes.map((s) => String(s).toLowerCase()) : [];
+
+  let oxDone = null, muDone = null;
+
+  // 1순위: 문항 수 합이 딱 맞으면 어느 쪽을 풀었는지 확실합니다
+  if (tq !== null && oxc !== null && muc !== null) {
+    if (tq === oxc + muc) { oxDone = true; muDone = true; }
+    else if (tq === oxc)  { oxDone = true; muDone = false; }
+    else if (tq === muc)  { oxDone = false; muDone = true; }
+  }
+  // 2순위: 완료 표시나 정답 개수가 있으면 푼 것입니다
+  if (oxDone === null) oxDone = r.oxDone === true || n0(r.oxCorrect) !== null
+                             || (n0(r.oxScore) !== null && n0(r.oxScore) > 0) || subs.includes("ox");
+  if (muDone === null) muDone = r.multiDone === true || n0(r.multiCorrect) !== null
+                             || (n0(r.multiScore) !== null && n0(r.multiScore) > 0)
+                             || subs.includes("multiple") || subs.includes("multi");
+
+  if (oxDone && n0(r.oxScore) !== null) {
+    out.ox = { score: n0(r.oxScore), total: oxc,
+               correct: pick(n0(r.oxCorrect), calcCorrect(n0(r.oxScore), oxc)) };
+  }
+  if (muDone && n0(r.multiScore) !== null) {
+    out.multi = { score: n0(r.multiScore), total: muc,
+                  correct: pick(n0(r.multiCorrect), calcCorrect(n0(r.multiScore), muc)) };
+  }
+  return out;
+}
+
+/* ── 꺾은선 차트 ───────────────────────────────────────── */
+function drawChart(rows) {
+  const wrap = $("chartWrap");
+  if (!rows.length) { wrap.innerHTML = '<p class="py-6 text-center text-[13.5px] text-slate-400">아직 기록이 없습니다.</p>'; return false; }
+  if (rows.length === 1) {
+    wrap.innerHTML = `<p class="py-6 text-center text-[13.5px] text-slate-400">회차가 2번 이상 쌓이면 추이가 그려집니다.</p>`;
+    return false;
+  }
+
+  const W = 640, H = 220, PL = 38, PR = 16, PT = 22, PB = 34;
   const iw = W - PL - PR, ih = H - PT - PB;
   const n = rows.length;
-  const x = (i) => PL + (n === 1 ? iw / 2 : (iw * i) / (n - 1));
+  const x = (i) => PL + (iw * i) / (n - 1);
   const y = (v) => PT + ih - (ih * Math.max(0, Math.min(100, v))) / 100;
 
   let grid = "";
   [0, 25, 50, 75, 100].forEach((v) => {
-    grid += `<line x1="${PL}" y1="${y(v)}" x2="${W - PR}" y2="${y(v)}" stroke="#E5E9EF" stroke-width="1"/>`;
+    grid += `<line x1="${PL}" y1="${y(v)}" x2="${W - PR}" y2="${y(v)}" stroke="#E9EDF3" stroke-width="1"/>`;
     grid += `<text x="${PL - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="#9AA5B4">${v}</text>`;
   });
 
@@ -188,8 +264,10 @@ function drawChart(rows) {
   let dots = "", labels = "";
   rows.forEach((r, i) => {
     const last = i === n - 1;
-    dots += `<circle cx="${x(i)}" cy="${y(r.score)}" r="${last ? 5.5 : 4}" fill="${last ? ACCENT : "#fff"}" stroke="${ACCENT}" stroke-width="2"/>`;
-    if (last) dots += `<text x="${x(i)}" y="${y(r.score) - 12}" text-anchor="middle" font-size="12" font-weight="700" fill="${ACCENT}">${r1(r.score)}</text>`;
+    const c = bandOf(r.score).color;
+    if (last) dots += `<circle cx="${x(i)}" cy="${y(r.score)}" r="9" fill="${c}" fill-opacity="0.18"/>`;
+    dots += `<circle cx="${x(i)}" cy="${y(r.score)}" r="${last ? 5.5 : 4.5}" fill="${last ? c : "#fff"}" stroke="${c}" stroke-width="2.2"/>`;
+    if (last) dots += `<text x="${x(i)}" y="${y(r.score) - 15}" text-anchor="middle" font-size="12.5" font-weight="700" fill="${c}">${r1(r.score)}</text>`;
     if (n <= 6 || i === 0 || last || i % 2 === 0) {
       labels += `<text x="${x(i)}" y="${H - 10}" text-anchor="middle" font-size="10.5" fill="#9AA5B4">${esc(r.shortDate)}</text>`;
     }
@@ -197,13 +275,34 @@ function drawChart(rows) {
 
   wrap.innerHTML =
     `<svg viewBox="0 0 ${W} ${H}" class="h-auto w-full" role="img" aria-label="회차별 점수 추이">
+      <defs>
+        <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#4C5FA8"/>
+          <stop offset="50%" stop-color="#7C6BC4"/>
+          <stop offset="100%" stop-color="#14B8A6"/>
+        </linearGradient>
+        <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${ACCENT}" stop-opacity="0.16"/>
+          <stop offset="100%" stop-color="${ACCENT}" stop-opacity="0.01"/>
+        </linearGradient>
+      </defs>
       ${grid}
-      <polygon points="${area}" fill="${ACCENT}" fill-opacity="0.07"/>
-      <polyline points="${pts}" fill="none" stroke="${ACCENT}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <polygon points="${area}" fill="url(#areaGrad)"/>
+      <polyline points="${pts}" fill="none" stroke="url(#lineGrad)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
       ${dots}${labels}
     </svg>`;
+  return true;
 }
 
+function drawLegend(show) {
+  if (!show) { $("legend").innerHTML = ""; return; }
+  $("legend").innerHTML = BANDS.map((b) =>
+    `<span class="inline-flex items-center gap-1.5 text-[12px] text-slate-500">
+       <span class="h-2.5 w-2.5 rounded-full" style="background:${b.color}"></span>${esc(b.label)}
+     </span>`).join("");
+}
+
+/* ── 화면 그리기 ───────────────────────────────────────── */
 function render(p) {
   $("hName").textContent = p.name || "학생";
   const sub = [p.grade, p.subject].filter(Boolean).join(" · ");
@@ -215,12 +314,13 @@ function render(p) {
       examId: r.examId || "",
       testName: r.testName || "시험",
       score: Number(r.score),
-      oxScore: isFinite(Number(r.oxScore)) && r.oxScore !== null ? Number(r.oxScore) : null,
-      multiScore: isFinite(Number(r.multiScore)) && r.multiScore !== null ? Number(r.multiScore) : null,
-      correctCount: isFinite(Number(r.correctCount)) && r.correctCount !== null ? Number(r.correctCount) : null,
-      totalQuestions: isFinite(Number(r.totalQuestions)) && r.totalQuestions !== null ? Number(r.totalQuestions) : null,
-      ts: isFinite(Number(r.ts)) && r.ts !== null ? Number(r.ts) : null,
-      date: r.date || ""
+      master: r.master === true,
+      subTypes: Array.isArray(r.subTypes) ? r.subTypes : [],
+      oxScore: n0(r.oxScore), oxCount: n0(r.oxCount), oxCorrect: n0(r.oxCorrect), oxDone: r.oxDone === true,
+      multiScore: n0(r.multiScore), multiCount: n0(r.multiCount), multiCorrect: n0(r.multiCorrect), multiDone: r.multiDone === true,
+      correctCount: n0(r.correctCount), totalQuestions: n0(r.totalQuestions),
+      totalCorrect: n0(r.totalCorrect), total: n0(r.total), correct: n0(r.correct),
+      ts: n0(r.ts), date: r.date || ""
     }))
     .sort((a, b) => (a.ts || 0) - (b.ts || 0));
 
@@ -228,6 +328,14 @@ function render(p) {
     const d = r.ts ? new Date(r.ts) : null;
     r.shortDate = d ? `${d.getMonth() + 1}/${d.getDate()}` : "";
     r.fullDate = fmtDate(r);
+    r.parts = splitParts(r);
+
+    // 이 회차 전체의 맞은 개수 / 총 문항 수
+    const partSum = Object.values(r.parts).reduce((a, x) => a + (x.correct || 0), 0);
+    const partTot = Object.values(r.parts).reduce((a, x) => a + (x.total || 0), 0);
+    r.allTotal = pick(r.totalQuestions, r.total, partTot || null);
+    r.allCorrect = pick(r.correctCount, r.totalCorrect, r.correct,
+                        partSum || null, calcCorrect(r.score, r.allTotal));
   });
 
   if (!rows.length) {
@@ -269,38 +377,73 @@ function render(p) {
   if (latest.score >= best.score && rows.length >= 2) msg = "지금까지 중 가장 높은 점수예요. 잘하고 있습니다.";
   $("msgText").textContent = msg;
 
-  drawChart(rows.slice(-10));
+  drawLegend(drawChart(rows.slice(-10)));
 
-  // 유형별
-  const ox = latest.oxScore, mu = latest.multiScore;
-  $("tOx").textContent = ox == null ? "—" : r1(ox) + "점";
-  $("tMulti").textContent = mu == null ? "—" : r1(mu) + "점";
-  $("tOxNote").textContent = ox == null ? "이번 회차에 없음" : "100점 만점 환산";
-  $("tMultiNote").textContent = mu == null ? "이번 회차에 없음" : "100점 만점 환산";
+  /* 유형별 최근 성적 — 유형마다 가장 최근 기록을 찾습니다 */
+  const latestOf = (key) => {
+    for (let i = rows.length - 1; i >= 0; i--) {
+      const part = rows[i].parts[key];
+      if (part && part.score !== null && part.score !== undefined) return { row: rows[i], part };
+    }
+    return null;
+  };
+
+  const fill = (key, scoreId, noteId) => {
+    const found = latestOf(key);
+    if (!found) {
+      $(scoreId).textContent = "—";
+      $(scoreId).className = "num mt-2.5 text-[20px] font-bold text-slate-300 sm:text-[23px]";
+      $(noteId).textContent = "아직 기록 없음";
+      return found;
+    }
+    $(scoreId).textContent = r1(found.part.score) + "점";
+    $(scoreId).className = "num mt-2.5 text-[20px] font-bold sm:text-[23px]";
+    const bits = [];
+    if (found.part.correct !== null && found.part.total) bits.push(`${found.part.correct}/${found.part.total}문항`);
+    if (found.row.shortDate) bits.push(found.row.shortDate);
+    $(noteId).textContent = bits.join(" · ") || "기록됨";
+    return found;
+  };
+
+  const fOx = fill("ox", "tOx", "tOxNote");
+  const fMu = fill("multi", "tMulti", "tMultiNote");
+  fill("master", "tMaster", "tMasterNote");
 
   let advice = "";
-  if (ox != null && mu != null) {
-    const gap = r1(Math.abs(ox - mu));
-    if (gap >= 15) advice = ox > mu
-      ? "객관식이 OX보다 낮아요. 개념은 잡혀 있으니 보기를 비교하는 연습을 늘리면 좋습니다."
-      : "OX가 객관식보다 낮아요. 헷갈리는 개념의 정의를 다시 정리해 보면 좋습니다.";
+  if (fOx && fMu) {
+    const gap = r1(Math.abs(fOx.part.score - fMu.part.score));
+    if (gap >= 15) advice = fOx.part.score > fMu.part.score
+      ? "사지선다가 OX보다 낮아요. 개념은 잡혀 있으니 보기를 비교하는 연습을 늘리면 좋습니다."
+      : "OX가 사지선다보다 낮아요. 헷갈리는 개념의 정의를 다시 정리해 보면 좋습니다.";
     else advice = "두 유형의 점수 차이가 크지 않아요. 고르게 준비되어 있습니다.";
   }
   $("typeAdvice").textContent = advice;
 
-  // 시험 기록 목록 (최신순)
-  const list = rows.slice().reverse().map((r) => {
-    const detail = (r.correctCount != null && r.totalQuestions != null)
-      ? `${r.correctCount} / ${r.totalQuestions}문항` : "";
-    return `<li class="flex items-center gap-4 px-5 py-4 sm:px-6">
-      <div class="min-w-0 flex-1">
-        <p class="truncate text-[14.5px] font-medium">${esc(r.testName)}</p>
-        <p class="num mt-1 text-[12.5px] text-slate-400">${esc(r.fullDate)}${detail ? " · " + esc(detail) : ""}</p>
+  /* 시험 기록 목록 (최신순) */
+  $("examList").innerHTML = rows.slice().reverse().map((r) => {
+    const chips = Object.keys(r.parts).map((k) => {
+      const st = TYPE_STYLE[k]; if (!st) return "";
+      return `<span class="inline-block rounded-md px-1.5 py-0.5 text-[11px] font-bold"
+                    style="background:${st.bg};color:${st.fg}">${esc(st.label)}</span>`;
+    }).join("");
+
+    const detail = (r.allCorrect !== null && r.allTotal)
+      ? `${r.allCorrect} / ${r.allTotal}문항` : "";
+
+    const sub = [r.fullDate, detail].filter(Boolean).map(esc).join(" · ");
+    const c = bandOf(r.score).color;
+
+    return `<li class="px-5 py-4 sm:px-6">
+      <div class="flex items-start gap-3">
+        <div class="min-w-0 flex-1">
+          <p class="text-[14.5px] font-medium leading-snug">${esc(r.testName)}</p>
+          <p class="num mt-1 text-[12.5px] text-slate-400">${sub}</p>
+          ${chips ? `<div class="mt-2 flex flex-wrap gap-1.5">${chips}</div>` : ""}
+        </div>
+        <p class="num shrink-0 text-[17px] font-bold" style="color:${c}">${r1(r.score)}점</p>
       </div>
-      <p class="num shrink-0 text-[16px] font-bold">${r1(r.score)}점</p>
     </li>`;
   }).join("");
-  $("examList").innerHTML = list;
 
   finish(p);
 }
@@ -316,24 +459,36 @@ function finish(p) {
   $("app").classList.remove("hidden");
 }
 
+/* ── 데이터 ────────────────────────────────────────────── */
 (async function () {
   try {
     const params = new URLSearchParams(location.search);
 
-    // 색 확인용 미리보기 (실제 데이터는 건드리지 않습니다)
+    // 미리보기 (실제 데이터는 건드리지 않습니다)
     if (params.get("demo") === "1") {
       const base = Date.now() - 864e5 * 70;
       render({
         name: "신재영", grade: "고등1학년", subject: "통합과학",
         results: [
-          { testName:"물질의 규칙성 1회",  score:62, ts:base,          oxScore:70, multiScore:54, correctCount:12, totalQuestions:20 },
-          { testName:"화학 결합 진단",     score:71, ts:base+864e5*9,  oxScore:76, multiScore:66, correctCount:14, totalQuestions:20 },
-          { testName:"산화·환원 1회",      score:68, ts:base+864e5*17, correctCount:17, totalQuestions:25 },
-          { testName:"산과 염기",          score:79, ts:base+864e5*24, oxScore:84, multiScore:74 },
-          { testName:"중화 반응 단원평가", score:85, ts:base+864e5*33, correctCount:17, totalQuestions:20 },
-          { testName:"역학적 시스템",      score:74, ts:base+864e5*41 },
-          { testName:"지구 시스템 1회",    score:88, ts:base+864e5*52, oxScore:90, multiScore:86 },
-          { testName:"중간 대비 모의",     score:93, ts:base+864e5*63, oxScore:96, multiScore:90, correctCount:28, totalQuestions:30 }
+          { testName:"4단원 - 물질의 구성 (① 물질을 구성하는 성분)", score:55, ts:base,
+            oxScore:55, oxCount:20, multiScore:0, multiCount:20, totalQuestions:20 },
+          { testName:"화학 결합 진단", score:71, ts:base+864e5*9,
+            oxScore:75, oxCount:20, oxCorrect:15, multiScore:67, multiCount:15, multiCorrect:10,
+            totalQuestions:35, correctCount:25, subTypes:["ox","multiple"] },
+          { testName:"생태계와 환경변화", score:80, ts:base+864e5*17,
+            master:true, total:30, totalCorrect:24, totalQuestions:30 },
+          { testName:"산과 염기", score:64, ts:base+864e5*24,
+            oxScore:70, oxCount:20, multiScore:58, multiCount:20, totalQuestions:40 },
+          { testName:"중화 반응 단원평가", score:88, ts:base+864e5*33,
+            oxScore:90, oxCount:20, oxCorrect:18, multiScore:85, multiCount:20, multiCorrect:17,
+            totalQuestions:40, correctCount:35, subTypes:["ox","multiple"] },
+          { testName:"역학적 시스템", score:74, ts:base+864e5*41,
+            master:true, total:25, totalCorrect:18, totalQuestions:25 },
+          { testName:"3-1. 생태계와 환경 (① 생태계의 구성 요소)", score:93, ts:base+864e5*52,
+            oxScore:90, oxCount:20, oxCorrect:18, multiScore:95, multiCount:20, multiCorrect:19,
+            totalQuestions:40, correctCount:37, subTypes:["ox","multiple"] },
+          { testName:"중간 대비 모의고사", score:96, ts:base+864e5*63,
+            master:true, total:30, totalCorrect:29, totalQuestions:30 }
         ]
       });
       return;
