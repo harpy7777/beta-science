@@ -27,6 +27,10 @@
   :focus-visible{outline:2px solid #4C5FA8;outline-offset:3px;border-radius:6px}
   .on-navy :focus-visible{outline-color:#fff}
   .safe-b{padding-bottom:calc(env(safe-area-inset-bottom) + 4rem)}
+  /* 모바일: 터치 영역 확보 */
+  button{touch-action:manipulation}
+  .navbtn{min-height:34px;min-width:34px}
+  .pagebtn{min-height:38px}
   @media (prefers-reduced-motion: reduce){*,*::before,*::after{transition-duration:.01ms !important;animation-duration:.01ms !important}}
 </style>
 </head>
@@ -63,18 +67,21 @@
       <p class="mt-6 text-[14px] text-white/50" id="hSub">—</p>
       <h1 class="tight mt-1 text-[24px] font-bold text-white sm:text-[27px]"><span id="hName">—</span> 학생의 성적표</h1>
 
-      <div class="mt-7 grid grid-cols-3 gap-4">
+      <div class="mt-7 grid grid-cols-3 gap-3 sm:gap-4">
         <div>
           <p class="text-[12.5px] text-white/45">최근 점수</p>
           <p class="num mt-1 text-[20px] font-bold text-white sm:text-[22px]" id="sLatest">—</p>
+          <p class="mt-0.5 text-[11.5px] leading-snug text-white/40" id="sLatestNote"></p>
         </div>
         <div>
           <p class="text-[12.5px] text-white/45">지난 회차 대비</p>
           <p class="num mt-1 text-[20px] font-bold sm:text-[22px]" id="sDelta">—</p>
+          <p class="mt-0.5 text-[11.5px] leading-snug text-white/40" id="sDeltaNote"></p>
         </div>
         <div>
           <p class="text-[12.5px] text-white/45">나의 최고 기록</p>
           <p class="num mt-1 text-[20px] font-bold text-white sm:text-[22px]" id="sBest">—</p>
+          <p class="mt-0.5 text-[11.5px] leading-snug text-white/40" id="sBestNote"></p>
         </div>
       </div>
     </div>
@@ -89,11 +96,26 @@
 
     <!-- 점수 추이 -->
     <section class="mt-8" id="chartSection">
-      <h2 class="tight text-[16px] font-bold">점수 추이</h2>
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h2 class="tight text-[16px] font-bold">점수 추이</h2>
+        <div class="flex items-center gap-1">
+          <button id="pPrev" type="button" aria-label="이전 3개월 보기"
+            class="navbtn flex items-center justify-center rounded-lg border border-slate-200 bg-white px-2 text-slate-500 transition-colors hover:bg-slate-50 disabled:opacity-30">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <span id="pLabel" class="num min-w-[7.5rem] text-center text-[13px] font-semibold text-navy-900">—</span>
+          <button id="pNext" type="button" aria-label="다음 3개월 보기"
+            class="navbtn flex items-center justify-center rounded-lg border border-slate-200 bg-white px-2 text-slate-500 transition-colors hover:bg-slate-50 disabled:opacity-30">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+
       <div class="mt-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-card sm:p-6">
         <div id="chartWrap" class="w-full"></div>
-        <div id="legend" class="mt-4 flex flex-wrap gap-x-4 gap-y-2"></div>
-        <p class="mt-3 text-[12.5px] text-slate-400">점의 색은 그 회차의 점수대를 나타냅니다.</p>
+        <div id="legendType" class="mt-4 flex flex-wrap gap-x-4 gap-y-2"></div>
+        <div id="legendBand" class="mt-2 flex flex-wrap gap-x-3 gap-y-1.5"></div>
+        <p class="mt-3 text-[12.5px] leading-relaxed text-slate-400" id="chartNote">—</p>
       </div>
     </section>
 
@@ -126,9 +148,20 @@
 
     <!-- 회차 목록 -->
     <section class="mt-8">
-      <h2 class="tight text-[16px] font-bold">시험 기록</h2>
+      <div class="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 class="tight text-[16px] font-bold">시험 기록</h2>
+        <span id="listCount" class="num text-[12.5px] text-slate-400"></span>
+      </div>
       <div class="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
         <ul id="examList" class="divide-y divide-slate-100"></ul>
+
+        <div id="listPager" class="hidden items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/60 px-4 py-3">
+          <button id="lPrev" type="button"
+            class="pagebtn rounded-lg border border-slate-200 bg-white px-3.5 text-[13px] font-semibold text-navy-900 transition-colors hover:bg-slate-50 disabled:opacity-30">이전</button>
+          <span id="lPage" class="num text-[13px] font-medium text-slate-500">1 / 1</span>
+          <button id="lNext" type="button"
+            class="pagebtn rounded-lg border border-slate-200 bg-white px-3.5 text-[13px] font-semibold text-navy-900 transition-colors hover:bg-slate-50 disabled:opacity-30">다음</button>
+        </div>
       </div>
     </section>
 
@@ -161,11 +194,16 @@ const BANDS = [
 ];
 const bandOf = (v) => BANDS.find((b) => v >= b.min) || BANDS[BANDS.length - 1];
 
+/* 유형별 색 · 정렬 순서 (line 은 그래프 선 색입니다) */
 const TYPE_STYLE = {
-  ox:     { label: "OX",     bg: "#CCFBF1", fg: "#0F766E" },
-  multi:  { label: "사지선다", bg: "#E6E9F6", fg: "#3E4E8C" },
-  master: { label: "마스터",  bg: "#FEF3C7", fg: "#B45309" }
+  ox:     { label: "OX",      bg: "#CCFBF1", fg: "#0F766E", line: "#0D9488", order: 1 },
+  multi:  { label: "사지선다", bg: "#E6E9F6", fg: "#3E4E8C", line: "#4C5FA8", order: 2 },
+  master: { label: "마스터",   bg: "#FEF3C7", fg: "#B45309", line: "#D97706", order: 3 },
+  total:  { label: "시험",     bg: "#F1F5F9", fg: "#475569", line: "#64748B", order: 4 }
 };
+const styleOf = (k) => TYPE_STYLE[k] || TYPE_STYLE.total;
+
+const PER_PAGE = 10;   // 시험 기록 한 페이지에 보여줄 개수
 
 const $ = (id) => document.getElementById(id);
 const showError = (m) => {
@@ -179,6 +217,7 @@ const esc = (s) => String(s == null ? "" : s)
 const r1 = (n) => Math.round(Number(n) * 10) / 10;
 const n0 = (x) => (x === null || x === undefined || x === "" || isNaN(Number(x)) ? null : Number(x));
 const pick = (...xs) => { for (const x of xs) if (x !== null && x !== undefined) return x; return null; };
+const isNum = (x) => x !== null && x !== undefined && isFinite(Number(x));
 
 function fmtDate(r) {
   if (r && typeof r.ts === "number" && isFinite(r.ts)) {
@@ -237,70 +276,254 @@ function splitParts(r) {
   return out;
 }
 
-/* ── 꺾은선 차트 ───────────────────────────────────────── */
-function drawChart(rows) {
+/* ── 회차를 유형 단위로 쪼갭니다 ─────────────────────────
+   OX 와 사지선다를 함께 본 회차는 두 줄로 나뉩니다.        */
+function buildEntries(rows) {
+  const list = [];
+  rows.forEach((r) => {
+    const parts = r.parts || {};
+    let keys = Object.keys(parts).filter((k) => parts[k] && isNum(parts[k].score));
+
+    // 유형을 알 수 없는 회차는 전체 점수 한 줄로 남깁니다
+    if (!keys.length) {
+      parts.total = { score: r.score, total: r.allTotal, correct: r.allCorrect };
+      keys = ["total"];
+    }
+
+    keys.forEach((k) => {
+      const p = parts[k];
+      list.push({
+        type: k,
+        examId: r.examId,
+        testName: r.testName,
+        score: Number(p.score),
+        total: n0(p.total),
+        correct: n0(p.correct),
+        ts: r.ts,
+        fullDate: r.fullDate,
+        shortDate: r.shortDate
+      });
+    });
+  });
+
+  list.sort((a, b) => {
+    const d = (a.ts || 0) - (b.ts || 0);
+    if (d !== 0) return d;
+    return styleOf(a.type).order - styleOf(b.type).order;
+  });
+  return list;
+}
+
+/* ── 3개월(분기) 단위로 묶습니다 ─────────────────────────
+   기록이 하나도 없는 분기는 만들지 않습니다.               */
+function buildPeriods(entries) {
+  const map = new Map();
+  entries.forEach((e) => {
+    if (!isNum(e.ts)) return;
+    const d = new Date(e.ts);
+    const q = Math.floor(d.getMonth() / 3);
+    const key = d.getFullYear() * 4 + q;
+    if (!map.has(key)) {
+      map.set(key, {
+        key,
+        label: `${d.getFullYear()}년 ${q * 3 + 1}~${q * 3 + 3}월`,
+        items: []
+      });
+    }
+    map.get(key).items.push(e);
+  });
+  return Array.from(map.values()).sort((a, b) => a.key - b.key);
+}
+
+/* ── 꺾은선 차트 (유형별로 선을 따로 그립니다) ──────────── */
+function drawChart(items) {
   const wrap = $("chartWrap");
-  if (!rows.length) { wrap.innerHTML = '<p class="py-6 text-center text-[13.5px] text-slate-400">아직 기록이 없습니다.</p>'; return false; }
-  if (rows.length === 1) {
-    wrap.innerHTML = `<p class="py-6 text-center text-[13.5px] text-slate-400">회차가 2번 이상 쌓이면 추이가 그려집니다.</p>`;
-    return false;
+  const pts = (items || []).filter((e) => isNum(e.ts));
+
+  if (!pts.length) {
+    wrap.innerHTML = '<p class="py-8 text-center text-[13.5px] text-slate-400">이 기간에는 기록이 없습니다.</p>';
+    return [];
   }
 
-  const W = 640, H = 220, PL = 38, PR = 16, PT = 22, PB = 34;
-  const iw = W - PL - PR, ih = H - PT - PB;
-  const n = rows.length;
-  const x = (i) => PL + (iw * i) / (n - 1);
-  const y = (v) => PT + ih - (ih * Math.max(0, Math.min(100, v))) / 100;
+  const W = 640, H = 232, PL = 38, PR = 18, PT = 26, PB = 36;
+  const gx0 = PL, gx1 = W - PR;
+  const x0 = PL + 12, x1 = W - PR - 12;
+  const ih = H - PT - PB;
+
+  let tMin = pts[0].ts, tMax = pts[0].ts;
+  pts.forEach((p) => { if (p.ts < tMin) tMin = p.ts; if (p.ts > tMax) tMax = p.ts; });
+  const span = tMax - tMin;
+
+  const X = (t) => (span > 0 ? x0 + (x1 - x0) * ((t - tMin) / span) : (x0 + x1) / 2);
+  const Y = (v) => PT + ih - (ih * Math.max(0, Math.min(100, Number(v)))) / 100;
 
   let grid = "";
   [0, 25, 50, 75, 100].forEach((v) => {
-    grid += `<line x1="${PL}" y1="${y(v)}" x2="${W - PR}" y2="${y(v)}" stroke="#E9EDF3" stroke-width="1"/>`;
-    grid += `<text x="${PL - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="#9AA5B4">${v}</text>`;
+    grid += `<line x1="${gx0}" y1="${Y(v)}" x2="${gx1}" y2="${Y(v)}" stroke="#E9EDF3" stroke-width="1"/>`;
+    grid += `<text x="${gx0 - 8}" y="${Y(v) + 4}" text-anchor="end" font-size="11" fill="#9AA5B4">${v}</text>`;
   });
 
-  const pts = rows.map((r, i) => `${x(i)},${y(r.score)}`).join(" ");
-  const area = `${PL},${y(0)} ${pts} ${x(n - 1)},${y(0)}`;
+  // 유형별로 묶습니다 (pts 는 이미 날짜순입니다)
+  const groups = new Map();
+  pts.forEach((p) => { if (!groups.has(p.type)) groups.set(p.type, []); groups.get(p.type).push(p); });
+  const types = Array.from(groups.keys()).sort((a, b) => styleOf(a).order - styleOf(b).order);
 
-  let dots = "", labels = "";
-  rows.forEach((r, i) => {
-    const last = i === n - 1;
-    const c = bandOf(r.score).color;
-    if (last) dots += `<circle cx="${x(i)}" cy="${y(r.score)}" r="9" fill="${c}" fill-opacity="0.18"/>`;
-    dots += `<circle cx="${x(i)}" cy="${y(r.score)}" r="${last ? 5.5 : 4.5}" fill="${last ? c : "#fff"}" stroke="${c}" stroke-width="2.2"/>`;
-    if (last) dots += `<text x="${x(i)}" y="${y(r.score) - 15}" text-anchor="middle" font-size="12.5" font-weight="700" fill="${c}">${r1(r.score)}</text>`;
-    if (n <= 6 || i === 0 || last || i % 2 === 0) {
-      labels += `<text x="${x(i)}" y="${H - 10}" text-anchor="middle" font-size="10.5" fill="#9AA5B4">${esc(r.shortDate)}</text>`;
+  let area = "", lines = "", dots = "", marks = "", xlabels = "";
+  const placed = [];
+
+  // 유형이 하나뿐일 때만 면을 채웁니다 (여러 개면 겹쳐서 지저분해집니다)
+  if (types.length === 1 && span > 0 && groups.get(types[0]).length >= 2) {
+    const g = groups.get(types[0]);
+    const poly = g.map((p) => `${X(p.ts)},${Y(p.score)}`).join(" ");
+    area = `<polygon points="${X(g[0].ts)},${Y(0)} ${poly} ${X(g[g.length - 1].ts)},${Y(0)}" fill="url(#areaGrad)"/>`;
+  }
+
+  types.forEach((t) => {
+    const g = groups.get(t);
+    const col = styleOf(t).line;
+
+    if (g.length >= 2 && span > 0) {
+      lines += `<polyline points="${g.map((p) => `${X(p.ts)},${Y(p.score)}`).join(" ")}" fill="none" stroke="${col}" stroke-width="2.6" stroke-opacity="0.9" stroke-linejoin="round" stroke-linecap="round"/>`;
     }
+
+    g.forEach((p, i) => {
+      const last = i === g.length - 1;
+      const bc = bandOf(p.score).color;
+      const cx = X(p.ts), cy = Y(p.score);
+
+      if (last) dots += `<circle cx="${cx}" cy="${cy}" r="9" fill="${bc}" fill-opacity="0.16"/>`;
+      dots += `<circle cx="${cx}" cy="${cy}" r="${last ? 5.4 : 4.4}" fill="${last ? bc : "#fff"}" stroke="${bc}" stroke-width="2.2"/>`;
+
+      if (last) {
+        // 마지막 점수는 겹치지 않는 자리에 적습니다
+        const cands = [cy - 14, cy + 21, cy - 31, cy + 38];
+        let ly = cands.find((c) => c > PT + 6 && c < H - PB + 4
+          && !placed.some((q) => Math.abs(q.x - cx) < 36 && Math.abs(q.y - c) < 13));
+        if (ly === undefined) ly = cy - 14;
+        placed.push({ x: cx, y: ly });
+        marks += `<text x="${cx}" y="${ly}" text-anchor="middle" font-size="12.5" font-weight="700" fill="${col}">${r1(p.score)}</text>`;
+      }
+    });
   });
+
+  // x축 날짜 (뒤에서부터 고르게 솎아냅니다)
+  const uniq = Array.from(new Set(pts.map((p) => p.ts))).sort((a, b) => a - b);
+  const step = Math.max(1, Math.ceil(uniq.length / 6));
+  for (let i = uniq.length - 1; i >= 0; i -= step) {
+    const d = new Date(uniq[i]);
+    xlabels += `<text x="${X(uniq[i])}" y="${H - 10}" text-anchor="middle" font-size="10.5" fill="#9AA5B4">${d.getMonth() + 1}/${d.getDate()}</text>`;
+  }
 
   wrap.innerHTML =
-    `<svg viewBox="0 0 ${W} ${H}" class="h-auto w-full" role="img" aria-label="회차별 점수 추이">
+    `<svg viewBox="0 0 ${W} ${H}" class="h-auto w-full" role="img" aria-label="유형별 점수 추이">
       <defs>
-        <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stop-color="#4C5FA8"/>
-          <stop offset="50%" stop-color="#7C6BC4"/>
-          <stop offset="100%" stop-color="#14B8A6"/>
-        </linearGradient>
         <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="${ACCENT}" stop-opacity="0.16"/>
           <stop offset="100%" stop-color="${ACCENT}" stop-opacity="0.01"/>
         </linearGradient>
       </defs>
-      ${grid}
-      <polygon points="${area}" fill="url(#areaGrad)"/>
-      <polyline points="${pts}" fill="none" stroke="url(#lineGrad)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-      ${dots}${labels}
+      ${grid}${area}${lines}${dots}${marks}${xlabels}
     </svg>`;
-  return true;
+
+  return types;
 }
 
-function drawLegend(show) {
-  if (!show) { $("legend").innerHTML = ""; return; }
-  $("legend").innerHTML = BANDS.map((b) =>
-    `<span class="inline-flex items-center gap-1.5 text-[12px] text-slate-500">
-       <span class="h-2.5 w-2.5 rounded-full" style="background:${b.color}"></span>${esc(b.label)}
-     </span>`).join("");
+function drawLegend(types) {
+  $("legendType").innerHTML = (types || []).map((t) => {
+    const st = styleOf(t);
+    return `<span class="inline-flex items-center gap-1.5 text-[12px] font-medium text-slate-600">
+              <span class="h-0.5 w-4 rounded-full" style="background:${st.line}"></span>${esc(st.label)}
+            </span>`;
+  }).join("");
+
+  $("legendBand").innerHTML = (types && types.length) ? BANDS.map((b) =>
+    `<span class="inline-flex items-center gap-1.5 text-[11.5px] text-slate-400">
+       <span class="h-2 w-2 rounded-full" style="background:${b.color}"></span>${esc(b.label)}
+     </span>`).join("") : "";
 }
+
+/* ── 화면 상태 ─────────────────────────────────────────── */
+let periods = [];
+let pIdx = 0;
+let listItems = [];   // 최신순
+let lPage = 0;
+
+function renderPeriod() {
+  if (!periods.length) {
+    $("chartWrap").innerHTML = '<p class="py-8 text-center text-[13.5px] text-slate-400">아직 기록이 없습니다.</p>';
+    $("pLabel").textContent = "—";
+    $("pPrev").disabled = true;
+    $("pNext").disabled = true;
+    drawLegend([]);
+    $("chartNote").textContent = "";
+    return;
+  }
+  const p = periods[pIdx];
+  $("pLabel").textContent = p.label;
+  $("pPrev").disabled = pIdx <= 0;
+  $("pNext").disabled = pIdx >= periods.length - 1;
+
+  const types = drawChart(p.items);
+  drawLegend(types);
+  $("chartNote").textContent =
+    `3개월 단위로 나누어 보여 드립니다. 이 기간에는 ${p.items.length}개의 기록이 있습니다. `
+    + `선의 색은 유형, 점의 색은 그 회차의 점수대를 나타냅니다.`;
+}
+
+function renderList() {
+  const totalPages = Math.max(1, Math.ceil(listItems.length / PER_PAGE));
+  if (lPage > totalPages - 1) lPage = totalPages - 1;
+  if (lPage < 0) lPage = 0;
+
+  const slice = listItems.slice(lPage * PER_PAGE, lPage * PER_PAGE + PER_PAGE);
+
+  if (!slice.length) {
+    $("examList").innerHTML = '<li class="px-6 py-8 text-center text-[13.5px] text-slate-400">기록이 없습니다.</li>';
+  } else {
+    $("examList").innerHTML = slice.map((e) => {
+      const st = styleOf(e.type);
+      const chip = `<span class="inline-block shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-bold"
+                          style="background:${st.bg};color:${st.fg}">${esc(st.label)}</span>`;
+      const detail = (isNum(e.correct) && e.total) ? `${e.correct} / ${e.total}문항` : "";
+      const sub = [e.fullDate, detail].filter(Boolean).map(esc).join(" · ");
+      const c = bandOf(e.score).color;
+
+      return `<li class="px-5 py-4 sm:px-6">
+        <div class="flex items-start gap-3">
+          <div class="min-w-0 flex-1">
+            <div class="flex flex-wrap items-center gap-2">
+              ${chip}
+              <p class="min-w-0 text-[14.5px] font-medium leading-snug">${esc(e.testName)}</p>
+            </div>
+            <p class="num mt-1 text-[12.5px] text-slate-400">${sub}</p>
+          </div>
+          <p class="num shrink-0 text-[17px] font-bold" style="color:${c}">${r1(e.score)}점</p>
+        </div>
+      </li>`;
+    }).join("");
+  }
+
+  const pager = $("listPager");
+  if (listItems.length > PER_PAGE) {
+    pager.classList.remove("hidden");
+    pager.classList.add("flex");
+    $("lPage").textContent = `${lPage + 1} / ${totalPages}`;
+    $("lPrev").disabled = lPage <= 0;
+    $("lNext").disabled = lPage >= totalPages - 1;
+  } else {
+    pager.classList.add("hidden");
+    pager.classList.remove("flex");
+  }
+}
+
+$("pPrev").addEventListener("click", () => { if (pIdx > 0) { pIdx--; renderPeriod(); } });
+$("pNext").addEventListener("click", () => { if (pIdx < periods.length - 1) { pIdx++; renderPeriod(); } });
+$("lPrev").addEventListener("click", () => {
+  if (lPage > 0) { lPage--; renderList(); $("examList").scrollIntoView({ block: "start", behavior: "smooth" }); }
+});
+$("lNext").addEventListener("click", () => {
+  if (lPage < Math.ceil(listItems.length / PER_PAGE) - 1) { lPage++; renderList(); $("examList").scrollIntoView({ block: "start", behavior: "smooth" }); }
+});
 
 /* ── 화면 그리기 ───────────────────────────────────────── */
 function render(p) {
@@ -325,12 +548,11 @@ function render(p) {
     .sort((a, b) => (a.ts || 0) - (b.ts || 0));
 
   rows.forEach((r) => {
-    const d = r.ts ? new Date(r.ts) : null;
+    const d = isNum(r.ts) ? new Date(r.ts) : null;
     r.shortDate = d ? `${d.getMonth() + 1}/${d.getDate()}` : "";
     r.fullDate = fmtDate(r);
     r.parts = splitParts(r);
 
-    // 이 회차 전체의 맞은 개수 / 총 문항 수
     const partSum = Object.values(r.parts).reduce((a, x) => a + (x.correct || 0), 0);
     const partTot = Object.values(r.parts).reduce((a, x) => a + (x.total || 0), 0);
     r.allTotal = pick(r.totalQuestions, r.total, partTot || null);
@@ -338,71 +560,90 @@ function render(p) {
                         partSum || null, calcCorrect(r.score, r.allTotal));
   });
 
-  if (!rows.length) {
+  const entries = buildEntries(rows);
+
+  if (!entries.length) {
     $("sLatest").textContent = "—";
     $("sDelta").textContent = "—";
     $("sBest").textContent = "—";
+    $("sLatestNote").textContent = "";
+    $("sDeltaNote").textContent = "";
+    $("sBestNote").textContent = "";
     $("msgText").textContent = "아직 등록된 시험 기록이 없어요. 첫 시험을 보고 나면 여기에 점수가 쌓입니다.";
     $("chartSection").classList.add("hidden");
     $("typeSection").classList.add("hidden");
-    $("examList").innerHTML = '<li class="px-6 py-8 text-center text-[13.5px] text-slate-400">기록이 없습니다.</li>';
+    $("listCount").textContent = "";
+    listItems = [];
+    renderList();
     finish(p);
     return;
   }
 
-  const latest = rows[rows.length - 1];
-  const prev = rows.length >= 2 ? rows[rows.length - 2] : null;
-  const best = rows.reduce((a, b) => (b.score > a.score ? b : a), rows[0]);
+  const latest = entries[entries.length - 1];
+  const latestStyle = styleOf(latest.type);
+
+  // 같은 유형의 바로 이전 기록과 비교합니다
+  let prevSame = null;
+  for (let i = entries.length - 2; i >= 0; i--) {
+    if (entries[i].type === latest.type) { prevSame = entries[i]; break; }
+  }
+  const best = entries.reduce((a, b) => (b.score > a.score ? b : a), entries[0]);
 
   $("sLatest").textContent = r1(latest.score) + "점";
+  $("sLatestNote").textContent = [latestStyle.label, latest.shortDate].filter(Boolean).join(" · ");
+
   $("sBest").textContent = r1(best.score) + "점";
+  $("sBestNote").textContent = [styleOf(best.type).label, best.shortDate].filter(Boolean).join(" · ");
 
   const dEl = $("sDelta");
-  if (!prev) {
+  if (!prevSame) {
     dEl.textContent = "첫 회차";
     dEl.className = "num mt-1 text-[20px] font-bold text-white/70 sm:text-[22px]";
+    $("sDeltaNote").textContent = `${latestStyle.label} 첫 기록`;
   } else {
-    const diff = r1(latest.score - prev.score);
+    const diff = r1(latest.score - prevSame.score);
     if (diff > 0) { dEl.textContent = "+" + diff + "점"; dEl.className = "num mt-1 text-[20px] font-bold text-brand-200 sm:text-[22px]"; }
     else if (diff < 0) { dEl.textContent = diff + "점"; dEl.className = "num mt-1 text-[20px] font-bold text-white/60 sm:text-[22px]"; }
     else { dEl.textContent = "동점"; dEl.className = "num mt-1 text-[20px] font-bold text-white/70 sm:text-[22px]"; }
+    $("sDeltaNote").textContent = `${latestStyle.label} 기준`;
   }
 
   // 응원 문구 — 하락을 지적하지 않고 다음 행동으로 연결합니다.
+  const tl = latestStyle.label;
   let msg;
-  if (!prev) msg = "첫 기록이 등록되었어요. 앞으로 회차가 쌓이면 변화가 한눈에 보입니다.";
-  else if (latest.score > prev.score) msg = `지난 회차보다 ${r1(latest.score - prev.score)}점 올랐어요. 지금 방식이 잘 맞고 있다는 뜻입니다.`;
-  else if (latest.score === prev.score) msg = "지난 회차와 같은 점수를 유지했어요. 틀린 문제 유형만 확인해 보면 다음에 올릴 수 있습니다.";
-  else msg = "이번 회차는 지난번보다 조금 내려갔어요. 아래 유형별 점수를 보고 약한 쪽부터 다시 보면 됩니다.";
-  if (latest.score >= best.score && rows.length >= 2) msg = "지금까지 중 가장 높은 점수예요. 잘하고 있습니다.";
+  if (!prevSame) msg = `${tl} 유형의 첫 기록이 등록되었어요. 회차가 쌓이면 변화가 한눈에 보입니다.`;
+  else if (latest.score > prevSame.score) msg = `지난 ${tl} 회차보다 ${r1(latest.score - prevSame.score)}점 올랐어요. 지금 방식이 잘 맞고 있다는 뜻입니다.`;
+  else if (latest.score === prevSame.score) msg = `지난 ${tl} 회차와 같은 점수를 유지했어요. 틀린 문제 유형만 확인해 보면 다음에 올릴 수 있습니다.`;
+  else msg = `이번 ${tl} 회차는 지난번보다 조금 내려갔어요. 아래 유형별 점수를 보고 약한 쪽부터 다시 보면 됩니다.`;
+  if (entries.length >= 2 && latest.score >= best.score) msg = "지금까지 중 가장 높은 점수예요. 잘하고 있습니다.";
   $("msgText").textContent = msg;
 
-  drawLegend(drawChart(rows.slice(-10)));
+  // 3개월 단위 그래프 — 가장 최근 기간부터 보여 줍니다
+  periods = buildPeriods(entries);
+  pIdx = Math.max(0, periods.length - 1);
+  renderPeriod();
 
-  /* 유형별 최근 성적 — 유형마다 가장 최근 기록을 찾습니다 */
+  /* 유형별 최근 성적 */
   const latestOf = (key) => {
-    for (let i = rows.length - 1; i >= 0; i--) {
-      const part = rows[i].parts[key];
-      if (part && part.score !== null && part.score !== undefined) return { row: rows[i], part };
-    }
+    for (let i = entries.length - 1; i >= 0; i--) if (entries[i].type === key) return entries[i];
     return null;
   };
 
   const fill = (key, scoreId, noteId) => {
-    const found = latestOf(key);
-    if (!found) {
+    const e = latestOf(key);
+    if (!e) {
       $(scoreId).textContent = "—";
       $(scoreId).className = "num mt-2.5 text-[20px] font-bold text-slate-300 sm:text-[23px]";
       $(noteId).textContent = "아직 기록 없음";
-      return found;
+      return null;
     }
-    $(scoreId).textContent = r1(found.part.score) + "점";
+    $(scoreId).textContent = r1(e.score) + "점";
     $(scoreId).className = "num mt-2.5 text-[20px] font-bold sm:text-[23px]";
     const bits = [];
-    if (found.part.correct !== null && found.part.total) bits.push(`${found.part.correct}/${found.part.total}문항`);
-    if (found.row.shortDate) bits.push(found.row.shortDate);
+    if (isNum(e.correct) && e.total) bits.push(`${e.correct}/${e.total}문항`);
+    if (e.shortDate) bits.push(e.shortDate);
     $(noteId).textContent = bits.join(" · ") || "기록됨";
-    return found;
+    return e;
   };
 
   const fOx = fill("ox", "tOx", "tOxNote");
@@ -411,39 +652,19 @@ function render(p) {
 
   let advice = "";
   if (fOx && fMu) {
-    const gap = r1(Math.abs(fOx.part.score - fMu.part.score));
-    if (gap >= 15) advice = fOx.part.score > fMu.part.score
+    const gap = r1(Math.abs(fOx.score - fMu.score));
+    if (gap >= 15) advice = fOx.score > fMu.score
       ? "사지선다가 OX보다 낮아요. 개념은 잡혀 있으니 보기를 비교하는 연습을 늘리면 좋습니다."
       : "OX가 사지선다보다 낮아요. 헷갈리는 개념의 정의를 다시 정리해 보면 좋습니다.";
     else advice = "두 유형의 점수 차이가 크지 않아요. 고르게 준비되어 있습니다.";
   }
   $("typeAdvice").textContent = advice;
 
-  /* 시험 기록 목록 (최신순) */
-  $("examList").innerHTML = rows.slice().reverse().map((r) => {
-    const chips = Object.keys(r.parts).map((k) => {
-      const st = TYPE_STYLE[k]; if (!st) return "";
-      return `<span class="inline-block rounded-md px-1.5 py-0.5 text-[11px] font-bold"
-                    style="background:${st.bg};color:${st.fg}">${esc(st.label)}</span>`;
-    }).join("");
-
-    const detail = (r.allCorrect !== null && r.allTotal)
-      ? `${r.allCorrect} / ${r.allTotal}문항` : "";
-
-    const sub = [r.fullDate, detail].filter(Boolean).map(esc).join(" · ");
-    const c = bandOf(r.score).color;
-
-    return `<li class="px-5 py-4 sm:px-6">
-      <div class="flex items-start gap-3">
-        <div class="min-w-0 flex-1">
-          <p class="text-[14.5px] font-medium leading-snug">${esc(r.testName)}</p>
-          <p class="num mt-1 text-[12.5px] text-slate-400">${sub}</p>
-          ${chips ? `<div class="mt-2 flex flex-wrap gap-1.5">${chips}</div>` : ""}
-        </div>
-        <p class="num shrink-0 text-[17px] font-bold" style="color:${c}">${r1(r.score)}점</p>
-      </div>
-    </li>`;
-  }).join("");
+  /* 시험 기록 — 최신순, 10개씩 */
+  listItems = entries.slice().reverse();
+  lPage = 0;
+  $("listCount").textContent = `모두 ${listItems.length}건`;
+  renderList();
 
   finish(p);
 }
@@ -466,7 +687,7 @@ function finish(p) {
 
     // 미리보기 (실제 데이터는 건드리지 않습니다)
     if (params.get("demo") === "1") {
-      const base = Date.now() - 864e5 * 70;
+      const base = Date.now() - 864e5 * 200;
       render({
         name: "신재영", grade: "고등1학년", subject: "통합과학",
         results: [
@@ -484,10 +705,18 @@ function finish(p) {
             totalQuestions:40, correctCount:35, subTypes:["ox","multiple"] },
           { testName:"역학적 시스템", score:74, ts:base+864e5*41,
             master:true, total:25, totalCorrect:18, totalQuestions:25 },
-          { testName:"3-1. 생태계와 환경 (① 생태계의 구성 요소)", score:93, ts:base+864e5*52,
+          { testName:"산화와 환원", score:77, ts:base+864e5*96,
+            oxScore:80, oxCount:20, oxCorrect:16, multiScore:74, multiCount:20, multiCorrect:15,
+            totalQuestions:40, correctCount:31, subTypes:["ox","multiple"] },
+          { testName:"지구 시스템", score:82, ts:base+864e5*110,
+            master:true, total:30, totalCorrect:25, totalQuestions:30 },
+          { testName:"3-1. 생태계와 환경 (① 생태계의 구성 요소)", score:93, ts:base+864e5*172,
             oxScore:90, oxCount:20, oxCorrect:18, multiScore:95, multiCount:20, multiCorrect:19,
             totalQuestions:40, correctCount:37, subTypes:["ox","multiple"] },
-          { testName:"중간 대비 모의고사", score:96, ts:base+864e5*63,
+          { testName:"에너지 전환과 보존", score:86, ts:base+864e5*180,
+            oxScore:85, oxCount:20, oxCorrect:17, multiScore:87, multiCount:15, multiCorrect:13,
+            totalQuestions:35, correctCount:30, subTypes:["ox","multiple"] },
+          { testName:"중간 대비 모의고사", score:96, ts:base+864e5*192,
             master:true, total:30, totalCorrect:29, totalQuestions:30 }
         ]
       });
