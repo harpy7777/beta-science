@@ -181,6 +181,13 @@ body.smode .fb-editor.open { display: none !important; }
 .total-comment { margin-top: 10px; padding: 10px 12px; background: #fdf2f8; border-radius: 10px; font-size: 12px; color: #3c3c43; line-height: 1.7; }
 .trend-card { background: #fff; border: 1px solid #fce7f3; border-radius: 16px; padding: 1.1rem 1.2rem; margin-bottom: 1rem; }
 .trend-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 6px; }
+.trend-nav { display: none; align-items: center; gap: 7px; margin-bottom: 0.8rem; flex-wrap: wrap; }
+.trend-nav.show { display: flex; }
+.tn-btn { padding: 8px 14px; min-height: 38px; border: 1.5px solid #fce7f3; background: #fff; border-radius: 9px; font-family: inherit; font-size: 12px; font-weight: 700; color: #db2777; cursor: pointer; white-space: nowrap; }
+.tn-btn:hover:not(:disabled) { background: #fdf2f8; border-color: #fbcfe8; }
+.tn-btn:disabled { opacity: 0.35; cursor: default; color: #aeaeb2; }
+.tn-label { flex: 1; text-align: center; font-size: 12px; font-weight: 700; color: #3c3c43; white-space: nowrap; min-width: 120px; }
+.tn-label span { font-weight: 500; color: #aeaeb2; font-size: 11px; }
 .trend-title { font-size: 13px; font-weight: 600; }
 .trend-badge { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 6px; }
 .tb-up{background:#dcfce7;color:#166534} .tb-dn{background:#fee2e2;color:#991b1b} .tb-fl{background:#f5f5f7;color:#6e6e73}
@@ -410,7 +417,7 @@ body.smode .fb-editor.open { display: none !important; }
     <div id="d-records"></div>
 
     <!-- 선생님 피드백 -->
-    <div class="fb-wrap">
+    <div class="fb-wrap admin-only">
       <div class="fb-head">
         <div class="fb-title">
           <div class="fb-icon"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M14 2H2a1 1 0 00-1 1v8a1 1 0 001 1h4l2 2 2-2h4a1 1 0 001-1V3a1 1 0 00-1-1z" stroke="#db2777" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
@@ -469,6 +476,11 @@ body.smode .fb-editor.open { display: none !important; }
             <div class="leg"><div class="leg-dot" style="background:#db2777;"></div>마스터</div>
           </div>
         </div>
+      </div>
+      <div class="trend-nav" id="rp-trend-nav">
+        <button type="button" class="tn-btn" id="rp-trend-prev" onclick="trendShift(-1)">‹ 이전</button>
+        <span class="tn-label" id="rp-trend-range">—</span>
+        <button type="button" class="tn-btn" id="rp-trend-next" onclick="trendShift(1)">다음 ›</button>
       </div>
       <div class="trend-canvas-wrap">
         <canvas id="rp-trend"></canvas>
@@ -558,7 +570,7 @@ async function startRealtime() {
   renderProfile();
 
   subscribeStudentDoc();
-  subscribeFeedback();
+  if(!IS_STUDENT) subscribeFeedback();   // 피드백은 학부모용 — 학생 화면에서는 읽지도 않는다
   subscribeAttendance();
 
   if(gradesUnsub){ gradesUnsub(); gradesUnsub=null; }
@@ -1238,12 +1250,11 @@ function rpDrawRadar(oxA,mcA,msA){
     },
     options:{
       responsive:false, animation:false,
-      layout:{ padding:8 },
+      layout:{ padding:12 },
       plugins:{ legend:{display:false} },
       scales:{ r:{
-        min:0, max:112,
-        ticks:{ stepSize:25, font:{size:9}, color:'#aeaeb2', showLabelBackdrop:false,
-                callback:function(v){ return v>100 ? '' : v; } },
+        min:0, max:100,
+        ticks:{ stepSize:25, font:{size:9}, color:'#aeaeb2', showLabelBackdrop:false },
         grid:{ color:'#fce7f3' },
         pointLabels:{ font:{size:10}, color:'#6e6e73' },
         angleLines:{ color:'#fce7f3' }
@@ -1252,58 +1263,108 @@ function rpDrawRadar(oxA,mcA,msA){
   });
 }
 
-/* 점수 추이 — 유형별 4회 이상. 100점 점이 잘리지 않게 상단 여유 확보 */
+/* ════════════════════════════════════════════
+   점수 추이 — 유형별(OX·4지선다·마스터) 각각 회차를 매김
+   · 1회만 응시한 유형도 점으로 표시
+   · 한 화면에 12회차씩, ‹ 이전 / 다음 › 로 1회차씩 이동
+   · y축 0~100 (100 라벨 표시), 점은 잘리지 않게 clip 해제
+════════════════════════════════════════════ */
+const TREND_WIN = 12;
+let trendWinStart = null;   // null = 자동(가장 최근 구간)
+
+function trendSeqs(filtered){
+  const seqOf=(kind)=> filtered.filter(r=>hasType(r,kind))
+      .slice().sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp))
+      .map(r=>typeScore(r,kind));
+  return [
+    {label:'OX',      seq:seqOf('ox'),     color:'#1e40af', bg:'rgba(30,64,175,0.06)'},
+    {label:'4지선다', seq:seqOf('mc'),     color:'#5b21b6', bg:'rgba(91,33,182,0.06)'},
+    {label:'마스터',  seq:seqOf('master'), color:'#db2777', bg:'rgba(219,39,119,0.06)'}
+  ];
+}
+window.trendShift=(d)=>{
+  const shown=trendSeqs(recsAll).filter(t=>t.seq.length>0);
+  if(!shown.length) return;
+  const maxLen=Math.max.apply(null, shown.map(t=>t.seq.length));
+  const maxStart=Math.max(0, maxLen-TREND_WIN);
+  const cur=(trendWinStart==null)?maxStart:trendWinStart;
+  trendWinStart=Math.min(Math.max(0, cur+d), maxStart);
+  rpDrawTrend(recsAll);
+};
+
 function rpDrawTrend(filtered) {
   const canvas=document.getElementById('rp-trend');
   const empty=document.getElementById('rp-trend-empty');
   const badge=document.getElementById('rp-trend-badge');
+  const nav=document.getElementById('rp-trend-nav');
   if(!canvas || typeof Chart==='undefined') return;
   if(trendInst){ trendInst.destroy(); trendInst=null; }
 
-  const MIN=4;
-  const seqOf=(kind)=> filtered.filter(r=>hasType(r,kind))
-      .slice().sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp))
-      .map(r=>typeScore(r,kind));
-  const oxSeq=seqOf('ox'), mcSeq=seqOf('mc'), msSeq=seqOf('master');
+  const shown=trendSeqs(filtered).filter(t=>t.seq.length>0);
 
-  const types=[
-    {label:'OX',      seq:oxSeq, color:'#1e40af', bg:'rgba(30,64,175,0.06)'},
-    {label:'4지선다', seq:mcSeq, color:'#5b21b6', bg:'rgba(91,33,182,0.06)'},
-    {label:'마스터',  seq:msSeq, color:'#db2777', bg:'rgba(219,39,119,0.06)'}
-  ];
-  const qualified=types.filter(t=>t.seq.length>=MIN);
-
-  if(!qualified.length){
+  if(!shown.length){
     canvas.style.display='none';
     empty.style.display='flex';
-    empty.innerHTML='각 유형별 4회 이상 응시하면 점수 추이가 표시됩니다.<br>'
+    empty.innerHTML='아직 응시 기록이 없습니다.<br>'
       + '<span style="font-size:12px;color:#6e6e73;font-weight:600;margin-top:6px;display:inline-block;">'
-      + 'OX '+oxSeq.length+'/4 · 4지선다 '+mcSeq.length+'/4 · 마스터 '+msSeq.length+'/4</span>';
-    badge.textContent='데이터 부족'; badge.className='trend-badge tb-fl';
+      + '시험을 보면 회차별 점수 추이가 여기에 표시됩니다.</span>';
+    badge.textContent='기록 없음'; badge.className='trend-badge tb-fl';
+    if(nav) nav.classList.remove('show');
     return;
   }
 
   canvas.style.display='block';
   empty.style.display='none';
 
-  const maxLen=Math.max.apply(null, qualified.map(t=>t.seq.length));
-  const labels=[];
-  for(let i=0;i<maxLen;i++) labels.push((i+1)+'회차');
-  const datasets=qualified.map(t=>({
-    label:t.label,
-    data:labels.map((_,i)=> i<t.seq.length ? t.seq[i] : null),
-    borderColor:t.color, backgroundColor:t.bg,
-    tension:0.35, spanGaps:true,
-    pointRadius:4.5, pointHoverRadius:6.5,
-    pointBackgroundColor:t.color,
-    pointBorderColor:'#ffffff', pointBorderWidth:2
-  }));
+  const maxLen=Math.max.apply(null, shown.map(t=>t.seq.length));
+  const maxStart=Math.max(0, maxLen-TREND_WIN);
+  let start=(trendWinStart==null)?maxStart:Math.min(Math.max(0,trendWinStart), maxStart);
+  const end=Math.min(maxLen, start+TREND_WIN);
 
-  const diffs=qualified.map(t=>t.seq[t.seq.length-1]-t.seq[0]);
-  const avgDiff=Math.round(diffs.reduce((a,v)=>a+v,0)/diffs.length);
-  if(avgDiff>0){ badge.textContent='상승세 (+'+avgDiff+'점)'; badge.className='trend-badge tb-up'; }
-  else if(avgDiff<0){ badge.textContent='하락세 ('+avgDiff+'점)'; badge.className='trend-badge tb-dn'; }
-  else { badge.textContent='보합세'; badge.className='trend-badge tb-fl'; }
+  const labels=[];
+  for(let i=start;i<end;i++) labels.push((i+1)+'회차');
+
+  const datasets=shown.map(t=>{
+    const data=[];
+    for(let i=start;i<end;i++) data.push(i<t.seq.length ? t.seq[i] : null);
+    return {
+      label:t.label, data:data,
+      borderColor:t.color, backgroundColor:t.bg,
+      tension:0.35, spanGaps:true, clip:false,
+      pointRadius:4.5, pointHoverRadius:6.5,
+      pointBackgroundColor:t.color,
+      pointBorderColor:'#ffffff', pointBorderWidth:2
+    };
+  });
+
+  // 이동 버튼 (전체가 12회차 이하면 숨김)
+  if(nav){
+    if(maxLen>TREND_WIN){
+      nav.classList.add('show');
+      const prev=document.getElementById('rp-trend-prev');
+      const next=document.getElementById('rp-trend-next');
+      if(prev) prev.disabled=(start<=0);
+      if(next) next.disabled=(start>=maxStart);
+      setHtml('rp-trend-range', (start+1)+'회차 ~ '+end+'회차 <span>/ 전체 '+maxLen+'회차</span>');
+    } else {
+      nav.classList.remove('show');
+    }
+  }
+
+  // 추세 배지 — 지금 보이는 구간 기준
+  const diffs=[];
+  datasets.forEach(ds=>{
+    const vals=ds.data.filter(v=>v!=null);
+    if(vals.length>=2) diffs.push(vals[vals.length-1]-vals[0]);
+  });
+  if(!diffs.length){
+    badge.textContent='추세 보기엔 부족'; badge.className='trend-badge tb-fl';
+  } else {
+    const avgDiff=Math.round(diffs.reduce((a,v)=>a+v,0)/diffs.length);
+    if(avgDiff>0){ badge.textContent='상승세 (+'+avgDiff+'점)'; badge.className='trend-badge tb-up'; }
+    else if(avgDiff<0){ badge.textContent='하락세 ('+avgDiff+'점)'; badge.className='trend-badge tb-dn'; }
+    else { badge.textContent='보합세'; badge.className='trend-badge tb-fl'; }
+  }
 
   const ctx=canvas.getContext('2d');
   trendInst=new Chart(ctx,{
@@ -1311,19 +1372,18 @@ function rpDrawTrend(filtered) {
     data:{labels:labels,datasets:datasets},
     options:{
       responsive:true, maintainAspectRatio:false, animation:false,
-      layout:{ padding:{ top:12, right:10, left:2, bottom:2 } },
+      layout:{ padding:{ top:14, right:12, left:2, bottom:2 } },
       plugins:{
         legend:{display:false},
         tooltip:{ callbacks:{ label:function(c){ return c.dataset.label+' '+c.parsed.y+'점'; } } }
       },
       scales:{
         y:{
-          min:0, max:108,
-          ticks:{ stepSize:25, font:{size:10}, color:'#aeaeb2',
-                  callback:function(v){ return v>100 ? '' : v; } },
+          min:0, max:100,
+          ticks:{ stepSize:25, font:{size:10}, color:'#aeaeb2' },
           grid:{ color:'#f5f5f7' }
         },
-        x:{ ticks:{font:{size:10},color:'#aeaeb2'}, grid:{display:false} }
+        x:{ ticks:{font:{size:10},color:'#aeaeb2', maxRotation:0, autoSkip:true}, grid:{display:false} }
       }
     }
   });
@@ -1350,6 +1410,7 @@ function fmtDateShort(ts){ if(!ts) return ''; const d=toDate(ts); if(d.getTime()
 function esc(s){ return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 function esc2(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function setTxt(id,txt){ const e=document.getElementById(id); if(e) e.textContent=txt; }
+function setHtml(id,html){ const e=document.getElementById(id); if(e) e.innerHTML=html; }
 </script>
 </body>
 </html>
