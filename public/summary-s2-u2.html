@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<script src="/favicon.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>통합과학 2 Ⅱ. 환경과 에너지 · 핵심정리 | 인후쌤 과학수업</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --ink:#111114;
+  --sub:#5c5c64;
+  --line:#8e8e98;
+  --line2:#cdcdd4;
+  --fill:#ededf0;
+  --fill2:#f7f7f9;
+  --hi:#dcdce1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#e9e9ec}
+body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',-apple-system,sans-serif;
+  color:var(--ink);-webkit-font-smoothing:antialiased;font-size:8.6pt;line-height:1.38}
+
+.toolbar{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line2);
+  padding:10px 14px;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+.toolbar span{font-size:11px;color:var(--sub)}
+.btn{background:var(--ink);color:#fff;border:0;border-radius:6px;padding:8px 16px;
+  font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.btn:hover{background:#000}
+
+.sheet+.sheet{margin-top:14px}
+.sheet{width:210mm;height:297mm;background:#fff;margin:14px auto;padding:9mm 10mm 8mm;
+  box-shadow:0 2px 14px rgba(0,0,0,.14);overflow:hidden}
+.inner{transform-origin:top left}
+
+.head{border-bottom:2.4pt solid var(--ink);padding-bottom:2.6mm;margin-bottom:3.2mm}
+.head-l h1{font-size:17pt;font-weight:800;letter-spacing:-.04em;line-height:1.05}
+.head-l .sub{white-space:nowrap;font-size:7.8pt;color:var(--sub);margin-top:1.3mm;letter-spacing:-.025em}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:3.6mm}
+.col{display:flex;flex-direction:column;gap:2.8mm}
+.full{grid-column:1 / -1}
+.blk{break-inside:avoid;page-break-inside:avoid}
+.blk-h{display:flex;align-items:center;gap:1.8mm;margin-bottom:1.4mm;
+  border-bottom:.9pt solid var(--ink);padding-bottom:.9mm}
+.no{width:4.6mm;height:4.6mm;background:var(--ink);color:#fff;font-size:7pt;font-weight:800;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.blk-h h2{font-size:9.6pt;font-weight:800;letter-spacing:-.04em;white-space:nowrap}
+.blk-h .tag{margin-left:auto;flex-shrink:0;white-space:nowrap;font-size:6.4pt;font-weight:700;color:var(--sub);
+  border:.6pt solid var(--line);border-radius:20px;padding:.3mm 1.8mm}
+
+ul{list-style:none}
+li{position:relative;padding-left:2.8mm;margin:.6mm 0;font-size:8.2pt;letter-spacing:-.03em}
+li::before{content:'';position:absolute;left:.5mm;top:1.5mm;width:1.1mm;height:1.1mm;background:var(--ink)}
+b{font-weight:800}
+.k{font-weight:800;background:var(--hi);padding:.2mm .5mm;border-radius:1px}
+.mono{font-variant-numeric:tabular-nums}
+
+table{width:100%;border-collapse:collapse;font-size:7.9pt}
+th,td{border:.6pt solid var(--line);padding:.8mm 1.3mm;text-align:left;letter-spacing:-.035em}
+th{background:var(--fill);font-weight:800;font-size:7.3pt}
+td.c,th.c{text-align:center}
+tbody tr:nth-child(even) td{background:var(--fill2)}
+
+.def{border:.7pt solid var(--line2);border-left:2.4pt solid var(--ink);background:var(--fill2);
+  padding:1.4mm 2.2mm;font-size:8.1pt;letter-spacing:-.03em}
+.def+.def{margin-top:1.2mm}
+.def .t{font-size:7.2pt;font-weight:800;color:var(--sub)}
+
+.trap{border:.9pt solid var(--ink);overflow:hidden}
+.trap .t{background:var(--ink);color:#fff;font-size:7.4pt;font-weight:800;padding:.9mm 2.2mm}
+.trap ul{padding:1.2mm 2.2mm 1.4mm}
+.trap li{font-size:7.9pt;margin:.5mm 0}
+
+.flow{display:flex;align-items:center;gap:.9mm;flex-wrap:wrap;margin:1mm 0}
+.fb{border:.7pt solid var(--line);padding:.7mm 1.6mm;font-size:7.4pt;font-weight:700;background:#fff}
+.fb.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.fa{font-weight:800;font-size:7.6pt}
+
+.mem{border-left:2.4pt solid var(--ink);background:var(--fill);padding:1.2mm 2.2mm;
+  font-size:7.9pt;letter-spacing:-.03em;margin-top:1.2mm}
+
+.chk{column-count:2;column-gap:2.6mm}
+.chk div{font-size:7.9pt;letter-spacing:-.035em;padding-left:3.2mm;position:relative;break-inside:avoid;margin:.5mm 0}
+.chk div::before{content:'□';position:absolute;left:0;top:-.3mm;font-weight:700}
+
+svg{display:block;width:100%;height:auto}
+
+@page{size:A4 portrait;margin:0}
+@media print{
+  html,body{background:#fff}
+  .toolbar{display:none}
+  .sheet{margin:0;box-shadow:none}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+@media screen and (max-width:820px){
+  .sheet{width:100%;height:auto;margin:0;padding:16px 14px;box-shadow:none;overflow:visible}
+  .inner{transform:none !important;width:100% !important}
+  .grid{grid-template-columns:1fr;gap:14px}
+  .col{gap:14px}
+  body{font-size:14px}
+  .head-l h1{font-size:20px}
+  .head-l .sub{white-space:normal}
+  .head-l .sub,li,td,th,.def,.chk div{font-size:13px}
+  .blk-h h2{font-size:16px}
+  li{padding-left:12px}
+  li::before{width:4px;height:4px;top:7px;left:2px}
+  .chk{column-count:1}
+  .toolbar{position:static}
+}
+
+/* ── 인후쌤 과학수업 · 공통 상단바 (남색/로얄블루) ── */
+:root{
+  --nv-navy:#1e3a8a; --nv-royal:#2563eb; --nv-mid:#3b82f6; --nv-light:#60a5fa;
+  --nv-tint:#eff6ff; --nv-tint2:#dbeafe; --nv-border:#bfdbfe; --nv-soft:#e0eaff;
+}
+.pg-header{
+  position:sticky; top:0; z-index:500; background:#fff;
+  border-bottom:1px solid var(--nv-soft);
+  height:54px; display:flex; align-items:center; justify-content:space-between;
+  gap:8px; padding:0 max(12px, env(safe-area-inset-left)) 0 max(12px, env(safe-area-inset-right));
+  box-shadow:0 1px 6px rgba(30,58,138,.06);
+}
+.pg-left{display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;min-width:0;transition:opacity .15s}
+.pg-left:hover{opacity:.75}
+.pg-logo{width:30px;height:30px;border-radius:8px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--nv-mid) 0%,var(--nv-navy) 100%);
+  display:flex;align-items:center;justify-content:center}
+.pg-brand{font-size:clamp(11px,2.9vw,14px);font-weight:700;color:#1d1d1f;letter-spacing:-.3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
+.pg-sub{font-size:10px;color:#8e8e98;font-weight:600;margin-top:1px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.pg-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.pg-chip{display:inline-flex;align-items:center;gap:5px;background:var(--nv-tint);
+  border:1px solid var(--nv-border);border-radius:20px;padding:4px 10px;
+  font-size:10px;font-weight:700;color:var(--nv-navy);white-space:nowrap}
+.pg-btn{min-height:36px;padding:7px 13px;border-radius:20px;border:1.5px solid var(--nv-border);
+  background:var(--nv-navy);color:#fff;font-family:inherit;font-size:12px;font-weight:700;
+  cursor:pointer;white-space:nowrap;transition:background .15s,transform .1s;border-color:var(--nv-navy)}
+.pg-btn:hover{background:#172f6e}
+.pg-btn:active{transform:scale(.96)}
+.pg-btn.ghost{background:transparent;color:var(--nv-navy);border-color:var(--nv-border)}
+.pg-btn.ghost:hover{background:var(--nv-tint)}
+.pg-tip{background:var(--nv-tint);border-bottom:1px solid var(--nv-soft);
+  padding:7px 14px;text-align:center;font-size:11px;color:#4b5563;font-weight:500;letter-spacing:-.02em}
+.pg-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+  background:#1e3a8a;color:#fff;font-size:12px;font-weight:700;padding:10px 18px;border-radius:22px;
+  box-shadow:0 8px 24px rgba(30,58,138,.28);opacity:0;pointer-events:none;transition:.25s;z-index:900}
+.pg-toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@media print{ .pg-header,.pg-tip,.pg-toast{display:none !important} }
+@media (max-width:520px){
+  .pg-sub{display:none}
+  .pg-chip{display:none}
+  .pg-btn{padding:7px 11px;font-size:11px}
+  .pg-tip{font-size:10px;padding:6px 10px}
+}
+</style>
+</head>
+<body style="padding-top:0">
+
+<header class="pg-header">
+  <a href="science-contents.html" class="pg-left" id="pgHome">
+    <div class="pg-logo">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <div style="min-width:0">
+      <div class="pg-brand">인후쌤 과학수업</div>
+      <div class="pg-sub">통합과학 2 · Ⅱ. 환경과 에너지</div>
+    </div>
+  </a>
+  <div class="pg-right">
+    <span class="pg-chip">A4 2장</span>
+    <button class="pg-btn" onclick="window.print()">🖨 인쇄 / PDF</button>
+    <button class="pg-btn ghost" id="pgBack" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+<div class="pg-tip">인쇄 설정 → 용지 A4 · 배율 100% · 여백 없음 · 흑백 권장</div>
+<div class="pg-toast" id="pgToast">링크를 복사했습니다</div>
+<div class="sheet">
+<div class="inner">
+
+  <div class="head">
+    <div class="head-l">
+      <h1>Ⅱ. 환경과 에너지 — 핵심정리 ①</h1>
+      <div class="sub">생태계의 구성 · 생태계 평형 · 환경 변화 · 온실 효과와 지구 온난화</div>
+    </div>
+  </div>
+
+  <div class="blk full" style="margin-bottom:3mm">
+    <div class="blk-h"><div class="no">1</div><h2>에너지 피라미드와 10% 법칙</h2><div class="tag">핵심 원리</div></div>
+    <svg viewBox="0 0 560 74" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="영양단계별 에너지 상대량을 나타낸 에너지 피라미드">
+      <g font-family="Pretendard, 'Noto Sans KR', sans-serif">
+        <g stroke="#111114" stroke-width=".8">
+          <rect x="120" y="3" width="60" height="15" fill="#ffffff"/>
+          <rect x="90" y="20" width="120" height="15" fill="#d4d4da"/>
+          <rect x="55" y="37" width="190" height="15" fill="#9a9aa4"/>
+          <rect x="20" y="54" width="260" height="15" fill="#111114"/>
+        </g>
+        <g font-size="9.6" font-weight="800" text-anchor="middle">
+          <text x="150" y="14" fill="#111114">0.1</text>
+          <text x="150" y="31" fill="#111114">1</text>
+          <text x="150" y="48" fill="#111114">10</text>
+          <text x="150" y="65" fill="#ffffff">100</text>
+        </g>
+        <g font-size="9.6" font-weight="700" fill="#111114" text-anchor="start">
+          <text x="292" y="14">3차 소비자</text>
+          <text x="292" y="31">2차 소비자</text>
+          <text x="292" y="48">1차 소비자</text>
+          <text x="292" y="65">생산자</text>
+        </g>
+        <line x1="372" y1="3" x2="372" y2="69" stroke="#8e8e98" stroke-width=".7"/>
+        <g font-size="9.6" fill="#111114" text-anchor="start">
+          <text x="386" y="16" font-weight="700">다음 단계로 약 10%만 전달</text>
+          <text x="386" y="33" fill="#5c5c64">나머지 90%는 호흡·열 방출·배설로 소비</text>
+          <text x="386" y="50" fill="#5c5c64">→ 상위 영양단계일수록 개체수·에너지가 적다</text>
+          <text x="386" y="67" fill="#5c5c64">에너지 피라미드는 항상 정피라미드</text>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <div class="grid">
+    <div class="col">
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">2</div><h2>생태계의 구성 요소</h2><div class="tag">최빈출</div></div>
+        <table>
+          <thead><tr><th class="c" style="width:20%">생물요소</th><th>유기물을 얻는 방법 · 역할</th><th style="width:24%">예</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>생산자</b></td><td><b>광합성</b>으로 스스로 유기물 합성 (무기물 → 유기물)</td><td>식물, 식물 플랑크톤</td></tr>
+            <tr><td class="c"><b>소비자</b></td><td>다른 생물의 유기물 섭취 → 상위 단계로 에너지 전달</td><td>초식·육식 동물</td></tr>
+            <tr><td class="c"><b>분해자</b></td><td>사체·배설물 분해 (<span class="k">유기물 → 무기물</span>) → 물질 순환</td><td>세균, 곰팡이, 버섯</td></tr>
+          </tbody>
+        </table>
+        <div class="flow">
+          <div class="fb">개체</div><span class="fa">›</span>
+          <div class="fb">개체군<span style="font-weight:500"> 같은 종</span></div><span class="fa">›</span>
+          <div class="fb">군집<span style="font-weight:500"> 모든 개체군</span></div><span class="fa">›</span>
+          <div class="fb on">생태계<span style="font-weight:500"> +비생물</span></div>
+        </div>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">3</div><h2>생물과 환경의 상호작용</h2></div>
+        <table>
+          <thead><tr><th class="c" style="width:20%">방향</th><th>사례</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>비생물 → 생물</b></td><td><b>온도</b> 북극여우 귀 작음·사막여우 귀 큼, 낙엽 / <b>물</b> 선인장의 굵은 줄기 / <b>빛</b> 광굴성, 일조 시간과 개화 / <b>토양</b> 영양 공급</td></tr>
+            <tr><td class="c"><b>생물 → 비생물</b></td><td>광합성으로 <b>대기 O₂ 증가</b> / 지렁이가 토양을 비옥하게 / 숲의 증산으로 습도 상승·기온 하강</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">4</div><h2>생태계 평형</h2></div>
+        <ul>
+          <li><b>먹이사슬</b> 한 줄로 연결된 먹고 먹히는 관계 / <b>먹이그물</b> 여러 사슬이 얽힌 형태 — <span class="k">복잡할수록 생태계가 안정</span>하다.</li>
+          <li><b>생태계 평형</b> 종류·개체수와 에너지 흐름이 안정한 상태. 스스로 회복하는 조절 능력이 있다.</li>
+        </ul>
+        <div class="flow">
+          <div class="fb">1차 소비자 증가</div><span class="fa">›</span>
+          <div class="fb">생산자 감소 · 포식자 증가</div><span class="fa">›</span>
+          <div class="fb on">1차 소비자 감소 → 평형 회복</div>
+        </div>
+        <div class="def">
+          <div class="t">해달 · 성게 · 다시마 — 최상위 포식자의 역할</div>
+          해달 감소 → 천적이 사라진 <b>성게 급증</b> → 다시마 급감 → 다시마 숲 붕괴. 충격이 너무 크면 <span class="k">평형은 회복되지 않는다</span>.
+        </div>
+      </div>
+
+      <div class="trap blk">
+        <div class="t">시험에 반복되는 함정</div>
+        <ul>
+          <li>지렁이가 토양을 비옥하게 = 비생물→생물 <b>✕</b> — <b>생물→비생물</b></li>
+          <li>에너지 피라미드가 역전될 수 있다 <b>✕</b> — <b>항상 정</b>피라미드</li>
+          <li>온실 효과 = 지구 온난화 <b>✕</b> — 온실 효과는 <b>자연 현상</b></li>
+          <li>온난화로 태양 복사 흡수량이 늘어난다 <b>✕</b> — <b>일정</b></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="col">
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">5</div><h2>환경 변화가 생태계에 미치는 영향</h2></div>
+        <table>
+          <thead><tr><th class="c" style="width:26%">위협</th><th>내용 · 사례</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>서식지 파괴</b></td><td>개발·간척으로 서식지 소실 — <span class="k">가장 주된 원인</span></td></tr>
+            <tr><td class="c"><b>침입종 유입</b></td><td>천적이 없어 급증 — 뉴트리아, 가시박, 황소개구리</td></tr>
+            <tr><td class="c"><b>환경 오염</b></td><td>산성비 → 삼림 황폐 / 플라스틱 → 해양 생태계</td></tr>
+            <tr><td class="c"><b>남획</b></td><td>해달 남획 → 성게 급증 → 다시마 숲 파괴</td></tr>
+          </tbody>
+        </table>
+        <ul style="margin-top:1mm">
+          <li><b>외래종</b> 다른 지역에서 유입된 생물 / <b>귀화종</b> 큰 피해 없이 정착(토끼풀) / <span class="k">침입종</span> 심각한 피해를 주는 외래종 = 생태계 교란 생물</li>
+          <li><b>기후 변화</b>로 생물 분포도 달라진다(사과 재배지 북상). <b>보전</b> — CBD·람사르·CITES / 멸종위기종 지정 / 일회용품 줄이기</li>
+        </ul>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">6</div><h2>온실 효과와 지구 온난화</h2><div class="tag">서술형 대비</div></div>
+        <ul>
+          <li><b>복사 평형</b> 흡수한 태양 복사(<b>가시광선</b>) = 방출하는 지구 복사(<b>적외선</b>) → 평균 기온 약 <span class="k">15 ℃</span> 유지</li>
+        </ul>
+        <div class="def" style="margin-top:1.2mm">
+          <div class="t">온실 효과 — 자연적이고 꼭 필요한 현상</div>
+          지표가 방출한 <b>적외선</b>을 온실 기체가 흡수했다가 <b>일부를 지표로 재방출</b> → 지표 온도가 더 높게 유지. 온실 효과가 없으면 지구 평균 기온은 <span class="k">약 −18 ℃</span>.
+        </div>
+        <div class="def">
+          <div class="t">지구 온난화 — 인간 활동으로 강화된 온실 효과</div>
+          화석 연료 연소·삼림 벌채로 온실 기체 증가 → 온실 효과 <b>강화</b> → 기온 비정상 상승. CO₂ 농도 <b>280 ppm(1880) → 420 ppm 이상</b>
+        </div>
+        <table style="margin-top:1.2mm">
+          <thead><tr><th class="c" style="width:30%">온실 기체</th><th>발생원 · 특징</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>이산화 탄소 CO₂</b></td><td>화석 연료·삼림 벌채 — <b>인위적 온난화의 주범</b> (수증기는 자연적 온실 효과의 주역)</td></tr>
+            <tr><td class="c"><b>메테인 CH₄</b></td><td>가축·논·매립지 — CO₂보다 약 25배 강력</td></tr>
+            <tr><td class="c"><b>아산화 질소 N₂O</b></td><td>비료·축산 — CO₂보다 약 300배 강력</td></tr>
+          </tbody>
+        </table>
+        <table style="margin-top:1.2mm">
+          <thead><tr><th class="c" style="width:52%">CO₂ 증가 시 열수지</th><th class="c">변화</th></tr></thead>
+          <tbody>
+            <tr><td>대기의 지구 복사(적외선) 흡수량</td><td class="c"><b>증가</b></td></tr>
+            <tr><td>대기 → 지표 재방출량 · 지표 온도</td><td class="c"><b>증가</b></td></tr>
+            <tr><td>우주로 방출되는 에너지 / 태양 복사 흡수량</td><td class="c">일시 감소 / <span class="k">일정</span></td></tr>
+          </tbody>
+        </table>
+        <ul style="margin-top:1mm">
+          <li><b>영향</b> 빙하 감소, 해수 열팽창 → <span class="k">해수면 상승</span> / 이상 기후 증가 / 서식지 변화·산호 백화</li>
+        </ul>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">✓</div><h2>암기 체크리스트</h2></div>
+        <div class="chk">
+          <div>생물요소 3분류와 역할</div>
+          <div>상호작용 방향 판단</div>
+          <div>에너지 10% 법칙</div>
+          <div>평형 회복 과정</div>
+          <div>15 ℃ / −18 ℃</div>
+          <div>열수지 항목 변화</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="sheet">
+<div class="inner">
+
+  <div class="head">
+    <div class="head-l">
+      <h1>Ⅱ. 환경과 에너지 — 핵심정리 ②</h1>
+      <div class="sub">대기 대순환과 엘니뇨 · 태양 에너지 · 전기 에너지의 생산 · 에너지 효율 · 신재생 에너지</div>
+    </div>
+  </div>
+
+  <div class="blk full" style="margin-bottom:3mm">
+    <div class="blk-h"><div class="no">7</div><h2>모든 에너지는 태양에서 출발한다</h2><div class="tag">전환 경로</div></div>
+    <svg viewBox="0 0 560 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="태양의 수소 핵융합에서 시작되는 에너지 전환 경로">
+      <g font-family="Pretendard, 'Noto Sans KR', sans-serif" text-anchor="middle">
+        <g stroke="#111114" stroke-width=".8">
+          <rect x="0" y="14" width="96" height="24" fill="#111114"/>
+          <rect x="120" y="14" width="86" height="24" fill="#e4e4e8"/>
+          <rect x="230" y="2" width="150" height="20" fill="#ffffff"/>
+          <rect x="230" y="30" width="150" height="20" fill="#ffffff"/>
+          <rect x="404" y="14" width="72" height="24" fill="#ffffff"/>
+          <rect x="488" y="14" width="72" height="24" fill="#e4e4e8"/>
+        </g>
+        <g font-size="10" font-weight="700" fill="#111114">
+          <text x="48" y="30" fill="#ffffff">수소 핵융합</text>
+          <text x="163" y="30">태양 빛에너지</text>
+          <text x="305" y="15">광합성 → 화석 연료</text>
+          <text x="305" y="43">대기 가열 → 바람 · 강수</text>
+          <text x="440" y="30">터빈 회전</text>
+          <text x="524" y="30">전기 에너지</text>
+        </g>
+        <g font-size="12" font-weight="800" fill="#111114">
+          <text x="108" y="31">›</text><text x="218" y="31">›</text>
+          <text x="392" y="31">›</text><text x="482" y="31">›</text>
+        </g>
+        <g font-size="8.8" fill="#5c5c64">
+          <text x="48" y="50">1500만 K · E = mc²</text>
+          <text x="440" y="9">전자기 유도</text>
+        </g>
+      </g>
+    </svg>
+    <ul style="margin-top:.8mm">
+      <li>태양 중심부에서 수소 원자핵 4개가 헬륨 원자핵 1개로 융합할 때 <b>줄어든 질량(Δm)</b>이 <span class="k">E = mc²</span>에 따라 에너지로 바뀐다. 핵융합에는 <b>1억 K</b> 이상의 초고온 플라스마가 필요하다(KSTAR).</li>
+    </ul>
+  </div>
+
+  <div class="grid">
+    <div class="col">
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">8</div><h2>대기 대순환과 엘니뇨</h2><div class="tag">서술형 대비</div></div>
+        <ul>
+          <li>위도별 <b>태양 복사 에너지 불균형</b>을 해소하려고 대기 대순환이 일어난다.</li>
+        </ul>
+        <table style="margin-top:1.2mm">
+          <thead><tr><th class="c" style="width:22%">위도</th><th class="c" style="width:26%">바람</th><th>방향 · 역할</th></tr></thead>
+          <tbody>
+            <tr><td class="c">0° ~ 30°</td><td class="c"><b>무역풍</b></td><td>동 → 서 / 표층 해수를 서쪽으로</td></tr>
+            <tr><td class="c">30° ~ 60°</td><td class="c"><b>편서풍</b></td><td>서 → 동 / 날씨 변화를 주도</td></tr>
+            <tr><td class="c">60° ~ 90°</td><td class="c"><b>극동풍</b></td><td>동 → 서 / 극지방 찬 공기 이동</td></tr>
+          </tbody>
+        </table>
+        <table style="margin-top:1.2mm">
+          <thead><tr><th class="c" style="width:22%">구분</th><th>동태평양(페루)</th><th>서태평양(인도네시아)</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>평상시</b></td><td>찬 해수 <b>용승</b> → 건조·풍어</td><td>따뜻하고 습함, 강수 많음</td></tr>
+            <tr><td class="c"><b>엘니뇨</b></td><td>수온 상승 → <span class="k">강수 증가·홍수</span></td><td>건조 → <span class="k">가뭄·산불</span></td></tr>
+          </tbody>
+        </table>
+        <ul style="margin-top:1mm">
+          <li><b>엘니뇨</b> 무역풍이 <b>약해져</b> 동태평양 표층 수온이 평년보다 <b>0.5 ℃ 이상</b> 높은 상태가 5개월 이상 지속되는 현상</li>
+          <li><b>사막화</b> 위도 30° 부근. 자연적(강수량 감소) + <b>인위적</b>(삼림 벌채·과잉 경작·방목)</li>
+        </ul>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">9</div><h2>전기 에너지의 생산</h2></div>
+        <ul>
+          <li><span class="k">전자기 유도</span> 코일 주위에서 자석을 움직여 <b>자기장이 변할 때</b> 코일에 유도 전류가 흐르는 현상 — 운동 에너지 → 전기 에너지</li>
+        </ul>
+        <ul>
+          <li><b>유도 전류가 세지는 조건</b> 자석이 셀수록 · 빠르게 움직일수록 · 코일을 많이 감을수록 / 자석이 <b>정지</b>하면 전류는 <span class="k">0</span></li>
+        </ul>
+        <div class="flow">
+          <div class="fb">연료</div><span class="fa">›</span>
+          <div class="fb">증기</div><span class="fa">›</span>
+          <div class="fb">터빈</div><span class="fa">›</span>
+          <div class="fb on">발전기</div><span class="fa">›</span>
+          <div class="fb">전기</div>
+        </div>
+        <table>
+          <thead><tr><th class="c" style="width:26%">구분</th><th>화력 발전</th><th>핵발전</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>열원</b></td><td>화석 연료 <b>연소열</b></td><td>우라늄 <b>핵분열</b>열</td></tr>
+            <tr><td class="c"><b>CO₂</b></td><td>다량 배출</td><td>거의 없음</td></tr>
+            <tr><td class="c"><b>폐기물·위험</b></td><td>대기 오염</td><td><b>방사성 폐기물</b>, 유출 사고</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="trap blk">
+        <div class="t">시험에 반복되는 함정</div>
+        <ul>
+          <li>엘니뇨는 무역풍이 <b>강해져서</b> 생긴다 <b>✕</b> — 약해져서</li>
+          <li>자석이 코일 안에 <b>정지</b>해도 전류가 흐른다 <b>✕</b> — 0</li>
+          <li>에너지는 보존되므로 절약이 필요 없다 <b>✕</b> — <b>쓸 수 있는</b> 에너지가 줄어든다</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="col">
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">10</div><h2>에너지 전환과 효율</h2></div>
+        <ul>
+          <li><b>에너지 보존 법칙</b> 형태가 바뀌어도 <b>총량은 일정</b>. 다만 전환할 때마다 일부가 <span class="k">열로 흩어져</span> 다시 쓰기 어려워진다 → 그래서 절약이 필요하다.</li>
+        </ul>
+        <div class="mem" style="text-align:center"><b>에너지 효율(%) = (유용한 에너지 ÷ 공급 에너지) × 100</b> — 100 %는 불가능</div>
+        <table style="margin-top:1.2mm">
+          <thead><tr><th class="c" style="width:38%">기기</th><th class="c" style="width:22%">효율</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr><td class="c">내연 기관 자동차</td><td class="c"><b>약 18 %</b></td><td>대부분 열로 손실</td></tr>
+            <tr><td class="c">전기 자동차</td><td class="c"><b>약 80 %</b></td><td><b>회생 제동</b>으로 운동E 회수</td></tr>
+            <tr><td class="c">열병합 발전</td><td class="c"><b>약 75 %</b></td><td>폐열을 난방에 활용(화력 51 %)</td></tr>
+          </tbody>
+        </table>
+        <ul style="margin-top:1mm">
+          <li><b>계산</b> 효율 18 %, 50 kJ 공급 → 운동 E <span class="k">9 kJ</span>, 41 kJ은 열로 방출 / <b>백열등</b> 5~10 %, <b>LED</b> 40~60 %</li>
+        </ul>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">11</div><h2>신재생 에너지</h2><div class="tag">최빈출</div></div>
+        <table>
+          <thead><tr><th class="c" style="width:22%">종류</th><th>전환 원리</th><th style="width:32%">한계</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>태양광</b></td><td>태양 전지로 빛 → 전기 <b>직접</b> 전환</td><td>야간·흐린 날 불가, 넓은 면적</td></tr>
+            <tr><td class="c"><b>풍력</b></td><td>바람의 운동 E → 날개 회전 → 전기</td><td>소음·진동, 발전량 불규칙</td></tr>
+            <tr><td class="c"><b>수력</b></td><td>물의 <b>위치 E</b> → 터빈 → 전기</td><td>지형 제한, 수몰·생태계 영향</td></tr>
+            <tr><td class="c"><b>조력 · 지열</b></td><td>밀물·썰물 <b>높이 차</b> / 지하 열 → 터빈</td><td>지형·지질 조건이 맞는 곳만</td></tr>
+            <tr><td class="c"><b>연료 전지</b></td><td>수소의 화학 E → 전기 직접 변환</td><td>배출물은 물뿐, 수소 생산비 높음</td></tr>
+          </tbody>
+        </table>
+        <table style="margin-top:1.2mm">
+          <thead><tr><th class="c" style="width:24%">수소</th><th>생산 방법</th><th class="c" style="width:22%">CO₂</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>그레이</b></td><td>천연가스 개질(현재 대부분)</td><td class="c">다량 배출</td></tr>
+            <tr><td class="c"><b>블루</b></td><td>그레이 + CO₂ 포집·저장(CCS)</td><td class="c">일부 감소</td></tr>
+            <tr><td class="c"><b>그린</b></td><td>신재생 전기로 <b>물 전기 분해</b></td><td class="c"><span class="k">없음</span></td></tr>
+          </tbody>
+        </table>
+        <ul style="margin-top:1mm">
+          <li><b>한계</b> <span class="k">간헐성</span>(날씨·시간에 따라 불규칙) · 낮은 에너지 밀도 · 높은 초기 투자비</li>
+          <li><b>보완</b> <b>ESS</b> 잉여 전력을 저장했다 공급 / <b>스마트 그리드</b> ICT로 수요·공급 실시간 조절 / <b>VPP</b> 분산 전원 통합 운영</li>
+        </ul>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">✓</div><h2>암기 체크리스트</h2></div>
+        <div class="chk">
+          <div>바람 3종과 방향</div>
+          <div>엘니뇨 정의와 영향</div>
+          <div>전자기 유도 3조건</div>
+          <div>효율 공식과 계산</div>
+          <div>신재생 원리</div>
+          <div>수소 3색 · ESS</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+/* A4 1장 자동 맞춤 — 실제 렌더 높이를 재서 넘칠 때만 축소(가로폭은 유지) */
+(function(){
+  function fit(){
+    document.querySelectorAll('.sheet').forEach(function(sheet){
+      var inner=sheet.querySelector('.inner'); if(!inner) return;
+      inner.style.transform='none'; inner.style.width='100%';
+      if(window.matchMedia('(max-width:820px)').matches) return;
+      var cs=getComputedStyle(sheet);
+      var avail=sheet.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
+      var h=inner.scrollHeight;
+      if(h>avail+1){ var k=avail/h; inner.style.width=(100/k)+'%'; inner.style.transform='scale('+k+')'; }
+    });
+  }
+  if(document.fonts&&document.fonts.ready){document.fonts.ready.then(fit);}
+  window.addEventListener('load',fit);
+  window.addEventListener('resize',fit);
+  window.addEventListener('beforeprint',fit);
+})();
+</script>
+<script>
+/* 학생 배포 모드(?student=1): 외부 이동 차단 · 홈 링크/뒤로가기 숨김 */
+(function(){
+  var isStudent = new URLSearchParams(location.search).get('student')==='1';
+  function apply(){
+    if(!isStudent) return;
+    var home=document.getElementById('pgHome');
+    if(home){ home.removeAttribute('href'); home.style.pointerEvents='none'; home.style.cursor='default'; }
+    var back=document.getElementById('pgBack');
+    if(back){ back.style.display='none'; }
+    document.querySelectorAll('a[href]').forEach(function(a){
+      var raw=a.getAttribute('href')||'';
+      if(!raw || raw.charAt(0)==='#') return;
+      if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim())) return;
+      try{ if(new URL(a.href, location.href).pathname===location.pathname) return; }catch(e){ return; }
+      a.removeAttribute('href'); a.style.pointerEvents='none'; a.style.cursor='default';
+      a.setAttribute('aria-disabled','true');
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply); else apply();
+  document.addEventListener('click',function(e){
+    if(!isStudent) return;
+    var a=e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if(!a) return;
+    try{ if(new URL(a.href, location.href).pathname!==location.pathname){ e.preventDefault(); e.stopPropagation(); } }catch(err){}
+  },true);
+})();
+</script>
+</body>
+</html>
