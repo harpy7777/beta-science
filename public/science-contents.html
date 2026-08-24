@@ -117,6 +117,12 @@ body {
   font-size: 11px; font-weight: 700; color: #aeaeb2;
   letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.8rem;
 }
+.section-heading-row {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap; margin-bottom: 0.8rem;
+}
+.section-heading-row .section-heading { margin-bottom: 0; }
+.section-note { font-size: 11px; color: #8e8e98; font-weight: 500; }
 
 /* ── Subject Grid ── */
 .subject-grid {
@@ -196,16 +202,134 @@ body {
 }
 .subject-card-2 .card-badge { background: #e0e7ff; color: #3b5bdb; }
 
-/* ── Quick Stats ── */
-.quick-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 1.6rem; }
-.qs-card {
-  background: #ffffff; border: 1px solid var(--border-soft);
-  border-radius: 14px; padding: 0.9rem 1rem;
-  display: flex; align-items: center; gap: 10px;
+/* ══════════════════════════════════════════
+   ── 핵심정리 A4 요약 (신규 섹션) ──
+   ══════════════════════════════════════════ */
+.sum-group { margin-bottom: 1.5rem; }
+.sum-group-head {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 0.7rem;
 }
-.qs-icon { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
-.qs-num  { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
-.qs-lbl  { font-size: 10px; color: #aeaeb2; margin-top: 3px; font-weight: 500; }
+.sum-group-chip {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.06em;
+  padding: 4px 11px; border-radius: 20px; white-space: nowrap;
+}
+.sum-group-chip.g1 { background: var(--bg-tint2); color: var(--navy); }
+.sum-group-chip.g2 { background: #e0e7ff;         color: #3b5bdb; }
+.sum-group-line { flex: 1; height: 1px; background: var(--border-soft); }
+
+.sum-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+.sum-card {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: 16px; padding: 1rem 1.1rem 0.9rem;
+  display: flex; flex-direction: column; gap: 10px;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  position: relative; overflow: hidden;
+}
+.sum-card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: linear-gradient(180deg, var(--royal), var(--navy));
+}
+.sum-card.g2::before { background: linear-gradient(180deg, #3b5bdb, #1e3a8a); }
+.sum-card.g2 { border-color: #c7d4f5; }
+.sum-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(30,58,138,0.14);
+  border-color: var(--blue-light);
+}
+.sum-card.soon { opacity: 0.62; }
+.sum-card.soon::before { background: #d1d1d6; }
+.sum-card.soon:hover { transform: none; box-shadow: none; border-color: var(--border-soft); }
+
+.sum-top { display: flex; align-items: flex-start; gap: 9px; }
+.sum-no {
+  width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--blue-mid), var(--navy));
+  color: #fff; font-size: 13px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  letter-spacing: -0.02em;
+}
+.sum-card.g2 .sum-no { background: linear-gradient(135deg, #3b5bdb, #1e3a8a); }
+.sum-card.soon .sum-no { background: #c7c7cc; }
+.sum-titlebox { flex: 1; min-width: 0; }
+.sum-title {
+  font-size: 14px; font-weight: 800; color: #1d1d1f;
+  letter-spacing: -0.03em; line-height: 1.25;
+}
+.sum-keywords {
+  font-size: 10.5px; color: #8e8e98; margin-top: 4px; line-height: 1.45;
+  font-weight: 500;
+}
+.sum-meta { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.sum-tag {
+  font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
+  background: var(--bg-tint); color: var(--navy);
+  border: 1px solid var(--border-soft); white-space: nowrap;
+}
+.sum-tag.soon-tag { background: #f2f2f7; color: #8e8e98; border-color: #e5e5ea; }
+
+.sum-actions { display: flex; gap: 6px; margin-top: auto; }
+.sum-btn {
+  flex: 1; min-height: 38px; padding: 9px 10px;
+  border-radius: 11px; font-family: inherit;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  border: 1.5px solid transparent;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  transition: background 0.15s, transform 0.1s, border-color 0.15s;
+  white-space: nowrap;
+}
+.sum-btn-open { background: var(--navy); color: #fff; }
+.sum-btn-open:hover  { background: #172f6e; }
+.sum-btn-open:active { transform: scale(0.97); }
+.sum-btn-copy {
+  background: #fff; color: var(--navy);
+  border-color: var(--border); flex: 0 0 auto; width: 44px; padding: 9px 0;
+}
+.sum-btn-copy:hover  { background: var(--bg-tint); }
+.sum-btn-copy:active { transform: scale(0.94); }
+.sum-btn:disabled { background: #f2f2f7; color: #aeaeb2; cursor: not-allowed; border-color: #e5e5ea; }
+.sum-btn:disabled:hover  { background: #f2f2f7; }
+.sum-btn:disabled:active { transform: none; }
+
+/* 배포 안내 박스 */
+.deploy-box {
+  background: linear-gradient(135deg, #f0f7ff 0%, #eef4ff 100%);
+  border: 1px solid var(--border); border-radius: 16px;
+  padding: 1rem 1.2rem; margin-bottom: 1.5rem;
+  display: flex; align-items: flex-start; gap: 11px;
+}
+.deploy-icon {
+  width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+  background: #fff; border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.deploy-title { font-size: 12.5px; font-weight: 800; color: var(--navy); letter-spacing: -0.02em; }
+.deploy-desc  { font-size: 11px; color: #5c5c64; line-height: 1.65; margin-top: 4px; }
+.deploy-desc code {
+  background: #fff; border: 1px solid var(--border-soft); border-radius: 4px;
+  padding: 1px 5px; font-size: 10px; color: var(--royal); font-weight: 700;
+}
+.copy-all-btn {
+  margin-top: 9px; padding: 8px 14px; min-height: 36px;
+  background: var(--navy); color: #fff; border: none; border-radius: 20px;
+  font-family: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.copy-all-btn:hover  { background: #172f6e; }
+.copy-all-btn:active { transform: scale(0.96); }
+
+/* 토스트 */
+.toast {
+  position: fixed; left: 50%; bottom: 28px;
+  transform: translateX(-50%) translateY(22px);
+  background: var(--navy); color: #fff;
+  font-size: 12.5px; font-weight: 700; letter-spacing: -0.02em;
+  padding: 11px 20px; border-radius: 24px;
+  box-shadow: 0 8px 26px rgba(30,58,138,0.3);
+  opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s;
+  z-index: 900; max-width: calc(100vw - 32px); text-align: center;
+}
+.toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ── Bottom 2-col ── */
 .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -243,10 +367,15 @@ body {
 .divider    { height: 1px; background: var(--border-soft); margin: 12px 0; }
 
 /* ── 반응형 ── */
+@media (max-width: 900px) {
+  .sum-grid { grid-template-columns: 1fr 1fr; }
+}
 @media (max-width: 700px) {
   .subject-grid { grid-template-columns: 1fr; }
-  .quick-stats  { grid-template-columns: repeat(2,1fr); }
   .bottom-row   { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .sum-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 520px) {
   .wrap { padding: 1rem 0.75rem 5rem; }
@@ -258,6 +387,8 @@ body {
   .brand-name { font-size: 13px; }
   .header-badge { font-size: 9px; padding: 3px 8px; }
   .header-badge .dot-green { display: none; }
+  .deploy-box { padding: 0.9rem 1rem; }
+  .sum-card { padding: 0.9rem 1rem 0.85rem; }
 }
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
@@ -305,6 +436,45 @@ body {
     </div>
   </div>
 
+  <!-- ══════════ 핵심정리 A4 요약 ══════════ -->
+  <div class="section-heading-row">
+    <div class="section-heading">CORE SUMMARY · A4 핵심정리</div>
+    <div class="section-note">단원별 A4 압축 정리 · 인쇄/PDF 저장 · 학생 배포 지원</div>
+  </div>
+
+  <!-- 배포 안내 -->
+  <div class="deploy-box">
+    <div class="deploy-icon">📤</div>
+    <div style="flex:1;min-width:0;">
+      <div class="deploy-title">주간학습클리닉으로 배포하기</div>
+      <div class="deploy-desc">
+        각 단원의 <b>🔗 버튼</b>을 누르면 <b>학생 전용 링크</b>가 복사됩니다.
+        복사된 주소는 <code>?student=1</code>이 붙어 있어 학생이 열었을 때
+        다른 페이지로 이동할 수 없습니다. 이 주소를
+        <b>주간학습클리닉(assignment-admin)</b>의 자료 링크란에 붙여넣으면 그대로 배포됩니다.
+      </div>
+      <button class="copy-all-btn" onclick="copyAllLinks()">📋 전체 배포 링크 한 번에 복사</button>
+    </div>
+  </div>
+
+  <!-- 통합과학 1 -->
+  <div class="sum-group">
+    <div class="sum-group-head">
+      <span class="sum-group-chip g1">통합과학 1</span>
+      <span class="sum-group-line"></span>
+    </div>
+    <div class="sum-grid" id="grid-s1"></div>
+  </div>
+
+  <!-- 통합과학 2 -->
+  <div class="sum-group">
+    <div class="sum-group-head">
+      <span class="sum-group-chip g2">통합과학 2</span>
+      <span class="sum-group-line"></span>
+    </div>
+    <div class="sum-grid" id="grid-s2"></div>
+  </div>
+
   <!-- 과목 선택 -->
   <div class="section-heading">SUBJECT SELECT</div>
   <div class="subject-grid">
@@ -331,7 +501,6 @@ body {
             <span class="card-menu-text">단원 요약·도표</span>
             <span class="card-menu-arrow">›</span>
           </div>
-      
         </div>
       </div>
       <div class="card-footer">
@@ -362,7 +531,6 @@ body {
             <span class="card-menu-text">단원 요약·도표</span>
             <span class="card-menu-arrow">›</span>
           </div>
-         
         </div>
       </div>
       <div class="card-footer">
@@ -388,18 +556,18 @@ body {
       <div style="font-size:10px;font-weight:700;color:#1e3a8a;letter-spacing:0.08em;margin-bottom:6px;">통합과학 1</div>
       <div class="unit-item">
         <span class="unit-num">01</span>
-        <span class="unit-title">물질의 규칙성과 결합</span>
-      
+        <span class="unit-title">과학의 기초</span>
+        <span class="unit-badge ub-1">정리 완료</span>
       </div>
       <div class="unit-item">
         <span class="unit-num">02</span>
-        <span class="unit-title">자연의 구성 물질</span>
-        
+        <span class="unit-title">물질과 규칙성</span>
+        <span class="unit-badge ub-1">정리 완료</span>
       </div>
       <div class="unit-item">
         <span class="unit-num">03</span>
-        <span class="unit-title">역학적 시스템</span>
-       
+        <span class="unit-title">시스템과 상호작용</span>
+        <span class="unit-badge ub-1">정리 완료</span>
       </div>
 
       <div class="divider"></div>
@@ -407,18 +575,18 @@ body {
       <div style="font-size:10px;font-weight:700;color:#3b5bdb;letter-spacing:0.08em;margin-bottom:6px;">통합과학 2</div>
       <div class="unit-item" style="background:#eef2ff;border-color:#c7d4f5;">
         <span class="unit-num" style="background:#e0e7ff;color:#3b5bdb;">01</span>
-        <span class="unit-title">화학 변화</span>
-        
+        <span class="unit-title">변화와 다양성</span>
+        <span class="unit-badge ub-1">정리 완료</span>
       </div>
       <div class="unit-item" style="background:#eef2ff;border-color:#c7d4f5;">
         <span class="unit-num" style="background:#e0e7ff;color:#3b5bdb;">02</span>
-        <span class="unit-title">생물 다양성과 유지</span>
-      
+        <span class="unit-title">환경과 에너지</span>
+        <span class="unit-badge ub-1">정리 완료</span>
       </div>
       <div class="unit-item" style="background:#eef2ff;border-color:#c7d4f5;">
         <span class="unit-num" style="background:#e0e7ff;color:#3b5bdb;">03</span>
-        <span class="unit-title">생태계와 환경</span>
-       
+        <span class="unit-title">과학과 미래 사회</span>
+        <span class="unit-badge ub-1">정리 완료</span>
       </div>
     </div>
 
@@ -458,16 +626,139 @@ body {
       <div class="activity-item">
         <div class="activity-dot" style="background:#60a5fa;"></div>
         <div style="flex:1;">
-          <div class="activity-text">단원 요약 노트</div>
-          <div style="font-size:10px;color:#aeaeb2;margin-top:1px;">시험 직전 빠른 복습</div>
+          <div class="activity-text">A4 핵심정리 배포</div>
+          <div style="font-size:10px;color:#aeaeb2;margin-top:1px;">주간학습클리닉으로 링크 전달</div>
         </div>
       </div>
-
-     
     </div>
 
   </div>
 </div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════ 핵심정리 데이터 (여기만 수정하면 카드가 자동 생성됩니다) ══════════ */
+var SUMMARIES = [
+  { grade:1, no:'Ⅰ', title:'과학의 기초',      file:'summary-s1-u1.html',
+    keywords:'시간과 공간 · 기본량과 단위 · 측정과 측정 표준 · 정보와 신호', sheets:'A4 1장', ready:true },
+  { grade:1, no:'Ⅱ', title:'물질과 규칙성',    file:'summary-s1-u2.html',
+    keywords:'원소의 생성 · 스펙트럼 · 주기율표 · 화학 결합 · 지각과 생명체 · 신소재', sheets:'A4 1장', ready:true },
+  { grade:1, no:'Ⅲ', title:'시스템과 상호작용', file:'summary-s1-u3.html',
+    keywords:'지구 시스템과 성층 구조 · 물질 순환 · 판 구조론 · 중력과 운동 · 운동량과 충격량 · 세포와 물질대사', sheets:'A4 2장', ready:true },
+
+  { grade:2, no:'Ⅰ', title:'변화와 다양성',    file:'summary-s2-u1.html',
+    keywords:'지질시대와 대멸종 · 자연선택 · 생물다양성 · 산화환원 · 산염기와 중화', sheets:'A4 2장', ready:true },
+  { grade:2, no:'Ⅱ', title:'환경과 에너지',    file:'summary-s2-u2.html',
+    keywords:'생태계 평형 · 지구 온난화 · 대기 대순환 · 전기 에너지 생산 · 신재생 에너지', sheets:'A4 2장', ready:true },
+  { grade:2, no:'Ⅲ', title:'과학과 미래 사회', file:'summary-s2-u3.html',
+    keywords:'감염병 진단 · 피지컬 컴퓨팅 · 빅데이터 · 인공지능 · 사물 인터넷 · SSI', sheets:'A4 2장', ready:true }
+];
+
+/* ── 링크 생성 ── */
+function baseDir() {
+  var p = location.pathname;
+  return location.origin + p.substring(0, p.lastIndexOf('/') + 1);
+}
+function studentLink(file) { return baseDir() + file + '?student=1'; }
+
+/* ── 카드 렌더 ── */
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                  .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function renderCards() {
+  var g1 = document.getElementById('grid-s1');
+  var g2 = document.getElementById('grid-s2');
+  g1.innerHTML = ''; g2.innerHTML = '';
+
+  SUMMARIES.forEach(function(s, i) {
+    var g2cls = (s.grade === 2) ? ' g2' : '';
+    var soon  = s.ready ? '' : ' soon';
+    var div = document.createElement('div');
+    div.className = 'sum-card' + g2cls + soon;
+    div.innerHTML =
+      '<div class="sum-top">' +
+        '<div class="sum-no">' + esc(s.no) + '</div>' +
+        '<div class="sum-titlebox">' +
+          '<div class="sum-title">' + esc(s.title) + '</div>' +
+          '<div class="sum-keywords">' + esc(s.keywords) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sum-meta">' +
+        '<span class="sum-tag' + (s.ready ? '' : ' soon-tag') + '">' + esc(s.sheets) + '</span>' +
+        '<span class="sum-tag' + (s.ready ? '' : ' soon-tag') + '">' +
+          (s.ready ? '배포 가능' : '준비 중') + '</span>' +
+      '</div>' +
+      '<div class="sum-actions">' +
+        '<button class="sum-btn sum-btn-open" data-act="open" data-i="' + i + '"' +
+          (s.ready ? '' : ' disabled') + '>' +
+          (s.ready ? '📄 열기' : '준비 중') + '</button>' +
+        '<button class="sum-btn sum-btn-copy" data-act="copy" data-i="' + i + '"' +
+          (s.ready ? '' : ' disabled') + ' title="학생 배포 링크 복사">🔗</button>' +
+      '</div>';
+    (s.grade === 1 ? g1 : g2).appendChild(div);
+  });
+}
+
+/* ── 버튼 동작(이벤트 위임) ── */
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest ? e.target.closest('.sum-btn') : null;
+  if (!btn || btn.disabled) return;
+  var s = SUMMARIES[parseInt(btn.getAttribute('data-i'), 10)];
+  if (!s) return;
+  if (btn.getAttribute('data-act') === 'open') {
+    location.href = s.file;
+  } else {
+    copyText(studentLink(s.file), '“' + s.no + '. ' + s.title + '” 배포 링크 복사 완료');
+  }
+});
+
+/* ── 전체 링크 복사 ── */
+function copyAllLinks() {
+  var lines = SUMMARIES.filter(function(s){ return s.ready; }).map(function(s) {
+    return '[통합과학' + s.grade + ' ' + s.no + '. ' + s.title + '] ' + studentLink(s.file);
+  });
+  if (!lines.length) { showToast('배포 가능한 자료가 없습니다'); return; }
+  copyText(lines.join('\n'), '배포 링크 ' + lines.length + '개를 복사했습니다');
+}
+
+/* ── 복사 유틸 (HTTPS/구형 브라우저 모두 대응) ── */
+function copyText(text, msg) {
+  function fallback() {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+    document.body.removeChild(ta);
+    showToast(ok ? msg : '복사 실패 — 주소를 길게 눌러 복사해 주세요');
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(function(){ showToast(msg); }, fallback);
+  } else {
+    fallback();
+  }
+}
+
+var toastTimer = null;
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('on'); }, 2200);
+}
+
+window.copyAllLinks = copyAllLinks;
+renderCards();
+</script>
 
 <script type="module">
   import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -493,9 +784,10 @@ body {
     document.getElementById('today-day').textContent = days[now.getDay()];
   })();
 
-  /* 인증 */
+  /* 인증 — 학생 배포 모드(?student=1)에서는 로그인 없이 열람 허용 */
+  const isStudent = new URLSearchParams(location.search).get('student') === '1';
   onAuthStateChanged(auth, user => {
-    if (!user) { location.replace('/login.html'); return; }
+    if (!user && !isStudent) { location.replace('/login.html'); return; }
   });
 
   window.goTo = url => { location.href = url; };
