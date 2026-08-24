@@ -221,6 +221,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .sc-rate{color:#7c8598;font-weight:700}
 .sc-retry{color:#be185d;font-weight:800}
 .sc-sub{font-size:11.5px;color:#a8b1bd;font-weight:600}
+/* ★ 정답률 추이 그래프 (외부 라이브러리 없이 인라인 SVG) */
+.tr-wrap{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:15px 15px 11px;margin-bottom:20px}
+.tr-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.tr-title{font-size:12.5px;font-weight:700;color:var(--tx);letter-spacing:-.01em}
+.tr-sub{font-size:11px;font-weight:700;color:var(--mt);white-space:nowrap}
+.tr-svg{display:block;width:100%;height:auto}
+@media(min-width:769px){
+  .tr-svg{max-width:620px;margin:0 auto}
+}
+.tr-note{font-size:11px;color:var(--mt);line-height:1.7;margin-top:7px;word-break:keep-all}
+@media(max-width:380px){
+  .tr-wrap{padding:13px 12px 10px;margin-bottom:16px}
+  .tr-title{font-size:12px}
+  .tr-sub{font-size:10.5px}
+  .tr-note{font-size:10.5px}
+}
 .sc-badge{
   display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.02em;
   padding:3px 9px;border-radius:999px;background:var(--pink-lt);
@@ -497,6 +513,7 @@ function buildSections(){
       <div class="stat-box"><div class="stat-lbl">누적 정답</div><div class="stat-num" id="ox-sum">—</div></div>
       <div class="stat-box"><div class="stat-lbl">최고 기록</div><div class="stat-num" id="ox-best">—</div></div>
     </div>
+    <div id="ox-trend"></div>
     <div class="sec-label">OX 퀴즈 결과</div>
     <div id="oxResultList"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
   </div>
@@ -507,6 +524,7 @@ function buildSections(){
       <div class="stat-box blue"><div class="stat-lbl">누적 정답</div><div class="stat-num" id="ts-sum">—</div></div>
       <div class="stat-box blue"><div class="stat-lbl">최고 기록</div><div class="stat-num" id="ts-best">—</div></div>
     </div>
+    <div id="ts-trend"></div>
     <div class="sec-label">4지선다 결과</div>
     <div id="testResultList"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
   </div>
@@ -517,6 +535,7 @@ function buildSections(){
       <div class="stat-box green"><div class="stat-lbl">누적 정답</div><div class="stat-num" id="ms-sum">—</div></div>
       <div class="stat-box green"><div class="stat-lbl">최고 기록</div><div class="stat-num" id="ms-best">—</div></div>
     </div>
+    <div id="ms-trend"></div>
     <div class="sec-label">단원별 결과</div>
     <div id="masterTestList"><div class="empty-box"><div class="spinner" style="margin:0 auto 14px"></div>불러오는 중...</div></div>
   </div>`;
@@ -1027,21 +1046,111 @@ function setStats(prefix,items){
   });
 }
 
+/* ════════════════════════════════════════════════════════════════
+   ★ 2026-08 추가 — 탭별 정답률 추이 꺾은선 그래프
+   ────────────────────────────────────────────────────────────────
+   OX · 4지선다 · 마스터 각 탭 목록 맨 위에 그 탭의 기록만 모아
+   날짜순(왼쪽=예전, 오른쪽=최근)으로 정답률을 잇는다.
+   탭마다 함수 호출이 따로라 세 종류가 섞이지 않는다.
+
+   [왜 외부 차트 라이브러리를 쓰지 않았나]
+   이 페이지는 학부모가 카카오톡 링크로 여는 공개 화면이라
+   CDN 하나만 늦게 떠도 그래프만 빈칸으로 남는다.
+   인라인 SVG 로 그리면 HTML 이 뜨는 순간 같이 그려진다.
+
+   [왜 회차별(재응시) 추이가 아닌가]
+   grades 문서 ID 가 {시험ID}__{학생ID} 로 고정이라 재응시하면
+   같은 문서를 덮어쓴다. 그래서 남아 있는 것은 시험별 '최근 결과'
+   한 벌뿐이고, 그릴 수 있는 것은 시험(단원)별 추이다.
+════════════════════════════════════════════════════════════════ */
+const TREND_MAX=12;
+function trendMD(ms){
+  if(!ms)return'';
+  const d=new Date(ms);
+  if(isNaN(d.getTime()))return'';
+  return`${d.getMonth()+1}/${d.getDate()}`;
+}
+function trendRate(sec){
+  if(!sec)return null;
+  if(sec.rate!=null)return sec.rate;
+  return(sec.correct!=null&&sec.total)?Math.round(sec.correct/sec.total*100):null;
+}
+function trendChart(items,color,label){
+  const all=(Array.isArray(items)?items:[]).filter(x=>x&&x.sec)
+    .map(x=>({t:gradeTime(x.r),rate:trendRate(x.sec),nm:String(x.r.testName||x.r.subject||'테스트'),c:x.sec.correct,tot:x.sec.total}))
+    .filter(x=>x.rate!=null)
+    .sort((a,b)=>a.t-b.t);
+  const list=all.slice(-TREND_MAX);
+  const cut=all.length-list.length;
+  if(list.length<2)return'';                      // 1회뿐이면 선이 안 되므로 그리지 않는다
+  /* 여백 — T 는 100% 라벨이 잘리지 않게, L 은 세로축 숫자와 첫 값 라벨이 겹치지 않게 잡았다 */
+  const W=340,H=176,L=30,R=12,T=22,B=26,iw=W-L-R,ih=H-T-B,base=T+ih;
+  const px=i=>L+iw*i/(list.length-1);
+  const py=v=>T+ih*(1-Math.max(0,Math.min(100,v))/100);
+  const pt=(p,i)=>px(i).toFixed(1)+','+py(p.rate).toFixed(1);
+  const grid=[0,50,100].map(v=>{
+    const y=py(v).toFixed(1);
+    return`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#f0e4ec" stroke-width="1"/>`
+      +`<text x="${L-6}" y="${(py(v)+3.2).toFixed(1)}" text-anchor="end" font-size="9" fill="#c7ccd6">${v}</text>`;
+  }).join('');
+  const path=list.map(pt).join(' ');
+  const area=`<polygon points="${L},${base} ${path} ${W-R},${base}" fill="${color}" opacity="0.07"/>`;
+  const line=`<polyline points="${path}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  const dots=list.map((p,i)=>`<circle cx="${px(i).toFixed(1)}" cy="${py(p.rate).toFixed(1)}" r="3" fill="#fff" stroke="${color}" stroke-width="2"><title>${e(p.nm)} · ${(p.c!=null&&p.tot!=null)?e(p.c+'/'+p.tot+'문항 · '):''}정답률 ${p.rate}%</title></circle>`).join('');
+  /* ── 글자 겹침 방지 ──
+     · 점이 많으면 한 칸 건너 하나씩만 쓴다 (마지막 점은 언제나 표시)
+     · 마지막 바로 옆 점은 마지막 글자와 부딪히므로 건너뛴다
+       (예전에 오른쪽 끝에서 "8/22 8/24" 가 붙어 뭉개졌다)
+     · 양 끝 글자는 그래프 밖으로 삐져나가지 않게 기준점을 안쪽으로 맞춘다
+       (예전에 첫 라벨 "40%" 가 세로축 숫자 "50" 을 덮었다) */
+  const last=list.length-1;
+  const tight=list.length>8;                 // 점이 촘촘할 때만 솎아낸다
+  const step=tight?2:1;
+  /* 첫 점과 마지막 점은 언제나 표시한다.
+     (예전에 점이 2개뿐인 마스터 탭에서 첫 점의 날짜·숫자가 통째로 사라졌다) */
+  const keep=i=>(i===0||i===last)?true:(i%step===0&&(!tight||(last-i)>1));
+  const anchorOf=i=>(i===0)?'start':(i===last?'end':'middle');
+  /* 골짜기(양옆보다 낮은 점)에서는 글자를 선 위가 아니라 아래에 둔다 — 선과 겹치지 않게 */
+  const dip=i=>(i>0&&i<last&&list[i-1].rate>list[i].rate&&list[i+1].rate>list[i].rate);
+  const vals=list.map((p,i)=>{
+    if(!keep(i))return'';
+    const y=dip(i)?(py(p.rate)+13):(py(p.rate)-8);
+    return`<text x="${px(i).toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchorOf(i)}" font-size="9" font-weight="700" fill="${color}">${p.rate}%</text>`;
+  }).join('');
+  const xs=list.map((p,i)=>{
+    const md=trendMD(p.t);
+    if(!md||!keep(i))return'';
+    return`<text x="${px(i).toFixed(1)}" y="${H-9}" text-anchor="${anchorOf(i)}" font-size="9" fill="#b9c0cc">${e(md)}</text>`;
+  }).join('');
+  const avg=Math.round(list.reduce((a,p)=>a+p.rate,0)/list.length);
+  return`<div class="tr-wrap">
+    <div class="tr-head">
+      <span class="tr-title">📈 정답률 추이</span>
+      <span class="tr-sub">최근 ${list.length}회 · 평균 ${avg}%</span>
+    </div>
+    <svg class="tr-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${e(label)} 정답률 추이 그래프">${grid}${area}${line}${dots}${vals}${xs}</svg>
+    <div class="tr-note">왼쪽이 예전, 오른쪽이 최근입니다.${cut>0?` 기록이 많아 최근 ${TREND_MAX}회만 그렸습니다.`:''} 각 시험의 단원명과 문항 수는 아래 목록에서 확인하실 수 있습니다.</div>
+  </div>`;
+}
+
 function renderOx(docs){
   const items=docs.map(r=>({r,sec:oxOf(r)})).filter(x=>x.sec);
   setStats('ox',items);
+  document.querySelectorAll('#ox-trend').forEach(el=>el.innerHTML=trendChart(items,'#ec4899','OX 퀴즈'));
   const html=!items.length?emptyBox('⭕','아직 응시한 OX 퀴즈가 없습니다.'):items.map(x=>renderScoreCard(x.r,x.sec)).join('');
   document.querySelectorAll('#oxResultList').forEach(el=>el.innerHTML=html);
 }
 function renderMultiple(docs){
   const items=docs.map(r=>({r,sec:mcOf(r)})).filter(x=>x.sec);
   setStats('ts',items);
+  document.querySelectorAll('#ts-trend').forEach(el=>el.innerHTML=trendChart(items,'#3b82f6','4지선다'));
   const html=!items.length?emptyBox('📝','아직 응시한 4지선다 테스트가 없습니다.'):items.map(x=>renderScoreCard(x.r,x.sec)).join('');
   document.querySelectorAll('#testResultList').forEach(el=>el.innerHTML=html);
 }
 function renderMaster(docs){
   const items=docs.map(r=>({r,sec:masterOf(r)})).filter(x=>x.sec);
   setStats('ms',items);
+  document.querySelectorAll('#ms-trend').forEach(el=>el.innerHTML=trendChart(items,'#10b981','마스터테스트'));
   const html=!items.length?emptyBox('🎯','아직 응시한 마스터테스트가 없습니다.'):items.map(x=>renderScoreCard(x.r,x.sec)).join('');
   document.querySelectorAll('#masterTestList').forEach(el=>el.innerHTML=html);
 }
