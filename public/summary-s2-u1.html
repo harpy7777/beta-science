@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<script src="/favicon.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>통합과학 2 Ⅰ. 변화와 다양성 · 핵심정리 | 인후쌤 과학수업</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --ink:#111114;
+  --sub:#5c5c64;
+  --line:#8e8e98;
+  --line2:#cdcdd4;
+  --fill:#ededf0;
+  --fill2:#f7f7f9;
+  --hi:#dcdce1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#e9e9ec}
+body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',-apple-system,sans-serif;
+  color:var(--ink);-webkit-font-smoothing:antialiased;font-size:8.6pt;line-height:1.38}
+
+.toolbar{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line2);
+  padding:10px 14px;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+.toolbar span{font-size:11px;color:var(--sub)}
+.btn{background:var(--ink);color:#fff;border:0;border-radius:6px;padding:8px 16px;
+  font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.btn:hover{background:#000}
+
+.sheet+.sheet{margin-top:14px}
+.sheet{width:210mm;height:297mm;background:#fff;margin:14px auto;padding:9mm 10mm 8mm;
+  box-shadow:0 2px 14px rgba(0,0,0,.14);overflow:hidden}
+.inner{transform-origin:top left}
+
+.head{border-bottom:2.4pt solid var(--ink);padding-bottom:2.6mm;margin-bottom:3.2mm}
+.head-l h1{font-size:17pt;font-weight:800;letter-spacing:-.04em;line-height:1.05}
+.head-l .sub{white-space:nowrap;font-size:7.8pt;color:var(--sub);margin-top:1.3mm;letter-spacing:-.025em}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:3.6mm}
+.col{display:flex;flex-direction:column;gap:2.8mm}
+.full{grid-column:1 / -1}
+.blk{break-inside:avoid;page-break-inside:avoid}
+.blk-h{display:flex;align-items:center;gap:1.8mm;margin-bottom:1.4mm;
+  border-bottom:.9pt solid var(--ink);padding-bottom:.9mm}
+.no{width:4.6mm;height:4.6mm;background:var(--ink);color:#fff;font-size:7pt;font-weight:800;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.blk-h h2{font-size:9.6pt;font-weight:800;letter-spacing:-.04em;white-space:nowrap}
+.blk-h .tag{margin-left:auto;flex-shrink:0;white-space:nowrap;font-size:6.4pt;font-weight:700;color:var(--sub);
+  border:.6pt solid var(--line);border-radius:20px;padding:.3mm 1.8mm}
+
+ul{list-style:none}
+li{position:relative;padding-left:2.8mm;margin:.6mm 0;font-size:8.2pt;letter-spacing:-.03em}
+li::before{content:'';position:absolute;left:.5mm;top:1.5mm;width:1.1mm;height:1.1mm;background:var(--ink)}
+b{font-weight:800}
+.k{font-weight:800;background:var(--hi);padding:.2mm .5mm;border-radius:1px}
+.mono{font-variant-numeric:tabular-nums}
+
+table{width:100%;border-collapse:collapse;font-size:7.9pt}
+th,td{border:.6pt solid var(--line);padding:.8mm 1.3mm;text-align:left;letter-spacing:-.035em}
+th{background:var(--fill);font-weight:800;font-size:7.3pt}
+td.c,th.c{text-align:center}
+tbody tr:nth-child(even) td{background:var(--fill2)}
+
+.def{border:.7pt solid var(--line2);border-left:2.4pt solid var(--ink);background:var(--fill2);
+  padding:1.4mm 2.2mm;font-size:8.1pt;letter-spacing:-.03em}
+.def+.def{margin-top:1.2mm}
+.def .t{font-size:7.2pt;font-weight:800;color:var(--sub)}
+
+.trap{border:.9pt solid var(--ink);overflow:hidden}
+.trap .t{background:var(--ink);color:#fff;font-size:7.4pt;font-weight:800;padding:.9mm 2.2mm}
+.trap ul{padding:1.2mm 2.2mm 1.4mm}
+.trap li{font-size:7.9pt;margin:.5mm 0}
+
+.flow{display:flex;align-items:center;gap:.9mm;flex-wrap:wrap;margin:1mm 0}
+.fb{border:.7pt solid var(--line);padding:.7mm 1.6mm;font-size:7.4pt;font-weight:700;background:#fff}
+.fb.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.fa{font-weight:800;font-size:7.6pt}
+
+.mem{border-left:2.4pt solid var(--ink);background:var(--fill);padding:1.2mm 2.2mm;
+  font-size:7.9pt;letter-spacing:-.03em;margin-top:1.2mm}
+
+.chk{column-count:2;column-gap:2.6mm}
+.chk div{font-size:7.9pt;letter-spacing:-.035em;padding-left:3.2mm;position:relative;break-inside:avoid;margin:.5mm 0}
+.chk div::before{content:'□';position:absolute;left:0;top:-.3mm;font-weight:700}
+
+svg{display:block;width:100%;height:auto}
+
+@page{size:A4 portrait;margin:0}
+@media print{
+  html,body{background:#fff}
+  .toolbar{display:none}
+  .sheet{margin:0;box-shadow:none}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+@media screen and (max-width:820px){
+  .sheet{width:100%;height:auto;margin:0;padding:16px 14px;box-shadow:none;overflow:visible}
+  .inner{transform:none !important;width:100% !important}
+  .grid{grid-template-columns:1fr;gap:14px}
+  .col{gap:14px}
+  body{font-size:14px}
+  .head-l h1{font-size:20px}
+  .head-l .sub{white-space:normal}
+  .head-l .sub,li,td,th,.def,.chk div{font-size:13px}
+  .blk-h h2{font-size:16px}
+  li{padding-left:12px}
+  li::before{width:4px;height:4px;top:7px;left:2px}
+  .chk{column-count:1}
+  .toolbar{position:static}
+}
+
+/* ── 인후쌤 과학수업 · 공통 상단바 (남색/로얄블루) ── */
+:root{
+  --nv-navy:#1e3a8a; --nv-royal:#2563eb; --nv-mid:#3b82f6; --nv-light:#60a5fa;
+  --nv-tint:#eff6ff; --nv-tint2:#dbeafe; --nv-border:#bfdbfe; --nv-soft:#e0eaff;
+}
+.pg-header{
+  position:sticky; top:0; z-index:500; background:#fff;
+  border-bottom:1px solid var(--nv-soft);
+  height:54px; display:flex; align-items:center; justify-content:space-between;
+  gap:8px; padding:0 max(12px, env(safe-area-inset-left)) 0 max(12px, env(safe-area-inset-right));
+  box-shadow:0 1px 6px rgba(30,58,138,.06);
+}
+.pg-left{display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;min-width:0;transition:opacity .15s}
+.pg-left:hover{opacity:.75}
+.pg-logo{width:30px;height:30px;border-radius:8px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--nv-mid) 0%,var(--nv-navy) 100%);
+  display:flex;align-items:center;justify-content:center}
+.pg-brand{font-size:clamp(11px,2.9vw,14px);font-weight:700;color:#1d1d1f;letter-spacing:-.3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
+.pg-sub{font-size:10px;color:#8e8e98;font-weight:600;margin-top:1px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.pg-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.pg-chip{display:inline-flex;align-items:center;gap:5px;background:var(--nv-tint);
+  border:1px solid var(--nv-border);border-radius:20px;padding:4px 10px;
+  font-size:10px;font-weight:700;color:var(--nv-navy);white-space:nowrap}
+.pg-btn{min-height:36px;padding:7px 13px;border-radius:20px;border:1.5px solid var(--nv-border);
+  background:var(--nv-navy);color:#fff;font-family:inherit;font-size:12px;font-weight:700;
+  cursor:pointer;white-space:nowrap;transition:background .15s,transform .1s;border-color:var(--nv-navy)}
+.pg-btn:hover{background:#172f6e}
+.pg-btn:active{transform:scale(.96)}
+.pg-btn.ghost{background:transparent;color:var(--nv-navy);border-color:var(--nv-border)}
+.pg-btn.ghost:hover{background:var(--nv-tint)}
+.pg-tip{background:var(--nv-tint);border-bottom:1px solid var(--nv-soft);
+  padding:7px 14px;text-align:center;font-size:11px;color:#4b5563;font-weight:500;letter-spacing:-.02em}
+.pg-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+  background:#1e3a8a;color:#fff;font-size:12px;font-weight:700;padding:10px 18px;border-radius:22px;
+  box-shadow:0 8px 24px rgba(30,58,138,.28);opacity:0;pointer-events:none;transition:.25s;z-index:900}
+.pg-toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@media print{ .pg-header,.pg-tip,.pg-toast{display:none !important} }
+@media (max-width:520px){
+  .pg-sub{display:none}
+  .pg-chip{display:none}
+  .pg-btn{padding:7px 11px;font-size:11px}
+  .pg-tip{font-size:10px;padding:6px 10px}
+}
+</style>
+</head>
+<body style="padding-top:0">
+
+<header class="pg-header">
+  <a href="science-contents.html" class="pg-left" id="pgHome">
+    <div class="pg-logo">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <div style="min-width:0">
+      <div class="pg-brand">인후쌤 과학수업</div>
+      <div class="pg-sub">통합과학 2 · Ⅰ. 변화와 다양성</div>
+    </div>
+  </a>
+  <div class="pg-right">
+    <span class="pg-chip">A4 2장</span>
+    <button class="pg-btn" onclick="window.print()">🖨 인쇄 / PDF</button>
+    <button class="pg-btn ghost" id="pgBack" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+<div class="pg-tip">인쇄 설정 → 용지 A4 · 배율 100% · 여백 없음 · 흑백 권장</div>
+<div class="pg-toast" id="pgToast">링크를 복사했습니다</div>
+<div class="sheet">
+<div class="inner">
+
+  <div class="head">
+    <div class="head-l">
+      <h1>Ⅰ. 변화와 다양성 — 핵심정리 ①</h1>
+      <div class="sub">진화와 생물다양성 · 지질시대 / 대멸종 / 자연선택 / 생물다양성</div>
+    </div>
+  </div>
+
+  <div class="blk full" style="margin-bottom:3mm">
+    <div class="blk-h"><div class="no">1</div><h2>지질시대의 구분</h2><div class="tag">비율 · 순서 암기</div></div>
+    <svg viewBox="0 0 560 56" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="지질시대 4구분과 실제 시간 비율">
+      <g font-family="Pretendard, 'Noto Sans KR', sans-serif" text-anchor="middle">
+        <g stroke="#111114" stroke-width=".8">
+          <rect x="0" y="2" width="250" height="26" fill="#e4e4e8"/>
+          <rect x="250" y="2" width="100" height="26" fill="#ffffff"/>
+          <rect x="350" y="2" width="110" height="26" fill="#ffffff"/>
+          <rect x="460" y="2" width="100" height="26" fill="#ffffff"/>
+        </g>
+        <g font-size="10.6" font-weight="700" fill="#111114">
+          <text x="125" y="14">선캄브리아 시대</text><text x="300" y="14">고생대</text>
+          <text x="405" y="14">중생대</text><text x="510" y="14">신생대</text>
+        </g>
+        <g font-size="8.6" fill="#5c5c64">
+          <text x="125" y="24">46억 ~ 5.39억 년 전</text><text x="300" y="24">5.39 ~ 2.52억</text>
+          <text x="405" y="24">2.52 ~ 0.66억</text><text x="510" y="24">6600만 ~ 현재</text>
+        </g>
+        <g stroke="#111114" stroke-width=".7">
+          <rect x="0" y="37" width="494" height="9" fill="#111114"/>
+          <rect x="494" y="37" width="35" height="9" fill="#9a9aa4"/>
+          <rect x="529" y="37" width="23" height="9" fill="#d4d4da"/>
+          <rect x="552" y="37" width="8" height="9" fill="#ffffff"/>
+        </g>
+        <g font-size="8.8" fill="#5c5c64">
+          <text x="0" y="55" text-anchor="start">실제 시간 비율 — 선캄브리아 88.2%</text>
+          <text x="560" y="55" text-anchor="end">고생대 6.3% · 중생대 4.1% · 신생대 1.4%</text>
+        </g>
+      </g>
+    </svg>
+    <ul style="margin-top:.8mm">
+      <li><b>지질시대</b> 지구 탄생 약 <span class="k">46억 년 전</span>부터 현재까지. <b>넓은 지역에 걸친 급격한 환경 변화</b>를 기준으로 구분한다.</li>
+      <li><b>화석</b> 지질시대 생물의 유해나 흔적. 당시 환경을 알려 준다 — 고사리(온난·습한 육상), 산호(수심 얕고 따뜻한 바다).</li>
+    </ul>
+  </div>
+
+  <div class="grid">
+    <div class="col">
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">2</div><h2>지질시대의 환경과 생물</h2><div class="tag">최빈출</div></div>
+        <table>
+          <thead><tr><th class="c" style="width:20%">시대</th><th>환경</th><th style="width:28%">대표 생물 · 화석</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>선캄브리아</b></td><td>오존층 ✕, 강한 자외선 / 남세균 광합성 → 산소 축적</td><td>단세포 생물 · <b>스트로마톨라이트</b></td></tr>
+            <tr><td class="c"><b>고생대</b></td><td>오존층 형성 → 육상 진출 / 말기 <b>판게아</b> 형성</td><td><b>삼엽충</b>·어류·양치식물·양서류</td></tr>
+            <tr><td class="c"><b>중생대</b></td><td>판게아 분리, 기후 온난</td><td>공룡·겉씨식물 · <b>암모나이트</b></td></tr>
+            <tr><td class="c"><b>신생대</b></td><td>현재와 비슷한 수륙 분포 / 말기 빙하기·간빙기 반복</td><td>포유류·속씨식물·인류 조상 · <b>화폐석</b></td></tr>
+          </tbody>
+        </table>
+        <div class="flow">
+          <div class="fb">남세균 광합성</div><span class="fa">›</span>
+          <div class="fb">산소 축적</div><span class="fa">›</span>
+          <div class="fb">오존층 형성</div><span class="fa">›</span>
+          <div class="fb on">고생대 중기 육상 진출</div>
+        </div>
+        <ul>
+          <li>육상 진출은 <b>식물이 먼저</b>, 동물이 뒤따랐다. 각 시대 <b>말기</b>에 대멸종이 있었다는 점도 함께 기억한다.</li>
+        </ul>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">3</div><h2>대멸종</h2></div>
+        <ul>
+          <li>짧은 지질학적 기간에 생물종의 상당 비율이 사라지는 사건. 지질시대 동안 총 <span class="k">5번</span> 발생, <b>수만 ~ 수백만 년</b>에 걸쳐 진행된다.</li>
+        </ul>
+        <table style="margin-top:1.2mm">
+          <thead><tr><th class="c" style="width:26%">중생대 말 가설</th><th>내용</th><th style="width:28%">증거</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>소행성 충돌설</b></td><td>먼지가 햇빛 차단 → 광합성 불가 → 먹이사슬 붕괴</td><td><b>이리듐</b> 고농도, 칙술루브 크레이터</td></tr>
+            <tr><td class="c"><b>화산 폭발설</b></td><td>화산재·가스가 햇빛 차단, 산성비 → 기후 변화</td><td>인도 <b>데칸 고원</b> 현무암</td></tr>
+          </tbody>
+        </table>
+        <ul style="margin-top:1mm">
+          <li>현재는 소행성 충돌이 방아쇠가 되고 화산 활동·해수면 변화가 <b>복합 작용</b>했다는 견해가 우세하다.</li>
+          <li>대멸종 후 비워진 생태 공간에서 살아남은 생물이 적응하며 <span class="k">폭발적으로 다양화</span>한다 (공룡 멸종 → 포유류 번성).</li>
+        </ul>
+      </div>
+
+      <div class="trap blk">
+        <div class="t">시험에 반복되는 함정</div>
+        <ul>
+          <li>진화는 <b>개체</b>가 변하는 것 <b>✕</b> — <b>집단</b> 수준의 변화</li>
+          <li><b>환경적 변이</b>로 진화가 일어난다 <b>✕</b> — 유전적 변이만</li>
+          <li>대멸종이 몇 년 사이에 일어났다 <b>✕</b> — 수만~수백만 년</li>
+          <li>종다양성은 종 수만 따진다 <b>✕</b> — <b>고른 분포</b>도 함께</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="col">
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">4</div><h2>자연선택과 진화</h2></div>
+        <ul>
+          <li><b>진화</b> 여러 세대를 거치며 <span class="k">집단(개체군)</span>의 특성이 변하는 과정 / <b>변이</b> 같은 종의 개체마다 형질이 다른 것 — 진화의 재료</li>
+        </ul>
+        <table style="margin-top:1.2mm">
+          <thead><tr><th class="c" style="width:26%">변이</th><th>원인 · 예</th><th class="c" style="width:18%">유전</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>유전적 변이</b></td><td>돌연변이·유성생식 → 유전자 차이 / 토끼 털색</td><td class="c"><span class="k">유전 ○</span></td></tr>
+            <tr><td class="c"><b>환경적 변이</b></td><td>먹이·온도·빛 등 환경 차이 / 어린 홍학의 회색 몸</td><td class="c"><b>유전 ✕</b></td></tr>
+          </tbody>
+        </table>
+        <div class="flow">
+          <div class="fb">① 변이</div><span class="fa">›</span>
+          <div class="fb">② 생존 경쟁</div><span class="fa">›</span>
+          <div class="fb">③ 자연선택</div><span class="fa">›</span>
+          <div class="fb on">④ 진화</div>
+        </div>
+        <div class="def">
+          <div class="t">살충제 내성 — 자연선택의 대표 사례</div>
+          처음부터 저항성 개체와 비저항성 개체가 <b>공존(변이)</b> → 살포로 비저항성 개체 대부분 사망(<b>자연선택</b>) → 저항성 개체만 번식 → 세대가 지날수록 <span class="k">저항성 유전자 비율 증가</span>
+        </div>
+        <div class="def">
+          <div class="t">낫 모양 적혈구 — 환경에 따라 달라지는 결과</div>
+          일반 지역에서는 빈혈로 <b>불리</b>하지만, 말라리아 다발 지역에서는 저항성 덕분에 <b>유리</b> → 자연선택 결과는 <span class="k">환경에 따라 달라진다</span>
+        </div>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">5</div><h2>생물다양성과 보전</h2></div>
+        <table>
+          <thead><tr><th class="c" style="width:28%">3요소</th><th>뜻 · 예</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>유전적 다양성</b></td><td>같은 종 안의 유전적 변이 정도 — 무당벌레 무늬</td></tr>
+            <tr><td class="c"><b>종다양성</b></td><td>종 <b>수</b>가 많고 각 종이 <b>고르게</b> 분포하는 정도</td></tr>
+            <tr><td class="c"><b>생태계다양성</b></td><td>생태계의 종류와 구성 요소 간 상호작용이 다양한 정도</td></tr>
+          </tbody>
+        </table>
+        <ul style="margin-top:1mm">
+          <li><b>감소 원인</b> <span class="k">서식지 파괴(가장 주된 원인)</span> · 침입종(뉴트리아·가시박·황소개구리) · 환경 오염 · 과도한 포획 · 기후 변화</li>
+          <li><b>유전적 다양성이 낮으면</b> 단일 품종 재배지처럼 병원균 하나에 집단 전체가 무너질 수 있다.</li>
+        </ul>
+        <table style="margin-top:1.2mm">
+          <thead><tr><th class="c" style="width:26%">국제 협약</th><th>주요 내용</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>CBD</b> 생물다양성</td><td>생물다양성 보전과 지속 가능한 이용 (1992년 채택)</td></tr>
+            <tr><td class="c"><b>CITES</b></td><td>멸종 위기 야생 동식물의 국제 거래 금지·규제</td></tr>
+            <tr><td class="c"><b>람사르</b></td><td>국제적으로 중요한 <b>습지</b> 보호</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">✓</div><h2>암기 체크리스트</h2></div>
+        <div class="chk">
+          <div>지질시대 4구분과 비율</div>
+          <div>시대별 환경 · 대표 화석</div>
+          <div>육상 진출 4단계</div>
+          <div>대멸종 두 가설과 증거</div>
+          <div>변이 2종과 유전 여부</div>
+          <div>자연선택 4단계</div>
+          <div>생물다양성 3요소</div>
+          <div>협약 3종 구분</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="sheet">
+<div class="inner">
+
+  <div class="head">
+    <div class="head-l">
+      <h1>Ⅰ. 변화와 다양성 — 핵심정리 ②</h1>
+      <div class="sub">화학 변화 · 산화와 환원 / 산과 염기 / 중화 반응 / 에너지의 출입</div>
+    </div>
+  </div>
+
+  <div class="blk full" style="margin-bottom:3mm">
+    <div class="blk-h"><div class="no">6</div><h2>산화와 환원은 항상 동시에</h2><div class="tag">핵심 원리</div></div>
+    <svg viewBox="0 0 560 62" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="산화구리와 탄소의 반응에서 산소가 이동하며 산화와 환원이 동시에 일어남">
+      <g font-family="Pretendard, 'Noto Sans KR', sans-serif" text-anchor="middle">
+        <path d="M96 26 C 150 2, 210 2, 262 26" stroke="#111114" stroke-width="1.2" fill="none"/>
+        <polygon points="262,26 253,20 254,27" fill="#111114"/>
+        <text x="179" y="10" font-size="9.6" font-weight="700" fill="#111114">산소(O) 이동</text>
+        <g font-size="14" font-weight="800" fill="#111114">
+          <text x="96" y="44">2CuO</text><text x="152" y="44">+</text><text x="196" y="44">C</text>
+          <text x="248" y="44">→</text><text x="300" y="44">2Cu</text><text x="352" y="44">+</text><text x="400" y="44">CO₂</text>
+        </g>
+        <g stroke="#111114" stroke-width=".8" fill="none">
+          <rect x="64" y="30" width="64" height="19"/><rect x="176" y="30" width="40" height="19"/>
+        </g>
+        <g font-size="9.6" font-weight="700">
+          <text x="96" y="59" fill="#111114">산소를 잃음 → 환원</text>
+          <text x="196" y="59" fill="#111114">산소를 얻음 → 산화</text>
+        </g>
+        <text x="490" y="38" font-size="9.6" fill="#5c5c64">한쪽이 산화되면</text>
+        <text x="490" y="50" font-size="9.6" fill="#5c5c64">반드시 다른 쪽은 환원</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="grid">
+    <div class="col">
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">7</div><h2>산화·환원의 두 가지 정의</h2><div class="tag">최빈출</div></div>
+        <table>
+          <thead><tr><th class="c" style="width:20%">구분</th><th>산소의 이동</th><th>전자의 이동</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>산화</b></td><td>산소를 <span class="k">얻음</span></td><td>전자(e⁻)를 <span class="k">잃음</span></td></tr>
+            <tr><td class="c"><b>환원</b></td><td>산소를 <span class="k">잃음</span></td><td>전자(e⁻)를 <span class="k">얻음</span></td></tr>
+          </tbody>
+        </table>
+        <div class="mem"><b>암기</b> 산화 = 산소 <b>얻고</b> 전자 <b>잃고</b> / 환원 = 산소 <b>잃고</b> 전자 <b>얻고</b></div>
+        <div class="def" style="margin-top:1.2mm">
+          <div class="t">전자 이동의 예</div>
+          <b>Cu + 2Ag⁺ → Cu²⁺ + 2Ag</b> — Cu는 전자를 잃어 <b>산화</b>, Ag⁺은 전자를 얻어 <b>환원</b>. 전자는 <b>Cu → Ag⁺</b> 방향으로 이동한다.
+        </div>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">8</div><h2>철의 제련과 생활 속 산화·환원</h2></div>
+        <div class="def">
+          <div class="t">철의 제련 (용광로)</div>
+          ① 2C + O₂ → 2CO (탄소가 <b>산화</b>) ② <b>Fe₂O₃ + 3CO → 2Fe + 3CO₂</b> — CO는 산화, <span class="k">Fe₂O₃는 환원</span>되어 순수한 철을 얻는다.
+        </div>
+        <table style="margin-top:1.2mm">
+          <thead><tr><th class="c" style="width:28%">생활 속 사례</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>철의 부식</b></td><td>4Fe + 3O₂ → 2Fe₂O₃ — 철이 산소를 얻어 <b>산화</b></td></tr>
+            <tr><td class="c"><b>연소</b></td><td>CH₄ + 2O₂ → CO₂ + 2H₂O — 연료의 <b>산화</b></td></tr>
+            <tr><td class="c"><b>광합성</b></td><td>CO₂가 <b>환원</b>되어 포도당 생성</td></tr>
+            <tr><td class="c"><b>호흡</b></td><td>포도당이 <b>산화</b>되어 에너지 방출</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="trap blk">
+        <div class="t">시험에 반복되는 함정</div>
+        <ul>
+          <li>산화와 환원이 <b>따로</b> 일어난다 <b>✕</b> — 항상 동시</li>
+          <li>산화 = 전자를 얻는 것 <b>✕</b> — 전자를 <b>잃는</b> 것</li>
+          <li>중화 반응에서 물 대신 다른 물질이 먼저 <b>✕</b> — <b>H⁺+OH⁻→H₂O</b></li>
+          <li>흡열 반응이면 주변 온도가 오른다 <b>✕</b> — <b>내려간다</b></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="col">
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">9</div><h2>산과 염기 · 중화 반응</h2></div>
+        <table>
+          <thead><tr><th class="c" style="width:16%">구분</th><th>정의(아레니우스)</th><th style="width:32%">예</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>산</b></td><td>물에 녹아 <span class="k">H⁺</span>을 내놓는 물질</td><td>HCl → H⁺ + Cl⁻ / H₂SO₄</td></tr>
+            <tr><td class="c"><b>염기</b></td><td>물에 녹아 <span class="k">OH⁻</span>을 내놓는 물질</td><td>NaOH → Na⁺ + OH⁻ / Ca(OH)₂</td></tr>
+          </tbody>
+        </table>
+        <div class="def" style="margin-top:1.2mm">
+          <div class="t">중화 반응의 핵심</div>
+          <b>H⁺ + OH⁻ → H₂O</b> (예: HCl + NaOH → NaCl + H₂O)<br>
+          남은 이온으로 액성 판단 — H⁺ 남으면 <b>산성</b>, OH⁻ 남으면 <b>염기성</b>, 모두 반응하면 <b>중성</b>
+        </div>
+        <ul style="margin-top:1mm">
+          <li><b>중화열</b>은 실제로 반응한 <span class="k">H⁺·OH⁻의 수에 비례</span>한다 → <b>완전히 중화</b>되는 지점에서 온도가 가장 높다.</li>
+        </ul>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">10</div><h2>생활 속 중화 반응</h2></div>
+        <table>
+          <thead><tr><th class="c" style="width:30%">상황</th><th>중화 방법</th></tr></thead>
+          <tbody>
+            <tr><td class="c">생선 비린내(염기성)</td><td>레몬즙·식초 등 <b>산성</b>으로 중화</td></tr>
+            <tr><td class="c">충치 예방</td><td>세균이 만든 산 → <b>염기성 치약</b>으로 중화</td></tr>
+            <tr><td class="c">위산 과다</td><td>염기성 <b>제산제</b> 복용</td></tr>
+            <tr><td class="c">산성화된 토양</td><td><b>석회 가루</b> 살포</td></tr>
+            <tr><td class="c">벌레 물린 곳</td><td>산성인 벌레의 독 → <b>암모니아수</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">11</div><h2>물질 변화에서 에너지의 출입</h2></div>
+        <table>
+          <thead><tr><th class="c" style="width:20%">구분</th><th>열에너지</th><th class="c" style="width:18%">주변 온도</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>발열 반응</b></td><td>반응계 → 주변으로 <span class="k">방출</span> (반응물 에너지 &gt; 생성물)</td><td class="c"><b>상승</b></td></tr>
+            <tr><td class="c"><b>흡열 반응</b></td><td>주변 → 반응계로 <span class="k">흡수</span> (반응물 에너지 &lt; 생성물)</td><td class="c"><b>하강</b></td></tr>
+          </tbody>
+        </table>
+        <table style="margin-top:1.2mm">
+          <thead><tr><th class="c" style="width:20%">사례</th><th>발열 반응</th><th>흡열 반응</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>예</b></td><td>연소 / 손난로(철의 산화) / 산화칼슘 + 물 / 중화 반응</td><td>냉찜질(질산 암모늄 용해) / 광합성 / 열분해</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">✓</div><h2>암기 체크리스트</h2></div>
+        <div class="chk">
+          <div>산화·환원 산소/전자 정의</div>
+          <div>2CuO + C 반응 해석</div>
+          <div>철의 제련 반응식</div>
+          <div>생활 속 산화·환원 4종</div>
+          <div>산·염기 아레니우스 정의</div>
+          <div>H⁺ + OH⁻ → H₂O</div>
+          <div>중화열과 완전 중화점</div>
+          <div>발열 · 흡열 사례 구분</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+/* A4 1장 자동 맞춤 — 실제 렌더 높이를 재서 넘칠 때만 축소(가로폭은 유지) */
+(function(){
+  function fit(){
+    document.querySelectorAll('.sheet').forEach(function(sheet){
+      var inner=sheet.querySelector('.inner'); if(!inner) return;
+      inner.style.transform='none'; inner.style.width='100%';
+      if(window.matchMedia('(max-width:820px)').matches) return;
+      var cs=getComputedStyle(sheet);
+      var avail=sheet.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
+      var h=inner.scrollHeight;
+      if(h>avail+1){ var k=avail/h; inner.style.width=(100/k)+'%'; inner.style.transform='scale('+k+')'; }
+    });
+  }
+  if(document.fonts&&document.fonts.ready){document.fonts.ready.then(fit);}
+  window.addEventListener('load',fit);
+  window.addEventListener('resize',fit);
+  window.addEventListener('beforeprint',fit);
+})();
+</script>
+<script>
+/* 학생 배포 모드(?student=1): 외부 이동 차단 · 홈 링크/뒤로가기 숨김 */
+(function(){
+  var isStudent = new URLSearchParams(location.search).get('student')==='1';
+  function apply(){
+    if(!isStudent) return;
+    var home=document.getElementById('pgHome');
+    if(home){ home.removeAttribute('href'); home.style.pointerEvents='none'; home.style.cursor='default'; }
+    var back=document.getElementById('pgBack');
+    if(back){ back.style.display='none'; }
+    document.querySelectorAll('a[href]').forEach(function(a){
+      var raw=a.getAttribute('href')||'';
+      if(!raw || raw.charAt(0)==='#') return;
+      if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim())) return;
+      try{ if(new URL(a.href, location.href).pathname===location.pathname) return; }catch(e){ return; }
+      a.removeAttribute('href'); a.style.pointerEvents='none'; a.style.cursor='default';
+      a.setAttribute('aria-disabled','true');
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply); else apply();
+  document.addEventListener('click',function(e){
+    if(!isStudent) return;
+    var a=e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if(!a) return;
+    try{ if(new URL(a.href, location.href).pathname!==location.pathname){ e.preventDefault(); e.stopPropagation(); } }catch(err){}
+  },true);
+})();
+</script>
+</body>
+</html>
