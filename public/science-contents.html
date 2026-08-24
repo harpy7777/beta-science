@@ -281,55 +281,9 @@ body {
 .sum-btn-open { background: var(--navy); color: #fff; }
 .sum-btn-open:hover  { background: #172f6e; }
 .sum-btn-open:active { transform: scale(0.97); }
-.sum-btn-copy {
-  background: #fff; color: var(--navy);
-  border-color: var(--border); flex: 0 0 auto; width: 44px; padding: 9px 0;
-}
-.sum-btn-copy:hover  { background: var(--bg-tint); }
-.sum-btn-copy:active { transform: scale(0.94); }
 .sum-btn:disabled { background: #f2f2f7; color: #aeaeb2; cursor: not-allowed; border-color: #e5e5ea; }
 .sum-btn:disabled:hover  { background: #f2f2f7; }
 .sum-btn:disabled:active { transform: none; }
-
-/* 배포 안내 박스 */
-.deploy-box {
-  background: linear-gradient(135deg, #f0f7ff 0%, #eef4ff 100%);
-  border: 1px solid var(--border); border-radius: 16px;
-  padding: 1rem 1.2rem; margin-bottom: 1.5rem;
-  display: flex; align-items: flex-start; gap: 11px;
-}
-.deploy-icon {
-  width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
-  background: #fff; border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center; font-size: 16px;
-}
-.deploy-title { font-size: 12.5px; font-weight: 800; color: var(--navy); letter-spacing: -0.02em; }
-.deploy-desc  { font-size: 11px; color: #5c5c64; line-height: 1.65; margin-top: 4px; }
-.deploy-desc code {
-  background: #fff; border: 1px solid var(--border-soft); border-radius: 4px;
-  padding: 1px 5px; font-size: 10px; color: var(--royal); font-weight: 700;
-}
-.copy-all-btn {
-  margin-top: 9px; padding: 8px 14px; min-height: 36px;
-  background: var(--navy); color: #fff; border: none; border-radius: 20px;
-  font-family: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-}
-.copy-all-btn:hover  { background: #172f6e; }
-.copy-all-btn:active { transform: scale(0.96); }
-
-/* 토스트 */
-.toast {
-  position: fixed; left: 50%; bottom: 28px;
-  transform: translateX(-50%) translateY(22px);
-  background: var(--navy); color: #fff;
-  font-size: 12.5px; font-weight: 700; letter-spacing: -0.02em;
-  padding: 11px 20px; border-radius: 24px;
-  box-shadow: 0 8px 26px rgba(30,58,138,0.3);
-  opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s;
-  z-index: 900; max-width: calc(100vw - 32px); text-align: center;
-}
-.toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ── Bottom 2-col ── */
 .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -387,7 +341,6 @@ body {
   .brand-name { font-size: 13px; }
   .header-badge { font-size: 9px; padding: 3px 8px; }
   .header-badge .dot-green { display: none; }
-  .deploy-box { padding: 0.9rem 1rem; }
   .sum-card { padding: 0.9rem 1rem 0.85rem; }
 }
 </style>
@@ -434,45 +387,6 @@ body {
       <div class="welcome-date" id="today-date">—</div>
       <div class="welcome-day"  id="today-day">—</div>
     </div>
-  </div>
-
-  <!-- ══════════ 핵심정리 A4 요약 ══════════ -->
-  <div class="section-heading-row">
-    <div class="section-heading">CORE SUMMARY · A4 핵심정리</div>
-    <div class="section-note">단원별 A4 압축 정리 · 인쇄/PDF 저장 · 학생 배포 지원</div>
-  </div>
-
-  <!-- 배포 안내 -->
-  <div class="deploy-box">
-    <div class="deploy-icon">📤</div>
-    <div style="flex:1;min-width:0;">
-      <div class="deploy-title">주간학습클리닉으로 배포하기</div>
-      <div class="deploy-desc">
-        각 단원의 <b>🔗 버튼</b>을 누르면 <b>학생 전용 링크</b>가 복사됩니다.
-        복사된 주소는 <code>?student=1</code>이 붙어 있어 학생이 열었을 때
-        다른 페이지로 이동할 수 없습니다. 이 주소를
-        <b>주간학습클리닉(assignment-admin)</b>의 자료 링크란에 붙여넣으면 그대로 배포됩니다.
-      </div>
-      <button class="copy-all-btn" onclick="copyAllLinks()">📋 전체 배포 링크 한 번에 복사</button>
-    </div>
-  </div>
-
-  <!-- 통합과학 1 -->
-  <div class="sum-group">
-    <div class="sum-group-head">
-      <span class="sum-group-chip g1">통합과학 1</span>
-      <span class="sum-group-line"></span>
-    </div>
-    <div class="sum-grid" id="grid-s1"></div>
-  </div>
-
-  <!-- 통합과학 2 -->
-  <div class="sum-group">
-    <div class="sum-group-head">
-      <span class="sum-group-chip g2">통합과학 2</span>
-      <span class="sum-group-line"></span>
-    </div>
-    <div class="sum-grid" id="grid-s2"></div>
   </div>
 
   <!-- 과목 선택 -->
@@ -539,6 +453,30 @@ body {
       </div>
     </div>
 
+  </div>
+
+  <!-- ══════════ 핵심정리 A4 요약 ══════════ -->
+  <div class="section-heading-row">
+    <div class="section-heading">CORE SUMMARY · A4 핵심정리</div>
+    <div class="section-note">단원별 A4 압축 정리 · 눌러서 보기 · 인쇄/PDF 저장</div>
+  </div>
+
+  <!-- 통합과학 1 -->
+  <div class="sum-group">
+    <div class="sum-group-head">
+      <span class="sum-group-chip g1">통합과학 1</span>
+      <span class="sum-group-line"></span>
+    </div>
+    <div class="sum-grid" id="grid-s1"></div>
+  </div>
+
+  <!-- 통합과학 2 -->
+  <div class="sum-group">
+    <div class="sum-group-head">
+      <span class="sum-group-chip g2">통합과학 2</span>
+      <span class="sum-group-line"></span>
+    </div>
+    <div class="sum-grid" id="grid-s2"></div>
   </div>
 
   <!-- 통계 -->
@@ -635,8 +573,6 @@ body {
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <script>
 /* ══════════ 핵심정리 데이터 (여기만 수정하면 카드가 자동 생성됩니다) ══════════ */
 var SUMMARIES = [
@@ -654,13 +590,6 @@ var SUMMARIES = [
   { grade:2, no:'Ⅲ', title:'과학과 미래 사회', file:'summary-s2-u3.html',
     keywords:'감염병 진단 · 피지컬 컴퓨팅 · 빅데이터 · 인공지능 · 사물 인터넷 · SSI', sheets:'A4 2장', ready:true }
 ];
-
-/* ── 링크 생성 ── */
-function baseDir() {
-  var p = location.pathname;
-  return location.origin + p.substring(0, p.lastIndexOf('/') + 1);
-}
-function studentLink(file) { return baseDir() + file + '?student=1'; }
 
 /* ── 카드 렌더 ── */
 function esc(s) {
@@ -693,9 +622,7 @@ function renderCards() {
       '<div class="sum-actions">' +
         '<button class="sum-btn sum-btn-open" data-act="open" data-i="' + i + '"' +
           (s.ready ? '' : ' disabled') + '>' +
-          (s.ready ? '📄 열기' : '준비 중') + '</button>' +
-        '<button class="sum-btn sum-btn-copy" data-act="copy" data-i="' + i + '"' +
-          (s.ready ? '' : ' disabled') + ' title="학생 배포 링크 복사">🔗</button>' +
+          (s.ready ? '📄 열어보기' : '준비 중') + '</button>' +
       '</div>';
     (s.grade === 1 ? g1 : g2).appendChild(div);
   });
@@ -707,56 +634,9 @@ document.addEventListener('click', function(e) {
   if (!btn || btn.disabled) return;
   var s = SUMMARIES[parseInt(btn.getAttribute('data-i'), 10)];
   if (!s) return;
-  if (btn.getAttribute('data-act') === 'open') {
-    location.href = s.file;
-  } else {
-    copyText(studentLink(s.file), '“' + s.no + '. ' + s.title + '” 배포 링크 복사 완료');
-  }
+  location.href = s.file;
 });
 
-/* ── 전체 링크 복사 ── */
-function copyAllLinks() {
-  var lines = SUMMARIES.filter(function(s){ return s.ready; }).map(function(s) {
-    return '[통합과학' + s.grade + ' ' + s.no + '. ' + s.title + '] ' + studentLink(s.file);
-  });
-  if (!lines.length) { showToast('배포 가능한 자료가 없습니다'); return; }
-  copyText(lines.join('\n'), '배포 링크 ' + lines.length + '개를 복사했습니다');
-}
-
-/* ── 복사 유틸 (HTTPS/구형 브라우저 모두 대응) ── */
-function copyText(text, msg) {
-  function fallback() {
-    var ta = document.createElement('textarea');
-    ta.value = text;
-    ta.setAttribute('readonly', '');
-    ta.style.position = 'fixed';
-    ta.style.top = '-1000px';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    ta.setSelectionRange(0, ta.value.length);
-    var ok = false;
-    try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
-    document.body.removeChild(ta);
-    showToast(ok ? msg : '복사 실패 — 주소를 길게 눌러 복사해 주세요');
-  }
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text).then(function(){ showToast(msg); }, fallback);
-  } else {
-    fallback();
-  }
-}
-
-var toastTimer = null;
-function showToast(msg) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('on');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(function(){ t.classList.remove('on'); }, 2200);
-}
-
-window.copyAllLinks = copyAllLinks;
 renderCards();
 </script>
 
