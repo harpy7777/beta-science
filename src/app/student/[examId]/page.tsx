@@ -7,7 +7,7 @@ import {
   formatCorrectAnswer, buildSubmissionSummary, getSubmissionSummary,
   Exam, SubmissionSummary
 } from '@/lib/examService';
-import { FlaskConical, ChevronLeft, ChevronRight, CheckCircle, ArrowLeft, RefreshCw, PartyPopper } from 'lucide-react';
+import { FlaskConical, ChevronLeft, ChevronRight, CheckCircle, ArrowLeft, RefreshCw, PartyPopper, Send, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 type Phase = 'name' | 'exam' | 'result';
@@ -42,6 +42,80 @@ function nextUnansweredFrom(
   return after !== undefined ? after : miss[0];
 }
 
+// ─────────────────────────────────────────────
+// ★★ 답안 임시저장 (2026-08 추가) ★★
+//
+// [무엇이 문제였나]
+// 답안(answers)이 메모리에만 있어서, 제출이 실패하거나 학생이 실수로
+// 창을 닫으면 20문항을 푼 기록이 통째로 사라졌다.
+// 카카오톡 인앱 브라우저에서 제출이 튕긴 학생은 처음부터 다시 풀어야 했다.
+//
+// [어떻게 고쳤나]
+// 답을 고를 때마다 브라우저에 즉시 저장한다. 다시 열면 그대로 복원된다.
+// 저장이 성공하면 지운다. 7일이 지난 기록은 자동으로 버린다.
+//
+// 저장 실패(시크릿 모드·스토리지 차단)해도 시험 자체는 그대로 진행된다.
+// 저장은 어디까지나 '보험'이므로, 여기서 절대 예외를 밖으로 던지지 않는다.
+// ─────────────────────────────────────────────
+const DRAFT_PREFIX = 'examDraft:';
+const DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;   // 7일
+
+function makeDraftKey(examId: string, type: string | null, who: string): string {
+  return `${DRAFT_PREFIX}${examId}:${type || 'all'}:${who || 'anon'}`;
+}
+
+function readDraft(key: string): Record<string, string> | null {
+  if (!key) return null;
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return null;
+    if (typeof parsed.savedAt === 'number' && Date.now() - parsed.savedAt > DRAFT_TTL_MS) {
+      try { localStorage.removeItem(key); } catch { /* 무시 */ }
+      return null;
+    }
+    const a = parsed.answers;
+    if (!a || typeof a !== 'object' || Array.isArray(a)) return null;
+    const out: Record<string, string> = {};
+    Object.keys(a).forEach(k => {
+      const v = a[k];
+      if (typeof v === 'string' && v.trim() !== '') out[k] = v;
+    });
+    return Object.keys(out).length > 0 ? out : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeDraft(key: string, answers: Record<string, string>): void {
+  if (!key) return;
+  try {
+    localStorage.setItem(key, JSON.stringify({ answers, savedAt: Date.now() }));
+  } catch { /* 저장 못 해도 시험은 계속된다 */ }
+}
+
+function clearDraft(key: string): void {
+  if (!key) return;
+  try { localStorage.removeItem(key); } catch { /* 무시 */ }
+}
+
+// ★ 제출 실패 사유를 학생이 알아들을 수 있는 말로 바꾼다.
+//   답안이 남아 있다는 사실을 반드시 함께 알려, 다시 풀지 않게 한다.
+function submitErrorMessage(err: any): string {
+  const code = err && err.code;
+  if (code === 'UNANSWERED' || code === 'PREV_READ_FAILED') {
+    return String((err && err.message) || '제출할 수 없습니다.');
+  }
+  if (code === 'permission-denied') {
+    return '성적 저장 권한이 없어 제출되지 않았어요.\n선생님께 알려주세요. (푼 답안은 저장돼 있어요)';
+  }
+  if (code === 'unavailable' || code === 'deadline-exceeded') {
+    return '인터넷 연결이 잠시 끊겼어요.\n답안은 저장돼 있으니 [제출하기]를 다시 눌러주세요.';
+  }
+  return '제출에 실패했어요.\n푼 답안은 저장돼 있으니 [제출하기]를 다시 눌러주세요.';
+}
+
 function StudentExamInner() {
   const { examId } = useParams<{ examId: string }>();
   const searchParams = useSearchParams();
@@ -62,6 +136,11 @@ function StudentExamInner() {
   const [submitting, setSubmitting] = useState(false);
   const [summary, setSummary] = useState<SubmissionSummary | null>(null);
 
+  // ★ 임시저장 관련
+  const [draftKey, setDraftKey] = useState('');
+  const [restored, setRestored] = useState(false);      // 지난 답안을 불러왔는가
+  const [submitError, setSubmitError] = useState('');   // 마지막 제출 실패 사유
+
   // 재풀기용
   const [retryQuestions, setRetryQuestions] = useState<Exam['questions']>([]);
   const [isRetryMode, setIsRetryMode] = useState(false);
@@ -72,17 +151,12 @@ function StudentExamInner() {
   const [studentId, setStudentId] = useState('');
 
   useEffect(() => {
-    getExam(examId).then(e => {
-      setExam(e);
-      setLoading(false);
-    });
-
     let savedName = '';
     let savedId   = '';
     try {
       savedName = localStorage.getItem('studentName') || '';
       savedId   = localStorage.getItem('studentId') || '';
-    } catch {}
+    } catch { /* 스토리지가 막혀 있어도 진행 */ }
 
     const urlSid   = (searchParams.get('sid') || '').trim();
     const urlSname = (searchParams.get('sname') || '').trim();
@@ -106,13 +180,43 @@ function StudentExamInner() {
     try {
       if (effectiveId) localStorage.setItem('studentId', effectiveId);
       if (effectiveName) localStorage.setItem('studentName', effectiveName);
-    } catch {}
+    } catch { /* 무시 */ }
 
-    if (effectiveName) {
-      setStudentName(effectiveName);
-      setPhase('exam');
-      setCurrent(0);
-    }
+    if (effectiveName) setStudentName(effectiveName);
+
+    // ★ 임시저장 열쇠 — 학생ID(없으면 이름) + 시험 + 유형 단위로 따로 보관한다.
+    //   같은 기기를 형제가 같이 써도 서로 답안이 섞이지 않는다.
+    const who = effectiveId || effectiveName || '';
+    const key = who ? makeDraftKey(String(examId), typeFilter, who) : '';
+    if (key) setDraftKey(key);
+
+    getExam(examId).then(e => {
+      setExam(e);
+
+      // ★ 지난번에 풀다 만 답안이 있으면 되살린다
+      if (e && key) {
+        const saved = readDraft(key);
+        if (saved) {
+          setAnswers(saved);
+          setRestored(true);
+          const list = (e.questions ?? []).filter(
+            (q: any) => !typeFilter || q.type === typeFilter
+          );
+          const miss = unansweredIndexes(list, saved);
+          setCurrent(miss.length > 0 ? miss[0] : 0);
+        } else {
+          setCurrent(0);
+        }
+      } else {
+        setCurrent(0);
+      }
+
+      if (effectiveName) setPhase('exam');
+      setLoading(false);
+    }).catch(() => {
+      setExam(null);
+      setLoading(false);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [examId]);
 
@@ -126,6 +230,9 @@ function StudentExamInner() {
   // 제출 — 빈 문항이 하나도 없을 때만 저장한다.
   // 저장에 실패하면 결과 화면으로 넘어가지 않는다.
   // (예전에는 저장이 실패해도 "시험 끝!"이 떠서 학생이 정상 제출로 착각했다)
+  //
+  // ★ 저장에 성공한 순간에만 임시저장을 지운다.
+  //   실패하면 답안이 그대로 남아, 다시 제출하거나 나중에 열어도 이어서 낼 수 있다.
   // ─────────────────────────────────────────────
   async function autoSubmit(finalAnswers: Record<string, string>, questionsForSubmit: Exam['questions']) {
     if (!exam) return;
@@ -151,6 +258,7 @@ function StudentExamInner() {
     }
 
     setSubmitting(true);
+    setSubmitError('');
     try {
       await submitStudentAnswers({
         examId: exam.id!,
@@ -161,6 +269,10 @@ function StudentExamInner() {
         totalQuestions: questionsForSubmit.length,
         subType: typeFilter,
       });
+
+      // ★ 저장이 확실히 끝난 뒤에만 임시저장을 지운다
+      clearDraft(draftKey);
+      setRestored(false);
 
       // 저장된 이전 답안까지 합친 정확한 요약 (OX를 먼저 푼 기록 반영)
       let merged: SubmissionSummary | null = null;
@@ -176,12 +288,18 @@ function StudentExamInner() {
       setPhase('result');   // ★ 저장이 성공했을 때만 결과 화면으로
     } catch (err: any) {
       setSubmitting(false);
+
+      // ★ 답안은 그대로 남겨둔다. 임시저장도 지우지 않는다.
+      writeDraft(draftKey, finalAnswers);
+
+      const msg = submitErrorMessage(err);
+      setSubmitError(msg);
+      toast.error(msg, { duration: 7000 });
+
       const code = err && err.code;
-      if (code === 'UNANSWERED' || code === 'PREV_READ_FAILED') {
-        // examService가 알려준 정확한 사유를 그대로 보여준다
-        toast.error(String(err.message || '제출할 수 없습니다'), { duration: 6000 });
-      } else {
-        toast.error('제출에 실패했습니다. 네트워크를 확인하고 다시 시도해주세요.', { duration: 6000 });
+      if (code === 'UNANSWERED' && Array.isArray(err.unanswered) && err.unanswered.length > 0) {
+        const firstMiss = unansweredIndexes(questionsForSubmit, finalAnswers);
+        if (firstMiss.length > 0) setCurrent(firstMiss[0]);
       }
       // 결과 화면으로 넘어가지 않는다 → 학생이 다시 제출할 수 있다
     }
@@ -193,6 +311,10 @@ function StudentExamInner() {
     const filteredQs = getFilteredQuestions(exam);
     const newAnswers = { ...answers, [questionId]: value };
     setAnswers(newAnswers);
+    setSubmitError('');
+
+    // ★ 답을 고른 즉시 저장한다 — 여기서부터는 창이 닫혀도 답이 남는다
+    writeDraft(draftKey, newAnswers);
 
     // ★ 빈 문항이 하나도 없을 때만 제출한다 (푼 순서는 상관없다)
     const nextIdx = nextUnansweredFrom(filteredQs, newAnswers, current);
@@ -203,7 +325,7 @@ function StudentExamInner() {
     }
   }
 
-  // 재풀기 답 선택 — 같은 규칙 적용
+  // 재풀기 답 선택 — 같은 규칙 적용 (재풀기는 성적에 저장되지 않으므로 임시저장 대상이 아니다)
   function handleRetryAnswer(questionId: string, value: string) {
     const newAnswers = { ...retryAnswers, [questionId]: value };
     setRetryAnswers(newAnswers);
@@ -249,8 +371,24 @@ function StudentExamInner() {
     if (!studentName.trim() && !isPreview) { toast.error('이름을 입력하세요'); return; }
     const finalName = studentName.trim() || '미리보기';
     setStudentName(finalName);
-    try { localStorage.setItem('studentName', finalName); } catch {}
-    setCurrent(0);
+    try { localStorage.setItem('studentName', finalName); } catch { /* 무시 */ }
+
+    // ★ 이름으로 들어온 학생도 임시저장을 쓸 수 있게 열쇠를 만든다
+    const who = studentId || finalName;
+    const key = makeDraftKey(String(examId), typeFilter, who);
+    setDraftKey(key);
+
+    const saved = readDraft(key);
+    if (saved && exam) {
+      setAnswers(saved);
+      setRestored(true);
+      const list = getFilteredQuestions(exam);
+      const miss = unansweredIndexes(list, saved);
+      setCurrent(miss.length > 0 ? miss[0] : 0);
+    } else {
+      setCurrent(0);
+    }
+
     setPhase('exam');
   }
 
@@ -264,7 +402,7 @@ function StudentExamInner() {
   function goToList() {
     let target = safeReturnPath(fromParam);
     if (!target) {
-      try { target = safeReturnPath(localStorage.getItem('clinicReturn')); } catch {}
+      try { target = safeReturnPath(localStorage.getItem('clinicReturn')); } catch { /* 무시 */ }
     }
     if (target) window.location.href = target;
     else router.push('/student-test');
@@ -338,6 +476,15 @@ function StudentExamInner() {
   const remaining = missingIdxs.length;
   function goToFirstUnanswered() {
     if (missingIdxs.length > 0) setCurrent(missingIdxs[0]);
+  }
+
+  // ★ 손으로 누르는 제출 버튼.
+  //   제출이 한 번 실패해 답안이 다 채워진 채로 남아 있을 때,
+  //   이 버튼이 없으면 학생이 다시 제출할 방법이 없다.
+  function manualSubmit() {
+    if (submitting) return;
+    if (isRetryMode) return;
+    autoSubmit(answers, filteredQuestions);
   }
 
   const wrongQuestions = filteredQuestions.filter(item => !isAnswerCorrect(answers[item.id], item.answer));
@@ -485,6 +632,34 @@ function StudentExamInner() {
               </div>
             )}
 
+            {/* ★ 지난 답안을 되살렸을 때 알려준다 */}
+            {!isRetryMode && restored && (
+              <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5 mb-4 text-xs font-bold text-blue-800 leading-snug">
+                💾 지난번에 풀던 답안을 그대로 불러왔어요 · 이어서 풀면 됩니다
+              </div>
+            )}
+
+            {/* ★ 제출 실패 안내 — 답안이 남아 있다는 사실과 다시 낼 방법을 함께 보여준다 */}
+            {!isRetryMode && submitError && (
+              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle size={16} className="text-red-500 shrink-0 mt-0.5" />
+                  <p className="text-xs font-bold text-red-700 leading-relaxed whitespace-pre-line">
+                    {submitError}
+                  </p>
+                </div>
+                {remaining === 0 && (
+                  <button
+                    onClick={manualSubmit}
+                    disabled={submitting}
+                    className="w-full mt-3 rounded-xl bg-red-600 text-white text-sm font-bold py-2.5 disabled:opacity-50"
+                  >
+                    다시 제출하기
+                  </button>
+                )}
+              </div>
+            )}
+
             {/* ★ 빈 문항 경고 — 남은 문항이 있으면 항상 보인다 */}
             {remaining > 0 && (
               <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 mb-4 flex items-center justify-between gap-3">
@@ -500,8 +675,22 @@ function StudentExamInner() {
               </div>
             )}
             {remaining === 0 && (
-              <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-2.5 mb-4 text-xs font-bold text-green-700">
-                ✓ 모든 문항을 풀었어요
+              <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-2.5 mb-4">
+                <div className="text-xs font-bold text-green-700">
+                  ✓ 모든 문항을 풀었어요
+                </div>
+                {/* ★ 재풀기가 아닐 때만 제출 버튼을 둔다.
+                    자동 제출이 실패했더라도 여기서 다시 낼 수 있다. */}
+                {!isRetryMode && (
+                  <button
+                    onClick={manualSubmit}
+                    disabled={submitting}
+                    className="w-full mt-2.5 rounded-xl bg-green-600 text-white text-sm font-bold py-3 flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <Send size={15} />
+                    {submitting ? '제출하는 중…' : '제출하기'}
+                  </button>
+                )}
               </div>
             )}
 
