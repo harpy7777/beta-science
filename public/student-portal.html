@@ -187,6 +187,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .ls-hw{margin-top:10px;padding-top:10px;border-top:1px dashed var(--bd);font-size:13px;line-height:1.9;color:#5b6573;white-space:pre-wrap;word-break:break-word}
 .ls-hw b{color:var(--pink-dk);font-weight:700;display:block;margin-bottom:3px;font-size:12px;letter-spacing:.03em}
 .ls-more{text-align:center;font-size:12.5px;color:var(--mt);padding:14px 8px 4px;line-height:1.8}
+/* ★ 수업 태도 · 과제 완성도 · 숙제 완료 배지 */
+.ls-tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.ls-tag{font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid #e5e7eb;background:#f8fafc;color:#7c8598;white-space:nowrap;word-break:keep-all;line-height:1.5}
+.ls-tag b{font-weight:800;margin-left:5px}
+.ls-tag.good{background:var(--green-lt);border-color:#a7f3d0;color:#047857}
+.ls-tag.mid{background:#fffbeb;border-color:#fde68a;color:#b45309}
+.ls-tag.bad{background:#fef2f2;border-color:#fecaca;color:#b91c1c}
+@media(max-width:380px){
+  .ls-tags{gap:5px;margin-bottom:9px}
+  .ls-tag{font-size:11px;padding:3px 9px}
+}
 
 /* ══ 점수 카드 ══ */
 .test-item{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:10px}
@@ -687,6 +698,34 @@ const LS_BADGE={
 };
 
 /* ════════════════════════════════════════════════════════════════
+   ★ 2026-08 추가 — 수업 태도 · 과제 완성도 · 숙제 완료 배지
+   ────────────────────────────────────────────────────────────────
+   선생님이 수업카드에 적은 세 칸이 이제 recentLessons 로 함께
+   넘어온다. (a=태도 · w=과제 완성도 · p=숙제 완료)
+   값이 없는 옛 기록은 키 자체가 없으므로 배지도 나오지 않는다.
+   → 지난 기록은 예전 화면 그대로 보인다.
+   색은 좋음(초록) · 보통(노랑) · 주의(빨강) 세 단계로만 구분한다.
+════════════════════════════════════════════════════════════════ */
+const LS_TONE={
+  '적극적':'good','보통':'mid','산만':'bad',
+  '높음':'good','낮음':'bad',
+  '완료':'good','부분완료':'mid','미완료':'bad'
+};
+function lessonTags(x){
+  const bits=[];
+  const add=(lbl,val)=>{
+    const v=String(val||'').trim();
+    if(!v||v==='-')return;
+    const tone=LS_TONE[v]||'';
+    bits.push(`<span class="ls-tag${tone?' '+tone:''}">${e(lbl)}<b>${e(v)}</b></span>`);
+  };
+  add('수업 태도',x.a);
+  add('과제 완성도',x.w);
+  add('숙제',x.p);
+  return bits.length?`<div class="ls-tags">${bits.join('')}</div>`:'';
+}
+
+/* ════════════════════════════════════════════════════════════════
    ★★ 2026-08 수정 — 회차 번호가 40회를 넘으면 어긋나던 문제
    ────────────────────────────────────────────────────────────────
    [무엇이 어긋나 있었나]
@@ -713,7 +752,8 @@ function renderLessons(student,fbList){
   try{
     const raw=Array.isArray(student&&student.recentLessons)?student.recentLessons:[];
     const list=raw.filter(x=>x&&atYmd(x.d))
-      .map(x=>({d:String(x.d),k:normSlot(x.k),s:atStatusOf(x),u:String(x.u||''),c:String(x.c||''),h:String(x.h||'')}))
+      /* a=수업 태도 · w=과제 완성도 · p=숙제 완료 — 없는 옛 기록은 ''  */
+      .map(x=>({d:String(x.d),k:normSlot(x.k),s:atStatusOf(x),u:String(x.u||''),c:String(x.c||''),h:String(x.h||''),a:String(x.a||''),w:String(x.w||''),p:String(x.p||'')}))
       .sort(cmpSlot);
 
     if(!list.length){renderLessonsFallback(student,fbList);return;}
@@ -764,6 +804,7 @@ function renderLessons(student,fbList){
       const unit=x.u?`<div class="ls-unit">📘 ${e(x.u)}</div>`:'';
       // 같은 날 2건인 날에만 '본수업 / 보강 수업' 구분표를 붙인다
       const slotTag=pairs.has(x.d)?`<span class="ls-slot">${e(slotName(x.k))}</span>`:'';
+      const tags=lessonTags(x);
       const fbs=(map.get(slotKey(x.d,x.k))||[]).map(fbBlock).join('');
       return`<div class="ls-card${i===0?' latest':''}${x.k===SLOT_MK?' mk':''}">
         <div class="ls-top">
@@ -773,7 +814,7 @@ function renderLessons(student,fbList){
           ${i===0&&items.length>1?'<span class="ls-new">최신</span>':''}
           ${x.no?`<span class="ls-no">${x.no}회차</span>`:''}
         </div>
-        ${unit}${body}${hw}${fbs}
+        ${unit}${tags}${body}${hw}${fbs}
       </div>`;
     }).join('');
 
