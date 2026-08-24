@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<script src="/favicon.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>통합과학 1 Ⅰ. 과학의 기초 · 핵심정리 | 인후쌤 과학수업</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --ink:#111114;
+  --sub:#5c5c64;
+  --line:#8e8e98;
+  --line2:#cdcdd4;
+  --fill:#ededf0;
+  --fill2:#f7f7f9;
+  --hi:#dcdce1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#e9e9ec}
+body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',-apple-system,sans-serif;
+  color:var(--ink);-webkit-font-smoothing:antialiased;font-size:8.6pt;line-height:1.38}
+
+.toolbar{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line2);
+  padding:10px 14px;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+.toolbar span{font-size:11px;color:var(--sub)}
+.btn{background:var(--ink);color:#fff;border:0;border-radius:6px;padding:8px 16px;
+  font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.btn:hover{background:#000}
+
+.sheet{width:210mm;height:297mm;background:#fff;margin:14px auto;padding:9mm 10mm 8mm;
+  box-shadow:0 2px 14px rgba(0,0,0,.14);overflow:hidden}
+.inner{transform-origin:top left}
+
+.head{border-bottom:2.4pt solid var(--ink);padding-bottom:2.6mm;margin-bottom:3.2mm}
+.head-l h1{font-size:17pt;font-weight:800;letter-spacing:-.04em;line-height:1.05}
+.head-l .sub{white-space:nowrap;font-size:7.8pt;color:var(--sub);margin-top:1.3mm;letter-spacing:-.025em}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:3.6mm}
+.col{display:flex;flex-direction:column;gap:2.8mm}
+.full{grid-column:1 / -1}
+.blk{break-inside:avoid;page-break-inside:avoid}
+.blk-h{display:flex;align-items:center;gap:1.8mm;margin-bottom:1.4mm;
+  border-bottom:.9pt solid var(--ink);padding-bottom:.9mm}
+.no{width:4.6mm;height:4.6mm;background:var(--ink);color:#fff;font-size:7pt;font-weight:800;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.blk-h h2{font-size:9.6pt;font-weight:800;letter-spacing:-.04em;white-space:nowrap}
+.blk-h .tag{margin-left:auto;flex-shrink:0;white-space:nowrap;font-size:6.4pt;font-weight:700;color:var(--sub);
+  border:.6pt solid var(--line);border-radius:20px;padding:.3mm 1.8mm}
+
+ul{list-style:none}
+li{position:relative;padding-left:2.8mm;margin:.6mm 0;font-size:8.2pt;letter-spacing:-.03em}
+li::before{content:'';position:absolute;left:.5mm;top:1.5mm;width:1.1mm;height:1.1mm;background:var(--ink)}
+b{font-weight:800}
+.k{font-weight:800;background:var(--hi);padding:.2mm .5mm;border-radius:1px}
+.mono{font-variant-numeric:tabular-nums}
+
+table{width:100%;border-collapse:collapse;font-size:7.9pt}
+th,td{border:.6pt solid var(--line);padding:.8mm 1.3mm;text-align:left;letter-spacing:-.035em}
+th{background:var(--fill);font-weight:800;font-size:7.3pt}
+td.c,th.c{text-align:center}
+tbody tr:nth-child(even) td{background:var(--fill2)}
+
+.def{border:.7pt solid var(--line2);border-left:2.4pt solid var(--ink);background:var(--fill2);
+  padding:1.4mm 2.2mm;font-size:8.1pt;letter-spacing:-.03em}
+.def+.def{margin-top:1.2mm}
+.def .t{font-size:7.2pt;font-weight:800;color:var(--sub)}
+
+.trap{border:.9pt solid var(--ink);overflow:hidden}
+.trap .t{background:var(--ink);color:#fff;font-size:7.4pt;font-weight:800;padding:.9mm 2.2mm}
+.trap ul{padding:1.2mm 2.2mm 1.4mm}
+.trap li{font-size:7.9pt;margin:.5mm 0}
+
+.flow{display:flex;align-items:center;gap:.9mm;flex-wrap:wrap;margin:1mm 0}
+.fb{border:.7pt solid var(--line);padding:.7mm 1.6mm;font-size:7.4pt;font-weight:700;background:#fff}
+.fb.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.fa{font-weight:800;font-size:7.6pt}
+
+.mem{border-left:2.4pt solid var(--ink);background:var(--fill);padding:1.2mm 2.2mm;
+  font-size:7.9pt;letter-spacing:-.03em;margin-top:1.2mm}
+
+.chk{column-count:2;column-gap:2.6mm}
+.chk div{font-size:7.9pt;letter-spacing:-.035em;padding-left:3.2mm;position:relative;break-inside:avoid;margin:.5mm 0}
+.chk div::before{content:'□';position:absolute;left:0;top:-.3mm;font-weight:700}
+
+svg{display:block;width:100%;height:auto}
+
+@page{size:A4 portrait;margin:0}
+@media print{
+  html,body{background:#fff}
+  .toolbar{display:none}
+  .sheet{margin:0;box-shadow:none}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+@media screen and (max-width:820px){
+  .sheet{width:100%;height:auto;margin:0;padding:16px 14px;box-shadow:none;overflow:visible}
+  .inner{transform:none !important;width:100% !important}
+  .grid{grid-template-columns:1fr;gap:14px}
+  .col{gap:14px}
+  body{font-size:14px}
+  .head-l h1{font-size:20px}
+  .head-l .sub{white-space:normal}
+  .head-l .sub,li,td,th,.def,.chk div{font-size:13px}
+  .blk-h h2{font-size:16px}
+  li{padding-left:12px}
+  li::before{width:4px;height:4px;top:7px;left:2px}
+  .chk{column-count:1}
+  .toolbar{position:static}
+}
+
+/* ── 인후쌤 과학수업 · 공통 상단바 (남색/로얄블루) ── */
+:root{
+  --nv-navy:#1e3a8a; --nv-royal:#2563eb; --nv-mid:#3b82f6; --nv-light:#60a5fa;
+  --nv-tint:#eff6ff; --nv-tint2:#dbeafe; --nv-border:#bfdbfe; --nv-soft:#e0eaff;
+}
+.pg-header{
+  position:sticky; top:0; z-index:500; background:#fff;
+  border-bottom:1px solid var(--nv-soft);
+  height:54px; display:flex; align-items:center; justify-content:space-between;
+  gap:8px; padding:0 max(12px, env(safe-area-inset-left)) 0 max(12px, env(safe-area-inset-right));
+  box-shadow:0 1px 6px rgba(30,58,138,.06);
+}
+.pg-left{display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;min-width:0;transition:opacity .15s}
+.pg-left:hover{opacity:.75}
+.pg-logo{width:30px;height:30px;border-radius:8px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--nv-mid) 0%,var(--nv-navy) 100%);
+  display:flex;align-items:center;justify-content:center}
+.pg-brand{font-size:clamp(11px,2.9vw,14px);font-weight:700;color:#1d1d1f;letter-spacing:-.3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
+.pg-sub{font-size:10px;color:#8e8e98;font-weight:600;margin-top:1px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.pg-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.pg-chip{display:inline-flex;align-items:center;gap:5px;background:var(--nv-tint);
+  border:1px solid var(--nv-border);border-radius:20px;padding:4px 10px;
+  font-size:10px;font-weight:700;color:var(--nv-navy);white-space:nowrap}
+.pg-btn{min-height:36px;padding:7px 13px;border-radius:20px;border:1.5px solid var(--nv-border);
+  background:var(--nv-navy);color:#fff;font-family:inherit;font-size:12px;font-weight:700;
+  cursor:pointer;white-space:nowrap;transition:background .15s,transform .1s;border-color:var(--nv-navy)}
+.pg-btn:hover{background:#172f6e}
+.pg-btn:active{transform:scale(.96)}
+.pg-btn.ghost{background:transparent;color:var(--nv-navy);border-color:var(--nv-border)}
+.pg-btn.ghost:hover{background:var(--nv-tint)}
+.pg-tip{background:var(--nv-tint);border-bottom:1px solid var(--nv-soft);
+  padding:7px 14px;text-align:center;font-size:11px;color:#4b5563;font-weight:500;letter-spacing:-.02em}
+.pg-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+  background:#1e3a8a;color:#fff;font-size:12px;font-weight:700;padding:10px 18px;border-radius:22px;
+  box-shadow:0 8px 24px rgba(30,58,138,.28);opacity:0;pointer-events:none;transition:.25s;z-index:900}
+.pg-toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@media print{ .pg-header,.pg-tip,.pg-toast{display:none !important} }
+@media (max-width:520px){
+  .pg-sub{display:none}
+  .pg-chip{display:none}
+  .pg-btn{padding:7px 11px;font-size:11px}
+  .pg-tip{font-size:10px;padding:6px 10px}
+}
+</style>
+</head>
+<body style="padding-top:0">
+
+<header class="pg-header">
+  <a href="science-contents.html" class="pg-left" id="pgHome">
+    <div class="pg-logo">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <div style="min-width:0">
+      <div class="pg-brand">인후쌤 과학수업</div>
+      <div class="pg-sub">통합과학 1 · Ⅰ. 과학의 기초</div>
+    </div>
+  </a>
+  <div class="pg-right">
+    <span class="pg-chip">A4 1장</span>
+    <button class="pg-btn" onclick="window.print()">🖨 인쇄 / PDF</button>
+    <button class="pg-btn ghost" id="pgBack" onclick="history.back()">← 뒤로</button>
+  </div>
+</header>
+<div class="pg-tip">인쇄 설정 → 용지 A4 · 배율 100% · 여백 없음 · 흑백 권장</div>
+<div class="pg-toast" id="pgToast">링크를 복사했습니다</div>
+<div class="sheet" id="sheet">
+<div class="inner" id="inner">
+
+  <div class="head">
+    <div class="head-l">
+      <h1>Ⅰ. 과학의 기초 — 핵심정리</h1>
+      <div class="sub">시간과 공간 · 기본량과 단위 · 측정과 측정 표준 · 정보와 신호</div>
+    </div>
+  </div>
+
+  <div class="blk full" style="margin-bottom:3mm">
+    <div class="blk-h"><div class="no">1</div><h2>시간과 공간의 규모</h2><div class="tag">규모 ↔ 탐구 방법</div></div>
+    <svg viewBox="0 0 560 84" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="원자핵부터 우리은하까지의 규모와 관측 도구">
+      <g font-family="Pretendard, 'Noto Sans KR', sans-serif" text-anchor="middle">
+        <line x1="34" y1="40" x2="546" y2="40" stroke="#111114" stroke-width="1.4"/>
+        <polygon points="546,40 538,36.4 538,43.6" fill="#111114"/>
+        <g stroke="#111114" stroke-width="1.2">
+          <line x1="46" y1="34" x2="46" y2="46"/><line x1="113" y1="34" x2="113" y2="46"/>
+          <line x1="180" y1="34" x2="180" y2="46"/><line x1="247" y1="34" x2="247" y2="46"/>
+          <line x1="314" y1="34" x2="314" y2="46"/><line x1="381" y1="34" x2="381" y2="46"/>
+          <line x1="448" y1="34" x2="448" y2="46"/><line x1="515" y1="34" x2="515" y2="46"/>
+        </g>
+        <g font-size="10.5" font-weight="700" fill="#111114">
+          <text x="46" y="26">원자핵</text><text x="113" y="26">원자</text>
+          <text x="180" y="26">DNA</text><text x="247" y="26">세포</text>
+          <text x="314" y="26">사람</text><text x="381" y="26">지구</text>
+          <text x="448" y="26">태양계</text><text x="515" y="26">우리은하</text>
+        </g>
+        <g font-size="9.2" fill="#5c5c64">
+          <text x="46" y="56">10⁻¹⁵ m</text><text x="113" y="56">10⁻¹⁰ m</text>
+          <text x="180" y="56">10⁻⁸ m</text><text x="247" y="56">10⁻⁵ m</text>
+          <text x="314" y="56">10⁰ m</text><text x="381" y="56">10⁷ m</text>
+          <text x="448" y="56">10¹³ m</text><text x="515" y="56">10²¹ m</text>
+        </g>
+        <g>
+          <rect x="14" y="64" width="126" height="16" fill="#e4e4e8" stroke="#8e8e98" stroke-width=".7"/>
+          <rect x="140" y="64" width="114" height="16" fill="#ffffff" stroke="#8e8e98" stroke-width=".7"/>
+          <rect x="254" y="64" width="98" height="16" fill="#e4e4e8" stroke="#8e8e98" stroke-width=".7"/>
+          <rect x="352" y="64" width="194" height="16" fill="#ffffff" stroke="#8e8e98" stroke-width=".7"/>
+          <g font-size="9.6" font-weight="700" fill="#111114">
+            <text x="77" y="75.5">전자 현미경</text><text x="197" y="75.5">광학 현미경</text>
+            <text x="303" y="75.5">맨눈</text><text x="449" y="75.5">망원경 · 우주 망원경</text>
+          </g>
+        </g>
+      </g>
+    </svg>
+    <ul style="margin-top:.8mm">
+      <li>시간의 규모도 같다 — <b>10⁻⁹초</b> 수준의 순간부터 우주의 나이 <span class="k">약 138억 년</span>까지. 규모가 달라지면 <b>현상의 특성과 탐구 방법이 함께 달라진다.</b></li>
+    </ul>
+  </div>
+
+  <div class="grid">
+    <div class="col">
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">2</div><h2>길이·시간의 측정</h2></div>
+        <table>
+          <thead><tr><th class="c" style="width:17%">대상</th><th>측정 원리</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>길이</b></td><td>빛의 <b>속력이 일정</b>함을 이용(왕복 시간·반사광 비교) → <span class="k">가장 정밀</span></td></tr>
+            <tr><td class="c"><b>시간</b></td><td>원자의 <b>고유 진동수가 일정</b> → <span class="k">원자시계</span>가 가장 정확</td></tr>
+            <tr><td class="c"><b>GPS</b></td><td>항법 위성 <b>원자시계</b> 신호의 <b>시간차</b> 계산 → 위치 결정</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">3</div><h2>기본량과 단위</h2><div class="tag">최빈출</div></div>
+        <ul>
+          <li><b>물리량</b> = 측정할 수 있는 양 = <span class="k">수 × 단위</span></li>
+          <li><b>기본량</b> 바꿀 수 없는 고유한 양 <span class="k">7가지</span> / <b>유도량</b> 기본량을 곱하거나 나눈 양</li>
+        </ul>
+        <table style="margin-top:1.2mm">
+          <thead><tr><th class="c">기본량</th><th class="c">단위</th><th class="c">기호</th><th class="c">기본량</th><th class="c">단위</th><th class="c">기호</th></tr></thead>
+          <tbody>
+            <tr><td class="c">길이</td><td class="c">미터</td><td class="c"><b>m</b></td><td class="c">온도</td><td class="c">켈빈</td><td class="c"><b>K</b></td></tr>
+            <tr><td class="c">질량</td><td class="c">킬로그램</td><td class="c"><b>kg</b></td><td class="c">물질량</td><td class="c">몰</td><td class="c"><b>mol</b></td></tr>
+            <tr><td class="c">시간</td><td class="c">초</td><td class="c"><b>s</b></td><td class="c">광도</td><td class="c">칸델라</td><td class="c"><b>cd</b></td></tr>
+            <tr><td class="c">전류</td><td class="c">암페어</td><td class="c"><b>A</b></td><td class="c" colspan="3">기본량은 이 <b>7개</b>가 전부</td></tr>
+          </tbody>
+        </table>
+        <div class="mem"><b>암기</b> 길·질·시·전 / 온·물·광 → <span class="mono">m · kg · s · A / K · mol · cd</span></div>
+        <ul style="margin-top:1mm">
+          <li><b>유도량</b> <span class="mono">넓이 m² · 부피 m³ · 속력 m/s · 밀도 kg/m³ · 힘 kg·m/s²</span></li>
+        </ul>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">4</div><h2>단위의 접두어</h2><div class="tag">10의 거듭제곱</div></div>
+        <table>
+          <thead><tr><th class="c">T</th><th class="c">G</th><th class="c">M</th><th class="c">k</th><th class="c">c</th><th class="c">m</th><th class="c">μ</th><th class="c">n</th></tr></thead>
+          <tbody>
+            <tr><td class="c mono">10¹²</td><td class="c mono">10⁹</td><td class="c mono">10⁶</td><td class="c mono">10³</td><td class="c mono">10⁻²</td><td class="c mono">10⁻³</td><td class="c mono">10⁻⁶</td><td class="c mono">10⁻⁹</td></tr>
+            <tr><td class="c">테라</td><td class="c">기가</td><td class="c">메가</td><td class="c">킬로</td><td class="c">센티</td><td class="c">밀리</td><td class="c">마이크로</td><td class="c">나노</td></tr>
+          </tbody>
+        </table>
+        <ul style="margin-top:1mm">
+          <li><span class="mono">1 km = 10³ m / 1 mg = 10⁻³ g / 1 nm = 10⁻⁹ m</span> — 접두어는 예외 없이 <b>10의 거듭제곱</b></li>
+        </ul>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">5</div><h2>측정과 어림</h2></div>
+        <ul>
+          <li><b>측정</b> 기준이 되는 양과 <b>비교</b>하여 <span class="k">수치 + 단위</span>로 나타냄 (자로 길이 재기)</li>
+          <li><b>어림</b> 측정 도구 없이 아는 정보로 <span class="k">대략 가늠</span> (천체 크기 추정, 결과 예상)</li>
+        </ul>
+      </div>
+
+      <div class="trap blk">
+        <div class="t">시험에 반복되는 함정</div>
+        <ul>
+          <li>부피(m³)·속력(m/s)은 <b>유도량</b> — 기본량 <b>✕</b></li>
+          <li>원자는 <b>전자 현미경</b>으로 — 우주 망원경 <b>✕</b></li>
+          <li>측정 표준은 <b>국제 공통(SI)</b> — 나라마다 다르게 <b>✕</b></li>
+          <li>디지털이 아날로그 정보를 <b>전부</b> 기록 <b>✕</b></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="col">
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">6</div><h2>측정 표준</h2><div class="tag">숫자 그대로 암기</div></div>
+        <ul>
+          <li>누가·언제·어디서 재도 <b>같은 결과</b>를 얻기 위한 공통 기준 → <span class="k">국제단위계(SI)</span>를 국제 공통으로 사용</li>
+        </ul>
+        <div class="def" style="margin-top:1.2mm">
+          <div class="t">1 s (초)의 정의</div>
+          <b>세슘-133</b> 원자에서 나오는 빛이 <span class="k mono">9 192 631 770</span>번 진동하는 데 걸리는 시간
+        </div>
+        <div class="def">
+          <div class="t">1 m (미터)의 정의</div>
+          <b>진공</b>에서 빛이 <span class="k mono">1/299 792 458</span>초 동안 진행한 경로의 길이
+        </div>
+        <ul style="margin-top:1.2mm">
+          <li><b>인증 표준 물질</b> 정확한 측정값이 표기된 물질 → 측정 기기를 <b>주기적으로 확인·교정</b></li>
+          <li><b>활용</b> 실내 공기 질, 층간 소음, 식품·의약품 검사 등 안전한 사회의 기반</li>
+        </ul>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">7</div><h2>정보와 신호</h2></div>
+        <div class="flow">
+          <div class="fb">자연의 변화</div><span class="fa">→</span>
+          <div class="fb">신호</div><span class="fa">→</span>
+          <div class="fb on">센서</div><span class="fa">→</span>
+          <div class="fb">전기 신호</div><span class="fa">→</span>
+          <div class="fb">정보</div>
+        </div>
+        <ul>
+          <li><b>신호</b> 자연의 변화가 전달되는 것 / <b>정보</b> 신호를 측정·분석해 의미를 갖게 한 것</li>
+          <li><span class="k">센서</span> 여러 형태의 신호를 <b>전기 신호로 변환</b>하는 소자</li>
+        </ul>
+        <table style="margin-top:1.2mm">
+          <thead><tr><th class="c" style="width:27%">센서</th><th>감지 대상 · 활용 예</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>광센서</b></td><td>빛 — 비접촉 체온계, 디지털카메라</td></tr>
+            <tr><td class="c"><b>화학 센서</b></td><td>미세한 기체 — 가스 누설 경보기</td></tr>
+            <tr><td class="c"><b>압력 센서</b></td><td>누르는 힘 — 터치스크린, 혈압계</td></tr>
+            <tr><td class="c"><b>가속도·자이로</b></td><td>기울어짐·방향 — 화면 회전, 게임</td></tr>
+          </tbody>
+        </table>
+        <table style="margin-top:1.2mm">
+          <thead><tr><th class="c" style="width:18%">구분</th><th>아날로그</th><th>디지털</th></tr></thead>
+          <tbody>
+            <tr><td class="c"><b>형태</b></td><td><span class="k">연속적</span>으로 변함</td><td><span class="k">0과 1</span>의 불연속 값</td></tr>
+            <tr><td class="c"><b>예</b></td><td>빛, 소리, 온도, 압력</td><td>전자 기기가 처리하는 신호</td></tr>
+            <tr><td class="c"><b>특징</b></td><td>원래 정보를 모두 담음</td><td>일부 손실 / 용량 적고 복사·편집 자유, <b>왜곡 없이</b> 전달</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="blk">
+        <div class="blk-h"><div class="no">✓</div><h2>암기 체크리스트</h2></div>
+        <div class="chk">
+          <div>기본량 7가지 기호</div>
+          <div>유도량 5가지 단위</div>
+          <div>접두어 8개 크기</div>
+          <div>1 s 정의(세슘-133)</div>
+          <div>1 m 정의(진공·빛)</div>
+          <div>측정과 어림 차이</div>
+          <div>센서 4종 활용 예</div>
+          <div>아날로그 ↔ 디지털</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+/* A4 1장 자동 맞춤 — 실제 렌더 높이를 재서 넘칠 때만 축소(가로폭은 유지) */
+(function(){
+  var sheet=document.getElementById('sheet'), inner=document.getElementById('inner');
+  function fit(){
+    if(window.matchMedia('(max-width:820px)').matches){
+      inner.style.transform='none'; inner.style.width='100%'; return;
+    }
+    inner.style.transform='none'; inner.style.width='100%';
+    var cs=getComputedStyle(sheet);
+    var avail=sheet.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
+    var h=inner.scrollHeight;
+    if(h>avail+1){
+      var k=avail/h;
+      inner.style.width=(100/k)+'%';
+      inner.style.transform='scale('+k+')';
+    }
+  }
+  if(document.fonts&&document.fonts.ready){document.fonts.ready.then(fit);}
+  window.addEventListener('load',fit);
+  window.addEventListener('resize',fit);
+  window.addEventListener('beforeprint',fit);
+})();
+</script>
+<script>
+/* 학생 배포 모드(?student=1): 외부 이동 차단 · 홈 링크/뒤로가기 숨김 */
+(function(){
+  var isStudent = new URLSearchParams(location.search).get('student')==='1';
+  function apply(){
+    if(!isStudent) return;
+    var home=document.getElementById('pgHome');
+    if(home){ home.removeAttribute('href'); home.style.pointerEvents='none'; home.style.cursor='default'; }
+    var back=document.getElementById('pgBack');
+    if(back){ back.style.display='none'; }
+    document.querySelectorAll('a[href]').forEach(function(a){
+      var raw=a.getAttribute('href')||'';
+      if(!raw || raw.charAt(0)==='#') return;
+      if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim())) return;
+      try{ if(new URL(a.href, location.href).pathname===location.pathname) return; }catch(e){ return; }
+      a.removeAttribute('href'); a.style.pointerEvents='none'; a.style.cursor='default';
+      a.setAttribute('aria-disabled','true');
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply); else apply();
+  document.addEventListener('click',function(e){
+    if(!isStudent) return;
+    var a=e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if(!a) return;
+    try{ if(new URL(a.href, location.href).pathname!==location.pathname){ e.preventDefault(); e.stopPropagation(); } }catch(err){}
+  },true);
+})();
+</script>
+</body>
+</html>
