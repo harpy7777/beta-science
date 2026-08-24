@@ -561,6 +561,33 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
 .bt-mksel:focus { border-color:#3b82f6; }
 
 /* ══════════════════════════════════════════════════════════════════
+   ★ 2026-08 추가 — 일괄 작성 · 학생별 「숙제 완료」 3버튼
+   ────────────────────────────────────────────────────────────────────
+   출결은 학생마다 다르게 넣을 수 있었는데 숙제 완료만 '-' 로 고정돼
+   있었다. 숙제는 학생마다 다른 것이 정상이므로 줄 안에서 바로 고른다.
+   같은 버튼을 다시 누르면 선택이 풀려 '-' 로 돌아간다.
+   결석인 학생 줄에서는 숨긴다. (숙제를 물을 자리가 아니다)
+══════════════════════════════════════════════════════════════════ */
+.bt-hwrow { display:flex; align-items:center; gap:6px; margin-top:7px; flex-wrap:wrap; }
+.bt-hwrow.off { display:none; }
+.bt-hwlbl { font-size:10.5px; font-weight:800; color:#8e8e93; flex:0 0 auto; letter-spacing:0.02em; }
+.bt-hbtn {
+  min-height:34px; padding:6px 12px; border:1.5px solid #e5e7eb; background:#fff; color:#8e8e93;
+  border-radius:9px; font-family:inherit; font-size:11.5px; font-weight:700; cursor:pointer;
+  transition:all .12s; white-space:nowrap;
+}
+.bt-hbtn:active { transform:scale(0.95); }
+.bt-hbtn.on[data-hw="완료"]   { background:#ecfdf5; border-color:#10b981; color:#047857; }
+.bt-hbtn.on[data-hw="부분완료"] { background:#fffbeb; border-color:#f59e0b; color:#b45309; }
+.bt-hbtn.on[data-hw="미완료"] { background:#fef2f2; border-color:#ef4444; color:#b91c1c; }
+.bt-qbtn.hw { border-color:#bfdbfe; background:#eff6ff; color:#1d4ed8; }
+@media (max-width:600px) {
+  .bt-hwrow { gap:5px; }
+  .bt-hbtn { flex:1; min-height:42px; font-size:12.5px; padding:6px 4px; }
+  .bt-hwlbl { width:100%; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
    ★★ 2026-08 추가 — 개별 수업카드 「기존 기록 불러오기 + 삭제」
    ────────────────────────────────────────────────────────────────────
    [무엇이 불편했나]
@@ -965,6 +992,7 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
         <span class="bt-sum" id="bt-sum">—</span>
         <span class="bt-quick">
           <button class="bt-qbtn" onclick="setAllBatch('출석')">전원 출석</button>
+          <button class="bt-qbtn hw" onclick="setAllBatchHw('완료')">전원 숙제 완료</button>
           <button class="bt-qbtn gray" onclick="setAllBatch('')">초기화</button>
         </span>
       </div>
@@ -1274,7 +1302,7 @@ function saveBTDraft() {
     cls: cs ? cs.value : '',
     date: ds ? ds.value : '',
     vals: grabFields(BT_FIELDS),
-    rows: btRows.map(r => ({ sid: r.sid, status: r.status, memo: r.memo, mkFor: r.mkFor }))
+    rows: btRows.map(r => ({ sid: r.sid, status: r.status, memo: r.memo, mkFor: r.mkFor, hwDone: r.hwDone }))
   };
   DIRTY.add('bt-modal-bg');
 }
@@ -1607,11 +1635,30 @@ function regKey(s) {
 ════════════════════════════════════════════════════════════════════ */
 const LESSON_MAX = 40;
 const REC_MAX = 40;
-function lessonEntry(date, kind, st, unit, content, homework) {
+/* ★ 2026-08 추가 — 수업 태도(a) · 과제 완성도(w) · 숙제 완료(p)
+   ────────────────────────────────────────────────────────────────────
+   [무엇이 빠져 있었나]
+   이 세 칸은 classCards 에는 저장되는데 students.recentLessons 로는
+   넘어가지 않았다. 학부모 화면(student-portal.html)은 recentLessons 만
+   읽으므로, 선생님이 적은 태도 · 과제 완성도 · 숙제 완료가 학부모에게는
+   아예 보이지 않았다.
+
+   [키 이름 규칙]
+   기존 키는 d(날짜) k(슬롯) s(출결) u(단원) c(수업내용) h(과제내용).
+   h 는 이미 과제 '내용'이 쓰고 있으므로 피하고 a · w · p 를 쓴다.
+     a = attitude      수업 태도    (적극적 · 보통 · 산만)
+     w = homework      과제 완성도  (높음 · 보통 · 낮음)
+     p = homeworkDone  숙제 완료    (완료 · 부분완료 · 미완료)
+   값이 비었거나 '-' 이면 키 자체를 넣지 않는다.
+   → 문서 크기가 늘지 않고, 옛 기록(a·w·p 없음)과도 그대로 호환된다. */
+function lessonEntry(date, kind, st, unit, content, homework, attitude, hwLevel, hwDone) {
   const o = { d: String(date), k: normSlot(kind), s: String(st || '출석') };
   const u = String(unit || '').trim();       if (u) o.u = u;
   const c = String(content || '').trim();    if (c) o.c = c;
   const h = String(homework || '').trim();   if (h) o.h = h;
+  const a = String(attitude == null ? '' : attitude).trim();  if (a && a !== '-') o.a = a;
+  const w = String(hwLevel  == null ? '' : hwLevel).trim();   if (w && w !== '-') o.w = w;
+  const p = String(hwDone   == null ? '' : hwDone).trim();    if (p && p !== '-') o.p = p;
   return o;
 }
 function cleanLessonList(cur) {
@@ -1622,6 +1669,10 @@ function cleanLessonList(cur) {
       if (x.u) o.u = String(x.u);
       if (x.c) o.c = String(x.c);
       if (x.h) o.h = String(x.h);
+      /* ★ 태도 · 과제 완성도 · 숙제 완료 — 병합할 때 지워지지 않게 보존한다 */
+      if (x.a) o.a = String(x.a);
+      if (x.w) o.w = String(x.w);
+      if (x.p) o.p = String(x.p);
       return o;
     });
 }
@@ -1885,10 +1936,16 @@ window.recalcAll = async function() {
         if (hwTx && (!o.hw || cd >= o.hw.date)) o.hw = { date: cd, text: hwTx };
       }
       o.rec.push({ d: cd, k: kd, s: st });
+      /* ★ 이미 저장돼 있던 카드의 태도 · 과제 완성도 · 숙제 완료도 함께 옮긴다.
+         (이 세 칸은 예전에 학부모 화면으로 넘어가지 않았으므로,
+          재집계를 한 번 누르면 지난 기록까지 소급해서 채워진다) */
       o.lessons.push(lessonEntry(cd, kd, st,
         st === '결석' ? '' : c.unit,
         st === '결석' ? '' : c.content,
-        st === '결석' ? '' : c.homeworkContent));
+        st === '결석' ? '' : c.homeworkContent,
+        st === '결석' ? '' : c.attitude,
+        st === '결석' ? '' : c.homework,
+        st === '결석' ? '' : c.homeworkDone));
       agg.set(sid, o);
     });
     let batch = writeBatch(db), pend = 0, done = 0, linked = 0;
@@ -1975,6 +2032,13 @@ window.recalcAll = async function() {
      잡혀서, 후보가 없으면 연결 없이 저장되고 결석이 계속 미보강으로 남았다.
 ════════════════════════════════════════════════════════════════════ */
 const BT_ST = ['출석','지각','결석','보강'];
+/* ★ 학생별 숙제 완료 — 저장 값은 개별 수업카드의 select 와 똑같이 맞춘다.
+   화면 글자만 짧게 줄인다. (부분완료 → 부분) */
+const BT_HW = [{ v:'완료', t:'완료' }, { v:'부분완료', t:'부분' }, { v:'미완료', t:'미완료' }];
+function normHwDone(v) {
+  const s = String(v == null ? '' : v).trim();
+  return BT_HW.some(h => h.v === s) ? s : '';
+}
 let btRows = [];
 function btStudentId(s) { return (s.id != null && String(s.id).trim()) ? String(s.id).trim() : String(s.fireId); }
 
@@ -2090,6 +2154,28 @@ function paintBtCyc(i) {
     ? `📗 ${CYCLE}/${CYCLE}회차 마감 예정 · ${ordinal4(f.cycleRound)} 4주`
     : `📗 ${f.cycleIn}/${CYCLE}회차 · 남은 ${f.cycleLeft}회`;
 }
+/* ★ 학생별 숙제 완료 — 버튼 3개 · 같은 버튼을 다시 누르면 선택 해제 */
+function paintBtHw(i) {
+  const r = btRows[i];
+  const row = document.getElementById('bt-hwrow-' + i);
+  if (!r || !row) return;
+  row.classList.toggle('off', r.status === '결석');
+  row.querySelectorAll('.bt-hbtn').forEach(b => b.classList.toggle('on', b.dataset.hw === r.hwDone));
+}
+window.setBatchHw = function(i, v) {
+  const r = btRows[i];
+  if (!r) return;
+  const want = normHwDone(v);
+  r.hwDone = (r.hwDone === want) ? '' : want;
+  paintBtHw(i);
+  saveBTDraft();
+};
+window.setAllBatchHw = function(v) {
+  const want = normHwDone(v);
+  btRows.forEach(r => { if (r.status !== '결석') r.hwDone = want; });
+  btRows.forEach((r, i) => paintBtHw(i));
+  saveBTDraft();
+};
 window.setBatchStatus = function(i, st) {
   if (!btRows[i]) return;
   const r = btRows[i];
@@ -2105,6 +2191,7 @@ window.setBatchStatus = function(i, st) {
   paintBtMk(i);
   paintBtOther(i);
   paintBtCyc(i);
+  paintBtHw(i);
   updateBtSum();
   saveBTDraft();
 };
@@ -2146,13 +2233,17 @@ function renderBatch() {
       <div class="bt-mkpick${r.status === '보강' ? ' open' : ''}" id="bt-mkpick-${i}">
         <select class="bt-mksel" id="bt-mksel-${i}" onchange="btMkForInput(${i},this.value)">${btMkOptions(r)}</select>
       </div>
+      <div class="bt-hwrow${r.status === '결석' ? ' off' : ''}" id="bt-hwrow-${i}">
+        <span class="bt-hwlbl">숙제</span>
+        ${BT_HW.map(h => `<button class="bt-hbtn${r.hwDone === h.v ? ' on' : ''}" data-hw="${esc(h.v)}" onclick="setBatchHw(${i},'${esc(h.v)}')">${esc(h.t)}</button>`).join('')}
+      </div>
       <button class="bt-memo-btn" onclick="toggleBatchMemo(${i})">＋ 개별 메모 · 결석 사유${r.memo ? ' (작성됨)' : ''}</button>
       <div class="bt-memo-wrap${r.memo ? ' open' : ''}" id="bt-memo-${i}">
         <input class="bt-memo-inp" type="text" placeholder="이 학생에게만 남길 메모" value="${esc(r.memo)}" oninput="btMemoInput(${i},this.value)">
       </div>
     </div>`;
   }).join('');
-  btRows.forEach((r, i) => { paintBtMk(i); paintBtOther(i); paintBtCyc(i); });
+  btRows.forEach((r, i) => { paintBtMk(i); paintBtOther(i); paintBtCyc(i); paintBtHw(i); });
   updateBtSum();
 }
 /* 한 학생의 그 날 기록을 슬롯별로 읽는다 (새 ID + 옛 ID 모두 확인) */
@@ -2211,6 +2302,8 @@ window.loadBatch = async function() {
       name: s.name || '이름없음', grade: s.grade || '',
       status: lsCard ? (lsCard.status || '출석') : '',
       memo: lsCard ? String(lsCard.absenceReason || lsCard.studentNote || '') : '',
+      /* ★ 이미 저장된 카드가 있으면 그 날 숙제 완료도 그대로 되살린다 */
+      hwDone: lsCard ? normHwDone(lsCard.homeworkDone) : '',
       mkFor: '',
       cand, openCnt: openA.length,
       prevLs: lsCard ? (lsCard.status || '출석') : '',
@@ -2231,6 +2324,7 @@ window.loadBatch = async function() {
       if (!x) return;
       if (x.status) r.status = x.status;
       if (x.memo) r.memo = x.memo;
+      if (normHwDone(x.hwDone)) r.hwDone = normHwDone(x.hwDone);
       if (r.status === '보강') {
         if (x.mkFor && parseYMD(x.mkFor)) r.mkFor = String(x.mkFor);
         else if (!r.mkFor) r.mkFor = r.prevMkFor || (r.cand.length ? r.cand[r.cand.length - 1] : '');
@@ -2339,7 +2433,8 @@ window.saveBatch = async function() {
           score: null, scoreNone: false, ox: null, multiple: null, omr: null,
           homework: lesson ? hwDefault : '-',
           attitude: lesson ? atDefault : '-',
-          homeworkDone: '-',
+          /* ★ 학생별로 고른 숙제 완료 — 고르지 않았으면 '-' */
+          homeworkDone: lesson ? (r.hwDone || '-') : '-',
           homeworkContent: lesson ? homeworkContent : '',
           batchWrite: true, createdAt: serverTimestamp()
         }, { merge: true });
@@ -2403,7 +2498,8 @@ window.saveBatch = async function() {
         const lesson = isLessonStatus(newSt);
         ra = mergeRecent(ra, date, kind, newSt);
         rl = mergeLesson(rl, date, kind,
-          lessonEntry(date, kind, newSt, lesson ? unit : '', lesson ? content : '', lesson ? homeworkContent : ''));
+          lessonEntry(date, kind, newSt, lesson ? unit : '', lesson ? content : '', lesson ? homeworkContent : '',
+            lesson ? atDefault : '', lesson ? hwDefault : '', lesson ? (r.hwDone || '') : ''));
       }
       patch.recentAttendance = ra;
       patch.recentLessons = rl;
@@ -3635,7 +3731,8 @@ window.saveClassCard = async function() {
         // 학부모 공개용 요약 — 슬롯별로 따로 담는다
         patch.recentAttendance = mergeRecent(ccStudent.recentAttendance, classDate, kind, status);
         patch.recentLessons = mergeLesson(ccStudent.recentLessons, classDate, kind,
-          lessonEntry(classDate, kind, status, lesson ? unit : '', lesson ? content : '', lesson ? homeworkContent : ''));
+          lessonEntry(classDate, kind, status, lesson ? unit : '', lesson ? content : '', lesson ? homeworkContent : '',
+            lesson ? attitude : '', lesson ? homework : '', lesson ? homeworkDone : ''));
         if (lesson && homeworkContent) patch.lastHomework = { date: classDate, text: homeworkContent };
         if (Object.keys(patch).length) await setDoc(doc(db,'students',ccStudent.fireId), patch, { merge:true });
       } catch (err) { console.warn('학생 문서 보정 실패:', err); }
