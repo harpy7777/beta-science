@@ -15,7 +15,7 @@ body {
   overscroll-behavior: none;
 }
 
-/* ── Header (기존 동일) ── */
+/* ── Header ── */
 .header {
   background: #ffffff; border-bottom: 1px solid #f0e8ed;
   padding: 0 1rem;
@@ -158,6 +158,7 @@ body {
   border: none; cursor: pointer; font-size: 10px;
   display: flex; align-items: center; justify-content: center;
 }
+.upload-size-info { font-size: 11px; color: #6e6e73; text-align: right; margin-top: 6px; }
 
 /* ── 시험 정보 입력 ── */
 .info-card { background: #fff; border: 1.5px solid #e5e5e5; border-radius: 16px; padding: 1.2rem 1.4rem; margin-bottom: 1.4rem; }
@@ -347,7 +348,7 @@ body {
 .history-meta { font-size: 10px; color: #aeaeb2; margin-top: 2px; }
 .history-badge { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 7px; background: #f3f4f6; color: #6e6e73; white-space: nowrap; }
 
-/* ── 폼 공통 (기존 동일) ── */
+/* ── 폼 공통 ── */
 .btn-primary {
   padding: 10px 20px; min-height: 44px;
   background: linear-gradient(135deg, #f472b6, #db2777); border: none; border-radius: 10px;
@@ -474,15 +475,16 @@ body {
       <input type="file" id="file-input" accept="image/*,application/pdf" multiple onchange="handleFiles(this.files)">
       <span class="upload-icon">📄</span>
       <div class="upload-title">시험지 파일을 여기에 드래그하거나 클릭하세요</div>
-      <div class="upload-desc">여러 장의 이미지 또는 PDF를 한 번에 업로드할 수 있습니다<br>고해상도 사진일수록 인식률이 높아집니다</div>
+      <div class="upload-desc">여러 장의 이미지 또는 PDF를 한 번에 업로드할 수 있습니다<br>업로드 시 자동으로 크기를 줄여 전송합니다</div>
       <div class="upload-types">
         <span class="upload-type-chip">📷 JPG / PNG</span>
         <span class="upload-type-chip">📄 PDF</span>
-        <span class="upload-type-chip">🖼️ WEBP / HEIC</span>
-        <span class="upload-type-chip">최대 20MB</span>
+        <span class="upload-type-chip">🖼️ WEBP</span>
+        <span class="upload-type-chip">최대 20장</span>
       </div>
     </div>
     <div class="preview-grid" id="preview-grid"></div>
+    <div class="upload-size-info" id="upload-size-info"></div>
   </div>
 
   <!-- ── STEP 2: 시험 정보 입력 ── -->
@@ -646,7 +648,7 @@ body {
 import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, collection, getDocs, addDoc, deleteDoc, doc,
+  getFirestore, collection, getDocs, addDoc, deleteDoc, doc, getDoc,
   query, orderBy, serverTimestamp, where
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -665,7 +667,6 @@ const db   = getFirestore(app);
 // ── 인증 체크 ──
 onAuthStateChanged(auth, async user => {
   if (!user) { location.replace('/login.html'); return; }
-  const { getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
   try {
     const snap = await getDoc(doc(db,'users',user.uid));
     if (!snap.exists() || snap.data().status !== 'approved') {
@@ -679,11 +680,98 @@ onAuthStateChanged(auth, async user => {
 // 날짜 기본값
 document.getElementById('info-exam-date').value = new Date().toISOString().split('T')[0];
 
+// ── 설정값 ──
+const MODEL = 'claude-sonnet-4-20250514';
+const MAX_PAYLOAD_BYTES = 3.5 * 1024 * 1024; // Vercel 요청 본문 4.5MB 제한 대비
+const MAX_IMAGE_DIM = 1600;                   // 긴 변 기준 리사이즈 픽셀
+
 // ── 파일 상태 ──
 let uploadedFiles = [];       // {name, type, dataUrl, base64}
 let analysisResult = null;    // 분석 결과 객체
 let blogStyle = '전문적';
 let promoStyle = '블로그 말미';
+
+// ── Claude 호출 (서버리스 함수 /api/analyze 경유) ──
+async function callClaude(payload) {
+  const resp = await fetch('/api/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  const raw = await resp.text();
+  let data;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    throw new Error(`서버 응답 오류 (${resp.status}): ${raw.slice(0, 200)}`);
+  }
+
+  if (!resp.ok) {
+    const msg = data?.error?.message || data?.error || `HTTP ${resp.status}`;
+    throw new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
+  }
+
+  if (data.stop_reason === 'max_tokens') {
+    console.warn('응답이 잘렸습니다. 문항 수가 많으면 시험지를 나눠서 분석하세요.');
+  }
+
+  return (data.content || [])
+    .filter(b => b.type === 'text')
+    .map(b => b.text)
+    .join('');
+}
+
+// ── 이미지 축소 → JPEG 변환 ──
+function downscaleImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, MAX_IMAGE_DIM / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * scale));
+      const h = Math.max(1, Math.round(img.height * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+      resolve({ name: file.name, type: 'image/jpeg', dataUrl, base64: dataUrl.split(',')[1] });
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error(`${file.name} 을(를) 읽을 수 없습니다. HEIC 파일이면 JPG로 변환 후 올려주세요.`));
+    };
+    img.src = url;
+  });
+}
+
+function readAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const dataUrl = e.target.result;
+      resolve({ name: file.name, type: file.type, dataUrl, base64: dataUrl.split(',')[1] });
+    };
+    reader.onerror = () => reject(new Error(`${file.name} 읽기 실패`));
+    reader.readAsDataURL(file);
+  });
+}
+
+function totalPayloadBytes() {
+  return uploadedFiles.reduce((sum, f) => sum + (f.base64 ? f.base64.length : 0), 0);
+}
+
+function renderSizeInfo() {
+  const el = document.getElementById('upload-size-info');
+  if (!uploadedFiles.length) { el.textContent = ''; return; }
+  const mb = (totalPayloadBytes() / 1024 / 1024).toFixed(1);
+  const limitMb = (MAX_PAYLOAD_BYTES / 1024 / 1024).toFixed(1);
+  el.textContent = `${uploadedFiles.length}개 · 전송 용량 ${mb}MB / ${limitMb}MB`;
+}
 
 // ── 드래그&드롭 ──
 const zone = document.getElementById('upload-zone');
@@ -695,19 +783,34 @@ zone.addEventListener('drop', e => {
 });
 
 // ── 파일 처리 ──
-window.handleFiles = function(files) {
-  Array.from(files).forEach(file => {
-    if (uploadedFiles.length >= 20) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      const dataUrl = e.target.result;
-      const base64  = dataUrl.split(',')[1];
-      uploadedFiles.push({ name: file.name, type: file.type, dataUrl, base64 });
+window.handleFiles = async function(files) {
+  for (const file of Array.from(files)) {
+    if (uploadedFiles.length >= 20) { alert('최대 20개까지 업로드할 수 있습니다'); break; }
+    try {
+      let item;
+      if (file.type.startsWith('image/')) {
+        item = await downscaleImage(file);
+      } else if (file.type === 'application/pdf') {
+        item = await readAsDataUrl(file);
+      } else {
+        alert(`${file.name}: 이미지 또는 PDF만 업로드할 수 있습니다`);
+        continue;
+      }
+
+      uploadedFiles.push(item);
+      if (totalPayloadBytes() > MAX_PAYLOAD_BYTES) {
+        uploadedFiles.pop();
+        alert('전송 용량 한도를 넘었습니다. 시험지를 나눠서 분석해 주세요.');
+        break;
+      }
       renderPreviews();
+      renderSizeInfo();
       setStep(2);
-    };
-    reader.readAsDataURL(file);
-  });
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+  document.getElementById('file-input').value = '';
 };
 
 function renderPreviews() {
@@ -720,7 +823,12 @@ function renderPreviews() {
       <button class="preview-del" onclick="removeFile(${i})">✕</button>
     </div>`).join('');
 }
-window.removeFile = i => { uploadedFiles.splice(i, 1); renderPreviews(); if (!uploadedFiles.length) setStep(1); };
+window.removeFile = i => {
+  uploadedFiles.splice(i, 1);
+  renderPreviews();
+  renderSizeInfo();
+  if (!uploadedFiles.length) setStep(1);
+};
 
 // ── 단계 표시 ──
 function setStep(n) {
@@ -762,10 +870,8 @@ window.startAnalysis = async function() {
 
 // ── 실제 AI 분석 ──
 async function runAnalysis({ school, grade, subject, examName }) {
-  // 진행 단계 시뮬레이션 + 실제 API 호출
   await setProgressStep(1, 10, '이미지/PDF 처리 중...');
 
-  // 이미지 컨텐츠 구성
   const imageContents = uploadedFiles
     .filter(f => f.type.startsWith('image/'))
     .map(f => ({
@@ -773,7 +879,6 @@ async function runAnalysis({ school, grade, subject, examName }) {
       source: { type: 'base64', media_type: f.type, data: f.base64 }
     }));
 
-  // PDF는 document 타입
   const docContents = uploadedFiles
     .filter(f => f.type === 'application/pdf')
     .map(f => ({
@@ -782,6 +887,8 @@ async function runAnalysis({ school, grade, subject, examName }) {
     }));
 
   await setProgressStep(2, 30, '문항 텍스트 인식 중...');
+
+  const memo = document.getElementById('info-memo').value.trim();
 
   const systemPrompt = `당신은 대한민국 고등학교 과학 내신 전문 분석가입니다.
 시험지 이미지나 PDF를 보고 반드시 아래 JSON 형식으로만 응답하세요. 다른 텍스트, 마크다운 백틱 없이 순수 JSON만 반환하세요.
@@ -823,7 +930,7 @@ async function runAnalysis({ school, grade, subject, examName }) {
 - 학교: ${school}
 - 학년: ${grade}
 - 과목: ${subject}
-- 시험명: ${examName}
+- 시험명: ${examName}${memo ? `\n- 추가 메모: ${memo}` : ''}
 
 모든 문항을 찾아서 분석하고, 지시된 JSON 형식으로만 응답하세요.`
     }
@@ -831,36 +938,32 @@ async function runAnalysis({ school, grade, subject, examName }) {
 
   await setProgressStep(3, 55, '문항별 개별 분석 중...');
 
-  const resp = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4000,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userMessage }]
-    })
+  const rawText = await callClaude({
+    model: MODEL,
+    max_tokens: 8000,
+    system: systemPrompt,
+    messages: [{ role: 'user', content: userMessage }]
   });
-
-  if (!resp.ok) throw new Error(`API 오류: ${resp.status} ${await resp.text()}`);
-  const data = await resp.json();
-  const rawText = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
 
   await setProgressStep(4, 80, '시험 전체 종합 분석 중...');
 
-  // JSON 파싱
+  // JSON 파싱 (앞뒤 잡텍스트 제거)
   let result;
   try {
-    const cleaned = rawText.replace(/```json|```/g, '').trim();
+    let cleaned = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+    const start = cleaned.indexOf('{');
+    const end   = cleaned.lastIndexOf('}');
+    if (start === -1 || end === -1 || end <= start) throw new Error('JSON 형식이 아님');
+    cleaned = cleaned.slice(start, end + 1);
     result = JSON.parse(cleaned);
-  } catch(e) {
-    throw new Error('AI 응답 파싱 실패: ' + rawText.slice(0, 200));
+  } catch (e) {
+    throw new Error('AI 응답 파싱 실패 (' + e.message + '): ' + rawText.slice(0, 300));
   }
 
   await setProgressStep(5, 100, '분석 완료!');
   await sleep(600);
 
-  analysisResult = { ...result, school, grade, subject, examName, date: document.getElementById('info-exam-date').value };
+  analysisResult = { ...result, school, grade, subject, examName, memo, date: document.getElementById('info-exam-date').value };
   showProgress(false);
   renderResults(analysisResult);
   setStep(4);
@@ -871,7 +974,6 @@ async function runAnalysis({ school, grade, subject, examName }) {
 function renderResults(r) {
   document.getElementById('results-wrap').classList.add('show');
 
-  // 개요 통계
   document.getElementById('overview-exam-name').textContent = `· ${r.examName}`;
   document.getElementById('overview-stats').innerHTML = `
     <div class="ov-stat"><div class="ov-stat-num">${r.totalQuestions || '—'}</div><div class="ov-stat-lbl">총 문항수</div></div>
@@ -880,28 +982,24 @@ function renderResults(r) {
     <div class="ov-stat"><div class="ov-stat-num">${r.overallDifficulty || '—'}</div><div class="ov-stat-lbl">전체 난이도</div></div>
   `;
 
-  // 특성 태그
   const ftags = document.getElementById('feature-tags');
   ftags.innerHTML = (r.features || []).map((f, i) =>
     `<span class="ftag ${i===0?'highlight':i%3===1?'warn':'good'}">${esc(f)}</span>`
   ).join('') + (r.nextExamStrategy ? `<span class="ftag" style="background:#f0f9ff;color:#0284c7;border-color:#bae6fd;">${esc(r.nextExamStrategy)}</span>` : '');
 
-  // 단원별 비중
   const ubars = document.getElementById('unit-bars');
   ubars.innerHTML = (r.unitDistribution || []).map(u =>
     `<div class="unit-bar-item">
       <span class="unit-bar-name">${esc(u.name)}</span>
-      <div class="unit-bar-track"><div class="unit-bar-fill" style="width:${u.percent}%"></div></div>
-      <span class="unit-bar-pct">${u.percent}%</span>
+      <div class="unit-bar-track"><div class="unit-bar-fill" style="width:${Number(u.percent)||0}%"></div></div>
+      <span class="unit-bar-pct">${Number(u.percent)||0}%</span>
     </div>`
   ).join('');
 
-  // 킬러문항
   document.getElementById('killer-badges').innerHTML =
-    (r.killerQuestions || []).map(n => `<span class="killer-badge">${n}번</span>`).join('') ||
+    (r.killerQuestions || []).map(n => `<span class="killer-badge">${esc(n)}번</span>`).join('') ||
     '<span style="font-size:12px;color:#aeaeb2;">킬러문항 없음</span>';
 
-  // 문항별
   const qGrid = document.getElementById('q-analysis-grid');
   if (!r.questions || !r.questions.length) {
     qGrid.innerHTML = '<div class="empty-hint">문항 분석 결과가 없습니다</div>';
@@ -915,7 +1013,7 @@ function renderResults(r) {
           <div class="q-card-info">
             <div class="q-card-title">${esc(q.unit||'—')} · ${esc(q.concept||'—')}</div>
             <div class="q-card-meta">
-              <span class="q-chip qc-diff-${q.difficulty||'중'}">난이도 ${q.difficulty||'—'}</span>
+              <span class="q-chip qc-diff-${q.difficulty||'중'}">난이도 ${esc(q.difficulty||'—')}</span>
               <span class="q-chip qc-type">${esc(q.questionType||'—')}</span>
               <span class="q-chip qc-unit">${esc(q.unit||'—')}</span>
             </div>
@@ -943,11 +1041,9 @@ function renderResults(r) {
     }).join('');
   }
 
-  // 생성 버튼 활성화
   document.getElementById('blog-gen-btn').disabled = false;
   document.getElementById('promo-gen-btn').disabled = false;
 
-  // 스크롤
   setTimeout(() => document.getElementById('results-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
 }
 
@@ -977,17 +1073,12 @@ window.generateBlog = async function() {
 
 블로그 글 (500~700자, 자연스러운 구어체):`;
 
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
+    const text = await callClaude({
+      model: MODEL,
+      max_tokens: 1500,
+      messages: [{ role: 'user', content: prompt }]
     });
-    const data = await resp.json();
-    const text = data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+
     document.getElementById('blog-result-text').textContent = text;
     document.getElementById('blog-result').classList.add('show');
     setStep(5);
@@ -1013,17 +1104,12 @@ window.generatePromo = async function() {
 
 ${promoStyle} 형식 홍보 문구 (150~250자):`;
 
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 500,
-        messages: [{ role: 'user', content: prompt }]
-      })
+    const text = await callClaude({
+      model: MODEL,
+      max_tokens: 700,
+      messages: [{ role: 'user', content: prompt }]
     });
-    const data = await resp.json();
-    const text = data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+
     document.getElementById('promo-result-text').textContent = text;
     document.getElementById('promo-result').classList.add('show');
   } catch(e) { alert('생성 실패: '+e.message); }
@@ -1084,9 +1170,9 @@ async function loadHistory() {
         <span class="history-icon">🔍</span>
         <div style="flex:1;min-width:0;">
           <div class="history-title">${esc(item.examName||'—')}</div>
-          <div class="history-meta">${esc(item.school||'')} · ${esc(item.grade||'')} · ${esc(item.subject||'')} · ${item.date||''}</div>
+          <div class="history-meta">${esc(item.school||'')} · ${esc(item.grade||'')} · ${esc(item.subject||'')} · ${esc(item.date||'')}</div>
         </div>
-        <span class="history-badge">${item.totalQuestions||'?'}문항</span>
+        <span class="history-badge">${esc(item.totalQuestions||'?')}문항</span>
         <button class="preview-del" style="position:static;width:22px;height:22px;" onclick="deleteAnalysis('${item.id}')">✕</button>
       </div>`).join('');
   } catch(e) { console.error(e); }
@@ -1122,25 +1208,15 @@ window.loadSchoolDB = async function() {
     const items = []; snap.forEach(d => items.push(d.data()));
     if (!items.length) { el.innerHTML = '<div class="empty-hint">해당 학교 데이터가 없습니다</div>'; return; }
 
-    // 단원별 집계
     const unitMap = {};
     let totalQ = 0;
     items.forEach(item => {
-      totalQ += (item.totalQuestions || 0);
+      totalQ += (Number(item.totalQuestions) || 0);
       (item.unitDistribution || []).forEach(u => {
-        unitMap[u.name] = (unitMap[u.name] || 0) + u.percent;
+        unitMap[u.name] = (unitMap[u.name] || 0) + (Number(u.percent) || 0);
       });
     });
     const sortedUnits = Object.entries(unitMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
-
-    // 킬러 집계
-    const killerMap = {};
-    items.forEach(item => {
-      (item.killerQuestions || []).forEach(n => {
-        const key = n+'번';
-        killerMap[key] = (killerMap[key] || 0) + 1;
-      });
-    });
 
     el.innerHTML = `
       <div class="school-stat-grid">
@@ -1165,6 +1241,7 @@ window.resetAll = function() {
   uploadedFiles = [];
   analysisResult = null;
   renderPreviews();
+  renderSizeInfo();
   document.getElementById('results-wrap').classList.remove('show');
   document.getElementById('blog-result').classList.remove('show');
   document.getElementById('promo-result').classList.remove('show');
@@ -1191,7 +1268,7 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // ── 유틸 ──
 function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 </script>
 </body>
