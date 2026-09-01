@@ -266,25 +266,72 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .unit-go-btn.p2 { color: #1e3a8a; }
 .unit-go-btn:hover { gap: 8px; }
 
-/* ── 단원별 핵심정리 버튼 (손글씨 / 깔끔) ── */
-.unit-card-body { display: flex; flex-direction: column; }
-.sum-btns { display: flex; gap: 7px; margin-top: auto; padding-top: 10px; }
+/* ══ CORE SUMMARY · 단원별 핵심정리 ══
+   단원마다 카드 1개 · 손글씨 / 깔끔한 정리 버튼 2개
+   파일이 아직 없는 단원은 SUMMARIES 에서 handReady/cleanReady 를 false 로 두면
+   버튼이 '준비 중'으로 잠겨 404 가 나지 않는다
+   (PART 02 항목은 part2:true — 카드가 파란 계열로 바뀐다) */
+.sum-note {
+  font-size: 11.5px; line-height: 1.7; color: var(--chem-dark);
+  background: var(--chem-tint); border: 1px solid var(--chem-border);
+  border-radius: 12px; padding: 0.75rem 0.9rem; margin-bottom: 0.8rem;
+}
+.sum-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.8rem; }
+.sum-card {
+  background: #ffffff; border: 1px solid var(--chem-border); border-radius: 16px;
+  padding: 1rem 1.15rem; display: flex; flex-direction: column; gap: 0.7rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.sum-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(5,150,105,0.14); }
+.sum-card.part2 { border-color: #bfdbfe; }
+.sum-card.part2:hover { box-shadow: 0 8px 24px rgba(37,99,235,0.16); }
+.sum-card.soon { background: #fafafc; border-style: dashed; border-color: #d1d1d6; }
+.sum-card.soon:hover { transform: none; box-shadow: none; }
+.sum-top { display: flex; align-items: flex-start; gap: 10px; }
+.sum-no {
+  flex-shrink: 0; width: 34px; height: 34px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--chem-mid), var(--chem-dark));
+  color: #fff; font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(5,150,105,0.28);
+}
+.sum-card.part2 .sum-no {
+  background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+  box-shadow: 0 2px 8px rgba(37,99,235,0.28);
+}
+.sum-card.soon .sum-no { background: #c7c7cc; box-shadow: none; }
+.sum-titlebox { min-width: 0; flex: 1; }
+.sum-title { font-size: 14px; font-weight: 800; color: #1d1d1f; letter-spacing: -0.02em; line-height: 1.4; }
+.sum-keywords { font-size: 11px; color: var(--muted); line-height: 1.65; margin-top: 4px; word-break: keep-all; }
+.sum-meta { display: flex; flex-wrap: wrap; gap: 5px; }
+.sum-tag {
+  font-size: 10px; font-weight: 700; border-radius: 20px; padding: 3px 9px;
+  background: var(--chem-tint2); color: var(--chem-dark);
+  border: 1px solid var(--chem-border); white-space: nowrap;
+}
+.sum-card.part2 .sum-tag { background: #dbeafe; color: #1e3a8a; border-color: #bfdbfe; }
+.sum-tag.soon-tag { background: #f5f5f7; color: #8e8e93; border-color: #e5e5ea; }
+.sum-btns { display: flex; gap: 8px; margin-top: auto; }
 .sum-btn {
-  flex: 1 1 0; min-width: 0; min-height: 40px;
-  border: none; -webkit-appearance: none; appearance: none;
-  border-radius: 11px; padding: 0 6px;
-  font-family: inherit; font-size: clamp(11px, 3vw, 12px); font-weight: 700;
-  color: #fff; cursor: pointer; white-space: nowrap;
-  display: flex; align-items: center; justify-content: center; gap: 4px;
-  transition: opacity 0.15s, transform 0.1s;
+  flex: 1 1 0; min-width: 0; min-height: 42px; border: none;
+  -webkit-appearance: none; appearance: none; border-radius: 11px; padding: 0 6px;
+  font-size: 12.5px; font-weight: 700; color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  font-family: inherit; transition: opacity 0.15s, transform 0.1s; white-space: nowrap;
 }
 .sum-btn.hand  { background: linear-gradient(135deg,#8b5cf6,#4c1d95); box-shadow: 0 2px 8px rgba(124,58,237,0.25); }
 .sum-btn.clean { background: linear-gradient(135deg,#3b82f6,#1e3a8a); box-shadow: 0 2px 8px rgba(59,130,246,0.25); }
-.sum-btn:hover  { opacity: 0.9; }
+.sum-btn:hover { opacity: 0.9; }
 .sum-btn:active { transform: scale(0.98); }
+.sum-btn.locked { background: #e5e5ea; color: #8e8e93; box-shadow: none; cursor: default; }
+.sum-btn.locked:hover { opacity: 1; }
+.sum-btn.locked:active { transform: none; }
 
 /* 장식용 '핵심 정리' 뱃지를 뺐으므로 학습하기 버튼을 오른쪽에 그대로 붙인다 */
 .unit-card-footer { justify-content: flex-end; }
+
+@media (max-width: 700px) { .sum-grid { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .sum-btn { font-size: 12px; } }
 
 /* ── Bottom 2-col ── */
 .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1.8rem; }
@@ -452,10 +499,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
           <a href="chemistry2-unit1-1.html#unit3" class="topic-item"><span class="topic-dot"></span>분자 간 힘과 액체</a>
           <a href="chemistry2-unit1-1.html#unit4" class="topic-item"><span class="topic-dot"></span>결정성 고체의 종류</a>
         </div>
-        <div class="sum-btns">
-          <button class="sum-btn hand" onclick="event.stopPropagation();location.href='summary-c2-p1u1-hand.html'">✍️ 손글씨</button>
-          <button class="sum-btn clean" onclick="event.stopPropagation();location.href='summary-c2-p1u1-clean.html'">📄 깔끔한 정리</button>
-        </div>
       </div>
       <div class="unit-card-footer">
         <button class="unit-go-btn" onclick="event.stopPropagation();location.href='chemistry2-unit1-1.html'">학습하기 →</button>
@@ -478,10 +521,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
           <a href="chemistry2-unit1-2.html#unit2" class="topic-item"><span class="topic-dot"></span>증기 압력 내림 (라울 법칙)</a>
           <a href="chemistry2-unit1-2.html#unit2" class="topic-item"><span class="topic-dot"></span>끓는점 오름·어는점 내림</a>
           <a href="chemistry2-unit1-2.html#unit3" class="topic-item"><span class="topic-dot"></span>삼투 현상과 삼투압</a>
-        </div>
-        <div class="sum-btns">
-          <button class="sum-btn hand" onclick="event.stopPropagation();location.href='summary-c2-p1u2-hand.html'">✍️ 손글씨</button>
-          <button class="sum-btn clean" onclick="event.stopPropagation();location.href='summary-c2-p1u2-clean.html'">📄 깔끔한 정리</button>
         </div>
       </div>
       <div class="unit-card-footer">
@@ -506,10 +545,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
           <a href="chemistry2-unit1-3.html#unit2" class="topic-item"><span class="topic-dot"></span>결합 에너지</a>
           <a href="chemistry2-unit1-3.html#unit3" class="topic-item"><span class="topic-dot"></span>엔트로피와 반응 자발성</a>
         </div>
-        <div class="sum-btns">
-          <button class="sum-btn hand" onclick="event.stopPropagation();location.href='summary-c2-p1u3-hand.html'">✍️ 손글씨</button>
-          <button class="sum-btn clean" onclick="event.stopPropagation();location.href='summary-c2-p1u3-clean.html'">📄 깔끔한 정리</button>
-        </div>
       </div>
       <div class="unit-card-footer">
         <button class="unit-go-btn" onclick="event.stopPropagation();location.href='chemistry2-unit1-3.html'">학습하기 →</button>
@@ -532,10 +567,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
           <a href="chemistry2-unit1-4.html#unit2" class="topic-item"><span class="topic-dot"></span>일차 반응과 반감기</a>
           <a href="chemistry2-unit1-4.html#unit3" class="topic-item"><span class="topic-dot"></span>활성화 에너지와 유효 충돌</a>
           <a href="chemistry2-unit1-4.html#unit4" class="topic-item"><span class="topic-dot"></span>농도·온도·촉매와 반응 속도</a>
-        </div>
-        <div class="sum-btns">
-          <button class="sum-btn hand" onclick="event.stopPropagation();location.href='summary-c2-p1u4-hand.html'">✍️ 손글씨</button>
-          <button class="sum-btn clean" onclick="event.stopPropagation();location.href='summary-c2-p1u4-clean.html'">📄 깔끔한 정리</button>
         </div>
       </div>
       <div class="unit-card-footer">
@@ -577,10 +608,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
           <a href="chemistry2-unit2-1.html#unit3" class="topic-item p2"><span class="topic-dot p2"></span>중화 적정 곡선</a>
           <a href="chemistry2-unit2-1.html#unit4" class="topic-item p2"><span class="topic-dot p2"></span>염의 가수 분해 · 완충 작용</a>
         </div>
-        <div class="sum-btns">
-          <button class="sum-btn hand" onclick="event.stopPropagation();location.href='summary-c2-p2u1-hand.html'">✍️ 손글씨</button>
-          <button class="sum-btn clean" onclick="event.stopPropagation();location.href='summary-c2-p2u1-clean.html'">📄 깔끔한 정리</button>
-        </div>
       </div>
       <div class="unit-card-footer">
         <button class="unit-go-btn p2" onclick="event.stopPropagation();location.href='chemistry2-unit2-1.html'">학습하기 →</button>
@@ -603,10 +630,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
           <a href="chemistry2-unit2-2.html#unit2" class="topic-item p2"><span class="topic-dot p2"></span>볼타 전지 · 다니엘 전지</a>
           <a href="chemistry2-unit2-2.html#unit3" class="topic-item p2"><span class="topic-dot p2"></span>표준 환원 전위 · 전지 전위</a>
           <a href="chemistry2-unit2-2.html#unit4" class="topic-item p2"><span class="topic-dot p2"></span>전기 분해 · 도금 · 연료 전지</a>
-        </div>
-        <div class="sum-btns">
-          <button class="sum-btn hand" onclick="event.stopPropagation();location.href='summary-c2-p2u2-hand.html'">✍️ 손글씨</button>
-          <button class="sum-btn clean" onclick="event.stopPropagation();location.href='summary-c2-p2u2-clean.html'">📄 깔끔한 정리</button>
         </div>
       </div>
       <div class="unit-card-footer">
@@ -631,10 +654,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
           <a href="chemistry2-unit2-3.html#unit3" class="topic-item p2"><span class="topic-dot p2"></span>중합 반응 · 천연·합성 고분자</a>
           <a href="chemistry2-unit2-3.html#unit4" class="topic-item p2"><span class="topic-dot p2"></span>의약품 · 비누 · 식품 첨가물</a>
         </div>
-        <div class="sum-btns">
-          <button class="sum-btn hand" onclick="event.stopPropagation();location.href='summary-c2-p2u3-hand.html'">✍️ 손글씨</button>
-          <button class="sum-btn clean" onclick="event.stopPropagation();location.href='summary-c2-p2u3-clean.html'">📄 깔끔한 정리</button>
-        </div>
       </div>
       <div class="unit-card-footer">
         <button class="unit-go-btn p2" onclick="event.stopPropagation();location.href='chemistry2-unit2-3.html'">학습하기 →</button>
@@ -642,6 +661,18 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     </div>
 
   </div>
+
+  <!-- ═════════════════════════════════════ -->
+  <!-- CORE SUMMARY : 단원별 핵심정리 (7단원 14개)  -->
+  <!-- ═════════════════════════════════════ -->
+  <div class="section-heading" style="margin-top:1.8rem;">CORE SUMMARY · 단원별 핵심정리</div>
+  <div class="sum-note">✍️ <strong>손글씨</strong>는 형광펐·색펜으로 정리한 노트 느낌, 📄 <strong>깔끔한 정리</strong>는 검은 글씨의 단정한 정리본입니다. 휴대폰에서 바로 읽히고, 그 화면에서 인쇄·PDF 저장도 됩니다.</div>
+
+  <div class="section-heading">PART 01 · 물질과 에너지</div>
+  <div class="sum-grid" id="grid-c2-p1"></div>
+
+  <div class="section-heading">PART 02 · 화학 반응의 세계</div>
+  <div class="sum-grid" id="grid-c2-p2"></div>
 
   <!-- ── 하단 2단 ── -->
   <div class="section-heading" style="margin-top:1.8rem;">OVERVIEW</div>
@@ -735,6 +766,115 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
   </div>
 </div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   단원별 핵심정리 카드
+   ──────────────────────────────────────────────────────
+   파일이 아직 없는 단원은 handReady / cleanReady 를 false 로 둔다
+   → 그 버튼만 '준비 중'으로 잠기고 404 가 나지 않는다
+   (2026-09 기준 7단원 14개 모두 올라가 있어 잠긴 단원은 없다)
+   part2:true → PART 02 카드(파란 계열) / 그리드도 따로 나눈다
+   ═══════════════════════════════════════════════════════ */
+var SUMMARIES = [
+  { no:'Ⅰ', title:'물질의 세 가지 상태',
+    keywords:'보일·샤를·아보가드로 법칙 · 이상 기체 방정식 · 혼합 기체와 분압 · 분자 간 힘 · 결정성 고체',
+    hand:'summary-c2-p1u1-hand.html', clean:'summary-c2-p1u1-clean.html',
+    handReady:true, cleanReady:true },
+
+  { no:'Ⅱ', title:'용액의 성질',
+    keywords:'물의 밀도·표면 장력·비열 · 증기 압력 내림(라울 법칙) · 끓는점 오름·어는점 내림 · 삼투 현상과 삼투압',
+    hand:'summary-c2-p1u2-hand.html', clean:'summary-c2-p1u2-clean.html',
+    handReady:true, cleanReady:true },
+
+  { no:'Ⅲ', title:'화학 변화의 자발성',
+    keywords:'엔탈피와 열화학 반응식 · 헤스 법칙 · 표준 생성 엔탈피 · 결합 에너지 · 엔트로피와 반응 자발성',
+    hand:'summary-c2-p1u3-hand.html', clean:'summary-c2-p1u3-clean.html',
+    handReady:true, cleanReady:true },
+
+  { no:'Ⅳ', title:'반응 속도',
+    keywords:'반응 속도식과 반응 차수 · 일차 반응과 반감기 · 활성화 에너지와 유효 충돌 · 농도·온도·촉매 효과',
+    hand:'summary-c2-p1u4-hand.html', clean:'summary-c2-p1u4-clean.html',
+    handReady:true, cleanReady:true },
+
+  { no:'Ⅰ', title:'산 염기 평형', part2:true,
+    keywords:'브띑스테드·라우리 산 염기 · 이온화 상수 Ka·Kb · 중화 적정 곱선 · 염의 가수 분해 · 완충 작용',
+    hand:'summary-c2-p2u1-hand.html', clean:'summary-c2-p2u1-clean.html',
+    handReady:true, cleanReady:true },
+
+  { no:'Ⅱ', title:'산화·환원 반응', part2:true,
+    keywords:'산화수 규칙·반쪽 반응식 · 볼타·다니엘 전지 · 표준 환원 전위·전지 전위 · 전기 분해·도금·연료 전지',
+    hand:'summary-c2-p2u2-hand.html', clean:'summary-c2-p2u2-clean.html',
+    handReady:true, cleanReady:true },
+
+  { no:'Ⅲ', title:'탄소 화합물과 반응', part2:true,
+    keywords:'탄화수소·작용기·시성식 · 알코올 산화·에스테화 반응 · 중합 반응·천연·합성 고분자 · 의약품·비누·식품 첨가물',
+    hand:'summary-c2-p2u3-hand.html', clean:'summary-c2-p2u3-clean.html',
+    handReady:true, cleanReady:true }
+];
+
+/* 학생 배포 모드(?student=1)에서는 이동하는 링크에도 student=1 을 이어붙여
+   학생이 관리자 화면으로 빠져나가지 않게 한다 */
+var STUDENT_MODE = new URLSearchParams(location.search).get('student') === '1';
+
+function goTo(url){
+  if(!url) return;
+  var u = String(url);
+  if(STUDENT_MODE && u.indexOf('student=1') === -1){
+    u += (u.indexOf('?') > -1 ? '&' : '?') + 'student=1';
+  }
+  location.href = u;
+}
+
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                  .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderSummaries(){
+  var g1 = document.getElementById('grid-c2-p1');
+  var g2 = document.getElementById('grid-c2-p2');
+  if(!g1 || !g2) return;
+  g1.innerHTML = ''; g2.innerHTML = '';
+
+  SUMMARIES.forEach(function(s){
+    var ready = !!(s.handReady || s.cleanReady);
+    var card = document.createElement('div');
+    card.className = 'sum-card' + (s.part2 ? ' part2' : '') + (ready ? '' : ' soon');
+    card.innerHTML =
+      '<div class="sum-top">' +
+        '<div class="sum-no">' + esc(s.no) + '</div>' +
+        '<div class="sum-titlebox">' +
+          '<div class="sum-title">' + esc(s.title) + '</div>' +
+          '<div class="sum-keywords">' + esc(s.keywords) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="sum-meta">' +
+        '<span class="sum-tag' + (ready ? '' : ' soon-tag') + '">손글씨 · 깔끔 2종</span>' +
+        '<span class="sum-tag' + (ready ? '' : ' soon-tag') + '">' +
+          (ready ? '휴대폰 열람 · 인쇄 가능' : '준비 중') + '</span>' +
+      '</div>' +
+      '<div class="sum-btns">' +
+        '<button class="sum-btn ' + (s.handReady ? 'hand' : 'locked') + '" data-go="' +
+          (s.handReady ? esc(s.hand) : '') + '">' +
+          (s.handReady ? '✍️ 손글씨' : '✍️ 준비 중') + '</button>' +
+        '<button class="sum-btn ' + (s.cleanReady ? 'clean' : 'locked') + '" data-go="' +
+          (s.cleanReady ? esc(s.clean) : '') + '">' +
+          (s.cleanReady ? '📄 깔끔한 정리' : '📄 준비 중') + '</button>' +
+      '</div>';
+
+    card.querySelectorAll('.sum-btn').forEach(function(b){
+      var target = b.getAttribute('data-go');
+      if(!target){ b.disabled = true; return; }
+      b.addEventListener('click', function(){ goTo(target); });
+    });
+
+    (s.part2 ? g2 : g1).appendChild(card);
+  });
+}
+
+renderSummaries();
+</script>
 
 <script type="module">
   import { initializeApp }               from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
