@@ -4,273 +4,346 @@
 <meta charset="UTF-8"><script src="/favicon.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>SMS설정 - 인후쌤의 과학 수업 관리 시스템</title>
+<title>문자 발송 - 인후쌤의 과학 수업 관리 시스템</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Arial,sans-serif;background:#fafafa;color:#1d1d1f;min-height:100vh;-webkit-font-smoothing:antialiased;visibility:hidden;overscroll-behavior:none}
-
+:root{
+--pink:#db2777;--pink-lt:#fff0f7;--pink-dk:#be185d;--pink-bd:#fce7f3;
+--tx:#1d1d1f;--mt:#6e6e73;--dim:#aeaeb2;--bd:#f0e8ed;
+--ok:#16a34a;--ng:#dc2626;
+--safe-bot:env(safe-area-inset-bottom);
+}
+html{-webkit-text-size-adjust:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',Arial,sans-serif;background:#fafafa;color:var(--tx);min-height:100vh;-webkit-font-smoothing:antialiased;visibility:hidden;overscroll-behavior:none}
 /* ── Header ── */
-.header{background:#fff;border-bottom:1px solid #f0e8ed;padding:0 1.2rem;padding-left:max(1.2rem,env(safe-area-inset-left));padding-right:max(1.2rem,env(safe-area-inset-right));height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300}
+.header{background:#fff;border-bottom:1px solid var(--bd);padding:0 1.2rem;padding-left:max(1.2rem,env(safe-area-inset-left));padding-right:max(1.2rem,env(safe-area-inset-right));height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300}
 .header-left{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit;cursor:pointer;transition:opacity .15s}
 .header-left:hover{opacity:.75}
 .logo-mark{width:30px;height:30px;background:linear-gradient(135deg,#f472b6 0%,#db2777 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.brand-name{font-size:14px;font-weight:600;color:#1d1d1f;letter-spacing:-.3px}
-.header-badge{display:flex;align-items:center;gap:5px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;color:#16a34a;white-space:nowrap}
+.brand-name{font-size:14px;font-weight:600;color:var(--tx);letter-spacing:-.3px}
+.header-badge{display:flex;align-items:center;gap:5px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;color:var(--ok);white-space:nowrap}
 .dot-green{width:5px;height:5px;background:#22c55e;border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .logout-btn{padding:7px 14px;min-height:36px;background:transparent;border:1.5px solid #f4c8d4;border-radius:20px;font-family:inherit;font-size:12px;font-weight:600;color:#e8375a;cursor:pointer;white-space:nowrap;transition:background .15s}
 .logout-btn:hover,.logout-btn:active{background:#fceef2}
-
 /* ── Page Nav ── */
-.page-nav{background:#fff;border-bottom:1px solid #f0e8ed;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:54px;z-index:200}
+.page-nav{background:#fff;border-bottom:1px solid var(--bd);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:54px;z-index:200}
 .page-nav::-webkit-scrollbar{display:none}
-.page-nav-inner{display:flex;padding:0;width:100%;justify-content:space-evenly;}
-.pnav-a{display:block;padding:11px 13px;font-size:13px;font-weight:500;color:#aeaeb2;text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
-.pnav-a:hover{color:#1d1d1f}
-.pnav-a.on{color:#db2777;border-bottom-color:#db2777;font-weight:600}
-
+.page-nav-inner{display:flex;padding:0;width:100%;justify-content:space-evenly}
+.pnav-a{display:block;padding:11px 13px;font-size:13px;font-weight:500;color:var(--dim);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
+.pnav-a:hover{color:var(--tx)}
+.pnav-a.on{color:var(--pink);border-bottom-color:var(--pink);font-weight:600}
 /* ── Wrap ── */
-.wrap{padding:1.4rem 1.2rem;padding-bottom:max(6rem,calc(5rem + env(safe-area-inset-bottom)));padding-left:max(1.2rem,env(safe-area-inset-left));padding-right:max(1.2rem,env(safe-area-inset-right));flex:1}
-
+.wrap{padding:1.4rem 1.2rem;padding-bottom:max(9rem,calc(8rem + var(--safe-bot)));padding-left:max(1.2rem,env(safe-area-inset-left));padding-right:max(1.2rem,env(safe-area-inset-right));max-width:1100px;margin:0 auto}
 /* ── Page Hero ── */
-.page-hero{background:linear-gradient(135deg,#fff0f7 0%,#fdf2f8 60%,#f0f9ff 100%);border:1px solid #fce7f3;border-radius:18px;padding:1.2rem 1.4rem;margin-bottom:1.4rem;display:flex;align-items:center;gap:12px}
+.page-hero{background:linear-gradient(135deg,#fff0f7 0%,#fdf2f8 60%,#f0f9ff 100%);border:1px solid var(--pink-bd);border-radius:18px;padding:1.2rem 1.4rem;margin-bottom:1rem;display:flex;align-items:center;gap:12px}
 .hero-icon{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#f472b6,#db2777);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 12px rgba(219,39,119,.25)}
 .hero-title{font-size:1.05rem;font-weight:700;letter-spacing:-.03em}
-.hero-sub{font-size:11px;color:#aeaeb2;margin-top:3px}
-
-/* ── Section heading ── */
-.section-heading{font-size:11px;font-weight:700;color:#aeaeb2;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.8rem}
-
+.hero-sub{font-size:11.5px;color:var(--mt);margin-top:3px;line-height:1.6}
+/* ── 안내 ── */
+.guide{background:#fff;border:1px solid #fbcfe8;border-radius:12px;padding:13px 16px;margin-bottom:1.2rem;font-size:12.5px;line-height:1.85;color:var(--mt)}
+.guide b{color:var(--pink-dk)}
+.guide a{color:var(--pink);font-weight:700;text-decoration:none}
+.guide a:hover{text-decoration:underline}
 /* ── Layout ── */
 .layout{display:flex;flex-direction:column;gap:1rem}
 .form-col{flex:1;min-width:0}
 .preview-panel{width:100%}
-
 /* ── Card ── */
-.card{background:#fff;border:1px solid #fce7f3;border-radius:16px;margin-bottom:1rem;overflow:hidden;transition:border-color .15s}
+.card{background:#fff;border:1px solid var(--pink-bd);border-radius:16px;margin-bottom:1rem;overflow:hidden}
 .card:last-child{margin-bottom:0}
-.card:hover{border-color:#fbcfe8}
-.card-header{padding:1rem 1.2rem;border-bottom:1px solid #fce7f3}
+.card-header{padding:.95rem 1.2rem;border-bottom:1px solid var(--pink-bd);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .card-header h2{font-size:14px;font-weight:700}
-.card-header p{font-size:11px;color:#aeaeb2;margin-top:3px}
-.card-body{padding:1.1rem 1.2rem}
-
-/* ── Form ── */
-.form-group{margin-bottom:1rem}
-.form-group:last-child{margin-bottom:0}
-.form-group label{display:block;font-size:12px;font-weight:700;color:#1d1d1f;margin-bottom:6px}
-.form-group .hint{font-size:11px;color:#aeaeb2;margin-top:5px}
-.form-input{width:100%;padding:11px 13px;min-height:44px;border:1.5px solid #fce7f3;border-radius:10px;font-size:16px;color:#1d1d1f;background:#fff;outline:none;transition:border .15s;font-family:inherit;-webkit-appearance:none;appearance:none}
-.form-input:focus{border-color:#db2777}
-
-/* ── Score Msg Grid ── */
-.score-msg-grid{display:grid;grid-template-columns:1fr;gap:10px}
-.score-msg-item label{font-size:12px;font-weight:700;color:#aeaeb2;margin-bottom:5px;display:flex;align-items:center;gap:5px}
-.score-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.score-msg-item textarea{width:100%;padding:10px 13px;min-height:44px;border:1.5px solid #fce7f3;border-radius:10px;font-size:16px;color:#1d1d1f;background:#fff;outline:none;resize:vertical;font-family:inherit;transition:border .15s;line-height:1.5;-webkit-appearance:none}
-.score-msg-item textarea:focus{border-color:#db2777}
-
-/* ── Feedback Grid ── */
-.feedback-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.feedback-item label{font-size:11px;font-weight:700;color:#aeaeb2;margin-bottom:4px;display:block;text-align:center}
-.feedback-item input{width:100%;padding:9px 7px;min-height:44px;border:1.5px solid #fce7f3;border-radius:10px;font-size:15px;color:#1d1d1f;text-align:center;background:#fff;outline:none;font-family:inherit;transition:border .15s;-webkit-appearance:none}
-.feedback-item input:focus{border-color:#db2777}
-
-/* ── Homework Type ── */
-.hw-type-grid{display:grid;grid-template-columns:1fr;gap:10px}
-.hw-type-item label{font-size:12px;font-weight:700;color:#1d1d1f;margin-bottom:5px;display:block}
-.hw-type-item input{width:100%;padding:10px 13px;min-height:44px;border:1.5px solid #fce7f3;border-radius:10px;font-size:16px;color:#1d1d1f;background:#fff;outline:none;font-family:inherit;transition:border .15s;-webkit-appearance:none}
-.hw-type-item input:focus{border-color:#db2777}
-
-/* ── HW Default ── */
-.hw-default-item{margin-bottom:.9rem}
-.hw-default-item:last-child{margin-bottom:0}
-.hw-default-item label{font-size:12px;font-weight:700;color:#1d1d1f;margin-bottom:5px;display:block}
-.hw-default-item textarea{width:100%;padding:10px 13px;min-height:44px;border:1.5px solid #fce7f3;border-radius:10px;font-size:16px;color:#1d1d1f;background:#fff;outline:none;resize:vertical;min-height:60px;font-family:inherit;transition:border .15s;line-height:1.6;-webkit-appearance:none}
-.hw-default-item textarea:focus{border-color:#db2777}
-
-/* ── Preview ── */
-.preview-toggle-btn{width:100%;padding:12px;background:#fff0f7;border:1.5px solid #fce7f3;border-radius:12px;font-size:13px;font-weight:600;color:#db2777;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;margin-bottom:1rem}
-.preview-toggle-btn:hover{background:#fce7f3}
+.card-header p{font-size:11px;color:var(--dim);margin-top:3px;line-height:1.6}
+.card-body{padding:1.05rem 1.2rem}
+/* ── 필터 ── */
+.filter-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:150px}
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--dim)}
+.search-input{width:100%;padding:10px 12px 10px 36px;min-height:44px;border:1.5px solid var(--pink-bd);border-radius:10px;font-size:16px;color:var(--tx);background:#fff;outline:none;font-family:inherit;-webkit-appearance:none}
+.search-input:focus{border-color:var(--pink)}
+.sel{padding:10px 28px 10px 12px;min-height:44px;border:1.5px solid var(--pink-bd);border-radius:10px;font-size:14px;color:var(--tx);background:#fff;cursor:pointer;outline:none;font-family:inherit;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236e6e73' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;flex:1;min-width:120px}
+.sel:focus{border-color:var(--pink)}
+.pick-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.pick-count{font-size:12.5px;color:var(--mt);margin-right:auto}
+.pick-count b{color:var(--pink);font-weight:800}
+.mini-btn{padding:8px 13px;min-height:38px;border:1.5px solid var(--pink-bd);background:#fff;color:var(--mt);border-radius:9px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.mini-btn:hover{background:var(--pink-lt);color:var(--pink);border-color:#fbcfe8}
+.mini-btn.on{background:var(--pink);color:#fff;border-color:var(--pink)}
+/* ── 학생 목록 ── */
+.stu-list{display:grid;grid-template-columns:1fr;gap:7px;max-height:340px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:2px}
+.stu{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--bd);border-radius:11px;background:#fff;cursor:pointer;text-align:left;font-family:inherit;width:100%;min-height:52px}
+.stu:hover{border-color:#fbcfe8}
+.stu.on{border-color:var(--pink);background:var(--pink-lt)}
+.stu.off{opacity:.55;cursor:default;background:#fafafa}
+.stu-box{width:20px;height:20px;border-radius:6px;border:2px solid #d6d6db;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:800}
+.stu.on .stu-box{background:var(--pink);border-color:var(--pink)}
+.stu-main{flex:1;min-width:0}
+.stu-name{font-size:14px;font-weight:700;color:var(--tx)}
+.stu-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.chip{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:5px;background:#f4f4f5;color:#52525b}
+.chip.grade{background:#ede9fe;color:#6d28d9}
+.chip.subj{background:#f0fdf4;color:#166534}
+.chip.ph{background:#eff6ff;color:#1d4ed8;font-family:monospace}
+.chip.no{background:#f8f9fa;color:#b0b0b5}
+.list-empty{padding:34px 16px;text-align:center;color:var(--dim);font-size:13px;line-height:1.8}
+.spinner{width:30px;height:30px;border:3px solid var(--bd);border-top-color:var(--pink);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* ── 직접 입력 ── */
+.manual{margin-top:14px;padding-top:14px;border-top:1px dashed var(--pink-bd)}
+.manual-lbl{font-size:12px;font-weight:700;color:var(--mt);margin-bottom:8px}
+.manual-row{display:flex;gap:7px;flex-wrap:wrap}
+.manual-row input{padding:10px 12px;min-height:44px;border:1.5px solid var(--pink-bd);border-radius:10px;font-size:16px;font-family:inherit;color:var(--tx);background:#fff;outline:none;-webkit-appearance:none}
+.manual-row input:focus{border-color:var(--pink)}
+#mName{width:110px;flex:0 0 auto}
+#mPhone{flex:1;min-width:130px}
+.manual-add{padding:10px 16px;min-height:44px;background:var(--pink-lt);border:1.5px solid #fbcfe8;color:var(--pink);border-radius:10px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.manual-add:hover{background:var(--pink-bd)}
+.manual-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.manual-tag{display:inline-flex;align-items:center;gap:7px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:6px 9px;font-size:12px;font-weight:700;color:#1d4ed8}
+.manual-tag .num{font-family:monospace;font-weight:600;opacity:.85}
+.manual-tag button{border:none;background:transparent;color:#1d4ed8;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;padding:0 2px;line-height:1}
+/* ── 템플릿 ── */
+.tpl-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.tpl-btn{padding:9px 13px;min-height:40px;border:1.5px solid var(--pink-bd);background:#fff;border-radius:20px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--mt);cursor:pointer;white-space:nowrap}
+.tpl-btn:hover{background:var(--pink-lt);color:var(--pink);border-color:#fbcfe8}
+.tpl-btn.mine{background:#fffbeb;border-color:#fde68a;color:#b45309}
+.tpl-btn.mine:hover{background:#fef3c7}
+.msg-ta{width:100%;min-height:190px;resize:vertical;border:1.5px solid var(--pink-bd);border-radius:12px;padding:13px 14px;font-size:16px;font-family:inherit;line-height:1.85;color:var(--tx);background:#fff;outline:none;-webkit-appearance:none}
+.msg-ta:focus{border-color:var(--pink)}
+.hint{font-size:11.5px;color:var(--mt);line-height:1.9;margin-top:9px}
+.hint code{background:var(--pink-lt);border:1px solid var(--pink-bd);border-radius:5px;padding:1px 6px;font-size:11px;color:var(--pink-dk);font-weight:700}
+.ta-tools{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+/* ── 미리보기 ── */
+.preview-toggle-btn{width:100%;padding:12px;min-height:46px;background:var(--pink-lt);border:1.5px solid var(--pink-bd);border-radius:12px;font-size:13px;font-weight:700;color:var(--pink);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:1rem}
+.preview-toggle-btn:hover{background:var(--pink-bd)}
 .preview-content{display:none}
 .preview-content.show{display:block}
-.preview-card{background:#fff;border:1.5px solid #fce7f3;border-radius:16px;overflow:hidden}
-.preview-header{padding:.9rem 1.1rem;border-bottom:1px solid #fce7f3;background:#fff0f7;display:flex;align-items:center;gap:8px}
-.preview-header h3{font-size:13px;font-weight:700;color:#db2777}
-.preview-body{padding:1.1rem}
-.sms-bubble{background:#fff0f7;border:1.5px solid #fce7f3;border-radius:12px;padding:1rem 1.1rem;font-size:13px;line-height:1.9;color:#1d1d1f;white-space:pre-wrap;font-family:inherit;min-height:160px}
-.preview-meta{margin-top:8px;font-size:11px;color:#aeaeb2;text-align:right}
-
-/* ── Save Bar ── */
-.save-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid #fce7f3;padding:10px 1.2rem;padding-bottom:max(10px,env(safe-area-inset-bottom));z-index:50}
-.btn-save{width:100%;max-width:480px;display:block;margin:0 auto;padding:14px;background:linear-gradient(135deg,#f472b6,#db2777);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(219,39,119,.3);transition:opacity .15s}
-.btn-save:hover{opacity:.9}
-.btn-save:active{opacity:.8}
-
+.preview-card{background:#fff;border:1.5px solid var(--pink-bd);border-radius:16px;overflow:hidden;margin-bottom:1rem}
+.preview-header{padding:.85rem 1.1rem;border-bottom:1px solid var(--pink-bd);background:var(--pink-lt);display:flex;align-items:center;gap:8px}
+.preview-header h3{font-size:13px;font-weight:700;color:var(--pink)}
+.kind{margin-left:auto;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:5px;background:#ecfdf5;border:1px solid #a7f3d0;color:#047857}
+.kind.lms{background:#fffbeb;border-color:#fde68a;color:#b45309}
+.preview-body{padding:1rem}
+.sms-bubble{background:var(--pink-lt);border:1.5px solid var(--pink-bd);border-radius:12px;padding:1rem 1.1rem;font-size:13.5px;line-height:1.9;color:var(--tx);white-space:pre-wrap;word-break:break-word;min-height:150px}
+.preview-meta{margin-top:10px;font-size:11.5px;color:var(--mt);line-height:1.9}
+.preview-meta b{color:var(--tx);font-weight:800}
+.preview-meta .warn{color:#b91c1c;font-weight:700}
+/* ── 최근 내역 ── */
+.hist-item{border:1px solid var(--bd);border-radius:11px;padding:10px 12px;margin-bottom:8px}
+.hist-item:last-child{margin-bottom:0}
+.hist-top{font-size:11.5px;font-weight:700;color:var(--pink-dk);margin-bottom:5px}
+.hist-txt{font-size:12px;color:var(--mt);line-height:1.7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.hist-empty{font-size:12.5px;color:var(--dim);text-align:center;padding:18px 8px;line-height:1.8}
+/* ── 결과 ── */
+.result{display:none;border-radius:14px;padding:15px 17px;font-size:13px;line-height:1.9;margin-top:1rem;word-break:keep-all}
+.result.show{display:block}
+.result.wait{background:#fafafa;border:1px solid var(--bd);color:var(--mt);text-align:center}
+.result.ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
+.result.ng{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+.result b{font-weight:800}
+.result ul{margin:8px 0 0 18px;padding:0}
+.result li{margin-bottom:3px}
+.warnbox{display:none;font-size:12.5px;font-weight:700;line-height:1.85;background:#fffbeb;border:1px solid #fde68a;color:#b45309;border-radius:12px;padding:12px 14px;margin-bottom:1rem;word-break:keep-all}
+.warnbox.show{display:block}
+/* ── Send Bar ── */
+.send-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--pink-bd);padding:9px 1.2rem;padding-bottom:max(9px,var(--safe-bot));z-index:50}
+.send-inner{max-width:620px;margin:0 auto}
+.send-sum{font-size:11.5px;color:var(--mt);text-align:center;margin-bottom:7px;line-height:1.6}
+.send-sum b{color:var(--pink);font-weight:800}
+.send-btns{display:flex;gap:8px}
+.btn{flex:1;min-height:50px;padding:13px 10px;border-radius:13px;font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer;border:none;white-space:nowrap}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.test{flex:0 0 auto;padding:13px 18px;background:#eff6ff;color:#1d4ed8;border:1.5px solid #bfdbfe}
+.btn.go{background:linear-gradient(135deg,#f472b6,#db2777);color:#fff;box-shadow:0 4px 16px rgba(219,39,119,.3)}
 /* ── Toast ── */
-.toast{position:fixed;bottom:6rem;left:50%;transform:translateX(-50%) translateY(20px);background:#1d1d1f;color:#fff;padding:11px 22px;border-radius:12px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s,transform .3s;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.toast{position:fixed;bottom:7.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:#1d1d1f;color:#fff;padding:11px 22px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s,transform .3s;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.2);max-width:calc(100vw - 32px);text-align:center;line-height:1.5;word-break:keep-all;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
 /* ── Responsive ── */
 @media(max-width:520px){
-  .wrap{padding:.9rem .85rem}
-  .header{padding:0 .9rem;height:50px}
-  .page-nav{top:50px}
-  .page-nav-inner{padding:0 .75rem}
-  .brand-name{font-size:13px}
-  .header-badge .dot-green{display:none}
-  .page-hero{padding:.9rem 1rem;border-radius:14px}
-  .card{border-radius:14px}
-}
-@media(min-width:600px){
-  .score-msg-grid{grid-template-columns:1fr 1fr}
-  .feedback-grid{grid-template-columns:repeat(5,1fr)}
-  .hw-type-grid{grid-template-columns:repeat(3,1fr)}
+.wrap{padding:.9rem .85rem;padding-bottom:max(9rem,calc(8rem + var(--safe-bot)))}
+.header{padding:0 .9rem;height:50px}
+.page-nav{top:50px}
+.page-nav-inner{padding:0 .75rem}
+.brand-name{font-size:13px}
+.header-badge .dot-green{display:none}
+.page-hero{padding:.9rem 1rem;border-radius:14px}
+.card{border-radius:14px}
+.stu-list{max-height:300px}
+#mName{width:90px}
 }
 @media(min-width:920px){
-  .layout{flex-direction:row;align-items:flex-start}
-  .preview-panel{width:360px;flex-shrink:0;position:sticky;top:calc(54px + 44px + 1.4rem)}
-  .preview-toggle-btn{display:none}
-  .preview-content{display:block!important}
-  .save-bar{max-width:1100px;left:50%;right:auto;transform:translateX(-50%);width:100%;border-radius:0;padding:12px 1.2rem 12px}
+.layout{flex-direction:row;align-items:flex-start}
+.preview-panel{width:360px;flex-shrink:0;position:sticky;top:calc(54px + 44px + 1.4rem)}
+.preview-toggle-btn{display:none}
+.preview-content{display:block!important}
+.stu-list{grid-template-columns:1fr 1fr}
+.send-bar{max-width:1100px;left:50%;right:auto;transform:translateX(-50%);width:100%;padding:11px 1.2rem}
 }
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
 <body>
 
 <header class="header">
-  <a href="index.html" class="header-left">
-    <div class="logo-mark">
-      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-        <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
-        <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
-      </svg>
-    </div>
-    <span class="brand-name" style="font-size:clamp(11px,3vw,14px);line-height:1.15">인후쌤의 과학 수업 관리 시스템</span>
-  </a>
-  <div style="display:flex;align-items:center;gap:8px">
-    <div class="header-badge"><span class="dot-green"></span>ONLINE</div>
-    <button class="logout-btn" onclick="doLogout()">로그아웃</button>
-  </div>
+<a href="index.html" class="header-left">
+<div class="logo-mark">
+<svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+<circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.9)"/>
+<path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+</svg>
+</div>
+<span class="brand-name" style="font-size:clamp(11px,3vw,14px);line-height:1.15">인후쌤의 과학 수업 관리 시스템</span>
+</a>
+<div style="display:flex;align-items:center;gap:8px">
+<div class="header-badge"><span class="dot-green"></span>ONLINE</div>
+<button class="logout-btn" onclick="doLogout()">로그아웃</button>
+</div>
 </header>
 
 <nav class="page-nav">
-  <div class="page-nav-inner">
-    <a href="dashboard.html" class="pnav-a">대시보드</a>
-    <a href="students.html" class="pnav-a">학생 관리</a>
-    <a href="special.html" class="pnav-a">특별관리</a>
-    <a href="sms.html" class="pnav-a on">SMS설정</a>
-    <a href="management.html" class="pnav-a">학원관리</a>
-    <a href="teacher-board.html" class="pnav-a">선생님 게시판</a><a href="backup.html" class="pnav-a">백업</a>
-  </div>
+<div class="page-nav-inner">
+<a href="dashboard.html" class="pnav-a">대시보드</a>
+<a href="students.html" class="pnav-a">학생 관리</a>
+<a href="special.html" class="pnav-a">특별관리</a>
+<a href="sms.html" class="pnav-a on">문자 발송</a>
+<a href="management.html" class="pnav-a">학원관리</a>
+<a href="teacher-board.html" class="pnav-a">선생님 게시판</a><a href="backup.html" class="pnav-a">백업</a>
+</div>
 </nav>
 
 <div class="wrap">
-  <!-- Page Hero -->
-  <div class="page-hero">
-    <div class="hero-icon">💬</div>
-    <div>
-      <div class="hero-title">SMS 문자 설정</div>
-      <div class="hero-sub">학부모에게 발송되는 성적 알림 문자의 내용을 설정하세요</div>
-    </div>
-  </div>
 
-  <div class="layout">
-    <div class="form-col">
-      <!-- 학원 정보 -->
-      <div class="section-heading">BASIC</div>
-      <div class="card">
-        <div class="card-header"><h2>학원 정보</h2></div>
-        <div class="card-body">
-          <div class="form-group">
-            <label>학원명</label>
-            <input class="form-input" id="academyName" type="text" value="인후쌤의 과학 수업 관리 시스템" oninput="updatePreview()">
-            <div class="hint">문자 발송 시 "[학원명 성적알림]" 형태로 표시됩니다</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 점수별 평가 메시지 -->
-      <div class="section-heading">MESSAGES</div>
-      <div class="card">
-        <div class="card-header"><h2>점수별 평가 메시지</h2></div>
-        <div class="card-body">
-          <div class="score-msg-grid">
-            <div class="score-msg-item"><label><span class="score-dot" style="background:#16a34a"></span>90점 이상</label><textarea id="msg90" oninput="updatePreview()">훌륭합니다!</textarea></div>
-            <div class="score-msg-item"><label><span class="score-dot" style="background:#db2777"></span>80점 이상</label><textarea id="msg80" oninput="updatePreview()">잘했어요!</textarea></div>
-            <div class="score-msg-item"><label><span class="score-dot" style="background:#d97706"></span>70점 이상</label><textarea id="msg70" oninput="updatePreview()">조금만 더 노력하면 완벽해요!</textarea></div>
-            <div class="score-msg-item"><label><span class="score-dot" style="background:#ea580c"></span>60점 이상</label><textarea id="msg60" oninput="updatePreview()">조금 더 복습이 필요해요.</textarea></div>
-            <div class="score-msg-item"><label><span class="score-dot" style="background:#dc2626"></span>60점 미만</label><textarea id="msg59" oninput="updatePreview()">열심히 복습해주세요!</textarea></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 파트별 점수 피드백 -->
-      <div class="section-heading">FEEDBACK</div>
-      <div class="card">
-        <div class="card-header"><h2>파트별 점수 피드백</h2></div>
-        <div class="card-body">
-          <div class="feedback-grid">
-            <div class="feedback-item"><label>90% 이상</label><input id="fb90" type="text" value="우수" oninput="updatePreview()"></div>
-            <div class="feedback-item"><label>80% 이상</label><input id="fb80" type="text" value="양호" oninput="updatePreview()"></div>
-            <div class="feedback-item"><label>70% 이상</label><input id="fb70" type="text" value="보통" oninput="updatePreview()"></div>
-            <div class="feedback-item"><label>60% 이상</label><input id="fb60" type="text" value="노력" oninput="updatePreview()"></div>
-            <div class="feedback-item"><label>60% 미만</label><input id="fb59" type="text" value="복습필요" oninput="updatePreview()"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 과제 유형명 -->
-      <div class="section-heading">HOMEWORK</div>
-      <div class="card">
-        <div class="card-header"><h2>과제 유형명</h2></div>
-        <div class="card-body">
-          <div class="hw-type-grid">
-            <div class="hw-type-item"><label>0-2개 오답</label><input id="hwType1" type="text" value="기본" oninput="updatePreview()"></div>
-            <div class="hw-type-item"><label>3-4개 오답</label><input id="hwType2" type="text" value="보충" oninput="updatePreview()"></div>
-            <div class="hw-type-item"><label>5개 이상 오답</label><input id="hwType3" type="text" value="심화" oninput="updatePreview()"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 기본 과제 내용 -->
-      <div class="card">
-        <div class="card-header"><h2>기본 과제 내용</h2><p>테스트별 과제가 설정되지 않았을 때 사용됩니다</p></div>
-        <div class="card-body">
-          <div class="hw-default-item"><label>0-2개 오답 과제</label><textarea id="hw1" oninput="updatePreview()">시험지에 오답문제 정리해오기</textarea></div>
-          <div class="hw-default-item"><label>3-4개 오답 과제</label><textarea id="hw2" oninput="updatePreview()">수업노트 필기 다시하고 오답문제 정리하기</textarea></div>
-          <div class="hw-default-item"><label>5개 이상 오답 과제</label><textarea id="hw3" oninput="updatePreview()">동영상 수업 내용복습, 수업노트 필기, 오답정리해오기</textarea></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Preview Panel -->
-    <div class="preview-panel">
-      <button class="preview-toggle-btn" onclick="togglePreview()">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        <span id="previewToggleText">문자 미리보기 보기</span>
-      </button>
-      <div class="preview-content" id="previewContent">
-        <div class="preview-card">
-          <div class="preview-header">
-            <svg width="14" height="14" fill="none" stroke="#db2777" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <h3>문자 미리보기</h3>
-          </div>
-          <div class="preview-body">
-            <div class="sms-bubble" id="previewBubble"></div>
-            <div class="preview-meta">샘플: 홍길동 학생 / 70점 / 오답 3개</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="page-hero">
+<div class="hero-icon">💬</div>
+<div>
+<div class="hero-title">문자 발송</div>
+<div class="hero-sub">보강·휴강·공지 같은 자유 문구를 학부모님께 바로 보냅니다</div>
+</div>
 </div>
 
-<div class="save-bar">
-  <button class="btn-save" onclick="saveSettings()">
-    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-    SMS 설정 저장
-  </button>
+<div class="guide">
+받는 사람은 <b>학생 관리에 등록된 학부모 전화번호</b>로 나갑니다. 번호가 없는 학생은 선택되지 않으니 학생 관리에서 번호를 먼저 넣어주세요.<br>
+성적·테스트 결과 문자는 <a href="student-portal-admin.html">학생 개별 학습 리포트</a>에서 보냅니다.
+</div>
+
+<div class="layout">
+<div class="form-col">
+
+<div class="warnbox" id="warnBox"></div>
+
+<!-- 받는 사람 -->
+<div class="card">
+<div class="card-header">
+<div>
+<h2>받는 사람</h2>
+<p>학생을 눌러 선택하세요. 여러 명을 한 번에 보낼 수 있습니다.</p>
+</div>
+</div>
+<div class="card-body">
+
+<div class="filter-row">
+<div class="search-wrap">
+<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+<input class="search-input" type="text" id="searchInput" placeholder="이름 또는 ID 검색" oninput="renderStudents()">
+</div>
+<select class="sel" id="gradeFilter" onchange="renderStudents()">
+<option value="">전체 학년</option>
+<option value="중등1학년">중등1학년</option><option value="중등2학년">중등2학년</option><option value="중등3학년">중등3학년</option>
+<option value="고등1학년">고등1학년</option><option value="고등2학년">고등2학년</option><option value="고등3학년">고등3학년</option>
+</select>
+<select class="sel" id="subjectFilter" onchange="renderStudents()">
+<option value="">전체 과목</option>
+</select>
+</div>
+
+<div class="pick-row">
+<span class="pick-count">선택 <b id="pickN">0</b>명 · 보이는 학생 <span id="viewN">0</span>명</span>
+<button class="mini-btn" onclick="selectAllVisible()">보이는 학생 모두 선택</button>
+<button class="mini-btn" onclick="clearSelection()">선택 해제</button>
+</div>
+
+<div class="stu-list" id="stuList">
+<div class="list-empty" style="grid-column:1/-1"><div class="spinner"></div>학생 목록을 불러오는 중…</div>
+</div>
+
+<div class="manual">
+<div class="manual-lbl">번호 직접 추가 <span style="font-weight:600;color:var(--dim)">— 등록되지 않은 번호나 내 번호로 시험 발송할 때</span></div>
+<div class="manual-row">
+<input type="text" id="mName" placeholder="이름(선택)" maxlength="12">
+<input type="tel" id="mPhone" placeholder="010-0000-0000" inputmode="numeric" onkeydown="if(event.key==='Enter'){event.preventDefault();addManual();}">
+<button class="manual-add" onclick="addManual()">추가</button>
+</div>
+<div class="manual-list" id="manualList"></div>
+</div>
+
+</div>
+</div>
+
+<!-- 문자 내용 -->
+<div class="card">
+<div class="card-header">
+<div>
+<h2>문자 내용</h2>
+<p>문구를 고른 뒤 날짜·시간만 고쳐서 보내세요.</p>
+</div>
+</div>
+<div class="card-body">
+<div class="tpl-row" id="tplRow"></div>
+<textarea class="msg-ta" id="msgTa" placeholder="보낼 내용을 입력하세요." oninput="onMsgInput()"></textarea>
+<div class="hint">
+<code>{이름}</code> <code>{학년}</code> <code>{과목}</code> <code>{오늘}</code> 을 넣으면 학생마다 자동으로 바뀝니다. 작성 중인 내용은 이 브라우저에 저장됩니다.
+</div>
+<div class="ta-tools">
+<button class="mini-btn" onclick="saveMyTpl()">이 문구 저장</button>
+<button class="mini-btn" onclick="clearMsg()">내용 비우기</button>
+<button class="mini-btn" onclick="manageMyTpl()">저장한 문구 삭제</button>
+</div>
+</div>
+</div>
+
+<div class="result" id="resultBox"></div>
+
+</div>
+
+<!-- 미리보기 -->
+<div class="preview-panel">
+<button class="preview-toggle-btn" onclick="togglePreview()">
+<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+<span id="previewToggleText">문자 미리보기 보기</span>
+</button>
+<div class="preview-content" id="previewContent">
+
+<div class="preview-card">
+<div class="preview-header">
+<svg width="14" height="14" fill="none" stroke="#db2777" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+<h3>문자 미리보기</h3>
+<span class="kind" id="kindTag">SMS</span>
+</div>
+<div class="preview-body">
+<div class="sms-bubble" id="previewBubble">보낼 내용을 입력하면 여기에 보입니다.</div>
+<div class="preview-meta" id="previewMeta"></div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header"><h2>최근 발송</h2></div>
+<div class="card-body" id="histBox"><div class="hist-empty">아직 보낸 문자가 없습니다.</div></div>
+</div>
+
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="send-bar">
+<div class="send-inner">
+<div class="send-sum" id="sendSum">받는 사람을 선택해주세요</div>
+<div class="send-btns">
+<button class="btn test" id="testBtn" onclick="sendSms(true)" disabled>🔍 검사</button>
+<button class="btn go" id="goBtn" onclick="sendSms(false)" disabled>📨 문자 보내기</button>
+</div>
+</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -278,18 +351,385 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,collection,getDocs}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
 const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
 const app=initializeApp(fc),auth=getAuth(app),db=getFirestore(app);
-onAuthStateChanged(auth,async u=>{if(!u){window.location.replace("/login.html");return;}try{const s=await getDoc(doc(db,"users",u.uid));if(!s.exists()||s.data().status!=="approved"){await signOut(auth);window.location.replace("/login.html");return;}document.body.style.visibility="visible";}catch(e){window.location.replace("/login.html");}});
-window.doLogout=async function(){await signOut(auth);window.location.replace("/login.html");};
+
+/* ══════════════════════════════════════════════════════════════
+   문자 발송 — /api/send-sms (Vercel 서버) 를 통해 솔라피로 나간다
+   ──────────────────────────────────────────────────────────────
+   · 브라우저는 솔라피를 직접 부르지 않는다 (CORS · Secret 노출 방지)
+   · 로그인한 선생님의 Firebase ID 토큰을 함께 보내 서버가 검증한다
+   · student-portal-admin.html 과 완전히 같은 규격을 쓴다
+     { idToken, dryRun, subject, messages:[{name,to,text}] }
+     서버는 성적 문자 전용이 아니라 messages 를 그대로 보내주므로
+     자유 문구도 서버 수정 없이 그대로 나간다.
+   ══════════════════════════════════════════════════════════════ */
+const SMS_API='/api/send-sms';
+const SMS_SUBJECT='인후쌤 과학수업';   // LMS(장문) 제목
+const SMS_MAX=50;                      // 솔라피 개인계정 일일 한도
+const SMS_BYTE_SMS=90;                 // 이 이하 SMS, 넘으면 LMS
+const SMS_BYTE_MAX=1900;               // LMS 본문 상한
+
+/* 문구를 바꿀 때는 키 뒤 번호(v1, v2...)도 같이 올린다.
+   안 그러면 브라우저에 저장된 예전 문구가 계속 불려와 바뀌지 않는다. */
+const KEY_DRAFT='beta-science.freeSms.draft.v1';
+const KEY_MINE ='beta-science.freeSms.mine.v1';
+const KEY_HIST ='beta-science.freeSms.hist.v1';
+
+/* ── 기본 문구 ── */
+const PRESETS=[
+ {label:'📅 보강 안내',text:'[인후쌤 과학수업]\n{이름} 학생 보강 안내드립니다.\n\n· 일시 : 0월 0일(0) 오후 0시\n· 내용 : 결석분 보강\n\n시간 맞춰 보내주시면 감사하겠습니다.'},
+ {label:'🚫 휴강 안내',text:'[인후쌤 과학수업]\n0월 0일(0) 수업은 사정상 휴강합니다.\n\n보강 일정은 다시 안내드리겠습니다.\n양해 부탁드립니다.'},
+ {label:'📌 결석 확인',text:'[인후쌤 과학수업]\n{이름} 학생이 오늘 수업에 오지 않았습니다.\n\n혹시 사정이 있으시면 회신 부탁드립니다.'},
+ {label:'📝 테스트 안내',text:'[인후쌤 과학수업]\n{이름} 학생 테스트 안내드립니다.\n\n· 일시 : 0월 0일(0) 수업 시간\n· 범위 : \n\n미리 복습하고 올 수 있도록 지도 부탁드립니다.'},
+ {label:'🎒 준비물·과제',text:'[인후쌤 과학수업]\n{이름} 학생 다음 수업 준비 안내입니다.\n\n· 과제 : \n· 준비물 : \n\n챙겨서 등원할 수 있도록 부탁드립니다.'},
+ {label:'💬 상담 안내',text:'[인후쌤 과학수업]\n{이름} 학생 학습 상담을 드리고자 합니다.\n\n편하신 요일과 시간을 회신해 주시면 일정을 잡겠습니다.\n감사합니다.'},
+ {label:'📢 전체 공지',text:'[인후쌤 과학수업]\n안녕하세요, 학부모님.\n\n\n\n감사합니다.'},
+ {label:'🗓 일정 변경',text:'[인후쌤 과학수업]\n{이름} 학생 수업 일정 변경 안내입니다.\n\n· 변경 전 : 0월 0일(0) 0시\n· 변경 후 : 0월 0일(0) 0시\n\n확인 부탁드립니다.'}
+];
+
+let allStudents=[],visible=[],selected=new Set(),manual=[],busy=false;
+
+/* ── 공통 ── */
+const e=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const digitsOf=v=>String(v==null?'':v).replace(/\D/g,'');
+function validPhone(v){const d=digitsOf(v);return /^01[016789]\d{7,8}$/.test(d)?d:'';}
+function phoneOf(s){return validPhone(s&&s.phone);}
+function fmtPhone(d){
+ if(!d)return'';
+ if(d.length===11)return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7);
+ if(d.length===10)return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6);
+ return d;
+}
+// 통신사 기준 바이트 수 (한글 2바이트) — 서버와 동일한 규칙
+function byteLen(s){let n=0;for(const ch of String(s==null?'':s))n+=ch.charCodeAt(0)>0x7f?2:1;return n;}
+function todayLabel(){const d=new Date();return`${d.getMonth()+1}월 ${d.getDate()}일`;}
+function lsGet(k,fb){try{const v=localStorage.getItem(k);return v==null?fb:v;}catch(err){return fb;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(err){}}
+function lsJson(k,fb){try{const v=JSON.parse(localStorage.getItem(k)||'null');return Array.isArray(v)?v:fb;}catch(err){return fb;}}
+
+window.showToast=function(m){
+ const t=document.getElementById('toast');
+ t.textContent=m;t.classList.add('show');
+ clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove('show'),2600);
+};
+
+/* ── 로그인 확인 ── */
+onAuthStateChanged(auth,async u=>{
+ if(!u){window.location.replace('/login.html');return;}
+ try{
+  const s=await getDoc(doc(db,'users',u.uid));
+  if(!s.exists()||s.data().status!=='approved'){await signOut(auth);window.location.replace('/login.html');return;}
+  document.body.style.visibility='visible';
+  loadStudents();
+ }catch(err){window.location.replace('/login.html');}
+});
+window.doLogout=async function(){await signOut(auth);window.location.replace('/login.html');};
+
+/* ── 학생 불러오기 ── */
+async function loadStudents(){
+ try{
+  const snap=await getDocs(collection(db,'students'));
+  allStudents=snap.docs.map(d=>({fireId:d.id,...d.data()}));
+  allStudents.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ko'));
+  const subs=[...new Set(allStudents.map(s=>s.subject).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'ko'));
+  const sel=document.getElementById('subjectFilter');
+  subs.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o);});
+  renderStudents();
+ }catch(err){
+  document.getElementById('stuList').innerHTML='<div class="list-empty" style="grid-column:1/-1">학생 정보를 불러오지 못했습니다.<br>새로고침 후 다시 시도해주세요.</div>';
+ }
+}
+
+/* ── 학생 목록 ── */
+window.renderStudents=function(){
+ const kw=document.getElementById('searchInput').value.trim().toLowerCase();
+ const gr=document.getElementById('gradeFilter').value;
+ const sub=document.getElementById('subjectFilter').value;
+ visible=allStudents.filter(s=>
+  (!kw||String(s.name||'').toLowerCase().includes(kw)||String(s.id||'').toLowerCase().includes(kw))
+  &&(!gr||s.grade===gr)&&(!sub||s.subject===sub));
+ const box=document.getElementById('stuList');
+ if(!allStudents.length){box.innerHTML='<div class="list-empty" style="grid-column:1/-1">등록된 학생이 없습니다.</div>';updateAll();return;}
+ if(!visible.length){box.innerHTML='<div class="list-empty" style="grid-column:1/-1">검색 결과가 없습니다.</div>';updateAll();return;}
+ box.innerHTML=visible.map(s=>{
+  const ph=phoneOf(s),fid=e(s.fireId),on=selected.has(s.fireId);
+  const cls='stu'+(ph?(on?' on':''):' off');
+  const phChip=ph?`<span class="chip ph">${e(fmtPhone(ph))}</span>`:'<span class="chip no">번호 없음</span>';
+  return`<button type="button" class="${cls}" ${ph?`onclick="toggleStu('${fid}')"`:'disabled'}>
+   <span class="stu-box">${on&&ph?'✓':''}</span>
+   <span class="stu-main">
+    <span class="stu-name">${e(s.name||'이름없음')}</span>
+    <span class="stu-meta">
+     ${s.grade?`<span class="chip grade">${e(s.grade)}</span>`:''}
+     ${s.subject?`<span class="chip subj">${e(s.subject)}</span>`:''}
+     ${phChip}
+    </span>
+   </span>
+  </button>`;
+ }).join('');
+ updateAll();
+};
+
+window.toggleStu=function(fireId){
+ if(selected.has(fireId))selected.delete(fireId);else selected.add(fireId);
+ renderStudents();
+};
+window.selectAllVisible=function(){
+ const ok=visible.filter(s=>phoneOf(s));
+ if(!ok.length){showToast('번호가 등록된 학생이 없습니다');return;}
+ ok.forEach(s=>selected.add(s.fireId));
+ renderStudents();
+ showToast(`${ok.length}명을 선택했습니다`);
+};
+window.clearSelection=function(){selected.clear();renderStudents();};
+
+/* ── 번호 직접 추가 ── */
+window.addManual=function(){
+ const nEl=document.getElementById('mName'),pEl=document.getElementById('mPhone');
+ const p=validPhone(pEl.value);
+ if(!p){showToast('휴대폰 번호 형식을 확인해주세요');pEl.focus();return;}
+ if(manual.some(x=>x.phone===p)){showToast('이미 추가된 번호입니다');return;}
+ const nm=(nEl.value||'').trim();
+ manual.push({name:nm||'직접입력',phone:p,anon:!nm});
+ nEl.value='';pEl.value='';
+ renderManual();updateAll();
+};
+window.removeManual=function(p){manual=manual.filter(x=>x.phone!==p);renderManual();updateAll();};
+function renderManual(){
+ const box=document.getElementById('manualList');
+ box.innerHTML=manual.map(x=>`<span class="manual-tag">${e(x.name)}<span class="num">${e(fmtPhone(x.phone))}</span><button type="button" onclick="removeManual('${e(x.phone)}')" aria-label="삭제">✕</button></span>`).join('');
+}
+
+/* ── 대상 만들기 ── */
+function targets(){
+ const list=allStudents.filter(s=>selected.has(s.fireId)&&phoneOf(s))
+  .map(s=>({name:s.name||'이름없음',phone:phoneOf(s),grade:s.grade||'',subject:s.subject||''}));
+ manual.forEach(x=>{if(!list.some(t=>t.phone===x.phone))list.push({name:x.name,phone:x.phone,grade:'',subject:'',anon:!!x.anon});});
+ return list;
+}
+function renderTpl(tpl,t){
+ /* 이름 없이 번호만 넣은 대상은 「{이름} 학생」이 어색하게 나가므로
+    「자녀분」으로 바꿔서 문장이 자연스럽게 읽히도록 한다. */
+ let s=String(tpl==null?'':tpl);
+ if(t.anon)s=s.split('{이름} 학생').join('자녀분').split('{이름}').join('자녀분');
+ return s
+  .split('{이름}').join(t.name||'')
+  .split('{학년}').join(t.grade||'')
+  .split('{과목}').join(t.subject||'')
+  .split('{오늘}').join(todayLabel());
+}
+
+/* ── 문구 버튼 ── */
+function renderTplRow(){
+ const row=document.getElementById('tplRow');
+ const mine=lsJson(KEY_MINE,[]);
+ row.innerHTML=PRESETS.map((p,i)=>`<button type="button" class="tpl-btn" onclick="useTpl(${i})">${e(p.label)}</button>`).join('')
+  +mine.map((m,i)=>`<button type="button" class="tpl-btn mine" onclick="useMine(${i})">⭐ ${e(m.label)}</button>`).join('');
+}
+window.useTpl=function(i){
+ const p=PRESETS[i];if(!p)return;
+ document.getElementById('msgTa').value=p.text;
+ onMsgInput();showToast(`${p.label} 문구를 넣었습니다`);
+};
+window.useMine=function(i){
+ const m=lsJson(KEY_MINE,[])[i];if(!m)return;
+ document.getElementById('msgTa').value=m.text;
+ onMsgInput();showToast('저장한 문구를 넣었습니다');
+};
+window.saveMyTpl=function(){
+ const text=document.getElementById('msgTa').value;
+ if(!text.trim()){showToast('저장할 내용이 없습니다');return;}
+ const label=(prompt('저장할 이름을 적어주세요 (예: 겨울특강 안내)','')||'').trim();
+ if(!label)return;
+ const mine=lsJson(KEY_MINE,[]);
+ if(mine.length>=10){showToast('문구는 10개까지 저장됩니다. 하나 지우고 다시 저장해주세요');return;}
+ mine.push({label:label.slice(0,14),text});
+ lsSet(KEY_MINE,JSON.stringify(mine));
+ renderTplRow();showToast('문구를 저장했습니다');
+};
+window.manageMyTpl=function(){
+ const mine=lsJson(KEY_MINE,[]);
+ if(!mine.length){showToast('저장한 문구가 없습니다');return;}
+ const list=mine.map((m,i)=>`${i+1}. ${m.label}`).join('\n');
+ const v=(prompt('지울 문구 번호를 적어주세요.\n\n'+list,'')||'').trim();
+ const n=parseInt(v,10);
+ if(!n||n<1||n>mine.length)return;
+ mine.splice(n-1,1);
+ lsSet(KEY_MINE,JSON.stringify(mine));
+ renderTplRow();showToast('문구를 지웠습니다');
+};
+window.clearMsg=function(){
+ document.getElementById('msgTa').value='';
+ onMsgInput();
+ document.getElementById('msgTa').focus();
+};
+
+/* ── 미리보기 · 요약 ── */
+window.onMsgInput=function(){lsSet(KEY_DRAFT,document.getElementById('msgTa').value);updateAll();};
+window.togglePreview=function(){
+ const c=document.getElementById('previewContent');
+ const on=c.classList.toggle('show');
+ document.getElementById('previewToggleText').textContent=on?'문자 미리보기 닫기':'문자 미리보기 보기';
+};
+
+function updateAll(){
+ const tpl=document.getElementById('msgTa').value;
+ const list=targets();
+ const sample=list.length?list[0]:{name:'홍길동',grade:'고등1학년',subject:'통합과학',phone:''};
+ const text=renderTpl(tpl,sample);
+
+ document.getElementById('pickN').textContent=selected.size;
+ document.getElementById('viewN').textContent=visible.length;
+ document.getElementById('previewBubble').textContent=text.trim()?text:'보낼 내용을 입력하면 여기에 보입니다.';
+
+ // 가장 긴 문자를 기준으로 종류·요금을 계산한다
+ let maxB=byteLen(text),over=0;
+ list.forEach(t=>{const b=byteLen(renderTpl(tpl,t));if(b>maxB)maxB=b;if(b>SMS_BYTE_MAX)over++;});
+ const isLms=maxB>SMS_BYTE_SMS;
+ const kindEl=document.getElementById('kindTag');
+ kindEl.textContent=isLms?'LMS 장문':'SMS 단문';
+ kindEl.className='kind'+(isLms?' lms':'');
+
+ const per=isLms?50:20;
+ const n=Math.min(list.length,SMS_MAX);
+ const meta=[
+  `길이 <b>${maxB}바이트</b> · 90바이트를 넘으면 장문(LMS)으로 나갑니다`,
+  `받는 사람 <b>${list.length}명</b>${manual.length?` <span style="opacity:.75">(직접 추가 ${manual.length}명 포함)</span>`:''}`,
+  `예상 요금 <b>약 ${(per*n).toLocaleString()}원</b> <span style="opacity:.7">(${isLms?'LMS':'SMS'} 건당 약 ${per}원 기준 · 참고값)</span>`
+ ];
+ if(over)meta.push(`<span class="warn">내용이 너무 긴 사람 ${over}명 (${SMS_BYTE_MAX}바이트 초과) — 문구를 줄여주세요</span>`);
+ document.getElementById('previewMeta').innerHTML=meta.join('<br>');
+
+ // 보낼 수 없는 상황 안내
+ const warn=document.getElementById('warnBox');
+ const bits=[];
+ if(list.length>SMS_MAX)bits.push(`한 번에 최대 <b>${SMS_MAX}명</b>까지 보낼 수 있습니다. 학년·과목으로 나눠서 보내주세요. (현재 ${list.length}명)`);
+ if(over)bits.push(`내용이 ${SMS_BYTE_MAX}바이트를 넘는 사람이 ${over}명 있습니다. 문구를 줄여주세요.`);
+ warn.innerHTML=bits.join('<hr style="border:none;border-top:1px solid #fde68a;margin:9px 0">');
+ warn.classList.toggle('show',bits.length>0);
+
+ const blocked=!list.length||list.length>SMS_MAX||!tpl.trim()||over>0;
+ if(!busy){
+  document.getElementById('goBtn').disabled=blocked;
+  document.getElementById('testBtn').disabled=blocked;
+ }
+ document.getElementById('sendSum').innerHTML=list.length
+  ? `<b>${list.length}명</b>에게 ${isLms?'LMS 장문':'SMS 단문'} · 예상 약 ${(per*n).toLocaleString()}원`
+  : '받는 사람을 선택해주세요';
+}
+
+/* ── 발송 ── */
+function toggleBtns(b){
+ busy=b;
+ ['goBtn','testBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=b;});
+ if(!b)updateAll();
+}
+
+window.sendSms=async function(dryRun){
+ if(busy)return;
+ const tpl=document.getElementById('msgTa').value;
+ const list=targets();
+ if(!list.length){showToast('받는 사람을 선택해주세요');return;}
+ if(!tpl.trim()){showToast('문자 내용을 입력해주세요');return;}
+ if(list.length>SMS_MAX){showToast(`한 번에 ${SMS_MAX}명까지만 보낼 수 있습니다`);return;}
+
+ if(!dryRun){
+  const msg=`아래 내용으로 ${list.length}명에게 실제로 문자를 발송합니다.\n요금이 발생하며 발송 후 취소할 수 없습니다.\n\n─────────────\n${renderTpl(tpl,list[0])}\n─────────────\n\n계속할까요?`;
+  if(!confirm(msg))return;
+ }
+
+ const u=auth.currentUser;
+ if(!u){showToast('로그인이 필요합니다. 새로고침 후 다시 시도해주세요');return;}
+
+ toggleBtns(true);
+ const box=document.getElementById('resultBox');
+ box.className='result show wait';
+ box.innerHTML=`<div class="spinner"></div>${dryRun?'검사 중입니다…':'발송 중입니다. 창을 닫지 마세요…'}`;
+ try{box.scrollIntoView({block:'nearest',behavior:'smooth'});}catch(err){}
+
+ try{
+  const idToken=await u.getIdToken();
+  const res=await fetch(SMS_API,{
+   method:'POST',
+   headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({
+    idToken,
+    dryRun:!!dryRun,
+    subject:SMS_SUBJECT,
+    messages:list.map(t=>({name:t.name,to:t.phone,text:renderTpl(tpl,t)}))
+   })
+  });
+
+  let d={};
+  try{d=await res.json();}catch(err){d={};}
+
+  if(!res.ok||d.ok===false){
+   const msg=d.error||`서버 오류 (HTTP ${res.status})`;
+   box.className='result show ng';
+   box.innerHTML=`<b>❌ ${e(msg)}</b>${d.hint?`<br><span style="font-weight:600">${e(d.hint)}</span>`:''}`
+    +(Array.isArray(d['실패목록'])&&d['실패목록'].length?`<ul>${d['실패목록'].map(f=>`<li>${e(f.name||'')} — ${e(f.reason||'')}</li>`).join('')}</ul>`:'');
+   showToast('발송하지 못했습니다');
+   return;
+  }
+
+  const fails=Array.isArray(d['실패목록'])?d['실패목록']:[];
+
+  if(dryRun){
+   box.className='result show ok';
+   box.innerHTML=`<b>🔍 검사 완료 — 요금은 발생하지 않았습니다</b><br>`
+    +`보낼 수 있는 사람 <b>${d['발송대상']!=null?d['발송대상']:list.length}명</b> · 종류 <b>${e(d['종류']||'')}</b><br>`
+    +(d['제목']?`제목 <b>${e(d['제목'])}</b><br>`:'')
+    +`발신번호 <b>${e(d['발신번호']||'')}</b>`
+    +(fails.length?`<ul>${fails.map(f=>`<li>${e(f.name||'')} — ${e(f.reason||'')}</li>`).join('')}</ul>`:'')
+    +`<br><span style="font-weight:600">문제가 없으면 <b>📨 문자 보내기</b>를 눌러주세요.</span>`;
+   showToast('검사 완료 — 이상 없습니다');
+  }else{
+   const okN=d['성공']!=null?d['성공']:0;
+   const ngN=d['실패']!=null?d['실패']:fails.length;
+   box.className='result show '+(ngN?'ng':'ok');
+   box.innerHTML=`<b>${ngN?'⚠️':'🎉'} 발송 완료 — 성공 ${okN}건${ngN?` · 실패 ${ngN}건`:''}</b>`
+    +(d['잔액']?`<br>남은 잔액 <b>${e(d['잔액'])}</b>`:'')
+    +(fails.length?`<ul>${fails.map(f=>`<li>${e(f.name||'')} — ${e(f.reason||'')}</li>`).join('')}</ul>`:'');
+   showToast(ngN?`성공 ${okN}건 · 실패 ${ngN}건`:`${okN}건 발송 완료!`);
+   pushHist(list.length,okN,renderTpl(tpl,list[0]));
+  }
+ }catch(err){
+  box.className='result show ng';
+  box.innerHTML=`<b>❌ 연결 실패</b><br>${e(err&&err.message?err.message:'알 수 없는 오류')}<br><span style="font-weight:600">인터넷 연결을 확인하거나 잠시 후 다시 시도해주세요.</span>`;
+  showToast('연결에 실패했습니다');
+ }finally{
+  toggleBtns(false);
+ }
+};
+
+/* ── 최근 발송 (이 브라우저에만 저장) ── */
+function pushHist(total,okN,text){
+ const list=lsJson(KEY_HIST,[]);
+ list.unshift({at:Date.now(),total,ok:okN,text:String(text||'').slice(0,120)});
+ lsSet(KEY_HIST,JSON.stringify(list.slice(0,8)));
+ renderHist();
+}
+function renderHist(){
+ const box=document.getElementById('histBox');
+ const list=lsJson(KEY_HIST,[]);
+ if(!list.length){box.innerHTML='<div class="hist-empty">아직 보낸 문자가 없습니다.</div>';return;}
+ box.innerHTML=list.map(h=>{
+  const d=new Date(h.at);
+  const when=isNaN(d.getTime())?'':`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  return`<div class="hist-item"><div class="hist-top">${e(when)} · 성공 ${h.ok}건 / ${h.total}명</div><div class="hist-txt">${e(h.text)}</div></div>`;
+ }).join('');
+}
+
+/* ── 시작 ── */
+document.getElementById('msgTa').value=lsGet(KEY_DRAFT,'');
+renderTplRow();
+renderManual();
+renderHist();
+updateAll();
 </script>
-<script>
-function updatePreview(){const ac=document.getElementById('academyName').value||'인후쌤의 과학 수업 관리 시스템';const msg=document.getElementById('msg70').value||'조금만 더 노력하면 완벽해요!';const hw2=document.getElementById('hw2').value||'수업노트 필기 다시하고 오답문제 정리하기';const fb90=document.getElementById('fb90').value||'우수';const fb70=document.getElementById('fb70').value||'보통';const fb59=document.getElementById('fb59').value||'복습필요';document.getElementById('previewBubble').textContent=`[${ac} 성적알림]\n\n홍길동 학생\n1주차 통합과학 결과\n\n12/31 테스트 결과\n총점: 70점\n정답: 21/30문항\n${msg}\n\n[파트별 성적]\n세포의 구조: 8/10 (${fb90})\n세포 분열: 7/10 (${fb70})\nDNA 구조: 6/10 (${fb59})\n\n[보충 과제]\n세포의 구조(기본): 시험지에 오답문제 정리해오기\n세포 분열(보충): ${hw2}\nDNA 구조(심화): 동영상 수업 내용복습, 수업노트 필기, 오답정리해오기\n\n문의: ${ac}`;}
-function togglePreview(){const content=document.getElementById('previewContent');const btn=document.getElementById('previewToggleText');const isShow=content.classList.toggle('show');btn.textContent=isShow?'문자 미리보기 닫기':'문자 미리보기 보기';}
-function saveSettings(){showToast('✓ SMS 설정이 저장되었습니다');}
-function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
-updatePreview();
-</script>
+
 </body>
 </html>
