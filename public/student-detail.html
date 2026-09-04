@@ -133,7 +133,10 @@ body.smode .gc-head, body.smode .gc-row { grid-template-columns: 160px 112px min
     .gc-item:last-child { border-bottom:none; }
     .gc-item .gc-row { border-bottom:none; }
     .gc-item.open .gc-row { background:#fffbfe; }
-    .wq-btn { display:inline-flex; align-items:center; gap:5px; margin-top:5px; padding:4px 10px; min-height:30px; background:#fff; border:1.5px solid #fce7f3; border-radius:999px; font-family:inherit; font-size:10.5px; font-weight:700; color:#db2777; cursor:pointer; white-space:nowrap; transition:background 0.15s; }
+    /* 시험명 칸: 제목은 왼쪽, 오답 칩은 칸 오른쪽 끝(OX 열 옆)으로 민다 */
+    .gc-row .gc-exam { justify-content:flex-start; gap:16px; text-align:left; }
+    .gc-exam-t { flex:1 1 auto; min-width:0; word-break:break-word; }
+    .wq-btn { display:inline-flex; align-items:center; gap:5px; margin-left:auto; flex-shrink:0; padding:5px 11px; min-height:30px; background:#fff; border:1.5px solid #fce7f3; border-radius:999px; font-family:inherit; font-size:10.5px; font-weight:700; color:#db2777; cursor:pointer; white-space:nowrap; transition:background 0.15s; }
     .wq-btn:hover { background:#fdf2f8; }
     .wq-btn.zero { color:#15803d; border-color:#bbf7d0; }
     .wq-btn.none { color:#aeaeb2; border-color:#ececef; cursor:default; }
@@ -258,6 +261,10 @@ body.smode .gc-head, body.smode .gc-row { grid-template-columns: 160px 112px min
   .gc-row > div { justify-content:flex-start; }
   .gc-subj-col { grid-area:subj; }
   .gc-exam { grid-area:exam; font-size:13.5px; align-self:center; }
+    /* 모바일: 가로 폭이 좁아 옆에 두면 제목이 눌리므로 칩을 아래 줄로 내린다 */
+    .gc-row .gc-exam { flex-wrap:wrap; gap:0; }
+    .gc-exam-t { flex:1 1 100%; }
+    .wq-btn { margin-left:0; margin-top:7px; }
   .gc-date { grid-area:date; }
   .gc-del  { grid-area:del; justify-content:flex-end !important; }
   .sc-col-ox { grid-area:ox; }
@@ -1101,7 +1108,7 @@ function gcRenderTable(list){
       + '<div class="gc-row">'
         + '<div class="gc-date">'+esc2(date)+'</div>'
         + '<div class="gc-subj-col">'+subjBadge+'</div>'
-        + '<div class="gc-exam">'+name+wqBtn+'</div>'
+        + '<div class="gc-exam"><span class="gc-exam-t">'+name+'</span>'+wqBtn+'</div>'
         + scCell(p.ox,'ox')
         + scCell(p.mc,'mc')
         + scCell(p.master,'ms')
