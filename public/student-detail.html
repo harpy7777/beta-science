@@ -128,6 +128,37 @@ body.smode .gc-head, body.smode .gc-row { grid-template-columns: 160px 112px min
 .gc-del-btn:hover { background:#fef2f2; }
 .gc-err { padding:1.4rem 1rem; text-align:center; font-size:12.5px; color:#b91c1c; background:#fef2f2; border:1px solid #fecaca; border-radius:14px; line-height:1.8; }
 
+    /* 오답 토글 */
+    .gc-item { border-bottom:1px solid #fdf2f8; }
+    .gc-item:last-child { border-bottom:none; }
+    .gc-item .gc-row { border-bottom:none; }
+    .gc-item.open .gc-row { background:#fffbfe; }
+    .wq-btn { display:inline-flex; align-items:center; gap:5px; margin-top:5px; padding:4px 10px; min-height:30px; background:#fff; border:1.5px solid #fce7f3; border-radius:999px; font-family:inherit; font-size:10.5px; font-weight:700; color:#db2777; cursor:pointer; white-space:nowrap; transition:background 0.15s; }
+    .wq-btn:hover { background:#fdf2f8; }
+    .wq-btn.zero { color:#15803d; border-color:#bbf7d0; }
+    .wq-btn.none { color:#aeaeb2; border-color:#ececef; cursor:default; }
+    .wq-btn .wq-arrow { font-size:8px; transition:transform 0.15s; }
+    .gc-item.open .wq-btn .wq-arrow { transform:rotate(180deg); }
+    .wq-panel { display:none; padding:0 1rem 1rem; }
+    .gc-item.open .wq-panel { display:block; }
+    .wq-group { margin-top:10px; }
+    .wq-group:first-child { margin-top:0; }
+    .wq-gtitle { font-size:11px; font-weight:800; color:#6e6e73; margin-bottom:7px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+    .wq-gtag { font-size:9.5px; font-weight:700; padding:2px 8px; border-radius:6px; }
+    .wq-gtag.ox { background:#dbeafe; color:#1e40af; }
+    .wq-gtag.mc { background:#ede9fe; color:#5b21b6; }
+    .wq-gtag.ms { background:#fdf2f8; color:#db2777; }
+    .wq-item { border:1px solid #fee2e2; background:#fffbfb; border-radius:11px; padding:9px 11px; margin-bottom:6px; }
+    .wq-item:last-child { margin-bottom:0; }
+    .wq-no { display:inline-block; font-size:10.5px; font-weight:800; color:#991b1b; background:#fee2e2; border-radius:6px; padding:2px 8px; margin-bottom:5px; }
+    .wq-text { font-size:12.5px; color:#1d1d1f; line-height:1.65; word-break:break-word; margin-bottom:6px; }
+    .wq-ans { font-size:11.5px; line-height:1.7; word-break:break-word; }
+    .wq-ans .ok { color:#166534; font-weight:700; }
+    .wq-ans .no { color:#b91c1c; font-weight:700; }
+    .wq-ans .sep { color:#d8d8dd; margin:0 6px; }
+    .wq-empty { font-size:12px; color:#aeaeb2; line-height:1.8; padding:12px; background:#fafafa; border:1px dashed #f0e4ec; border-radius:11px; }
+    .wq-allok { font-size:12.5px; color:#166534; font-weight:700; line-height:1.8; padding:12px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:11px; }
+
 
 /* 분석 리포트 */
 .subject-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid #fce7f3; }
@@ -461,6 +492,8 @@ let radarInst=null, trendInst=null;
 let gradesUnsub=null, stuUnsub=null, ccUnsub=null, offUnsub=null, started=false;
 let testById=new Map(), testByTitle=new Map();
 let testsLoaded=false;
+let testMissing=new Set();      /* 삭제됐거나 읽을 수 없는 시험지 — 재시도 방지 */
+let wqOpen=new Set();           /* 오답 패널이 열린 기록 id */
 let gradesErr=false;
 
 /* 진입 분기 */
@@ -516,6 +549,14 @@ async function startRealtime() {
       recsAll = enrichSubjectsSync(recsAll);
       gcRender();
       rpRender();
+      /* 문항별 오답 표시에 필요한 시험지를 뒤이어 확보한다.
+         실패하더라도 위에서 그린 성적표는 그대로 남는다. */
+      try {
+        if(await ensureTestsForRecords(recsAll)){
+          recsAll = enrichSubjectsSync(recsAll);
+          gcRender();
+        }
+      } catch(e){ console.warn('ensureTestsForRecords error:', e); }
     },
     (err)=>{
       console.error('grades onSnapshot error:', err);
@@ -615,6 +656,9 @@ function normalizeDoc(id, r){
     score: (typeof r.score==='number') ? r.score : (typeof r.percentage==='number'?r.percentage:null),
     totalQuestions: (r.totalQuestions!=null?r.totalQuestions:(r.totalQ!=null?r.totalQ:(r.total!=null?r.total:null))),
     answers: Array.isArray(r.answers) ? r.answers : null,
+    /* ★ OX·4지선다는 answers가 배열이 아니라 { 문항ID: "답" } 맵으로 저장된다.
+       예전에는 배열이 아니면 버려서 문항별 분석이 불가능했다. 이제 맵도 보관한다. */
+    answersMap: (r.answers && typeof r.answers==='object' && !Array.isArray(r.answers)) ? r.answers : null,
     timestamp: r.timestamp || r.submittedTimestamp || r.submittedAt || r.date || null,
     testType: r.testType || null
   };
@@ -656,6 +700,109 @@ function partAnswers(r,kind){
   if(kind==='master') return r.answers;
   if(kind==='ox')     return r.answers.filter(a=>a.type==='ox');
   return r.answers.filter(a=>a.type==='multiple' || a.type==='mc');
+}
+
+/* ════════════════════════════════════════════
+   문항별 오답 분석
+   · 채점 규칙은 examService.ts의 normalizeAnswer / isAnswerCorrect와 동일
+     ("선택지3" · "3번" · "3" → "3",  "o" → "O")
+   · 문항 번호 = tests 문서의 oxQuestions / multipleQuestions 배열 순서 + 1
+   · answers 맵의 키 = 각 문항의 id
+════════════════════════════════════════════ */
+function normAns(val){
+  if(val===undefined||val===null) return '';
+  const s=String(val).trim();
+  if(/^[oOxX]$/.test(s)) return s.toUpperCase();
+  const m=s.match(/\d+/);
+  if(m) return m[0];
+  return s;
+}
+function ansCorrect(studentAns, correctAns){
+  const a=normAns(studentAns), b=normAns(correctAns);
+  return a!=='' && a===b;
+}
+/* 시험지 문서에서 유형별 문항 배열을 꺼낸다 (구버전은 questions 하나로만 저장돼 있을 수 있다) */
+function examQuestions(t){
+  if(!t) return {ox:[],mc:[]};
+  const all=Array.isArray(t.questions)?t.questions:[];
+  const ox=(Array.isArray(t.oxQuestions)&&t.oxQuestions.length)
+    ? t.oxQuestions : all.filter(q=>q&&q.type==='ox');
+  const mc=(Array.isArray(t.multipleQuestions)&&t.multipleQuestions.length)
+    ? t.multipleQuestions : all.filter(q=>q&&q.type==='multiple');
+  return {ox:Array.isArray(ox)?ox:[], mc:Array.isArray(mc)?mc:[]};
+}
+/* 4지선다 답을 "3번 · 유리" 형태로 */
+function fmtChoice(q,val){
+  const n=normAns(val);
+  if(n==='') return '무응답';
+  const idx=Number(n)-1;
+  const opt=(q&&Array.isArray(q.options))?q.options[idx]:null;
+  return opt ? (n+'번 · '+opt) : (n+'번');
+}
+/* 한 응시 기록의 오답 정보. ready:false = 아직 판단할 재료가 없음 */
+function wrongInfo(r){
+  if(r.category==='master' || r.testType==='master'){
+    const arr=Array.isArray(r.answers)?r.answers:null;
+    if(!arr||!arr.length) return {ready:false, reason:'nodata', groups:[], wrong:0, total:0};
+    const items=[];
+    arr.forEach((a,i)=>{
+      const ok=(a && a.isCorrect!==undefined)?a.isCorrect:(a&&a.correct===true);
+      if(ok) return;
+      items.push({ no:i+1, text:'', correct:'', student:(normAns(a&&a.studentAnswer)||'무응답') });
+    });
+    return { ready:true,
+      groups:[{key:'ms', label:'마스터테스트', total:arr.length, items:items}],
+      wrong:items.length, total:arr.length };
+  }
+  const map=r.answersMap;
+  if(!map) return {ready:false, reason:'nodata', groups:[], wrong:0, total:0};
+  const eid=r.examId||r.testId;
+  const t=eid?testById.get(eid):null;
+  if(!t) return {ready:false, reason:'notest', groups:[], wrong:0, total:0};
+  const qs=examQuestions(t);
+  const groups=[]; let wrong=0, total=0;
+  [{key:'ox',label:'OX',list:qs.ox},{key:'mc',label:'4지선다',list:qs.mc}].forEach(g=>{
+    if(!g.list.length) return;
+    const attempted=g.list.filter(q=>q&&q.id!=null&&normAns(map[q.id])!=='');
+    if(!attempted.length) return;   /* 이 유형은 응시하지 않았다 */
+    const items=[];
+    g.list.forEach((q,i)=>{
+      if(!q||q.id==null) return;
+      const sv=map[q.id];
+      if(normAns(sv)==='') return;              /* 무응답은 오답으로 세지 않는다 */
+      if(ansCorrect(sv,q.answer)) return;
+      items.push({
+        no:i+1,
+        text:String(q.text||''),
+        correct:(g.key==='ox') ? normAns(q.answer) : fmtChoice(q,q.answer),
+        student:(g.key==='ox') ? (normAns(sv)||'무응답') : fmtChoice(q,sv)
+      });
+    });
+    wrong+=items.length; total+=attempted.length;
+    groups.push({key:g.key, label:g.label, total:attempted.length, items:items});
+  });
+  if(!groups.length) return {ready:false, reason:'nodata', groups:[], wrong:0, total:0};
+  return {ready:true, groups:groups, wrong:wrong, total:total};
+}
+/* 화면에 보이는 기록들의 시험지 문서를 확보 (받은 건 다시 안 받는다) */
+async function ensureTestsForRecords(records){
+  const need=[];
+  records.forEach(r=>{
+    if(r.category==='master'||r.testType==='master') return;
+    const eid=r.examId||r.testId;
+    if(!eid) return;
+    if(testById.has(eid)||testMissing.has(eid)) return;
+    if(need.indexOf(eid)<0) need.push(eid);
+  });
+  if(!need.length) return false;
+  const got=await Promise.all(need.map(async eid=>{
+    try {
+      const s=await getDoc(doc(db,'tests',eid));
+      if(s.exists()){ testById.set(eid, s.data()); return true; }
+      testMissing.add(eid); return false;
+    } catch(e){ console.warn('test load error:', eid, e); testMissing.add(eid); return false; }
+  }));
+  return got.some(Boolean);
 }
 
 function renderProfile() {
@@ -945,14 +1092,22 @@ function gcRenderTable(list){
     const date=fmtDateShort(r.timestamp)||'—';
     const delCell = IS_STUDENT ? '' :
       '<div class="gc-del"><button class="gc-del-btn" title="기록 삭제" onclick="gcDeleteRec(\''+esc(r.id)+'\',\''+esc(r.testName||r.examTitle||'')+'\')">🗑</button></div>';
-    return '<div class="gc-row">'
-      + '<div class="gc-date">'+esc2(date)+'</div>'
-      + '<div class="gc-subj-col">'+subjBadge+'</div>'
-      + '<div class="gc-exam">'+name+'</div>'
-      + scCell(p.ox,'ox')
-      + scCell(p.mc,'mc')
-      + scCell(p.master,'ms')
-      + delCell
+    /* ★ 오답 토글 — 선생님 화면에서만 */
+    const wq   = IS_STUDENT ? null : wrongInfo(r);
+    const open = !IS_STUDENT && wqOpen.has(r.id);
+    const wqBtn = wq ? wqButton(r,wq) : '';
+    const wqPanel = wq ? '<div class="wq-panel">'+wqPanelHtml(wq)+'</div>' : '';
+    return '<div class="gc-item'+(open?' open':'')+'" id="wq-i-'+esc2(r.id)+'">'
+      + '<div class="gc-row">'
+        + '<div class="gc-date">'+esc2(date)+'</div>'
+        + '<div class="gc-subj-col">'+subjBadge+'</div>'
+        + '<div class="gc-exam">'+name+wqBtn+'</div>'
+        + scCell(p.ox,'ox')
+        + scCell(p.mc,'mc')
+        + scCell(p.master,'ms')
+        + delCell
+      + '</div>'
+      + wqPanel
       + '</div>';
   }).join('');
   const headDel = IS_STUDENT ? '' : '<div>삭제</div>';
@@ -961,6 +1116,54 @@ function gcRenderTable(list){
     + rows
     + '</div>';
 }
+/* 오답 칩 — 접혀 있을 때도 개수가 보이게 한다 */
+function wqButton(r,wq){
+  if(!wq.ready){
+    const msg = (wq.reason==='notest') ? '시험지 없음' : '문항 기록 없음';
+    return '<button type="button" class="wq-btn none" disabled>'+msg+'</button>';
+  }
+  if(wq.wrong===0){
+    return '<button type="button" class="wq-btn zero" onclick="wqToggle(\''+esc(r.id)+'\')">'
+      + '전부 정답 <span class="wq-arrow">▼</span></button>';
+  }
+  return '<button type="button" class="wq-btn" onclick="wqToggle(\''+esc(r.id)+'\')">'
+    + '오답 '+wq.wrong+'개 <span class="wq-arrow">▼</span></button>';
+}
+/* 펼쳤을 때 내용 */
+function wqPanelHtml(wq){
+  if(!wq.ready){
+    return '<div class="wq-empty">'
+      + ((wq.reason==='notest')
+          ? '이 시험지를 찾을 수 없어 문항을 표시할 수 없습니다.<br>시험지가 삭제되었을 수 있습니다.'
+          : '이 기록에는 문항별 응답이 저장되어 있지 않습니다.<br>예전 방식으로 제출된 기록일 수 있습니다.')
+      + '</div>';
+  }
+  if(wq.wrong===0){
+    return '<div class="wq-allok">응시한 '+wq.total+'문항을 모두 맞혔습니다.</div>';
+  }
+  return wq.groups.filter(g=>g.items.length).map(g=>
+    '<div class="wq-group">'
+    + '<div class="wq-gtitle"><span class="wq-gtag '+g.key+'">'+esc2(g.label)+'</span>'
+      + g.total+'문항 중 <b style="color:#b91c1c;">'+g.items.length+'개</b> 오답</div>'
+    + g.items.map(it=>
+        '<div class="wq-item">'
+        + '<span class="wq-no">Q'+it.no+'</span>'
+        + (it.text ? '<div class="wq-text">'+esc2(it.text)+'</div>' : '')
+        + '<div class="wq-ans">'
+          + (it.correct ? '정답 <span class="ok">'+esc2(it.correct)+'</span><span class="sep">|</span>' : '')
+          + '학생 답 <span class="no">'+esc2(it.student)+'</span>'
+        + '</div>'
+        + '</div>'
+      ).join('')
+    + '</div>'
+  ).join('');
+}
+window.wqToggle=(recId)=>{
+  if(wqOpen.has(recId)) wqOpen.delete(recId); else wqOpen.add(recId);
+  const el=document.getElementById('wq-i-'+recId);
+  if(el) el.classList.toggle('open', wqOpen.has(recId));
+};
+
 window.gcDeleteRec=async(recId,name)=>{
   if(IS_STUDENT) return;
   if(!recId){ alert('기록 정보를 찾을 수 없습니다.'); return; }
