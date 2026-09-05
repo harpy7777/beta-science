@@ -138,19 +138,20 @@ tbody td{font-size:13px;padding:11px 12px;text-align:center;white-space:nowrap;o
 tbody tr.grp-row:hover{background:#fff}
 .grp-head{display:block;width:100%;min-height:50px;padding:12px 24px;border:none;border-left:3px solid #f472b6;border-top:1px solid #fce7f3;border-bottom:1px solid #fce7f3;background:linear-gradient(90deg,#fdf2f8 0%,#fff 58%);font-family:inherit;text-align:left;cursor:pointer;transition:background .15s}
 .grp-head:hover{background:#fdf2f8}
-/* 이름 · 아이디 · 학교 · 건수는 한 덩어리로 붙여 놓고,
-   최근 응시일만 오른쪽에 두되 표 끝에 딱 붙지 않게 안쪽으로 12% 들여놓는다. */
-.grp-inner{display:flex;align-items:center;gap:9px;width:100%}
-.grp-name-box{display:flex;align-items:center;gap:9px;min-width:0;flex-shrink:1}
+/* 이름 / 아이디 / 학교 / 건수는 각각 너비를 고정해 위아래 줄이 세로로 딱 맞게 정렬되고,
+   그 사이는 18px씩 벌린다. 최근 응시일만 오른쪽 끝으로 민다. */
+.grp-inner{display:flex;align-items:center;gap:18px;width:100%}
+.grp-name-box{display:flex;align-items:center;gap:9px;flex:0 0 auto;min-width:0}
 .grp-caret{flex-shrink:0;width:11px;font-size:9px;color:#db2777;transition:transform .2s}
 .grp-row.open .grp-caret{transform:rotate(90deg)}
-.grp-title{min-width:0;font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.grp-meta{display:inline-flex;align-items:center;gap:6px;min-width:0;flex-shrink:1;font-size:11.5px;font-weight:600;color:#8e8e93;white-space:nowrap;overflow:hidden}
-.grp-id{font-family:'SF Mono',ui-monospace,Menlo,monospace;font-size:11px;color:#c7c7cc;letter-spacing:-.01em}
-.grp-school{overflow:hidden;text-overflow:ellipsis}
-.grp-dot{color:#e5e5ea;font-weight:700}
-.grp-cnt{flex-shrink:0;font-size:11.5px;font-weight:700;color:#db2777;background:#fce7f3;border-radius:20px;padding:3px 10px;white-space:nowrap}
-.grp-last{margin-left:auto;margin-right:12%;flex-shrink:0;font-size:11.5px;font-weight:700;color:#8e8e93;background:#f5f5f7;border-radius:20px;padding:3px 11px;white-space:nowrap}
+.grp-title{flex:0 0 132px;font-size:14px;font-weight:700;color:#1d1d1f;letter-spacing:-.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.grp-meta{display:flex;align-items:center;gap:18px;flex:0 0 auto;font-size:11.5px;font-weight:600;color:#8e8e93;white-space:nowrap}
+.grp-id{flex:0 0 78px;font-family:'SF Mono',ui-monospace,Menlo,monospace;font-size:11px;color:#c7c7cc;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis}
+.grp-school{flex:0 0 96px;overflow:hidden;text-overflow:ellipsis}
+.grp-school.none{color:#d1d1d6}
+.grp-people{flex:0 0 78px}
+.grp-cnt{flex:0 0 auto;min-width:54px;text-align:center;font-size:11.5px;font-weight:700;color:#db2777;background:#fce7f3;border-radius:20px;padding:3px 10px;white-space:nowrap}
+.grp-last{margin-left:auto;flex-shrink:0;font-size:11.5px;font-weight:700;color:#8e8e93;background:#f5f5f7;border-radius:20px;padding:3px 11px;white-space:nowrap}
 .day-badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
 .d-fresh{background:#f5f5f7;color:#6e6e73}
 .d-warn{background:#fef9c3;color:#854d0e}
@@ -270,11 +271,13 @@ tbody tr.grp-row:hover{background:#fff}
   .seg-btn{flex:1 1 0;min-width:0;padding:10px 4px;min-height:40px;font-size:12.5px;border-radius:10px;text-align:center}
   .rec-expand-all{position:static;transform:none;align-self:center;padding:8px 16px}
   .grp-head{padding:10px 12px;min-height:46px}
-  .grp-inner{gap:7px}
+  .grp-inner{gap:11px}
   .grp-name-box{gap:7px}
-  .grp-title{font-size:13px}
-  .grp-meta{font-size:10.5px;gap:5px}
-  .grp-id{font-size:10px}
+  .grp-title{flex:0 0 96px;font-size:13px}
+  .grp-meta{font-size:10.5px;gap:11px}
+  .grp-id{flex:0 0 60px;font-size:10px}
+  .grp-school,.grp-people{flex:0 0 66px}
+  .grp-cnt{min-width:44px}
   .grp-cnt,.grp-last{font-size:10px;padding:2px 8px}
   .grp-last{margin-left:0;margin-right:0}
   .exam-badge-box{flex:0 0 52px}
@@ -1199,13 +1202,12 @@ function renderRecentAttempts(){
     }
     if(recMode==='student'){
       // 이름 옆에 아이디 · 학교를 붙여 왼쪽이 비어 보이지 않게 한다
-      const bits=[];
-      if(g.sid)bits.push(`<span class="grp-id">${e(g.sid)}</span>`);
+      // 학교가 없어도 '-'를 채워 넣어 위아래 줄의 칸이 어긋나지 않게 한다
       const sch=g.sid?(sSchoolMap[g.sid]||''):'';
-      if(sch)bits.push(`<span class="grp-school">${e(sch)}</span>`);
-      if(bits.length)meta=`<span class="grp-meta">${bits.join('<span class="grp-dot">·</span>')}</span>`;
+      meta=`<span class="grp-meta"><span class="grp-id">${e(g.sid||'-')}</span>`
+          +`<span class="grp-school${sch?'':' none'}" title="${e(sch)}">${sch?e(sch):'-'}</span></span>`;
     }else{
-      meta=`<span class="grp-meta">${g.students.size}명</span>`;
+      meta=`<span class="grp-meta"><span class="grp-people">${g.students.size}명</span></span>`;
     }
     const head=`<tr class="grp-row${open?' open':''}"><td colspan="9"><button type="button" class="grp-head" aria-expanded="${open?'true':'false'}" onclick="toggleRecGroup(${i})"><span class="grp-inner"><span class="grp-name-box"><span class="grp-caret">▶</span>${title}${meta}</span><span class="grp-cnt">${g.rows.length}건</span><span class="grp-last">${lastStr?'최근 '+lastStr:'—'}</span></span></button></td></tr>`;
     return head+g.rows.map(row=>recRowHtml(row,open?'open':'closed')).join('');
