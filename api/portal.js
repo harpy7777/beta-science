@@ -15,7 +15,16 @@
      classOff / feedbacks 를 전부 잠글 수 있다.
 
    호출 방법
-     GET /api/portal?t=<토큰>
+     GET /api/portal?t=<토큰>      ← 앞으로 쓸 방식 (무작위 토큰)
+     GET /api/portal?id=<학생ID>   ← 기존 학부모 링크 유지용 (한시적)
+
+   ⚠ ?id= 경로에 대하여
+     학부모께 이미 ?id=m03003 형태의 링크를 보내 둔 상태라, 이 경로를
+     막으면 기존 링크가 전부 죽는다. 그래서 한시적으로 함께 받는다.
+     ID 는 추측이 가능하지만, 그 위험은 '지금과 같은 수준'일 뿐이고
+     전교생 덤프와 토큰 유출은 이 API 로 완전히 막힌다.
+     → 토큰 재발급과 새 링크 발송이 끝나면 ALLOW_ID_LOOKUP 을 false 로
+       바꾸는 것만으로 이 경로를 닫을 수 있다.
 
    응답 (성공)
      {
@@ -40,6 +49,11 @@
 import admin from 'firebase-admin';
 
 export const config = { maxDuration: 30 };
+
+/* ── 기존 ?id= 링크를 계속 받아줄지 ─────────────────────────────
+   학부모께 보낸 새 ?t= 링크 발송이 끝나면 false 로 바꾼다.
+   그 순간부터 ?id= 로는 아무것도 조회되지 않는다. */
+const ALLOW_ID_LOOKUP = true;
 
 /* ── Firebase Admin 초기화 (backup.js 와 동일한 방식) ──────────── */
 function getDb() {
@@ -226,21 +240,35 @@ export default async function handler(req, res) {
 
   try {
     const token = String((req.query && req.query.t) || '').trim();
+    const legacyId = String((req.query && req.query.id) || '').trim().toLowerCase();
 
-    /* 1) 토큰 형식 검사 — 무작위 대입에 서버 자원을 쓰지 않는다 */
-    if (!token) {
+    /* 1) 어느 방식으로 들어왔는지 정한다. 토큰이 있으면 토큰이 우선이다. */
+    let lookupField, lookupValue;
+
+    if (token) {
+      /* 토큰 형식 검사 — 무작위 대입에 서버 자원을 쓰지 않는다 */
+      if (token.length < 16 || token.length > 128 || !/^[A-Za-z0-9_-]+$/.test(token)) {
+        return res.status(400).json({ ok: false, error: '토큰 형식이 올바르지 않습니다.' });
+      }
+      lookupField = 'viewToken';
+      lookupValue = token;
+    } else if (legacyId && ALLOW_ID_LOOKUP) {
+      /* 학생 ID 형식: [영문 1자][숫자 5자]  예) h01001 · m03004 */
+      if (!/^[a-z]\d{5}$/.test(legacyId)) {
+        return res.status(400).json({ ok: false, error: '링크 형식이 올바르지 않습니다.' });
+      }
+      lookupField = 'id';
+      lookupValue = legacyId;
+    } else {
       return res.status(400).json({ ok: false, error: '토큰이 없습니다.' });
-    }
-    if (token.length < 16 || token.length > 128 || !/^[A-Za-z0-9_-]+$/.test(token)) {
-      return res.status(400).json({ ok: false, error: '토큰 형식이 올바르지 않습니다.' });
     }
 
     const db = getDb();
 
-    /* 2) 토큰으로 학생 1명 찾기 — 대조는 전부 서버에서 한다 */
+    /* 2) 학생 1명 찾기 — 대조는 전부 서버에서 한다 */
     const snap = await db
       .collection('students')
-      .where('viewToken', '==', token)
+      .where(lookupField, '==', lookupValue)
       .limit(1)
       .get();
 
