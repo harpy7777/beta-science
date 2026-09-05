@@ -12,7 +12,7 @@
      그래서 students 를 where('viewToken','==',...) 로 찾으려면
      컬렉션 전체 읽기(list)를 열어야 하고, 그 순간 토큰까지 통째로
      털린다. 대조를 서버로 옮기면 students / classCards / grades /
-     classOff 를 전부 isApproved() 로 잠글 수 있다.
+     classOff / feedbacks 를 전부 잠글 수 있다.
 
    호출 방법
      GET /api/portal?t=<토큰>
@@ -20,16 +20,18 @@
    응답 (성공)
      {
        ok: true,
-       student:   { __id, ... },   // 토큰 계열 필드는 제거됨
-       classCards: [ { __id, ... } ],
-       grades:     [ { __id, ... } ],
-       classOff:   [ { __id, ... } ]
+       student:      { __id, name, grade, ... },   // 화이트리스트 필드만
+       grades:       [ { __id, ... } ],            // 정답(correctAnswer) 제거됨
+       classCards:   [ { __id, ... } ],
+       classOff:     [ { __id, ... } ],
+       feedback:     { ... } | null,               // feedbacks/{학생문서ID}
+       testSubjects: { "시험ID": "통합과학2" }      // 과목 표시용
      }
 
    응답 (실패)
-     400 { ok:false, error:'...' }   토큰이 없거나 형식이 이상함
-     404 { ok:false, error:'...' }   토큰에 해당하는 학생이 없음
-     500 { ok:false, error:'...' }   서버 오류
+     400  토큰이 없거나 형식이 이상함
+     404  토큰에 해당하는 학생이 없음
+     500  서버 오류
 
    ⚠ 이 파일은 서버에서만 실행된다. FIREBASE_SERVICE_ACCOUNT 는
      브라우저로 내려가지 않는다. (backup.js 와 같은 환경변수를 쓴다)
@@ -62,7 +64,8 @@ function getDb() {
 }
 
 /* ── Firestore 특수 타입을 JSON 으로 안전하게 바꾸기 ───────────── */
-/*  브라우저에서 그대로 쓸 수 있도록 Timestamp 는 ISO 문자열로 편다. */
+/*  브라우저에서 그대로 쓸 수 있도록 Timestamp 는 ISO 문자열로 편다.
+    (두 페이지 모두 문자열 날짜를 Date.parse 로 읽을 수 있다) */
 function encode(value) {
   if (value === null || value === undefined) return null;
 
@@ -89,12 +92,39 @@ function encode(value) {
   return value;
 }
 
-/* ── 밖으로 내보내면 안 되는 필드 ─────────────────────────────── */
-/*  토큰이 응답에 섞여 나가면 이번 작업이 통째로 무의미해진다.
-    이름에 token / secret / password 가 들어간 필드는 전부 자른다. */
+/* ════════════════════════════════════════════════════════════════
+   학생 문서 — 화이트리스트
+   ────────────────────────────────────────────────────────────────
+   student-portal.html 과 student-detail.html 이 실제로 읽는 필드만
+   내보낸다. 목록에 없는 필드는 무엇이든 나가지 않는다.
+   → viewToken 은 물론이고, 앞으로 학생 문서에 연락처·메모 같은
+     필드를 새로 추가해도 이 파일을 고치지 않는 한 새지 않는다.
+
+   차단 목록(blocklist)이 아니라 허용 목록으로 만든 이유가 이것이다.
+   차단 목록은 새 필드가 생길 때마다 잊어버리면 그대로 뚫린다.
+════════════════════════════════════════════════════════════════ */
+const STUDENT_FIELDS = [
+  'id', 'name', 'displayName', 'grade', 'year', 'subject',
+  'classes', 'classIds', 'classNames',
+  'startDate', 'lastClassDate',
+  'sessionCount', 'absentCount', 'makeupCount',
+  'recentAttendance', 'recentLessons', 'lastHomework',
+];
+
+function pickStudent(docId, data) {
+  const out = { __id: docId };
+  for (const key of STUDENT_FIELDS) {
+    if (data[key] !== undefined) out[key] = data[key];
+  }
+  return out;
+}
+
+/* ── 그 밖의 컬렉션 — 이름에 비밀이 들어간 필드는 자른다 ───────── */
 function isSecretKey(key) {
   const k = String(key).toLowerCase();
-  return k.includes('token') || k.includes('secret') || k.includes('password') || k.includes('apikey');
+  return k.includes('token') || k.includes('secret')
+      || k.includes('password') || k.includes('apikey')
+      || k.includes('phone');
 }
 
 function sanitize(obj) {
@@ -110,27 +140,82 @@ function docToJson(d) {
   return sanitize({ __id: d.id, ...encode(d.data()) });
 }
 
-/* ── 학생에 연결된 문서 찾기 ──────────────────────────────────── */
-/*  컬렉션마다 학생을 가리키는 필드 이름이 다를 수 있어서
-    후보를 순서대로 시도하고, 처음으로 결과가 나온 것을 쓴다.
-    (실제 필드 이름이 확정되면 후보를 1개로 줄이면 된다) */
-const LINK_FIELDS = ['studentId', 'sid', 'studentDocId', 'student'];
-
-async function findByStudent(db, collectionName, keys, limit) {
-  for (const field of LINK_FIELDS) {
-    for (const key of keys) {
-      if (!key) continue;
-      const snap = await db
-        .collection(collectionName)
-        .where(field, '==', key)
-        .limit(limit)
-        .get();
-      if (!snap.empty) {
-        return snap.docs.map(docToJson);
-      }
+/* ════════════════════════════════════════════════════════════════
+   성적 문서에서 정답을 지운다
+   ────────────────────────────────────────────────────────────────
+   마스터테스트 기록의 answers 배열에는 문항마다 correctAnswer 가
+   들어 있다. 학부모 화면은 isCorrect 만 쓰고 정답은 쓰지 않으므로
+   내보낼 이유가 없다. (오답 상세는 선생님 화면에서만 표시된다)
+   → 학생이 브라우저 개발자도구로 정답을 미리 보는 길을 막는다.
+════════════════════════════════════════════════════════════════ */
+function stripAnswerKeys(grade) {
+  if (!Array.isArray(grade.answers)) return grade;
+  grade.answers = grade.answers.map(a => {
+    if (!a || typeof a !== 'object' || Array.isArray(a)) return a;
+    const copy = {};
+    for (const k of Object.keys(a)) {
+      if (k === 'correctAnswer') continue;
+      copy[k] = a[k];
     }
+    return copy;
+  });
+  return grade;
+}
+
+/* ── 학생에 연결된 문서 찾기 ──────────────────────────────────── */
+/*  grades 와 classCards 는 둘 다 studentId 필드로 학생을 가리킨다.
+    (Firestore 콘솔에서 확인 완료)
+    학생 ID 는 문서 ID 가 아니라 필드 값(예: h01001)이므로,
+    필드 값과 문서 ID 를 모두 후보로 넣고 찾는다. */
+async function findByStudent(db, collectionName, keys, limitN) {
+  const seen = new Set();
+  const out = [];
+  for (const key of keys) {
+    if (!key) continue;
+    const snap = await db
+      .collection(collectionName)
+      .where('studentId', '==', key)
+      .limit(limitN)
+      .get();
+    snap.docs.forEach(d => {
+      if (seen.has(d.id)) return;
+      seen.add(d.id);
+      out.push(docToJson(d));
+    });
   }
-  return [];
+  return out;
+}
+
+/* ── 성적에 붙일 과목 이름 (tests 문서에서 가져온다) ───────────── */
+/*  예전 성적 기록에는 subject 가 비어 있는 것이 있어서, 화면이
+    tests 컬렉션을 통째로 읽어 과목을 채우고 있었다.
+    필요한 시험지만 서버에서 골라 오면 tests 를 열지 않아도 된다. */
+async function fetchTestSubjects(db, grades) {
+  const ids = [];
+  grades.forEach(g => {
+    const eid = g.examId || g.testId;
+    if (eid && typeof eid === 'string' && ids.indexOf(eid) < 0) ids.push(eid);
+  });
+  if (!ids.length) return {};
+
+  const picked = ids.slice(0, 100);
+  const refs = picked.map(id => db.collection('tests').doc(id));
+
+  let snaps;
+  try {
+    snaps = await db.getAll(...refs);
+  } catch (e) {
+    console.warn('[portal] tests 조회 실패:', e && e.message);
+    return {};
+  }
+
+  const map = {};
+  snaps.forEach(s => {
+    if (!s.exists) return;
+    const data = s.data() || {};
+    if (data.subject) map[s.id] = String(data.subject);
+  });
+  return map;
 }
 
 /* ── 본체 ──────────────────────────────────────────────────────── */
@@ -164,29 +249,36 @@ export default async function handler(req, res) {
     }
 
     const studentDoc = snap.docs[0];
-    const studentRaw = encode(studentDoc.data());
-    const student = sanitize({ __id: studentDoc.id, ...studentRaw });
+    const studentRaw = encode(studentDoc.data()) || {};
+    const student = pickStudent(studentDoc.id, studentRaw);
 
     /* 3) 그 학생에게 연결된 문서만 골라 온다 */
-    /*    학생 ID 는 문서 ID 가 아니라 필드 값(예: h01001)이므로
-          필드 값과 문서 ID 둘 다 후보로 넣는다 */
-    const keys = [studentRaw.id, studentDoc.id].filter(Boolean);
+    const keys = [];
+    if (studentRaw.id) keys.push(String(studentRaw.id));
+    if (studentDoc.id !== studentRaw.id) keys.push(studentDoc.id);
 
-    const [classCards, grades] = await Promise.all([
+    const [classCards, gradesRaw, offSnap, fbSnap] = await Promise.all([
       findByStudent(db, 'classCards', keys, 500),
       findByStudent(db, 'grades', keys, 500),
+      db.collection('classOff').limit(500).get(),
+      db.collection('feedbacks').doc(studentDoc.id).get(),
     ]);
 
-    /* 4) 휴강 정보는 학생별이 아니라 전체 공지 성격이라 통째로 준다 */
-    const offSnap = await db.collection('classOff').limit(500).get();
+    const grades = gradesRaw.map(stripAnswerKeys);
     const classOff = offSnap.docs.map(docToJson);
+    const feedback = fbSnap.exists ? sanitize(encode(fbSnap.data()) || {}) : null;
+
+    /* 4) 성적에 붙일 과목 이름 */
+    const testSubjects = await fetchTestSubjects(db, grades);
 
     return res.status(200).json({
       ok: true,
       student,
-      classCards,
       grades,
+      classCards,
       classOff,
+      feedback,
+      testSubjects,
     });
   } catch (e) {
     console.error('[portal] 실패:', e);
