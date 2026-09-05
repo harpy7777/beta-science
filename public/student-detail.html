@@ -507,7 +507,7 @@ if(IS_STUDENT){
   document.body.classList.add('smode');
   document.body.style.visibility='visible';
   started=true;
-  startRealtime();
+  startStudent();
 } else {
   onAuthStateChanged(auth, async user => {
     if(!user){ cleanupSubs(); location.replace('/login.html'); return; }
@@ -531,6 +531,67 @@ function cleanupSubs(){
 window.doLogout=async()=>{ cleanupSubs(); await signOut(auth); location.replace('/login.html'); };
 window.addEventListener('beforeunload', cleanupSubs);
 
+/* ════════════════════════════════════════════
+   학생 모드(?t=) — Firestore 를 직접 읽지 않는다
+   ────────────────────────────────────────────
+   서버 API(/api/portal)가 토큰을 대조하고, 그 학생 것만 내려준다.
+   students / grades / classCards / classOff / tests 를 브라우저가
+   여는 일이 없어진다. 실시간 구독은 없고, 새로고침하면 최신
+   데이터를 다시 받는다.
+════════════════════════════════════════════ */
+async function startStudent(){
+  let json=null, status=0;
+  try {
+    const res=await fetch('/api/portal?t='+encodeURIComponent(tokenParam), { cache:'no-store' });
+    status=res.status;
+    json=await res.json().catch(()=>null);
+    if(!res.ok || !json || json.ok!==true){
+      if(status===400 || status===404) showError();
+      else showApiError(json && json.error);
+      return;
+    }
+  } catch(e){
+    console.error('portal fetch error:', e);
+    showApiError('네트워크 연결을 확인해주세요.');
+    return;
+  }
+
+  const s=(json.student && typeof json.student==='object') ? json.student : null;
+  if(!s){ showError(); return; }
+  stu={ ...s, uid: String(s.__id || s.id || '') };
+  sid = stu.id || stu.uid;
+
+  document.getElementById('loadingBox').style.display='none';
+  document.getElementById('content').style.display='block';
+  renderProfile();
+
+  /* 과목 이름 — 서버가 시험ID→과목 맵으로 내려준다 (tests 를 열지 않는다) */
+  const ts=(json.testSubjects && typeof json.testSubjects==='object') ? json.testSubjects : {};
+  testById=new Map(); testByTitle=new Map();
+  Object.keys(ts).forEach(k=>{ if(ts[k]) testById.set(k,{subject:ts[k]}); });
+  testsLoaded=true;
+
+  /* 성적 */
+  gradesErr=false;
+  const gs=Array.isArray(json.grades)?json.grades:[];
+  recsAll=gs.map(g=>normalizeDoc(String((g&&g.__id)||''), g||{}))
+            .sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp));
+  recsAll=enrichSubjectsSync(recsAll);
+
+  /* 출결 */
+  atErr='';
+  const cc=Array.isArray(json.classCards)?json.classCards:[];
+  atCards=cc.map(c=>normCard(String((c&&c.__id)||''), c||{}))
+            .sort((a,b)=> (b.date.localeCompare(a.date)) || (cardMs(b)-cardMs(a)));
+  const off=Array.isArray(json.classOff)?json.classOff:[];
+  atOffs=off.map(o=>({ id:String((o&&o.__id)||''), ...(o||{}) })).filter(o=>o&&isYMD(o.date));
+
+  atRender();
+  gcRender();
+  rpRender();
+}
+
+/* 선생님 모드(?id= · 로그인) — 기존 Firestore 실시간 구독 그대로 */
 async function startRealtime() {
   if(!IS_STUDENT && !idParam){ showError(); return; }
 
@@ -632,6 +693,16 @@ function showError(){
   box.innerHTML = IS_STUDENT
     ? '이 링크는 사용할 수 없습니다.<br>주소가 잘못되었거나 새 링크가 발급되었을 수 있어요.<br><span style="color:#6e6e73;font-size:13px;">선생님께 링크를 다시 받아주세요.</span>'
     : '학생을 찾을 수 없습니다. 주소를 확인해주세요.';
+  box.style.display='block';
+}
+function showApiError(msg){
+  const lb=document.getElementById('loadingBox');
+  if(lb) lb.style.display='none';
+  const box=document.getElementById('errorBox');
+  if(!box) return;
+  box.innerHTML='성적표를 불러오지 못했습니다.<br>'
+    + '<span style="color:#6e6e73;font-size:13px;">'
+    + esc2(msg || '잠시 후 다시 시도해주세요.') + '</span>';
   box.style.display='block';
 }
 function showExpired(){
