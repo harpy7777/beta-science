@@ -4,6 +4,8 @@
 <meta charset="UTF-8"><script src="/favicon.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
 <title>개별 학습 리포트 - 인후쌤의 과학 수업 관리 시스템</title>
   <!-- Open Graph / 카카오톡·소셜 링크 미리보기 -->
 <meta property="og:type" content="website" />
@@ -365,7 +367,7 @@ body {
 }
 @media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
 </style>
-<script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
+<script>(function(){var _p=new URLSearchParams(location.search);if(_p.get('student')!=='1'&&!_p.get('t'))return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
 <body>
 
 <div id="loadingScreen" class="loading-screen">
@@ -453,14 +455,22 @@ body {
 </div>
 
 <script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,query,where,getDocs,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+/* ════════════════════════════════════════════════════════════════
+   이 페이지는 Firestore 를 직접 읽지 않는다.
+   ────────────────────────────────────────────────────────────────
+   예전에는 ?id=h01001 을 받아 students 를 where 로 조회했다.
+   그런데 Firestore 보안 규칙은 where 조건을 검사할 수 없어서,
+   이 방식이 되려면 students 컬렉션 전체 읽기를 열어 두어야 했다.
+   그러면 아무나 전교생 명단과 링크 토큰까지 통째로 가져갈 수 있다.
+   학생 ID 는 [영문1자][5자리] 라 추측도 쉬웠다.
 
-const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
-const app=initializeApp(fc);const db=getFirestore(app);
+   지금은 무작위 토큰(?t=)을 서버로 보내고, 서버가 대조해서
+   그 학생 것만 골라 내려준다. (api/portal.js)
+   브라우저에는 Firebase 접속 코드 자체가 없다.
+════════════════════════════════════════════════════════════════ */
 const params=new URLSearchParams(window.location.search);
-const studentId=params.get('id');
-if(!studentId){showError();}else{loadPortal(studentId);}
+const portalToken=(params.get('t')||'').trim();
+if(!portalToken){showError();}else{loadPortal(portalToken);}
 
 /* 탭 4개 — 출결·수업 / OX퀴즈 / 4지선다 / 마스터테스트 */
 const TAB_COUNT=4;
@@ -541,12 +551,19 @@ function buildSections(){
   </div>`;
 }
 
-async function loadPortal(sid){
+async function loadPortal(token){
   try{
-    const sq=query(collection(db,'students'),where('id','==',sid));
-    const ss=await getDocs(sq);
-    if(ss.empty){showError();return;}
-    const sdoc=ss.docs[0];const student={fireId:sdoc.id,...sdoc.data()};
+    let res;
+    try{
+      res=await fetch('/api/portal?t='+encodeURIComponent(token),{cache:'no-store'});
+    }catch(netErr){showError('net');return;}
+    /* 4xx = 링크 자체가 잘못됨(형식 오류·폐기된 토큰) → 링크 안내
+       5xx = 서버 문제 → 새로고침 안내 */
+    if(!res.ok){showError(res.status>=400&&res.status<500?'link':'net');return;}
+    let data;
+    try{ data=await res.json(); }catch(e){ showError('net'); return; }
+    if(!data||!data.ok||!data.student){showError('link');return;}
+    const student={fireId:data.student.__id,...data.student};
     ['hNameD','hNameM'].forEach(id=>document.getElementById(id).textContent=student.name||'학생');
     document.title=`${student.name||'학생'} 개별 학습 리포트 - 인후쌤의 과학 수업 관리 시스템`;
     if(student.grade){['hGradeD','hGradeM'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=student.grade;el.style.display='inline';}})}
@@ -557,10 +574,9 @@ async function loadPortal(sid){
     document.getElementById('loadingScreen').style.display='none';
     document.getElementById('portalApp').style.display='block';
     renderAttendance(student);
-    loadGrades(sid,student.fireId);
-    const fbList=await fetchFeedback(student.fireId);
-    renderLessons(student,fbList);
-  }catch(err){showError();}
+    renderGrades(data.grades);
+    renderLessons(student,parseFbEntries(data.feedback));
+  }catch(err){showError('net');}
 }
 
 /* ════════ 선생님 메모 (feedbacks/{학생문서ID}) ════════ */
@@ -596,12 +612,8 @@ function parseFbEntries(data){
   }
   return list.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||(b.createdAt-a.createdAt));
 }
-async function fetchFeedback(fireId){
-  try{
-    const snap=await getDoc(doc(db,'feedbacks',fireId));
-    return parseFbEntries(snap.exists()?snap.data():null);
-  }catch(err){return[];}
-}
+/* 선생님 메모는 api/portal.js 응답의 feedback 필드로 함께 들어온다.
+   (예전에는 여기서 feedbacks 문서를 직접 읽었다) */
 
 /* ════════════════════════════════════════════════════════════════
    ★ 메모를 수업 슬롯에 배정한다 — 2026-08 수정
@@ -997,22 +1009,14 @@ function gradeDateStr(r){
   return`${String(d.getFullYear()).slice(2)}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
 }
 
-async function loadGrades(sid,fireId){
+/* 성적 기록 — 서버가 이 학생 것만 골라 보내주므로 여기서 걸러낼 필요가 없다.
+   예전에는 grades 를 where('studentId','==',...) 로 직접 조회했는데,
+   그러려면 grades 컬렉션 전체 읽기를 열어 두어야 했다.
+   (grades 안에는 마스터테스트 정답표까지 들어 있다) */
+function renderGrades(list){
   try{
-    let docs=[];const seen=new Set();
-    async function q(field,val){
-      try{
-        const s=await getDocs(query(collection(db,'grades'),where(field,'==',val)));
-        s.forEach(d=>{
-          if(seen.has(d.id))return;
-          seen.add(d.id);
-          const raw=d.data()||{};
-          docs.push(normalizeGrade(d.id,raw));
-        });
-      }catch(e){}
-    }
-    await q('studentId',sid);
-    if(fireId&&fireId!==sid)await q('studentId',fireId);
+    const rows=Array.isArray(list)?list:[];
+    const docs=rows.map(raw=>normalizeGrade(String((raw&&raw.__id)||''),raw||{}));
     docs.sort((a,b)=>gradeTime(b)-gradeTime(a));
     renderOx(docs);
     renderMultiple(docs);
@@ -1190,7 +1194,23 @@ function renderScoreCard(r,sec){
 }
 
 function emptyBox(icon,msg){return`<div class="empty-box"><div class="empty-icon">${icon}</div>${msg}</div>`;}
-function showError(){document.getElementById('loadingScreen').style.display='none';document.getElementById('errorScreen').style.display='flex';}
+function showError(kind){
+  const box=document.getElementById('errorScreen');
+  if(box){
+    const h=box.querySelector('h2');
+    const p=box.querySelector('p');
+    if(kind==='net'){
+      if(h)h.textContent='잠시 연결이 어렵습니다';
+      if(p)p.innerHTML='인터넷 상태를 확인하신 뒤<br>화면을 새로고침해 주세요.<br><br>계속되면 학원으로<br>문의해 주세요.';
+    }else{
+      if(h)h.textContent='링크를 확인해주세요';
+      if(p)p.innerHTML='이 링크는 사용할 수 없습니다.<br>새 링크가 발급되었을 수 있어요.<br><br>학원에서 보내드린 가장 최근 링크를<br>다시 확인해 주세요.';
+    }
+  }
+  const load=document.getElementById('loadingScreen');
+  if(load)load.style.display='none';
+  if(box)box.style.display='flex';
+}
 function e(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 window.switchTab=function(idx){
