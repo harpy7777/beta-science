@@ -324,6 +324,28 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
 .sm-class-hint { font-size:11px; color:#aeaeb2; line-height:1.6; padding:8px 2px; }
 .sm-class-note { font-size:10.5px; color:#0e7490; background:#ecfeff; border:1px solid #cffafe; border-radius:9px; padding:7px 9px; line-height:1.55; margin-bottom:7px; }
 
+/* ★ 반 변경 이력 */
+.ch-row { display:grid; grid-template-columns:132px minmax(0,1fr) auto; gap:6px; align-items:center; margin-bottom:6px; }
+.ch-row .ch-date { min-height:44px; padding:9px 10px; border:1.5px solid #ddd6fe; border-radius:9px; font-size:15px; font-family:inherit; color:#1d1d1f; background:#fff; outline:none; -webkit-appearance:none; appearance:none; }
+.ch-row .ch-date:focus { border-color:#7c3aed; }
+.ch-row .ch-sel { min-height:44px; padding:9px 28px 9px 10px; border:1.5px solid #ddd6fe; border-radius:9px; font-size:15px; font-family:inherit; color:#1d1d1f; background:#fff; outline:none; min-width:0; -webkit-appearance:none; appearance:none;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%236e6e73' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 9px center; text-overflow:ellipsis; }
+.ch-row .ch-sel:focus { border-color:#7c3aed; }
+.ch-row .ch-del { min-height:44px; padding:9px 13px; border:1.5px solid #fecaca; background:#fff; color:#dc2626; border-radius:9px; font-family:inherit; font-size:13px; font-weight:800; cursor:pointer; }
+.ch-row .ch-del:hover { background:#fef2f2; }
+.ch-empty { font-size:11px; color:#aeaeb2; line-height:1.6; padding:9px 2px; }
+.ch-add { border-color:#ddd6fe !important; color:#6d28d9 !important; width:100%; }
+.ch-add:active { background:#f5f3ff !important; }
+.ch-warn { display:none; font-size:11px; font-weight:700; line-height:1.6; color:#b45309; background:#fffbeb; border:1px solid #fde68a; border-radius:9px; padding:8px 10px; margin-bottom:7px; word-break:keep-all; }
+.ch-warn.show { display:block; }
+@media (max-width:600px) {
+  .ch-row { grid-template-columns:1fr auto; grid-template-areas:"date del" "sel sel"; gap:6px; }
+  .ch-row .ch-date { grid-area:date; }
+  .ch-row .ch-sel { grid-area:sel; }
+  .ch-row .ch-del { grid-area:del; }
+}
+
 .sm-chip.abs { color:#b91c1c; background:#fef2f2; border:1px solid #fecaca; }
 .sm-chip.est { color:#8e8e93; background:#f5f5f7; border:1px solid #ececef; font-weight:700; }
 .sm-chip.hol { color:#6b7280; background:#f3f4f6; border:1px solid #e5e7eb; }
@@ -372,6 +394,19 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
 }
 .sm-warnline .wl-d:hover { background:#fee2e2; }
 .sm-warnline .wl-d:active { transform:scale(0.96); }
+/* ★ 날짜 + ✕ 를 한 덩어리로 붙여 놓는다 */
+.sm-warnline .wl-pair { display:inline-flex; align-items:stretch; }
+.sm-warnline .wl-pair .wl-d { border-radius:8px 0 0 8px; border-right:none; }
+.sm-warnline .wl-skip {
+  border:1px solid #fca5a5; background:#fff5f5; color:#9ca3af;
+  font-family:inherit; font-size:12px; font-weight:900;
+  padding:6px 9px; min-height:34px; border-radius:0 8px 8px 0; cursor:pointer;
+  transition:background .15s, color .15s; touch-action:manipulation; line-height:1;
+}
+.sm-warnline .wl-skip:hover { background:#f3f4f6; color:#374151; }
+.sm-warnline .wl-skip:active { transform:scale(0.96); }
+.sm-warnline .wl-tip { flex:1 1 100%; font-size:10px; font-weight:600; color:#dc2626; opacity:0.85; line-height:1.5; }
+.sm-warnline .wl-tip b { font-weight:900; }
 .sm-warnline .wl-more { font-size:10px; font-weight:700; color:#dc2626; }
 
 .sm-mkline {
@@ -677,8 +712,10 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
   .sm-mkline { font-size:10.5px; padding:7px 8px; }
   .sm-dblline { font-size:10.5px; padding:7px 8px; }
   .sm-warnline { font-size:10.5px; padding:8px 9px; gap:6px; }
-  .sm-warnline .wl-d { min-height:40px; padding:9px 12px; font-size:11.5px; }
-  .sm-warnline .wl-dates { gap:5px; width:100%; }
+  .sm-warnline .wl-d { min-height:44px; padding:9px 12px; font-size:11.5px; }
+  .sm-warnline .wl-skip { min-height:44px; padding:9px 13px; font-size:13px; }
+  .sm-warnline .wl-dates { gap:6px; width:100%; }
+  .sm-warnline .wl-tip { font-size:9.5px; }
   .sm-cycbar { flex-wrap:wrap; gap:5px; }
   .sm-cycbar .cb-tx { font-size:10px; }
   .sm-stat { font-size:10.5px; gap:4px; }
@@ -712,6 +749,7 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
   .sm-cycbar .cb-d { width:13px; }
   .sm-chip { font-size:9.5px; padding:2px 6px; margin-left:4px; }
   .sm-warnline .wl-d { padding:7px 9px; font-size:11px; }
+  .sm-warnline .wl-skip { padding:7px 8px; font-size:12px; }
   .fb-item-top { flex-wrap:wrap; }
   .cc-exist { font-size:10px; }
 }
@@ -855,6 +893,19 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
       <span class="cc-label">반 배정 (시간표 연동)</span>
       <div class="sm-class-note">📋 반 목록은 <b>시간표(관리 시스템)</b>에서 자동으로 만들어집니다. 시간표를 수정하면 여기에도 즉시 반영됩니다.</div>
       <div class="sm-class-checks" id="sm-class-checks"></div>
+    </div>
+    <div class="sm-field">
+      <span class="cc-label">📅 반 변경 이력 (요일을 옮긴 경우)</span>
+      <div class="sm-class-note">
+        수업 요일을 아예 옮겼다면 <b>언제부터 어느 반이었는지</b> 적어주세요.
+        그 전 기간은 <b>이전 반 요일</b>로 회차를 계산해서, 옮기는 자리에 없던
+        「수업 기록 없음」 경고가 생기지 않습니다.<br>
+        <b>첫 줄은 처음 다니던 반</b>, 그 아래로 옮긴 날짜와 새 반을 차례로 적으면 됩니다.
+        요일을 바꾼 적이 없으면 비워 두세요.
+      </div>
+      <div class="ch-warn" id="sm-ch-warn"></div>
+      <div id="sm-class-history"></div>
+      <button type="button" class="sm-idbtn ch-add" onclick="addClassHistoryRow()">＋ 반 변경 기록 추가</button>
     </div>
     <div class="sm-row2">
       <div class="sm-field">
@@ -1325,7 +1376,8 @@ function saveSMDraft() {
     day: todayStr(),
     vals: grabFields(SM_FIELDS),
     subs: [...document.querySelectorAll('.sm-subj-chk:checked')].map(c => c.value),
-    classes: getCheckedClasses()
+    classes: getCheckedClasses(),
+    history: getClassHistory()
   };
   DIRTY.add('sm-modal-bg');
 }
@@ -1510,30 +1562,98 @@ function studentOffDates(s) {
   });
   return set;
 }
+/* ════════════════════════════════════════════════════════════════════
+   ★ 2026-09 추가 — 반 변경 이력 (classHistory)
+   ────────────────────────────────────────────────────────────────────
+   [무엇이 어긋나 있었나]
+   예정일은 '지금 소속된 반의 요일'만 보고 첫 수업일부터 오늘까지
+   쭉 깔았다. 그래서 화요일반에서 일요일반으로 옮기면, 화요일에
+   다니던 지난 몇 달까지 전부 일요일로 계산됐다.
+   옮긴 자리에 없던 예정일이 하나 생겨 「수업 기록 없음」이 떴다.
+
+   [저장 구조]
+   students.classHistory = [ { d: '2026-05-16', n: '화요일 오후 7시 …' },
+                             { d: '2026-08-23', n: '일요일 오후 1시 …' } ]
+   "d 날짜부터 n 반을 다녔다"는 뜻이다. 날짜순으로 구간이 나뉘고,
+   마지막 줄은 오늘까지 이어진다.
+   이력이 비어 있으면 예전처럼 현재 반 하나로만 계산한다.
+   (첫 줄의 날짜는 첫 수업일보다 늦어도 첫 수업일부터로 본다 — 관대하게)
+════════════════════════════════════════════════════════════════════ */
+function classHistoryOf(s) {
+  return (Array.isArray(s && s.classHistory) ? s.classHistory : [])
+    .filter(x => x && parseYMD(x.d) && String(x.n || '').trim())
+    .map(x => ({ d: String(x.d), n: String(x.n).trim() }))
+    .sort((a, b) => a.d.localeCompare(b.d));
+}
+/* 이력의 마지막 반과 현재 반 배정이 어긋났는지 — 수정 모달에서 알려주기 위함 */
+function historyOutOfSync(s) {
+  const h = classHistoryOf(s);
+  if (!h.length) return false;
+  return !studentClassNames(s).includes(h[h.length - 1].n);
+}
+function addDaysYmd(ymd, n) {
+  const d = parseYMD(ymd);
+  if (!d) return '';
+  d.setDate(d.getDate() + n);
+  return ymdOf(d);
+}
 function scheduledOf(s) {
   const start = parseYMD(s && s.startDate);
   if (!start) return null;
-  const names = studentClassNames(s);
-  if (!names.length) return null;
   const today = new Date(); today.setHours(0,0,0,0);
   if (start > today) return { dates: [], map: new Map(), count: 0, offCnt: 0, future: true };
-  const map = new Map();
+
+  const hist = classHistoryOf(s);
   const myOff = studentOffDates(s);
+  const map = new Map();
   let offCnt = 0;
-  names.forEach(nm => {
-    const dc = classDayChar(nm);
+
+  /* 검사할 구간 목록 — [시작일, 종료일, 반이름] */
+  const segs = [];
+  if (hist.length) {
+    hist.forEach((h, i) => {
+      const from = (i === 0) ? ymdOf(start) : h.d;          /* 첫 줄은 첫 수업일부터 */
+      const to = (i === hist.length - 1) ? ymdOf(today) : addDaysYmd(hist[i + 1].d, -1);
+      if (from && to && from <= to) segs.push({ from, to, n: h.n });
+    });
+  } else {
+    const names = studentClassNames(s);
+    if (!names.length) return null;
+    names.forEach(nm => segs.push({ from: ymdOf(start), to: ymdOf(today), n: nm }));
+  }
+  if (!segs.length) return null;
+
+  segs.forEach(sg => {
+    const dc = classDayChar(sg.n);
     if (!dc) return;
-    const offSet = offDatesFor(nameToId.get(nm) || '');
-    const list = weekdayDates(dc, start, today);
+    const offSet = offDatesFor(nameToId.get(sg.n) || '');
+    const f = parseYMD(sg.from), t2 = parseYMD(sg.to);
+    if (!f || !t2) return;
+    const list = weekdayDates(dc, f, t2);
+    /* 첫 수업일은 무슨 요일이든 수업한 날이므로 그 구간에 넣어 준다 */
     const sYmd = ymdOf(start);
-    if (!list.includes(sYmd)) list.unshift(sYmd);
+    if (sg.from === sYmd && !list.includes(sYmd)) list.unshift(sYmd);
     list.forEach(d => {
       if (offSet.has(d) || myOff.has(d)) { offCnt++; return; }
-      if (!map.has(d)) map.set(d, nm);
+      if (!map.has(d)) map.set(d, sg.n);
     });
   });
   if (!map.size) return null;
-  const dates = [...map.keys()].sort();
+  /* ★ 반을 옮기는 자리에서 예정일이 겹치는 것을 정리한다.
+     예) 8/11 화요일 수업 → 8/23부터 일요일반. 그 사이 8/18(화)이 예정일로
+     남으면 하지도 않은 수업이 「기록 없음」으로 뜬다.
+     주 1회 수업이므로 7일 안에 예정일이 둘 있는 것은 겹친 것이다.
+     최신 쪽(새 반)을 남기고 그보다 이른 쪽을 버린다. */
+  const all = [...map.keys()].sort();
+  const dates = [];
+  let nextMs = Infinity;
+  for (let i = all.length - 1; i >= 0; i--) {
+    const ms = parseYMD(all[i]).getTime();
+    if ((nextMs - ms) / 86400000 < 7) { map.delete(all[i]); continue; }
+    dates.unshift(all[i]);
+    nextMs = ms;
+  }
+  if (!dates.length) return null;
   return { dates, map, count: dates.length, offCnt, future: false };
 }
 /* ════════════════════════════════════════════════════════════════════
@@ -2053,6 +2173,41 @@ window.delOff = async function(id) {
   if (!confirm('이 휴강 기록을 삭제하시겠습니까?')) return;
   try { await deleteDoc(doc(db,'classOff', id)); }
   catch (e) { alert('삭제 오류: ' + e.message); }
+};
+
+/* ════════════════════════════════════════════════════════════════════
+   ★ 2026-09 추가 — 「이 날은 수업이 없던 날」 한 번에 표시하기
+   ────────────────────────────────────────────────────────────────────
+   [왜 필요한가]
+   수업을 옮겨서 했는지, 정말로 한 회차를 건너뛴 것인지는 기록만으로는
+   끝까지 갈리지 않는 경우가 있다. (예: 8/9 예정 · 8/11 수업 · 8/16 예정)
+   그 판단은 선생님만 할 수 있으므로, 경고에 뜬 날짜 옆의 ✕ 를 누르면
+   그 학생 · 그 날짜만 휴강으로 등록해 예정일에서 빼 준다.
+   휴강 등록 모달을 열고 반 · 학생 · 날짜를 다시 고를 필요가 없다.
+════════════════════════════════════════════════════════════════════ */
+window.skipDate = async function(fireId, date) {
+  const s = students.find(x => x.fireId === fireId);
+  if (!s) { alert('학생 정보를 찾을 수 없습니다.'); return; }
+  if (!parseYMD(date)) { alert('날짜가 올바르지 않습니다.'); return; }
+  const nm = s.name || '이름없음';
+  const sid = (s.id && String(s.id).trim()) ? String(s.id).trim() : String(s.fireId);
+
+  const reason = prompt(
+    `${nm} 학생 · ${fmtYMD(date)}\n\n이 날은 수업이 없던 날로 처리합니다.\n예정일에서 빠지고 경고가 사라집니다. (이 학생만 적용)\n\n사유를 적어주세요 (선택)`,
+    '');
+  if (reason === null) return;   /* 취소 */
+
+  const names = studentClassNames(s);
+  const cls = names.find(c => ttClasses.includes(c)) || names[0] || '';
+  const classId = cls ? (nameToId.get(cls) || '') : '';
+  try {
+    await setDoc(doc(db, 'classOff', offStuDocId(sid, date)), {
+      classId, className: cls, date,
+      studentId: sid, studentName: nm,
+      reason: String(reason || '').trim(),
+      createdAt: serverTimestamp()
+    }, { merge: true });
+  } catch (e) { alert('처리 오류: ' + e.message); }
 };
 
 /* ════════════════════════════════════════════════════════════════════
@@ -2862,9 +3017,13 @@ window.renderCards = function() {
     const subs = (s.subject && s.subject !== '-') ? String(s.subject).split(',').map(x => x.trim()).filter(Boolean) : [];
     const subHtml = subs.length ? subs.map(x => `<span class="sm-subj">${esc(x)}</span>`).join('') : '<span class="sm-subj none">과목 미등록</span>';
     const cn = studentClassNames(s);
-    const clsHtml = cn.length
+    const chList = classHistoryOf(s);
+    const chChip = chList.length > 1
+      ? `<span class="sm-class" style="color:#6d28d9;background:#f5f3ff;border-color:#ddd6fe;" title="${esc(chList.map(x => shortDate(x.d) + ' ' + x.n).join(' → '))}">📅 반 변경 ${chList.length - 1}회</span>`
+      : '';
+    const clsHtml = (cn.length
       ? cn.map(c => `<span class="sm-class${ttClasses.includes(c) ? '' : ' off'}">🕒 ${esc(c)}</span>`).join('')
-      : '<span class="sm-class none">반 미배정</span>';
+      : '<span class="sm-class none">반 미배정</span>') + chChip;
     const teacher = (s.teacher && s.teacher !== '-') ? s.teacher : '미배정';
     const phone = (s.phone && s.phone !== '-') ? s.phone : '-';
     const sPhone = (s.studentPhone && s.studentPhone !== '-') ? s.studentPhone : '';
@@ -2928,13 +3087,18 @@ window.renderCards = function() {
     if (miss) {
       const show = miss.dates.slice(-6);
       const more = miss.dates.length - show.length;
+      /* 날짜 버튼 = 그 날 수업카드 작성 / ✕ = 이 날은 넘어간 날로 표시(개인 휴강) */
       const btns = show.map(d => {
         const nm = miss.sched.map.get(d) || '';
-        return `<button class="wl-d" title="${esc(nm)} · ${esc(d)} 수업카드 작성" onclick="openBatchFor('${esc(nm)}','${esc(d)}')">${esc(shortDate(d))}</button>`;
+        return `<span class="wl-pair">`
+          + `<button class="wl-d" title="${esc(nm)} · ${esc(d)} 수업카드 작성" onclick="openBatchFor('${esc(nm)}','${esc(d)}')">${esc(shortDate(d))}</button>`
+          + `<button class="wl-skip" title="이 날은 수업이 없던 날로 표시합니다 (이 학생만)" onclick="skipDate('${esc(s.fireId)}','${esc(d)}')">✕</button>`
+          + `</span>`;
       }).join('');
       misHtml = `<div class="sm-warnline">⚠️ 수업 기록 없음 <b>${miss.count}회</b>` +
         `<span class="wl-dates">${btns}${more > 0 ? `<span class="wl-more">+${more}</span>` : ''}` +
-        `${miss.unknown > 0 ? `<span class="wl-more">날짜 미확인 ${miss.unknown}회</span>` : ''}</span></div>`;
+        `${miss.unknown > 0 ? `<span class="wl-more">날짜 미확인 ${miss.unknown}회</span>` : ''}</span>` +
+        `<span class="wl-tip">날짜를 누르면 수업카드 작성 · <b>✕</b>를 누르면 그 날은 수업이 없던 날로 처리합니다</span></div>`;
     }
     const newBadge = isNewStudent(s.startDate) ? '<span class="sm-new-badge">NEW</span>' : '';
     /* ★ 「📊 테스트 결과」 버튼 → 「💬 피드백」 버튼으로 교체.
@@ -3113,12 +3277,97 @@ function renderClassChecks(selected) {
     </label>`;
   }).join('');
   box.querySelectorAll('.sm-class-chk').forEach(cb => {
-    cb.addEventListener('change', () => cb.closest('.sm-class-label').classList.toggle('checked', cb.checked));
+    cb.addEventListener('change', () => {
+      cb.closest('.sm-class-label').classList.toggle('checked', cb.checked);
+      chCheckWarn();
+    });
   });
 }
 function getCheckedClasses() {
   return [...document.querySelectorAll('.sm-class-chk:checked')].map(c => c.value);
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   ★ 반 변경 이력 — 수정 모달 안의 입력 줄
+   저장 형태: [{ d:'2026-05-16', n:'화요일 오후 7시 …' }, …]
+════════════════════════════════════════════════════════════════════ */
+let chSeq = 0;
+function chClassOptions(sel) {
+  const known = new Set(ttClasses);
+  const extra = (sel && !known.has(sel)) ? [sel] : [];
+  return '<option value="">반 선택</option>'
+    + ttClasses.concat(extra).map(c =>
+        `<option value="${esc(c)}"${c === sel ? ' selected' : ''}>${esc(c)}${known.has(c) ? '' : ' · 시간표에 없음'}</option>`
+      ).join('');
+}
+function chRowHtml(d, n) {
+  const i = ++chSeq;
+  return `<div class="ch-row" id="ch-row-${i}">
+    <input class="ch-date" type="date" value="${esc(d || '')}">
+    <select class="ch-sel">${chClassOptions(n || '')}</select>
+    <button type="button" class="ch-del" title="이 줄 삭제" onclick="removeClassHistoryRow(${i})">🗑</button>
+  </div>`;
+}
+function renderClassHistory(list) {
+  const box = document.getElementById('sm-class-history');
+  if (!box) return;
+  const arr = Array.isArray(list) ? list : [];
+  box.innerHTML = arr.length
+    ? arr.map(x => chRowHtml(x.d, x.n)).join('')
+    : '<div class="ch-empty">등록된 반 변경 이력이 없습니다. 요일을 옮긴 적이 없으면 그대로 두세요.</div>';
+  chCheckWarn();
+}
+function getClassHistory() {
+  const rows = [...document.querySelectorAll('#sm-class-history .ch-row')];
+  return rows.map(r => ({
+    d: String(r.querySelector('.ch-date').value || '').trim(),
+    n: String(r.querySelector('.ch-sel').value || '').trim()
+  })).filter(x => parseYMD(x.d) && x.n)
+     .sort((a, b) => a.d.localeCompare(b.d));
+}
+/* 이력의 마지막 반과 지금 체크된 반이 다르면 알려준다 */
+function chCheckWarn() {
+  const box = document.getElementById('sm-ch-warn');
+  if (!box) return;
+  const h = getClassHistory();
+  if (!h.length) { box.classList.remove('show'); box.innerHTML = ''; return; }
+  const last = h[h.length - 1].n;
+  const cur = getCheckedClasses();
+  if (cur.length && !cur.includes(last)) {
+    box.classList.add('show');
+    box.innerHTML = `⚠️ 이력의 마지막 반(<b>${esc(last)}</b>)과 위에서 체크한 <b>반 배정</b>이 다릅니다.<br>지금 다니는 반으로 옮긴 날짜를 이력에 추가하거나, 반 배정을 맞춰주세요.`;
+  } else {
+    box.classList.remove('show'); box.innerHTML = '';
+  }
+}
+window.addClassHistoryRow = function() {
+  const box = document.getElementById('sm-class-history');
+  if (!box) return;
+  const cur = getClassHistory();
+  const empty = box.querySelector('.ch-empty');
+  if (empty) box.innerHTML = '';
+  /* 첫 줄이면 '첫 수업일 + 지금 반', 그 뒤로는 '오늘 + 빈 반'을 기본값으로 */
+  let d = todayStr(), n = '';
+  if (!cur.length) {
+    const sd = document.getElementById('sm-start');
+    if (sd && parseYMD(sd.value)) d = sd.value;
+    const cc = getCheckedClasses();
+    n = cc.length ? cc[0] : '';
+  }
+  box.insertAdjacentHTML('beforeend', chRowHtml(d, n));
+  chCheckWarn();
+  if (!hydrating) saveSMDraft();
+};
+window.removeClassHistoryRow = function(i) {
+  const row = document.getElementById('ch-row-' + i);
+  if (row) row.remove();
+  const box = document.getElementById('sm-class-history');
+  if (box && !box.querySelector('.ch-row')) {
+    box.innerHTML = '<div class="ch-empty">등록된 반 변경 이력이 없습니다. 요일을 옮긴 적이 없으면 그대로 두세요.</div>';
+  }
+  chCheckWarn();
+  if (!hydrating) saveSMDraft();
+};
 window.openAdd = function() {
   hydrating = true;
   editId = null; editPhotoUrl = '';
@@ -3133,6 +3382,7 @@ window.openAdd = function() {
   document.getElementById('sm-start-hint').textContent = '오늘로 채워뒀습니다. 실제 첫 수업일로 바꿔주세요. (주 1회 기준 회차 계산)';
   setSubjChecks([]);
   renderClassChecks([]);
+  renderClassHistory([]);
   const d = (smDraft && !smDraft.editId) ? smDraft : null;
   if (d) {
     // ★ 오늘 만든 draft 가 아니면 첫 수업일은 오늘로 둔다
@@ -3140,6 +3390,7 @@ window.openAdd = function() {
     else putFieldsKeepToday(SM_FIELDS, d.vals, ['sm-start']);
     setSubjChecks(d.subs);
     renderClassChecks(d.classes);
+    renderClassHistory(d.history || []);
     DIRTY.add('sm-modal-bg');
   } else {
     DIRTY.delete('sm-modal-bg');
@@ -3173,6 +3424,7 @@ window.openEdit = function(fireId) {
   const subs = (s.subject && s.subject !== '-') ? String(s.subject).split(',').map(x => x.trim()) : [];
   setSubjChecks(subs);
   renderClassChecks(studentClassNames(s));
+  renderClassHistory(classHistoryOf(s));
   const d = (smDraft && smDraft.editId === fireId) ? smDraft : null;
   if (d) {
     // ★ 오늘 만든 draft 가 아니면 첫 수업일은 저장된 값을 그대로 둔다
@@ -3180,6 +3432,7 @@ window.openEdit = function(fireId) {
     else putFieldsKeepToday(SM_FIELDS, d.vals, ['sm-start']);
     setSubjChecks(d.subs);
     renderClassChecks(d.classes);
+    if (Array.isArray(d.history)) renderClassHistory(d.history);
     DIRTY.add('sm-modal-bg');
   } else {
     DIRTY.delete('sm-modal-bg');
@@ -3223,6 +3476,7 @@ window.saveStudent = async function() {
   const checked = [...document.querySelectorAll('.sm-subj-chk:checked')].map(c => c.value);
   const subject = checked.length ? checked.join(',') : '-';
   const cf = buildClassFields(getCheckedClasses());
+  const classHistory = getClassHistory();
   if (!name || !grade) { alert('이름과 학년을 입력해주세요.'); return; }
   if (startRaw && !startDate) { alert('첫 수업일 형식이 올바르지 않습니다.'); return; }
   if (!editId) {
@@ -3245,6 +3499,7 @@ window.saveStudent = async function() {
       await addDoc(collection(db,'students'), {
         id, name, grade, subject, phone, studentPhone, teacher, startDate,
         classIds: cf.classIds, classNames: cf.classNames, classes: cf.classes,
+        classHistory,
         photoUrl: '',
         sessionCount: 0, absentCount: 0, makeupCount: 0, makeupPending: 0, makeupFors: [],
         cycleRound: 1, cycleIn: 0, cycleLeft: CYCLE,
@@ -3256,6 +3511,7 @@ window.saveStudent = async function() {
       await updateDoc(doc(db,'students',editId), {
         name, grade, subject, phone, studentPhone, teacher, startDate,
         classIds: cf.classIds, classNames: cf.classNames, classes: cf.classes,
+        classHistory,
         photoUrl: editPhotoUrl || ''
       });
     }
@@ -3951,9 +4207,12 @@ Object.keys(MODALS).forEach(id => {
   const bg = document.getElementById(id);
   if (!bg) return;
   const cfgM = MODALS[id];
-  ['input','change'].forEach(ev => bg.addEventListener(ev, () => {
+  ['input','change'].forEach(ev => bg.addEventListener(ev, (e) => {
     if (hydrating) return;
     DIRTY.add(id);
+    /* 반 변경 이력 줄을 고치면 경고를 다시 계산한다 */
+    if (id === 'sm-modal-bg' && e.target && typeof e.target.closest === 'function'
+        && e.target.closest('.ch-row')) chCheckWarn();
     if (cfgM.draft) cfgM.draft();
   }));
   let downOnBg = false;
