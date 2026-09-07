@@ -1449,6 +1449,16 @@ const DAY_IDX = { '일':0, '월':1, '화':2, '수':3, '목':4, '금':5, '토':6 
 function ymdOf(dt) {
   return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
 }
+/* ★ 2026-09 추가 — 그 날짜가 속한 주(월요일 시작)를 하나의 열쇠로 만든다.
+   수업 날짜를 옮겨도 같은 주 안이면 같은 값이 나오므로,
+   「이번 주에 수업했는가」를 날짜가 아니라 주 단위로 볼 수 있다. */
+function weekKey(v) {
+  const d = parseYMD(v);
+  if (!d) return '';
+  const t = new Date(d.getTime());
+  t.setDate(t.getDate() - ((t.getDay() + 6) % 7));
+  return ymdOf(t);
+}
 function classDayChar(className) {
   const id = nameToId.get(className);
   if (id) {
@@ -1499,23 +1509,54 @@ function scheduledOf(s) {
   const dates = [...map.keys()].sort();
   return { dates, map, count: dates.length, offCnt, future: false };
 }
+/* ════════════════════════════════════════════════════════════════════
+   ★ 2026-09 수정 — 「한 주에 1번이라도 수업했으면 빠진 것이 아니다」
+   ────────────────────────────────────────────────────────────────────
+   [무엇이 어긋나 있었나]
+   예전에는 시간표상의 수업일을 하나씩 대조해서, 그 날짜에 카드가
+   없으면 곧바로 미작성으로 세었다.
+   그래서 사정이 생겨 수업 날짜를 옮기면 (예: 8/16 수업을 8/23으로)
+   실제로는 매주 빠짐없이 수업했는데도 8/16 이 미작성으로 남았다.
+   날짜만 보고 판단하니 '옮겨서 했다'는 사실을 알 방법이 없었다.
+
+   [지금 규칙]
+   주(월요일 시작) 단위로 본다. 그 주에 기록이 한 건이라도 있으면
+   — 출석 · 지각 · 결석 · 보강 · 휴강 무엇이든 — 그 주는 수업한 주로
+   처리한다. 날짜를 옮겨도 같은 주 안이면 경고가 뜨지 않는다.
+
+   [세지 않는 구간]
+   recentAttendance 는 최근 40건까지만 남는다. 잘려나간 옛날 주까지
+   미작성으로 세면 오래된 학생일수록 경고가 부풀려지므로,
+   기록이 남아 있는 가장 이른 날부터만 검사한다.
+════════════════════════════════════════════════════════════════════ */
 function missingOf(s) {
   if (!hasCounter(s)) return null;
   const sch = scheduledOf(s);
   if (!sch || sch.future || !sch.count) return null;
   const t = todayStr();
-  const past = sch.dates.filter(d => d < t);
+
+  /* 기록이 있는 주 — 어떤 출결이든 1건이면 그 주는 수업한 것으로 본다 */
+  const recDates = (Array.isArray(s.recentAttendance) ? s.recentAttendance : [])
+    .filter(x => x && parseYMD(x.d)).map(x => String(x.d)).sort();
+  const doneWeeks = new Set(recDates.map(weekKey).filter(Boolean));
+
+  /* 기록이 남아 있는 구간만 검사한다 (잘려나간 옛날 주는 제외) */
+  const from = recDates.length ? recDates[0] : '';
+  const past = sch.dates.filter(d => d < t && (!from || d >= from));
   if (!past.length) return null;
-  const recorded = (typeof s.sessionCount === 'number' ? s.sessionCount : 0) + absentOf(s);
-  const gap = past.length - recorded;
-  if (gap < 1) return null;
-  const rec = new Set(
-    (Array.isArray(s.recentAttendance) ? s.recentAttendance : [])
-      .filter(x => x && parseYMD(x.d)).map(x => String(x.d))
-  );
-  const known = past.filter(d => !rec.has(d));
-  const dates = known.slice(-gap);
-  return { count: gap, dates, unknown: Math.max(0, gap - dates.length), sched: sch };
+
+  /* 예정일을 주 단위로 묶는다 — 한 주에 여러 날이면 가장 이른 날을 대표로 */
+  const weekMap = new Map();
+  past.forEach(d => {
+    const k = weekKey(d);
+    if (k && !weekMap.has(k)) weekMap.set(k, d);
+  });
+
+  const dates = [];
+  weekMap.forEach((d, k) => { if (!doneWeeks.has(k)) dates.push(d); });
+  dates.sort();
+  if (!dates.length) return null;
+  return { count: dates.length, dates, unknown: 0, sched: sch };
 }
 const missingCount = s => { const m = missingOf(s); return m ? m.count : 0; };
 
@@ -2651,7 +2692,7 @@ window.renderCards = function() {
   const dblCnt = list.filter(s => doubleDays(s).length > 0).length;
   document.getElementById('sm-count').textContent =
     base + (noStart ? ` · 첫 수업일 미기록 ${noStart}명` : '')
-    + (misCnt ? ` · 카드 미작성 ${misCnt}명` : '')
+    + (misCnt ? ` · 기록 없는 주 있음 ${misCnt}명` : '')
     + (absSum ? ` · 누적 결석 ${absSum}회` : '')
     + (mkSum ? ` · 보강 완료 ${mkSum}회` : '')
     + (pdSum ? ` · 보강 대기 ${pdSum}회` : '')
@@ -2668,7 +2709,7 @@ window.renderCards = function() {
       need.innerHTML = `⚠️ 회차가 아직 집계되지 않은 학생 <b>${noCnt}명</b> — 위의 <b>🔄 회차 재집계</b>를 한 번 눌러주세요.<br>기존 수업카드를 읽어 회차 · 4주 단위 · 결석 · 보강 · 첫 수업일을 자동으로 채웁니다. (한 번만 하면 됩니다)`;
     } else if (misAll) {
       need.classList.add('show');
-      need.innerHTML = `📝 시간표 요일 기준으로 <b>수업카드가 빠진 학생 ${misAll}명</b> — 정렬을 <b>「카드 미작성순」</b>으로 바꾸면 맨 위로 모입니다.<br>학생 카드의 <b>빨간 날짜 버튼</b>을 누르면 그 반 · 그 날짜로 일괄 작성 창이 바로 열립니다. (휴강 등록일은 제외하고 셉니다)`;
+      need.innerHTML = `📝 <b>수업 기록이 아예 없는 주가 있는 학생 ${misAll}명</b> — 정렬을 <b>「카드 미작성순」</b>으로 바꾸면 맨 위로 모입니다.<br>학생 카드의 <b>빨간 날짜 버튼</b>을 누르면 그 반 · 그 날짜로 일괄 작성 창이 바로 열립니다.<br><b>주 단위로 셉니다.</b> 사정이 있어 수업 날짜를 옮겼더라도 그 주에 기록이 1건이라도 있으면 빠진 것으로 보지 않습니다. (휴강 등록일도 제외)`;
     } else if (noMk) {
       need.classList.add('show');
       need.innerHTML = `🔁 보강 집계가 아직 없는 학생 <b>${noMk}명</b> — <b>🔄 회차 재집계</b>를 한 번 누르면 과거 보강 기록까지 카드에 표시됩니다.`;
@@ -2754,7 +2795,7 @@ window.renderCards = function() {
         const nm = miss.sched.map.get(d) || '';
         return `<button class="wl-d" title="${esc(nm)} · ${esc(d)} 수업카드 작성" onclick="openBatchFor('${esc(nm)}','${esc(d)}')">${esc(shortDate(d))}</button>`;
       }).join('');
-      misHtml = `<div class="sm-warnline">⚠️ 수업카드 미작성 <b>${miss.count}회</b>` +
+      misHtml = `<div class="sm-warnline">⚠️ 수업 기록 없는 주 <b>${miss.count}주</b>` +
         `<span class="wl-dates">${btns}${more > 0 ? `<span class="wl-more">+${more}</span>` : ''}` +
         `${miss.unknown > 0 ? `<span class="wl-more">날짜 미확인 ${miss.unknown}회</span>` : ''}</span></div>`;
     }
