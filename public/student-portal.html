@@ -516,7 +516,7 @@ function buildSections(){
         <span class="at-lg"><i style="background:#fffbeb;border-color:#fde68a"></i>지각</span>
         <span class="at-lg"><i style="background:#fef2f2;border-color:#fecaca"></i>결석</span>
         <span class="at-lg"><i style="background:#eff6ff;border-color:#bfdbfe"></i>보강</span>
-        <span class="at-lg"><i style="background:#f3f4f6;border-color:#e5e7eb"></i>휴강</span>
+        <span class="at-lg"><i style="background:#f3f4f6;border-color:#e5e7eb"></i>수업일 변경</span>
       </div>
       <div class="at-note" id="at-note"></div>
     </div>
@@ -713,7 +713,7 @@ function renderAttendance(student){
       .slice(-40);
     const pairs=new Set(pairedDates(flow));
     const flowHtml=flow.length
-      ?flow.map(x=>`<span class="at-dot at-st-${e(x.s)}${pairs.has(x.d)?' at-pair':''}" title="${e(atLongDate(x.d))} ${e(slotName(x.k))} · ${e(x.s)}">${e(x.s.charAt(0))}<span class="at-d">${e(atShortDate(x.d))}</span></span>`).join('')
+      ?flow.map(x=>`<span class="at-dot at-st-${e(x.s)}${pairs.has(x.d)?' at-pair':''}" title="${e(atLongDate(x.d))} ${e(slotName(x.k))} · ${e(stName(x.s))}">${e(x.s==='휴강'?'변':x.s.charAt(0))}<span class="at-d">${e(atShortDate(x.d))}</span></span>`).join('')
       :`<span class="at-wait">${ses?'출결 기록이 정리되는 중입니다.':'아직 기록된 수업이 없습니다.'}</span>`;
     document.querySelectorAll('#at-line').forEach(el=>el.innerHTML=flowHtml);
     const noteEl=pairs.size
@@ -728,6 +728,13 @@ function renderAttendance(student){
 
 /* ════════ 수업 내용 · 과제 — recentLessons ════════ */
 const LS_LESSON=['출석','지각','보강'];
+/* ★ 2026-09 — 화면에 보이는 이름
+   저장된 값은 그대로 '휴강'이지만, 회차로 수강료를 받는 구조라
+   '휴강'이라고만 적으면 그냥 한 번 쉰 것처럼 읽힌다.
+   실제로는 수업일을 옮겼거나 일정이 조정된 것이므로 이름을 바꾼다.
+   (사유는 선생님이 적은 내용이 본문에 그대로 나온다) */
+const ST_LABEL={ '휴강':'수업일 변경' };
+function stName(s){ return ST_LABEL[s] || s; }
 const LS_BADGE={
   '출석':'background:#ecfdf5;border-color:#6ee7b7;color:#047857',
   '지각':'background:#fffbeb;border-color:#fde68a;color:#b45309',
@@ -837,7 +844,7 @@ function renderLessons(student,fbList){
       const body=x.c
         ?`<div class="ls-body">${e(x.c)}</div>`
         :(x.s==='결석'?'<div class="ls-body mute">결석으로 기록된 날입니다.</div>'
-         :(x.s==='휴강'?'<div class="ls-body mute">휴강일입니다.</div>'
+         :(x.s==='휴강'?'<div class="ls-body mute">정규 수업일이 변경되어 이 날은 수업이 진행되지 않았습니다. (회차 차감 없음)</div>'
          :'<div class="ls-body mute">수업 내용이 등록되지 않았습니다.</div>'));
       const hw=x.h?`<div class="ls-hw"><b>과제</b>${e(x.h)}</div>`:'';
       const unit=x.u?`<div class="ls-unit">📘 ${e(x.u)}</div>`:'';
@@ -848,7 +855,7 @@ function renderLessons(student,fbList){
       return`<div class="ls-card${i===0?' latest':''}${x.k===SLOT_MK?' mk':''}">
         <div class="ls-top">
           <span class="ls-date">${e(atLongDate(x.d))}</span>
-          <span class="ls-badge" style="${badge}">${e(x.s)}</span>
+          <span class="ls-badge" style="${badge}">${e(stName(x.s))}</span>
           ${slotTag}
           ${i===0&&items.length>1?'<span class="ls-new">최신</span>':''}
           ${x.no?`<span class="ls-no">${x.no}회차</span>`:''}
