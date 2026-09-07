@@ -1051,20 +1051,32 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
 <div class="sm-modal-bg" id="off-modal-bg">
   <div class="sm-modal">
     <div class="sm-modal-title">🚫 휴강 등록 · 관리</div>
-    <div class="sm-class-note">휴강은 <b>반 단위로 1건</b>만 저장됩니다. 학생마다 따로 입력할 필요가 없고, 그 주에는 해당 반 학생 전원의 회차가 올라가지 않습니다.</div>
+    <div class="sm-class-note">휴강으로 등록한 날은 <b>수업 예정일에서 빠집니다.</b> 회차가 올라가지 않고, 「수업 기록 없는 주」 경고도 뜨지 않습니다.<br><b>학교마다 시험 기간이 다를 때</b>는 아래에서 <b>학생 한 명만</b> 골라 등록하세요. 같은 반 다른 학생은 그대로 수업한 것으로 처리됩니다.</div>
+    <div class="sm-field">
+      <span class="cc-label">누가 쉬나요? <span class="req">*</span></span>
+      <div class="seg" id="off-scope" style="grid-template-columns:repeat(2,1fr);">
+        <button type="button" class="seg-btn on" data-sc="class" onclick="setOffScope('class')">🏫 반 전체</button>
+        <button type="button" class="seg-btn" data-sc="stu" onclick="setOffScope('stu')">🙋 학생 한 명</button>
+      </div>
+      <div class="sm-hint" id="off-scope-hint">이 반 학생 전원이 그 날 쉽니다.</div>
+    </div>
     <div class="sm-field">
       <span class="cc-label">반 <span class="req">*</span></span>
-      <select class="cc-sel" id="off-class"><option value="">선택</option></select>
+      <select class="cc-sel" id="off-class" onchange="onOffClassChange()"><option value="">선택</option></select>
     </div>
-    <div class="sm-row2">
-      <div class="sm-field">
-        <span class="cc-label">휴강 날짜 <span class="req">*</span></span>
-        <input class="cc-inp" id="off-date" type="date">
-      </div>
-      <div class="sm-field">
-        <span class="cc-label">사유</span>
-        <input class="cc-inp" id="off-reason" type="text" placeholder="예: 학교 시험 · 공휴일" autocomplete="off">
-      </div>
+    <div class="sm-field" id="off-stu-field" style="display:none;">
+      <span class="cc-label">학생 <span class="req">*</span></span>
+      <select class="cc-sel" id="off-student"><option value="">선택</option></select>
+      <div class="sm-hint" id="off-stu-hint">반을 먼저 고르면 그 반 학생만 나옵니다.</div>
+    </div>
+    <div class="sm-field">
+      <span class="cc-label">휴강 날짜 <span class="req">*</span></span>
+      <input class="cc-inp" id="off-date" type="date">
+    </div>
+    <div class="sm-field">
+      <span class="cc-label">휴강 사유 · 내용</span>
+      <textarea class="cc-textarea" id="off-reason" placeholder="예: 중간고사 기간이라 이번 주 수업 없음 / 학교 수학여행 / 공휴일" style="min-height:72px;"></textarea>
+      <div class="sm-hint">적어 두면 나중에 왜 쉬었는지 바로 알 수 있습니다. 학생 카드와 아래 목록에 표시됩니다.</div>
     </div>
     <button class="cc-write-btn" id="off-save-btn" style="width:100%;min-height:46px;" onclick="saveOff()">휴강 등록</button>
     <div class="section-heading" style="margin-top:1.4rem;">등록된 휴강</div>
@@ -1481,7 +1493,27 @@ function weekdayDates(dayChar, fromDt, toDt) {
 function offDatesFor(classId) {
   const set = new Set();
   if (!classId) return set;
-  offs.forEach(o => { if (String(o.classId) === String(classId) && parseYMD(o.date)) set.add(String(o.date)); });
+  offs.forEach(o => {
+    if (offTargetId(o)) return;                 /* 학생 개인 휴강은 여기서 세지 않는다 */
+    if (String(o.classId) === String(classId) && parseYMD(o.date)) set.add(String(o.date));
+  });
+  return set;
+}
+/* ★ 2026-09 추가 — 학생 한 명에게만 걸린 휴강 날짜
+   ────────────────────────────────────────────────────────────────────
+   같은 반이어도 학교가 다르면 시험 주가 다르다. 반 전체가 쉬는 게
+   아니라 한 학생만 그 주를 건너뛰는 경우가 실제로 생긴다.
+   그런 날은 이 학생의 예정일에서만 빠진다. */
+function studentOffDates(s) {
+  const set = new Set();
+  if (!s) return set;
+  const keys = new Set([String(s.id == null ? '' : s.id).trim(), String(s.fireId || '')].filter(Boolean));
+  if (!keys.size) return set;
+  offs.forEach(o => {
+    const sid = offTargetId(o);
+    if (!sid || !keys.has(String(sid))) return;
+    if (parseYMD(o.date)) set.add(String(o.date));
+  });
   return set;
 }
 function scheduledOf(s) {
@@ -1492,6 +1524,7 @@ function scheduledOf(s) {
   const today = new Date(); today.setHours(0,0,0,0);
   if (start > today) return { dates: [], map: new Map(), count: 0, offCnt: 0, future: true };
   const map = new Map();
+  const myOff = studentOffDates(s);
   let offCnt = 0;
   names.forEach(nm => {
     const dc = classDayChar(nm);
@@ -1501,7 +1534,7 @@ function scheduledOf(s) {
     const sYmd = ymdOf(start);
     if (!list.includes(sYmd)) list.unshift(sYmd);
     list.forEach(d => {
-      if (offSet.has(d)) { offCnt++; return; }
+      if (offSet.has(d) || myOff.has(d)) { offCnt++; return; }
       if (!map.has(d)) map.set(d, nm);
     });
   });
@@ -1838,8 +1871,28 @@ function refreshClassSelectors() {
   }
 }
 
-/* ════════ 휴강(classOff) ════════ */
+/* ════════════════════════════════════════════════════════════════════
+   ★ 휴강(classOff) — 반 전체 휴강 + 학생 개인 휴강
+   ────────────────────────────────────────────────────────────────────
+   [왜 두 가지가 필요한가]
+   시험 주에는 보통 반 전체가 쉰다. 그런데 같은 반이어도 학교가 다르면
+   시험 기간이 달라서, 한 학생만 그 주를 건너뛰는 일이 실제로 생긴다.
+   반 휴강으로 처리하면 그 주에 나온 다른 학생까지 휴강이 되어 버린다.
+
+   [문서 구조]
+   · 반 전체 : { classId, className, date, reason }              ID = `반ID__날짜`
+   · 학생 개인 : 위에 studentId · studentName 이 더 붙는다        ID = `stu_학생ID__날짜`
+   studentId 가 있으면 개인 휴강, 없으면 반 전체 휴강이다.
+   옛 문서에는 studentId 가 아예 없으므로 그대로 반 휴강으로 읽힌다.
+════════════════════════════════════════════════════════════════════ */
 function offDocId(classId, date) { return `${classId}__${date}`; }
+function offStuDocId(sid, date) { return `stu_${sid}__${date}`; }
+/* 이 휴강이 걸린 학생 ID — 없으면 반 전체 휴강 */
+function offTargetId(o) {
+  const v = String((o && o.studentId) == null ? '' : o.studentId).trim();
+  return v;
+}
+function isStuOff(o) { return !!offTargetId(o); }
 function studentClassIds(s) {
   if (!s) return [];
   const ids = Array.isArray(s.classIds) ? s.classIds.filter(Boolean).map(String) : [];
@@ -1847,13 +1900,21 @@ function studentClassIds(s) {
   return (Array.isArray(s.classNames) ? s.classNames : [])
     .map(n => nameToId.get(String(n))).filter(Boolean).map(String);
 }
+/* 이 학생에게 적용되는 휴강인가 — 반 전체 휴강이면 반 소속으로, 개인 휴강이면 본인만 */
+function offAppliesTo(o, s) {
+  const sid = offTargetId(o);
+  if (sid) {
+    const keys = new Set([String(s.id == null ? '' : s.id).trim(), String(s.fireId || '')].filter(Boolean));
+    return keys.has(String(sid));
+  }
+  return new Set(studentClassIds(s)).has(String(o.classId));
+}
 function nextOff(s) {
-  const ids = new Set(studentClassIds(s));
-  if (!ids.size || !offs.length) return null;
+  if (!s || !offs.length) return null;
   const t = todayStr();
   let best = null;
   offs.forEach(o => {
-    if (!ids.has(String(o.classId))) return;
+    if (!offAppliesTo(o, s)) return;
     const d = String(o.date || '');
     if (d < t) return;
     if (!best || d < String(best.date)) best = o;
@@ -1876,14 +1937,59 @@ function renderOffList() {
   const t = todayStr();
   box.innerHTML = offs.slice(0, 30).map(o => {
     const past = String(o.date) < t;
-    const nm = o.className || idToName.get(String(o.classId)) || String(o.classId || '');
+    const cls = o.className || idToName.get(String(o.classId)) || String(o.classId || '');
+    const sid = offTargetId(o);
+    /* 개인 휴강이면 학생 이름을 앞세우고, 반 이름은 작게 뒤에 붙인다 */
+    const who = sid
+      ? `<b style="color:#7e22ce;">🙋 ${esc(o.studentName || sid)}</b>${cls ? ` <span style="color:#aeaeb2;">· ${esc(cls)}</span>` : ''}`
+      : `🏫 ${esc(cls)} <span style="color:#aeaeb2;">· 반 전체</span>`;
     return `<div class="off-item"${past ? ' style="opacity:0.55;"' : ''}>
       <span class="oi-d">${esc(shortDate(o.date))}</span>
-      <span class="oi-n">${esc(nm)}${o.reason ? `<br><span class="oi-r">${esc(o.reason)}</span>` : ''}</span>
+      <span class="oi-n">${who}${o.reason ? `<br><span class="oi-r">${esc(o.reason)}</span>` : ''}</span>
       <button class="oi-x" onclick="delOff('${esc(o.id)}')">삭제</button>
     </div>`;
   }).join('');
 }
+/* 지금 고른 대상 — 'class'(반 전체) 또는 'stu'(학생 한 명) */
+let offScope = 'class';
+
+/* 반을 고르면 그 반 학생만 목록에 채운다 (반 미선택이면 전체 학생) */
+window.onOffClassChange = function() {
+  const cls = document.getElementById('off-class').value;
+  const sel = document.getElementById('off-student');
+  const hint = document.getElementById('off-stu-hint');
+  if (!sel) return;
+  const cur = sel.value;
+  const list = (cls ? students.filter(s => studentClassNames(s).includes(cls)) : students.slice())
+    .filter(s => s && (s.id || s.fireId))
+    .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'ko'));
+  sel.innerHTML = '<option value="">선택</option>'
+    + list.map(s => {
+        const sid = (s.id && String(s.id).trim()) ? String(s.id).trim() : String(s.fireId);
+        return `<option value="${esc(sid)}">${esc(s.name || '이름없음')}${s.grade ? ' · ' + esc(s.grade) : ''}</option>`;
+      }).join('');
+  if (cur && [...sel.options].some(o => o.value === cur)) sel.value = cur;
+  if (hint) {
+    hint.className = 'sm-hint';
+    hint.textContent = cls
+      ? `${cls} · ${list.length}명 중에서 고릅니다.`
+      : '반을 고르면 그 반 학생만 나옵니다. (지금은 전체 학생)';
+  }
+};
+window.setOffScope = function(sc) {
+  offScope = (sc === 'stu') ? 'stu' : 'class';
+  document.querySelectorAll('#off-scope .seg-btn').forEach(b => b.classList.toggle('on', b.dataset.sc === offScope));
+  const stuField = document.getElementById('off-stu-field');
+  if (stuField) stuField.style.display = (offScope === 'stu') ? '' : 'none';
+  const hint = document.getElementById('off-scope-hint');
+  if (hint) {
+    hint.className = 'sm-hint' + (offScope === 'stu' ? ' blue' : '');
+    hint.textContent = (offScope === 'stu')
+      ? '고른 학생 한 명만 그 날 쉽니다. 같은 반 다른 학생은 그대로 수업한 것으로 처리됩니다.'
+      : '이 반 학생 전원이 그 날 쉽니다.';
+  }
+  if (offScope === 'stu') onOffClassChange();
+};
 window.openOff = function() {
   hydrating = true;
   const sel = document.getElementById('off-class');
@@ -1891,6 +1997,8 @@ window.openOff = function() {
     + ttClasses.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
   document.getElementById('off-date').value = todayStr();
   document.getElementById('off-reason').value = '';
+  setOffScope('class');
+  onOffClassChange();
   renderOffList();
   DIRTY.delete('off-modal-bg');
   showModalBg('off-modal-bg');
@@ -1908,11 +2016,26 @@ window.saveOff = async function() {
   if (!parseYMD(date)) { alert('휴강 날짜를 올바르게 선택하세요.'); return; }
   const classId = nameToId.get(className) || '';
   if (!classId) { alert('이 반은 시간표에 없어 휴강을 등록할 수 없습니다.'); return; }
+
+  const perStu = (offScope === 'stu');
+  let sid = '', sname = '';
+  if (perStu) {
+    sid = String(document.getElementById('off-student').value || '').trim();
+    if (!sid) { alert('휴강할 학생을 선택하세요.'); return; }
+    const st = students.find(x => String(x.id || '').trim() === sid || String(x.fireId) === sid);
+    sname = st ? (st.name || '') : '';
+    if (!confirm(`${sname || sid} 학생만 ${fmtYMD(date)}에 쉬는 것으로 등록합니다.\n같은 반 다른 학생은 그대로 수업한 것으로 처리됩니다.\n\n계속할까요?`)) return;
+  }
+
   const btn = document.getElementById('off-save-btn');
   btn.disabled = true; btn.textContent = '등록 중...';
   try {
-    await setDoc(doc(db,'classOff', offDocId(classId, date)),
-      { classId, className, date, reason, createdAt: serverTimestamp() }, { merge:true });
+    const ref = perStu
+      ? doc(db, 'classOff', offStuDocId(sid, date))
+      : doc(db, 'classOff', offDocId(classId, date));
+    const body = { classId, className, date, reason, createdAt: serverTimestamp() };
+    if (perStu) { body.studentId = sid; body.studentName = sname; }
+    await setDoc(ref, body, { merge: true });
     document.getElementById('off-reason').value = '';
     DIRTY.delete('off-modal-bg');
   } catch (e) { alert('휴강 등록 오류: ' + e.message); }
@@ -2006,19 +2129,19 @@ window.recalcAll = async function() {
       });
       // 본수업 슬롯이 이미 있는 날에는 휴강을 넣지 않는다
       const lsDates = new Set(rec.filter(x => x.k === SLOT_LS).map(x => x.d));
-      const myIds = new Set(studentClassIds(s));
       const today = todayStr();
       const base = first || (parseYMD(s.startDate) ? String(s.startDate) : '');
-      if (myIds.size) offs.forEach(o => {
+      /* ★ 반 전체 휴강 + 이 학생 개인 휴강을 모두 '휴강'으로 남긴다.
+         offAppliesTo 가 둘을 알아서 가려낸다. */
+      offs.forEach(o => {
         const od = String(o.date || '');
         if (!parseYMD(od) || od > today) return;
         if (base && od < base) return;
         if (lsDates.has(od)) return;
-        if (myIds.has(String(o.classId))) {
-          rec.push({ d: od, k: SLOT_LS, s: '휴강' });
-          lessons.push(lessonEntry(od, SLOT_LS, '휴강', '', '', ''));
-          lsDates.add(od);
-        }
+        if (!offAppliesTo(o, s)) return;
+        rec.push({ d: od, k: SLOT_LS, s: '휴강' });
+        lessons.push(lessonEntry(od, SLOT_LS, '휴강', '', '', ''));
+        lsDates.add(od);
       });
       // 날짜 + 슬롯 기준으로 중복 제거 (뒤에 온 것을 남긴다)
       const seenR = new Set(); const recU = [];
@@ -2327,7 +2450,8 @@ window.loadBatch = async function() {
     box.innerHTML = '<div class="bt-empty">이 반에 배정된 학생이 없습니다.<br>학생 카드의 ✏️ 수정에서 반을 먼저 배정하세요.</div>';
     updateBtSum(); return;
   }
-  document.getElementById('bt-off').checked = !!(classId && offs.some(o => String(o.classId) === String(classId) && String(o.date) === date));
+  /* 반 전체 휴강만 본다 — 개인 휴강은 이 체크박스와 무관하다 */
+  document.getElementById('bt-off').checked = !!(classId && offs.some(o => !isStuOff(o) && String(o.classId) === String(classId) && String(o.date) === date));
   toggleBatchOff();
   box.innerHTML = '<div class="bt-empty">기존 기록 확인 중...</div>';
   const slots = await Promise.all(mem.map(s => readSlots(btStudentId(s), date, classId)));
@@ -2549,7 +2673,7 @@ window.saveBatch = async function() {
     });
     const offRef = doc(db, 'classOff', offDocId(classId, date));
     if (isOff) batch.set(offRef, { classId, className: cls, date, reason, createdAt: serverTimestamp() }, { merge: true });
-    else if (offs.some(o => String(o.classId) === String(classId) && String(o.date) === date)) batch.delete(offRef);
+    else if (offs.some(o => !isStuOff(o) && String(o.classId) === String(classId) && String(o.date) === date)) batch.delete(offRef);
     await batch.commit();
     btDraft = null; DIRTY.delete('bt-modal-bg'); showDraftNote('bt-draft', false);
     closeBatch(true);
@@ -2778,7 +2902,12 @@ window.renderCards = function() {
     if (abs) bits.push(`<span class="red">결석 <b>${abs}</b></span>`);
     if (mk) bits.push(`<span class="blue">보강 <b>${mk}</b></span>`);
     if (parseYMD(s.lastClassDate)) bits.push(`최근 ${esc(shortDate(s.lastClassDate))}`);
-    if (nOff) bits.push(`<span class="sm-chip hol" style="margin-left:0;">🚫 ${esc(shortDate(nOff.date))} 휴강</span>`);
+    if (nOff) {
+      const solo = isStuOff(nOff);
+      const rs = String(nOff.reason || '').trim();
+      bits.push(`<span class="sm-chip hol" style="margin-left:0;" title="${esc(rs || (solo ? '개인 휴강' : '반 전체 휴강'))}">`
+        + `🚫 ${esc(shortDate(nOff.date))} ${solo ? '개인휴강' : '휴강'}${rs ? ' · ' + esc(rs.slice(0, 12)) : ''}</span>`);
+    }
     const statHtml = bits.length ? `<div class="sm-stat">${bits.join('<span class="sep">·</span>')}</div>` : '';
     const cycBarHtml = cycleBar(cyc);
     const mkHtml = pend
