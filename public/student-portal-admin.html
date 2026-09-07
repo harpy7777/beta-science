@@ -58,6 +58,8 @@ body{
 .hstat{text-align:center;background:var(--wh);border:1px solid #fbcfe8;border-radius:12px;padding:12px 20px}
 .hstat-num{font-size:24px;font-weight:700;color:var(--pink);line-height:1}
 .hstat-lbl{font-size:11px;color:var(--mt);margin-top:3px}
+.hstat.sent .hstat-num{color:#7e22ce}
+.hstat.sent{border-color:#e9d5ff}
 
 /* ══ 안내 박스 ══ */
 .guide-box{background:var(--wh);border:1px solid #fbcfe8;border-radius:var(--r);padding:16px 20px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px}
@@ -80,6 +82,8 @@ body{
 .bulk-btn:hover{background:var(--pink-dk)}
 .bulk-btn.sms{background:linear-gradient(135deg,#a855f7,#7e22ce)}
 .bulk-btn.sms:hover{opacity:.9}
+.bulk-btn.hist{background:var(--wh);color:#6d28d9;border:1.5px solid #ddd6fe}
+.bulk-btn.hist:hover{background:#faf5ff}
 
 /* ══ 카드 그리드 ══ */
 .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
@@ -96,12 +100,16 @@ body{
 /* 학부모 번호 칩 */
 .ph-chip{font-size:11px;font-weight:700;font-family:monospace;border-radius:4px;padding:1px 6px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8}
 .ph-chip.none{background:#f8f9fa;border-color:var(--bd);color:#b0b0b5;font-weight:600}
+/* 마지막 발송 칩 — 카드만 훑어도 누가 빠졌는지 바로 보이게 하는 것이 목적 */
+.sent-chip{font-size:11px;font-weight:700;border-radius:4px;padding:1px 6px;background:#faf5ff;border:1px solid #e9d5ff;color:#7e22ce}
+.sent-chip.none{background:#f8f9fa;border-color:var(--bd);color:#b0b0b5;font-weight:600}
 .card-body{padding:14px 16px}
 .url-row{display:flex;align-items:center;gap:8px;background:var(--pink-lt);border:1px solid #fbcfe8;border-radius:10px;padding:10px 12px;margin-bottom:10px}
 .url-txt{flex:1;font-size:11px;font-family:monospace;color:var(--pink-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .btn-copy{display:flex;align-items:center;gap:4px;padding:7px 13px;background:var(--pink);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;white-space:nowrap}
 .btn-copy:hover{background:var(--pink-dk)}.btn-copy.copied{background:var(--ok)}
 .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn-row.top{margin-bottom:8px}
 .btn-preview{display:flex;align-items:center;justify-content:center;gap:5px;padding:10px;background:var(--pink-lt);color:var(--pink);border:1px solid #fbcfe8;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;font-family:inherit}
 .btn-preview:hover{background:#fce7f3}
 .btn-sms{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:linear-gradient(135deg,#fdf4ff,#c084fc);color:#7e22ce;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(192,132,252,.25);transition:opacity .15s,transform .1s;}
@@ -109,10 +117,13 @@ body{
 .btn-sms.off{background:#f4f4f5;color:#a1a1aa;box-shadow:none;cursor:default}
 .btn-sms.off:hover{opacity:1}.btn-sms.off:active{transform:none}
 
-/* ══ 피드백 버튼 ══ */
-.btn-fb{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;margin-bottom:8px;background:linear-gradient(135deg,#fff7ed,#fed7aa);color:#b45309;border:1px solid #fdba74;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s,transform .1s;}
+/* ══ 피드백 · 발송이력 버튼 ══ */
+.btn-fb{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;background:linear-gradient(135deg,#fff7ed,#fed7aa);color:#b45309;border:1px solid #fdba74;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s,transform .1s;}
 .btn-fb:hover{opacity:.88}.btn-fb:active{transform:scale(.98)}
+.btn-hist{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;background:linear-gradient(135deg,#f5f3ff,#ddd6fe);color:#6d28d9;border:1px solid #c4b5fd;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s,transform .1s;}
+.btn-hist:hover{opacity:.88}.btn-hist:active{transform:scale(.98)}
 .fb-cnt{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#b45309;color:#fff;font-size:11px;font-weight:800}
+.fb-cnt.h{background:#6d28d9}
 .fb-cnt.zero{background:#d6d3d1;color:#57534e}
 
 /* ══ 빈 상태 ══ */
@@ -129,7 +140,7 @@ body{
    반대로 잠금이 남아 페이지가 굳는 일이 있었다. */
 body.modal-open{overflow:hidden}
 
-/* ══ 공용 모달 (피드백 · 문자) ══ */
+/* ══ 공용 모달 (피드백 · 문자 · 발송이력) ══ */
 /* backdrop-filter 사용 금지 — 크롬에서 합성 레이어가 만들어지면
    그 안의 스크롤 상자(.fbm-body)가 한 번 스크롤한 뒤 멈추는 버그가 있다.
    흐림 효과 대신 배경을 조금 더 진하게 해서 같은 느낌을 낸다. */
@@ -192,6 +203,7 @@ body.modal-open{overflow:hidden}
 .smsm-to{display:flex;flex-wrap:wrap;gap:6px}
 .smsm-to-item{display:inline-flex;align-items:center;gap:6px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;color:#6d28d9}
 .smsm-to-item .p{font-family:monospace;font-weight:600;color:#7c3aed;opacity:.85}
+.smsm-to-item .last{font-weight:600;color:#9ca3af;font-size:11px}
 .smsm-ta{width:100%;min-height:130px;resize:vertical;border:1px solid #e9d5ff;border-radius:10px;padding:12px 14px;font-size:16px;font-family:inherit;line-height:1.8;color:var(--tx);background:var(--wh);outline:none;-webkit-appearance:none}
 .smsm-ta:focus{border-color:#a855f7}
 .smsm-hint{font-size:11.5px;color:var(--mt);line-height:1.8;margin-top:7px}
@@ -211,6 +223,25 @@ body.modal-open{overflow:hidden}
 .smsm-result b{font-weight:800}
 .smsm-result ul{margin:8px 0 0 18px;padding:0}
 .smsm-result li{margin-bottom:3px}
+
+/* ══ 발송 이력 모달 ══ */
+.histm-head{background:#faf5ff;border-bottom-color:#e9d5ff}
+.hist-day{font-size:12px;font-weight:700;color:var(--mt);margin:16px 0 9px;display:flex;align-items:center;gap:8px}
+.hist-day::after{content:'';flex:1;height:1px;background:var(--bd)}
+.hist-day.first{margin-top:0}
+.hist-item{border:1px solid var(--bd);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.hist-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:#faf5ff;border-bottom:1px solid #e9d5ff;flex-wrap:wrap}
+.hist-when{font-size:12.5px;font-weight:700;color:#6d28d9}
+.hist-when .ph{font-family:monospace;font-weight:600;opacity:.75;margin-left:6px}
+.hist-tags{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.hist-who{font-size:12px;font-weight:700;color:var(--tx)}
+.hist-tag{font-size:11px;font-weight:800;padding:2px 8px;border-radius:5px;background:#ecfdf5;border:1px solid #a7f3d0;color:#047857}
+.hist-tag.ng{background:#fef2f2;border-color:#fecaca;color:#b91c1c}
+.hist-tag.kind{background:#f8f9fa;border-color:var(--bd);color:var(--mt);font-weight:700}
+.hist-body{padding:13px 14px;font-size:13.5px;line-height:1.85;color:var(--tx);white-space:pre-wrap;word-break:break-word}
+.hist-reason{padding:9px 14px;background:#fef2f2;border-top:1px solid #fecaca;font-size:12px;font-weight:700;color:#b91c1c;line-height:1.7}
+.hist-empty{text-align:center;padding:32px 16px;color:var(--mt);font-size:13.5px;line-height:1.9;background:#fafafa;border:1px dashed var(--bd);border-radius:12px}
+.hist-note{font-size:12px;color:var(--mt);line-height:1.8;background:#f8f9fa;border:1px solid var(--bd);border-radius:10px;padding:10px 13px;margin-bottom:14px;word-break:keep-all}
 
 /* ══ 모바일 ══ */
 .m-header{background:linear-gradient(135deg,#f472b6,#db2777);color:#fff;padding:calc(16px + var(--safe-top)) 18px 16px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(219,39,119,.2);}
@@ -241,6 +272,7 @@ body.modal-open{overflow:hidden}
 .m-stat-row{display:flex;gap:10px;padding:14px 18px 0;background:var(--wh);border-bottom:1px solid var(--bd)}
 .m-stat{flex:1;text-align:center;padding-bottom:14px}
 .m-stat-num{font-size:20px;font-weight:700;color:var(--pink);line-height:1}
+.m-stat-num.sent{color:#7e22ce}
 .m-stat-lbl{font-size:10px;color:var(--mt);margin-top:3px}
 .m-guide{margin:14px 14px 0;background:var(--wh);border:1px solid #fbcfe8;border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:10px;}
 .m-guide-icon{font-size:16px;flex-shrink:0;margin-top:1px}
@@ -262,6 +294,8 @@ body.modal-open{overflow:hidden}
 .m-bulk-btn:active{background:var(--pink-dk)}
 .m-bulk-btn.sms{background:linear-gradient(135deg,#a855f7,#7e22ce)}
 .m-bulk-btn.sms:active{opacity:.85}
+.m-bulk-btn.hist{background:var(--wh);color:#6d28d9;border:1.5px solid #ddd6fe}
+.m-bulk-btn.hist:active{background:#faf5ff}
 .m-card-list{padding:12px 14px calc(14px + var(--safe-bot));display:flex;flex-direction:column;gap:10px;}
 .m-portal-card{background:var(--wh);border:1px solid var(--bd);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04);}
 .m-card-head{padding:14px 16px;border-bottom:1px solid #fdf2f8;display:flex;align-items:center;gap:12px;}
@@ -273,9 +307,12 @@ body.modal-open{overflow:hidden}
 .m-url-txt{flex:1;font-size:11px;font-family:monospace;color:var(--pink-dk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .m-btn-copy{display:flex;align-items:center;gap:4px;padding:9px 14px;background:var(--pink);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;white-space:nowrap;min-height:40px;}
 .m-btn-copy.copied{background:var(--ok)}
-.m-btn-fb{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px 10px;margin-bottom:8px;background:linear-gradient(135deg,#fff7ed,#fed7aa);color:#b45309;border:1px solid #fdba74;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;min-height:48px;}
+.m-btn-fb{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px 10px;background:linear-gradient(135deg,#fff7ed,#fed7aa);color:#b45309;border:1px solid #fdba74;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;min-height:48px;}
 .m-btn-fb:active{opacity:.85}
+.m-btn-hist{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px 10px;background:linear-gradient(135deg,#f5f3ff,#ddd6fe);color:#6d28d9;border:1px solid #c4b5fd;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;min-height:48px;}
+.m-btn-hist:active{opacity:.85}
 .m-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.m-btn-row.top{margin-bottom:8px}
 .m-btn-preview{display:flex;align-items:center;justify-content:center;gap:5px;padding:12px 10px;background:var(--pink-lt);color:var(--pink);border:1px solid #fbcfe8;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;font-family:inherit;min-height:48px;}
 .m-btn-preview:active{background:#fce7f3}
 .m-btn-sms{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 10px;background:linear-gradient(135deg,#fdf4ff,#c084fc);color:#7e22ce;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;min-height:48px;box-shadow:0 2px 8px rgba(192,132,252,.25);transition:opacity .15s;}
@@ -334,6 +371,7 @@ body.modal-open{overflow:hidden}
         <div class="hstat"><div class="hstat-num" id="d-statTotal">—</div><div class="hstat-lbl">전체 학생</div></div>
         <div class="hstat"><div class="hstat-num" id="d-statFiltered">—</div><div class="hstat-lbl">표시 중</div></div>
         <div class="hstat"><div class="hstat-num" id="d-statPhone">—</div><div class="hstat-lbl">번호 등록</div></div>
+        <div class="hstat sent"><div class="hstat-num" id="d-statSent">—</div><div class="hstat-lbl">문자 보냄</div></div>
       </div>
     </div>
 
@@ -342,7 +380,8 @@ body.modal-open{overflow:hidden}
       <div class="guide-txt">
         <strong style="font-size:15px;">보기 전용 · 로그인 불필요 · 피드백·테스트 자동 연동</strong><br>
         피드백 버튼으로 작성한 내용은 학부모 리포트 첫 화면에 바로 표시됩니다. 학생 상세 페이지에서 작성한 피드백과도 같이 연동됩니다.<br>
-        <span style="color:#7e22ce;">📨 <b>문자 발송</b>은 학생 관리에 등록된 <b>학부모 전화번호</b>로 바로 나갑니다. 번호가 없으면 버튼이 잠깁니다.</span>
+        <span style="color:#7e22ce;">📨 <b>문자 발송</b>은 학생 관리에 등록된 <b>학부모 전화번호</b>로 바로 나갑니다. 번호가 없으면 버튼이 잠깁니다.</span><br>
+        <span style="color:#6d28d9;">🗂 보낸 문자는 학생 카드에 <b>마지막 발송일</b>로 표시되고, <b>발송 이력</b> 버튼에서 내용까지 확인할 수 있습니다.</span>
         <span class="guide-url" id="d-baseUrlDisplay">불러오는 중...</span>
       </div>
     </div>
@@ -360,6 +399,11 @@ body.modal-open{overflow:hidden}
       <select class="filter-select" id="d-subjectFilter" onchange="filterStudents()">
         <option value="">전체 과목</option>
       </select>
+      <select class="filter-select" id="d-sentFilter" onchange="filterStudents()">
+        <option value="">문자 전체</option>
+        <option value="none">아직 안 보냄</option>
+        <option value="sent">보낸 적 있음</option>
+      </select>
       <span class="count-txt">총 <strong id="d-countDisplay">0</strong>명</span>
       <button class="bulk-btn" onclick="copyAllLinks()">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -368,6 +412,10 @@ body.modal-open{overflow:hidden}
       <button class="bulk-btn sms" onclick="smsOpenBulk()">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         전체 문자 발송
+      </button>
+      <button class="bulk-btn hist" onclick="histOpenAll()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        발송 내역
       </button>
     </div>
     <div class="card-grid" id="d-cardGrid">
@@ -408,13 +456,15 @@ body.modal-open{overflow:hidden}
     <div class="m-stat"><div class="m-stat-num" id="m-statTotal">—</div><div class="m-stat-lbl">전체 학생</div></div>
     <div class="m-stat" style="border-left:1px solid var(--bd)"><div class="m-stat-num" id="m-statFiltered">—</div><div class="m-stat-lbl">표시 중</div></div>
     <div class="m-stat" style="border-left:1px solid var(--bd)"><div class="m-stat-num" id="m-statPhone">—</div><div class="m-stat-lbl">번호 등록</div></div>
+    <div class="m-stat" style="border-left:1px solid var(--bd)"><div class="m-stat-num sent" id="m-statSent">—</div><div class="m-stat-lbl">문자 보냄</div></div>
   </div>
   <div class="m-guide">
     <div class="m-guide-icon">💡</div>
     <div class="m-guide-txt">
       <strong>보기 전용 · 로그인 불필요</strong><br>
       피드백은 학부모 리포트 첫 화면에 표시됩니다.<br>
-      <span style="color:#7e22ce">📨 문자는 <b>학부모 전화번호</b>로 바로 발송됩니다.</span>
+      <span style="color:#7e22ce">📨 문자는 <b>학부모 전화번호</b>로 바로 발송됩니다.</span><br>
+      <span style="color:#6d28d9">🗂 보낸 문자는 카드에 <b>마지막 발송일</b>로 표시됩니다.</span>
       <span class="m-guide-url" id="m-baseUrlDisplay">불러오는 중...</span>
     </div>
   </div>
@@ -433,6 +483,13 @@ body.modal-open{overflow:hidden}
         <option value="">전체 과목</option>
       </select>
     </div>
+    <div class="m-filter-selects">
+      <select class="m-filter-select" id="m-sentFilter" onchange="filterStudents()">
+        <option value="">문자 전체</option>
+        <option value="none">아직 안 보냄</option>
+        <option value="sent">보낸 적 있음</option>
+      </select>
+    </div>
     <div class="m-filter-bottom">
       <span class="m-count">총 <strong id="m-countDisplay">0</strong>명</span>
       <button class="m-bulk-btn" onclick="copyAllLinks()">
@@ -442,6 +499,10 @@ body.modal-open{overflow:hidden}
       <button class="m-bulk-btn sms" onclick="smsOpenBulk()">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         전체문자
+      </button>
+      <button class="m-bulk-btn hist" onclick="histOpenAll()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        발송내역
       </button>
     </div>
   </div>
@@ -514,12 +575,23 @@ body.modal-open{overflow:hidden}
   </div>
 </div>
 
+<!-- 발송 이력 모달 -->
+<div class="fbm-overlay" id="histOverlay" onclick="histBgClose(event)">
+  <div class="fbm" role="dialog" aria-modal="true" aria-labelledby="histTitle">
+    <div class="fbm-head histm-head">
+      <div class="fbm-title" id="histTitle">🗂 문자 발송 내역<span id="histSub"></span></div>
+      <button class="fbm-close" onclick="histClose()" aria-label="닫기">✕</button>
+    </div>
+    <div class="fbm-body" id="histBody"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc,setDoc,collection,getDocs,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,setDoc,collection,getDocs,onSnapshot,query,orderBy,limit}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const fc={apiKey:"AIzaSyD5MQx_rXO_xRYelyKxK090TaKa3Gg2D3k",authDomain:"beta-science.firebaseapp.com",projectId:"beta-science",storageBucket:"beta-science.firebasestorage.app",messagingSenderId:"650652155367",appId:"1:650652155367:web:41d2958e675cb4edd4d142"};
 const app=initializeApp(fc);const auth=getAuth(app);const db=getFirestore(app);
@@ -544,18 +616,30 @@ let fbUnsub=null;
 let fbmStudent=null;      // 모달에 열려 있는 학생
 let fbmEditId=null;       // 수정 중인 항목 id (없으면 새 작성)
 
+/* 발송 이력(smsLogs) 상태 — 아래 로그인 콜백과 unsubAll() 이 참조하므로
+   반드시 그보다 먼저 선언해 둔다 */
+let smsLogsAll=[];          // 최신순 전체
+let smsLogMap=new Map();    // 학생문서ID -> 해당 학생 기록 (최신순)
+let logUnsub=null;
+let logError='';            // 읽기 실패 시 사유 (보안 규칙 누락 등)
+
 onAuthStateChanged(auth,async u=>{
-  if(!u){if(fbUnsub){fbUnsub();fbUnsub=null;}window.location.replace('/login.html');return;}
+  if(!u){unsubAll();window.location.replace('/login.html');return;}
   try{
     const s=await getDoc(doc(db,'users',u.uid));
     if(!s.exists()||s.data().status!=='approved'){await signOut(auth);window.location.replace('/login.html');return;}
     document.body.style.visibility='visible';
     loadStudents();
     subscribeFeedbacks();
+    subscribeSmsLogs();
   }catch(e){window.location.replace('/login.html');}
 });
-window.doLogout=async()=>{if(fbUnsub){fbUnsub();fbUnsub=null;}await signOut(auth);window.location.replace('/login.html');};
-window.addEventListener('beforeunload',()=>{if(fbUnsub){fbUnsub();fbUnsub=null;}});
+function unsubAll(){
+  if(fbUnsub){fbUnsub();fbUnsub=null;}
+  if(logUnsub){logUnsub();logUnsub=null;}
+}
+window.doLogout=async()=>{unsubAll();await signOut(auth);window.location.replace('/login.html');};
+window.addEventListener('beforeunload',unsubAll);
 
 async function loadStudents(){
   try{
@@ -575,6 +659,7 @@ async function loadStudents(){
     ['d-statPhone','m-statPhone'].forEach(id=>setTxt(id,withPhone));
     populateSubjects();
     filterStudents();
+    updateSentStat();
   }catch(err){
     document.getElementById('d-cardGrid').innerHTML='<div class="empty-state">학생 정보를 불러오지 못했습니다.</div>';
     document.getElementById('m-cardList').innerHTML='<div class="m-empty">학생 정보를 불러오지 못했습니다.</div>';
@@ -642,12 +727,108 @@ function subscribeFeedbacks(){
 }
 function fbOf(fireId){return fbMap.get(fireId)||[];}
 
+/* ════════════════════════════════════════════════════════════════
+   발송 이력 — smsLogs 실시간 구독
+   ────────────────────────────────────────────────────────────────
+   서버(/api/send-sms)가 실제 발송 직후 한 명당 한 건씩 남긴다.
+   여기서는 읽기만 한다. 최신순 500건이면 학원 규모상 몇 년치가 들어간다.
+   sentAt 한 필드만 정렬하므로 Firestore 복합 색인이 필요 없다.
+════════════════════════════════════════════════════════════════ */
+function subscribeSmsLogs(){
+  if(logUnsub){logUnsub();logUnsub=null;}
+  const q=query(collection(db,'smsLogs'),orderBy('sentAt','desc'),limit(500));
+  logUnsub=onSnapshot(q,snap=>{
+    logError='';
+    const arr=[],map=new Map();
+    snap.forEach(d=>{
+      const v=d.data()||{};
+      const row={
+        id:d.id,
+        studentRef:String(v.studentRef||''),
+        studentId:String(v.studentId||''),
+        name:String(v.name||''),
+        grade:String(v.grade||''),
+        phone:String(v.phone||''),
+        text:String(v.text||''),
+        kind:String(v.kind||''),
+        status:String(v.status||''),
+        reason:String(v.reason||''),
+        sentAt:Number(v.sentAt)||0,
+        sentBy:String(v.sentBy||'')
+      };
+      arr.push(row);
+      if(row.studentRef){
+        const l=map.get(row.studentRef)||[];
+        l.push(row);
+        map.set(row.studentRef,l);
+      }
+    });
+    smsLogsAll=arr;smsLogMap=map;
+    renderDesktop();renderMobile();updateSentStat();
+    if(document.getElementById('histOverlay').classList.contains('open'))histRender();
+  },err=>{
+    console.error('smsLogs onSnapshot error:',err);
+    logError=(err&&err.code==='permission-denied')
+      ? 'Firestore 보안 규칙에 smsLogs 읽기 권한이 없습니다.'
+      : ('발송 내역을 불러오지 못했습니다: '+(err&&err.message?err.message:'알 수 없는 오류'));
+    smsLogsAll=[];smsLogMap=new Map();
+    renderDesktop();renderMobile();updateSentStat();
+    if(document.getElementById('histOverlay').classList.contains('open'))histRender();
+  });
+}
+function logsOf(fireId){return smsLogMap.get(fireId)||[];}
+// 마지막으로 "성공한" 발송 한 건 (실패는 보낸 것으로 치지 않는다)
+function lastOkOf(fireId){return logsOf(fireId).find(x=>x.status==='success')||null;}
+
+function updateSentStat(){
+  const n=allStudents.filter(s=>lastOkOf(s.fireId)).length;
+  ['d-statSent','m-statSent'].forEach(id=>setTxt(id,n));
+}
+
+/* 날짜·시각 표시 */
+function shortWhen(ms){
+  const d=new Date(ms);
+  if(!ms||isNaN(d.getTime()))return'';
+  const n=new Date();
+  if(d.toDateString()===n.toDateString())return'오늘';
+  const y=new Date(n.getTime()-86400000);
+  if(d.toDateString()===y.toDateString())return'어제';
+  return`${d.getMonth()+1}월 ${d.getDate()}일`;
+}
+function fullDay(ms){
+  const d=new Date(ms);
+  if(!ms||isNaN(d.getTime()))return'날짜 미상';
+  const w=['일','월','화','수','목','금','토'][d.getDay()];
+  return`${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${w})`;
+}
+function timeOnly(ms){
+  const d=new Date(ms);
+  if(!ms||isNaN(d.getTime()))return'시각 미상';
+  let h=d.getHours();
+  const ap=h<12?'오전':'오후';
+  h=h%12;if(h===0)h=12;
+  return`${ap} ${h}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function dayKey(ms){
+  const d=new Date(ms);
+  if(!ms||isNaN(d.getTime()))return'x';
+  return`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
 window.filterStudents=function(){
   const isMobile=window.innerWidth<=768;
   const kw=isMobile?document.getElementById('m-searchInput').value.trim().toLowerCase():document.getElementById('d-searchInput').value.trim().toLowerCase();
   const gr=isMobile?document.getElementById('m-gradeFilter').value:document.getElementById('d-gradeFilter').value;
   const sub=isMobile?document.getElementById('m-subjectFilter').value:document.getElementById('d-subjectFilter').value;
-  filtered=allStudents.filter(s=>(!kw||(s.name||'').toLowerCase().includes(kw)||(s.id||'').toLowerCase().includes(kw))&&(!gr||s.grade===gr)&&(!sub||s.subject===sub));
+  const sf=isMobile?document.getElementById('m-sentFilter').value:document.getElementById('d-sentFilter').value;
+  filtered=allStudents.filter(s=>{
+    if(kw&&!((s.name||'').toLowerCase().includes(kw)||(s.id||'').toLowerCase().includes(kw)))return false;
+    if(gr&&s.grade!==gr)return false;
+    if(sub&&s.subject!==sub)return false;
+    if(sf==='none'&&lastOkOf(s.fireId))return false;
+    if(sf==='sent'&&!lastOkOf(s.fireId))return false;
+    return true;
+  });
   const cnt=filtered.length;
   ['d-countDisplay','m-countDisplay'].forEach(id=>setTxt(id,cnt));
   ['d-statFiltered','m-statFiltered'].forEach(id=>setTxt(id,cnt));
@@ -667,6 +848,11 @@ window.filterStudents=function(){
      기본 문구를 바꿨으므로 저장 키를 v2 → v3 으로 올린다.
      (키를 그대로 두면 브라우저에 저장된 예전 문구가 계속 불려와
       화면에서는 바뀌지 않는다)
+
+   ★ 2026-09 수정 — 발송 기록
+     보낼 때 학생 문서 ID(studentRef)와 학년을 같이 실어 보낸다.
+     서버가 이 값을 smsLogs 에 함께 적어야 "이 기록은 어느 학생 것"인지
+     연결된다. 번호만 남기면 나중에 번호가 바뀌었을 때 추적이 끊긴다.
 ════════════════════════════════════════════════════════════════ */
 const SMS_API='/api/send-sms';
 // 기본 문구를 바꿀 때는 KEY 뒤 번호(v2, v3...)도 같이 올린다.
@@ -731,14 +917,24 @@ function smsStart(list,subLabel){
   if(ok.length>SMS_MAX){
     bits.push(`⚠️ 한 번에 최대 <b>${SMS_MAX}명</b>까지 보낼 수 있습니다. 검색·필터로 나눠서 보내주세요. (현재 ${ok.length}명)`);
   }
+  // 이미 오늘 보낸 사람이 섞여 있으면 알려준다 (중복 발송 방지)
+  const dupToday=ok.filter(x=>{const l=lastOkOf(x.s.fireId);return l&&shortWhen(l.sentAt)==='오늘';});
+  if(dupToday.length){
+    const names=dupToday.slice(0,8).map(x=>e(x.s.name||'이름없음')).join(', ');
+    bits.push(`🔁 <b>오늘 이미 문자를 받은 학부모 ${dupToday.length}명</b>이 포함되어 있습니다.<br>${names}${dupToday.length>8?` 외 ${dupToday.length-8}명`:''}<br><span style="font-weight:600">그대로 보내면 같은 분께 한 번 더 갑니다.</span>`);
+  }
   warn.innerHTML=bits.join('<hr style="border:none;border-top:1px solid #fde68a;margin:9px 0">');
   warn.classList.toggle('show',bits.length>0);
 
-  // 받는 사람 칩
+  // 받는 사람 칩 (마지막 발송일 같이 표시)
   const toBox=document.getElementById('smsTo');
   document.getElementById('smsCount').textContent=ok.length?`· ${ok.length}명`:'';
   toBox.innerHTML=ok.length
-    ? ok.slice(0,60).map(x=>`<span class="smsm-to-item">${e(x.s.name||'이름없음')}<span class="p">${e(fmtPhone(x.p))}</span></span>`).join('')
+    ? ok.slice(0,60).map(x=>{
+        const l=lastOkOf(x.s.fireId);
+        const last=l?`<span class="last">${e(shortWhen(l.sentAt))} 보냄</span>`:'<span class="last">첫 발송</span>';
+        return`<span class="smsm-to-item">${e(x.s.name||'이름없음')}<span class="p">${e(fmtPhone(x.p))}</span>${last}</span>`;
+      }).join('')
       +(ok.length>60?`<span class="smsm-to-item">외 ${ok.length-60}명</span>`:'')
     : '<span style="font-size:13px;color:var(--mt)">보낼 수 있는 대상이 없습니다.</span>';
 
@@ -827,7 +1023,15 @@ window.smsSend=async function(dryRun){
         idToken,
         dryRun:!!dryRun,
         subject:SMS_SUBJECT,
-        messages:smsTargets.map(x=>({name:x.s.name||'이름없음',to:x.p,text:renderTpl(tpl,x.s)}))
+        messages:smsTargets.map(x=>({
+          name:x.s.name||'이름없음',
+          to:x.p,
+          text:renderTpl(tpl,x.s),
+          // ↓ 발송 기록을 학생과 연결하기 위한 정보
+          studentRef:x.s.fireId||'',
+          studentId:x.s.id||'',
+          grade:x.s.grade||''
+        }))
       })
     });
     let d={};
@@ -858,6 +1062,9 @@ window.smsSend=async function(dryRun){
       box.className='smsm-result show '+(ngN?'ng':'ok');
       box.innerHTML=`<b>${ngN?'⚠️':'🎉'} 발송 완료 — 성공 ${okN}건${ngN?` · 실패 ${ngN}건`:''}</b>`
         +(d['잔액']?`<br>남은 잔액 <b>${e(d['잔액'])}</b>`:'')
+        +(d['기록']==='저장 실패'
+            ? `<br><span style="font-weight:700;color:#b45309">⚠️ 문자는 나갔지만 발송 기록이 저장되지 않았습니다. Firestore 보안 규칙에서 smsLogs 쓰기 권한을 확인해주세요.</span>`
+            : `<br><span style="font-weight:600">발송 내역에 기록되었습니다.</span>`)
         +(fails.length?`<ul>${fails.map(f=>`<li>${e(f.name||'')} — ${e(f.reason||'')}</li>`).join('')}</ul>`:'');
       showToast(ngN?`⚠️ 성공 ${okN}건 · 실패 ${ngN}건`:`🎉 ${okN}건 발송 완료!`);
     }
@@ -873,6 +1080,14 @@ window.smsSend=async function(dryRun){
 function gradeClassOf(grade){
   return{'중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3','고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3'}[grade]||'grade-mid1';
 }
+// 카드에 붙는 "마지막 발송" 칩 — 카드만 훑어도 누가 빠졌는지 보이게 하는 것이 목적
+function sentChipOf(fireId){
+  if(logError)return'';
+  const last=lastOkOf(fireId);
+  return last
+    ? `<span class="sent-chip" title="${e(fullDay(last.sentAt))} ${e(timeOnly(last.sentAt))}">📨 ${e(shortWhen(last.sentAt))} 보냄</span>`
+    : `<span class="sent-chip none">📭 보낸 적 없음</span>`;
+}
 
 function renderDesktop(){
   const grid=document.getElementById('d-cardGrid');
@@ -884,6 +1099,7 @@ function renderDesktop(){
     const initial=(s.name||'?').charAt(0);
     const fid=e(s.fireId),safeUrl=e(url),safeName=e(s.name||'');
     const n=fbOf(s.fireId).length;
+    const ln=logsOf(s.fireId).length;
     const ph=phoneOf(s);
     const phChip=ph
       ? `<span class="ph-chip" title="학부모 전화번호">📱 ${e(fmtPhone(ph))}</span>`
@@ -904,6 +1120,7 @@ function renderDesktop(){
             ${s.subject?`<span class="id-chip" style="background:#f0fdf4;border-color:#bbf7d0;color:#166534">${e(s.subject)}</span>`:''}
             <span class="id-chip">${e(s.id||'-')}</span>
             ${phChip}
+            ${sentChipOf(s.fireId)}
           </div>
         </div>
       </div>
@@ -912,7 +1129,10 @@ function renderDesktop(){
           <span class="url-txt" title="${safeUrl}">${safeUrl}</span>
           <button class="btn-copy" id="dbtn-${fid}" onclick="copyLink('${safeUrl}','dbtn-${fid}')">📋 복사</button>
         </div>
-        <button class="btn-fb" onclick="fbmOpen('${fid}')">💬 피드백 <span class="fb-cnt ${n?'':'zero'}">${n}</span></button>
+        <div class="btn-row top">
+          <button class="btn-fb" onclick="fbmOpen('${fid}')">💬 피드백 <span class="fb-cnt ${n?'':'zero'}">${n}</span></button>
+          <button class="btn-hist" onclick="histOpen('${fid}')">🗂 발송 이력 <span class="fb-cnt h ${ln?'':'zero'}">${ln}</span></button>
+        </div>
         <div class="btn-row">
           <a class="btn-preview" href="${safeUrl}" target="_blank" rel="noopener">👁 미리보기</a>
           ${smsBtn}
@@ -932,6 +1152,7 @@ function renderMobile(){
     const initial=(s.name||'?').charAt(0);
     const fid=e(s.fireId),safeUrl=e(url),safeName=e(s.name||'');
     const n=fbOf(s.fireId).length;
+    const ln=logsOf(s.fireId).length;
     const ph=phoneOf(s);
     const phChip=ph
       ? `<span class="ph-chip">📱 ${e(fmtPhone(ph))}</span>`
@@ -952,6 +1173,7 @@ function renderMobile(){
             ${s.subject?`<span class="id-chip" style="background:#f0fdf4;border-color:#bbf7d0;color:#166534">${e(s.subject)}</span>`:''}
             <span class="id-chip">${e(s.id||'-')}</span>
             ${phChip}
+            ${sentChipOf(s.fireId)}
           </div>
         </div>
       </div>
@@ -960,7 +1182,10 @@ function renderMobile(){
           <span class="m-url-txt" title="${safeUrl}">${safeUrl}</span>
           <button class="m-btn-copy" id="mbtn-${fid}" onclick="copyLink('${safeUrl}','mbtn-${fid}')">📋 복사</button>
         </div>
-        <button class="m-btn-fb" onclick="fbmOpen('${fid}')">💬 피드백 <span class="fb-cnt ${n?'':'zero'}">${n}</span></button>
+        <div class="m-btn-row top">
+          <button class="m-btn-fb" onclick="fbmOpen('${fid}')">💬 피드백 <span class="fb-cnt ${n?'':'zero'}">${n}</span></button>
+          <button class="m-btn-hist" onclick="histOpen('${fid}')">🗂 이력 <span class="fb-cnt h ${ln?'':'zero'}">${ln}</span></button>
+        </div>
         <div class="m-btn-row">
           <a class="m-btn-preview" href="${safeUrl}" target="_blank" rel="noopener">👁 미리보기</a>
           ${smsBtn}
@@ -968,6 +1193,85 @@ function renderMobile(){
       </div>
     </div>`;
   }).join('');
+}
+
+/* ════ 발송 이력 모달 ════ */
+let histMode='all';      // 'all' 전체 내역 · 'one' 학생 한 명
+let histStudent=null;
+
+window.histOpen=function(fireId){
+  const s=allStudents.find(x=>x.fireId===fireId);
+  if(!s){showToast('⚠️ 학생 정보를 찾을 수 없습니다');return;}
+  histMode='one';histStudent=s;
+  document.getElementById('histSub').textContent=`${s.name||'이름없음'} · ${s.grade||'—'}${s.id?' · '+s.id:''}`;
+  histShow();
+};
+window.histOpenAll=function(){
+  histMode='all';histStudent=null;
+  document.getElementById('histSub').textContent='전체 학생 · 최근 500건';
+  histShow();
+};
+function histShow(){
+  histRender();
+  document.getElementById('histOverlay').classList.add('open');
+  const body=document.getElementById('histBody');
+  if(body)body.scrollTop=0;
+  syncScrollLock();
+}
+window.histClose=function(){
+  document.getElementById('histOverlay').classList.remove('open');
+  histStudent=null;
+  syncScrollLock();
+};
+window.histBgClose=function(ev){if(ev.target&&ev.target.id==='histOverlay')histClose();};
+
+function histRender(){
+  const body=document.getElementById('histBody');
+  if(!body)return;
+
+  if(logError){
+    body.innerHTML=`<div class="hist-empty">${e(logError)}<br>
+      <span style="font-size:12.5px">Firebase 콘솔 → Firestore → 규칙 에서 smsLogs 규칙을 추가해주세요.</span></div>`;
+    return;
+  }
+
+  const list=histMode==='one'
+    ? (histStudent?logsOf(histStudent.fireId):[])
+    : smsLogsAll;
+
+  if(!list.length){
+    body.innerHTML=`<div class="hist-empty">아직 발송 기록이 없습니다.<br>
+      <span style="font-size:12.5px">이 기능을 적용한 뒤 보낸 문자부터 기록됩니다. 그 전에 보낸 문자는 남아 있지 않습니다.</span></div>`;
+    return;
+  }
+
+  const okN=list.filter(x=>x.status==='success').length;
+  let html=`<div class="hist-note">📊 총 <b>${list.length}건</b> · 성공 <b>${okN}건</b>${list.length-okN?` · 실패 <b>${list.length-okN}건</b>`:''}
+    ${histMode==='all'?'<br>최근 500건까지 보여줍니다.':''}</div>`;
+
+  let prevDay='',first=true;
+  list.forEach(x=>{
+    const dk=dayKey(x.sentAt);
+    if(dk!==prevDay){
+      prevDay=dk;
+      html+=`<div class="hist-day${first?' first':''}">🗓 ${e(fullDay(x.sentAt))}</div>`;
+      first=false;
+    }
+    const ok=x.status==='success';
+    html+=`<div class="hist-item">
+      <div class="hist-top">
+        <span class="hist-when">${e(timeOnly(x.sentAt))}<span class="ph">${e(fmtPhone(x.phone))}</span></span>
+        <span class="hist-tags">
+          ${histMode==='all'?`<span class="hist-who">${e(x.name||'이름없음')}${x.grade?' · '+e(x.grade):''}</span>`:''}
+          <span class="hist-tag kind">${e(x.kind||'-')}</span>
+          <span class="hist-tag ${ok?'':'ng'}">${ok?'✅ 발송됨':'❌ 실패'}</span>
+        </span>
+      </div>
+      <div class="hist-body">${e(x.text)}</div>
+      ${x.reason?`<div class="hist-reason">사유 · ${e(x.reason)}</div>`:''}
+    </div>`;
+  });
+  body.innerHTML=html;
 }
 
 /* ════ 피드백 모달 ════ */
@@ -995,6 +1299,7 @@ window.fbmBgClose=function(ev){if(ev.target&&ev.target.id==='fbmOverlay')fbmClos
 document.addEventListener('keydown',ev=>{
   if(ev.key!=='Escape')return;
   if(document.getElementById('smsOverlay').classList.contains('open')){smsClose();return;}
+  if(document.getElementById('histOverlay').classList.contains('open')){histClose();return;}
   if(fbmStudent)fbmClose();
 });
 
