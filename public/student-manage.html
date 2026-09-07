@@ -471,6 +471,16 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
 .off-item .oi-r { color:#aeaeb2; font-size:11px; }
 .off-item .oi-x { flex-shrink:0; border:none; background:#fef2f2; color:#dc2626; border-radius:8px; min-height:40px; padding:0 13px; font-family:inherit; font-size:11px; font-weight:700; cursor:pointer; }
 .off-empty { font-size:11.5px; color:#aeaeb2; padding:12px 2px; }
+/* ★ 휴강 사유 빠른 입력 */
+.off-presets { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:7px; }
+.off-preset {
+  padding:8px 12px; min-height:38px; border:1.5px solid #ddd6fe; background:#f5f3ff;
+  color:#6d28d9; border-radius:9px; font-family:inherit; font-size:11.5px; font-weight:700;
+  cursor:pointer; white-space:normal; word-break:keep-all; text-align:left; line-height:1.35;
+}
+.off-preset:hover { background:#ede9fe; }
+.off-preset:active { transform:scale(0.97); }
+@media (max-width:600px) { .off-preset { flex:1 1 100%; min-height:44px; font-size:12.5px; } }
 
 /* 핑크 유지 — 다만 혼자 한 줄을 차지하지 않도록 flex 지정을 뺐다 */
 .sm-tool-btn.primary {
@@ -837,7 +847,7 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
   </div>
   <div class="sm-tools">
     <button class="sm-tool-btn primary" onclick="openBatch()">📋 반별 수업카드 일괄 작성</button>
-    <button class="sm-tool-btn" onclick="openOff()">🚫 휴강 등록 · 관리</button>
+    <button class="sm-tool-btn" onclick="openOff()">📅 수업 없는 날 등록</button>
     <button class="sm-tool-btn" id="sm-recalc-btn" onclick="recalcAll()">🔄 회차 재집계</button>
   </div>
   <div class="sm-need" id="sm-need"></div>
@@ -1101,8 +1111,8 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
 <!-- 휴강 등록/관리 모달 -->
 <div class="sm-modal-bg" id="off-modal-bg">
   <div class="sm-modal">
-    <div class="sm-modal-title">🚫 휴강 등록 · 관리</div>
-    <div class="sm-class-note">휴강으로 등록한 날은 <b>수업 예정일에서 빠집니다.</b> 회차가 올라가지 않고, 「수업 기록 없음」 경고도 뜨지 않습니다.<br><b>학교마다 시험 기간이 다를 때</b>는 아래에서 <b>학생 한 명만</b> 골라 등록하세요. 같은 반 다른 학생은 그대로 수업한 것으로 처리됩니다.</div>
+    <div class="sm-modal-title">📅 수업 없는 날 등록 · 관리</div>
+    <div class="sm-class-note">등록한 날은 <b>정규 수업일에서 빠집니다.</b> 회차가 올라가지 않고, 「수업 기록 없음」 경고도 뜨지 않습니다.<br><b>학교마다 시험 기간이 다르거나 한 학생만 요일을 옮겼을 때</b>는 <b>학생 한 명만</b> 골라 등록하세요. 같은 반 다른 학생은 그대로 수업한 것으로 처리됩니다.<br><b>사유를 꼭 적어주세요.</b> 회차로 수강료를 받으므로, 그냥 쉰 날이 아니라 왜 수업이 없었는지가 기록에 남아야 합니다.</div>
     <div class="sm-field">
       <span class="cc-label">누가 쉬나요? <span class="req">*</span></span>
       <div class="seg" id="off-scope" style="grid-template-columns:repeat(2,1fr);">
@@ -1121,16 +1131,17 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
       <div class="sm-hint" id="off-stu-hint">반을 먼저 고르면 그 반 학생만 나옵니다.</div>
     </div>
     <div class="sm-field">
-      <span class="cc-label">휴강 날짜 <span class="req">*</span></span>
+      <span class="cc-label">날짜 <span class="req">*</span></span>
       <input class="cc-inp" id="off-date" type="date">
     </div>
     <div class="sm-field">
-      <span class="cc-label">휴강 사유 · 내용</span>
-      <textarea class="cc-textarea" id="off-reason" placeholder="예: 중간고사 기간이라 이번 주 수업 없음 / 학교 수학여행 / 공휴일" style="min-height:72px;"></textarea>
-      <div class="sm-hint">적어 두면 나중에 왜 쉬었는지 바로 알 수 있습니다. 학생 카드와 아래 목록에 표시됩니다.</div>
+      <span class="cc-label">사유 · 내용 <span class="req">*</span></span>
+      <div class="off-presets" id="off-presets"></div>
+      <textarea class="cc-textarea" id="off-reason" placeholder="예: 반 이동으로 인한 수업일 변경" style="min-height:72px;"></textarea>
+      <div class="sm-hint blue">회차로 수강료를 받으므로 <b>왜 수업이 없었는지</b> 꼭 남겨주세요. 이 문구가 학생 카드와 <b>학부모 화면 기록</b>에 그대로 표시됩니다. 비워 두면 「수업일 변경 (결손 아님)」으로 저장됩니다.</div>
     </div>
-    <button class="cc-write-btn" id="off-save-btn" style="width:100%;min-height:46px;" onclick="saveOff()">휴강 등록</button>
-    <div class="section-heading" style="margin-top:1.4rem;">등록된 휴강</div>
+    <button class="cc-write-btn" id="off-save-btn" style="width:100%;min-height:46px;" onclick="saveOff()">등록하기</button>
+    <div class="section-heading" style="margin-top:1.4rem;">등록된 날짜</div>
     <div class="off-list" id="off-list"><div class="off-empty">불러오는 중...</div></div>
     <div class="sm-modal-footer"><button class="btn-secondary" onclick="closeOff()">닫기</button></div>
   </div>
@@ -2015,6 +2026,24 @@ function refreshClassSelectors() {
 ════════════════════════════════════════════════════════════════════ */
 function offDocId(classId, date) { return `${classId}__${date}`; }
 function offStuDocId(sid, date) { return `stu_${sid}__${date}`; }
+
+/* ★ 2026-09 — 「휴강」이라는 말만 남기지 않는다
+   ────────────────────────────────────────────────────────────────────
+   회차로 수강료를 받는 구조라, 기록에 '휴강'만 찍히면 학부모 입장에서는
+   그냥 한 번 쉰 것처럼 보인다. 실제로는 수업일을 옮겼거나 시험 주라
+   건너뛴 것이므로, 사유를 반드시 함께 남겨 학생 카드와 학부모 화면에
+   그대로 보이게 한다. 비워 두면 아래 기본 문구가 들어간다. */
+const OFF_REASON_DEFAULT = '수업일 변경 (결손 아님)';
+const OFF_PRESETS = [
+  '반 이동으로 인한 수업일 변경',
+  '학교 시험 기간으로 일정 조정',
+  '수업일 변경 (다른 날 진행)',
+  '공휴일 · 학원 휴원일'
+];
+function offReasonText(o) {
+  const v = String((o && o.reason) == null ? '' : o.reason).trim();
+  return v || OFF_REASON_DEFAULT;
+}
 /* 이 휴강이 걸린 학생 ID — 없으면 반 전체 휴강 */
 function offTargetId(o) {
   const v = String((o && o.studentId) == null ? '' : o.studentId).trim();
@@ -2073,7 +2102,7 @@ function renderOffList() {
       : `🏫 ${esc(cls)} <span style="color:#aeaeb2;">· 반 전체</span>`;
     return `<div class="off-item"${past ? ' style="opacity:0.55;"' : ''}>
       <span class="oi-d">${esc(shortDate(o.date))}</span>
-      <span class="oi-n">${who}${o.reason ? `<br><span class="oi-r">${esc(o.reason)}</span>` : ''}</span>
+      <span class="oi-n">${who}<br><span class="oi-r">${esc(offReasonText(o))}</span></span>
       <button class="oi-x" onclick="delOff('${esc(o.id)}')">삭제</button>
     </div>`;
   }).join('');
@@ -2125,6 +2154,9 @@ window.openOff = function() {
     + ttClasses.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
   document.getElementById('off-date').value = todayStr();
   document.getElementById('off-reason').value = '';
+  const pbox = document.getElementById('off-presets');
+  if (pbox) pbox.innerHTML = OFF_PRESETS.map((t, i) =>
+    `<button type="button" class="off-preset" onclick="useOffPreset(${i})">${esc(t)}</button>`).join('');
   setOffScope('class');
   onOffClassChange();
   renderOffList();
@@ -2136,10 +2168,17 @@ window.closeOff = function() {
   DIRTY.delete('off-modal-bg');
   hideModalBg('off-modal-bg');
 };
+window.useOffPreset = function(i) {
+  const el = document.getElementById('off-reason');
+  const t = OFF_PRESETS[i];
+  if (!el || !t) return;
+  el.value = t;
+  el.focus();
+};
 window.saveOff = async function() {
   const className = document.getElementById('off-class').value;
   const date = document.getElementById('off-date').value.trim();
-  const reason = document.getElementById('off-reason').value.trim();
+  const reason = document.getElementById('off-reason').value.trim() || OFF_REASON_DEFAULT;
   if (!className) { alert('반을 선택하세요.'); return; }
   if (!parseYMD(date)) { alert('휴강 날짜를 올바르게 선택하세요.'); return; }
   const classId = nameToId.get(className) || '';
@@ -2167,10 +2206,10 @@ window.saveOff = async function() {
     document.getElementById('off-reason').value = '';
     DIRTY.delete('off-modal-bg');
   } catch (e) { alert('휴강 등록 오류: ' + e.message); }
-  finally { btn.disabled = false; btn.textContent = '휴강 등록'; }
+  finally { btn.disabled = false; btn.textContent = '등록하기'; }
 };
 window.delOff = async function(id) {
-  if (!confirm('이 휴강 기록을 삭제하시겠습니까?')) return;
+  if (!confirm('이 기록을 삭제하시겠습니까?\n삭제하면 그 날이 다시 정규 수업일로 잡힙니다.')) return;
   try { await deleteDoc(doc(db,'classOff', id)); }
   catch (e) { alert('삭제 오류: ' + e.message); }
 };
@@ -2193,8 +2232,8 @@ window.skipDate = async function(fireId, date) {
   const sid = (s.id && String(s.id).trim()) ? String(s.id).trim() : String(s.fireId);
 
   const reason = prompt(
-    `${nm} 학생 · ${fmtYMD(date)}\n\n이 날은 수업이 없던 날로 처리합니다.\n예정일에서 빠지고 경고가 사라집니다. (이 학생만 적용)\n\n사유를 적어주세요 (선택)`,
-    '');
+    `${nm} 학생 · ${fmtYMD(date)}\n\n이 날은 정규 수업일에서 빼고, 아래 사유를 기록으로 남깁니다.\n(이 학생만 적용 · 학부모 화면에도 이 문구가 표시됩니다)\n\n사유를 적어주세요`,
+    OFF_PRESETS[0]);
   if (reason === null) return;   /* 취소 */
 
   const names = studentClassNames(s);
@@ -2204,7 +2243,7 @@ window.skipDate = async function(fireId, date) {
     await setDoc(doc(db, 'classOff', offStuDocId(sid, date)), {
       classId, className: cls, date,
       studentId: sid, studentName: nm,
-      reason: String(reason || '').trim(),
+      reason: String(reason || '').trim() || OFF_REASON_DEFAULT,
       createdAt: serverTimestamp()
     }, { merge: true });
   } catch (e) { alert('처리 오류: ' + e.message); }
@@ -2303,7 +2342,9 @@ window.recalcAll = async function() {
         if (lsDates.has(od)) return;
         if (!offAppliesTo(o, s)) return;
         rec.push({ d: od, k: SLOT_LS, s: '휴강' });
-        lessons.push(lessonEntry(od, SLOT_LS, '휴강', '', '', ''));
+        /* ★ 사유를 '수업 내용' 자리에 담는다. 학부모 화면에 그대로 표시되어
+           그냥 쉰 날이 아니라 왜 수업이 없었는지 알 수 있다. */
+        lessons.push(lessonEntry(od, SLOT_LS, '휴강', '', offReasonText(o), ''));
         lsDates.add(od);
       });
       // 날짜 + 슬롯 기준으로 중복 제거 (뒤에 온 것을 남긴다)
@@ -2729,7 +2770,9 @@ window.saveBatch = async function() {
   }
   // ★ 저장 직전 날짜 확인 — 지난 달 날짜로 잘못 저장되는 것을 막는다
   if (!confirmClassDate(date, '수업 날짜')) return;
-  const reason = isOff ? (prompt('휴강 사유를 입력하세요 (선택)', '') || '') : '';
+  const reason = isOff
+    ? ((prompt('이 날 수업이 없는 사유를 적어주세요.\n학부모 화면 기록에 그대로 표시됩니다.', OFF_PRESETS[2]) || '').trim() || OFF_REASON_DEFAULT)
+    : '';
 
   const btn = document.getElementById('bt-save-btn');
   btn.disabled = true; btn.textContent = '저장 중...';
@@ -2821,7 +2864,7 @@ window.saveBatch = async function() {
         ra = mergeRecent(ra, date, SLOT_MK, null);
         ra = mergeRecent(ra, date, SLOT_LS, '휴강');
         rl = mergeLesson(rl, date, SLOT_MK, null);
-        rl = mergeLesson(rl, date, SLOT_LS, lessonEntry(date, SLOT_LS, '휴강', '', '', ''));
+        rl = mergeLesson(rl, date, SLOT_LS, lessonEntry(date, SLOT_LS, '휴강', '', (reason || OFF_REASON_DEFAULT), ''));
       } else {
         const lesson = isLessonStatus(newSt);
         ra = mergeRecent(ra, date, kind, newSt);
@@ -3070,10 +3113,11 @@ window.renderCards = function() {
     if (mk) bits.push(`<span class="blue">보강 <b>${mk}</b></span>`);
     if (parseYMD(s.lastClassDate)) bits.push(`최근 ${esc(shortDate(s.lastClassDate))}`);
     if (nOff) {
-      const solo = isStuOff(nOff);
-      const rs = String(nOff.reason || '').trim();
-      bits.push(`<span class="sm-chip hol" style="margin-left:0;" title="${esc(rs || (solo ? '개인 휴강' : '반 전체 휴강'))}">`
-        + `🚫 ${esc(shortDate(nOff.date))} ${solo ? '개인휴강' : '휴강'}${rs ? ' · ' + esc(rs.slice(0, 12)) : ''}</span>`);
+      /* '휴강' 대신 사유를 앞세운다 — 회차로 수강료를 받으므로
+         그냥 쉰 날처럼 보이지 않게 한다 */
+      const rs = offReasonText(nOff);
+      bits.push(`<span class="sm-chip hol" style="margin-left:0;" title="${esc((isStuOff(nOff) ? '이 학생만 · ' : '반 전체 · ') + rs)}">`
+        + `📅 ${esc(shortDate(nOff.date))} ${esc(rs.length > 16 ? rs.slice(0, 15) + '…' : rs)}</span>`);
     }
     const statHtml = bits.length ? `<div class="sm-stat">${bits.join('<span class="sep">·</span>')}</div>` : '';
     const cycBarHtml = cycleBar(cyc);
