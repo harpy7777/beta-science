@@ -437,7 +437,7 @@ tbody tr.grp-row:hover{background:#fff}
         <tbody id="pendingBody"><tr><td colspan="8" style="text-align:center;padding:2.5rem;color:#aeaeb2">데이터를 불러오는 중...</td></tr></tbody>
       </table>
     </div>
-    <div class="pend-note">※ 주간 학습 클리닉으로 배포된 시험만 집계합니다. 학생이 응시하면 이 목록에서 사라지고 위 '최근 응시 학생'으로 자동 이동합니다.<br>※ 클리닉에 <b>핵심내용 · 핵심정리</b>가 함께 담겨 있으면 그것은 응시 대상이 아니라 여기에 나오지 않습니다. 이 경우 시험명 옆에 <b>클리닉 N개 중 시험 M개</b>로 표시됩니다.<br>※ 반 · 이름 · 학년은 학생 관리에 저장된 <b>현재 정보</b>를 실시간으로 표시합니다. (배포 후 반을 배정해도 즉시 반영)<br>※ 학생 ID 없이 만든 옛 클리닉과 삭제된 학생은 집계에서 제외됩니다.</div>
+    <div class="pend-note">※ 주간 학습 클리닉으로 배포된 시험만 집계합니다. 학생이 응시하면 이 목록에서 사라지고 위 '최근 응시 학생'으로 자동 이동합니다.<br>※ 클리닉에 <b>핵심내용 · 핵심정리</b>가 함께 담겨 있으면 그것은 응시 대상이 아니라 여기에 나오지 않습니다. 이 경우 시험명 옆에 <b>클리닉 N개 중 시험 M개</b>로 표시됩니다.<br>※ 전에 푼 시험을 다시 배포하면 <b>🔁 재시험</b>으로 표시되고, 다시 풀기 전까지 이 목록에 남습니다. (배지에 마우스를 올리면 지난 응시일과 점수가 보입니다)<br>※ 반 · 이름 · 학년은 학생 관리에 저장된 <b>현재 정보</b>를 실시간으로 표시합니다. (배포 후 반을 배정해도 즉시 반영)<br>※ 학생 ID 없이 만든 옛 클리닉과 삭제된 학생은 집계에서 제외됩니다.</div>
   </div>
 
   <!-- Test Management -->
@@ -897,17 +897,31 @@ function submittedTypes(r){
   }
   return out;
 }
-/* 이미 응시한 (학생|시험|유형) 집합 */
-function buildAttemptedSet(){
-  const s=new Set();
+/* 응시 이력 — '학생|시험|유형' → [{ms:응시시각, score:점수}, …] (오래된 순)
+   예전에는 "한 번이라도 응시했는가"만 Set 으로 봤다. 그래서 같은 시험을
+   다시 풀라고 재배포해도 옛 응시 기록 때문에 미응시 목록에 잡히지 않았다.
+   이제 응시 시각을 함께 들고 있다가, 배포일 기준으로 그 배포 이후에 푼
+   기록이 있는지를 따로 판단한다.
+   ※ 응시일이 기록되지 않은 옛 기록(ms<=0)은 판단할 근거가 없으므로
+     예전처럼 "응시함"으로 보고 목록에 띄우지 않는다. (false 미응시 방지) */
+function buildAttemptedMap(){
+  const m={};
   (lastGradeDocs||[]).forEach(d=>{
     const r=d.data()||{};
     const sid=String(r.studentId||'').trim();
     const key=r.examId||r.testId;
     if(!sid||!key)return;
-    submittedTypes(r).forEach(t=>s.add(sid+'|'+key+'|'+t));
+    const t=tD(r.timestamp||r.submittedTimestamp||r.date).getTime();
+    const ms=(t>0&&!isNaN(t))?t:0;
+    const p=displayParts(r);
+    submittedTypes(r).forEach(type=>{
+      const sc=(type==='master')?p.master:(type==='ox'?p.ox:p.multi);
+      const k=sid+'|'+key+'|'+type;
+      (m[k]||(m[k]=[])).push({ms,score:(sc==null?null:sc)});
+    });
   });
-  return s;
+  Object.values(m).forEach(v=>v.sort((a,b)=>a.ms-b.ms));
+  return m;
 }
 
 /* ── 미응시 명단 렌더 ── */
@@ -915,14 +929,27 @@ function renderPending(){
   const tb=document.getElementById('pendingBody');
   const cntEl=document.getElementById('pendCount');
   if(!tb)return;
-  const attempted=buildAttemptedSet();
+  const attempted=buildAttemptedMap();
+  /* 배포 당일에 바로 푼 경우를 놓치지 않도록 하루치 여유를 둔다.
+     주 1회 시험이라 같은 시험이 하루 안에 두 번 배포될 일은 없다. */
+  const GRACE=86400000;
   const groups={};
   distList.forEach(x=>{
     if(!x.sid)return;
     if(studentsLoaded&&!aIds.has(String(x.sid).trim()))return;   // 퇴원·삭제 학생 제외
     const k=x.sid+'|'+x.examId+'|'+x.type;
-    if(attempted.has(k))return;                           // 이미 응시 → 제외
-    (groups[k]||(groups[k]=[])).push(x);
+    const list=attempted[k]||[];
+    // 응시일이 없는 옛 기록이 하나라도 있으면 판단 불가 → 예전처럼 응시로 본다
+    if(list.some(a=>!(a.ms>0)))return;
+    // 이 배포 이후에 푼 기록이 있으면 이 배포는 완료된 것
+    if(list.some(a=>a.ms>=x.ms-GRACE))return;
+    // 이 배포보다 앞선 응시가 있으면 = 같은 시험을 다시 보낸 것 (재시험)
+    const prior=list.filter(a=>a.ms<x.ms-GRACE);
+    (groups[k]||(groups[k]=[])).push(Object.assign({},x,{
+      prevMs: prior.length?prior[prior.length-1].ms:0,
+      prevScore: prior.length?prior[prior.length-1].score:null,
+      prevCnt: prior.length
+    }));
   });
   const now=Date.now();
   const rows=Object.keys(groups).map(k=>{
@@ -964,6 +991,9 @@ function renderPending(){
     const cn=sClassMap[x.sid]||x.className||'';
     const cb=cn?`<span class="class-badge" title="${e(cn)}">${e(cn)}</span>`:'<span style="color:#aeaeb2">-</span>';
     const ti=TYPE_INFO[x.type]||TYPE_INFO.multi;
+    /* 재시험 — 이 배포 이전에 같은 시험을 푼 기록이 있는 경우.
+       점수는 성적 페이지에서 보면 되므로 표에는 띄우지 않고 툴팁에만 담는다. */
+    const rt=x.prevMs?`<span class="retake-badge" title="이 시험을 ${fmtYMD(x.prevMs)}에 이미 응시했습니다${x.prevScore==null?'':` (${x.prevScore}점)`}. 이후 다시 배포되어 아직 응시하지 않았습니다.">🔁 재시험</span>`:'';
     const re=x.cnt>1?`<span class="re-badge">재배포 ${x.cnt}회</span>`:'';
     /* 클리닉에 시험 아닌 항목(핵심내용·핵심정리 등)이 섞여 있을 때만 표시.
        "클리닉 5개 중 시험 3개" — 배포 개수와 표의 건수가 다른 이유를 알려준다. */
@@ -971,7 +1001,7 @@ function renderPending(){
     const pack=(pt>0&&pe>0&&pt>pe)
       ? `<span class="pack-badge" title="이 클리닉에는 ${pt}개가 담겼고, 그중 학생이 풀어 점수가 남는 시험은 ${pe}개입니다. 핵심내용·핵심정리는 응시 대상이 아니라 이 목록에 나오지 않습니다.">클리닉 ${pt}개 중 시험 ${pe}개</span>`
       : '';
-    const testCell=`<div class="exam-cell"><span class="exam-badge-box"><span class="type-badge ${ti.cls}">${ti.label}</span></span><span class="test-name-cell"><span class="exam-name-text" title="${e(x.title||'(제목 없음)')}">${e(x.title||'(제목 없음)')}</span>${re}${pack}</span></div>`;
+    const testCell=`<div class="exam-cell"><span class="exam-badge-box"><span class="type-badge ${ti.cls}">${ti.label}</span></span><span class="test-name-cell">${rt}<span class="exam-name-text" title="${e(x.title||'(제목 없음)')}">${e(x.title||'(제목 없음)')}</span>${re}${pack}</span></div>`;
     const linkCell=`<button class="link-btn" title="이 학생의 클리닉 링크 복사" onclick="copyClinicLink('${e(x.token)}')">🔗</button>`;
     return `<tr><td>${dcell}${days==null?'':`<span class="m-only ${days>=7?'m-late':'m-mid'}">D+${days} 경과</span>`}</td><td class="c-days">${dayCell}</td><td class="c-sid"><span class="sid-text">${e(x.sid)}</span></td><td style="font-weight:700;color:#1d1d1f">${e(nm||'-')}<span class="m-only m-sid">${e(x.sid)}</span></td><td>${gb}</td><td>${cb}</td><td>${testCell}</td><td>${linkCell}</td></tr>`;
   }).join('');
