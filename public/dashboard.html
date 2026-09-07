@@ -161,6 +161,7 @@ tbody tr.grp-row:hover{background:#fff}
 .link-btn:hover{background:#fdf2f8;border-color:#fbcfe8}
 .pend-note{font-size:10.5px;color:#c7c7cc;margin-top:.7rem;line-height:1.6}
 .re-badge{display:inline-block;margin-left:5px;padding:1px 6px;border-radius:20px;font-size:10px;font-weight:700;background:#fff7ed;color:#c2410c;white-space:nowrap}
+.pack-badge{display:inline-block;flex-shrink:0;margin-left:5px;padding:1px 6px;border-radius:20px;font-size:10px;font-weight:700;background:#eff6ff;color:#1d4ed8;white-space:nowrap}
 .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(12px);background:rgba(29,29,31,.92);color:#fff;font-size:12.5px;font-weight:600;padding:10px 18px;border-radius:22px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:900;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -283,7 +284,7 @@ tbody tr.grp-row:hover{background:#fff}
   .exam-badge-box{flex:0 0 52px}
   .class-badge{max-width:104px}
   .type-badge,.grade-badge,.subj-badge,.day-badge,.dist-date{padding:2px 7px;font-size:10px}
-  .retake-badge,.re-badge{font-size:9.5px;padding:1px 6px}
+  .retake-badge,.re-badge,.pack-badge{font-size:9.5px;padding:1px 6px}
   .exam-cell{padding:0 6px;gap:7px}
   /* 터치 타깃 확보 (44px 권장) */
   #recentAttemptsBody .action-btn{width:38px;height:38px;font-size:15px}
@@ -436,7 +437,7 @@ tbody tr.grp-row:hover{background:#fff}
         <tbody id="pendingBody"><tr><td colspan="8" style="text-align:center;padding:2.5rem;color:#aeaeb2">데이터를 불러오는 중...</td></tr></tbody>
       </table>
     </div>
-    <div class="pend-note">※ 주간 학습 클리닉으로 배포된 시험만 집계합니다. 학생이 응시하면 이 목록에서 사라지고 위 '최근 응시 학생'으로 자동 이동합니다.<br>※ 반 · 이름 · 학년은 학생 관리에 저장된 <b>현재 정보</b>를 실시간으로 표시합니다. (배포 후 반을 배정해도 즉시 반영)<br>※ 학생 ID 없이 만든 옛 클리닉과 삭제된 학생은 집계에서 제외됩니다.</div>
+    <div class="pend-note">※ 주간 학습 클리닉으로 배포된 시험만 집계합니다. 학생이 응시하면 이 목록에서 사라지고 위 '최근 응시 학생'으로 자동 이동합니다.<br>※ 클리닉에 <b>핵심내용 · 핵심정리</b>가 함께 담겨 있으면 그것은 응시 대상이 아니라 여기에 나오지 않습니다. 이 경우 시험명 옆에 <b>클리닉 N개 중 시험 M개</b>로 표시됩니다.<br>※ 반 · 이름 · 학년은 학생 관리에 저장된 <b>현재 정보</b>를 실시간으로 표시합니다. (배포 후 반을 배정해도 즉시 반영)<br>※ 학생 ID 없이 만든 옛 클리닉과 삭제된 학생은 집계에서 제외됩니다.</div>
   </div>
 
   <!-- Test Management -->
@@ -800,6 +801,12 @@ function buildDistMap(){
     const t=a.createdAt?tD(a.createdAt):null;
     const ms=(t&&!isNaN(t))?t.getTime():0;
     const sid=String(a.studentId||'').trim();
+    /* 이 클리닉에 담긴 전체 항목 수와, 그중 "응시로 집계되는 시험"의 수.
+       핵심내용·핵심정리(type:'link')와 직접 입력한 OX·4지선다는 학생이 푸는
+       시험이 아니라서 미응시 집계에 잡히지 않는다. 5개를 보냈는데 표에는
+       3건만 보이는 이유를 표에서 바로 알 수 있게 두 값을 함께 들고 간다. */
+    const packTotal=items.length;
+    const packExam=items.filter(it=>it&&it.type==='examlink'&&it.examId).length;
     items.forEach(it=>{
       if(!it||it.type!=='examlink'||!it.examId)return;
       const type=it.source==='master'?'master':(EXAMTYPE_KEY[it.examType]||'multi');
@@ -808,7 +815,8 @@ function buildDistMap(){
       if(!sid)return;
       (distMap[sid+'|'+k2]||(distMap[sid+'|'+k2]=[])).push(ms);
       distList.push({sid,name:a.studentName||'',grade:a.studentGrade||'',className:a.className||'',
-        token:d.id,examId:it.examId,type,title:it.title||'',subject:it.subject||'',ms});
+        token:d.id,examId:it.examId,type,title:it.title||'',subject:it.subject||'',ms,
+        packTotal,packExam});
     });
   });
   Object.values(distMap).forEach(v=>v.sort((x,y)=>x-y));
@@ -957,7 +965,13 @@ function renderPending(){
     const cb=cn?`<span class="class-badge" title="${e(cn)}">${e(cn)}</span>`:'<span style="color:#aeaeb2">-</span>';
     const ti=TYPE_INFO[x.type]||TYPE_INFO.multi;
     const re=x.cnt>1?`<span class="re-badge">재배포 ${x.cnt}회</span>`:'';
-    const testCell=`<div class="exam-cell"><span class="exam-badge-box"><span class="type-badge ${ti.cls}">${ti.label}</span></span><span class="test-name-cell"><span class="exam-name-text" title="${e(x.title||'(제목 없음)')}">${e(x.title||'(제목 없음)')}</span>${re}</span></div>`;
+    /* 클리닉에 시험 아닌 항목(핵심내용·핵심정리 등)이 섞여 있을 때만 표시.
+       "클리닉 5개 중 시험 3개" — 배포 개수와 표의 건수가 다른 이유를 알려준다. */
+    const pt=Number(x.packTotal)||0, pe=Number(x.packExam)||0;
+    const pack=(pt>0&&pe>0&&pt>pe)
+      ? `<span class="pack-badge" title="이 클리닉에는 ${pt}개가 담겼고, 그중 학생이 풀어 점수가 남는 시험은 ${pe}개입니다. 핵심내용·핵심정리는 응시 대상이 아니라 이 목록에 나오지 않습니다.">클리닉 ${pt}개 중 시험 ${pe}개</span>`
+      : '';
+    const testCell=`<div class="exam-cell"><span class="exam-badge-box"><span class="type-badge ${ti.cls}">${ti.label}</span></span><span class="test-name-cell"><span class="exam-name-text" title="${e(x.title||'(제목 없음)')}">${e(x.title||'(제목 없음)')}</span>${re}${pack}</span></div>`;
     const linkCell=`<button class="link-btn" title="이 학생의 클리닉 링크 복사" onclick="copyClinicLink('${e(x.token)}')">🔗</button>`;
     return `<tr><td>${dcell}${days==null?'':`<span class="m-only ${days>=7?'m-late':'m-mid'}">D+${days} 경과</span>`}</td><td class="c-days">${dayCell}</td><td class="c-sid"><span class="sid-text">${e(x.sid)}</span></td><td style="font-weight:700;color:#1d1d1f">${e(nm||'-')}<span class="m-only m-sid">${e(x.sid)}</span></td><td>${gb}</td><td>${cb}</td><td>${testCell}</td><td>${linkCell}</td></tr>`;
   }).join('');
