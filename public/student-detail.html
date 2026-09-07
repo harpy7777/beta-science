@@ -131,7 +131,7 @@ body.smode .gc-head, body.smode .gc-row { grid-template-columns: 160px 112px min
 
     /* 오답 토글 */
     .gc-item { border-bottom:1px solid #fdf2f8; }
-    .gc-item:last-child { border-bottom:none; }
+    .gc-item:last-of-type { border-bottom:none; }
     .gc-item .gc-row { border-bottom:none; }
     .gc-item.open .gc-row { background:#fffbfe; }
     /* 오답은 시험명과 분리된 독립 열 — 칸 안에서 가운데 정렬(.gc-row > div 상속) */
@@ -164,7 +164,18 @@ body.smode .gc-head, body.smode .gc-row { grid-template-columns: 160px 112px min
 
 
 /* 분석 리포트 */
-/* 분석 기간 필터 */
+/* 응시 기록 접기/펴기 */
+.gc-toggle { width:100%; display:flex; align-items:center; gap:8px; margin-bottom:0.6rem; min-height:42px; padding:9px 12px; background:#fff; border:1px solid #fce7f3; border-radius:12px; font-family:inherit; text-align:left; cursor:pointer; transition:background 0.15s; }
+.gc-toggle:hover { background:#fdf2f8; }
+.gc-toggle-t { font-size:12px; font-weight:700; color:#6e6e73; }
+.gc-toggle-c { font-size:10.5px; font-weight:700; color:#db2777; background:#fdf2f8; border:1px solid #fce7f3; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+.gc-toggle-arrow { margin-left:auto; font-size:10px; color:#c7c7cc; transition:transform 0.15s; }
+.gc-toggle.open .gc-toggle-arrow { transform:rotate(180deg); color:#db2777; }
+.gc-collapsed { display:none; }
+.gc-more { width:100%; padding:10px; min-height:42px; background:#fdf2f8; border:none; border-top:1px solid #fce7f3; font-family:inherit; font-size:12px; font-weight:700; color:#db2777; cursor:pointer; }
+.gc-more:hover { background:#fce7f3; }
+
+/* 분석 리포트 — 기간 필터 */
 .rp-filter { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: #fff; border: 1px solid #fce7f3; border-radius: 14px; padding: 0.7rem 0.9rem; margin-bottom: 0.9rem; }
 .rp-filter-label { font-size: 11px; font-weight: 700; color: #aeaeb2; letter-spacing: 0.04em; white-space: nowrap; }
 .rp-filter-btns { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -227,7 +238,6 @@ body.smode .gc-head, body.smode .gc-row { grid-template-columns: 160px 112px min
 .q-stat { margin-top: 10px; font-size: 12px; color: #3c3c43; display: flex; gap: 12px; flex-wrap: wrap; }
 .q-stat b { color: #db2777; }
 .empty-box { padding: 3rem; text-align: center; font-size: 13px; color: #aeaeb2; background: #fff; border: 1px solid #fce7f3; border-radius: 16px; }
-.print-btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 16px; background: #fdf2f8; border: 1px solid #fce7f3; border-radius: 10px; font-size: 12px; font-weight: 600; color: #db2777; cursor: pointer; font-family: inherit; min-height: 38px; }
 
 /* 세부 페이지 전용 */
 .detail-wrap { max-width: 1100px; margin: 0 auto; padding: 1.4rem 1rem 4rem; padding-left: max(1rem, env(safe-area-inset-left)); padding-right: max(1rem, env(safe-area-inset-right)); }
@@ -353,12 +363,6 @@ body.smode .gc-head, body.smode .gc-row { grid-template-columns: 160px 112px min
   .ut-cnt, .ut-date { font-size:11px; }
 }
 
-@media print {
-  .header, .back-link, .print-btn, .gc-del, .at-more { display: none !important; }
-  .rp-filter-btns, .ut-more { display: none !important; }
-  .ut-row.ut-hidden { display: grid !important; }
-  .ut-row { break-inside: avoid; page-break-inside: avoid; }
-}
 </style>
 <script>
 /* 학생 링크(?t=)로 열린 경우 다른 페이지로 나가는 링크를 모두 잠근다 */
@@ -466,22 +470,24 @@ body.smode .gc-head, body.smode .gc-row { grid-template-columns: 160px 112px min
       <div class="mini-card"><div class="mini-n" id="d-mc" style="color:#5b21b6;">—</div><div class="mini-l">4지선다</div></div>
       <div class="mini-card"><div class="mini-n" id="d-ms" style="color:#db2777;">—</div><div class="mini-l">마스터</div></div>
     </div>
-    <div style="margin-bottom:0.6rem;font-size:12px;font-weight:600;color:#6e6e73;">응시 기록</div>
+    <button type="button" class="gc-toggle open" id="gc-toggle" onclick="gcToggle()">
+      <span class="gc-toggle-t">응시 기록</span>
+      <span class="gc-toggle-c" id="gc-toggle-c">0건</span>
+      <span class="gc-toggle-arrow">▼</span>
+    </button>
     <div id="d-records"></div>
 
 
     <div class="big-divider"></div>
 
     <!-- 분석 리포트 -->
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-      <div class="sect-title" style="margin-top:0;"><span class="sect-ico sect-report">📈</span>분석 리포트</div>
-      <button class="print-btn" onclick="window.print()">🖨 인쇄 / PDF</button>
-    </div>
+    <div class="sect-title" style="margin-top:0;"><span class="sect-ico sect-report">📈</span>분석 리포트</div>
     <div class="rp-filter" id="rp-filter">
       <span class="rp-filter-label">분석 기간</span>
       <div class="rp-filter-btns">
         <button type="button" class="rf-btn" data-days="28" onclick="rpSetPeriod(28)">최근 4주</button>
         <button type="button" class="rf-btn" data-days="56" onclick="rpSetPeriod(56)">최근 8주</button>
+        <button type="button" class="rf-btn" data-days="84" onclick="rpSetPeriod(84)">최근 12주</button>
         <button type="button" class="rf-btn active" data-days="0" onclick="rpSetPeriod(0)">전체</button>
       </div>
       <span class="rp-filter-info" id="rp-filter-info">—</span>
@@ -1203,7 +1209,19 @@ window.atToggle=(idx,cardId)=>{
 };
 window.atMore=()=>{ atLimit=Math.max(AT_PAGE,atLimit)+AT_PAGE; atRenderCards(); };
 
-/* 성적 현황 */
+/* 성적 현황 — 접기/펴기 + 최근 10건씩 */
+const GC_PAGE=10;
+let gcOpen=true, gcLimit=GC_PAGE;
+
+window.gcToggle=()=>{
+  gcOpen=!gcOpen;
+  const btn=document.getElementById('gc-toggle');
+  const box=document.getElementById('d-records');
+  if(btn) btn.classList.toggle('open', gcOpen);
+  if(box) box.classList.toggle('gc-collapsed', !gcOpen);
+};
+window.gcMore=()=>{ gcLimit=Math.max(GC_PAGE,gcLimit)+GC_PAGE; gcRender(); };
+
 function gcRender() {
   const avg=(kind)=>{ const v=recsAll.filter(r=>hasType(r,kind)); return v.length?Math.round(v.map(r=>typeScore(r,kind)).reduce((s,x)=>s+x,0)/v.length):null; };
   setTxt('d-cnt',recsAll.length);
@@ -1211,6 +1229,11 @@ function gcRender() {
   setTxt('d-ox',ox!==null?(ox+'점'):'—');
   setTxt('d-mc',mc!==null?(mc+'점'):'—');
   setTxt('d-ms',ms!==null?(ms+'점'):'—');
+  setTxt('gc-toggle-c', recsAll.length+'건');
+  const btn=document.getElementById('gc-toggle');
+  const box=document.getElementById('d-records');
+  if(btn) btn.classList.toggle('open', gcOpen);
+  if(box) box.classList.toggle('gc-collapsed', !gcOpen);
   const list=recsAll.slice().sort((a,b)=>toDate(b.timestamp)-toDate(a.timestamp));
   gcRenderTable(list);
 }
@@ -1225,7 +1248,8 @@ function gcRenderTable(list){
     const inner = (v==null) ? '<span class="sc-na">—</span>' : '<span class="sc-pill '+m.cls+'">'+esc2(v)+'점</span>';
     return '<div class="gc-sc '+m.col+'"><span class="sc-lbl">'+m.lbl+'</span>'+inner+'</div>';
   };
-  const rows=list.map(r=>{
+  const shown=list.slice(0, Math.max(GC_PAGE, gcLimit));
+  const rows=shown.map(r=>{
     const p=partScores(r);
     const name=esc2(r.testName||r.examTitle||'—');
     const subjRaw=(r.subject&&String(r.subject).trim())?String(r.subject).trim():'';
@@ -1256,9 +1280,13 @@ function gcRenderTable(list){
   }).join('');
   const headDel = IS_STUDENT ? '' : '<div>삭제</div>';
   const headWq  = IS_STUDENT ? '' : '<div>오답</div>';
+  const more = (list.length>shown.length)
+    ? '<button type="button" class="gc-more" onclick="gcMore()">이전 기록 더보기 ('+(list.length-shown.length)+'건 남음)</button>'
+    : '';
   el.innerHTML='<div class="gc-table">'
     + '<div class="gc-head"><div>응시일</div><div>과목</div><div>시험명</div>'+headWq+'<div>OX</div><div>4지선다</div><div>마스터</div>'+headDel+'</div>'
     + rows
+    + more
     + '</div>';
 }
 /* 오답 칩 — 접혀 있을 때도 개수가 보이게 한다 */
@@ -1329,7 +1357,7 @@ function todayStr(){
      — 단원 요약, 평균 카드, 레이더, 추이, 문항 분석, 종합 평가
    · 성적 현황(응시 기록 원본)은 기간과 무관하게 항상 전체를 보여준다
 ════════════════════════════════════════════ */
-const RP_PERIODS={ 0:'전체 기간', 28:'최근 4주', 56:'최근 8주' };
+const RP_PERIODS={ 0:'전체 기간', 28:'최근 4주', 56:'최근 8주', 84:'최근 12주' };
 const UT_PAGE=5;
 let rpPeriodDays=0;
 let utExpanded=false;
@@ -1341,7 +1369,7 @@ function rpScope(){
   return recsAll.filter(r=>{ const t=toDate(r.timestamp).getTime(); return t>0 && t>=cut; });
 }
 window.rpSetPeriod=(days)=>{
-  const d=(days===28||days===56)?days:0;
+  const d=(days===28||days===56||days===84)?days:0;
   if(d===rpPeriodDays) return;
   rpPeriodDays=d; utExpanded=false; trendWinStart=null;
   const btns=document.querySelectorAll('#rp-filter .rf-btn');
