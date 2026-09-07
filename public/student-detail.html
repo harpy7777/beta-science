@@ -164,13 +164,39 @@ body.smode .gc-head, body.smode .gc-row { grid-template-columns: 160px 112px min
 
 
 /* 분석 리포트 */
-.subject-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid #fce7f3; }
-.subject-table thead tr { background: #fdf2f8; }
-.subject-table th { padding: 13px 14px; text-align: center; font-weight: 700; color: #db2777; font-size: 12px; }
-.subject-table th:first-child { width: 120px; border-right: 1px solid #fce7f3; }
-.subject-table td { padding: 13px 14px; border-bottom: 1px solid #fdf2f8; color: #3c3c43; font-size: 13px; text-align: center; line-height: 1.6; word-break: break-word; }
-.subject-table tr:last-child td { border-bottom: none; }
-.subject-table td:first-child { color: #5b21b6; font-weight: 600; border-right: 1px solid #fdf2f8; }
+/* 분석 기간 필터 */
+.rp-filter { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: #fff; border: 1px solid #fce7f3; border-radius: 14px; padding: 0.7rem 0.9rem; margin-bottom: 0.9rem; }
+.rp-filter-label { font-size: 11px; font-weight: 700; color: #aeaeb2; letter-spacing: 0.04em; white-space: nowrap; }
+.rp-filter-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.rf-btn { padding: 8px 14px; min-height: 38px; border: 1.5px solid #fce7f3; background: #fff; border-radius: 9px; font-family: inherit; font-size: 11.5px; font-weight: 700; color: #db2777; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+.rf-btn:hover { background: #fdf2f8; }
+.rf-btn.active { background: #db2777; border-color: #db2777; color: #fff; }
+.rp-filter-info { margin-left: auto; font-size: 11px; color: #8e8e93; line-height: 1.6; }
+
+/* 단원별 요약 */
+.ut-table { background: #fff; border: 1px solid #fce7f3; border-radius: 16px; overflow: hidden; margin-bottom: 1rem; }
+.ut-head, .ut-row { display: grid; grid-template-columns: 118px minmax(0,1fr) 58px 84px 92px; align-items: center; gap: 0 8px; }
+.ut-head { padding: 0.7rem 1rem; background: #fdf2f8; border-bottom: 1px solid #fce7f3; font-size: 10px; font-weight: 700; color: #c9a8bc; letter-spacing: 0.06em; text-transform: uppercase; }
+.ut-head > div, .ut-row > div { display: flex; align-items: center; min-width: 0; }
+.ut-c { justify-content: center; }
+.ut-row { padding: 0.75rem 1rem; border-bottom: 1px solid #fdf2f8; transition: background 0.15s; }
+.ut-row:last-of-type { border-bottom: none; }
+.ut-row:hover { background: #fffbfe; }
+.ut-row.ut-hidden { display: none; }
+.ut-subj { display: inline-block; max-width: 100%; font-size: 11px; font-weight: 700; color: #7c3aed; background: #ede9fe; padding: 3px 8px; border-radius: 6px; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ut-subj.none { color: #9ca3af; background: #f3f4f6; }
+.ut-unit { font-size: 12.5px; font-weight: 600; color: #1d1d1f; line-height: 1.45; word-break: break-word; }
+.ut-cnt, .ut-date { font-size: 11.5px; color: #6e6e73; white-space: nowrap; }
+.ut-avg { display: inline-flex; align-items: center; justify-content: center; min-width: 54px; padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 800; white-space: nowrap; }
+.ut-avg.g { background: #dcfce7; color: #166534; }
+.ut-avg.a { background: #fef3c7; color: #92400e; }
+.ut-avg.w { background: #fee2e2; color: #991b1b; }
+.ut-avg.n { background: #f5f5f7; color: #aeaeb2; font-weight: 600; }
+.ut-lbl { display: none; }
+.ut-more { width: 100%; padding: 10px; min-height: 42px; background: #fdf2f8; border: none; border-top: 1px solid #fce7f3; font-family: inherit; font-size: 12px; font-weight: 700; color: #db2777; cursor: pointer; }
+.ut-more:hover { background: #fce7f3; }
+.ut-empty { padding: 2rem 1rem; text-align: center; font-size: 12.5px; color: #aeaeb2; background: #fff; border: 1px dashed #f0e4ec; border-radius: 14px; margin-bottom: 1rem; line-height: 1.9; }
+.ut-empty b { color: #db2777; }
 .analysis-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; align-items: stretch; }
 .analysis-row .chart-card { margin-bottom: 0; }
 .radar-wrap { display: flex; justify-content: center; align-items: center; }
@@ -291,16 +317,47 @@ body.smode .gc-head, body.smode .gc-row { grid-template-columns: 160px 112px min
   .section-heading { font-size: 11px; margin-bottom: 0.7rem; }
   .q-grid { grid-template-columns: repeat(auto-fill, minmax(30px, 1fr)); gap: 4px; }
   .q-bubble { border-radius: 6px; font-size: 10px; }
+
+  .rp-filter { padding: 0.7rem 0.8rem; border-radius: 12px; gap: 8px; }
+  .rp-filter-info { margin-left: 0; flex: 1 1 100%; }
+  .rf-btn { padding: 7px 11px; font-size: 11px; }
+
+  .ut-head { display: none; }
+  .ut-row {
+    grid-template-columns: auto minmax(0,1fr) auto;
+    grid-template-areas:
+      "subj subj avg"
+      "unit unit avg"
+      "cnt  date avg";
+    gap: 5px 10px;
+    padding: 0.85rem 0.9rem;
+  }
+  .ut-col-subj { grid-area: subj; }
+  .ut-col-unit { grid-area: unit; }
+  .ut-col-cnt  { grid-area: cnt;  justify-content: flex-start; }
+  .ut-col-date { grid-area: date; justify-content: flex-start; }
+  .ut-col-avg  { grid-area: avg;  justify-content: flex-end; }
+  .ut-unit { font-size: 13px; }
+  .ut-lbl { display: inline; color: #c7c7cc; font-weight: 700; margin-right: 4px; }
 }
 
 @media (max-width: 380px) {
   .sc-pill { min-width:38px; padding:4px 7px; font-size:10.5px; }
   .at-kv { grid-template-columns: 58px 1fr; }
   .mini-n { font-size: 0.92rem; }
+  .rf-btn { padding:8px 11px; font-size:10.5px; }
+  .rp-filter { padding:0.65rem 0.7rem; }
+  .ut-row { padding:0.8rem 0.75rem; gap:5px 7px; }
+  .ut-avg { min-width:46px; padding:4px 8px; font-size:11px; }
+  .ut-unit { font-size:12.5px; }
+  .ut-cnt, .ut-date { font-size:11px; }
 }
 
 @media print {
   .header, .back-link, .print-btn, .gc-del, .at-more { display: none !important; }
+  .rp-filter-btns, .ut-more { display: none !important; }
+  .ut-row.ut-hidden { display: grid !important; }
+  .ut-row { break-inside: avoid; page-break-inside: avoid; }
 }
 </style>
 <script>
@@ -419,6 +476,15 @@ body.smode .gc-head, body.smode .gc-row { grid-template-columns: 160px 112px min
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
       <div class="sect-title" style="margin-top:0;"><span class="sect-ico sect-report">📈</span>분석 리포트</div>
       <button class="print-btn" onclick="window.print()">🖨 인쇄 / PDF</button>
+    </div>
+    <div class="rp-filter" id="rp-filter">
+      <span class="rp-filter-label">분석 기간</span>
+      <div class="rp-filter-btns">
+        <button type="button" class="rf-btn" data-days="28" onclick="rpSetPeriod(28)">최근 4주</button>
+        <button type="button" class="rf-btn" data-days="56" onclick="rpSetPeriod(56)">최근 8주</button>
+        <button type="button" class="rf-btn active" data-days="0" onclick="rpSetPeriod(0)">전체</button>
+      </div>
+      <span class="rp-filter-info" id="rp-filter-info">—</span>
     </div>
     <div id="rp-subject-table" style="margin-bottom:1rem;"></div>
     <div class="mini-grid">
@@ -1257,20 +1323,127 @@ function todayStr(){
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 
-/* 분석 리포트 */
-function rpRender() {
-  const filtered=recsAll;
-  const firstOnly=filtered.slice().sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp));
-  const subMap=new Map();
-  firstOnly.forEach(r=>{
-    const subj=r.subject||'과목미지정', content=r.testName||r.examTitle||'';
-    if(content){ if(!subMap.has(subj)) subMap.set(subj,new Set()); subMap.get(subj).add(content); }
+/* ════════════════════════════════════════════
+   분석 리포트
+   · 분석 기간 필터(전체 / 최근 8주 / 최근 4주)가 리포트 전체에 적용된다
+     — 단원 요약, 평균 카드, 레이더, 추이, 문항 분석, 종합 평가
+   · 성적 현황(응시 기록 원본)은 기간과 무관하게 항상 전체를 보여준다
+════════════════════════════════════════════ */
+const RP_PERIODS={ 0:'전체 기간', 28:'최근 4주', 56:'최근 8주' };
+const UT_PAGE=5;
+let rpPeriodDays=0;
+let utExpanded=false;
+
+/* 현재 기간에 해당하는 기록만 */
+function rpScope(){
+  if(!rpPeriodDays) return recsAll.slice();
+  const cut=Date.now()-rpPeriodDays*86400000;
+  return recsAll.filter(r=>{ const t=toDate(r.timestamp).getTime(); return t>0 && t>=cut; });
+}
+window.rpSetPeriod=(days)=>{
+  const d=(days===28||days===56)?days:0;
+  if(d===rpPeriodDays) return;
+  rpPeriodDays=d; utExpanded=false; trendWinStart=null;
+  const btns=document.querySelectorAll('#rp-filter .rf-btn');
+  for(let i=0;i<btns.length;i++) btns[i].classList.toggle('active', String(d)===btns[i].getAttribute('data-days'));
+  rpRender();
+};
+window.utToggle=()=>{ utExpanded=!utExpanded; rpRenderUnitTable(rpScope()); };
+
+/* 기록 1건의 대표 점수 = 그 기록에 있던 유형 점수들의 평균 */
+function recScore(r){
+  const p=partScores(r);
+  const v=[p.ox,p.mc,p.master].filter(x=>x!=null);
+  return v.length ? (v.reduce((a,x)=>a+x,0)/v.length) : null;
+}
+function utDate(ms){
+  if(!ms) return '—';
+  const d=new Date(ms);
+  if(isNaN(d.getTime())) return '—';
+  return String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0')+'('+DAY_KO[d.getDay()]+')';
+}
+function rpRenderFilterInfo(scope){
+  const el=document.getElementById('rp-filter-info');
+  if(!el) return;
+  const label=RP_PERIODS[rpPeriodDays]||'전체 기간';
+  if(!scope.length){ el.textContent=label+' · 기록 0건'; return; }
+  const ts=scope.map(r=>toDate(r.timestamp).getTime()).filter(t=>t>0).sort((a,b)=>a-b);
+  const range=ts.length?(utDate(ts[0])+' ~ '+utDate(ts[ts.length-1])):'';
+  const rest=(rpPeriodDays && recsAll.length>scope.length)?(' · 전체 '+recsAll.length+'건 중'):'';
+  el.textContent=label+' · '+scope.length+'건'+rest+(range?(' · '+range):'');
+}
+
+/* 단원별 요약 — 평균 낮은 순(약점 우선), 기본 5줄 + 더보기 */
+function rpRenderUnitTable(recs){
+  const el=document.getElementById('rp-subject-table');
+  if(!el) return;
+
+  const map=new Map();
+  recs.forEach(r=>{
+    const unit=String(r.testName||r.examTitle||'').trim();
+    if(!unit) return;
+    const subj=String(r.subject||'').trim()||'과목미지정';
+    const key=subj+'\u0000'+unit;
+    let g=map.get(key);
+    if(!g){ g={subj:subj,unit:unit,cnt:0,sum:0,scored:0,last:0}; map.set(key,g); }
+    g.cnt++;
+    const sc=recScore(r);
+    if(sc!=null){ g.sum+=sc; g.scored++; }
+    const t=toDate(r.timestamp).getTime();
+    if(t>g.last) g.last=t;
   });
-  const subEl=document.getElementById('rp-subject-table');
-  if(subMap.size>0){
-    const rows=Array.from(subMap.entries()).map(pair=>'<tr><td>'+esc2(pair[0])+'</td><td>'+Array.from(pair[1]).map(x=>esc2(x)).join(', ')+'</td></tr>').join('');
-    subEl.innerHTML='<table class="subject-table"><thead><tr><th>과목</th><th>내용</th></tr></thead><tbody>'+rows+'</tbody></table>';
-  } else { subEl.innerHTML=''; }
+
+  const rows=Array.from(map.values()).map(g=>({
+    subj:g.subj, unit:g.unit, cnt:g.cnt, last:g.last,
+    avg: g.scored ? Math.round(g.sum/g.scored) : null
+  }));
+
+  if(!rows.length){
+    el.innerHTML='<div class="ut-empty">'+(rpPeriodDays
+      ? (esc2(RP_PERIODS[rpPeriodDays]||'선택한 기간')+' 안에는 응시 기록이 없습니다.<br>기간을 <b>전체</b>로 바꾸면 전체 이력을 볼 수 있어요.')
+      : '아직 응시한 기록이 없습니다.')+'</div>';
+    return;
+  }
+
+  /* 평균 낮은 순 → 동점이면 최근 응시 순. 점수 없는 단원은 맨 뒤 */
+  rows.sort((a,b)=>{
+    if(a.avg==null && b.avg==null) return b.last-a.last;
+    if(a.avg==null) return 1;
+    if(b.avg==null) return -1;
+    if(a.avg!==b.avg) return a.avg-b.avg;
+    return b.last-a.last;
+  });
+
+  const body=rows.map((g,i)=>{
+    const hidden=(!utExpanded && i>=UT_PAGE)?' ut-hidden':'';
+    const cls=(g.avg==null)?'n':(g.avg>=80?'g':(g.avg>=60?'a':'w'));
+    const avgTxt=(g.avg==null)?'—':(g.avg+'점');
+    return '<div class="ut-row'+hidden+'">'
+      + '<div class="ut-col-subj"><span class="ut-subj'+(g.subj==='과목미지정'?' none':'')+'" title="'+esc2(g.subj)+'">'+esc2(g.subj)+'</span></div>'
+      + '<div class="ut-col-unit"><span class="ut-unit">'+esc2(g.unit)+'</span></div>'
+      + '<div class="ut-col-cnt ut-c"><span class="ut-cnt">'+g.cnt+'회</span></div>'
+      + '<div class="ut-col-avg ut-c"><span class="ut-avg '+cls+'">'+esc2(avgTxt)+'</span></div>'
+      + '<div class="ut-col-date ut-c"><span class="ut-date"><span class="ut-lbl">최근</span>'+esc2(utDate(g.last))+'</span></div>'
+      + '</div>';
+  }).join('');
+
+  const more=(rows.length>UT_PAGE)
+    ? '<button type="button" class="ut-more" onclick="utToggle()">'
+      + (utExpanded ? '접기' : ('전체 '+rows.length+'개 단원 보기 (+'+(rows.length-UT_PAGE)+')'))
+      + '</button>'
+    : '';
+
+  el.innerHTML='<div class="ut-table">'
+    + '<div class="ut-head"><div>과목</div><div>단원</div><div class="ut-c">응시</div><div class="ut-c">평균</div><div class="ut-c">최근</div></div>'
+    + body + more
+    + '</div>';
+}
+
+function rpRender() {
+  const filtered=rpScope();
+  const firstOnly=filtered.slice().sort((a,b)=>toDate(a.timestamp)-toDate(b.timestamp));
+  rpRenderFilterInfo(filtered);
+  rpRenderUnitTable(filtered);
   const avg=(arr,kind)=>{ const v=arr.filter(r=>hasType(r,kind)); return v.length?Math.round(v.map(r=>typeScore(r,kind)).reduce((a,x)=>a+x,0)/v.length):null; };
   const oxA=avg(firstOnly,'ox'), mcA=avg(firstOnly,'mc'), msA=avg(firstOnly,'master');
   setTxt('rp-cnt',firstOnly.length);
@@ -1380,12 +1553,13 @@ function trendCols(filtered){
   return cols;
 }
 window.trendShift=(d)=>{
-  const cols=trendCols(recsAll);
+  const scope=rpScope();
+  const cols=trendCols(scope);
   if(!cols.length) return;
   const maxStart=Math.max(0, cols.length-TREND_WIN);
   const cur=(trendWinStart==null)?maxStart:trendWinStart;
   trendWinStart=Math.min(Math.max(0, cur+d), maxStart);
-  rpDrawTrend(recsAll);
+  rpDrawTrend(scope);
 };
 
 function rpDrawTrend(filtered) {
