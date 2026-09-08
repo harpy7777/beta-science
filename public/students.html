@@ -521,7 +521,6 @@ tbody td{font-size:13px;padding:11px 12px;color:#1d1d1f;text-align:center;vertic
     </div>
   </div>
 </div>
-
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -802,6 +801,30 @@ function renderClassChecks(checkedIds){
 function gBC(g){return{'중등1학년':'grade-mid1','중등2학년':'grade-mid2','중등3학년':'grade-mid3','고등1학년':'grade-high1','고등2학년':'grade-high2','고등3학년':'grade-high3'}[g]||'grade-mid1';}
 window.goStudentDetail=function(sid){if(!sid)return;window.location.href='student-detail.html?id='+encodeURIComponent(sid);};
 
+/* ══════════════════════════════════════════
+   학생 ID 정렬 — h01001 · m01010 처럼 [영문 1자][숫자 5자리]
+   · 영문 접두사를 먼저 비교하고, 그다음 숫자를 "값"으로 비교한다
+     (문자열 비교가 아니므로 자릿수가 달라도 h9 < h10 이 보장된다)
+   · ID가 없는 학생은 목록에서 사라지면 안 되므로 맨 뒤에 이름순으로 둔다
+   · Firestore orderBy("id") 를 쓰지 않는 이유:
+     해당 필드가 없는 문서는 쿼리 결과에서 통째로 빠지기 때문에
+     ID가 비어 있는 학생이 화면에서 조용히 사라진다.
+   ══════════════════════════════════════════ */
+function cmpStudentId(a,b){
+  const ka=String((a&&a.id)||'').trim().toLowerCase();
+  const kb=String((b&&b.id)||'').trim().toLowerCase();
+  if(!ka&&!kb)return String((a&&a.name)||'').localeCompare(String((b&&b.name)||''),'ko');
+  if(!ka)return 1;    // ID 없는 학생은 뒤로
+  if(!kb)return -1;
+  const ma=ka.match(/^([a-z]*)(\d*)$/),mb=kb.match(/^([a-z]*)(\d*)$/);
+  if(ma&&mb){
+    if(ma[1]!==mb[1])return ma[1]<mb[1]?-1:1;
+    const na=parseInt(ma[2]||'0',10),nb=parseInt(mb[2]||'0',10);
+    if(na!==nb)return na-nb;
+  }
+  return ka<kb?-1:(ka>kb?1:0);
+}
+
 /* ── 초기화 ── */
 async function iStudents(){
   await loadClassList();
@@ -811,7 +834,7 @@ async function iStudents(){
   onSnapshot(query(collection(db,"students"),orderBy("regDate","desc")),s=>{
     fireIdSet=new Set();
     s.docs.forEach(d=>{fireIdSet.add(d.id);const id=d.data().id;if(id)s2f[id]=d.id;});
-    students=s.docs.map(d=>({fireId:d.id,...d.data()}));
+    students=s.docs.map(d=>({fireId:d.id,...d.data()})).sort(cmpStudentId);   // 화면 표시는 학생 ID 오름차순
     clsCache=new WeakMap();
     renderClassFilter();renderSchoolList();filterStudents();updateSyncBar();
     // 모달이 열려 있으면 ID 검사 결과를 최신 목록 기준으로 갱신
