@@ -771,7 +771,7 @@ h1.hl b{font-weight:700;color:rgba(255,255,255,.5)}
     if (home) { startSlides(); startParallax(); } else { stopSlides(); stopParallax(); }
     closeMenu();
     window.scrollTo(0, 0);
-    if (push && location.hash !== '#' + id) history.pushState(null, '', '#' + id);
+    if (push) history.pushState({ view: id }, '', location.pathname + location.search);
     observeReveals();
   }
 
@@ -781,7 +781,7 @@ h1.hl b{font-weight:700;color:rgba(255,255,255,.5)}
       show(a.getAttribute('href').slice(1), true);
     });
   });
-  window.addEventListener('popstate', function () { show(location.hash.slice(1), false); });
+  window.addEventListener('popstate', function (e) { show((e.state && e.state.view) || 'home', false); });
   burger.addEventListener('click', function () {
     var open = document.body.classList.toggle('menu-open');
     burger.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -900,7 +900,9 @@ h1.hl b{font-weight:700;color:rgba(255,255,255,.5)}
     stage.style.transform = ''; homeIn.style.transform = '';
   }
 
-  show(location.hash.slice(1) || 'home', false);
+  /* 링크를 어떻게 열든 항상 랜딩부터 보이도록 주소의 # 표시를 제거 */
+  history.replaceState({ view: 'home' }, '', location.pathname + location.search);
+  show('home', false);
 })();
 </script>
 </body>
