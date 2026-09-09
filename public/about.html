@@ -223,6 +223,10 @@ h1.hl b{font-weight:700;color:rgba(255,255,255,.5)}
 }
 .portrait svg{width:52px;height:52px;opacity:.28}
 .portrait em{font-style:normal;font-size:12px;color:var(--ink-3);letter-spacing:.04em}
+.portrait>img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.portrait:has(img)::after{display:none}
+#portraitFallback{display:flex;flex-direction:column;align-items:center;gap:14px}
+#portraitFallback[hidden]{display:none}
 .portrait::after{
   content:'';position:absolute;inset:14px;border:1px dashed var(--line-2);pointer-events:none;
 }
@@ -387,12 +391,12 @@ h1.hl b{font-weight:700;color:rgba(255,255,255,.5)}
 
   <div class="home-in">
     <div class="wrap">
-      <div class="h-eyebrow">베타과학학원 · 중고등 과학 전문</div>
+      <div class="h-eyebrow">베타과학학원 · 목동 중고등 과학 전문</div>
       <h1 class="hl">
         <span class="ln"><span>과학은 외우는 과목이</span></span>
         <span class="ln"><span><b>아니라,</b> 이해하는 과목입니다</span></span>
       </h1>
-      <p class="h-sub">개념이 손에 잡힐 때까지 설명하고, 이해했는지 데이터로 확인합니다.<br>15년 동안 그 방식만 지켜왔습니다.</p>
+      <p class="h-sub">개념이 손에 잡힐 때까지 설명하고, 이해했는지 데이터로 확인합니다.<br>목동에서 20년, 그 방식만 지켜왔습니다.</p>
       <div class="h-actions">
         <a href="#about" class="btn btn-light" data-nav>
           원장 소개 보기
@@ -404,7 +408,7 @@ h1.hl b{font-weight:700;color:rgba(255,255,255,.5)}
       <div class="home-foot">
         <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
         <div class="home-mini">
-          <div><b>15년</b><span>과학 강의 경력</span></div>
+          <div><b>20년</b><span>목동 강의·운영</span></div>
           <div><b>8명</b><span>반당 정원</span></div>
           <div><b>96%</b><span>재등록률</span></div>
         </div>
@@ -419,26 +423,31 @@ h1.hl b{font-weight:700;color:rgba(255,255,255,.5)}
     <div class="wrap">
       <div class="page-head rv">
         <div class="eyebrow">01 — About</div>
-        <h2>칠판 앞에 선 지 15년,<br>여전히 첫 수업처럼 준비합니다</h2>
-        <p>학생이 어디서 막혔는지 찾아내는 일. 15년 동안 가장 많이 해온 일이고, 가장 잘하는 일입니다.</p>
+        <h2>목동에서 20년,<br>여전히 첫 수업처럼 준비합니다</h2>
+        <p>학생이 어디서 막혔는지 찾아내는 일. 20년 동안 가장 많이 해온 일이고, 가장 잘하는 일입니다.</p>
       </div>
       <div class="rule"></div>
 
       <div class="about-grid">
         <!-- ✏️ 수정: 아래 자리에 원장님 사진을 넣으세요.
              예) <img src="/images/director.jpg" alt="베타과학학원 원장" style="width:100%;height:100%;object-fit:cover"> -->
-        <div class="portrait rv">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#8b9098" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="8.5" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>
-          </svg>
-          <em>프로필 사진 자리</em>
+        <div class="portrait rv" id="portrait">
+          <!-- public/images/director.jpg 파일을 넣으면 아래 사진이 자동으로 표시됩니다. -->
+          <img src="/images/director.jpg" alt="베타과학학원 원장 김인후" id="portraitImg"
+               onerror="this.remove();document.getElementById('portraitFallback').hidden=false">
+          <div id="portraitFallback" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#8b9098" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="8.5" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>
+            </svg>
+            <em>프로필 사진 자리</em>
+          </div>
         </div>
 
         <div class="about-body">
           <!-- ✏️ 수정: 아래 문단과 표는 예시입니다. 실제 이력으로 바꿔주세요. -->
-          <p class="rv">안녕하세요, 베타과학학원 원장 <strong>○○○</strong>입니다. 대학에서 화학을 전공하고
-            대형 학원 강단과 개인 교습을 거쳐, 내 방식대로 끝까지 책임지는 수업을 하고 싶어
-            직접 학원을 열었습니다.</p>
+          <p class="rv">안녕하세요, 베타과학학원 원장 <strong>김인후</strong>입니다.
+            목동에서 20년 동안 중고등 과학을 가르쳐 왔습니다. 대형 학원 강단에서 시작해
+            지금은 직접 학원을 운영하며, 제 방식대로 끝까지 책임지는 수업을 하고 있습니다.</p>
           <p class="rv">과학을 어려워하는 학생들은 대부분 머리가 나쁜 게 아니라,
             <strong>딱 한 단계 앞에서 이해가 끊겨 있습니다.</strong> 그 지점을 찾아 되짚어주면
             대부분은 스스로 따라옵니다. 그래서 진도보다 그 한 단계를 먼저 봅니다.</p>
@@ -447,11 +456,10 @@ h1.hl b{font-weight:700;color:rgba(255,255,255,.5)}
             <strong>"이 단원 정답률이 62%에서 88%로 올랐습니다"</strong>라고 말씀드리는 학원이고 싶습니다.</p>
 
           <dl class="facts rv">
-            <div class="fact"><dt>전공</dt><dd>○○대학교 화학과 졸업</dd></div>
-            <div class="fact"><dt>강의 경력</dt><dd>중·고등 과학 15년 (통합과학 / 화학Ⅰ·Ⅱ)</dd></div>
-            <div class="fact"><dt>담당 과정</dt><dd>중등 과학 전 학년, 고1 통합과학, 고2·3 화학</dd></div>
+            <div class="fact"><dt>이름</dt><dd>김인후</dd></div>
+            <div class="fact"><dt>경력</dt><dd>목동 20년 · 중고등 과학 강의 및 학원 운영</dd></div>
+            <div class="fact"><dt>담당 과목</dt><dd>중등 과학 전 학년 / 고1 통합과학 / 고2·3 화학Ⅰ·Ⅱ</dd></div>
             <div class="fact"><dt>수업 방식</dt><dd>소수정예 정원제 · 주 2~3회 · 개별 보충</dd></div>
-            <div class="fact"><dt>위치</dt><dd>○○시 ○○구 ○○로 00, 3층</dd></div>
           </dl>
         </div>
       </div>
@@ -640,7 +648,6 @@ h1.hl b{font-weight:700;color:rgba(255,255,255,.5)}
           <div><dt>상담 시간</dt><dd>평일 14:00 – 22:00</dd></div>
           <div><dt>회신</dt><dd>보통 24시간 이내</dd></div>
           <div><dt>대상</dt><dd>중등 과학 전 학년 / 고1 통합과학 / 고2·3 화학</dd></div>
-          <div><dt>위치</dt><dd>○○시 ○○구 ○○로 00, 3층</dd></div>
         </dl>
       </div>
     </div>
