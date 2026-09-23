@@ -1301,7 +1301,7 @@ function renderStudentGrid(){
   selectedStudent=null;
   if(!grade){ $('studentHint').textContent='학년을 먼저 선택하세요.'; return; }
   if(allStudents===null){ $('studentHint').textContent='학생 목록을 불러오는 중…'; return; }
-  const list=allStudents.filter(s=>normalizeGrade(s.grade)===normalizeGrade(grade))
+  const list=allStudents.filter(s=>normalizeGrade(s.grade)===normalizeGrade(grade)&&isActiveStu(s))
     .sort((a,b)=>(a.name||'').localeCompare(b.name||'','ko'));
   if(list.length===0){ $('studentHint').textContent=`${grade} 학생이 없습니다.`; return; }
   $('studentHint').textContent='학생을 누르면 선택됩니다.';
@@ -1359,10 +1359,16 @@ function renderClassSelect(){
   if(names.length===0){ $('classHint').textContent='아직 배정된 반이 없습니다. 학생 관리에서 반을 먼저 배정하세요.'; }
   renderClassStudents();
 }
+/* ★ 2026-09 — 학생 관리에서 휴원 · 퇴원 처리한 학생은 배포 명단에서 뺀다.
+   (기존 배포 기록을 찾는 findStudentRec 은 전체 명단을 그대로 쓴다) */
+function isActiveStu(s){
+  const st=String((s&&s.enrollStatus)==null?'':s.enrollStatus).trim();
+  return st!=='휴원' && st!=='퇴원';
+}
 function classStudentList(className){
   if(!className) return [];
   return (allStudents||[])
-    .filter(s=>normClassList(s.classNames).includes(className))
+    .filter(s=>normClassList(s.classNames).includes(className)&&isActiveStu(s))
     .sort((a,b)=>(a.name||'').localeCompare(b.name||'','ko'));
 }
 function renderClassStudents(){
