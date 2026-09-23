@@ -172,6 +172,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .at-lg{display:flex;align-items:center;gap:5px}
 .at-lg i{width:11px;height:11px;border-radius:4px;display:inline-block;border:1.5px solid}
 .at-note{font-size:11.5px;color:var(--mt);line-height:1.75;margin-top:10px;word-break:keep-all}
+/* ★ 2026-09 — 시험대비 보강 */
+.at-st-시험대비{background:#f5f3ff;border-color:#c4b5fd;color:#6d28d9}
+/* ★ 2026-09 — 재원 상태 안내 (휴원 · 퇴원 · 복귀) */
+.at-enroll{display:none;border-radius:var(--r);padding:14px 16px;margin-bottom:16px;border:1px solid;font-size:13px;line-height:1.8;word-break:keep-all}
+.at-enroll.show{display:block}
+.at-enroll b{font-weight:800}
+.at-enroll .ae-t{display:block;font-size:14px;font-weight:800;margin-bottom:2px}
+.at-enroll.pause{background:#fffbeb;border-color:#fde68a;color:#92400e}
+.at-enroll.leave{background:#f3f4f6;border-color:#e5e7eb;color:#374151}
+.at-enroll.back{background:var(--green-lt);border-color:#a7f3d0;color:#065f46}
 
 /* ══ 수업 기록 카드 (최신순) ══ */
 .ls-card{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px;margin-bottom:10px}
@@ -196,6 +206,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .ls-tag.good{background:var(--green-lt);border-color:#a7f3d0;color:#047857}
 .ls-tag.mid{background:#fffbeb;border-color:#fde68a;color:#b45309}
 .ls-tag.bad{background:#fef2f2;border-color:#fecaca;color:#b91c1c}
+.ls-tag.ex{background:#f5f3ff;border-color:#ddd6fe;color:#6d28d9}
+.ls-card.ex{border-color:#ddd6fe}
+.ls-card.ev{background:#fafafa}
+.ls-card.ev.pause{border-color:#fde68a;background:#fffdf5}
+.ls-card.ev.back{border-color:#a7f3d0;background:#f7fdfa}
 @media(max-width:380px){
   .ls-tags{gap:5px;margin-bottom:9px}
   .ls-tag{font-size:11px;padding:3px 9px}
@@ -492,16 +507,21 @@ const TAB_COUNT=4;
    k 가 없는 예전 기록은 모두 ls 로 읽는다. (그대로 표시된다)
    같은 날짜에 ls 와 mk 가 모두 있으면 칸도 2개, 카드도 2장 나온다.
 ════════════════════════════════════════════════════════════════ */
-const SLOT_LS='ls',SLOT_MK='mk';
-function normSlot(k){return String(k==null?'':k)===SLOT_MK?SLOT_MK:SLOT_LS;}
+/* ★ 2026-09 — 세 번째 슬롯 ex = 시험대비 보강
+   ex 항목에는 f(1 = 회차 차감 · 0 = 무상)가 함께 온다. */
+const SLOT_LS='ls',SLOT_MK='mk',SLOT_EX='ex';
+const SLOT_RANK={ls:0,mk:1,ex:2};
+function normSlot(k){const v=String(k==null?'':k);return v===SLOT_MK?SLOT_MK:(v===SLOT_EX?SLOT_EX:SLOT_LS);}
 function slotKey(d,k){return String(d)+'|'+normSlot(k);}
-function slotName(k){return normSlot(k)===SLOT_MK?'보강 수업':'본수업';}
-function cmpSlot(a,b){return String(a.d).localeCompare(String(b.d))||normSlot(a.k).localeCompare(normSlot(b.k));}
+function slotName(k){const n=normSlot(k);return n===SLOT_MK?'보강 수업':(n===SLOT_EX?'시험대비 보강':'본수업');}
+function cmpSlot(a,b){return String(a.d).localeCompare(String(b.d))||(SLOT_RANK[normSlot(a.k)]-SLOT_RANK[normSlot(b.k)]);}
+function flagOn(v){return v===1||v===true;}
 
 function buildSections(){
   return`
   <div class="section active" id="sec0">
     <br>
+    <div class="at-enroll" id="at-enroll"></div>
     <div class="stat-row at4">
       <div class="stat-box green"><div class="stat-lbl">수업 회차</div><div class="stat-num" id="at-ses">—</div></div>
       <div class="stat-box"><div class="stat-lbl">결석</div><div class="stat-num" id="at-abs">—</div></div>
@@ -516,6 +536,7 @@ function buildSections(){
         <span class="at-lg"><i style="background:#fffbeb;border-color:#fde68a"></i>지각</span>
         <span class="at-lg"><i style="background:#fef2f2;border-color:#fecaca"></i>결석</span>
         <span class="at-lg"><i style="background:#eff6ff;border-color:#bfdbfe"></i>보강</span>
+        <span class="at-lg"><i style="background:#f5f3ff;border-color:#c4b5fd"></i>시험대비</span>
         <span class="at-lg"><i style="background:#f3f4f6;border-color:#e5e7eb"></i>수업일 변경</span>
       </div>
       <div class="at-note" id="at-note"></div>
@@ -681,7 +702,7 @@ function atYmd(v){
 }
 function atLongDate(v){const d=atYmd(v);return d?`${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`:String(v==null?'':v);}
 function atShortDate(v){const d=atYmd(v);return d?`${d.getMonth()+1}/${d.getDate()}`:String(v==null?'':v);}
-const AT_VALID=['출석','지각','결석','보강','휴강'];
+const AT_VALID=['출석','지각','결석','보강','휴강','시험대비'];
 function atStatusOf(x){
   const st=String(x&&x.s!=null?x.s:'').trim();
   return AT_VALID.indexOf(st)>=0?st:'출석';
@@ -706,24 +727,77 @@ function renderAttendance(student){
     document.querySelectorAll('#at-last').forEach(el=>el.textContent=last?atShortDate(last):'—');
 
     const raw=Array.isArray(student&&student.recentAttendance)?student.recentAttendance:[];
-    // 날짜 + 슬롯 순으로 정렬 — 같은 날이면 본수업 먼저, 보강 나중
+    // 날짜 + 슬롯 순으로 정렬 — 같은 날이면 본수업 → 보강 → 시험대비
     const flow=raw.filter(x=>x&&atYmd(x.d))
-      .map(x=>({d:String(x.d),k:normSlot(x.k),s:atStatusOf(x)}))
+      .map(x=>({d:String(x.d),k:normSlot(x.k),s:atStatusOf(x),f:flagOn(x.f)}))
       .sort(cmpSlot)
       .slice(-40);
-    const pairs=new Set(pairedDates(flow));
+    const pairs=new Set(pairedDates(flow.filter(x=>x.k!==SLOT_EX)));
+    const dotTitle=x=>`${atLongDate(x.d)} ${slotName(x.k)} · ${stName(x.s)}${x.s==='시험대비'?(x.f?' (회차 차감)':' (무상)'):''}`;
     const flowHtml=flow.length
-      ?flow.map(x=>`<span class="at-dot at-st-${e(x.s)}${pairs.has(x.d)?' at-pair':''}" title="${e(atLongDate(x.d))} ${e(slotName(x.k))} · ${e(stName(x.s))}">${e(x.s==='휴강'?'변':x.s.charAt(0))}<span class="at-d">${e(atShortDate(x.d))}</span></span>`).join('')
+      ?flow.map(x=>`<span class="at-dot at-st-${e(x.s)}${pairs.has(x.d)?' at-pair':''}" title="${e(dotTitle(x))}">${e(x.s==='휴강'?'변':x.s.charAt(0))}<span class="at-d">${e(atShortDate(x.d))}</span></span>`).join('')
       :`<span class="at-wait">${ses?'출결 기록이 정리되는 중입니다.':'아직 기록된 수업이 없습니다.'}</span>`;
     document.querySelectorAll('#at-line').forEach(el=>el.innerHTML=flowHtml);
-    const noteEl=pairs.size
-      ?`같은 날에 본수업과 보강을 함께 진행한 날이 ${pairs.size}일 있습니다. 그 날은 칸이 두 개로 표시되고, 수업 회차도 두 번으로 계산됩니다.`
-      :'';
-    document.querySelectorAll('#at-note').forEach(el=>el.textContent=noteEl);
+    /* 같은 날 본수업 + 결석 보강 (시험대비는 따로 안내) */
+    const lsMk=pairs;
+    const ex=flow.filter(x=>x.k===SLOT_EX);
+    const exPaid=ex.filter(x=>x.f).length;
+    const notes=[];
+    if(lsMk.size)notes.push(`같은 날에 본수업과 보강을 함께 진행한 날이 ${lsMk.size}일 있습니다. 그 날은 칸이 두 개로 표시되고, 수업 회차도 두 번으로 계산됩니다.`);
+    if(ex.length)notes.push(`시험대비 보강 ${ex.length}회 — 무상 ${ex.length-exPaid}회${exPaid?` · 회차 차감 ${exPaid}회`:''}. 무상 보강은 수업 회차에 포함되지 않습니다.`);
+    document.querySelectorAll('#at-note').forEach(el=>el.innerHTML=notes.map(e).join('<br>'));
+    renderEnroll(student);
   }catch(err){
     ['#at-ses','#at-abs','#at-mk','#at-last'].forEach(sel=>document.querySelectorAll(sel).forEach(el=>el.textContent='—'));
     document.querySelectorAll('#at-line').forEach(el=>el.innerHTML='<span class="at-wait">출결을 불러오지 못했습니다.</span>');
   }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   ★ 2026-09 — 재원 상태 안내 (휴원 · 퇴원 · 복귀)
+   api/portal.js 가 enrollStatus · enrollFrom · enrollUntil · enrollLog
+   (상태와 날짜만)를 보내준다. 선생님 메모는 오지 않는다.
+════════════════════════════════════════════════════════════════ */
+function enrollLogOf(student){
+  return(Array.isArray(student&&student.enrollLog)?student.enrollLog:[])
+    .filter(x=>x&&['재원','휴원','퇴원'].indexOf(String(x.st))>=0&&atYmd(x.d))
+    .map(x=>({st:String(x.st),d:String(x.d),until:atYmd(x.until)?String(x.until):''}))
+    .sort((a,b)=>a.d.localeCompare(b.d));
+}
+function renderEnroll(student){
+  const st=String(student&&student.enrollStatus||'');
+  const from=(student&&atYmd(student.enrollFrom))?String(student.enrollFrom):'';
+  const until=(student&&atYmd(student.enrollUntil))?String(student.enrollUntil):'';
+  let cls='',html='';
+  if(st==='휴원'){
+    const ses=atNum(student&&student.sessionCount);
+    let left='';
+    if(ses!=null&&ses>0){
+      const inC=((ses-1)%4)+1;
+      if(inC<4)left=` 이번 4회 과정 중 ${inC}회를 마쳤고, <b>남은 ${4-inC}회는 복귀 후 이어서</b> 진행됩니다.`;
+    }
+    cls='pause';
+    html=`<span class="ae-t">⏸ 현재 휴원 중입니다</span>${from?`${e(atLongDate(from))}부터 휴원 중`:'휴원 중'}${until?`이며, <b>${e(atLongDate(until))}</b> 복귀 예정입니다.`:'입니다.'} 휴원 기간은 결석으로 처리되지 않습니다.${left}`;
+  }else if(st==='퇴원'){
+    cls='leave';
+    html=`<span class="ae-t">수업이 종료되었습니다</span>${from?`${e(atLongDate(from))}자로 수업을 마쳤습니다. `:''}그동안의 수업 기록과 시험 결과는 이 화면에서 계속 확인하실 수 있습니다.`;
+  }else{
+    const log=enrollLogOf(student);
+    const last=log[log.length-1];
+    if(last&&last.st==='재원'&&log.length>1){
+      const d=atYmd(last.d);
+      const t=new Date();t.setHours(0,0,0,0);
+      const days=d?Math.round((t.getTime()-d.getTime())/86400000):-1;
+      if(days>=0&&days<=30){
+        cls='back';
+        html=`<span class="ae-t">▶ 다시 수업을 시작했습니다</span>${e(atLongDate(last.d))}부터 수업을 이어서 진행하고 있습니다.`;
+      }
+    }
+  }
+  document.querySelectorAll('#at-enroll').forEach(el=>{
+    el.className='at-enroll'+(html?' show '+cls:'');
+    el.innerHTML=html;
+  });
 }
 
 /* ════════ 수업 내용 · 과제 — recentLessons ════════ */
@@ -733,15 +807,24 @@ const LS_LESSON=['출석','지각','보강'];
    '휴강'이라고만 적으면 그냥 한 번 쉰 것처럼 읽힌다.
    실제로는 수업일을 옮겼거나 일정이 조정된 것이므로 이름을 바꾼다.
    (사유는 선생님이 적은 내용이 본문에 그대로 나온다) */
-const ST_LABEL={ '휴강':'수업일 변경' };
+const ST_LABEL={ '휴강':'수업일 변경', '시험대비':'시험대비 보강' };
 function stName(s){ return ST_LABEL[s] || s; }
 const LS_BADGE={
   '출석':'background:#ecfdf5;border-color:#6ee7b7;color:#047857',
   '지각':'background:#fffbeb;border-color:#fde68a;color:#b45309',
   '결석':'background:#fef2f2;border-color:#fecaca;color:#b91c1c',
   '보강':'background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8',
-  '휴강':'background:#f3f4f6;border-color:#e5e7eb;color:#6b7280'
+  '휴강':'background:#f3f4f6;border-color:#e5e7eb;color:#6b7280',
+  '시험대비':'background:#f5f3ff;border-color:#c4b5fd;color:#6d28d9',
+  '휴원':'background:#fffbeb;border-color:#fde68a;color:#b45309',
+  '퇴원':'background:#f3f4f6;border-color:#d1d5db;color:#4b5563',
+  '재원':'background:#ecfdf5;border-color:#6ee7b7;color:#047857'
 };
+/* ★ 수업 회차에 들어가는 기록인가 — 시험대비는 「회차 차감」(f=1)일 때만 */
+function isCounted(x){
+  if(x.s==='시험대비')return !!x.f;
+  return LS_LESSON.indexOf(x.s)>=0;
+}
 
 /* ════════════════════════════════════════════════════════════════
    ★ 2026-08 추가 — 수업 태도 · 과제 완성도 · 숙제 완료 배지
@@ -759,6 +842,8 @@ const LS_TONE={
 };
 function lessonTags(x){
   const bits=[];
+  /* ★ 2026-09 — 시험대비 보강은 회차 차감인지 무상인지 맨 앞에 보여준다 */
+  if(x.s==='시험대비')bits.push(`<span class="ls-tag ex">회차<b>${x.f?'1회 차감':'무상 (차감 없음)'}</b></span>`);
   const add=(lbl,val)=>{
     const v=String(val||'').trim();
     if(!v||v==='-')return;
@@ -799,22 +884,25 @@ function renderLessons(student,fbList){
     const raw=Array.isArray(student&&student.recentLessons)?student.recentLessons:[];
     const list=raw.filter(x=>x&&atYmd(x.d))
       /* a=수업 태도 · w=과제 완성도 · p=숙제 완료 — 없는 옛 기록은 ''  */
-      .map(x=>({d:String(x.d),k:normSlot(x.k),s:atStatusOf(x),u:String(x.u||''),c:String(x.c||''),h:String(x.h||''),a:String(x.a||''),w:String(x.w||''),p:String(x.p||'')}))
+      .map(x=>({d:String(x.d),k:normSlot(x.k),s:atStatusOf(x),u:String(x.u||''),c:String(x.c||''),h:String(x.h||''),a:String(x.a||''),w:String(x.w||''),p:String(x.p||''),f:flagOn(x.f)}))
       .sort(cmpSlot);
 
     if(!list.length){renderLessonsFallback(student,fbList);return;}
 
-    const pairs=new Set(pairedDates(list));
+    /* 같은 날 본수업 + 결석 보강이 모두 있는 날 (시험대비는 배지로 구분되므로 제외) */
+    const pairs=new Set(pairedDates(list.filter(x=>x.k!==SLOT_EX)));
 
-    /* ★ 회차 번호 보정 — 배열에서 밀려난 만큼 시작 번호를 올린다 */
-    const shown=list.filter(x=>LS_LESSON.indexOf(x.s)>=0).length;   // 지금 보이는 수업 수
+    /* ★ 회차 번호 보정 — 배열에서 밀려난 만큼 시작 번호를 올린다
+       (무상 시험대비 보강은 회차가 아니므로 번호를 매기지 않는다) */
+    const shown=list.filter(isCounted).length;                       // 지금 보이는 수업 수
     const total=atNum(student&&student.sessionCount);               // 실제 총 회차
     const cut=(total!=null&&total>shown)?(total-shown):0;           // 밀려난 회차 수
 
     let no=cut;
     const numbered=list.map(x=>{
-      if(LS_LESSON.indexOf(x.s)>=0)no++;
-      return{...x,no:LS_LESSON.indexOf(x.s)>=0?no:null};
+      const c=isCounted(x);
+      if(c)no++;
+      return{...x,no:c?no:null};
     });
     numbered.reverse();
 
@@ -825,10 +913,32 @@ function renderLessons(student,fbList){
       const d=String(fb&&fb.date||'');
       if(atYmd(d))items.push({kind:'fb',d,k:SLOT_MK,fb});
     });
+    /* ★ 휴원 · 퇴원 · 복귀 기록을 그 날짜 자리에 한 장씩 끼워 넣는다 */
+    const oldest=list[0]?list[0].d:'';
+    enrollLogOf(student).forEach((ev,idx)=>{
+      if(ev.st==='재원'&&idx===0)return;           // 첫 줄이 재원이면 '입회'라 표시하지 않는다
+      if(oldest&&ev.d<oldest)return;                 // 보관 범위(최근 40건)보다 오래된 것은 생략
+      items.push({kind:'ev',d:ev.d,k:SLOT_EX,ev});
+    });
     items.sort((a,b)=>cmpSlot(b,a));
     orphans.filter(fb=>!atYmd(String(fb&&fb.date||''))).forEach(fb=>items.unshift({kind:'fb',d:'',k:SLOT_LS,fb}));
 
     const html=items.map((it,i)=>{
+      if(it.kind==='ev'){
+        const ev=it.ev;
+        const back=ev.st==='재원';
+        const lbl=back?'복귀':ev.st;
+        const body=ev.st==='휴원'
+          ?`이 날부터 휴원했습니다.${ev.until?` (${atLongDate(ev.until)} 복귀 예정)`:''} 휴원 기간은 결석으로 처리되지 않으며, 남은 회차는 복귀 후 이어서 진행됩니다.`
+          :(ev.st==='퇴원'?'이 날로 수업을 마쳤습니다.':'이 날부터 다시 수업을 시작했습니다. 회차는 멈춰 있던 곳부터 이어서 셉니다.');
+        return`<div class="ls-card ev${ev.st==='휴원'?' pause':(back?' back':'')}">
+          <div class="ls-top">
+            <span class="ls-date">${e(atLongDate(ev.d))}</span>
+            <span class="ls-badge" style="${LS_BADGE[ev.st]||LS_BADGE['휴강']}">${e(lbl)}</span>
+          </div>
+          <div class="ls-body mute">${e(body)}</div>
+        </div>`;
+      }
       if(it.kind==='fb'){
         return`<div class="ls-card fbonly${i===0?' latest':''}">
           <div class="ls-top">
@@ -848,11 +958,11 @@ function renderLessons(student,fbList){
          :'<div class="ls-body mute">수업 내용이 등록되지 않았습니다.</div>'));
       const hw=x.h?`<div class="ls-hw"><b>과제</b>${e(x.h)}</div>`:'';
       const unit=x.u?`<div class="ls-unit">📘 ${e(x.u)}</div>`:'';
-      // 같은 날 2건인 날에만 '본수업 / 보강 수업' 구분표를 붙인다
-      const slotTag=pairs.has(x.d)?`<span class="ls-slot">${e(slotName(x.k))}</span>`:'';
+      // 같은 날 2건인 날에만 '본수업 / 보강 수업' 구분표를 붙인다 (시험대비는 배지가 이미 구분해 준다)
+      const slotTag=(pairs.has(x.d)&&x.k!==SLOT_EX)?`<span class="ls-slot">${e(slotName(x.k))}</span>`:'';
       const tags=lessonTags(x);
       const fbs=(map.get(slotKey(x.d,x.k))||[]).map(fbBlock).join('');
-      return`<div class="ls-card${i===0?' latest':''}${x.k===SLOT_MK?' mk':''}">
+      return`<div class="ls-card${i===0?' latest':''}${x.k===SLOT_MK?' mk':''}${x.k===SLOT_EX?' ex':''}">
         <div class="ls-top">
           <span class="ls-date">${e(atLongDate(x.d))}</span>
           <span class="ls-badge" style="${badge}">${e(stName(x.s))}</span>
