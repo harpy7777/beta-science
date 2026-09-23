@@ -1149,7 +1149,8 @@ async function loadAll() {
 async function loadStats() {
   try {
     const st = await fetchStudents();
-    setTxt('qs-students', st.length+'명');
+    /* ★ 2026-09 — 퇴원 처리한 학생은 재원생 수에서 뺀다 */
+    setTxt('qs-students', st.filter(s => String(s.enrollStatus || '') !== '퇴원').length+'명');
   } catch { setTxt('qs-students','—'); }
   try {
     const now = new Date();
@@ -1277,7 +1278,7 @@ window.clearDoneTasks = async () => {
 let ccData = [], ccSubjFilter = '전체', ccClassFilter = '전체', ccLoaded = false;
 async function loadStudentList() {
   try {
-    const list = await fetchStudents();
+    const list = (await fetchStudents()).filter(s => String(s.enrollStatus || '') !== '퇴원');
     const sel = document.getElementById('cc-student');
     if (!list.length) {
       sel.innerHTML = '<option value="">등록된 학생 없음</option>';
@@ -1639,6 +1640,8 @@ async function loadClassrooms(){
   ttClasses.forEach(c => byClass.set(c, []));
   const unassigned = [];
   students.forEach(s => {
+    /* ★ 2026-09 — 퇴원생은 반 명단에서 뺀다 (학생 관리에서 퇴원 처리한 학생) */
+    if (String(s.enrollStatus || '') === '퇴원') return;
     const cns = Array.isArray(s.classNames) ? s.classNames.filter(Boolean) : [];
     if (!cns.length) { unassigned.push(s); return; }
     cns.forEach(raw => {
@@ -1678,7 +1681,8 @@ async function loadClassrooms(){
         ? members.map(s => {
             const nm = esc(s.name || s.id);
             const gr = s.grade ? `<span class="stu-chip-grade">${esc(s.grade)}</span>` : '';
-            return `<span class="stu-chip">${nm}${gr}<button class="stu-chip-x" data-sid="${esc(s.id)}" data-cls="${esc(cls)}" title="반에서 제외">✕</button></span>`;
+            const pz = String(s.enrollStatus || '') === '휴원' ? '<span class="stu-chip-grade" style="color:#b45309;">휴원</span>' : '';
+            return `<span class="stu-chip">${nm}${gr}${pz}<button class="stu-chip-x" data-sid="${esc(s.id)}" data-cls="${esc(cls)}" title="반에서 제외">✕</button></span>`;
           }).join('')
         : `<span class="room-empty">배정된 학생이 없습니다</span>`;
       return `<div class="room-card">
