@@ -654,7 +654,7 @@ async function loadStudents(){
       if(typeof va==='number'&&typeof vb==='number')return vb-va;
       return String(vb).localeCompare(String(va));
     });
-    ['d-statTotal','m-statTotal'].forEach(id=>setTxt(id,allStudents.length));
+    ['d-statTotal','m-statTotal'].forEach(id=>setTxt(id,allStudents.filter(s=>String(s.enrollStatus||'')!=='퇴원').length));
     const withPhone=allStudents.filter(s=>phoneOf(s)).length;
     ['d-statPhone','m-statPhone'].forEach(id=>setTxt(id,withPhone));
     populateSubjects();
@@ -822,6 +822,7 @@ window.filterStudents=function(){
   const sub=isMobile?document.getElementById('m-subjectFilter').value:document.getElementById('d-subjectFilter').value;
   const sf=isMobile?document.getElementById('m-sentFilter').value:document.getElementById('d-sentFilter').value;
   filtered=allStudents.filter(s=>{
+    if(String(s.enrollStatus||'')==='퇴원')return false;   // ★ 2026-09 — 퇴원생은 발송 목록에서 뺀다
     if(kw&&!((s.name||'').toLowerCase().includes(kw)||(s.id||'').toLowerCase().includes(kw)))return false;
     if(gr&&s.grade!==gr)return false;
     if(sub&&s.subject!==sub)return false;
