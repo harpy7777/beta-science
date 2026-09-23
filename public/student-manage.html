@@ -464,6 +464,70 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
 .seg-btn.on[data-st="보강"] { background:#eff6ff; border-color:#3b82f6; color:#1d4ed8; }
 .sm-modal.absent-mode .hide-absent { display:none; }
 
+/* ══════════ ★ 2026-09 — 시험대비 보강 ══════════ */
+#cc-seg { grid-template-columns:repeat(5,1fr); }
+.seg-btn[data-st="시험대비"] { font-size:12px; line-height:1.25; word-break:keep-all; }
+.seg-btn.on[data-st="시험대비"] { background:#f5f3ff; border-color:#8b5cf6; color:#6d28d9; }
+.cc-exchk {
+  display:flex; align-items:center; gap:9px; padding:11px 12px;
+  border:1.5px solid #ddd6fe; background:#faf5ff; border-radius:12px; cursor:pointer; min-height:48px;
+  -webkit-user-select:none; user-select:none; transition:all .15s;
+}
+.cc-exchk input { position:absolute; opacity:0; width:1px; height:1px; pointer-events:none; }
+.cc-exchk .cc-exbox {
+  width:22px; height:22px; border-radius:7px; border:2px solid #c4b5fd; background:#fff; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:12px; color:transparent; font-weight:900;
+}
+.cc-exchk input:checked + .cc-exbox { background:#7c3aed; border-color:#7c3aed; color:#fff; }
+.cc-exchk.on { border-color:#7c3aed; background:#f5f3ff; }
+.cc-exchk .cc-extx { display:block; font-size:13px; font-weight:800; color:#5b21b6; }
+.cc-exchk .cc-exsub { display:block; font-size:10.5px; color:#7c6f9b; margin-top:2px; line-height:1.5; }
+.cc-exchk .cc-exsub b { color:#6d28d9; }
+.sm-exline {
+  font-size:11px; font-weight:700; line-height:1.5;
+  color:#6d28d9; background:#f5f3ff; border:1px solid #ddd6fe;
+  border-radius:10px; padding:7px 9px; margin:0 0 0.7rem;
+  display:flex; align-items:center; gap:5px; flex-wrap:wrap; word-break:keep-all;
+}
+.sm-exline b { font-weight:900; }
+
+/* ══════════ ★ 2026-09 — 재원 상태 (휴원 · 퇴원) ══════════ */
+.sm-enroll-filter { flex:0 1 180px; min-width:140px; width:auto; border-color:#fde68a; }
+.sm-enroll-filter:focus { border-color:#f59e0b; }
+.sm-en-badge {
+  display:inline-block; margin-left:6px; padding:2px 7px; border-radius:6px;
+  font-size:10px; font-weight:800; vertical-align:2px; letter-spacing:0;
+}
+.sm-en-badge.pause { color:#b45309; background:#fffbeb; border:1px solid #fde68a; }
+.sm-en-badge.leave { color:#6b7280; background:#f3f4f6; border:1px solid #e5e7eb; }
+.sm-card.en-pause { border-color:#fde68a; background:#fffdf5; }
+.sm-card.en-leave { border-color:#e5e7eb; background:#fafafa; }
+.sm-card.en-leave .sm-card-top, .sm-card.en-leave .sm-subjects, .sm-card.en-leave .sm-classes { opacity:0.7; }
+.sm-enline {
+  font-size:11px; font-weight:700; line-height:1.5;
+  border-radius:10px; padding:7px 9px; margin:0 0 0.7rem; border:1px solid;
+  display:flex; align-items:center; gap:5px; flex-wrap:wrap; word-break:keep-all;
+}
+.sm-enline b { font-weight:900; }
+.sm-enline.pause { color:#b45309; background:#fffbeb; border-color:#fde68a; }
+.sm-enline.pause .late { color:#b91c1c; }
+.sm-enline.leave { color:#4b5563; background:#f3f4f6; border-color:#e5e7eb; }
+.sm-enline.back  { color:#047857; background:#ecfdf5; border-color:#a7f3d0; }
+.sm-btn.en { flex:0 0 auto; padding:9px 10px; font-size:11.5px; color:#b45309; border-color:#fde68a; white-space:nowrap; }
+.sm-btn.en:hover { background:#fffbeb; }
+.seg-btn.on[data-en="휴원"] { background:#fffbeb; border-color:#f59e0b; color:#b45309; }
+.seg-btn.on[data-en="퇴원"] { background:#f3f4f6; border-color:#6b7280; color:#374151; }
+.seg-btn.on[data-en="재원"] { background:#ecfdf5; border-color:#10b981; color:#047857; }
+.off-item .oi-d.en-a { color:#047857; }
+.off-item .oi-d.en-p { color:#b45309; }
+.off-item .oi-d.en-l { color:#4b5563; }
+@media (max-width:600px) {
+  /* 5칸이면 글자가 눌리므로 4칸 + 시험대비는 아래 한 줄 전체 */
+  #cc-seg { grid-template-columns:repeat(4,1fr); }
+  #cc-seg .seg-btn[data-st="시험대비"] { grid-column:1 / -1; font-size:13px; }
+  .sm-enroll-filter { flex:1 1 100%; max-width:none; min-width:0; }
+}
+
 .off-list { max-height:none; overflow:visible; }
 .off-item { display:flex; align-items:center; gap:8px; padding:10px 11px; border:1.5px solid #f3f4f6; border-radius:10px; font-size:12px; margin-bottom:6px; }
 .off-item .oi-d { font-weight:800; color:#b91c1c; flex-shrink:0; }
@@ -588,6 +652,34 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
 .bt-sbtn.on[data-st="지각"] { background:#fffbeb; border-color:#f59e0b; color:#b45309; }
 .bt-sbtn.on[data-st="결석"] { background:#fef2f2; border-color:#ef4444; color:#b91c1c; }
 .bt-sbtn.on[data-st="보강"] { background:#eff6ff; border-color:#3b82f6; color:#1d4ed8; }
+/* ★ 2026-09 — 일괄 작성 · 시험대비 */
+.bt-seg { grid-template-columns:repeat(5,1fr); width:290px; }
+.bt-sbtn[data-st="시험대비"] { font-size:11px; letter-spacing:-0.03em; }
+.bt-sbtn.on[data-st="시험대비"] { background:#f5f3ff; border-color:#8b5cf6; color:#6d28d9; }
+.bt-row.st-시험대비 { border-color:#ddd6fe; }
+.bt-sum .v { color:#6d28d9; }
+.bt-qbtn.ex { border-color:#ddd6fe; background:#f5f3ff; color:#6d28d9; }
+.bt-expick { display:none; margin-top:6px; }
+.bt-expick.open { display:block; }
+.bt-exbtn {
+  width:100%; min-height:40px; padding:8px 10px; border:1.5px solid #ddd6fe; background:#fff; color:#6d28d9;
+  border-radius:9px; font-family:inherit; font-size:12px; font-weight:800; cursor:pointer; text-align:left; transition:all .12s;
+}
+.bt-exbtn span { font-weight:600; color:#a78bfa; font-size:11px; }
+.bt-exbtn.on { background:#7c3aed; border-color:#7c3aed; color:#fff; }
+.bt-exbtn.on span { color:#ddd6fe; }
+.bt-exbtn:active { transform:scale(0.98); }
+.bt-exquick { display:none; align-items:center; gap:6px; flex-wrap:wrap; margin:-0.2rem 0 0.7rem; padding:7px 9px; border:1px solid #ddd6fe; background:#faf5ff; border-radius:10px; }
+.bt-exquick.show { display:flex; }
+.bt-exq-lbl { font-size:11px; font-weight:800; color:#6d28d9; flex:1 1 auto; }
+.bt-exq-btn { min-height:36px; padding:6px 12px; border-radius:9px; border:1.5px solid #ddd6fe; background:#fff; color:#6d28d9; font-family:inherit; font-size:11.5px; font-weight:700; cursor:pointer; }
+.bt-exq-btn.on { background:#7c3aed; border-color:#7c3aed; color:#fff; }
+@media (max-width:600px) {
+  .bt-quick { flex-wrap:wrap; }
+  .bt-quick .bt-qbtn { flex:1 1 calc(50% - 3px); }
+  .bt-exbtn { min-height:44px; }
+  .bt-exq-btn { flex:1; min-height:42px; }
+}
 .bt-memo-btn { background:none; border:none; font-family:inherit; font-size:11px; font-weight:700; color:#a21caf; cursor:pointer; padding:8px 2px 2px; min-height:36px; text-align:left; }
 .bt-memo-wrap { display:none; margin-top:6px; }
 .bt-memo-wrap.open { display:block; }
@@ -835,6 +927,13 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
       <option value="mkw">보강 대기순</option>
       <option value="name">이름순</option>
     </select>
+    <select class="cc-sel sm-enroll-filter" id="sm-enroll-filter" onchange="setEnrollFilter(this.value)" title="재원 상태로 거르기">
+      <option value="cur">재원 · 휴원 (기본)</option>
+      <option value="active">재원생만</option>
+      <option value="pause">휴원생만</option>
+      <option value="leave">퇴원생</option>
+      <option value="all">전체 (퇴원 포함)</option>
+    </select>
   </div>
   <div class="grade-filter-row" id="grade-filter-row">
     <button class="gf-btn on" data-grade="" onclick="setGradeFilter(this,'')">전체</button>
@@ -952,8 +1051,20 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
         <button type="button" class="seg-btn" data-st="지각" onclick="setCCStatus('지각')">지각</button>
         <button type="button" class="seg-btn" data-st="결석" onclick="setCCStatus('결석')">결석</button>
         <button type="button" class="seg-btn" data-st="보강" onclick="setCCStatus('보강')">보강</button>
+        <button type="button" class="seg-btn" data-st="시험대비" onclick="setCCStatus('시험대비')">📝 시험대비 보강</button>
       </div>
       <div class="sm-hint" id="cc-status-hint">출석 · 지각 · 보강은 회차에 포함되고, 결석은 결석 횟수로만 집계됩니다.</div>
+    </div>
+    <!-- ★ 시험대비 보강 — 회차(4회권) 차감 여부 -->
+    <div class="sm-field" id="cc-ex-field" style="display:none;">
+      <label class="cc-exchk" for="cc-w-excount">
+        <input type="checkbox" id="cc-w-excount">
+        <span class="cc-exbox">✓</span>
+        <span>
+          <span class="cc-extx">회차 차감 (4회권에서 1회 사용)</span>
+          <span class="cc-exsub" id="cc-ex-sub">체크하지 않으면 <b>무상 보강</b>으로 기록되고 회차는 그대로입니다.</span>
+        </span>
+      </label>
     </div>
     <div class="sm-field">
       <span class="cc-label">수업 날짜 <span class="req">*</span></span>
@@ -1028,7 +1139,7 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
   <div class="sm-modal bt-modal">
     <div class="sm-modal-title">📋 반별 수업카드 일괄 작성</div>
     <div class="sm-draft" id="bt-draft"><span></span><button type="button" onclick="resetBTDraft()">새로 작성</button></div>
-    <div class="bt-note">반 · 날짜를 고르면 그 반 학생이 모두 나옵니다. <b>수업 내용은 한 번만</b> 쓰면 전원에게 저장되고, 출결과 개별 메모만 학생별로 다르게 넣습니다.<br><b>같은 날 본수업과 보강은 따로 저장됩니다.</b> 이미 그 날 보강이 기록돼 있으면 학생 이름 아래에 표시되고, 여기서 저장해도 <b>보강 기록은 지워지지 않습니다.</b><br>출결을 <b>보강</b>으로 고르면 <b>어떤 결석의 보강인지 고르는 칸</b>이 바로 아래에 열립니다.</div>
+    <div class="bt-note">반 · 날짜를 고르면 그 반 학생이 모두 나옵니다. <b>수업 내용은 한 번만</b> 쓰면 전원에게 저장되고, 출결과 개별 메모만 학생별로 다르게 넣습니다.<br><b>같은 날 본수업과 보강은 따로 저장됩니다.</b> 이미 그 날 보강이 기록돼 있으면 학생 이름 아래에 표시되고, 여기서 저장해도 <b>보강 기록은 지워지지 않습니다.</b><br>출결을 <b>보강</b>으로 고르면 <b>어떤 결석의 보강인지 고르는 칸</b>이 바로 아래에 열립니다.<br><b>📝 시험대비</b>를 고르면 본수업과 따로 저장되고, 학생마다 <b>회차 차감 / 무상</b>을 고를 수 있습니다. (기본값 무상)</div>
     <div class="bt-loaded" id="bt-loaded"></div>
     <div class="sm-row2">
       <div class="sm-field">
@@ -1053,9 +1164,16 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
         <span class="bt-sum" id="bt-sum">—</span>
         <span class="bt-quick">
           <button class="bt-qbtn" onclick="setAllBatch('출석')">전원 출석</button>
+          <button class="bt-qbtn ex" onclick="setAllBatch('시험대비')">전원 시험대비</button>
           <button class="bt-qbtn hw" onclick="setAllBatchHw('완료')">전원 숙제 완료</button>
           <button class="bt-qbtn gray" onclick="setAllBatch('')">초기화</button>
         </span>
+      </div>
+      <!-- ★ 시험대비를 고른 학생이 있을 때만 보이는 한 번에 바꾸기 -->
+      <div class="bt-exquick" id="bt-exquick">
+        <span class="bt-exq-lbl">📝 시험대비 학생 전원</span>
+        <button type="button" class="bt-exq-btn" onclick="setAllBatchEx(false)">무상</button>
+        <button type="button" class="bt-exq-btn on" onclick="setAllBatchEx(true)">회차 1회 차감</button>
       </div>
       <div class="bt-list" id="bt-list"><div class="bt-empty">반과 날짜를 선택하세요.</div></div>
       <div class="bt-common">
@@ -1147,6 +1265,43 @@ body.modal-open { position: static; top: auto; left: auto; right: auto; width: a
   </div>
 </div>
 
+<!-- ★ 휴원 · 퇴원 · 복귀 모달 -->
+<div class="sm-modal-bg" id="en-modal-bg">
+  <div class="sm-modal">
+    <div class="sm-modal-title" id="en-modal-title">🗂 휴원 · 퇴원 · 복귀</div>
+    <div class="student-grade-info" id="en-stu-info" style="margin-top:0;margin-bottom:0.9rem;">학생</div>
+    <div class="sm-class-note">학생을 지우지 않고 <b>상태만 바꿔</b> 기록을 남깁니다.<br>휴원 · 퇴원 기간에는 정규 수업일이 잡히지 않아 <b>「수업 기록 없음」 경고가 뜨지 않고</b>, 학부모 리포트에는 <b>결석이 아니라 「휴원」</b>으로 표시됩니다.</div>
+    <div class="sm-field">
+      <span class="cc-label">상태 <span class="req">*</span></span>
+      <div class="seg" id="en-seg" style="grid-template-columns:repeat(3,1fr);">
+        <button type="button" class="seg-btn" data-en="휴원" onclick="setEnStatus('휴원')">⏸ 휴원</button>
+        <button type="button" class="seg-btn" data-en="퇴원" onclick="setEnStatus('퇴원')">🚪 퇴원</button>
+        <button type="button" class="seg-btn" data-en="재원" onclick="setEnStatus('재원')">▶ 복귀</button>
+      </div>
+      <div class="sm-hint" id="en-st-hint"></div>
+    </div>
+    <div class="sm-row2">
+      <div class="sm-field">
+        <span class="cc-label" id="en-from-lbl">휴원 시작일 <span class="req">*</span></span>
+        <input class="cc-inp" id="en-from" type="date">
+      </div>
+      <div class="sm-field" id="en-until-field">
+        <span class="cc-label">복귀 예정일 (선택)</span>
+        <input class="cc-inp" id="en-until" type="date">
+      </div>
+    </div>
+    <div class="sm-field">
+      <span class="cc-label">사유 · 메모 (선생님만 보임)</span>
+      <textarea class="cc-textarea" id="en-memo" placeholder="예: 학교 시험 준비로 한 달 쉼 · 이사 · 타 학원 이동" style="min-height:64px;"></textarea>
+      <div class="sm-hint">이 메모는 <b>학부모 리포트에 나가지 않습니다.</b> 학부모 화면에는 상태와 날짜만 표시됩니다.</div>
+    </div>
+    <button class="cc-write-btn" id="en-save-btn" style="width:100%;min-height:46px;" onclick="saveEnroll()">저장하기</button>
+    <div class="section-heading" style="margin-top:1.4rem;">변경 기록</div>
+    <div class="off-list" id="en-list"><div class="off-empty">불러오는 중...</div></div>
+    <div class="sm-modal-footer"><button class="btn-secondary" onclick="closeEnroll()">닫기</button></div>
+  </div>
+</div>
+
 <!-- ★ 선생님 피드백 모달 (student-detail.html 과 동일한 구조 · 같은 컬렉션) -->
 <div class="sm-modal-bg" id="fb-modal-bg">
   <div class="sm-modal">
@@ -1210,6 +1365,8 @@ let editPhotoUrl = '';
 let gradeFilter = '';
 let classFilter = '전체';
 let sortMode = 'reg';
+/* ★ 재원 상태 보기 — cur(재원+휴원, 기본) · active · pause · leave · all */
+let enrollFilter = 'cur';
 let ccStudent = null;
 let ccStatus = '출석';
 let offs = [];
@@ -1221,6 +1378,9 @@ let offs = [];
 let ccLoaded = null;
 let ccLookupSeq = 0;
 let ccFilledKey = '';
+/* ★ 시험대비 「회차 차감」 체크를 선생님이 직접 눌렀는지.
+   누르지 않았으면 불러온 카드의 저장값을 따르고, 눌렀으면 그 선택을 지킨다. */
+let ccExTouched = false;
 
 /* ════════════════════════════════════════════════════════════════════
    ★ 같은 날 두 건 저장 — 슬롯(slot) 규칙
@@ -1244,9 +1404,41 @@ let ccFilledKey = '';
 ════════════════════════════════════════════════════════════════════ */
 const SLOT_LS = 'ls';
 const SLOT_MK = 'mk';
-function slotOf(status) { return String(status == null ? '' : status) === '보강' ? SLOT_MK : SLOT_LS; }
-function slotLabel(k) { return k === SLOT_MK ? '보강' : '본수업'; }
-function normSlot(k) { return String(k == null ? '' : k) === SLOT_MK ? SLOT_MK : SLOT_LS; }
+/* ════════════════════════════════════════════════════════════════════
+   ★ 2026-09 추가 — 시험대비 보강 (세 번째 슬롯 ex)
+   ────────────────────────────────────────────────────────────────────
+   시험 기간에 따로 잡는 보강은 결석 보강(mk)과 성격이 다르다.
+     · 결석을 메우는 수업이 아니다 → 미보강 결석 계산과 무관
+     · 원비(4회권)에서 차감할지 말지를 그때그때 정한다
+   그래서 자리를 따로 둔다.  ex = 시험대비 보강
+   → 같은 날 본수업 · 결석 보강 · 시험대비가 모두 있어도 서로 지우지 않는다.
+
+   [회차 차감 여부]
+   classCards 문서의 countSession(true/false) 에 적는다.
+     true  = 4회권에서 1회 사용 (회차 +1)
+     false = 무상 보강 (회차 그대로)
+   students.recentAttendance · recentLessons 의 ex 항목에는 f(1/0)로
+   같은 값을 담아 학부모 화면이 「회차 차감 · 무상」을 표시한다.
+════════════════════════════════════════════════════════════════════ */
+const SLOT_EX = 'ex';
+const EX_ST = '시험대비';
+const isExamPrep = st => String(st == null ? '' : st) === EX_ST;
+function slotOf(status) {
+  const s = String(status == null ? '' : status);
+  if (s === '보강') return SLOT_MK;
+  if (s === EX_ST) return SLOT_EX;
+  return SLOT_LS;
+}
+function slotLabel(k) { return k === SLOT_MK ? '보강' : (k === SLOT_EX ? '시험대비 보강' : '본수업'); }
+function normSlot(k) {
+  const v = String(k == null ? '' : k);
+  if (v === SLOT_MK) return SLOT_MK;
+  if (v === SLOT_EX) return SLOT_EX;
+  return SLOT_LS;
+}
+/* 같은 날 여러 건일 때 보여주는 순서 — 본수업 → 결석 보강 → 시험대비 */
+const SLOT_RANK = { ls: 0, mk: 1, ex: 2 };
+function slotRank(k) { return SLOT_RANK[normSlot(k)]; }
 function cardDocId(sid, date, kind) { return `${sid}__${date}__${normSlot(kind)}`; }
 function legacyCardId(classId, date, sid) { return `${classId}__${date}__${sid}`; }
 
@@ -1365,7 +1557,8 @@ function showDraftNote(id, on, txt) {
 }
 function saveCCDraft() {
   if (hydrating || !ccStudent) return;
-  ccDraft = { fireId: ccStudent.fireId, day: todayStr(), vals: grabFields(CC_FIELDS), status: ccStatus };
+  const exEl = document.getElementById('cc-w-excount');
+  ccDraft = { fireId: ccStudent.fireId, day: todayStr(), vals: grabFields(CC_FIELDS), status: ccStatus, exCount: !!(exEl && exEl.checked), exTouched: ccExTouched };
   DIRTY.add('cc-modal-bg');
 }
 function saveBTDraft() {
@@ -1376,7 +1569,7 @@ function saveBTDraft() {
     cls: cs ? cs.value : '',
     date: ds ? ds.value : '',
     vals: grabFields(BT_FIELDS),
-    rows: btRows.map(r => ({ sid: r.sid, status: r.status, memo: r.memo, mkFor: r.mkFor, hwDone: r.hwDone }))
+    rows: btRows.map(r => ({ sid: r.sid, status: r.status, memo: r.memo, mkFor: r.mkFor, hwDone: r.hwDone, exCharge: !!r.exCharge }))
   };
   DIRTY.add('bt-modal-bg');
 }
@@ -1412,6 +1605,92 @@ window.resetBTDraft = function() {
 /* 출결 상태: 출석·지각·보강 = 수업 1회 / 결석 = 결석 카운트 */
 const LESSON_ST = ['출석','지각','보강'];
 const isLessonStatus = st => LESSON_ST.includes(st || '출석');
+/* ★ 2026-09 — 시험대비 보강
+   hasLessonBody  : 단원 · 수업 내용 · 과제를 적는 출결인가 (출석 · 지각 · 보강 · 시험대비)
+   countsSession  : 회차(4회권)에서 1회 빠지는가 — 시험대비는 「회차 차감」에 체크했을 때만
+   빈 값('')은 호출하는 쪽에서 먼저 걸러야 한다 (isLessonStatus('')는 출석으로 본다) */
+const hasLessonBody = st => isLessonStatus(st) || isExamPrep(st);
+function countsSession(st, charge) {
+  if (isExamPrep(st)) return charge === true;
+  return isLessonStatus(st);
+}
+const cardCharge = c => !!(c && c.countSession === true);
+
+/* ════════════════════════════════════════════════════════════════════
+   ★ 2026-09 추가 — 재원 상태 (재원 · 휴원 · 퇴원)
+   ────────────────────────────────────────────────────────────────────
+   [저장 구조 — students 문서]
+     enrollStatus  : '재원' | '휴원' | '퇴원'   (없으면 재원)
+     enrollFrom    : 지금 상태가 시작된 날 (휴원 시작일 · 퇴원일 · 복귀일)
+     enrollUntil   : 휴원 복귀 예정일 (선택)
+     enrollMemo    : 사유 메모 — 선생님만 본다 (학부모 API 로 나가지 않음)
+     enrollHistory : [{ st, d, until?, memo?, left?, at }]  변경 기록 전체
+   [쓰이는 곳]
+     · 휴원 · 퇴원 기간은 정규 수업일에서 빠진다 → 「수업 기록 없음」 경고가 뜨지 않는다
+     · 반별 일괄 작성에서 그 날 쉬는 학생은 명단에서 빠진다
+     · 퇴원생은 학생 목록 기본 화면에서 숨긴다 (지우지 않고 보관)
+     · 학부모 리포트에는 상태와 날짜만 나간다 (메모는 안 나감)
+════════════════════════════════════════════════════════════════════ */
+const EN_ACTIVE = '재원', EN_PAUSE = '휴원', EN_LEAVE = '퇴원';
+const EN_LIST = [EN_ACTIVE, EN_PAUSE, EN_LEAVE];
+const EN_HIST_MAX = 30;
+function enrollOf(s) {
+  const v = String((s && s.enrollStatus) == null ? '' : s.enrollStatus).trim();
+  return (v === EN_PAUSE || v === EN_LEAVE) ? v : EN_ACTIVE;
+}
+function enrollHistoryOf(s) {
+  return (Array.isArray(s && s.enrollHistory) ? s.enrollHistory : [])
+    .filter(x => x && EN_LIST.includes(String(x.st)) && parseYMD(x.d))
+    .map(x => ({
+      st: String(x.st),
+      d: String(x.d),
+      until: parseYMD(x.until) ? String(x.until) : '',
+      memo: String(x.memo == null ? '' : x.memo),
+      left: (typeof x.left === 'number' && isFinite(x.left)) ? x.left : null,
+      at: (typeof x.at === 'number' && isFinite(x.at)) ? x.at : 0
+    }))
+    .sort((a, b) => a.d.localeCompare(b.d) || (a.at - b.at));
+}
+/* 저장용으로 빈 칸을 뺀 모양 */
+function enrollHistoryRaw(list) {
+  return list.map(x => {
+    const o = { st: x.st, d: x.d, at: x.at || 0 };
+    if (x.until) o.until = x.until;
+    if (x.memo) o.memo = x.memo;
+    if (typeof x.left === 'number') o.left = x.left;
+    return o;
+  }).slice(-EN_HIST_MAX);
+}
+/* 수업이 없던 구간 [from, to] 목록 — 휴원 · 퇴원 시작일부터 복귀 전날까지.
+   아직 복귀하지 않았으면 끝이 없다(9999-12-31). */
+const EN_OPEN_END = '9999-12-31';
+function inactiveRanges(s) {
+  const h = enrollHistoryOf(s);
+  const out = [];
+  let open = '';
+  h.forEach(x => {
+    if (x.st === EN_ACTIVE) {
+      if (open) {
+        const to = addDaysYmd(x.d, -1);
+        if (to && to >= open) out.push({ from: open, to });
+        open = '';
+      }
+    } else if (!open) {
+      open = x.d;
+    }
+  });
+  if (open) out.push({ from: open, to: EN_OPEN_END });
+  /* 기록 없이 상태만 휴원 · 퇴원인 경우 — enrollFrom 부터 */
+  if (!h.length && enrollOf(s) !== EN_ACTIVE && parseYMD(s && s.enrollFrom)) {
+    out.push({ from: String(s.enrollFrom), to: EN_OPEN_END });
+  }
+  return out;
+}
+function inRanges(ranges, ymd) {
+  const d = String(ymd || '');
+  return ranges.some(r => d >= r.from && d <= r.to);
+}
+function inactiveOn(s, ymd) { return inRanges(inactiveRanges(s), ymd); }
 
 /* ════════ 날짜 유틸 ════════ */
 function todayStr() {
@@ -1616,6 +1895,8 @@ function scheduledOf(s) {
 
   const hist = classHistoryOf(s);
   const myOff = studentOffDates(s);
+  /* ★ 휴원 · 퇴원 기간은 수업이 없던 기간이다 — 예정일에서 뺀다 */
+  const pauseR = inactiveRanges(s);
   const map = new Map();
   let offCnt = 0;
 
@@ -1645,6 +1926,7 @@ function scheduledOf(s) {
     const sYmd = ymdOf(start);
     if (sg.from === sYmd && !list.includes(sYmd)) list.unshift(sYmd);
     list.forEach(d => {
+      if (inRanges(pauseR, d)) return;
       if (offSet.has(d) || myOff.has(d)) { offCnt++; return; }
       if (!map.has(d)) map.set(d, sg.n);
     });
@@ -1700,8 +1982,9 @@ function missingOf(s) {
   const t = todayStr();
 
   /* 실제 기록 — 출석 · 지각 · 결석 · 보강 · 휴강 무엇이든 '그 회차를 처리했다'로 본다 */
+  /* ★ 시험대비 보강(ex)은 정규 회차를 대신하지 않으므로 짝짓기에서 뺀다 */
   const recDates = (Array.isArray(s.recentAttendance) ? s.recentAttendance : [])
-    .filter(x => x && parseYMD(x.d)).map(x => String(x.d)).sort();
+    .filter(x => x && parseYMD(x.d) && normSlot(x.k) !== SLOT_EX).map(x => String(x.d)).sort();
   if (!recDates.length) return null;
 
   /* 기록이 남아 있는 구간만 검사한다 */
@@ -1864,7 +2147,10 @@ const REC_MAX = 40;
      p = homeworkDone  숙제 완료    (완료 · 부분완료 · 미완료)
    값이 비었거나 '-' 이면 키 자체를 넣지 않는다.
    → 문서 크기가 늘지 않고, 옛 기록(a·w·p 없음)과도 그대로 호환된다. */
-function lessonEntry(date, kind, st, unit, content, homework, attitude, hwLevel, hwDone) {
+/* ★ 2026-09 — 시험대비(ex) 항목에는 f(회차 차감 1 · 무상 0)를 붙인다.
+   다른 슬롯에는 f 를 넣지 않는다. (옛 기록과 모양이 같다) */
+const flagOn = v => v === 1 || v === true;
+function lessonEntry(date, kind, st, unit, content, homework, attitude, hwLevel, hwDone, charge) {
   const o = { d: String(date), k: normSlot(kind), s: String(st || '출석') };
   const u = String(unit || '').trim();       if (u) o.u = u;
   const c = String(content || '').trim();    if (c) o.c = c;
@@ -1872,6 +2158,7 @@ function lessonEntry(date, kind, st, unit, content, homework, attitude, hwLevel,
   const a = String(attitude == null ? '' : attitude).trim();  if (a && a !== '-') o.a = a;
   const w = String(hwLevel  == null ? '' : hwLevel).trim();   if (w && w !== '-') o.w = w;
   const p = String(hwDone   == null ? '' : hwDone).trim();    if (p && p !== '-') o.p = p;
+  if (o.k === SLOT_EX) o.f = flagOn(charge) ? 1 : 0;
   return o;
 }
 function cleanLessonList(cur) {
@@ -1886,12 +2173,19 @@ function cleanLessonList(cur) {
       if (x.a) o.a = String(x.a);
       if (x.w) o.w = String(x.w);
       if (x.p) o.p = String(x.p);
+      if (o.k === SLOT_EX) o.f = flagOn(x.f) ? 1 : 0;
       return o;
     });
 }
 function sortSlotList(list) {
-  list.sort((a, b) => a.d.localeCompare(b.d) || a.k.localeCompare(b.k));
+  list.sort((a, b) => a.d.localeCompare(b.d) || (slotRank(a.k) - slotRank(b.k)));
   return list;
+}
+/* recentAttendance 한 칸 */
+function recentItem(d, k, s, charge) {
+  const o = { d: String(d), k: normSlot(k), s: String(s || '출석') };
+  if (o.k === SLOT_EX) o.f = flagOn(charge) ? 1 : 0;
+  return o;
 }
 function mergeLesson(cur, date, kind, entry) {
   const list = cleanLessonList(cur);
@@ -1902,16 +2196,34 @@ function mergeLesson(cur, date, kind, entry) {
   else list.push(entry);
   return sortSlotList(list).slice(-LESSON_MAX);
 }
-function mergeRecent(cur, date, kind, st) {
+function mergeRecent(cur, date, kind, st, charge) {
   const list = (Array.isArray(cur) ? cur : [])
     .filter(x => x && parseYMD(x.d))
-    .map(x => ({ d: String(x.d), k: normSlot(x.k), s: String(x.s || '출석') }));
+    .map(x => recentItem(x.d, x.k, x.s, x.f));
   const kd = String(date), kk = normSlot(kind);
   const i = list.findIndex(x => x.d === kd && x.k === kk);
   if (st === null) { if (i >= 0) list.splice(i, 1); }
-  else if (i >= 0) list[i].s = st;
-  else list.push({ d: kd, k: kk, s: st });
+  else if (i >= 0) list[i] = recentItem(kd, kk, st, charge);
+  else list.push(recentItem(kd, kk, st, charge));
   return sortSlotList(list).slice(-REC_MAX);
+}
+/* ★ 2026-09 — 시험대비 보강 집계 (최근 기록 기준)
+   recentAttendance 의 ex 칸만 센다. 이번 달 · 전체 · 차감 · 무상 */
+function examPrepOf(s) {
+  const list = (Array.isArray(s && s.recentAttendance) ? s.recentAttendance : [])
+    .filter(x => x && parseYMD(x.d) && normSlot(x.k) === SLOT_EX);
+  const ym = todayStr().slice(0, 7);
+  const r = { all: list.length, paid: 0, free: 0, month: 0, monthPaid: 0, monthFree: 0, last: '' };
+  list.forEach(x => {
+    const paid = flagOn(x.f);
+    if (paid) r.paid++; else r.free++;
+    if (String(x.d).slice(0, 7) === ym) {
+      r.month++;
+      if (paid) r.monthPaid++; else r.monthFree++;
+    }
+    if (String(x.d) > r.last) r.last = String(x.d);
+  });
+  return r;
 }
 function cycleFields(total) {
   const n = Math.max(0, Math.floor(Number(total) || 0));
@@ -2118,7 +2430,7 @@ window.onOffClassChange = function() {
   if (!sel) return;
   const cur = sel.value;
   const list = (cls ? students.filter(s => studentClassNames(s).includes(cls)) : students.slice())
-    .filter(s => s && (s.id || s.fireId))
+    .filter(s => s && (s.id || s.fireId) && enrollOf(s) !== EN_LEAVE)
     .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'ko'));
   sel.innerHTML = '<option value="">선택</option>'
     + list.map(s => {
@@ -2263,7 +2575,7 @@ window.skipDate = async function(fireId, date) {
 ════════════════════════════════════════════════════════════════════ */
 window.recalcAll = async function() {
   if (!students.length) { alert('학생 데이터를 먼저 불러온 뒤 실행하세요.'); return; }
-  if (!confirm('모든 수업카드를 읽어 학생별 회차 · 4주 단위 · 결석 · 보강 · 첫 수업일과\n학부모 화면용 수업 기록을 다시 계산합니다.\n\n같은 날 본수업과 보강이 함께 있으면 둘 다 살아납니다.\n연결 정보가 없는 보강도 오래된 결석부터 자동으로 이어 붙입니다.\n계속하시겠습니까?')) return;
+  if (!confirm('모든 수업카드를 읽어 학생별 회차 · 4주 단위 · 결석 · 보강 · 첫 수업일과\n학부모 화면용 수업 기록을 다시 계산합니다.\n\n같은 날 본수업과 보강이 함께 있으면 둘 다 살아납니다.\n연결 정보가 없는 보강도 오래된 결석부터 자동으로 이어 붙입니다.\n시험대비 보강은 「회차 차감」에 체크한 것만 회차로 셉니다.\n계속하시겠습니까?')) return;
   const btn = document.getElementById('sm-recalc-btn');
   btn.disabled = true; btn.textContent = '집계 중...';
   try {
@@ -2287,7 +2599,15 @@ window.recalcAll = async function() {
     uniq.forEach(it => {
       const c = it.c, sid = it.sid, cd = it.cd, st = it.st, kd = it.kd;
       const o = agg.get(sid) || { ses:0, abs:0, mk:0, first:'', last:'', rec:[], hw:null, fors:[], lastMk:null, lessons:[] };
+      /* ★ 시험대비 보강 — 「회차 차감」에 체크한 카드만 회차로 센다 */
+      const exCharge = isExamPrep(st) && cardCharge(c);
       if (st === '결석') { o.abs++; }
+      else if (isExamPrep(st)) {
+        if (exCharge) o.ses++;
+        if (cd > o.last) o.last = cd;
+        const hwTx = String(c.homeworkContent || '').trim();
+        if (hwTx && (!o.hw || cd >= o.hw.date)) o.hw = { date: cd, text: hwTx };
+      }
       else {
         o.ses++;
         if (st === '보강') {
@@ -2301,7 +2621,7 @@ window.recalcAll = async function() {
         const hwTx = String(c.homeworkContent || '').trim();
         if (hwTx && (!o.hw || cd >= o.hw.date)) o.hw = { date: cd, text: hwTx };
       }
-      o.rec.push({ d: cd, k: kd, s: st });
+      o.rec.push(recentItem(cd, kd, st, exCharge));
       /* ★ 이미 저장돼 있던 카드의 태도 · 과제 완성도 · 숙제 완료도 함께 옮긴다.
          (이 세 칸은 예전에 학부모 화면으로 넘어가지 않았으므로,
           재집계를 한 번 누르면 지난 기록까지 소급해서 채워진다) */
@@ -2311,7 +2631,8 @@ window.recalcAll = async function() {
         st === '결석' ? '' : c.homeworkContent,
         st === '결석' ? '' : c.attitude,
         st === '결석' ? '' : c.homework,
-        st === '결석' ? '' : c.homeworkDone));
+        st === '결석' ? '' : c.homeworkDone,
+        exCharge));
       agg.set(sid, o);
     });
     let batch = writeBatch(db), pend = 0, done = 0, linked = 0;
@@ -2399,7 +2720,17 @@ window.recalcAll = async function() {
      학생 줄 안에 바로 열린다. 예전에는 화면에 보이지 않고 자동으로만
      잡혀서, 후보가 없으면 연결 없이 저장되고 결석이 계속 미보강으로 남았다.
 ════════════════════════════════════════════════════════════════════ */
-const BT_ST = ['출석','지각','결석','보강'];
+/* ★ 2026-09 — 「시험대비」 추가
+   시험대비를 고른 학생은 본수업(ls)이 아니라 시험대비 자리(ex)에 저장된다.
+   학생 줄마다 「회차 차감」 버튼이 열리고, 기본값은 무상(차감 안 함)이다.
+   같은 날 본수업도 했다면 한 번은 출석으로, 한 번은 시험대비로 두 번 저장하면 된다. */
+const BT_ST = ['출석','지각','결석','보강','시험대비'];
+/* 이 줄이 지금 고른 출결로 저장될 자리의 기존 기록 */
+function btPrevOf(r, kind) {
+  if (kind === SLOT_MK) return { st: r.prevMk, charge: false };
+  if (kind === SLOT_EX) return { st: r.prevEx, charge: !!r.prevExCharge };
+  return { st: r.prevLs, charge: false };
+}
 /* ★ 학생별 숙제 완료 — 저장 값은 개별 수업카드의 select 와 똑같이 맞춘다.
    화면 글자만 짧게 줄인다. (부분완료 → 부분) */
 const BT_HW = [{ v:'완료', t:'완료' }, { v:'부분완료', t:'부분' }, { v:'미완료', t:'미완료' }];
@@ -2497,11 +2828,12 @@ function paintBtOther(i) {
   const el = document.getElementById('bt-other-' + i);
   if (!r || !el) return;
   const target = r.status ? slotOf(r.status) : null;
-  let tx = '';
-  if (target === SLOT_MK && r.prevLs) tx = `📗 이 날 본수업(${r.prevLs}) 1건이 이미 있습니다 · 그대로 유지됩니다`;
-  else if (target !== SLOT_MK && r.prevMk) tx = '🔁 이 날 보강 1건이 이미 있습니다 · 그대로 유지됩니다';
-  else if (!target && r.prevMk) tx = '🔁 이 날 보강 1건 기록됨';
-  el.textContent = tx;
+  const bits = [];
+  if (target && target !== SLOT_LS && r.prevLs) bits.push(`📗 이 날 본수업(${r.prevLs}) 1건이 이미 있습니다 · 그대로 유지됩니다`);
+  if (r.prevMk && target !== SLOT_MK) bits.push(target ? '🔁 이 날 보강 1건이 이미 있습니다 · 그대로 유지됩니다' : '🔁 이 날 보강 1건 기록됨');
+  if (r.prevEx && target !== SLOT_EX) bits.push(`📝 이 날 시험대비 1건 기록됨 (${r.prevExCharge ? '회차 차감' : '무상'})${target ? ' · 그대로 유지됩니다' : ''}`);
+  if (r.prevEx && target === SLOT_EX) bits.push(`📝 이 날 시험대비 기록(${r.prevExCharge ? '회차 차감' : '무상'})을 고쳐 저장합니다`);
+  el.textContent = bits.join(' / ');
 }
 function paintBtCyc(i) {
   const r = btRows[i];
@@ -2510,9 +2842,9 @@ function paintBtCyc(i) {
   const base = r.cyc && typeof r.cyc.total === 'number' ? r.cyc.total : null;
   if (base === null) { el.className = 'bt-cyc'; el.textContent = ''; return; }
   const target = r.status ? slotOf(r.status) : null;
-  const prevSt = (target === SLOT_MK) ? r.prevMk : (target === SLOT_LS ? r.prevLs : '');
-  const prevL = !!prevSt && isLessonStatus(prevSt);
-  const newL = !!r.status && isLessonStatus(r.status);
+  const pv = target ? btPrevOf(r, target) : { st: '', charge: false };
+  const prevL = !!pv.st && countsSession(pv.st, pv.charge);
+  const newL = !!r.status && countsSession(r.status, !!r.exCharge);
   const next = Math.max(0, base + ((newL ? 1 : 0) - (prevL ? 1 : 0)));
   const f = cycleFields(next);
   if (next === 0) { el.className = 'bt-cyc'; el.textContent = '4주 단위 · 수업 전'; return; }
@@ -2551,6 +2883,7 @@ window.setBatchStatus = function(i, st) {
   if (r.status === '보강') { if (!r.mkFor) r.mkFor = r.prevMkFor || (r.cand.length ? r.cand[r.cand.length - 1] : ''); }
   else { r.mkFor = ''; }
   const row = document.getElementById('bt-row-' + i);
+  paintBtEx(i);
   if (row) {
     BT_ST.forEach(x => row.classList.remove('st-' + x));
     if (r.status) row.classList.add('st-' + r.status);
@@ -2572,6 +2905,36 @@ window.setAllBatch = function(st) {
   renderBatch();
   saveBTDraft();
 };
+/* ★ 시험대비 — 학생 줄의 「회차 차감」 버튼 */
+function paintBtEx(i) {
+  const r = btRows[i];
+  const box = document.getElementById('bt-expick-' + i);
+  const btn = document.getElementById('bt-exbtn-' + i);
+  if (!r || !box) return;
+  box.classList.toggle('open', r.status === EX_ST);
+  if (btn) {
+    btn.classList.toggle('on', !!r.exCharge);
+    btn.innerHTML = r.exCharge
+      ? '✓ 회차 1회 차감 <span>(누르면 무상으로)</span>'
+      : '무상 · 회차 그대로 <span>(누르면 1회 차감)</span>';
+  }
+}
+window.toggleBatchEx = function(i) {
+  const r = btRows[i];
+  if (!r) return;
+  r.exCharge = !r.exCharge;
+  paintBtEx(i);
+  paintBtCyc(i);
+  updateBtSum();
+  saveBTDraft();
+};
+/* 시험대비를 고른 학생 전원의 회차 차감을 한 번에 켜고 끈다 */
+window.setAllBatchEx = function(on) {
+  btRows.forEach(r => { if (r.status === EX_ST) r.exCharge = !!on; });
+  btRows.forEach((r, i) => { paintBtEx(i); paintBtCyc(i); });
+  updateBtSum();
+  saveBTDraft();
+};
 function updateBtSum() {
   const el = document.getElementById('bt-sum');
   if (!el) return;
@@ -2583,6 +2946,12 @@ function updateBtSum() {
   if (c('지각')) bits.push(`<span class="y">지각 ${c('지각')}</span>`);
   if (c('결석')) bits.push(`<span class="r">결석 ${c('결석')}</span>`);
   if (c('보강')) bits.push(`<span class="b">보강 ${c('보강')}</span>`);
+  if (c(EX_ST)) {
+    const paid = btRows.filter(r => r.status === EX_ST && r.exCharge).length;
+    bits.push(`<span class="v">시험대비 ${c(EX_ST)} (차감 ${paid} · 무상 ${c(EX_ST) - paid})</span>`);
+  }
+  const exq = document.getElementById('bt-exquick');
+  if (exq) exq.classList.toggle('show', c(EX_ST) > 0);
   if (none) bits.push(`<span style="color:#aeaeb2;">미선택 ${none}</span>`);
   el.innerHTML = `총 ${btRows.length}명 · ` + bits.join(' · ');
 }
@@ -2595,8 +2964,11 @@ function renderBatch() {
     return `<div class="bt-row${r.status ? ' st-' + r.status : ''}" id="bt-row-${i}">
       <div class="bt-top">
         <div class="bt-av" style="background:${bg};color:${col};">${esc(sh)}</div>
-        <div class="bt-nm">${esc(r.name)}${r.prevLs ? `<span class="bt-sub">이미 저장됨 · ${esc(r.prevLs)}</span>` : ''}<span class="bt-cyc" id="bt-cyc-${i}"></span><span class="bt-other" id="bt-other-${i}"></span><span class="bt-mkfor" id="bt-mkfor-${i}"></span></div>
+        <div class="bt-nm">${esc(r.name)}${r.prevLs ? `<span class="bt-sub">이미 저장됨 · ${esc(r.prevLs)}</span>` : (r.prevEx ? `<span class="bt-sub">이미 저장됨 · 시험대비</span>` : '')}<span class="bt-cyc" id="bt-cyc-${i}"></span><span class="bt-other" id="bt-other-${i}"></span><span class="bt-mkfor" id="bt-mkfor-${i}"></span></div>
         <div class="bt-seg">${BT_ST.map(st => `<button class="bt-sbtn${r.status === st ? ' on' : ''}" data-st="${st}" onclick="setBatchStatus(${i},'${st}')">${st}</button>`).join('')}</div>
+      </div>
+      <div class="bt-expick${r.status === EX_ST ? ' open' : ''}" id="bt-expick-${i}">
+        <button type="button" class="bt-exbtn${r.exCharge ? ' on' : ''}" id="bt-exbtn-${i}" onclick="toggleBatchEx(${i})"></button>
       </div>
       <div class="bt-mkpick${r.status === '보강' ? ' open' : ''}" id="bt-mkpick-${i}">
         <select class="bt-mksel" id="bt-mksel-${i}" onchange="btMkForInput(${i},this.value)">${btMkOptions(r)}</select>
@@ -2611,12 +2983,17 @@ function renderBatch() {
       </div>
     </div>`;
   }).join('');
-  btRows.forEach((r, i) => { paintBtMk(i); paintBtOther(i); paintBtCyc(i); paintBtHw(i); });
+  btRows.forEach((r, i) => { paintBtMk(i); paintBtOther(i); paintBtCyc(i); paintBtHw(i); paintBtEx(i); });
   updateBtSum();
 }
 /* 한 학생의 그 날 기록을 슬롯별로 읽는다 (새 ID + 옛 ID 모두 확인) */
 async function readSlots(sid, date, classId) {
-  const out = { ls: null, mk: null, hasCanonLs: false, hasCanonMk: false, legacyKind: '' };
+  const out = { ls: null, mk: null, ex: null, hasCanonLs: false, hasCanonMk: false, hasCanonEx: false, legacyKind: '' };
+  /* ★ 시험대비 자리(ex) — 옛 ID 문서는 시험대비가 없던 시절 것이라 새 ID 만 본다 */
+  try {
+    const d0 = await getDoc(doc(db, 'classCards', cardDocId(sid, date, SLOT_EX)));
+    if (d0.exists()) { out.ex = d0.data() || null; out.hasCanonEx = true; }
+  } catch (e) {}
   try {
     const d1 = await getDoc(doc(db, 'classCards', cardDocId(sid, date, SLOT_LS)));
     if (d1.exists()) { out.ls = d1.data() || null; out.hasCanonLs = true; }
@@ -2648,10 +3025,18 @@ window.loadBatch = async function() {
   info.classList.remove('show'); info.innerHTML = '';
   if (!cls || !parseYMD(date)) { renderBatch(); return; }
   const classId = nameToId.get(cls) || '';
-  const mem = students.filter(s => studentClassNames(s).includes(cls))
+  const inCls = students.filter(s => studentClassNames(s).includes(cls));
+  /* ★ 그 날 휴원 · 퇴원 중인 학생은 명단에서 뺀다 */
+  const away = inCls.filter(s => inactiveOn(s, date));
+  const mem = inCls.filter(s => !inactiveOn(s, date))
     .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'ko'));
+  const awayTx = away.length
+    ? `⏸ 휴원 · 퇴원 중이라 명단에서 뺀 학생 <b>${away.length}명</b> — ${away.map(s => esc(s.name || '이름없음') + ' (' + esc(enrollOf(s)) + ')').join(', ')}`
+    : '';
   if (!mem.length) {
-    box.innerHTML = '<div class="bt-empty">이 반에 배정된 학생이 없습니다.<br>학생 카드의 ✏️ 수정에서 반을 먼저 배정하세요.</div>';
+    box.innerHTML = away.length
+      ? `<div class="bt-empty">이 날 수업하는 학생이 없습니다.<br>${awayTx}</div>`
+      : '<div class="bt-empty">이 반에 배정된 학생이 없습니다.<br>학생 카드의 ✏️ 수정에서 반을 먼저 배정하세요.</div>';
     updateBtSum(); return;
   }
   /* 반 전체 휴강만 본다 — 개인 휴강은 이 체크박스와 무관하다 */
@@ -2661,7 +3046,9 @@ window.loadBatch = async function() {
   const slots = await Promise.all(mem.map(s => readSlots(btStudentId(s), date, classId)));
   btRows = mem.map((s, i) => {
     const sl = slots[i];
-    const lsCard = sl.ls, mkCard = sl.mk;
+    const lsCard = sl.ls, mkCard = sl.mk, exCard = sl.ex;
+    /* 본수업 기록이 없고 시험대비 기록만 있으면 그 줄은 시험대비로 불러온다 */
+    const baseCard = lsCard || exCard;
     const prevMkFor = (mkCard && parseYMD(mkCard.makeupFor)) ? String(mkCard.makeupFor) : '';
     // ★ 같은 날 결석 → 같은 날 보강도 연결할 수 있도록 d <= date 로 넓혔다
     const openA = openAbsentDates(s).filter(d => d <= date);
@@ -2669,16 +3056,19 @@ window.loadBatch = async function() {
     return {
       fireId: s.fireId, sid: btStudentId(s),
       name: s.name || '이름없음', grade: s.grade || '',
-      status: lsCard ? (lsCard.status || '출석') : '',
-      memo: lsCard ? String(lsCard.absenceReason || lsCard.studentNote || '') : '',
+      status: lsCard ? (lsCard.status || '출석') : (exCard ? EX_ST : ''),
+      memo: baseCard ? String(baseCard.absenceReason || baseCard.studentNote || '') : '',
       /* ★ 이미 저장된 카드가 있으면 그 날 숙제 완료도 그대로 되살린다 */
-      hwDone: lsCard ? normHwDone(lsCard.homeworkDone) : '',
+      hwDone: baseCard ? normHwDone(baseCard.homeworkDone) : '',
       mkFor: '',
       cand, openCnt: openA.length,
       prevLs: lsCard ? (lsCard.status || '출석') : '',
       prevMk: mkCard ? '보강' : '',
       prevMkFor,
-      hasCanonLs: sl.hasCanonLs, hasCanonMk: sl.hasCanonMk,
+      prevEx: exCard ? EX_ST : '',
+      prevExCharge: cardCharge(exCard),
+      exCharge: cardCharge(exCard),
+      hasCanonLs: sl.hasCanonLs, hasCanonMk: sl.hasCanonMk, hasCanonEx: sl.hasCanonEx,
       legacyKind: sl.legacyKind,
       cyc: cycleOf(s)
     };
@@ -2694,6 +3084,7 @@ window.loadBatch = async function() {
       if (x.status) r.status = x.status;
       if (x.memo) r.memo = x.memo;
       if (normHwDone(x.hwDone)) r.hwDone = normHwDone(x.hwDone);
+      if (typeof x.exCharge === 'boolean') r.exCharge = x.exCharge;
       if (r.status === '보강') {
         if (x.mkFor && parseYMD(x.mkFor)) r.mkFor = String(x.mkFor);
         else if (!r.mkFor) r.mkFor = r.prevMkFor || (r.cand.length ? r.cand[r.cand.length - 1] : '');
@@ -2705,6 +3096,7 @@ window.loadBatch = async function() {
   });
   const lsFound = btRows.filter(r => r.prevLs).length;
   const mkFound = btRows.filter(r => r.prevMk).length;
+  const exFound = btRows.filter(r => r.prevEx).length;
   const isEmpty = id => { const el = document.getElementById(id); return !el || String(el.value || '').trim() === ''; };
   const fillIfEmpty = (id, v) => { const el = document.getElementById(id); if (el && v != null && isEmpty(id)) el.value = String(v); };
   const setSelIfFree = (id, v) => {
@@ -2714,11 +3106,14 @@ window.loadBatch = async function() {
     const o = [...el.options].find(x => x.value === v);
     if (o) el.value = v;
   };
-  if (lsFound || mkFound) {
+  if (lsFound || mkFound || exFound) {
+    /* 공통 칸은 본수업 기록에서, 본수업이 없으면 시험대비 기록에서 가져온다 */
     const lsCards = slots.map(x => x.ls).filter(Boolean);
-    const common = lsCards.find(c => c && c.content) || lsCards[0] || null;
+    const exCards = slots.map(x => x.ex).filter(Boolean);
+    const pool = lsCards.length ? lsCards : exCards;
+    const common = pool.find(c => c && c.content) || pool[0] || null;
     info.classList.add('show');
-    info.innerHTML = `📂 이 반 ${esc(date)} 기록을 불러왔습니다 — 본수업 <b>${lsFound}건</b>${mkFound ? ` · 보강 <b>${mkFound}건</b>` : ''}.<br>그대로 저장하면 <b>본수업만 덮어쓰기(수정)</b>되고 회차는 중복으로 오르지 않습니다. <b>보강 기록은 지워지지 않습니다.</b><br>이미 입력해 둔 칸은 지우지 않고 그대로 두었습니다.`;
+    info.innerHTML = `📂 이 반 ${esc(date)} 기록을 불러왔습니다 — 본수업 <b>${lsFound}건</b>${mkFound ? ` · 보강 <b>${mkFound}건</b>` : ''}${exFound ? ` · 시험대비 <b>${exFound}건</b>` : ''}.<br>그대로 저장하면 <b>고른 출결의 기록만 덮어쓰기(수정)</b>되고 회차는 중복으로 오르지 않습니다. <b>다른 구분(본수업 · 보강 · 시험대비) 기록은 지워지지 않습니다.</b><br>이미 입력해 둔 칸은 지우지 않고 그대로 두었습니다.`;
     if (common) {
       setSelIfFree('bt-subj', common.subject);
       fillIfEmpty('bt-teacher', common.teacher);
@@ -2728,7 +3123,9 @@ window.loadBatch = async function() {
       setSelIfFree('bt-hw', common.homework);
       setSelIfFree('bt-attitude', common.attitude);
     }
+    if (awayTx) info.innerHTML += '<br>' + awayTx;
   } else {
+    if (awayTx) { info.classList.add('show'); info.innerHTML = awayTx; }
     const t = mem.find(x => x.teacher && x.teacher !== '-');
     if (t) fillIfEmpty('bt-teacher', t.teacher);
     const subs = mem.map(x => x.subject).filter(v => v && v !== '-').map(v => String(v).split(',')[0].trim());
@@ -2766,7 +3163,10 @@ window.saveBatch = async function() {
     const marked = btRows.filter(r => r.status);
     if (!marked.length) { alert('출결을 하나 이상 선택하세요.\n「전원 출석」을 누르면 한 번에 지정됩니다.'); return; }
     if (!teacher) { alert('담당 선생님을 입력하세요.'); return; }
-    if (marked.some(r => isLessonStatus(r.status)) && !content) { alert('수업 내용을 입력하세요.'); return; }
+    if (marked.some(r => hasLessonBody(r.status)) && !content) { alert('수업 내용을 입력하세요.'); return; }
+    /* ★ 시험대비와 정규 출결을 한 번에 저장하면 같은 수업 내용이 양쪽에 들어간다 — 한 번 묻는다 */
+    const nEx = marked.filter(r => r.status === EX_ST).length;
+    if (nEx && nEx < marked.length && !confirm(`시험대비 ${nEx}명과 정규 출결 ${marked.length - nEx}명을 함께 저장합니다.\n아래 수업 내용 · 과제가 양쪽 모두에 똑같이 들어갑니다.\n\n계속할까요? (내용을 따로 쓰려면 「취소」 후 한 쪽씩 저장하세요)`)) return;
   }
   // ★ 저장 직전 날짜 확인 — 지난 달 날짜로 잘못 저장되는 것을 막는다
   if (!confirmClassDate(date, '수업 날짜')) return;
@@ -2778,23 +3178,27 @@ window.saveBatch = async function() {
   btn.disabled = true; btn.textContent = '저장 중...';
   try {
     const batch = writeBatch(db);
-    let nCard = 0, nDel = 0, nMk = 0, nCycDone = 0;
+    let nCard = 0, nDel = 0, nMk = 0, nCycDone = 0, nEx = 0, nExPaid = 0;
     btRows.forEach(r => {
       const stu = students.find(x => x.fireId === r.fireId);
       const newSt = isOff ? '' : (r.status || '');
       if (!isOff && !newSt) return;
       const kind = isOff ? null : slotOf(newSt);
-      const prevSt = isOff ? '' : (kind === SLOT_MK ? r.prevMk : r.prevLs);
+      const pv = isOff ? { st: '', charge: false } : btPrevOf(r, kind);
+      const prevSt = pv.st;
+      /* ★ 시험대비 — 이 줄에서 고른 회차 차감 여부 */
+      const exCharge = !isOff && isExamPrep(newSt) && !!r.exCharge;
 
       if (isOff) {
         if (r.hasCanonLs) { batch.delete(doc(db, 'classCards', cardDocId(r.sid, date, SLOT_LS))); nDel++; }
         if (r.hasCanonMk) { batch.delete(doc(db, 'classCards', cardDocId(r.sid, date, SLOT_MK))); nDel++; }
         if (r.legacyKind) { batch.delete(doc(db, 'classCards', legacyCardId(classId, date, r.sid))); nDel++; }
       } else {
-        const lesson = isLessonStatus(newSt);
+        const lesson = hasLessonBody(newSt);
         const mkFor = (newSt === '보강' && parseYMD(r.mkFor)) ? String(r.mkFor) : '';
         if (newSt === '보강') nMk++;
-        batch.set(doc(db, 'classCards', cardDocId(r.sid, date, kind)), {
+        if (isExamPrep(newSt)) { nEx++; if (exCharge) nExPaid++; }
+        const cardBody = {
           studentId: r.sid, studentName: r.name, studentGrade: r.grade,
           subject, className: cls, classId, teacher, classDate: date,
           status: newSt, slot: kind, makeupFor: mkFor,
@@ -2808,7 +3212,9 @@ window.saveBatch = async function() {
           homeworkDone: lesson ? (r.hwDone || '-') : '-',
           homeworkContent: lesson ? homeworkContent : '',
           batchWrite: true, createdAt: serverTimestamp()
-        }, { merge: true });
+        };
+        if (isExamPrep(newSt)) cardBody.countSession = exCharge;
+        batch.set(doc(db, 'classCards', cardDocId(r.sid, date, kind)), cardBody, { merge: true });
         nCard++;
         // 옛 ID 문서가 같은 슬롯이면 정리 (중복 집계 방지)
         if (r.legacyKind === kind) batch.delete(doc(db, 'classCards', legacyCardId(classId, date, r.sid)));
@@ -2821,10 +3227,10 @@ window.saveBatch = async function() {
         if (r.prevLs) { if (isLessonStatus(r.prevLs)) dSes -= 1; if (r.prevLs === '결석') dAbs -= 1; }
         if (r.prevMk) { dSes -= 1; dMk -= 1; }
       } else {
-        const prevL = !!prevSt && isLessonStatus(prevSt);
+        const prevL = !!prevSt && countsSession(prevSt, pv.charge);
         const prevA = prevSt === '결석';
         const prevM = prevSt === '보강';
-        const newL = isLessonStatus(newSt);
+        const newL = countsSession(newSt, exCharge);
         dSes = (newL ? 1 : 0) - (prevL ? 1 : 0);
         dAbs = ((newSt === '결석') ? 1 : 0) - (prevA ? 1 : 0);
         dMk  = ((newSt === '보강') ? 1 : 0) - (prevM ? 1 : 0);
@@ -2854,9 +3260,9 @@ window.saveBatch = async function() {
         }
       }
       patch.makeupFors = fors;
-      if (!isOff && isLessonStatus(newSt)) {
+      if (!isOff && hasLessonBody(newSt)) {
         if (!parseYMD(stu.lastClassDate) || date > String(stu.lastClassDate)) patch.lastClassDate = date;
-        if (!parseYMD(stu.startDate) || date < String(stu.startDate)) patch.startDate = date;
+        if (isLessonStatus(newSt) && (!parseYMD(stu.startDate) || date < String(stu.startDate))) patch.startDate = date;
       }
       // ── 학부모 공개용 요약 (슬롯별로 따로) ──
       let ra = stu.recentAttendance, rl = stu.recentLessons;
@@ -2866,15 +3272,15 @@ window.saveBatch = async function() {
         rl = mergeLesson(rl, date, SLOT_MK, null);
         rl = mergeLesson(rl, date, SLOT_LS, lessonEntry(date, SLOT_LS, '휴강', '', (reason || OFF_REASON_DEFAULT), ''));
       } else {
-        const lesson = isLessonStatus(newSt);
-        ra = mergeRecent(ra, date, kind, newSt);
+        const lesson = hasLessonBody(newSt);
+        ra = mergeRecent(ra, date, kind, newSt, exCharge);
         rl = mergeLesson(rl, date, kind,
           lessonEntry(date, kind, newSt, lesson ? unit : '', lesson ? content : '', lesson ? homeworkContent : '',
-            lesson ? atDefault : '', lesson ? hwDefault : '', lesson ? (r.hwDone || '') : ''));
+            lesson ? atDefault : '', lesson ? hwDefault : '', lesson ? (r.hwDone || '') : '', exCharge));
       }
       patch.recentAttendance = ra;
       patch.recentLessons = rl;
-      if (!isOff && isLessonStatus(newSt) && homeworkContent) patch.lastHomework = { date, text: homeworkContent };
+      if (!isOff && hasLessonBody(newSt) && homeworkContent) patch.lastHomework = { date, text: homeworkContent };
       if (Object.keys(patch).length) batch.set(doc(db, 'students', r.fireId), patch, { merge: true });
     });
     const offRef = doc(db, 'classOff', offDocId(classId, date));
@@ -2885,7 +3291,7 @@ window.saveBatch = async function() {
     closeBatch(true);
     alert(isOff
       ? `${cls}\n${date} 휴강으로 저장했습니다.${nDel ? `\n기존 수업카드 ${nDel}건 삭제 · 회차 차감 완료` : ''}`
-      : `${cls}\n${fmtYMD(date)} 수업카드 ${nCard}건을 저장했습니다.${nMk ? `\n보강 ${nMk}건이 함께 기록됐습니다.` : ''}${nCycDone ? `\n📗 ${CYCLE}/${CYCLE}회차를 마친 학생 ${nCycDone}명 — 다음 4주 안내를 확인하세요.` : ''}\n학부모 리포트에 바로 반영됩니다.`);
+      : `${cls}\n${fmtYMD(date)} 수업카드 ${nCard}건을 저장했습니다.${nMk ? `\n보강 ${nMk}건이 함께 기록됐습니다.` : ''}${nEx ? `\n📝 시험대비 보강 ${nEx}건 — 회차 차감 ${nExPaid}건 · 무상 ${nEx - nExPaid}건` : ''}${nCycDone ? `\n📗 ${CYCLE}/${CYCLE}회차를 마친 학생 ${nCycDone}명 — 다음 4주 안내를 확인하세요.` : ''}\n학부모 리포트에 바로 반영됩니다.`);
   } catch (e) {
     alert('일괄 저장 오류: ' + e.message);
   } finally {
@@ -2941,6 +3347,56 @@ window.setSort = function(val) {
   sortMode = val || 'reg';
   renderCards();
 };
+window.setEnrollFilter = function(val) {
+  enrollFilter = ['cur','active','pause','leave','all'].includes(val) ? val : 'cur';
+  renderCards();
+};
+function enrollPass(s) {
+  const en = enrollOf(s);
+  if (enrollFilter === 'all') return true;
+  if (enrollFilter === 'active') return en === EN_ACTIVE;
+  if (enrollFilter === 'pause') return en === EN_PAUSE;
+  if (enrollFilter === 'leave') return en === EN_LEAVE;
+  return en !== EN_LEAVE;   /* cur — 퇴원생만 숨긴다 */
+}
+/* 학생 카드에 붙는 재원 상태 줄 */
+function enrollLineHtml(s) {
+  const en = enrollOf(s);
+  if (en === EN_ACTIVE) {
+    /* 최근 30일 안에 복귀한 학생이면 한 줄 알려준다 */
+    const h = enrollHistoryOf(s);
+    const last = h[h.length - 1];
+    if (last && last.st === EN_ACTIVE && h.length > 1) {
+      const dd = daysSince(last.d);
+      if (dd !== null && dd >= 0 && dd <= 30) {
+        return `<div class="sm-enline back">▶ ${esc(shortDate(last.d))} 복귀${typeof last.left === 'number' ? ` · 복귀 당시 이번 4주 남은 ${last.left}회` : ''}</div>`;
+      }
+    }
+    return '';
+  }
+  const from = parseYMD(s.enrollFrom) ? String(s.enrollFrom) : '';
+  if (en === EN_LEAVE) {
+    return `<div class="sm-enline leave">🚪 퇴원${from ? ` · ${esc(fmtYMD(from))}` : ''}<span class="sep">·</span>기록은 보관 중</div>`;
+  }
+  const until = parseYMD(s.enrollUntil) ? String(s.enrollUntil) : '';
+  const c = cycleOf(s);
+  const bits = [`⏸ 휴원 중${from ? ` · ${esc(shortDate(from))}부터` : ''}`];
+  if (until) {
+    const late = until < todayStr();
+    bits.push(late ? `<b class="late">복귀 예정일(${esc(shortDate(until))}) 지남</b>` : `${esc(shortDate(until))} 복귀 예정`);
+  }
+  if (c && !c.est && c.total > 0) bits.push(c.done ? `이번 4주 마감 상태` : `이번 4주 남은 <b>${c.left}회</b> (복귀 후 이어서)`);
+  return `<div class="sm-enline pause">${bits.join('<span class="sep">·</span>')}</div>`;
+}
+/* 학생 카드에 붙는 시험대비 보강 줄 */
+function examLineHtml(s) {
+  const r = examPrepOf(s);
+  if (!r.all) return '';
+  const mon = r.month
+    ? `이번 달 <b>${r.month}회</b> (회차 차감 ${r.monthPaid} · 무상 ${r.monthFree})`
+    : '이번 달 없음';
+  return `<div class="sm-exline">📝 시험대비 보강 ${mon}<span class="sep">·</span>최근 기록 ${r.all}회 · 마지막 ${esc(shortDate(r.last))}</div>`;
+}
 let searchTimer = null;
 window.onSearchInput = function() {
   if (searchTimer) clearTimeout(searchTimer);
@@ -2980,7 +3436,7 @@ window.renderCards = function() {
     }
     const okGf = !gf || (s.grade || '') === gf;
     const okCf = (cf === '전체') || (cf === '__none__' ? cn.length === 0 : cn.includes(cf));
-    return okKw && okGf && okCf;
+    return okKw && okGf && okCf && enrollPass(s);
   });
 
   if (sortMode === 'name') {
@@ -3009,11 +3465,17 @@ window.renderCards = function() {
   }
 
   const parts = [];
+  const EN_FILTER_TX = { active: '재원생만', pause: '휴원생만', leave: '퇴원생', all: '퇴원생 포함' };
+  if (EN_FILTER_TX[enrollFilter]) parts.push(EN_FILTER_TX[enrollFilter]);
   if (gf) parts.push(gf);
   if (cf === '__none__') parts.push('반 미배정');
   else if (cf !== '전체') parts.push(cf);
   const noStart = list.filter(s => !parseYMD(s.startDate)).length;
-  const base = parts.length ? `${parts.join(' · ')} · ${list.length}명` : `전체 ${students.length}명`;
+  const base = parts.length ? `${parts.join(' · ')} · ${list.length}명` : `전체 ${list.length}명`;
+  const pauseAll = students.filter(s => enrollOf(s) === EN_PAUSE).length;
+  const leaveAll = students.filter(s => enrollOf(s) === EN_LEAVE).length;
+  const enTx = (pauseAll ? ` · 휴원 ${pauseAll}명` : '')
+    + (leaveAll ? ` · 퇴원 ${leaveAll}명${enrollFilter === 'cur' ? ' (목록에서 숨김)' : ''}` : '');
   const absSum = list.reduce((n, s) => n + absentOf(s), 0);
   const mkSum  = list.reduce((n, s) => n + makeupOf(s), 0);
   const pdSum  = list.reduce((n, s) => n + pendingOf(s), 0);
@@ -3021,7 +3483,7 @@ window.renderCards = function() {
   const misCnt = list.filter(s => !!missingOf(s)).length;
   const dblCnt = list.filter(s => doubleDays(s).length > 0).length;
   document.getElementById('sm-count').textContent =
-    base + (noStart ? ` · 첫 수업일 미기록 ${noStart}명` : '')
+    base + enTx + (noStart ? ` · 첫 수업일 미기록 ${noStart}명` : '')
     + (misCnt ? ` · 수업 기록 없음 ${misCnt}명` : '')
     + (absSum ? ` · 누적 결석 ${absSum}회` : '')
     + (mkSum ? ` · 보강 완료 ${mkSum}회` : '')
@@ -3094,7 +3556,7 @@ window.renderCards = function() {
       const gap = cnt ? (sch.count - ses) : null;
       const cls = (gap === null) ? 'est' : (gap > 0 ? 'soon' : 'ses');
       schChip = `<span class="sm-chip ${cls}">정규 ${sch.count}회</span>`;
-    } else if (!sch && startD) {
+    } else if (!sch && startD && enrollOf(s) === EN_ACTIVE) {
       schChip = `<span class="sm-chip gray">${cn.length ? '요일 확인 필요' : '반 미배정'}</span>`;
     }
     const cycChip = cycleChip(cyc);
@@ -3152,18 +3614,22 @@ window.renderCards = function() {
     const tapHtml = detailHref
       ? (STUDENT_LOCK ? '' : '<div class="sm-tap">카드를 누르면 📊 테스트 결과 · 분석 리포트가 열립니다</div>')
       : '<div class="sm-tap">학생 ID가 없어 테스트 결과로 이동할 수 없습니다</div>';
+    const enNow = enrollOf(s);
+    const enCls = enNow === EN_PAUSE ? ' en-pause' : (enNow === EN_LEAVE ? ' en-leave' : '');
+    const enBadge = enNow === EN_ACTIVE ? '' : `<span class="sm-en-badge ${enNow === EN_PAUSE ? 'pause' : 'leave'}">${esc(enNow)}</span>`;
     const cardOpen = (detailHref && !STUDENT_LOCK)
-      ? `<div class="sm-card clickable" onclick="goDetail(event,'${esc(detailHref)}')">`
-      : '<div class="sm-card">';
+      ? `<div class="sm-card clickable${enCls}" onclick="goDetail(event,'${esc(detailHref)}')">`
+      : `<div class="sm-card${enCls}">`;
     return `${cardOpen}
       <div class="sm-card-top">
         <div class="sm-av" style="background:${bg};color:${col};">${esc(short)}</div>
         <div style="min-width:0;">
-          <div class="sm-name">${esc(name)}${newBadge}</div>
+          <div class="sm-name">${esc(name)}${newBadge}${enBadge}</div>
           <div class="sm-stu-phone${sPhone ? '' : ' none'}">📱 ${sPhone ? esc(sPhone) : '번호 미등록'}</div>
           <div class="sm-id">${esc(grade || '학년 미등록')}${sid ? ' · ' + esc(sid) : ''}</div>
         </div>
       </div>
+      ${enrollLineHtml(s)}
       <div class="sm-subjects">${subHtml}</div>
       <div class="sm-classes">${clsHtml}</div>
       ${statHtml}
@@ -3171,10 +3637,12 @@ window.renderCards = function() {
       ${misHtml}
       ${mkHtml}
       ${dblHtml}
+      ${examLineHtml(s)}
       <div class="sm-meta"><span class="ml">첫 수업</span> ${startHtml}<br><span class="ml">선생님</span> ${esc(teacher)}<br><span class="ml">학부모</span> ${esc(phone)}</div>
       <div class="sm-actions">
         ${fbBtn}
         <button class="sm-btn icon" title="수정" onclick="openEdit('${esc(s.fireId)}')">✏️</button>
+        <button class="sm-btn en" title="휴원 · 퇴원 · 복귀 처리" onclick="openEnroll('${esc(s.fireId)}')">${enNow === EN_ACTIVE ? '휴원·퇴원' : '복귀'}</button>
         <button class="sm-btn danger" title="삭제" onclick="delStudent('${esc(s.fireId)}','${esc(name)}')">🗑</button>
       </div>
       <button class="sm-btn primary" style="width:100%;margin-top:6px;" title="수업카드 작성 · 수정 · 삭제" onclick="openClassCard('${esc(s.fireId)}')">📝 수업카드 작성 · 수정</button>
@@ -3569,7 +4037,7 @@ window.saveStudent = async function() {
 };
 
 window.delStudent = async function(fireId, name) {
-  if (!confirm(`"${name}" 학생을 삭제하시겠습니까?\n삭제하면 되돌릴 수 없습니다.`)) return;
+  if (!confirm(`"${name}" 학생을 삭제하시겠습니까?\n삭제하면 되돌릴 수 없습니다.\n\n※ 학원을 그만둔 경우라면 삭제 대신 「휴원·퇴원」 버튼으로\n   퇴원 처리하세요. 지난 기록이 그대로 보관됩니다.`)) return;
   try { await deleteDoc(doc(db,'students',fireId)); }
   catch (e) { alert('삭제 오류: ' + e.message); }
 };
@@ -3858,6 +4326,13 @@ function ccFillFrom(card) {
   setSel('cc-w-hw', card.homework);
   setSel('cc-w-attitude', card.attitude);
   setSel('cc-w-homework-done', card.homeworkDone);
+  /* ★ 시험대비 카드면 저장돼 있던 「회차 차감」 체크를 되살린다.
+     (선생님이 체크박스를 직접 바꿨으면 그 선택을 그대로 둔다) */
+  if (isExamPrep(card.status) && !ccExTouched) {
+    const ex = document.getElementById('cc-w-excount');
+    if (ex) ex.checked = cardCharge(card);
+    paintCCEx();
+  }
 }
 /* ── 학생 · 날짜 · 구분에 해당하는 기존 카드를 찾는다 ──
    새 ID(학생ID__날짜__슬롯)를 먼저 보고, 없으면 옛 ID(반ID__날짜__학생ID)를 훑는다.
@@ -3905,7 +4380,16 @@ async function ccLookup() {
   if (seq !== ccLookupSeq) return;
   if (!ccStudent || ccStudent.fireId !== fireId) return;
   if (box) box.classList.remove('checking');
-  if (!data) { ccClearExist(); return; }
+  if (!data) {
+    ccClearExist();
+    if (isExamPrep(ccStatus)) {
+      /* 새로 쓰는 시험대비 카드 — 직접 누르지 않았으면 기본값(무상)으로 */
+      const ex = document.getElementById('cc-w-excount');
+      if (ex && !ccExTouched) ex.checked = false;
+      paintCCEx();
+    }
+    return;
+  }
   const st = String(data.status || '출석');
   ccLoaded = { sid, date, kind, canon, legacyId, data, status: st };
   const key = sid + '|' + date + '|' + kind;
@@ -3919,19 +4403,22 @@ async function ccLookup() {
     const same = (st === ccStatus);
     tx.innerHTML = `📂 <b>${esc(fmtYMD(date))} ${esc(slotLabel(kind))}</b> 기록이 이미 있습니다 — 저장된 출결 <b>${esc(st)}</b>.`
       + `<br>비어 있던 칸을 그 내용으로 채웠습니다. 그대로 저장하면 <b>덮어쓰기(수정)</b>되고 회차는 중복으로 오르지 않습니다.`
-      + (same ? '' : `<br>지금 고른 <b>${esc(ccStatus)}</b>(으)로 저장하면 출결이 <b>${esc(st)} → ${esc(ccStatus)}</b>로 바뀝니다.`);
+      + (same ? '' : `<br>지금 고른 <b>${esc(ccStatus)}</b>(으)로 저장하면 출결이 <b>${esc(st)} → ${esc(ccStatus)}</b>로 바뀝니다.`)
+      + (isExamPrep(st) ? `<br>저장된 회차 처리: <b>${cardCharge(data) ? '회차 1회 차감' : '무상 (회차 그대로)'}</b>` : '');
   }
   if (box) box.classList.add('show');
+  if (isExamPrep(ccStatus)) paintCCEx();
 }
 
 /* ── 카드 1건 삭제 — 회차 · 결석 · 보강 · 학부모 화면 기록까지 함께 되돌린다 ── */
 window.deleteClassCard = async function() {
-  if (!ccStudent || !ccLoaded) { alert('삭제할 기존 기록이 없습니다.\n날짜와 출결 구분(본수업 · 보강)을 먼저 확인해주세요.'); return; }
+  if (!ccStudent || !ccLoaded) { alert('삭제할 기존 기록이 없습니다.\n날짜와 출결 구분(본수업 · 보강 · 시험대비)을 먼저 확인해주세요.'); return; }
   const info = ccLoaded;
   const stu = students.find(x => x.fireId === ccStudent.fireId) || ccStudent;
   const prevSt = info.status;
+  const prevCounted = !!prevSt && countsSession(prevSt, cardCharge(info.data));
   const back = [];
-  if (isLessonStatus(prevSt)) back.push('회차 1회');
+  if (prevCounted) back.push('회차 1회');
   if (prevSt === '결석') back.push('결석 1회');
   if (prevSt === '보강') back.push('보강 1회');
   if (!confirm(`${fmtYMD(info.date)} ${slotLabel(info.kind)} 수업카드(${prevSt})를 삭제할까요?\n\n· ${back.length ? back.join(' · ') + '가 차감됩니다.' : '집계 변화는 없습니다.'}\n· 학부모 화면의 그 날 기록도 함께 사라집니다.\n· 삭제하면 되돌릴 수 없습니다.`)) return;
@@ -3942,7 +4429,7 @@ window.deleteClassCard = async function() {
     if (info.legacyId) await deleteDoc(doc(db, 'classCards', info.legacyId));
 
     const patch = {};
-    const dSes = isLessonStatus(prevSt) ? -1 : 0;
+    const dSes = prevCounted ? -1 : 0;
     const dAbs = (prevSt === '결석') ? -1 : 0;
     const dMk  = (prevSt === '보강') ? -1 : 0;
     if (hasCounter(stu)) {
@@ -3971,7 +4458,7 @@ window.deleteClassCard = async function() {
     patch.recentLessons = rl;
     // 최근 수업일이 지운 날이면 남아 있는 기록에서 다시 고른다
     if (String(stu.lastClassDate || '') === String(info.date)) {
-      const left = ra.filter(x => isLessonStatus(x.s)).map(x => x.d).sort();
+      const left = ra.filter(x => hasLessonBody(x.s)).map(x => x.d).sort();
       patch.lastClassDate = left.length ? left[left.length - 1] : '';
     }
     await setDoc(doc(db, 'students', ccStudent.fireId), patch, { merge: true });
@@ -4021,12 +4508,16 @@ window.openClassCard = function(fireId) {
   document.getElementById('cc-w-content').value = '';
   document.getElementById('cc-w-homework').value = '';
   document.getElementById('cc-w-reason').value = '';
+  document.getElementById('cc-w-excount').checked = false;
+  ccExTouched = false;
   setCCStatus('출석');
   const d = (ccDraft && ccDraft.fireId === fireId) ? ccDraft : null;
   if (d) {
     // ★ 오늘 만든 draft 가 아니면 수업 날짜는 오늘 그대로 둔다
     if (draftFresh(d)) putFields(CC_FIELDS, d.vals);
     else putFieldsKeepToday(CC_FIELDS, d.vals, ['cc-w-date']);
+    document.getElementById('cc-w-excount').checked = !!d.exCount;
+    ccExTouched = !!d.exTouched;
     setCCStatus(d.status || '출석');
     const mkEl = document.getElementById('cc-w-mkfor');
     const want = d.vals ? d.vals['cc-w-mkfor'] : '';
@@ -4041,13 +4532,50 @@ window.openClassCard = function(fireId) {
   // ★ 모달이 열린 뒤에 기존 기록을 확인한다 (열기 전에는 조회하지 않는다)
   ccLookup();
 };
+/* ★ 시험대비 — 「회차 차감」 체크 상태를 화면에 반영 */
+function ccExChecked() {
+  const el = document.getElementById('cc-w-excount');
+  return !!(el && el.checked);
+}
+function paintCCEx() {
+  const lab = document.querySelector('#cc-ex-field .cc-exchk');
+  const on = ccExChecked();
+  if (lab) lab.classList.toggle('on', on);
+  const sub = document.getElementById('cc-ex-sub');
+  if (sub) {
+    let cyc = '';
+    if (on && ccStudent) {
+      const c0 = cycleOf(ccStudent);
+      if (c0 && typeof c0.total === 'number') {
+        /* 이미 저장된 같은 카드가 차감으로 저장돼 있으면 회차는 그대로다 */
+        const already = !!(ccLoaded && isExamPrep(ccLoaded.status) && cardCharge(ccLoaded.data));
+        const f = cycleFields(c0.total + (already ? 0 : 1));
+        cyc = f.cycleIn === CYCLE ? ` 저장하면 이번 4주 ${CYCLE}/${CYCLE}회차로 마감됩니다.` : ` 저장하면 이번 4주 ${f.cycleIn}/${CYCLE}회차 (남은 ${f.cycleLeft}회)입니다.`;
+      }
+    }
+    sub.innerHTML = on
+      ? `<b>회차 1회 차감</b> — 정규 수업처럼 4회권에서 1회 빠집니다.${esc(cyc)}`
+      : '체크하지 않으면 <b>무상 보강</b>으로 기록되고 회차는 그대로입니다.';
+  }
+}
+(function(){
+  const el = document.getElementById('cc-w-excount');
+  if (el) el.addEventListener('change', () => {
+    if (!hydrating) ccExTouched = true;
+    paintCCEx();
+    saveCCDraft();
+  });
+})();
 window.setCCStatus = function(st) {
-  ccStatus = (LESSON_ST.includes(st) || st === '결석') ? st : '출석';
+  ccStatus = (LESSON_ST.includes(st) || st === '결석' || isExamPrep(st)) ? st : '출석';
   document.querySelectorAll('#cc-seg .seg-btn').forEach(b => b.classList.toggle('on', b.dataset.st === ccStatus));
   const box = document.getElementById('cc-modal-box');
   const absent = (ccStatus === '결석');
+  const exam = isExamPrep(ccStatus);
   box.classList.toggle('absent-mode', absent);
-  document.getElementById('cc-reason-field').style.display = (ccStatus === '출석') ? 'none' : '';
+  document.getElementById('cc-reason-field').style.display = (ccStatus === '출석' || exam) ? 'none' : '';
+  document.getElementById('cc-ex-field').style.display = exam ? '' : 'none';
+  paintCCEx();
   const mkField = document.getElementById('cc-mk-field');
   if (ccStatus === '보강') {
     if (ccStudent) fillMkForOptions(ccStudent, document.getElementById('cc-w-date').value);
@@ -4063,7 +4591,9 @@ window.setCCStatus = function(st) {
     slotHint.className = 'sm-hint blue';
     slotHint.textContent = (ccStatus === '보강')
       ? '보강은 본수업과 따로 저장됩니다. 같은 날 본수업이 있어도 지워지지 않고, 회차는 각각 1회씩 올라갑니다.'
-      : '같은 날짜에 이미 저장한 본수업 카드가 있으면 덮어쓰기(수정)됩니다. 회차가 중복으로 오르지 않습니다.';
+      : (exam
+          ? '시험대비 보강은 본수업 · 결석 보강과 따로 저장됩니다. 같은 날 다른 수업이 있어도 지워지지 않습니다.'
+          : '같은 날짜에 이미 저장한 본수업 카드가 있으면 덮어쓰기(수정)됩니다. 회차가 중복으로 오르지 않습니다.');
   }
   const hint = document.getElementById('cc-status-hint');
   let cycTx = '';
@@ -4077,6 +4607,7 @@ window.setCCStatus = function(st) {
     }
   }
   if (absent) hint.textContent = '결석은 회차에 포함되지 않고, 수업 내용 입력도 생략됩니다.';
+  else if (exam) hint.textContent = '시험 기간에 따로 하는 보강입니다. 결석 보강과 별개로 기록되고, 아래 「회차 차감」에 체크했을 때만 회차가 올라갑니다.';
   else if (ccStatus === '보강') hint.textContent = '보강은 수업 1회 + 보강 1회로 집계되고, 카드에 「보강 완료」로 표시됩니다.' + cycTx;
   else if (ccStatus === '지각') hint.textContent = '지각도 수업 1회로 집계됩니다.' + cycTx;
   else hint.textContent = '출석 · 지각 · 보강은 회차에 포함되고, 결석은 결석 횟수로만 집계됩니다.' + cycTx;
@@ -4110,9 +4641,14 @@ window.saveClassCard = async function() {
   const classDate = document.getElementById('cc-w-date').value;
   const unit = document.getElementById('cc-w-unit').value.trim();
   const content = document.getElementById('cc-w-content').value.trim();
-  const status = (LESSON_ST.includes(ccStatus) || ccStatus === '결석') ? ccStatus : '출석';
-  const lesson = isLessonStatus(status);
-  const absenceReason = document.getElementById('cc-w-reason').value.trim();
+  const status = (LESSON_ST.includes(ccStatus) || ccStatus === '결석' || isExamPrep(ccStatus)) ? ccStatus : '출석';
+  /* lesson  = 수업 기록(단원 · 내용 · 과제)을 남기는가 — 시험대비 포함
+     counted = 회차가 1 오르는가 — 시험대비는 「회차 차감」 체크했을 때만 */
+  const lesson = hasLessonBody(status);
+  const exam = isExamPrep(status);
+  const exCharge = exam && ccExChecked();
+  const counted = countsSession(status, exCharge);
+  const absenceReason = exam ? '' : document.getElementById('cc-w-reason').value.trim();
   const mkForRaw = document.getElementById('cc-w-mkfor').value;
   const makeupFor = (status === '보강' && parseYMD(mkForRaw)) ? String(mkForRaw) : '';
   const homework = lesson ? document.getElementById('cc-w-hw').value : '-';
@@ -4149,8 +4685,9 @@ window.saveClassCard = async function() {
     }
     const prevSt = prev ? String(prev.status || '출석') : '';
     const prevMkFor = (prev && parseYMD(prev.makeupFor)) ? String(prev.makeupFor) : '';
+    const prevCounted = !!prevSt && countsSession(prevSt, cardCharge(prev));
 
-    await setDoc(cardRef, {
+    const cardBody = {
       studentId,
       studentName: ccStudent.name || '',
       studentGrade: ccStudent.grade || '',
@@ -4160,7 +4697,10 @@ window.saveClassCard = async function() {
       score: null, scoreNone: false, ox: null, multiple: null, omr: null,
       homework, attitude, homeworkDone, homeworkContent,
       createdAt: serverTimestamp()
-    }, { merge: true });
+    };
+    /* ★ 시험대비 카드에만 회차 차감 여부를 적는다 */
+    if (exam) cardBody.countSession = exCharge;
+    await setDoc(cardRef, cardBody, { merge: true });
     if (legacyRef) { try { await deleteDoc(legacyRef); } catch (e) {} }
 
     if (ccStudent.fireId) {
@@ -4170,11 +4710,10 @@ window.saveClassCard = async function() {
           const cur = studentClassNames(ccStudent);
           if (!cur.includes(className)) Object.assign(patch, buildClassFields(cur.concat([className])));
         }
-        if (lesson && (!parseYMD(ccStudent.startDate) || String(classDate) < String(ccStudent.startDate))) patch.startDate = classDate;
-        const prevL = !!prevSt && isLessonStatus(prevSt);
+        if (isLessonStatus(status) && (!parseYMD(ccStudent.startDate) || String(classDate) < String(ccStudent.startDate))) patch.startDate = classDate;
         const prevA = prevSt === '결석';
         const prevM = prevSt === '보강';
-        const dSes = (lesson ? 1 : 0) - (prevL ? 1 : 0);
+        const dSes = (counted ? 1 : 0) - (prevCounted ? 1 : 0);
         const dAbs = ((status === '결석') ? 1 : 0) - (prevA ? 1 : 0);
         const dMk  = ((status === '보강') ? 1 : 0) - (prevM ? 1 : 0);
         if (hasCounter(ccStudent)) {
@@ -4187,7 +4726,7 @@ window.saveClassCard = async function() {
           const nextSes = Math.max(0, ccStudent.sessionCount + dSes);
           const cf3 = cycleFields(nextSes);
           Object.assign(patch, cf3);
-          if (lesson && nextSes > 0) {
+          if (counted && nextSes > 0) {
             cycMsg = cf3.cycleIn === CYCLE
               ? `\n📗 이번 4주 ${CYCLE}/${CYCLE}회차 마감 — 다음 4주 안내 타이밍입니다.`
               : `\n📗 이번 4주 ${cf3.cycleIn}/${CYCLE}회차 (남은 ${cf3.cycleLeft}회)`;
@@ -4207,10 +4746,10 @@ window.saveClassCard = async function() {
         }
         patch.makeupFors = fors;
         // 학부모 공개용 요약 — 슬롯별로 따로 담는다
-        patch.recentAttendance = mergeRecent(ccStudent.recentAttendance, classDate, kind, status);
+        patch.recentAttendance = mergeRecent(ccStudent.recentAttendance, classDate, kind, status, exCharge);
         patch.recentLessons = mergeLesson(ccStudent.recentLessons, classDate, kind,
           lessonEntry(classDate, kind, status, lesson ? unit : '', lesson ? content : '', lesson ? homeworkContent : '',
-            lesson ? attitude : '', lesson ? homework : '', lesson ? homeworkDone : ''));
+            lesson ? attitude : '', lesson ? homework : '', lesson ? homeworkDone : '', exCharge));
         if (lesson && homeworkContent) patch.lastHomework = { date: classDate, text: homeworkContent };
         if (Object.keys(patch).length) await setDoc(doc(db,'students',ccStudent.fireId), patch, { merge:true });
       } catch (err) { console.warn('학생 문서 보정 실패:', err); }
@@ -4218,7 +4757,11 @@ window.saveClassCard = async function() {
     ccDraft = null; DIRTY.delete('cc-modal-bg'); showDraftNote('cc-draft', false);
     closeCCModal(true);
     const again = prevSt ? '\n(같은 날 같은 구분의 기존 카드를 수정했습니다. 회차는 중복으로 오르지 않습니다.)' : '';
-    alert(status === '보강'
+    alert(exam
+      ? (exCharge
+          ? `${fmtYMD(classDate)} 시험대비 보강으로 저장했습니다.\n회차 1회 차감 — 4회권에서 1회 사용했습니다.${cycMsg}${again}`
+          : `${fmtYMD(classDate)} 시험대비 보강으로 저장했습니다.\n무상 보강 — 회차는 그대로입니다.${again}`)
+      : status === '보강'
       ? (makeupFor
           ? `보강으로 저장했습니다.\n${fmtYMD(makeupFor)} 결석 → ${fmtYMD(classDate)} 보강 완료로 표시됩니다.${cycMsg}${again}`
           : `${fmtYMD(classDate)} 보강으로 저장했습니다. 보강 1회가 기록됩니다.${cycMsg}${again}`)
@@ -4232,12 +4775,213 @@ window.saveClassCard = async function() {
   }
 };
 
+/* ════════════════════════════════════════════════════════════════════
+   ★ 2026-09 추가 — 휴원 · 퇴원 · 복귀 처리 모달
+   ────────────────────────────────────────────────────────────────────
+   · 지금 상태와 같은 상태(휴원 → 휴원)로 저장하면 새 줄을 만들지 않고
+     마지막 기록의 날짜 · 복귀 예정일 · 메모만 고친다.
+   · 다른 상태로 바꾸면 변경 기록에 한 줄을 더한다.
+   · 변경 기록 줄을 지우면, 남은 마지막 줄로 지금 상태를 다시 맞춘다.
+════════════════════════════════════════════════════════════════════ */
+let enFireId = '';
+let enSel = EN_PAUSE;
+function enStudentNow() { return students.find(x => x.fireId === enFireId) || null; }
+function enCycleTx(s) {
+  const c = cycleOf(s);
+  if (!c || c.est || c.total <= 0) return '';
+  return c.done ? `이번 4주 ${CYCLE}/${CYCLE}회차 마감 상태` : `이번 4주 ${c.inCycle}/${CYCLE}회차 · 남은 ${c.left}회`;
+}
+function renderEnrollInfo() {
+  const s = enStudentNow();
+  const box = document.getElementById('en-stu-info');
+  if (!s || !box) return;
+  const en = enrollOf(s);
+  const from = parseYMD(s.enrollFrom) ? String(s.enrollFrom) : '';
+  const col = en === EN_ACTIVE ? '#047857' : (en === EN_PAUSE ? '#b45309' : '#6b7280');
+  const cy = enCycleTx(s);
+  box.innerHTML = `<span style="font-size:11px;">📚</span><strong>${esc(s.name || '학생')}</strong>`
+    + (s.grade ? `<span style="margin-left:6px;color:#a21caf;">${esc(s.grade)}</span>` : '')
+    + `<span style="margin-left:6px;color:${col};font-weight:800;">지금 ${esc(en)}${from && en !== EN_ACTIVE ? ` · ${esc(fmtYMD(from))}부터` : ''}</span>`
+    + (cy ? `<span style="margin-left:auto;color:#4338ca;font-weight:800;">${esc(cy)}</span>` : '');
+}
+function renderEnrollList() {
+  const s = enStudentNow();
+  const box = document.getElementById('en-list');
+  if (!box) return;
+  const h = s ? enrollHistoryOf(s) : [];
+  if (!h.length) { box.innerHTML = '<div class="off-empty">아직 변경 기록이 없습니다. (처음부터 재원 중)</div>'; return; }
+  const ICON = { '재원': '▶', '휴원': '⏸', '퇴원': '🚪' };
+  /* 최신이 위로 — 삭제 버튼에는 정렬된 목록의 원래 위치(i)를 넘긴다 */
+  box.innerHTML = h.map((x, i) => ({ x, i })).reverse().map(({ x, i }) => {
+    const sub = [];
+    if (x.st === EN_ACTIVE && i > 0) sub.push('복귀');
+    if (x.until) sub.push(`${fmtYMD(x.until)} 복귀 예정`);
+    if (typeof x.left === 'number') sub.push(`당시 이번 4주 남은 ${x.left}회`);
+    return `<div class="off-item">
+      <span class="oi-d en-${x.st === EN_ACTIVE ? 'a' : (x.st === EN_PAUSE ? 'p' : 'l')}">${esc(shortDate(x.d))}</span>
+      <span class="oi-n"><b>${ICON[x.st] || ''} ${esc(x.st)}</b>${sub.length ? ` <span class="oi-r">· ${esc(sub.join(' · '))}</span>` : ''}${x.memo ? `<br><span class="oi-r">📝 ${esc(x.memo)}</span>` : ''}</span>
+      <button class="oi-x" onclick="delEnrollRow(${i})">삭제</button>
+    </div>`;
+  }).join('');
+}
+window.setEnStatus = function(st) {
+  enSel = EN_LIST.includes(st) ? st : EN_PAUSE;
+  document.querySelectorAll('#en-seg .seg-btn').forEach(b => b.classList.toggle('on', b.dataset.en === enSel));
+  const s = enStudentNow();
+  const cur = s ? enrollOf(s) : EN_ACTIVE;
+  const lbl = document.getElementById('en-from-lbl');
+  if (lbl) lbl.innerHTML = (enSel === EN_PAUSE ? '휴원 시작일' : (enSel === EN_LEAVE ? '퇴원일' : '복귀일 (다시 나오는 날)')) + ' <span class="req">*</span>';
+  const uf = document.getElementById('en-until-field');
+  if (uf) uf.style.display = (enSel === EN_PAUSE) ? '' : 'none';
+  const hint = document.getElementById('en-st-hint');
+  if (hint) {
+    let tx = '', cls = 'sm-hint blue';
+    if (enSel === cur && enSel !== EN_ACTIVE) {
+      tx = `이미 ${cur} 중입니다. 저장하면 새 기록을 만들지 않고 마지막 ${cur} 기록의 날짜 · 메모만 고칩니다.`;
+    } else if (enSel === EN_PAUSE) {
+      tx = '휴원 기간에는 정규 수업일이 잡히지 않아 「수업 기록 없음」 경고가 뜨지 않고, 반별 일괄 작성 명단에서도 빠집니다. 남은 회차는 그대로 두었다가 복귀 후 이어서 셉니다.';
+    } else if (enSel === EN_LEAVE) {
+      tx = '학생 정보와 지난 수업 기록은 지우지 않고 보관합니다. 학생 목록 기본 화면 · 반별 일괄 작성 · 주간 클리닉 배포 명단에서 빠집니다.';
+    } else if (cur === EN_ACTIVE) {
+      tx = '이미 재원 중입니다. 휴원이나 퇴원을 고르세요.'; cls = 'sm-hint bad';
+    } else {
+      tx = `${cur} 상태를 끝내고 이 날부터 다시 수업한 것으로 기록합니다. 회차는 멈춰 있던 곳부터 이어서 올라갑니다.`;
+    }
+    hint.className = cls;
+    hint.textContent = tx;
+  }
+  const btn = document.getElementById('en-save-btn');
+  if (btn) btn.textContent = enSel === EN_ACTIVE ? '복귀 처리하기' : (enSel === cur ? `${enSel} 기록 고치기` : `${enSel} 처리하기`);
+};
+window.openEnroll = function(fireId) {
+  const s = students.find(x => x.fireId === fireId);
+  if (!s) return;
+  hydrating = true;
+  enFireId = fireId;
+  const cur = enrollOf(s);
+  document.getElementById('en-modal-title').textContent = `🗂 ${s.name || '학생'} · 휴원 · 퇴원 · 복귀`;
+  document.getElementById('en-from').value = todayStr();
+  document.getElementById('en-until').value = '';
+  document.getElementById('en-memo').value = '';
+  renderEnrollInfo();
+  /* 재원 중이면 「휴원」, 휴원 · 퇴원 중이면 「복귀」를 먼저 골라 둔다 */
+  setEnStatus(cur === EN_ACTIVE ? EN_PAUSE : EN_ACTIVE);
+  renderEnrollList();
+  DIRTY.delete('en-modal-bg');
+  showModalBg('en-modal-bg');
+  hydrating = false;
+};
+window.closeEnroll = function() {
+  DIRTY.delete('en-modal-bg');
+  hideModalBg('en-modal-bg');
+  enFireId = '';
+};
+window.saveEnroll = async function() {
+  const s = enStudentNow();
+  if (!s) { alert('학생 정보를 찾을 수 없습니다.'); return; }
+  const cur = enrollOf(s);
+  const st = enSel;
+  const d = String(document.getElementById('en-from').value || '').trim();
+  const untilRaw = String(document.getElementById('en-until').value || '').trim();
+  const memo = String(document.getElementById('en-memo').value || '').trim();
+  const nm = s.name || '이름없음';
+  if (st === EN_ACTIVE && cur === EN_ACTIVE) { alert('이미 재원 중입니다.\n휴원이나 퇴원을 고르세요.'); return; }
+  if (!parseYMD(d)) { alert('날짜를 올바르게 선택하세요.'); return; }
+  if (untilRaw && !parseYMD(untilRaw)) { alert('복귀 예정일 형식이 올바르지 않습니다.'); return; }
+  const until = (st === EN_PAUSE && parseYMD(untilRaw)) ? untilRaw : '';
+  if (until && until <= d) { alert('복귀 예정일은 휴원 시작일보다 뒤여야 합니다.'); return; }
+
+  const hist = enrollHistoryOf(s);
+  const editLast = (st === cur && st !== EN_ACTIVE);
+  let lastIdx = -1;
+  if (editLast) {
+    for (let i = hist.length - 1; i >= 0; i--) { if (hist[i].st === st) { lastIdx = i; break; } }
+  }
+  /* 새 줄을 더할 때는 마지막 기록보다 앞선 날짜를 막는다 (순서가 꼬이지 않게) */
+  const prevRow = (lastIdx >= 0) ? hist[lastIdx - 1] : hist[hist.length - 1];
+  if (prevRow && d < prevRow.d) {
+    alert(`${fmtYMD(prevRow.d)} ${prevRow.st} 기록보다 앞선 날짜입니다.\n날짜를 확인해주세요. (날짜가 잘못된 기록은 아래 목록에서 지우고 다시 적으면 됩니다)`);
+    return;
+  }
+  if (st === EN_ACTIVE && cur !== EN_ACTIVE) {
+    const since = parseYMD(s.enrollFrom) ? String(s.enrollFrom) : '';
+    if (since && d < since) { alert(`${cur} 시작일(${fmtYMD(since)})보다 앞선 복귀일입니다.\n날짜를 확인해주세요.`); return; }
+  }
+  if (!confirmClassDate(d, st === EN_ACTIVE ? '복귀일' : (st === EN_PAUSE ? '휴원 시작일' : '퇴원일'))) return;
+  if (st === EN_LEAVE && !editLast && !confirm(`${nm} 학생을 ${fmtYMD(d)}자로 퇴원 처리할까요?\n\n· 학생 정보와 지난 기록은 지우지 않고 보관합니다.\n· 학생 목록 기본 화면 · 반별 일괄 작성 · 주간 클리닉 배포에서 빠집니다.\n· 다시 다니게 되면 「복귀」로 바꾸면 됩니다.`)) return;
+
+  const c = cycleOf(s);
+  const row = { st, d, until, memo, left: (c && !c.est && c.total > 0) ? c.left : null, at: Date.now() };
+  let next;
+  if (editLast && lastIdx >= 0) {
+    next = hist.slice();
+    row.left = hist[lastIdx].left;          /* 처음 기록한 당시 남은 회차를 유지 */
+    row.at = hist[lastIdx].at || row.at;
+    next[lastIdx] = row;
+  } else {
+    next = hist.concat([row]);
+  }
+  next.sort((a, b) => a.d.localeCompare(b.d) || (a.at - b.at));
+  const patch = {
+    enrollStatus: st,
+    enrollFrom: d,
+    enrollUntil: until,
+    enrollMemo: memo,
+    enrollHistory: enrollHistoryRaw(next),
+    enrollUpdatedAt: serverTimestamp()
+  };
+  const btn = document.getElementById('en-save-btn');
+  btn.disabled = true; btn.textContent = '저장 중...';
+  try {
+    await setDoc(doc(db, 'students', s.fireId), patch, { merge: true });
+    closeEnroll();
+    const cy = enCycleTx(s);
+    alert(st === EN_ACTIVE
+      ? `${nm} 학생 · ${fmtYMD(d)} 복귀로 기록했습니다.${cy ? `\n${cy} — 여기서부터 이어서 셉니다.` : ''}`
+      : (st === EN_PAUSE
+          ? `${nm} 학생 · ${fmtYMD(d)}부터 휴원으로 ${editLast ? '고쳤습니다' : '기록했습니다'}.${until ? `\n복귀 예정일: ${fmtYMD(until)}` : ''}${cy ? `\n${cy} — 복귀하면 이어서 셉니다.` : ''}\n학부모 리포트에 「휴원 중」으로 표시됩니다.`
+          : `${nm} 학생 · ${fmtYMD(d)} 퇴원으로 ${editLast ? '고쳤습니다' : '기록했습니다'}.\n학생 목록 위쪽 「재원 상태」에서 「퇴원생」을 고르면 다시 볼 수 있습니다.`));
+  } catch (e) {
+    alert('저장 오류: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    setEnStatus(enSel);
+  }
+};
+window.delEnrollRow = async function(idx) {
+  const s = enStudentNow();
+  if (!s) return;
+  const hist = enrollHistoryOf(s);
+  const x = hist[idx];
+  if (!x) return;
+  if (!confirm(`${fmtYMD(x.d)} ${x.st} 기록을 지울까요?\n\n잘못 적은 기록일 때만 지우세요.\n지우고 나면 남은 마지막 기록으로 지금 상태가 다시 맞춰집니다.`)) return;
+  const next = hist.filter((_, i) => i !== idx);
+  const last = next[next.length - 1];
+  const patch = {
+    enrollHistory: enrollHistoryRaw(next),
+    enrollStatus: last ? last.st : EN_ACTIVE,
+    enrollFrom: last ? last.d : '',
+    enrollUntil: (last && last.st === EN_PAUSE) ? (last.until || '') : '',
+    enrollMemo: last ? (last.memo || '') : '',
+    enrollUpdatedAt: serverTimestamp()
+  };
+  try {
+    await setDoc(doc(db, 'students', s.fireId), patch, { merge: true });
+    /* 목록은 onSnapshot 으로 새로 그려진다 — 모달 안 내용만 바로 다시 그린다 */
+    Object.assign(s, patch, { enrollUpdatedAt: null });
+    renderEnrollInfo();
+    renderEnrollList();
+    setEnStatus(enrollOf(s) === EN_ACTIVE ? EN_PAUSE : EN_ACTIVE);
+  } catch (e) { alert('삭제 오류: ' + e.message); }
+};
+
 /* ════════ 모달 닫힘 처리 (검증 완료 · 변경 없음) ════════ */
 const MODALS = {
   'sm-modal-bg':  { close: k => closeModal(k),   draft: saveSMDraft },
   'cc-modal-bg':  { close: k => closeCCModal(k), draft: saveCCDraft },
   'bt-modal-bg':  { close: k => closeBatch(k),   draft: saveBTDraft },
-  'off-modal-bg': { close: () => closeOff(),     draft: null }
+  'off-modal-bg': { close: () => closeOff(),     draft: null },
+  'en-modal-bg':  { close: () => closeEnroll(),  draft: null }
 };
 function isOpenModal(id) {
   const el = document.getElementById(id);
