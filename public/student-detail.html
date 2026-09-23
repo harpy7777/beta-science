@@ -88,6 +88,7 @@ body.smode .at-warn { display: none !important; }
 .at-st.abs  { color: #b91c1c; background: #fef2f2; border-color: #fecaca; }
 .at-st.mk   { color: #1d4ed8; background: #eff6ff; border-color: #bfdbfe; }
 .at-st.off  { color: #6b7280; background: #f3f4f6; border-color: #e5e7eb; }
+.at-st.ex   { color: #6d28d9; background: #f5f3ff; border-color: #ddd6fe; }
 .at-tl { display: flex; flex-wrap: wrap; gap: 6px; }
 .at-tl-item { display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px; border: 1px solid #f0e4ec; border-radius: 10px; background: #fffbfe; }
 .at-tl-d { font-size: 11px; font-weight: 700; color: #3c3c43; white-space: nowrap; }
@@ -977,7 +978,11 @@ function renderProfile() {
 /* 출결 (조회 전용) */
 const LESSON_ST=['출석','지각','보강'];
 const isLesson = st => LESSON_ST.indexOf(st||'출석')>=0;
-const ST_INFO={ '출석':{k:'att'}, '지각':{k:'late'}, '결석':{k:'abs'}, '보강':{k:'mk'}, '휴강':{k:'off'} };
+const ST_INFO={ '출석':{k:'att'}, '지각':{k:'late'}, '결석':{k:'abs'}, '보강':{k:'mk'}, '휴강':{k:'off'}, '시험대비':{k:'ex'} };
+/* ★ 2026-09 — 시험대비 보강: 「회차 차감」(countSession=true)일 때만 회차로 센다 */
+const isExamPrep = st => String(st==null?'':st)==='시험대비';
+const hasLessonBody = st => isLesson(st) || isExamPrep(st);
+function cardCounted(c){ return isExamPrep(c.status) ? c.countSession===true : c.status!=='결석'; }
 const AT_PAGE=20;
 let atCards=[], atOffs=[], atOpen=new Set(), atLimit=AT_PAGE, atErr='';
 
@@ -1046,6 +1051,7 @@ function normCard(id,c){
     homeworkContent: String(c.homeworkContent||''),
     absenceReason: String(c.absenceReason||''),
     studentNote: String(c.studentNote||''),
+    countSession: c.countSession===true,
     batchWrite: !!c.batchWrite,
     createdAt: c.createdAt||null
   };
@@ -1077,7 +1083,7 @@ function atCompute(){
   let ses=0, abs=0, first='', last='';
   atCards.forEach(c=>{
     if(c.status==='결석'){ abs++; return; }
-    ses++;
+    if(cardCounted(c)) ses++;
     if(!isYMD(c.date)) return;
     if(!first || c.date<first) first=c.date;
     if(c.date>last) last=c.date;
@@ -1180,8 +1186,9 @@ function atRenderCards(){
   const rows=list.map((c,i)=>{
     const open=atOpen.has(c.id);
     const dl=isYMD(c.date)?fmtYmdFull(c.date):'날짜 미기록';
-    const lesson=isLesson(c.status);
+    const lesson=hasLessonBody(c.status);
     const kv=[];
+    if(isExamPrep(c.status)) kv.push(['회차', c.countSession?'1회 차감':'무상 (차감 없음)']);
     if(c.subject) kv.push(['과목', esc2(c.subject)]);
     if(c.teacher) kv.push(['선생님', esc2(c.teacher)]);
     if(c.className) kv.push(['반', esc2(c.className)]);
