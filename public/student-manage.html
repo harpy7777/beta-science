@@ -3609,7 +3609,7 @@ window.renderCards = function() {
     const newBadge = isNewStudent(s.startDate) ? '<span class="sm-new-badge">NEW</span>' : '';
     /* ★ 「📊 테스트 결과」 버튼 → 「💬 피드백」 버튼으로 교체.
        성적 상세로 가는 길은 카드 본체 클릭이 대신한다. */
-    const fbBtn = `<button class="sm-btn primary" title="선생님 피드백 작성" onclick="openFeedback('${esc(s.fireId)}')">💬 피드백</button>`;
+    const fbBtn = `<button class="sm-btn primary" title="선생님 피드백 작성" onclick="openFeedback('${esc(s.fireId)}')">피드백</button>`;
     const detailHref = sid ? `student-detail.html?id=${encodeURIComponent(sid)}` : '';
     const tapHtml = detailHref
       ? (STUDENT_LOCK ? '' : '<div class="sm-tap">카드를 누르면 📊 테스트 결과 · 분석 리포트가 열립니다</div>')
@@ -3642,10 +3642,12 @@ window.renderCards = function() {
       <div class="sm-actions">
         ${fbBtn}
         <button class="sm-btn icon" title="수정" onclick="openEdit('${esc(s.fireId)}')">✏️</button>
-        <button class="sm-btn en" title="휴원 · 퇴원 · 복귀 처리" onclick="openEnroll('${esc(s.fireId)}')">${enNow === EN_ACTIVE ? '휴원·퇴원' : '복귀'}</button>
         <button class="sm-btn danger" title="삭제" onclick="delStudent('${esc(s.fireId)}','${esc(name)}')">🗑</button>
       </div>
-      <button class="sm-btn primary" style="width:100%;margin-top:6px;" title="수업카드 작성 · 수정 · 삭제" onclick="openClassCard('${esc(s.fireId)}')">📝 수업카드 작성 · 수정</button>
+      <div class="sm-actions" style="margin-top:6px;">
+        <button class="sm-btn primary" title="수업카드 작성 · 수정 · 삭제" onclick="openClassCard('${esc(s.fireId)}')">📝 수업카드 작성 · 수정</button>
+        <button class="sm-btn en" title="휴원 · 퇴원 · 복귀 처리" onclick="openEnroll('${esc(s.fireId)}')">${enNow === EN_ACTIVE ? '휴원·퇴원' : '▶ 복귀'}</button>
+      </div>
       ${tapHtml}
     </div>`;
   }).join('');
