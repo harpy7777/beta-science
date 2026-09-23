@@ -123,13 +123,36 @@ const STUDENT_FIELDS = [
   'startDate', 'lastClassDate',
   'sessionCount', 'absentCount', 'makeupCount',
   'recentAttendance', 'recentLessons', 'lastHomework',
+  /* ★ 2026-09 — 재원 상태 (휴원 · 퇴원). 날짜만 나가고 메모는 안 나간다 */
+  'enrollStatus', 'enrollFrom', 'enrollUntil',
 ];
+
+/* ★ 2026-09 — 재원 상태 변경 기록
+   students.enrollHistory 에는 선생님 메모(memo)가 들어 있으므로
+   통째로 내보내지 않는다. 상태 · 날짜 · 복귀 예정일만 새로 골라
+   enrollLog 라는 이름으로 내보낸다. (enrollMemo 도 나가지 않는다) */
+const ENROLL_ST = ['재원', '휴원', '퇴원'];
+const YMD_RE = /^\d{4}-\d{2}-\d{2}$/;
+function pickEnrollLog(list) {
+  if (!Array.isArray(list)) return [];
+  return list
+    .filter(x => x && typeof x === 'object'
+      && ENROLL_ST.includes(String(x.st)) && YMD_RE.test(String(x.d || '')))
+    .map(x => {
+      const o = { st: String(x.st), d: String(x.d) };
+      if (YMD_RE.test(String(x.until || ''))) o.until = String(x.until);
+      return o;
+    })
+    .slice(-30);
+}
 
 function pickStudent(docId, data) {
   const out = { __id: docId };
   for (const key of STUDENT_FIELDS) {
     if (data[key] !== undefined) out[key] = data[key];
   }
+  const log = pickEnrollLog(data.enrollHistory);
+  if (log.length) out.enrollLog = log;
   return out;
 }
 
