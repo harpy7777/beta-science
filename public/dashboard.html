@@ -757,7 +757,7 @@ function renderLowStat(){
 }
 
 function iStats(){
-  onSnapshot(collection(db,"students"),s=>{document.getElementById('stat-total-students').textContent=s.size;cSC(s.docs);});
+  onSnapshot(collection(db,"students"),s=>{/* ★ 2026-09 — 퇴원 처리한 학생은 재원생 수에서 뺀다 */document.getElementById('stat-total-students').textContent=s.docs.filter(d=>String((d.data()||{}).enrollStatus||'')!=='퇴원').length;cSC(s.docs);});
   onSnapshot(collection(db,"grades"),s=>{
     let v=0;
     s.forEach(d=>{const r=d.data(),sid=r.studentId||'';
