@@ -569,6 +569,18 @@ body {
 .color-opts { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
 .color-opt { width: 30px; height: 30px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s; }
 .color-opt.sel { border-color: #1d1d1f; }
+/* 시간표 수정 모드 */
+.tt-when { display: flex; gap: 8px; margin-bottom: 12px; }
+.tt-when .form-select { flex: 1; min-width: 0; }
+.btn-danger {
+  padding: 10px 16px; min-height: 44px;
+  background: #fff; border: 1.5px solid #fecaca; border-radius: 10px;
+  font-size: 14px; font-weight: 600; color: #dc2626; cursor: pointer;
+  font-family: inherit; transition: background-color 0.15s ease-out, transform 0.1s ease-out;
+}
+.btn-danger:hover { background: #fef2f2; }
+.btn-danger:active { background: #fee2e2; transform: scale(0.98); }
+.tt-edit-hint { font-size: 12px; color: #6e6e73; line-height: 1.5; margin: -4px 0 12px; }
 
 /* ── 반응형 ── */
 @media (max-width: 900px) {
@@ -1064,19 +1076,31 @@ body {
 <!-- 시간표 모달 (바텀시트 스타일) -->
 <div class="modal-bg" id="tt-modal">
   <div class="modal-box">
-    <div class="modal-title">수업 추가</div>
+    <div class="modal-title" id="tt-modal-title">수업 추가</div>
     <div style="margin-bottom:10px;">
+      <label for="tt-class-inp" class="section-label" style="display:block;">수업명</label>
       <input class="form-input" type="text" id="tt-class-inp" placeholder="수업명 (예: 중2 물리)" style="width:100%;">
     </div>
-    <div class="section-label">수업 길이</div>
+    <div id="tt-when-wrap" style="display:none;">
+      <div class="section-label">요일 · 시작 시간</div>
+      <div class="tt-when">
+        <select class="form-select" id="tt-day-inp" aria-label="요일" onchange="onTTWhenChange()"></select>
+        <select class="form-select" id="tt-hour-inp" aria-label="시작 시간" onchange="onTTWhenChange()"></select>
+      </div>
+    </div>
+    <label for="tt-span-inp" class="section-label" style="display:block;">수업 길이</label>
     <select class="form-select" id="tt-span-inp" style="width:100%;margin-bottom:12px;">
       <option value="1">1시간</option>
     </select>
     <div class="section-label">색상 선택</div>
     <div class="color-opts" id="tt-color-opts"></div>
+    <div class="tt-edit-hint" id="tt-edit-hint" style="display:none;">수업명·요일·시간을 바꾸면 이 반에 배정된 학생도 새 반으로 함께 옮겨져요. (지난 수업카드 기록은 그대로 남아요)</div>
     <div class="modal-row">
       <button class="btn-primary" style="flex:1;" onclick="saveTTCell()">저장</button>
       <button class="btn-secondary" style="flex:1;" onclick="closeTTModal()">취소</button>
+    </div>
+    <div class="modal-row" id="tt-del-row" style="display:none;">
+      <button class="btn-danger" style="flex:1;" onclick="deleteTTFromModal()">이 수업 삭제</button>
     </div>
   </div>
 </div>
@@ -1794,7 +1818,7 @@ function renderTimetable() {
         const endH=String(parseInt(h,10)+span).padStart(2,'0')+':00';
         const rowspanAttr=span>1?` rowspan="${span}"`:'';
         const rangeHtml=span>1?`<span class="tt-span-range">${h}~${endH}</span>`:'';
-        html+=`<td${rowspanAttr}><div class="tt-cell${span>1?' tt-span':''}" style="background:${cell.bg};color:${cell.fg};" onclick="deleteTTCell('${key}')">${esc(cell.label)}${rangeHtml}<span class="tt-del">✕</span></div></td>`;
+        html+=`<td${rowspanAttr}><div class="tt-cell${span>1?' tt-span':''}" style="background:${cell.bg};color:${cell.fg};" onclick="openTTEdit('${key}')" role="button" tabindex="0" aria-label="${esc(cell.label)} 수정" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTTEdit('${key}');}">${esc(cell.label)}${rangeHtml}<span class="tt-del" aria-hidden="true">✎</span></div></td>`;
       } else {
         html+=`<td><button class="tt-add" onclick="openTTModal('${d}','${h}')">+</button></td>`;
       }
@@ -1804,49 +1828,197 @@ function renderTimetable() {
   html+='</tbody>'; tbl.innerHTML=html;
   ttRendered=true;
 }
+/* ── 시간표 추가 · 수정 · 삭제 ──
+   ttPending = { mode:'add'|'edit', day, hour, key? }
+   수정 모드에서는 요일·시작시간·길이·수업명·색상을 모두 바꿀 수 있다.
+   반 이름(요일+시간+수업명)이 바뀌면 그 반 학생의 배정도 함께 옮긴다. */
+function ttKeyParts(key){
+  const dash = key.indexOf('-');
+  return { day: dash >= 0 ? key.slice(0, dash) : key, hour: dash >= 0 ? key.slice(dash+1) : '' };
+}
+// (day, 시간 칸 idx)를 다른 수업이 쓰고 있는지 — excludeKey 수업은 무시
+function ttSlotBusy(day, idx, excludeKey){
+  for (let j = 0; j <= idx; j++) {
+    const k = `${day}-${HOURS[j]}`;
+    if (k === excludeKey) continue;
+    const c = ttData[k];
+    if (c && j + ttSpan(c) > idx) return true;
+  }
+  return false;
+}
+function ttMaxSpan(day, hour, excludeKey){
+  const startIdx = HOURS.indexOf(hour);
+  if (startIdx < 0) return 1;
+  let maxSpan = HOURS.length - startIdx;
+  for (let k = 1; k < maxSpan; k++) { if (ttSlotBusy(day, startIdx + k, excludeKey)) { maxSpan = k; break; } }
+  return maxSpan;
+}
+function ttFillSpanOptions(day, hour, excludeKey, wanted){
+  const maxSpan = ttMaxSpan(day, hour, excludeKey);
+  let spanOpts = '';
+  for (let s = 1; s <= maxSpan; s++) { const eh = String(parseInt(hour,10)+s).padStart(2,'0')+':00'; spanOpts += `<option value="${s}">${s}시간 (${hour}~${eh})</option>`; }
+  const spanSel = document.getElementById('tt-span-inp');
+  spanSel.innerHTML = spanOpts;
+  spanSel.value = String(Math.min(Math.max(wanted || 1, 1), maxSpan));
+}
+function ttFillColors(bg){
+  let sel = COLORS.indexOf(bg); if (sel < 0) sel = 0;
+  selColor = COLORS[sel];
+  document.getElementById('tt-color-opts').innerHTML = COLORS.map((c,i)=>`<div class="color-opt ${i===sel?'sel':''}" style="background:${c};border:2px solid ${COLORS_DARK[i]};" data-idx="${i}" role="button" tabindex="0" aria-label="색상 ${i+1}" onclick="selectTTColor(${i},this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectTTColor(${i},this);}"></div>`).join('');
+}
+function ttSetMode(mode){
+  const edit = mode === 'edit';
+  document.getElementById('tt-modal-title').textContent = edit ? '수업 수정' : '수업 추가';
+  document.getElementById('tt-when-wrap').style.display = edit ? '' : 'none';
+  document.getElementById('tt-edit-hint').style.display = edit ? '' : 'none';
+  document.getElementById('tt-del-row').style.display = edit ? '' : 'none';
+}
 window.openTTModal=(day,hour)=>{
-  ttPending={day,hour}; selColor=COLORS[0];
-  const opts=document.getElementById('tt-color-opts');
-  opts.innerHTML=COLORS.map((c,i)=>`<div class="color-opt ${i===0?'sel':''}" style="background:${c};border:2px solid ${COLORS_DARK[i]};" data-idx="${i}" onclick="selectTTColor(${i},this)"></div>`).join('');
-  const startIdx=HOURS.indexOf(hour);
-  let maxSpan=HOURS.length-startIdx;
-  for(let k=1;k<maxSpan;k++){ if(ttData[`${day}-${HOURS[startIdx+k]}`]){ maxSpan=k; break; } }
-  const spanSel=document.getElementById('tt-span-inp');
-  let spanOpts='';
-  for(let s=1;s<=maxSpan;s++){ const eh=String(parseInt(hour,10)+s).padStart(2,'0')+':00'; spanOpts+=`<option value="${s}">${s}시간 (${hour}~${eh})</option>`; }
-  spanSel.innerHTML=spanOpts;
-  spanSel.value='1';
+  ttPending = { mode:'add', day, hour };
+  ttSetMode('add');
+  ttFillColors(COLORS[0]);
+  ttFillSpanOptions(day, hour, null, 1);
   document.getElementById('tt-class-inp').value='';
   document.getElementById('tt-modal').classList.add('open');
 };
+// 수정 모드: 시작 시간 목록(다른 수업이 차지한 칸은 비활성)
+function ttFillHourOptions(day, excludeKey, wantedHour){
+  const hourSel = document.getElementById('tt-hour-inp');
+  hourSel.innerHTML = HOURS.map((h,i) => {
+    const busy = ttSlotBusy(day, i, excludeKey);
+    return `<option value="${h}"${busy?' disabled':''}>${h}${busy?' (다른 수업)':''}</option>`;
+  }).join('');
+  const ok = HOURS.indexOf(wantedHour) >= 0 && !ttSlotBusy(day, HOURS.indexOf(wantedHour), excludeKey);
+  if (ok) hourSel.value = wantedHour;
+  else {
+    const free = HOURS.find((h,i) => !ttSlotBusy(day, i, excludeKey));
+    hourSel.value = free || '';
+  }
+  return hourSel.value;
+}
+window.openTTEdit = key => {
+  const cell = ttData[key];
+  if (!cell) return;
+  const { day, hour } = ttKeyParts(key);
+  ttPending = { mode:'edit', key, day, hour };
+  ttSetMode('edit');
+  document.getElementById('tt-class-inp').value = cell.label || '';
+  document.getElementById('tt-day-inp').innerHTML = DAYS.map(d => `<option value="${d}">${d}요일</option>`).join('');
+  document.getElementById('tt-day-inp').value = day;
+  ttFillHourOptions(day, key, hour);
+  ttFillSpanOptions(day, hour, key, ttSpan(cell));
+  ttFillColors(cell.bg);
+  document.getElementById('tt-modal').classList.add('open');
+};
+window.onTTWhenChange = () => {
+  if (!ttPending || ttPending.mode !== 'edit') return;
+  const day = document.getElementById('tt-day-inp').value;
+  const wantedHour = document.getElementById('tt-hour-inp').value;
+  const hour = ttFillHourOptions(day, ttPending.key, wantedHour);
+  const curSpan = parseInt(document.getElementById('tt-span-inp').value, 10) || 1;
+  if (!hour) { document.getElementById('tt-span-inp').innerHTML = ''; return; }
+  ttFillSpanOptions(day, hour, ttPending.key, curSpan);
+};
 window.selectTTColor=(idx,el)=>{ selColor=COLORS[idx]; document.querySelectorAll('.color-opt').forEach(c=>c.classList.remove('sel')); el.classList.add('sel'); };
+
+// 반 이름이 바뀌면 학생 배정(classNames / classIds / classes)도 새 반으로 옮긴다
+async function ttMoveStudents(oldKey, oldName, newKey, newName){
+  if (oldKey === newKey && oldName === newName) return 0;
+  const list = await fetchStudents(true);
+  const jobs = [];
+  list.forEach(s => {
+    const cn  = Array.isArray(s.classNames) ? s.classNames.map(String) : null;
+    const ids = Array.isArray(s.classIds) ? s.classIds.map(String) : null;
+    const map = (s.classes && typeof s.classes === 'object') ? s.classes : null;
+    const hasName = !!(cn && cn.includes(oldName));
+    const hasId   = !!((ids && ids.includes(oldKey)) || (map && Object.prototype.hasOwnProperty.call(map, oldKey)));
+    if (!hasName && !hasId) return;
+    const patch = {};
+    if (cn) {
+      const next = [];
+      cn.forEach(c => { const v = (c === oldName) ? newName : c; if (!next.includes(v)) next.push(v); });
+      if (hasId && !next.includes(newName)) next.push(newName);
+      patch.classNames = next;
+    } else if (hasId) {
+      patch.classNames = [newName];
+    }
+    if (ids) {
+      const nextIds = [];
+      ids.forEach(i => { const v = (i === oldKey) ? newKey : i; if (!nextIds.includes(v)) nextIds.push(v); });
+      if (hasName && !nextIds.includes(newKey)) nextIds.push(newKey);
+      patch.classIds = nextIds;
+    }
+    if (map) {
+      const nextMap = {};
+      Object.keys(map).forEach(k => { if (k !== oldKey) nextMap[k] = map[k]; });
+      if (hasName || hasId) nextMap[newKey] = newName;
+      patch.classes = nextMap;
+    }
+    jobs.push(updateDoc(doc(db,'students',s.fireId || s.id), patch));
+  });
+  await Promise.all(jobs);
+  if (jobs.length) await fetchStudents(true);
+  return jobs.length;
+}
+
+let ttSaving = false;
 window.saveTTCell = async () => {
-  if(!ttPending) return;
+  if(!ttPending || ttSaving) return;
   const label=document.getElementById('tt-class-inp').value.trim(); if(!label) return alert('수업명을 입력하세요');
+  const isEdit = ttPending.mode === 'edit';
+  const oldKey = isEdit ? ttPending.key : null;
+  const day  = isEdit ? document.getElementById('tt-day-inp').value  : ttPending.day;
+  const hour = isEdit ? document.getElementById('tt-hour-inp').value : ttPending.hour;
+  const startIdx=HOURS.indexOf(hour);
+  if (!day || startIdx < 0) return alert('요일과 시작 시간을 선택하세요');
   let span=parseInt(document.getElementById('tt-span-inp').value,10); if(!span||span<1) span=1;
-  const startIdx=HOURS.indexOf(ttPending.hour);
+  if (ttSlotBusy(day, startIdx, oldKey)) return alert('그 시간에는 이미 다른 수업이 있습니다.');
   for(let k=1;k<span;k++){
     if(startIdx+k>=HOURS.length){ return alert('시간표 범위를 벗어납니다'); }
-    if(ttData[`${ttPending.day}-${HOURS[startIdx+k]}`]){ return alert('겹치는 수업이 있습니다. 길이를 줄여주세요.'); }
+    if(ttSlotBusy(day, startIdx+k, oldKey)){ return alert('겹치는 수업이 있습니다. 길이를 줄여주세요.'); }
   }
-  const idx=COLORS.indexOf(selColor), fg=COLORS_DARK[idx>=0?idx:0], key=`${ttPending.day}-${ttPending.hour}`;
+  const idx=COLORS.indexOf(selColor), fg=COLORS_DARK[idx>=0?idx:0], key=`${day}-${hour}`;
+  const data = {label,bg:selColor,fg,span};
+  ttSaving = true;
   try {
-    await setDoc(doc(db,'timetable',key),{label,bg:selColor,fg,span});
-    ttData[key]={label,bg:selColor,fg,span};
+    let moved = 0;
+    if (isEdit) {
+      const old = ttData[oldKey] || {};
+      const op = ttKeyParts(oldKey);
+      const oldName = fmtClassName(op.day, op.hour, String(old.label||'').trim());
+      const newName = fmtClassName(day, hour, label);
+      await setDoc(doc(db,'timetable',key), data);
+      if (key !== oldKey) await deleteDoc(doc(db,'timetable',oldKey));
+      if (key !== oldKey) delete ttData[oldKey];
+      ttData[key] = data;
+      try { moved = await ttMoveStudents(oldKey, oldName, key, newName); }
+      catch(e) { alert('시간표는 수정됐지만 학생 반 배정 이동에 실패했습니다: '+e.message+'\n반별 명단의 "반 이름 옮기기"로 직접 옮겨 주세요.'); }
+    } else {
+      await setDoc(doc(db,'timetable',key), data);
+      ttData[key] = data;
+    }
     invalidateClassList();
     closeTTModal(); renderTimetable(); refreshClassSelectors();
+    if (moved) { loadStudentList(); if (document.getElementById('classroom-body')) loadClassrooms(); }
   }
   catch(e) { alert('저장 실패: '+e.message); }
+  finally { ttSaving = false; }
 };
 window.deleteTTCell = async key => {
-  if(!confirm('삭제할까요?')) return;
+  if(!confirm('삭제할까요?')) return false;
   try {
     await deleteDoc(doc(db,'timetable',key));
     delete ttData[key];
     invalidateClassList();
     renderTimetable(); refreshClassSelectors();
+    return true;
   }
-  catch(e) { alert('삭제 실패: '+e.message); }
+  catch(e) { alert('삭제 실패: '+e.message); return false; }
+};
+window.deleteTTFromModal = async () => {
+  if (!ttPending || ttPending.mode !== 'edit') return;
+  const ok = await deleteTTCell(ttPending.key);
+  if (ok) closeTTModal();
 };
 window.closeTTModal=()=>{ document.getElementById('tt-modal').classList.remove('open'); ttPending=null; };
 
