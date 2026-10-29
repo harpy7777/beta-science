@@ -448,6 +448,27 @@ button { -webkit-user-select:none; user-select:none; }
   .add-row .add-btn { flex:1 1 100%; }
   .ex-title { font-size:13px; }
 }
+/* ── 보낸 클리닉 목록 10개씩 쪽 나누기 (2026-10 추가) ── */
+.lrow[hidden] { display:none; }
+.pager { display:flex; align-items:center; justify-content:center; gap:4px; flex-wrap:wrap; margin-top:.9rem; }
+.pager[hidden] { display:none; }
+.pg-info { flex-basis:100%; text-align:center; font-size:12px; color:var(--mt); margin-bottom:6px; font-variant-numeric:tabular-nums; }
+.pg-btn { min-width:40px; height:40px; padding:0 11px; border:1px solid var(--bd); background:var(--wh); color:var(--chip-tx); border-radius:9px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; font-variant-numeric:tabular-nums;
+  transition: background-color .15s var(--ease), color .15s var(--ease), transform .12s var(--ease); }
+.pg-btn:hover { background:var(--p-lt); color:var(--p); }
+.pg-btn:active { transform:scale(.95); }
+.pg-btn[aria-current="page"] { background:var(--p); border-color:var(--p); color:#fff; }
+.pg-btn:disabled { opacity:.4; cursor:default; transform:none; background:var(--wh); color:var(--chip-tx); }
+.pg-gap { color:var(--mt); font-size:13px; padding:0 3px; }
+.pg-mid { display:none; font-size:13.5px; font-weight:800; color:var(--tx); font-variant-numeric:tabular-nums; padding:0 6px; }
+@media (max-width: 520px) {
+  /* 휴대폰: [이전] 2 / 5쪽 [다음] 한 줄로 */
+  .pager { justify-content:space-between; flex-wrap:nowrap; gap:8px; }
+  .pg-info { display:none; }
+  .pg-num, .pg-gap { display:none; }
+  .pg-mid { display:block; text-align:center; flex:1 1 auto; }
+  .pg-btn.pg-arrow { flex:0 0 auto; min-width:84px; height:44px; }
+}
 @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
 </style>
 <script>(function(){if(new URLSearchParams(location.search).get('student')!=='1')return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
@@ -1716,6 +1737,93 @@ onAuthStateChanged(auth, async user=>{
     bar.scrollLeft += e.deltaY;
     if(bar.scrollLeft !== before) e.preventDefault();   // 실제로 움직였을 때만 기본동작 차단
   }, { passive:false });
+})();
+</script>
+<!-- ★ 보낸 클리닉 목록 10개씩 쪽 나누기 (2026-10 추가)
+     위쪽 기능 코드는 건드리지 않는다. 목록(#list)에 줄이 그려지면
+     그걸 보고 10개씩만 보이게 숨기고, 아래에 쪽 버튼을 붙인다.
+     · 새 클리닉을 만들어 개수가 늘면 → 1쪽으로 (방금 만든 게 맨 위)
+     · 삭제로 줄면 → 보던 쪽 유지 (쪽이 사라지면 마지막 쪽으로) -->
+<script>
+(function(){
+  var PER = 10;
+  var list = document.getElementById('list');
+  if(!list) return;
+  var page = 1, prevTotal = 0;
+  var nav = document.createElement('nav');
+  nav.className = 'pager'; nav.hidden = true;
+  nav.setAttribute('aria-label', '보낸 클리닉 목록 쪽');
+  list.parentNode.insertBefore(nav, list.nextSibling);
+
+  function rows(){
+    return Array.prototype.filter.call(list.children, function(e){ return e.classList && e.classList.contains('lrow'); });
+  }
+  function btn(label, cls, onClick, aria){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'pg-btn' + (cls ? ' ' + cls : ''); b.textContent = label;
+    if(aria) b.setAttribute('aria-label', aria);
+    b.addEventListener('click', onClick);
+    return b;
+  }
+  function go(n){
+    page = n; render(false);
+    var r = list.getBoundingClientRect();
+    if(r.top < 60) window.scrollBy({ top: r.top - 90, behavior: 'smooth' });
+  }
+  function pageNums(total){
+    if(total <= 7){ var a=[]; for(var i=1;i<=total;i++) a.push(i); return a; }
+    var s = [1], from = Math.max(2, page - 1), to = Math.min(total - 1, page + 1);
+    if(page <= 3){ from = 2; to = 4; }
+    if(page >= total - 2){ from = total - 3; to = total - 1; }
+    if(from > 2) s.push('…');
+    for(var j=from;j<=to;j++) s.push(j);
+    if(to < total - 1) s.push('…');
+    s.push(total);
+    return s;
+  }
+  function render(fromList){
+    var r = rows(), total = r.length;
+    if(fromList){
+      if(total > prevTotal) page = 1;
+      prevTotal = total;
+    }
+    var pages = Math.max(1, Math.ceil(total / PER));
+    if(page > pages) page = pages;
+    if(page < 1) page = 1;
+    var start = (page - 1) * PER, end = start + PER;
+    r.forEach(function(e, i){ e.hidden = !(i >= start && i < end); });
+
+    nav.innerHTML = '';
+    if(total <= PER){ nav.hidden = true; return; }
+    nav.hidden = false;
+
+    var info = document.createElement('div');
+    info.className = 'pg-info';
+    info.textContent = '총 ' + total + '개 중 ' + (start + 1) + '–' + Math.min(end, total) + '번째';
+    nav.appendChild(info);
+
+    var prev = btn('‹ 이전', 'pg-arrow', function(){ if(page > 1) go(page - 1); }, '이전 쪽');
+    prev.disabled = page <= 1;
+    nav.appendChild(prev);
+
+    pageNums(pages).forEach(function(n){
+      if(n === '…'){ var g = document.createElement('span'); g.className = 'pg-gap'; g.textContent = '…'; nav.appendChild(g); return; }
+      var b = btn(String(n), 'pg-num', function(){ go(n); }, n + '쪽');
+      if(n === page) b.setAttribute('aria-current', 'page');
+      nav.appendChild(b);
+    });
+
+    var mid = document.createElement('span');
+    mid.className = 'pg-mid';
+    mid.textContent = page + ' / ' + pages + '쪽';
+    nav.appendChild(mid);
+
+    var next = btn('다음 ›', 'pg-arrow', function(){ if(page < pages) go(page + 1); }, '다음 쪽');
+    next.disabled = page >= pages;
+    nav.appendChild(next);
+  }
+  new MutationObserver(function(){ render(true); }).observe(list, { childList: true });
+  render(true);
 })();
 </script>
 </body>
