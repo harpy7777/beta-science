@@ -22,6 +22,7 @@
 <meta name="twitter:title" content="우리 아이 과학 학습 리포트" />
 <meta name="twitter:description" content="수업 내용과 시험 결과를 한눈에 확인하세요." />
 <meta name="twitter:image" content="https://beta-science.vercel.app/og-parent.png" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -98,7 +99,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text'
 .student-chips-m{display:flex;gap:8px;flex-wrap:nowrap;align-items:center;overflow-x:auto}
 .student-chips-m::-webkit-scrollbar{display:none}
 
-/* ══ 모바일 탭 (4칸) ══ */
+/* ══ 모바일 탭 (5칸) ══ */
 .mobile-tabs{
   position:fixed;bottom:0;left:0;right:0;
   background:var(--wh);border-top:1px solid var(--bd);
@@ -381,6 +382,116 @@ body {
   .mobile-header { padding-top: calc(16px + env(safe-area-inset-top)); }
 }
 @media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
+/* ════════════════════════════════════════════════════════════════
+   ★ 2026-10 — 새 화면 (흰 바탕 · 파랑 포인트 · 떠 있는 아래 탭)
+   ────────────────────────────────────────────────────────────────
+   · 폰 · 컴퓨터 모두 같은 한 줄 화면을 쓴다 (가운데 정렬, 폭 600px)
+   · 예전 분홍 머리글과 위쪽 탭은 숨긴다 (코드는 남겨 둠)
+   · 색 변수만 바꿔서 출결 · OX · 4지선다 · 마스터 탭도 같이 따라온다
+   · 움직임은 바뀌는 속성만 짧게(ease-out), 누르면 살짝 눌림
+════════════════════════════════════════════════════════════════ */
+:root{
+  --pink:#1d4fb8;--pink-lt:#eef3fc;--pink-dk:#163f94;
+  --bg:#f2f4f7;--wh:#fff;--tx:#1b2330;--mt:#8a94a3;--bd:#e4e8ee;
+  --chip:#edf0f4;--chip-tx:#5d6878;
+  --due:#fdecec;--due-tx:#b42318;
+  --blue-chip:#dce8fb;--blue-chip-tx:#1d4fb8;
+}
+body{font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);letter-spacing:-.01em}
+.desktop-only{display:none!important}
+.mobile-only{display:block!important}
+body{padding-bottom:calc(104px + env(safe-area-inset-bottom))!important}
+
+/* 머리줄 */
+.nv-top{position:sticky;top:0;z-index:150;background:rgba(255,255,255,.94);-webkit-backdrop-filter:saturate(1.4) blur(10px);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--bd);padding-top:env(safe-area-inset-top)}
+.nv-top-in{max-width:600px;margin:0 auto;display:flex;align-items:center;gap:11px;padding:12px max(16px,env(safe-area-inset-right)) 12px max(16px,env(safe-area-inset-left))}
+.nv-av{width:40px;height:40px;border-radius:50%;background:var(--blue-chip);color:var(--blue-chip-tx);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0}
+.nv-who{display:flex;flex-direction:column;gap:1px;min-width:0}
+.nv-who small{font-size:11px;font-weight:700;color:var(--pink)}
+.nv-who b{font-size:15px;font-weight:800;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nv-who b span{font-weight:600;color:var(--chip-tx);margin-left:3px}
+
+/* 인사 카드 */
+.nv-hello{background:#e9edf2;border-radius:20px;padding:16px 18px 17px;margin:14px 0 14px}
+.nv-hello small{display:block;font-size:12px;font-weight:700;color:var(--pink);margin-bottom:4px}
+.nv-hello h1{font-size:23px;font-weight:800;color:var(--tx);line-height:1.3;text-wrap:balance;word-break:keep-all}
+
+.mobile-body{max-width:600px!important;padding-top:0!important}
+.section{padding-top:0!important}
+.section>br:first-child{display:none}
+.section:not(#secHome){padding-top:16px!important}
+#secHome{padding-top:0}
+
+/* 홈 칸 (숙제 · 테스트 · 메모) */
+.nv-card{background:var(--wh);border-radius:20px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.nv-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 16px 14px 18px;background:#f6f8fa;border-bottom:1px solid var(--bd)}
+.nv-head h2{font-size:16px;font-weight:800;color:var(--tx);line-height:1.3}
+.nv-head p{font-size:12.5px;color:var(--chip-tx);margin-top:3px;line-height:1.4;word-break:keep-all}
+.nv-all{flex-shrink:0;font-family:inherit;font-size:13px;font-weight:700;color:var(--pink);background:var(--wh);border:1px solid #c9d3e0;border-radius:999px;padding:10px 16px;cursor:pointer;transition:background-color .15s ease-out,transform .12s ease-out}
+.nv-all:hover{background:var(--pink-lt)}
+.nv-all:active{transform:scale(.96)}
+.nv-row{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;padding:16px 16px 16px 18px;background:none;border:none;border-top:1px solid var(--bd);font-family:inherit;color:inherit;cursor:pointer;transition:background-color .15s ease-out}
+.nv-row:first-child{border-top:none}
+.nv-row:hover{background:#fafbfc}
+.nv-row:active{background:var(--pink-lt)}
+.nv-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.nv-tt{font-size:15px;font-weight:700;color:var(--tx);line-height:1.45;word-break:keep-all;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.nv-chips{display:flex;flex-wrap:wrap;gap:6px}
+.nv-chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--chip-tx);background:var(--chip);border-radius:10px;padding:6px 10px;line-height:1.2;white-space:nowrap}
+.nv-chip b{font-size:13.5px;font-weight:800;color:var(--tx)}
+.nv-chip.blue{background:var(--blue-chip);color:var(--blue-chip-tx)}
+.nv-chip.blue b{color:#10285e}
+.nv-chip.bad{background:var(--due);color:var(--due-tx)}
+.nv-chip.bad b{color:var(--due-tx)}
+.nv-chip.mid{background:#fff4dc;color:#a15c07}
+.nv-chip.mid b{color:#a15c07}
+.nv-chip.good{background:#e3f6ec;color:#0f7a4a}
+.nv-chip.good b{color:#0f7a4a}
+.nv-note{font-size:12.5px;color:var(--chip-tx);line-height:1.5;word-break:keep-all}
+.nv-side{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-top:2px}
+.nv-pill{font-size:11.5px;font-weight:800;padding:5px 10px;border-radius:8px;white-space:nowrap;line-height:1.2}
+.nv-pill.now{background:var(--blue-chip);color:var(--blue-chip-tx)}
+.nv-pill.re{background:var(--due);color:var(--due-tx)}
+.nv-pill.sc-high{background:#e3f6ec;color:#0f7a4a}
+.nv-pill.sc-mid{background:#fff4dc;color:#a15c07}
+.nv-pill.sc-low{background:var(--due);color:var(--due-tx)}
+.nv-pill.sc-none{background:var(--chip);color:var(--chip-tx)}
+.nv-empty{padding:22px 18px;font-size:13.5px;color:var(--mt);text-align:center;line-height:1.7;word-break:keep-all}
+.nv-memo{padding:16px 18px 18px;font-size:14px;line-height:1.85;color:var(--tx);white-space:pre-wrap;word-break:break-word}
+.nv-row:focus-visible,.nv-all:focus-visible,.m-tab:focus-visible{outline:2px solid var(--pink);outline-offset:-2px}
+
+/* 아래 탭 — 떠 있는 둥근 바 */
+.mobile-tabs{left:50%!important;right:auto!important;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom))!important;width:calc(100% - 20px);max-width:580px;border:1px solid var(--bd)!important;border-radius:24px;padding:6px!important;gap:2px;box-shadow:0 8px 28px rgba(16,24,40,.12)!important;background:rgba(255,255,255,.97)!important}
+.m-tab{border-radius:18px;min-height:58px!important;gap:4px!important;color:#5d6878!important;transition:background-color .15s ease-out,color .15s ease-out,transform .12s ease-out!important}
+.m-tab.active{background:var(--blue-chip)!important;color:var(--pink)!important}
+.m-tab:active{transform:scale(.95)}
+.m-tab-icon{display:flex;transform:none!important}
+.m-tab-icon svg{width:22px;height:22px}
+.m-tab-lbl{font-size:11px!important;font-weight:700!important}
+
+/* 다른 탭들이 분홍 테두리를 쓰던 곳 */
+.stat-box{border-color:#dbe4f3}
+.ls-card.latest{border-color:#c9d7f0;box-shadow:0 2px 12px rgba(29,79,184,.06)}
+.ls-card.fbonly{border-color:#dbe4f3;background:#fbfcfe}
+.ls-fb{border-color:#dbe4f3}
+.ls-unit{border-color:#dbe4f3}
+.sc-badge{border-color:#dbe4f3}
+.ls-card,.at-flow,.test-item,.tr-wrap,.empty-box{border-radius:18px}
+
+@media(max-width:380px){
+  .nv-hello h1{font-size:21px}
+  .nv-head{padding:14px 12px 12px 14px}
+  .nv-row{padding:14px 12px 14px 14px;gap:9px}
+  .nv-tt{font-size:14.5px}
+  .nv-chip{font-size:11.5px;padding:5px 8px}
+  .nv-chip b{font-size:12.5px}
+  .nv-all{padding:9px 12px;font-size:12.5px}
+  .m-tab-lbl{font-size:10px!important}
+}
+@media(min-width:769px){
+  .nv-hello{margin-top:20px}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
 </style>
 <script>(function(){var _p=new URLSearchParams(location.search);if(_p.get('student')!=='1'&&!_p.get('t'))return;var here=location.pathname;function cross(a){var raw=a.getAttribute('href');if(!raw||raw.charAt(0)==='#')return false;if(/^(javascript:|mailto:|tel:|sms:)/i.test(raw.trim()))return false;try{return new URL(a.href,location.href).pathname!==here;}catch(e){return false;}}function lock(){document.querySelectorAll('a[href]').forEach(function(a){if(!cross(a))return;a.removeAttribute('href');a.style.pointerEvents='none';a.style.cursor='default';a.setAttribute('aria-disabled','true');});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',lock);else lock();document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('a[href]'):null;if(a&&cross(a)){e.preventDefault();e.stopPropagation();}},true);})();</script></head>
 <body>
@@ -424,46 +535,34 @@ body {
       </div>
     </div>
     <nav class="desktop-tabs">
-      <button class="d-tab active" onclick="switchTab(0)">🗓 출결 · 수업내용</button>
-      <button class="d-tab" onclick="switchTab(1)">⭕ OX 퀴즈</button>
-      <button class="d-tab" onclick="switchTab(2)">📝 4지선다</button>
-      <button class="d-tab" onclick="switchTab(3)">🎯 마스터테스트</button>
+      <button class="d-tab active" onclick="switchTab(0)">🏠 홈</button>
+      <button class="d-tab" onclick="switchTab(1)">🗓 출결 · 수업내용</button>
+      <button class="d-tab" onclick="switchTab(2)">⭕ OX 퀴즈</button>
+      <button class="d-tab" onclick="switchTab(3)">📝 4지선다</button>
+      <button class="d-tab" onclick="switchTab(4)">🎯 마스터테스트</button>
     </nav>
     <div class="desktop-body" id="desktopContent"></div>
   </div>
 
   <!-- 모바일 -->
   <div class="mobile-only">
-    <div class="mobile-header">
-      <div class="mh-inner">
-        <div class="mh-top-row">
-          <div class="logo-row-m">
-            <div class="logo-icon-m">
-              <svg width="15" height="15" viewBox="0 0 18 18" fill="none">
-                <circle cx="9" cy="7" r="3" fill="rgba(255,255,255,0.95)"/>
-                <path d="M3.5 16c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5" stroke="rgba(255,255,255,0.95)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
-              </svg>
-            </div>
-            <span class="logo-name-m">인후쌤의 과학 수업 관리 시스템</span>
-          </div>
-          <div class="header-label-m">학생 개별 학습 리포트</div>
+    <header class="nv-top">
+      <div class="nv-top-in">
+        <div class="nv-av" id="nvAv" aria-hidden="true">·</div>
+        <div class="nv-who">
+          <small>학습 리포트</small>
+          <b><span id="hNameM" style="margin:0;color:inherit;font-weight:inherit">—</span><span>학생</span></b>
         </div>
-        <div class="header-divider"></div>
-        <div class="name-row-m">
-          <div class="student-name-m" id="hNameM">—</div>
-          <div class="student-chips-m">
-            <span class="s-chip" id="hGradeM" style="display:none"></span>
-            <span class="s-chip" id="hSubjectM" style="display:none"></span>
-          </div>
-        </div>
+        <span hidden><span id="hGradeM"></span><span id="hSubjectM"></span></span>
       </div>
-    </div>
+    </header>
     <div class="mobile-body" id="mobileContent"></div>
-    <nav class="mobile-tabs">
-      <button class="m-tab active" onclick="switchTab(0)"><span class="m-tab-icon">🗓</span><span class="m-tab-lbl">출결·수업</span></button>
-      <button class="m-tab" onclick="switchTab(1)"><span class="m-tab-icon">⭕</span><span class="m-tab-lbl">OX퀴즈</span></button>
-      <button class="m-tab" onclick="switchTab(2)"><span class="m-tab-icon">📝</span><span class="m-tab-lbl">4지선다</span></button>
-      <button class="m-tab" onclick="switchTab(3)"><span class="m-tab-icon">🎯</span><span class="m-tab-lbl">마스터</span></button>
+    <nav class="mobile-tabs" aria-label="화면 이동">
+      <button class="m-tab active" onclick="switchTab(0)"><span class="m-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V19a1 1 0 0 1-1 1H15v-5.5H9V20H4.5a1 1 0 0 1-1-1z"/></svg></span><span class="m-tab-lbl">홈</span></button>
+      <button class="m-tab" onclick="switchTab(1)"><span class="m-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg></span><span class="m-tab-lbl">출결·수업</span></button>
+      <button class="m-tab" onclick="switchTab(2)"><span class="m-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="12" r="4"/><path d="m14 8 7 8M21 8l-7 8"/></svg></span><span class="m-tab-lbl">OX</span></button>
+      <button class="m-tab" onclick="switchTab(3)"><span class="m-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="3.5" width="15" height="17" rx="2.5"/><path d="M8.5 8.5h7M8.5 12.5h7M8.5 16.5h4"/></svg></span><span class="m-tab-lbl">4지선다</span></button>
+      <button class="m-tab" onclick="switchTab(4)"><span class="m-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg></span><span class="m-tab-lbl">마스터</span></button>
     </nav>
   </div>
 
@@ -495,8 +594,10 @@ const portalQuery=portalToken?('t='+encodeURIComponent(portalToken))
   :(legacyId?('id='+encodeURIComponent(legacyId)):'');
 if(!portalQuery){showError('link');}else{loadPortal(portalQuery);}
 
-/* 탭 4개 — 출결·수업 / OX퀴즈 / 4지선다 / 마스터테스트 */
-const TAB_COUNT=4;
+/* 탭 5개 — 홈 / 출결·수업 / OX퀴즈 / 4지선다 / 마스터테스트
+   ★ 2026-10 — 맨 앞에 홈 탭 추가. 탭 번호가 하나씩 뒤로 밀렸다. */
+const TAB_COUNT=5;
+const TAB_HOME=0,TAB_LESSON=1,TAB_OX=2,TAB_MC=3,TAB_MASTER=4;
 
 /* ════════════════════════════════════════════════════════════════
    ★ 슬롯(slot) — 같은 날 본수업과 보강을 따로 담는다
@@ -519,7 +620,15 @@ function flagOn(v){return v===1||v===true;}
 
 function buildSections(){
   return`
-  <div class="section active" id="sec0">
+  <div class="section active" id="secHome">
+    <div class="nv-hello"><small class="nvMeta">인후쌤의 과학수업</small><h1 class="nvHello">안녕하세요</h1></div>
+    <div class="at-enroll" id="at-enroll"></div>
+    <div id="hmTodo"></div>
+    <div id="hmTests"></div>
+    <div id="hmMemo"></div>
+  </div>
+
+  <div class="section" id="sec0">
     <br>
     <div class="at-enroll" id="at-enroll"></div>
     <div class="stat-row at4">
@@ -595,16 +704,29 @@ async function loadPortal(qs){
     const student={fireId:data.student.__id,...data.student};
     ['hNameD','hNameM'].forEach(id=>document.getElementById(id).textContent=student.name||'학생');
     document.title=`${student.name||'학생'} 개별 학습 리포트 - 인후쌤의 과학 수업 관리 시스템`;
+    let nvHello='안녕하세요',nvMeta='인후쌤의 과학수업';
+    {
+      const nm=String(student.name||'학생');
+      const av=document.getElementById('nvAv');if(av)av.textContent=nm.charAt(0);
+      nvHello='안녕하세요, '+nm;
+      const meta=['인후쌤의 과학수업'];
+      if(student.grade)meta.push(String(student.grade));
+      nvMeta=meta.join(' · ');
+    }
     if(student.grade){['hGradeD','hGradeM'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=student.grade;el.style.display='inline';}})}
     if(student.subject&&student.subject!=='-'){['hSubjectD','hSubjectM'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=student.subject;el.style.display='inline';}})}
     const html=buildSections();
     document.getElementById('desktopContent').innerHTML=html;
     document.getElementById('mobileContent').innerHTML=html;
+    document.querySelectorAll('.nvHello').forEach(el=>el.textContent=nvHello);
+    document.querySelectorAll('.nvMeta').forEach(el=>el.textContent=nvMeta);
     document.getElementById('loadingScreen').style.display='none';
     document.getElementById('portalApp').style.display='block';
+    const fbList=parseFbEntries(data.feedback);
     renderAttendance(student);
     renderGrades(data.grades);
-    renderLessons(student,parseFbEntries(data.feedback));
+    renderLessons(student,fbList);
+    renderHome(student,data.grades,fbList);
   }catch(err){showError('net');}
 }
 
@@ -1317,6 +1439,175 @@ function renderScoreCard(r,sec){
     </div>
   </div>`;
 }
+
+/* ════════════════════════════════════════════════════════════════
+   ★ 2026-10 — 홈 탭
+   ────────────────────────────────────────────────────────────────
+   새 데이터를 받지 않는다. 이미 오고 있는 것만 다시 묶어 보여준다.
+     · 이번 과제   = recentLessons 중 과제(h)가 있는 가장 최근 수업
+     · 숙제 보완   = 최근 수업 4회 중 숙제 체크(p)가 미완료 · 부분완료
+     · 다시 보기   = 최근 45일 테스트 중 정답률 60% 미만 (최대 3개)
+   숙제 '마감일 · 제출 여부'는 저장된 데이터가 없어 보여주지 않는다.
+   (숙제 체크 p 가 어느 날 내 준 숙제를 검사한 것인지는 저장되어 있지
+    않으므로, '그 수업 날 숙제 체크 결과'라고만 적는다)
+════════════════════════════════════════════════════════════════ */
+const HM_LOW=60;          // 이 정답률 아래면 '다시 보기'
+const HM_RECENT_DAYS=45;  // 테스트 칸 요약에 쓰는 기간
+const HM_HW_LOOK=4;       // 숙제 체크를 살필 최근 수업 수
+const HM_HW_MAX=3;        // 숙제 칸에 보여줄 과제 수
+const HM_TEST_MAX=3;      // 테스트 칸에 보여줄 수
+const HM_WD=['일','월','화','수','목','금','토'];
+
+/* '10월 27일 (화)' — 올해가 아니면 연도를 붙인다 */
+function hmDate(v){
+  const d=atYmd(v);if(!d)return String(v==null?'':v);
+  const y=new Date().getFullYear();
+  return(d.getFullYear()===y?'':d.getFullYear()+'년 ')+`${d.getMonth()+1}월 ${d.getDate()}일 (${HM_WD[d.getDay()]})`;
+}
+function hmDateMs(ms){
+  if(!ms)return'';
+  const d=new Date(ms);if(isNaN(d.getTime()))return'';
+  const ymd=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  return hmDate(ymd);
+}
+function hmRate(sec){
+  if(!sec)return null;
+  if(sec.rate!=null)return sec.rate;
+  return(sec.correct!=null&&sec.total)?Math.round(sec.correct/sec.total*100):null;
+}
+function hmScoreText(sec){
+  const rate=hmRate(sec);
+  if(sec&&sec.correct!=null&&sec.total!=null)return`${sec.correct} / ${sec.total}`;
+  return rate!=null?rate+'%':'—';
+}
+function hmScoreCls(rate){
+  return(rate==null)?'sc-none':(rate>=80?'sc-high':(rate>=60?'sc-mid':'sc-low'));
+}
+/* 시험 기록을 파트별(OX · 4지선다 · 마스터) 한 줄씩으로 편다 */
+function hmTestRows(rawGrades){
+  const rows=[];
+  (Array.isArray(rawGrades)?rawGrades:[]).forEach(raw=>{
+    const r=normalizeGrade(String((raw&&raw.__id)||''),raw||{});
+    const t=gradeTime(r);
+    [['OX 퀴즈',TAB_OX,oxOf(r)],['4지선다',TAB_MC,mcOf(r)],['마스터테스트',TAB_MASTER,masterOf(r)]].forEach(([kind,tab,sec])=>{
+      if(!sec)return;
+      rows.push({r,t,kind,tab,sec,rate:hmRate(sec)});
+    });
+  });
+  return rows.sort((a,b)=>b.t-a.t);
+}
+function hmLessons(student){
+  const raw=Array.isArray(student&&student.recentLessons)?student.recentLessons:[];
+  return raw.filter(x=>x&&atYmd(x.d))
+    .map(x=>({d:String(x.d),k:normSlot(x.k),s:atStatusOf(x),u:String(x.u||'').trim(),h:String(x.h||'').trim(),p:String(x.p||'').trim()}))
+    .sort(cmpSlot);
+}
+function hmHead(title,sub,tab,allLabel){
+  return`<div class="nv-head"><div><h2>${e(title)}</h2>${sub?`<p>${e(sub)}</p>`:''}</div>${tab!=null?`<button type="button" class="nv-all" data-go="${tab}" aria-label="${e(allLabel)}">전체 보기</button>`:''}</div>`;
+}
+const HM_P_CLS={'완료':'good','부분완료':'mid','미완료':'bad'};
+
+/* ════════════════════════════════════════════════════════════════
+   ★ 2026-10 — 홈 탭 (참고 화면 구성: 먼저 할 숙제 → 테스트 → 메모)
+   ────────────────────────────────────────────────────────────────
+   새 데이터를 받지 않는다. 이미 오고 있는 것만 다시 묶는다.
+     · 숙제 칸  = recentLessons 중 과제(h)가 적힌 최근 수업 3개
+                 맨 위(가장 최근)에 '이번 과제' 표시
+                 그 수업 날 숙제 체크(p)가 있으면 칩으로 함께 표시
+     · 테스트 칸 = 최근 시험 3개, 정답률 60% 아래면 '다시 보기'
+   마감일 · 제출 여부는 저장된 데이터가 없어 보여주지 않는다.
+   (숙제 체크 p 는 '그 수업 날 검사한 결과'라고만 적는다)
+════════════════════════════════════════════════════════════════ */
+function renderHome(student,rawGrades,fbList){
+  /* ── 1) 먼저 할 숙제 ── */
+  try{
+    const lessons=hmLessons(student);
+    const recent=lessons.filter(x=>x.s!=='결석'&&x.s!=='휴강').slice(-HM_HW_LOOK);
+    const fix=recent.filter(x=>x.p==='미완료'||x.p==='부분완료').length;
+    const withHw=lessons.filter(x=>x.h).slice(-HM_HW_MAX).reverse();
+    let rows=withHw.map((x,i)=>{
+      const pc=HM_P_CLS[x.p]||'';
+      const chips=[`<span class="nv-chip">수업일 <b>${e(hmDate(x.d))}</b></span>`];
+      if(x.p)chips.push(`<span class="nv-chip ${pc}">그날 숙제 체크 <b>${e(x.p)}</b></span>`);
+      return`<button type="button" class="nv-row" data-go="${TAB_LESSON}" aria-label="${e(hmDate(x.d)+' 수업 과제, 수업 기록 보기')}">
+        <span class="nv-main">
+          <span class="nv-tt">${e(x.h)}</span>
+          <span class="nv-chips">${chips.join('')}</span>
+          ${x.u?`<span class="nv-note">${e(x.u)}</span>`:''}
+        </span>
+        ${i===0?'<span class="nv-side"><span class="nv-pill now">이번 과제</span></span>':''}
+      </button>`;
+    });
+    /* 수업 기록에 과제가 없으면 예전 lastHomework 를 쓴다 */
+    if(!rows.length){
+      const lh=(student&&student.lastHomework&&typeof student.lastHomework==='object')?student.lastHomework:null;
+      const t=lh?String(lh.text||'').trim():'';
+      if(t){
+        const d=atYmd(lh.date)?String(lh.date):'';
+        rows=[`<button type="button" class="nv-row" data-go="${TAB_LESSON}" aria-label="최근 과제, 수업 기록 보기">
+          <span class="nv-main"><span class="nv-tt">${e(t)}</span>${d?`<span class="nv-chips"><span class="nv-chip">수업일 <b>${e(hmDate(d))}</b></span></span>`:''}</span>
+          <span class="nv-side"><span class="nv-pill now">이번 과제</span></span>
+        </button>`];
+      }
+    }
+    const sub=fix?`최근 수업 ${recent.length}회 중 숙제 체크 미완료·부분완료 ${fix}회`:(recent.length?`최근 수업 ${recent.length}회 숙제 체크에서 밀린 것 없음`:'');
+    const html=`<section class="nv-card" aria-label="먼저 할 숙제">${hmHead('먼저 할 숙제',sub,TAB_LESSON,'수업 기록 전체 보기')}
+      ${rows.length?rows.join(''):'<div class="nv-empty">아직 적힌 과제가 없습니다.</div>'}</section>`;
+    document.querySelectorAll('#hmTodo').forEach(el=>el.innerHTML=html);
+  }catch(err){
+    document.querySelectorAll('#hmTodo').forEach(el=>el.innerHTML='<section class="nv-card"><div class="nv-empty">숙제를 불러오지 못했습니다.</div></section>');
+  }
+
+  /* ── 2) 테스트 ── */
+  try{
+    const all=hmTestRows(rawGrades);
+    const since=Date.now()-HM_RECENT_DAYS*86400000;
+    const recentN=all.filter(x=>x.t>=since).length;
+    const low=all.filter(x=>x.t>=since&&x.rate!=null&&x.rate<HM_LOW).length;
+    const rows=all.slice(0,HM_TEST_MAX);
+    const sub=all.length?`최근 ${HM_RECENT_DAYS}일 ${recentN}개 · 다시 볼 것 ${low}개`:'';
+    const allTab=rows.length?rows[0].tab:TAB_OX;
+    const body=rows.length?rows.map(x=>{
+      const nm=String(x.r.testName||x.r.subject||'테스트');
+      const dt=hmDateMs(x.t);
+      const low=x.rate!=null&&x.rate<HM_LOW;
+      return`<button type="button" class="nv-row" data-go="${x.tab}" aria-label="${e(nm+' '+x.kind+' 결과 보기')}">
+        <span class="nv-main">
+          <span class="nv-tt">${e(nm)}</span>
+          ${dt?`<span class="nv-chips"><span class="nv-chip blue">시험일 <b>${e(dt)}</b></span></span>`:''}
+          <span class="nv-note">${e(x.kind)}${x.rate!=null?` · 정답률 ${x.rate}%`:''}</span>
+        </span>
+        <span class="nv-side">
+          <span class="nv-pill ${hmScoreCls(x.rate)}">${e(hmScoreText(x.sec))}</span>
+          ${low?'<span class="nv-pill re">다시 보기</span>':''}
+        </span>
+      </button>`;
+    }).join(''):'<div class="nv-empty">아직 응시한 테스트가 없습니다.</div>';
+    const html=`<section class="nv-card" aria-label="테스트">${hmHead('테스트',sub,rows.length?allTab:null,'테스트 결과 전체 보기')}${body}</section>`;
+    document.querySelectorAll('#hmTests').forEach(el=>el.innerHTML=html);
+  }catch(err){
+    document.querySelectorAll('#hmTests').forEach(el=>el.innerHTML='<section class="nv-card"><div class="nv-empty">테스트를 불러오지 못했습니다.</div></section>');
+  }
+
+  /* ── 3) 선생님 메모 (가장 최근 1개) ── */
+  try{
+    const list=Array.isArray(fbList)?fbList:[];
+    const fb=list[0];
+    const sub=fb?((atYmd(fb.date)?hmDate(fb.date):'최근 메모')+(list.length>1?` · 지난 메모 ${list.length-1}개`:'')):'';
+    const html=`<section class="nv-card" aria-label="선생님 메모">${hmHead('선생님 메모',sub,fb&&list.length>1?TAB_LESSON:null,'지난 메모 전체 보기')}
+      ${fb?`<div class="nv-memo">${e(fb.text)}</div>`:'<div class="nv-empty">아직 남긴 메모가 없습니다.</div>'}</section>`;
+    document.querySelectorAll('#hmMemo').forEach(el=>el.innerHTML=html);
+  }catch(err){
+    document.querySelectorAll('#hmMemo').forEach(el=>el.innerHTML='<section class="nv-card"><div class="nv-empty">메모를 불러오지 못했습니다.</div></section>');
+  }
+}
+/* 홈의 줄을 누르면 해당 탭으로 이동 */
+document.addEventListener('click',ev=>{
+  const b=ev.target&&ev.target.closest?ev.target.closest('[data-go]'):null;
+  if(!b)return;
+  const n=Number(b.getAttribute('data-go'));
+  if(Number.isInteger(n)&&n>=0&&n<TAB_COUNT)window.switchTab(n);
+});
 
 function emptyBox(icon,msg){return`<div class="empty-box"><div class="empty-icon">${icon}</div>${msg}</div>`;}
 function showError(kind){
